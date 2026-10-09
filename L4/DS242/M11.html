@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="11" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التعامل مع بيانات جيسون (JSON) · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M10.html" data-gh-next="M12.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#organizing-json-data" class="toc-link" data-bilingual>
+        <template class="content-ar">تنظيم بيانات JSON</template>
+        <template class="content-en">Organizing JSON Data</template>
+        <span class="content-target">تنظيم بيانات JSON</span>
+      </a>
+      <a href="#serialization-deserialization" class="toc-link" data-bilingual>
+        <template class="content-ar">التسلسل وإلغاء التسلسل</template>
+        <template class="content-en">Understanding Serialization</template>
+        <span class="content-target">التسلسل وإلغاء التسلسل</span>
+      </a>
+      <a href="#loading-json-data" class="toc-link" data-bilingual>
+        <template class="content-ar">تحميل بيانات JSON</template>
+        <template class="content-en">Loading Data from JSON Files and Strings</template>
+        <span class="content-target">تحميل بيانات JSON</span>
+      </a>
+      <a href="#handling-json-dates" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع التواريخ في JSON</template>
+        <template class="content-en">Handling Dates in JSON (Excel &amp; Firebase)</template>
+        <span class="content-target">التعامل مع التواريخ في JSON</span>
+      </a>
+      <a href="#manipulating-json-data" class="toc-link" data-bilingual>
+        <template class="content-ar">تعديل وحذف بيانات JSON</template>
+        <template class="content-en">Changing and Removing JSON Data</template>
+        <span class="content-target">تعديل وحذف بيانات JSON</span>
+      </a>
+      <a href="#dumping-python-data-to-json" class="toc-link" data-bilingual>
+        <template class="content-ar">تصدير بيانات بايثون إلى JSON</template>
+        <template class="content-en">Dumping Python Data to JSON</template>
+        <span class="content-target">تصدير بيانات بايثون إلى JSON</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 11</template>
+      <template class="content-en">Module 11</template>
+      <span class="content-target">الوحدة 11</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التعامل مع بيانات جيسون (JSON)</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية تنظيم بيانات JSON، فهم عمليات التسلسل وإلغاء التسلسل، تحميل البيانات من ملفات ونصوص JSON، وتصدير بيانات بايثون إلى تنسيق JSON.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Juggling JSON Data</h1>
+      <p class="hero-description">This module covers organizing JSON data, understanding serialization and deserialization, loading data from JSON files and strings, and dumping Python data to JSON format.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">جيسون</span>
+      <span class="tag">التسلسل</span>
+      <span class="tag">بايثون</span>
+      <span class="tag">معالجة البيانات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">JSON</span>
+      <span class="tag">Serialization</span>
+      <span class="tag">Python</span>
+      <span class="tag">Data Processing</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم بنية بيانات JSON ومقارنتها بالبيانات المجدولة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق مفاهيم التسلسل وإلغاء التسلسل لتحويل البيانات بين بايثون و JSON.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحميل وقراءة بيانات JSON من الملفات والسلاسل النصية باستخدام مكتبة json.</span></li>
+      <li><span class="obj-icon">✦</span><span>تعديل بيانات JSON وحذفها وتصديرها مرة أخرى إلى نصوص مهيأة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand JSON data structure and compare it to tabular data.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply serialization and deserialization concepts to convert data between Python and JSON.</span></li>
+      <li><span class="obj-icon">✦</span><span>Load and read JSON data from files and strings using the json module.</span></li>
+      <li><span class="obj-icon">✦</span><span>Modify, remove, and dump JSON data back into formatted strings.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="organizing-json-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تنظيم بيانات JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Organizing JSON Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>JSON هو تنسيق شائع لنقل البيانات الموجهة للكائنات، يشبه إلى حد كبير قاموس البيانات (Dictionary) في بايثون.</p></template>
+    <template class="content-en"><p>JSON is a common marshalling format for object-oriented data, roughly equivalent to a data dictionary in Python.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يرمز JSON إلى (JavaScript Object Notation)، ورغم وجود كلمة JavaScript في اسمه، إلا أنه تنسيق عام يستخدم مع مختلف لغات البرمجة بما فيها بايثون.</p><p>يُستخدم JSON كتنسيق تنظيم (Marshalling format) لإرسال البيانات من جهاز كمبيوتر إلى آخر، وتستخدمه بعض قواعد البيانات مثل Firebase لتخزين البيانات.</p><p>يمكن مقارنة JSON بالبيانات المجدولة (مثل جداول الإكسل)؛ حيث يتم تحويل كل صف في الجدول إلى قاموس من أزواج (مفتاح:قيمة) محاط بأقواس معقوفة <code>{}</code>.</p><p>يمكن أن تكون ملفات JSON <b>مفهرسة (Keyed)</b>، حيث يكون لكل جزء من البيانات مفتاح فريد (رقم أو نص) يحدده، وهو أمر شائع في البيانات المحملة من قواعد بيانات مثل Firebase.</p></template>
+    <template class="content-en"><p>JSON stands for JavaScript Object Notation. Despite the name, it is a widely known general-purpose format used with all kinds of programming languages, including Python.</p><p>It is a <span class="smart-term" data-term-en="Marshalling" data-ar="التنظيم / التعبئة" data-en-def="The process of transforming the memory representation of an object to a data format suitable for storage or transmission.">marshalling<span class="smart-term-tooltip"></span></span> format generally used to send data from one computer to another. Some databases, like Google's Firebase Realtime Database, store data natively in JSON format.</p><p>JSON data is easiest to understand when compared to tabular data (like Excel). Each row of tabular data is converted to a dictionary of key:value pairs in the JSON file, enclosed in curly braces <code>{}</code>.</p><p>JSON files can also be <b>keyed</b>, where each chunk of data has a single unique key (number or text) that identifies it. This is common when downloading JSON files created by external services like Firebase.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التصميم القائم على أزواج (مفتاح:قيمة) يجعل JSON مرناً للغاية مقارنة بالجداول الصارمة، حيث يمكن أن يحتوي كل كائن على حقول مختلفة دون الحاجة لترك مساحات فارغة (Nulls) كما في قواعد البيانات العلائقية.</p><p>البيانات المفهرسة (Keyed JSON) توفر وصولاً مباشراً (O(1) complexity) لعنصر معين إذا كنت تعرف مفتاحه، بدلاً من البحث في قائمة (Array) كاملة.</p><p>مصطلح Marshalling يشير إلى عملية تحويل التمثيل الداخلي للكائن في الذاكرة إلى تنسيق بيانات مناسب للتخزين أو النقل عبر الشبكة.</p></template>
+    <template class="content-en"><p>The key-value pair design makes JSON highly flexible compared to rigid tabular structures. Objects can have varying schemas without the need for sparse columns or null values typical in relational databases.</p><p><span class="smart-term" data-term-en="Keyed JSON" data-ar="جيسون المفهرس" data-en-def="JSON data where each chunk of data has a single unique key that identifies it.">Keyed JSON<span class="smart-term-tooltip"></span></span> data provides direct access (O(1) time complexity) to specific elements if the key is known, which is vastly more efficient than iterating through an unkeyed JSON array.</p><p>The term 'marshalling' specifically refers to the process of transforming the memory representation of an object to a data format suitable for storage or transmission, ensuring cross-platform compatibility.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a visual transformation from a tabular Excel format (rows and columns) to a JSON tree structure. Left side: A simple table with columns 'Full Name', 'Birth Year'. Right side: A JSON structure with curly braces {} and key-value pairs corresponding to the table rows. Flow direction: Left to Right with an arrow labeled 'Conversion'. Style: educational, dark background #0d1117, accent color #39ff14, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Tabular Data to JSON Conversion</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تحويل البيانات الجدولية إلى JSON</text>
+
+  <!-- Left Side: Table Group -->
+  <g transform="translate(50, 150)">
+    <!-- Table Title -->
+    <text x="140" y="-15" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Tabular Format (Excel)</text>
+    <text x="140" y="-15" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تنسيق جدولي (إكسل)</text>
+
+    <!-- Table Header -->
+    <path d="M 8 0 L 272 0 A 8 8 0 0 1 280 8 L 280 40 L 0 40 L 0 8 A 8 8 0 0 1 8 0 Z" fill="var(--brand-500)" />
+    <text x="70" y="26" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Full Name</text>
+    <text x="70" y="26" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">الاسم الكامل</text>
+    <text x="210" y="26" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Birth Year</text>
+    <text x="210" y="26" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">سنة الميلاد</text>
+
+    <!-- Table Row 1 -->
+    <rect x="0" y="40" width="280" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="70" y="66" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">Alice</text>
+    <text x="70" y="66" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">أليس</text>
+    <text x="210" y="66" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">1995</text>
+    <text x="210" y="66" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">1995</text>
+
+    <!-- Table Row 2 -->
+    <path d="M 0 80 L 280 80 L 280 112 A 8 8 0 0 1 272 120 L 8 120 A 8 8 0 0 1 0 112 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="70" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">Bob</text>
+    <text x="70" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بوب</text>
+    <text x="210" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">2001</text>
+    <text x="210" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">2001</text>
+
+    <!-- Table Vertical Divider -->
+    <line x1="140" y1="0" x2="140" y2="120" stroke="var(--border-color)" stroke-width="1" />
+  </g>
+
+  <!-- Middle: Conversion Arrow -->
+  <path d="M 350 210 L 435 210" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow)" />
+  <text x="395" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Conversion</text>
+  <text x="395" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">تحويل</text>
+
+  <!-- Right Side: JSON Group -->
+  <g transform="translate(470, 80)">
+    <!-- JSON Title -->
+    <text x="150" y="5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">JSON Structure</text>
+    <text x="150" y="5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">هيكل JSON</text>
+
+    <!-- JSON Box -->
+    <rect x="0" y="20" width="300" height="260" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- JSON Code Content (Left-aligned for code readability) -->
+    <text x="20" y="45" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">[</text>
+    <text x="40" y="67" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">{</text>
+
+    <text x="60" y="89" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)">"Full Name":</text>
+    <text x="155" y="89" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">"Alice",</text>
+    <text x="155" y="89" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">"أليس",</text>
+
+    <text x="60" y="111" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)">"Birth Year":</text>
+    <text x="155" y="111" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">1995</text>
+    <text x="155" y="111" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">1995</text>
+
+    <text x="40" y="133" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">},</text>
+    <text x="40" y="155" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">{</text>
+
+    <text x="60" y="177" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)">"Full Name":</text>
+    <text x="155" y="177" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">"Bob",</text>
+    <text x="155" y="177" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">"بوب",</text>
+
+    <text x="60" y="199" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)">"Birth Year":</text>
+    <text x="155" y="199" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">2001</text>
+    <text x="155" y="199" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">2001</text>
+
+    <text x="40" y="221" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">}</text>
+    <text x="20" y="243" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">]</text>
+  </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Python</th><th>JSON</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القاموس / الكائن</template>
+          <template class="content-en">Dictionary / Object</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">dict</template>
+          <template class="content-en">dict</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">object</template>
+          <template class="content-en">object</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القوائم</template>
+          <template class="content-en">Lists</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">list, tuple</template>
+          <template class="content-en">list, tuple</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">array</template>
+          <template class="content-en">array</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">النصوص</template>
+          <template class="content-en">Strings</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">str</template>
+          <template class="content-en">str</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">string</template>
+          <template class="content-en">string</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الأرقام</template>
+          <template class="content-en">Numbers</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">int, float</template>
+          <template class="content-en">int, float</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">number</template>
+          <template class="content-en">number</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القيم المنطقية (صحيح)</template>
+          <template class="content-en">Boolean (True)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">True</template>
+          <template class="content-en">True</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">true</template>
+          <template class="content-en">true</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القيم المنطقية (خطأ)</template>
+          <template class="content-en">Boolean (False)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">False</template>
+          <template class="content-en">False</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">false</template>
+          <template class="content-en">false</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القيم الفارغة</template>
+          <template class="content-en">Null values</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">None</template>
+          <template class="content-en">None</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">null</template>
+          <template class="content-en">null</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفضل استخدام JSON المفهرس (Keyed) عند التعامل مع قواعد بيانات الوقت الفعلي مثل Firebase بدلاً من القوائم (Arrays)؟</template>
+      <template class="content-en">Why is Keyed JSON preferred when dealing with real-time databases like Firebase instead of Arrays?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الفهرسة بالمفاتيح تسمح بالوصول المباشر والسريع والتحديث الفردي لسجل معين دون الحاجة إلى تحميل أو البحث في المصفوفة بأكملها.</p></template>
+      <template class="content-en"><p>Because key indexing allows for direct, fast access and individual updates to a specific record without needing to load or search through the entire array.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="serialization-deserialization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> التسلسل وإلغاء التسلسل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Understanding Serialization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التسلسل (Serialize) هو تحويل كائن بايثون إلى نص JSON، وإلغاء التسلسل (Deserialize) هو تحويل نص JSON إلى كائن بايثون.</p></template>
+    <template class="content-en"><p>Serialize converts an object to a string, while Deserialize converts a string back to an object.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="Converting an object to a string or byte stream.">التسلسل<span class="smart-term-tooltip"></span></span> (Serialization):</b> هو عملية تحويل كائن (مثل قاموس بايثون) إلى سلسلة من البايتات أو الأحرف التي يمكن إرسالها عبر الشبكة، أو تخزينها في ملف أو قاعدة بيانات. الغرض الرئيسي هو حفظ المعلومات بطريقة يمكن استرجاعها بسهولة على أي جهاز آخر.</p><p><b><span class="smart-term" data-term-en="Deserialization" data-ar="إلغاء التسلسل" data-en-def="Converting a string or byte stream back into an object.">إلغاء التسلسل<span class="smart-term-tooltip"></span></span> (Deserialization):</b> هو العملية العكسية، أي تحويل المعلومات (النص) مرة أخرى إلى كائن برمجي.</p><p>توفر مكتبة <code>json</code> القياسية في بايثون أربع طرق رئيسية للتعامل مع هذه العمليات:</p><ol><li><code>json.dump()</code>: كتابة (تسلسل) بيانات بايثون إلى ملف JSON.</li><li><code>json.dumps()</code>: كتابة (تسلسل) كائن بايثون إلى سلسلة نصية (String).</li><li><code>json.load()</code>: تحميل (إلغاء تسلسل) JSON من ملف.</li><li><code>json.loads()</code>: تحميل (إلغاء تسلسل) بيانات JSON من سلسلة نصية.</li></ol></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="Converting an object to a string or byte stream.">Serialization<span class="smart-term-tooltip"></span></span></b> is the process of converting an object (such as a Python dictionary) into a stream of bytes or characters that can be sent across a wire, stored in a file or database, or stored in memory. The main purpose is to save all the information in an object in a way that can be retrieved easily on any other computer.</p><p><b><span class="smart-term" data-term-en="Deserialization" data-ar="إلغاء التسلسل" data-en-def="Converting a string or byte stream back into an object.">Deserialization<span class="smart-term-tooltip"></span></span></b> is the process of converting the information back to an object.</p><p>The Python standard library includes a <code>json</code> module with four main methods:</p><ol><li><code>json.dump()</code>: Write (serialize) Python data to a JSON file (or stream).</li><li><code>json.dumps()</code>: Write (serialize) a Python object to a JSON string.</li><li><code>json.load()</code>: Load (deserialize) JSON from a file or similar object.</li><li><code>json.loads()</code>: Load (deserialize) JSON data from a string.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حرف الـ 's' في <code>dumps</code> و <code>loads</code> يرمز إلى 'string' (سلسلة نصية). هذا التمييز البسيط يمنع أخطاء شائعة جداً عند محاولة تمرير نص إلى دالة تتوقع كائن ملف (File object).</p><p>أثناء التسلسل، يتم تحويل أنواع البيانات. على سبيل المثال، القوائم (Lists) والصفوف (Tuples) في بايثون تتحول كلاهما إلى مصفوفات (Arrays) في JSON. هذا يعني أنك إذا قمت بتسلسل Tuple ثم ألغيت تسلسله، سيعود كـ List، مما قد يؤدي إلى فقدان خاصية عدم القابلية للتعديل (Immutability).</p><p>القيم المنطقية تتغير أيضاً؛ <code>True/False</code> في بايثون تصبح <code>true/false</code> (بأحرف صغيرة) في JSON، و <code>None</code> تصبح <code>null</code>.</p></template>
+    <template class="content-en"><p>The 's' in <code>dumps</code> and <code>loads</code> stands for 'string'. This crucial distinction prevents common TypeErrors when developers accidentally pass a string to a method expecting a file-like object.</p><p>Data type mapping during serialization is lossy for some Python types. Both Python <code>list</code> and <code>tuple</code> convert to a JSON <code>array</code>. Upon deserialization, that array will always become a Python <code>list</code>, meaning the immutability of the original tuple is lost.</p><p>Boolean and null values also undergo syntax changes: Python's capitalized <code>True</code>, <code>False</code>, and <code>None</code> become lowercase <code>true</code>, <code>false</code>, and <code>null</code> in JSON.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بتسلسل (Serialize) كائن من نوع Tuple في بايثون إلى JSON، ثم قمت بإلغاء تسلسله (Deserialize) مرة أخرى إلى بايثون، ما هو نوع البيانات الناتج ولماذا؟</template>
+      <template class="content-en">If you serialize a Python Tuple to JSON, and then deserialize it back to Python, what is the resulting data type and why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيكون الناتج من نوع List (قائمة). لأن JSON لا يدعم نوع Tuple، فيقوم بتحويله إلى Array، وعند إعادته إلى بايثون يتم تحويل الـ Array دائماً إلى List.</p></template>
+      <template class="content-en"><p>The result will be a List. JSON does not have a Tuple type, so it converts it to an Array. When deserialized back to Python, a JSON Array is always parsed as a Python List.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="loading-json-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تحميل بيانات JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Loading Data from JSON Files and Strings</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نستخدم <code>json.load(f)</code> لقراءة ملفات JSON، ونستخدم <code>json.loads(string)</code> لقراءة النصوص المحفوظة في متغيرات.</p></template>
+    <template class="content-en"><p>Use <code>json.load(f)</code> to read JSON files, and <code>json.loads(string)</code> to read JSON data stored in string variables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحميل البيانات من ملفات JSON، يجب أولاً استيراد مكتبة <code>json</code>. ثم نستخدم دالة <code>open()</code> القياسية لفتح الملف.</p><p>من الممارسات الجيدة إضافة <code>encoding="utf-8"</code> للحفاظ على الأحرف غير الإنجليزية (non-ASCII)، واستخدام <code>newline=""</code> لتجنب جلب أحرف السطر الجديد المخفية في نهاية كل صف.</p><p>مثال لفتح ملف:</p><code>with open(filename, 'r', encoding='utf-8', newline='') as f:<br>&nbsp;&nbsp;&nbsp;&nbsp;people = json.load(f)</code><p>إذا كانت بيانات JSON موجودة داخل سلسلة نصية (String) في بايثون بدلاً من ملف، نستخدم <code>json.loads()</code>. يمكن تخزين البيانات غير المفهرسة أو المفهرسة داخل سلاسل نصية متعددة الأسطر باستخدام علامات الاقتباس الثلاثية <code>"""</code>.</p></template>
+    <template class="content-en"><p>To load data from JSON files, import the <code>json</code> module. Then use the regular <code>open()</code> method to open the file.</p><p>It is highly recommended to add <code>encoding="utf-8"</code> to preserve non-ASCII characters, and use <code>newline=""</code> to avoid bringing in the hidden newline character at the end of each row.</p><p>Example of opening a file:</p><code>with open(filename, 'r', encoding='utf-8', newline='') as f:<br>&nbsp;&nbsp;&nbsp;&nbsp;people = json.load(f)</code><p>Because JSON data is always delivered as text, you can copy and paste the entire thing into a Python string. To load JSON from a string variable, use <code>json.loads(json_string)</code>. You can use triple quotation marks <code>"""</code> to hold multi-line JSON strings.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>with open(...) as f:</code> يضمن إغلاق الملف تلقائياً وبشكل آمن حتى في حالة حدوث استثناء (Exception) أثناء قراءة البيانات، وهو نمط يُعرف بـ Context Manager.</p><p>المعامل <code>newline=""</code> مهم بشكل خاص عند التعامل مع ملفات تم إنشاؤها على أنظمة تشغيل مختلفة (مثل Windows الذي يستخدم CRLF مقابل Linux الذي يستخدم LF)، حيث يمنع بايثون من الترجمة التلقائية الخاطئة لفواصل الأسطر داخل نصوص JSON.</p><p>عند استخدام <code>json.loads()</code>، يجب التأكد من أن السلسلة النصية تحتوي على تنسيق JSON صالح تماماً (مثلاً، استخدام علامات الاقتباس المزدوجة <code>"</code> للمفاتيح، وليس الفردية <code>'</code>).</p></template>
+    <template class="content-en"><p>Using the <code>with open(...) as f:</code> context manager ensures that the file is automatically and safely closed even if an exception occurs during parsing.</p><p>The <code>newline=""</code> parameter is particularly important for cross-platform compatibility (Windows CRLF vs. Unix LF). It disables Python's universal newlines translation, ensuring that newline characters embedded within JSON string values are not corrupted.</p><p>When using <code>json.loads()</code>, the string must strictly adhere to the JSON specification. A common pitfall is using single quotes <code>'</code> for keys or string values, which is valid in Python but invalid in JSON (JSON requires double quotes <code>"</code>).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا حاولت استخدام <code>json.load()</code> مع متغير نصي بدلاً من ملف؟</template>
+      <template class="content-en">What happens if you try to use <code>json.load()</code> with a string variable instead of a file?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحدث خطأ (AttributeError)، لأن <code>json.load()</code> تتوقع كائن ملف يحتوي على دالة <code>read()</code>، بينما المتغير النصي لا يحتوي عليها. يجب استخدام <code>json.loads()</code> للنصوص.</p></template>
+      <template class="content-en"><p>It will raise an AttributeError because <code>json.load()</code> expects a file-like object that has a <code>.read()</code> method, which a string does not have. You must use <code>json.loads()</code> for strings.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="handling-json-dates" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التعامل مع التواريخ في JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Handling Dates in JSON (Excel &amp; Firebase)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تواريخ الإكسل تُخزن كأرقام تسلسلية وتُحول باستخدام <code>xlrd</code>، بينما تواريخ Firebase تُخزن بتنسيق UTC وتُحول باستخدام <code>datetime.utcfromtimestamp()</code>.</p></template>
+    <template class="content-en"><p>Excel dates are serial numbers converted using <code>xlrd</code>, while Firebase dates are UTC timestamps converted using <code>datetime.utcfromtimestamp()</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>البيانات المستوردة من مصادر مختلفة قد تحتوي على تواريخ بتنسيقات غير قياسية:</p><ol><li><strong>تواريخ الإكسل (Excel Dates):</strong><br>تظهر كأرقام صحيحة (مثل 40554). لتحويلها إلى تواريخ بايثون، نحتاج إلى مكتبتي <code>xlrd</code> و <code>datetime</code>. نستخدم الكود التالي:<br><code>y, m, d, h, i, s = xlrd.xldate_as_tuple(p['Date Joined'], 0)</code><br>ثم ننشئ التاريخ: <code>joined = dt.date(y, m, d)</code>.</li><li><strong>تواريخ فايربيس (Firebase Timestamps):</strong><br>تُخزن كطوابع زمنية تعتمد على التوقيت العالمي المنسق (UTC). لتحويلها، نستخدم دالة <code>utcfromtimestamp()</code> من مكتبة <code>datetime</code>:<br><code>last_visit = dt.datetime.utcfromtimestamp(v['lastvisit'])</code></li></ol><p>لعرض التواريخ بتنسيق مألوف، يمكن استخدام السلاسل النصية المنسقة (f-strings) مثل: <code>print(f"{joined:%m/%d/%Y}")</code>.</p></template>
+    <template class="content-en"><p>Data imported from different sources may have non-standard date formats:</p><ol><li><strong>Excel Dates:</strong><br>These appear as serial numbers (e.g., 40554). To convert them to Python dates, you need the <code>xlrd</code> (Excel reader) and <code>datetime</code> modules. Use the code:<br><code>y, m, d, h, i, s = xlrd.xldate_as_tuple(p['Date Joined'], 0)</code><br>Then create the date: <code>joined = dt.date(y, m, d)</code>.</li><li><strong>Firebase <span class="smart-term" data-term-en="Timestamp" data-ar="الطابع الزمني" data-en-def="A sequence of characters or encoded information identifying when a certain event occurred, usually giving date and time of day.">Timestamp<span class="smart-term-tooltip"></span></span>s:</strong><br>Firebase stores dates as UTC-based timestamps. To convert them, use the <code>utcfromtimestamp()</code> method from the <code>datetime</code> module:<br><code>last_visit = dt.datetime.utcfromtimestamp(v['lastvisit'])</code></li></ol><p>To display dates in a familiar format, use an f-string like this: <code>print(f"{joined:%m/%d/%Y}")</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تنسيق JSON بحد ذاته لا يمتلك نوع بيانات مخصص للتواريخ (Date type). لذلك، يتم دائماً تمرير التواريخ إما كسلاسل نصية (Strings) أو كأرقام (Timestamps/Serial numbers).</p><p>الرقم <code>0</code> في دالة <code>xlrd.xldate_as_tuple(..., 0)</code> يشير إلى نظام تواريخ الإكسل الافتراضي (نظام 1900). إذا كان الملف يستخدم نظام 1904 (شائع في أجهزة ماك القديمة)، يجب تغييره إلى <code>1</code>.</p><p>طابع Firebase الزمني (Timestamp) يمثل عدد الثواني (أو الميلي ثانية) التي انقضت منذ 1 يناير 1970 (Unix Epoch). استخدام <code>utcfromtimestamp</code> يضمن عدم تأثر الوقت بالمنطقة الزمنية المحلية للخادم الذي يقوم بتشغيل الكود.</p></template>
+    <template class="content-en"><p>The JSON specification itself does not define a native 'Date' data type. Therefore, dates are always serialized either as ISO-formatted strings or as numeric values (timestamps or serial numbers).</p><p>The <code>0</code> argument in <code>xlrd.xldate_as_tuple(..., 0)</code> specifies the Excel date system (1900-based system). If the workbook uses the 1904 date system (historically used on Macs), this argument must be <code>1</code>.</p><p>A Firebase timestamp represents the number of seconds (or milliseconds) elapsed since the Unix Epoch (Jan 1, 1970). Using <code>utcfromtimestamp</code> ensures the parsed time is absolute and unaffected by the local timezone of the machine executing the Python script.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يحتوي JSON على نوع بيانات خاص بالتواريخ (Date)؟</template>
+      <template class="content-en">Why doesn't JSON have a specific Date data type?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن JSON صُمم ليكون بسيطاً ومستقلاً عن لغات البرمجة. تمثيل التواريخ يختلف بشكل كبير بين اللغات، لذا يُترك الأمر للمبرمج لتمريرها كنصوص أو أرقام ومعالجتها برمجياً.</p></template>
+      <template class="content-en"><p>JSON was designed to be minimal and language-independent. Date representations vary wildly across programming languages, so it is left to the developer to serialize them as strings or numbers and parse them accordingly.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="manipulating-json-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تعديل وحذف بيانات JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Changing and Removing JSON Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بمجرد تحميل JSON إلى بايثون، يصبح قاموساً (Dictionary) عادياً، ويمكنك تعديل قيمه باستخدام <code>value['key'] = newdata</code> وحذفها باستخدام <code>pop()</code>.</p></template>
+    <template class="content-en"><p>Once JSON is loaded into Python, it's a standard dictionary. You can modify values using <code>value['key'] = newdata</code> and remove keys using <code>pop()</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما يكون لديك بيانات JSON محملة في قاموس بيانات بايثون، يمكنك استخدام إجراءات القاموس القياسية لمعالجة البيانات.</p><p><b>تغيير البيانات:</b><br>أثناء التكرار (Looping) عبر قاموس البيانات باستخدام متغيرات (المفتاح:القيمة)، يمكنك تغيير قيمة أي زوج باستخدام الصيغة البسيطة:<br><code>value['key'] = newdata</code></p><p><b>إزالة البيانات:</b><br>لإزالة بيانات من القاموس أثناء المرور عبر الحلقة، استخدم دالة <code>pop()</code>:<br><code>pop('keyname', None)</code><br>استبدل 'keyname' باسم العمود أو المفتاح الذي تريد إزالته. على سبيل المثال، لإزالة مفتاح <code>lastreferrer</code>:<br><code>v.pop('lastreferrer', None)</code></p></template>
+    <template class="content-en"><p>When you have JSON data loaded into a Python data dictionary, you can use standard dictionary procedures to manipulate the data.</p><p><b>Changing Data:</b><br>As you're looping through the data dictionary with key:value variables, you can change the value of any key:value pair using the relatively simple syntax:<br><code>value['key'] = newdata</code></p><p><b>Removing Data:</b><br>To remove data from a dictionary as you're going through the loop, use the <code>pop()</code> method:<br><code>pop('keyname', None)</code><br>Replace 'keyname' with the name of the column you want to remove. For example, to remove the <code>lastreferrer</code> key:<br><code>v.pop('lastreferrer', None)</code></p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>None</code> كمعامل ثانٍ في دالة <code>pop('key', None)</code> هو ممارسة برمجية آمنة (Safe practice). إذا لم يكن المفتاح موجوداً في القاموس، فإن الدالة ستعيد <code>None</code> بدلاً من التسبب في انهيار البرنامج بخطأ <code>KeyError</code>.</p><p>يجب الحذر عند تعديل قاموس أثناء التكرار المباشر عبر مفاتيحه (Iterating over keys). ومع ذلك، في الأمثلة المقدمة، نحن نعدل القاموس الداخلي (القيم <code>v</code>) أثناء التكرار عبر القاموس الخارجي، وهو أمر آمن تماماً.</p></template>
+    <template class="content-en"><p>Providing <code>None</code> as the second argument to <code>pop('key', None)</code> is a defensive programming technique. If the key does not exist in the dictionary, <code>pop</code> will silently return <code>None</code> instead of raising a fatal <code>KeyError</code>.</p><p>Modifying the structure of a dictionary (adding/removing keys) while directly iterating over it can cause a <code>RuntimeError</code>. However, in nested JSON structures, iterating over the outer dictionary while modifying the inner dictionaries (the values) is perfectly safe.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نكتب <code>v.pop('key', None)</code> بدلاً من <code>del v['key']</code>؟</template>
+      <template class="content-en">Why do we write <code>v.pop('key', None)</code> instead of <code>del v['key']</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن <code>del</code> ستؤدي إلى خطأ KeyError إذا كان المفتاح غير موجود، بينما <code>pop</code> مع المعامل <code>None</code> ستتجاهل الأمر بأمان دون إيقاف البرنامج.</p></template>
+      <template class="content-en"><p>Because <code>del</code> will raise a KeyError if the key does not exist, whereas <code>pop</code> with the <code>None</code> default argument will safely do nothing and prevent the program from crashing.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dumping-python-data-to-json" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تصدير بيانات بايثون إلى JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Dumping Python Data to JSON</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم دالة <code>json.dumps()</code> لتحويل قاموس بايثون إلى نص JSON، ويمكن استخدام <code>indent=2</code> لجعله مقروءاً للبشر.</p></template>
+    <template class="content-en"><p>The <code>json.dumps()</code> method converts a Python dictionary into a JSON string, and <code>indent=2</code> makes it human-readable.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بعد الانتهاء من معالجة البيانات في بايثون، قد ترغب في تحويلها مرة أخرى إلى تنسيق JSON. تقوم دالة <code>dumps()</code> بإنشاء سلسلة نصية (String) بتنسيق JSON من البيانات، والتي تظل في الذاكرة بحيث يمكنك استخدام <code>print()</code> لرؤيتها.</p><p>مثال:<br><code>new_dict = json.dumps(hits)</code><br><code>print(new_dict)</code></p><p>بشكل افتراضي، يتم إخراج النص كسطر واحد طويل. تدعم دالة <code>.dumps()</code> خيار <code>indent=</code> والذي يمكنك استخدامه لوضع مسافات بادئة لبيانات JSON وجعلها أكثر قابلية للقراءة (Pretty-printing). عادةً ما تكون مسافتان كافية.</p><p>مثال مع المسافات البادئة:<br><code>new_dict = json.dumps(hits, indent=2)</code></p></template>
+    <template class="content-en"><p>After processing data in Python, you may want to convert it back to JSON format. The <code>dumps()</code> method creates a JSON string of the data, which is still in memory so you can use <code>print()</code> to see it.</p><p>Example:<br><code>new_dict = json.dumps(hits)</code><br><code>print(new_dict)</code></p><p>By default, the output is a single, dense line of text. The <code>.dumps()</code> method supports an <code>indent=</code> option which you can use to <span class="smart-term" data-term-en="indent" data-ar="المسافة البادئة" data-en-def="A parameter used in json.dumps() to specify the number of spaces for formatting the JSON output, making it human-readable.">indent<span class="smart-term-tooltip"></span></span> the JSON data and make it more readable (pretty-printing). Two spaces is usually sufficient.</p><p>Example with indentation:<br><code>new_dict = json.dumps(hits, indent=2)</code></p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>indent</code> يزيد من حجم السلسلة النصية الناتجة بسبب إضافة مسافات وأسطر جديدة. في بيئات الإنتاج (Production) أو عند إرسال البيانات عبر الشبكة، يُفضل عدم استخدام <code>indent</code> لتقليل حجم البيانات (Minification).</p><p>دالة <code>dumps()</code> تقوم تلقائياً بتحويل أنواع بيانات بايثون إلى ما يعادلها في JSON (مثلاً <code>True</code> تصبح <code>true</code>). إذا واجهت الدالة كائناً لا تعرف كيفية تحويله (مثل كائن <code>datetime</code> مخصص)، ستطلق خطأ <code>TypeError: Object of type X is not JSON serializable</code>.</p></template>
+    <template class="content-en"><p>Using the <code>indent</code> parameter significantly increases the payload size due to the added whitespace and newline characters. In production APIs or network transmissions, it is best practice to omit <code>indent</code> to minimize bandwidth usage (minification).</p><p>The <code>dumps()</code> method automatically handles the type mapping back to JSON (e.g., Python's <code>True</code> becomes JSON's <code>true</code>). If it encounters a custom Python object (like a raw <code>datetime</code> object) that it doesn't know how to serialize, it will raise a <code>TypeError: Object of type X is not JSON serializable</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يجب عليك تجنب استخدام <code>indent=2</code> عند استخدام <code>json.dumps()</code>؟</template>
+      <template class="content-en">When should you avoid using <code>indent=2</code> with <code>json.dumps()</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عند إرسال البيانات عبر الشبكة أو تخزين ملفات ضخمة، لأن المسافات البادئة تزيد من حجم الملف وتستهلك نطاقاً ترددياً (Bandwidth) أكبر دون فائدة للآلة.</p></template>
+      <template class="content-en"><p>When transmitting data over a network or storing massive files, because indentation adds unnecessary whitespace that increases payload size and consumes more bandwidth.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه المراجعة السريعة. تخيلوا أن JSON هو لغة التواصل العالمية بين أجهزة الكمبيوتر؛ فهو بسيط، خفيف، ومفهوم للجميع. في الامتحان، ركزوا جيداً على الفرق الجوهري بين الدوال التي تنتهي بحرف 's' (مثل loads و dumps) وتلك التي لا تنتهي به. حرف الـ 's' يعني دائماً String (سلسلة نصية). تذكروا أيضاً كيف نتعامل مع التواريخ المزعجة؛ تواريخ الإكسل تحتاج إلى مكتبة xlrd، بينما تواريخ فايربيس تحتاج إلى datetime.utcfromtimestamp. وأخيراً، لا تنسوا الممارسة الآمنة عند حذف البيانات باستخدام pop مع None لتجنب الأخطاء القاتلة. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome friends to this quick review. Imagine JSON as the universal language between computers; it's simple, lightweight, and universally understood. For the exam, focus heavily on the fundamental difference between methods ending with an 's' (like loads and dumps) and those that don't. The 's' always stands for String. Also, remember how we handle pesky dates; Excel dates require the xlrd module, while Firebase dates need datetime.utcfromtimestamp. Finally, don't forget the safe practice of removing data using pop with None to avoid fatal errors. Good luck with your studies!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين JSON وقاموس بايثون (Dictionary)؟</template>
+          <template class="content-en">What is the main difference between JSON and a Python Dictionary?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين JSON وقاموس بايثون (Dictionary)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">قاموس بايثون هو كائن برمجي حي في الذاكرة يمكن التفاعل معه برمجياً، بينما JSON هو مجرد تنسيق نصي (String) يُستخدم لنقل أو تخزين تلك البيانات.</template>
+          <template class="content-en">A Python dictionary is a live programming object in memory that can be interacted with programmatically, whereas JSON is merely a text format (String) used to transmit or store that data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم المعامل <code>newline=""</code> عند فتح ملفات JSON؟</template>
+          <template class="content-en">Why do we use the <code>newline=""</code> parameter when opening JSON files?</template>
+          <span class="content-target">لماذا نستخدم المعامل <code>newline=""</code> عند فتح ملفات JSON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لمنع بايثون من الترجمة التلقائية لفواصل الأسطر (والتي تختلف بين أنظمة التشغيل)، مما يضمن قراءة بيانات JSON كما هي دون إدخال أحرف مخفية تفسد التنسيق.</template>
+          <template class="content-en">To prevent Python from automatically translating newlines (which vary between OSs), ensuring the JSON data is read exactly as is without introducing hidden characters that corrupt the format.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا نعني بـ Keyed JSON؟</template>
+          <template class="content-en">What do we mean by Keyed JSON?</template>
+          <span class="content-target">ماذا نعني بـ Keyed JSON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو هيكل JSON حيث لا تكون البيانات مجرد قائمة (Array)، بل قاموس كبير يمتلك فيه كل عنصر مفتاحاً فريداً (Key) يحدده، مما يسهل الوصول المباشر إليه.</template>
+          <template class="content-en">It is a JSON structure where the data is not just an Array, but a large dictionary where each item has a unique key identifying it, facilitating direct access.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نتعامل مع التواريخ القادمة من Firebase؟</template>
+          <template class="content-en">How do we handle dates coming from Firebase?</template>
+          <span class="content-target">كيف نتعامل مع التواريخ القادمة من Firebase؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تأتي كطوابع زمنية (Timestamps) تعتمد على توقيت UTC. نحولها إلى تواريخ بايثون باستخدام الدالة <code>datetime.utcfromtimestamp()</code>.</template>
+          <template class="content-en">They come as UTC-based timestamps. We convert them to Python dates using the <code>datetime.utcfromtimestamp()</code> method.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج مكتبة <code>xlrd</code> عند التعامل مع تواريخ الإكسل؟</template>
+          <template class="content-en">Why do we need the <code>xlrd</code> module when dealing with Excel dates?</template>
+          <span class="content-target">لماذا نحتاج مكتبة <code>xlrd</code> عند التعامل مع تواريخ الإكسل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الإكسل يخزن التواريخ كأرقام تسلسلية (Serial numbers) وليس كنصوص. مكتبة <code>xlrd</code> توفر دالة <code>xldate_as_tuple</code> لترجمة هذا الرقم إلى سنة، شهر، ويوم.</template>
+          <template class="content-en">Because Excel stores dates as serial numbers, not text. The <code>xlrd</code> module provides the <code>xldate_as_tuple</code> method to translate this number into a year, month, and day.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يمثل حرف الـ 's' في <code>loads</code> و <code>dumps</code>؟</template>
+          <template class="content-en">What does the 's' in <code>loads</code> and <code>dumps</code> represent?</template>
+          <span class="content-target">ماذا يمثل حرف الـ 's' في <code>loads</code> و <code>dumps</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمثل كلمة String (سلسلة نصية). <code>loads</code> تعني Load String، و <code>dumps</code> تعني Dump String.</template>
+          <template class="content-en">It represents the word String. <code>loads</code> means Load String, and <code>dumps</code> means Dump String.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نجعل مخرجات <code>json.dumps()</code> سهلة القراءة للبشر؟</template>
+          <template class="content-en">How do we make the output of <code>json.dumps()</code> easy for humans to read?</template>
+          <span class="content-target">كيف نجعل مخرجات <code>json.dumps()</code> سهلة القراءة للبشر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام المعامل <code>indent</code> (مثلاً <code>indent=2</code>)، والذي يضيف مسافات بادئة وأسطر جديدة لتنسيق النص بشكل هرمي واضح.</template>
+          <template class="content-en">By using the <code>indent</code> parameter (e.g., <code>indent=2</code>), which adds spaces and newlines to format the text in a clear hierarchical structure.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي ميزة استخدام <code>pop('key', None)</code> بدلاً من <code>del</code>؟</template>
+          <template class="content-en">What is the advantage of using <code>pop('key', None)</code> instead of <code>del</code>?</template>
+          <span class="content-target">ما هي ميزة استخدام <code>pop('key', None)</code> بدلاً من <code>del</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا كان المفتاح غير موجود، فإن <code>del</code> ستوقف البرنامج بخطأ، بينما <code>pop</code> مع <code>None</code> ستتجاهل الأمر بأمان وتستمر في التنفيذ.</template>
+          <template class="content-en">If the key does not exist, <code>del</code> will crash the program with an error, whereas <code>pop</code> with <code>None</code> will safely ignore the command and continue execution.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مصطلح Marshalling؟</template>
+          <template class="content-en">What is the term Marshalling?</template>
+          <span class="content-target">ما هو مصطلح Marshalling؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو عملية تجهيز وتغليف البيانات (مثل تحويلها إلى JSON) لتصبح جاهزة للإرسال عبر الشبكة من كمبيوتر إلى آخر.</template>
+          <template class="content-en">It is the process of preparing and packaging data (like converting it to JSON) so it is ready to be transmitted over a network from one computer to another.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تحويل القوائم (Lists) والصفوف (Tuples) عند تصديرها إلى JSON؟</template>
+          <template class="content-en">How are Lists and Tuples converted when dumped to JSON?</template>
+          <span class="content-target">كيف يتم تحويل القوائم (Lists) والصفوف (Tuples) عند تصديرها إلى JSON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كلاهما يتحول إلى مصفوفة (Array) في JSON. وعند إعادتها إلى بايثون، ستعود دائماً كـ List.</template>
+          <template class="content-en">Both are converted to an Array in JSON. When loaded back into Python, they will always return as a List.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو اختصار JSON؟",
+      "en": "What does JSON stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "JavaScript Object Notation (تدوين كائنات جافا سكريبت).",
+        "en": "JavaScript Object Notation."
+      },
+      "example": {
+        "ar": "رغم اسمه، يُستخدم مع بايثون ولغات أخرى.",
+        "en": "Despite the name, it's used with Python and other languages."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الغرض من تنسيق التنظيم (Marshalling format)؟",
+      "en": "What is the purpose of a marshalling format?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق يُستخدم لإرسال البيانات من جهاز كمبيوتر إلى آخر.",
+        "en": "A format used to send data from one computer to another."
+      },
+      "example": {
+        "ar": "JSON هو تنسيق تنظيم شائع.",
+        "en": "JSON is a common marshalling format."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو التسلسل (Serialization)؟",
+      "en": "What is Serialization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل كائن (مثل قاموس بايثون) إلى سلسلة نصية أو بايتات.",
+        "en": "Converting an object (like a Python dict) to a string or stream of bytes."
+      },
+      "example": {
+        "ar": "استخدام json.dumps() لتحويل قاموس إلى نص.",
+        "en": "Using json.dumps() to convert a dict to text."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو إلغاء التسلسل (Deserialization)؟",
+      "en": "What is Deserialization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل سلسلة نصية (String) مرة أخرى إلى كائن برمجي.",
+        "en": "Converting a string back to an object."
+      },
+      "example": {
+        "ar": "استخدام json.loads() لتحويل نص JSON إلى قاموس بايثون.",
+        "en": "Using json.loads() to convert JSON text to a Python dict."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما وظيفة دالة json.dump()؟",
+      "en": "What is the function of json.dump()?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كتابة (تسلسل) بيانات بايثون إلى ملف JSON.",
+        "en": "Write (serialize) Python data to a JSON file."
+      },
+      "example": {
+        "ar": "json.dump(data, file_object)",
+        "en": "json.dump(data, file_object)"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما وظيفة دالة json.dumps()؟",
+      "en": "What is the function of json.dumps()?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كتابة (تسلسل) كائن بايثون إلى سلسلة نصية (String).",
+        "en": "Write (serialize) a Python object to a JSON string."
+      },
+      "example": {
+        "ar": "json_string = json.dumps(data)",
+        "en": "json_string = json.dumps(data)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما وظيفة دالة json.load()؟",
+      "en": "What is the function of json.load()?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحميل (إلغاء تسلسل) بيانات JSON من ملف.",
+        "en": "Load (deserialize) JSON from a file."
+      },
+      "example": {
+        "ar": "data = json.load(file_object)",
+        "en": "data = json.load(file_object)"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما وظيفة دالة json.loads()؟",
+      "en": "What is the function of json.loads()?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحميل (إلغاء تسلسل) بيانات JSON من سلسلة نصية (String).",
+        "en": "Load (deserialize) JSON data from a string."
+      },
+      "example": {
+        "ar": "data = json.loads(json_string)",
+        "en": "data = json.loads(json_string)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو JSON المفهرس (Keyed JSON)؟",
+      "en": "What is a Keyed JSON file?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ملف JSON حيث يكون لكل جزء من البيانات مفتاح فريد يحدده.",
+        "en": "A JSON file where each chunk of data has a single unique key that identifies it."
+      },
+      "example": {
+        "ar": "مثل البيانات المستخرجة من Firebase.",
+        "en": "Like data extracted from Firebase."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يتم تمثيل قاموس بايثون (dict) في JSON؟",
+      "en": "How is a Python dictionary (dict) represented in JSON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمثيله ككائن (object).",
+        "en": "It is represented as an object."
+      },
+      "example": {
+        "ar": "{}",
+        "en": "{}"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "كيف يتم تمثيل قوائم بايثون (list, tuple) في JSON؟",
+      "en": "How are Python lists and tuples represented in JSON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمثيلها كمصفوفة (array).",
+        "en": "They are represented as an array."
+      },
+      "example": {
+        "ar": "[]",
+        "en": "[]"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "كيف يتم تمثيل القيمة True الخاصة ببايثون في JSON؟",
+      "en": "How is Python's True represented in JSON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُكتب بأحرف صغيرة: true.",
+        "en": "It is written in lowercase: true."
+      },
+      "example": {
+        "ar": "true",
+        "en": "true"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يتم تمثيل القيمة None الخاصة ببايثون في JSON؟",
+      "en": "How is Python's None represented in JSON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُكتب: null.",
+        "en": "It is written as: null."
+      },
+      "example": {
+        "ar": "null",
+        "en": "null"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "لماذا نستخدم المعامل newline=\"\" عند فتح ملف JSON؟",
+      "en": "Why use the newline=\"\" parameter when opening a JSON file?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لتجنب جلب أحرف السطر الجديد المخفية في نهاية كل صف.",
+        "en": "To avoid bringing in the hidden newline character at the end of each row."
+      },
+      "example": {
+        "ar": "open(filename, 'r', newline='')",
+        "en": "open(filename, 'r', newline='')"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي المكتبة المستخدمة لتحويل تواريخ الإكسل التسلسلية في بايثون؟",
+      "en": "Which module is used to convert Excel serial dates in Python?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكتبة xlrd.",
+        "en": "The xlrd module."
+      },
+      "example": {
+        "ar": "xlrd.xldate_as_tuple()",
+        "en": "xlrd.xldate_as_tuple()"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "كيف نحول طابع زمني (Timestamp) من Firebase إلى تاريخ بايثون؟",
+      "en": "How do we convert a Firebase timestamp to a Python date?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام دالة datetime.utcfromtimestamp().",
+        "en": "Using the datetime.utcfromtimestamp() method."
+      },
+      "example": {
+        "ar": "dt.datetime.utcfromtimestamp(timestamp)",
+        "en": "dt.datetime.utcfromtimestamp(timestamp)"
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هي الطريقة الآمنة لحذف مفتاح من قاموس بايثون؟",
+      "en": "What is the safe way to remove a key from a Python dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام دالة pop() مع تمرير None كقيمة افتراضية.",
+        "en": "Using the pop() method and passing None as a default value."
+      },
+      "example": {
+        "ar": "dict.pop('keyname', None)",
+        "en": "dict.pop('keyname', None)"
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما وظيفة المعامل indent في دالة json.dumps()؟",
+      "en": "What is the function of the indent parameter in json.dumps()?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يضيف مسافات بادئة لبيانات JSON لجعلها مقروءة للبشر.",
+        "en": "It indents the JSON data to make it more readable for humans."
+      },
+      "example": {
+        "ar": "json.dumps(data, indent=2)",
+        "en": "json.dumps(data, indent=2)"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الدوال التالية تُستخدم لتحويل كائن بايثون إلى سلسلة نصية (String) بتنسيق JSON؟",
+      "en": "Which of the following methods is used to convert a Python object to a JSON string?"
+    },
+    "options": {
+      "ar": [
+        "json.dump()",
+        "json.dumps()",
+        "json.load()",
+        "json.loads()"
+      ],
+      "en": [
+        "json.dump()",
+        "json.dumps()",
+        "json.load()",
+        "json.loads()"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حرف الـ 's' في dumps يرمز إلى string، وهي الدالة المخصصة لتحويل الكائنات إلى نصوص.",
+      "en": "The 's' in dumps stands for string, which is the method used to serialize objects into strings."
+    },
+    "hint": {
+      "ar": "تذكر حرف الـ 's'.",
+      "en": "Remember the letter 's'."
+    },
+    "difficulty": "easy",
+    "conceptId": "serialization-deserialization"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو المعادل في JSON لنوع البيانات Tuple في بايثون؟",
+      "en": "What is the JSON equivalent of a Python Tuple?"
+    },
+    "options": {
+      "ar": [
+        "object",
+        "array",
+        "string",
+        "null"
+      ],
+      "en": [
+        "object",
+        "array",
+        "string",
+        "null"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في JSON، يتم تحويل كل من القوائم (lists) والصفوف (tuples) إلى مصفوفات (arrays).",
+      "en": "In JSON, both lists and tuples are converted to arrays."
+    },
+    "hint": {
+      "ar": "JSON لا يمتلك نوعاً خاصاً بالبيانات غير القابلة للتعديل.",
+      "en": "JSON does not have a specific type for immutable sequences."
+    },
+    "difficulty": "medium",
+    "conceptId": "serialization-deserialization"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا يُنصح باستخدام المعامل newline=\"\" عند فتح ملف JSON للقراءة؟",
+      "en": "Why is it recommended to use the newline=\"\" parameter when opening a JSON file for reading?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عملية القراءة.",
+        "لتجنب جلب أحرف السطر الجديد المخفية في نهاية كل صف.",
+        "لتحويل النص إلى أحرف صغيرة.",
+        "للسماح بقراءة الملفات المشفرة."
+      ],
+      "en": [
+        "To speed up the reading process.",
+        "To avoid bringing in the hidden newline character at the end of each row.",
+        "To convert text to lowercase.",
+        "To allow reading encrypted files."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يمنع هذا المعامل بايثون من الترجمة التلقائية لفواصل الأسطر، مما يحافظ على سلامة البيانات.",
+      "en": "This parameter prevents Python from automatically translating newlines, preserving data integrity."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بالأحرف المخفية.",
+      "en": "It relates to hidden characters."
+    },
+    "difficulty": "medium",
+    "conceptId": "loading-json-data"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي مكتبة تُستخدم لتحويل تواريخ الإكسل التسلسلية إلى تواريخ بايثون؟",
+      "en": "Which module is used to convert Excel serial dates to Python dates?"
+    },
+    "options": {
+      "ar": [
+        "json",
+        "datetime",
+        "xlrd",
+        "firebase"
+      ],
+      "en": [
+        "json",
+        "datetime",
+        "xlrd",
+        "firebase"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مكتبة xlrd (Excel reader) تحتوي على دالة xldate_as_tuple المخصصة لهذا الغرض.",
+      "en": "The xlrd (Excel reader) module contains the xldate_as_tuple method specifically for this."
+    },
+    "hint": {
+      "ar": "اسم المكتبة يبدأ بـ xl.",
+      "en": "The module name starts with xl."
+    },
+    "difficulty": "easy",
+    "conceptId": "handling-json-dates"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الطريقة الصحيحة والآمنة لحذف مفتاح 'lastvisit' من قاموس 'v'؟",
+      "en": "What is the correct and safe way to remove the 'lastvisit' key from dictionary 'v'?"
+    },
+    "options": {
+      "ar": [
+        "del v['lastvisit']",
+        "v.remove('lastvisit')",
+        "v.pop('lastvisit', None)",
+        "v.delete('lastvisit')"
+      ],
+      "en": [
+        "del v['lastvisit']",
+        "v.remove('lastvisit')",
+        "v.pop('lastvisit', None)",
+        "v.delete('lastvisit')"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "استخدام pop مع None يضمن عدم توقف البرنامج بخطأ KeyError إذا كان المفتاح غير موجود.",
+      "en": "Using pop with None ensures the program won't crash with a KeyError if the key doesn't exist."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة التي تقبل قيمة افتراضية.",
+      "en": "Look for the method that accepts a default value."
+    },
+    "difficulty": "medium",
+    "conceptId": "manipulating-json-data"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض من المعامل indent=2 في دالة json.dumps()؟",
+      "en": "What is the purpose of the indent=2 parameter in json.dumps()?"
+    },
+    "options": {
+      "ar": [
+        "تشفير البيانات.",
+        "جعل نص JSON أكثر قابلية للقراءة بإضافة مسافات بادئة.",
+        "تغيير نوع البيانات إلى مصفوفة.",
+        "حذف القيم الفارغة من JSON."
+      ],
+      "en": [
+        "To encrypt the data.",
+        "To make the JSON string more readable by adding indentation.",
+        "To change the data type to an array.",
+        "To remove null values from JSON."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المعامل indent يقوم بتنسيق النص (Pretty-printing) ليكون مقروءاً للبشر.",
+      "en": "The indent parameter formats the text (pretty-printing) to be human-readable."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بالشكل الجمالي للمخرجات.",
+      "en": "It relates to the visual formatting of the output."
+    },
+    "difficulty": "easy",
+    "conceptId": "dumping-python-data-to-json"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يتم تمثيل القيمة None الخاصة ببايثون في تنسيق JSON؟",
+      "en": "How is Python's None value represented in JSON format?"
+    },
+    "options": {
+      "ar": [
+        "None",
+        "NaN",
+        "null",
+        "undefined"
+      ],
+      "en": [
+        "None",
+        "NaN",
+        "null",
+        "undefined"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في JSON، القيمة الفارغة تُكتب null بأحرف صغيرة.",
+      "en": "In JSON, the empty value is written as null in lowercase."
+    },
+    "hint": {
+      "ar": "كلمة من 4 أحرف تبدأ بحرف n.",
+      "en": "A 4-letter word starting with n."
+    },
+    "difficulty": "easy",
+    "conceptId": "serialization-deserialization"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الدالة المستخدمة لتحويل طابع زمني (Timestamp) من Firebase إلى تاريخ بايثون؟",
+      "en": "Which method is used to convert a Firebase timestamp to a Python date?"
+    },
+    "options": {
+      "ar": [
+        "datetime.now()",
+        "datetime.utcfromtimestamp()",
+        "xlrd.xldate_as_tuple()",
+        "json.loads()"
+      ],
+      "en": [
+        "datetime.now()",
+        "datetime.utcfromtimestamp()",
+        "xlrd.xldate_as_tuple()",
+        "json.loads()"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تواريخ Firebase تعتمد على التوقيت العالمي المنسق (UTC)، لذا نستخدم utcfromtimestamp.",
+      "en": "Firebase dates are UTC-based, so we use utcfromtimestamp."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة التي تحتوي على UTC.",
+      "en": "Look for the method containing UTC."
+    },
+    "difficulty": "medium",
+    "conceptId": "handling-json-dates"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو JSON المفهرس (Keyed JSON)؟",
+      "en": "What is a Keyed JSON file?"
+    },
+    "options": {
+      "ar": [
+        "ملف JSON مشفر بكلمة مرور.",
+        "ملف JSON يحتوي فقط على أرقام.",
+        "ملف JSON حيث يكون لكل جزء من البيانات مفتاح فريد يحدده.",
+        "ملف JSON لا يمكن تعديله."
+      ],
+      "en": [
+        "A JSON file encrypted with a password.",
+        "A JSON file containing only numbers.",
+        "A JSON file where each chunk of data has a single unique key that identifies it.",
+        "A JSON file that cannot be modified."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في JSON المفهرس، يتم تخزين البيانات كقاموس كبير حيث يمثل كل مفتاح معرفاً فريداً لسجل معين.",
+      "en": "In Keyed JSON, data is stored as a large dictionary where each key represents a unique identifier for a specific record."
+    },
+    "hint": {
+      "ar": "فكر في القاموس والمفاتيح.",
+      "en": "Think about dictionaries and keys."
+    },
+    "difficulty": "medium",
+    "conceptId": "organizing-json-data"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "إذا كان لديك نص JSON مخزن في متغير <code>my_string</code>، كيف تقوم بتحميله إلى بايثون؟",
+      "en": "If you have JSON text stored in a variable <code>my_string</code>, how do you load it into Python?"
+    },
+    "options": {
+      "ar": [
+        "json.load(my_string)",
+        "json.loads(my_string)",
+        "json.dump(my_string)",
+        "json.dumps(my_string)"
+      ],
+      "en": [
+        "json.load(my_string)",
+        "json.loads(my_string)",
+        "json.dump(my_string)",
+        "json.dumps(my_string)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بما أن البيانات موجودة في سلسلة نصية (string)، يجب استخدام الدالة التي تنتهي بحرف 's' وهي loads.",
+      "en": "Since the data is in a string, you must use the method ending with 's', which is loads."
+    },
+    "hint": {
+      "ar": "تذكر حرف الـ 's' للنصوص.",
+      "en": "Remember the 's' for strings."
+    },
+    "difficulty": "easy",
+    "conceptId": "loading-json-data"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين <code>load</code> و <code>loads</code>: تذكر دائماً أن <code>load</code> تأخذ كائن ملف (File object)، بينما <code>loads</code> تأخذ سلسلة نصية (String). استخدام <code>load</code> مع نص سيؤدي إلى خطأ فوري.</template>
+    <template class="content-en">Confusing <code>load</code> and <code>loads</code>: Always remember that <code>load</code> takes a file object, while <code>loads</code> takes a string. Using <code>load</code> with a string will cause an immediate error.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">القيم المنطقية في JSON حساسة لحالة الأحرف. <code>True</code> في بايثون يجب أن تُكتب <code>true</code> في JSON. دالة <code>dumps</code> تقوم بهذا التحويل تلقائياً، لكن إذا كنت تكتب JSON يدوياً، انتبه لهذه التفصيلة.</template>
+    <template class="content-en">JSON booleans are case-sensitive. Python's <code>True</code> must be written as <code>true</code> in JSON. The <code>dumps</code> method handles this automatically, but if you write JSON manually, pay attention to this detail.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التسلسل (Serialization) هو مجرد تحويل كائن برمجي حي في الذاكرة إلى نص ميت يمكن نقله أو حفظه. إلغاء التسلسل هو إعادة إحياء هذا النص إلى كائن برمجي.</template>
+    <template class="content-en">Serialization is simply converting a live programming object in memory into dead text that can be transmitted or saved. Deserialization is reviving that text back into a programming object.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>del dict['key']</code> لحذف مفتاح قد لا يكون موجوداً سيؤدي إلى انهيار البرنامج (KeyError). استخدم دائماً <code>dict.pop('key', None)</code> كبديل آمن.</template>
+    <template class="content-en">Using <code>del dict['key']</code> to remove a key that might not exist will crash the program (KeyError). Always use <code>dict.pop('key', None)</code> as a safe alternative.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M10.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M12.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

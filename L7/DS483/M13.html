@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="13" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>روبوتات الدردشة وأنظمة الحوار · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M12.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#properties-of-human-conversation" class="toc-link" data-bilingual>
+        <template class="content-ar">خصائص المحادثة البشرية</template>
+        <template class="content-en">Properties of Human Conversation</template>
+        <span class="content-target">خصائص المحادثة البشرية</span>
+      </a>
+      <a href="#task-based-dialogue-systems-gus" class="toc-link" data-bilingual>
+        <template class="content-ar">أنظمة الحوار القائمة على المهام: بنية GUS</template>
+        <template class="content-en">Task-Based Dialogue Systems: GUS Architecture</template>
+        <span class="content-target">أنظمة الحوار القائمة على المهام: بنية GUS</span>
+      </a>
+      <a href="#dialogue-state-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">بنية حالة الحوار (Dialogue-State System)</template>
+        <template class="content-en">Dialogue-State System Architecture</template>
+        <span class="content-target">بنية حالة الحوار (Dialogue-State System)</span>
+      </a>
+      <a href="#chatbots-rule-vs-corpus" class="toc-link" data-bilingual>
+        <template class="content-ar">روبوتات الدردشة: القائمة على القواعد مقابل القائمة على المتون</template>
+        <template class="content-en">Chatbots: Rule-based vs. Corpus-based</template>
+        <span class="content-target">روبوتات الدردشة: القائمة على القواعد مقابل القائمة على المتون</span>
+      </a>
+      <a href="#chatbot-finetuning-evaluation" class="toc-link" data-bilingual>
+        <template class="content-ar">ضبط وتقييم روبوتات الدردشة</template>
+        <template class="content-en">Chatbot Fine-Tuning and Evaluation</template>
+        <span class="content-target">ضبط وتقييم روبوتات الدردشة</span>
+      </a>
+      <a href="#dialogue-system-design-ethics" class="toc-link" data-bilingual>
+        <template class="content-ar">تصميم أنظمة الحوار والقضايا الأخلاقية</template>
+        <template class="content-en">Dialogue System Design &amp; Ethical Issues</template>
+        <span class="content-target">تصميم أنظمة الحوار والقضايا الأخلاقية</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 13</template>
+      <template class="content-en">Module 13</template>
+      <span class="content-target">الوحدة 13</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">روبوتات الدردشة وأنظمة الحوار</h1>
+      <p class="hero-description">دراسة خصائص المحادثة البشرية، وأنظمة الحوار القائمة على المهام (مثل GUS و Dialogue-state)، وروبوتات الدردشة، بالإضافة إلى تصميم أنظمة الحوار والاعتبارات الأخلاقية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Chatbots &amp; Dialogue Systems</h1>
+      <p class="hero-description">Study of human conversation properties, task-based dialogue systems (GUS and Dialogue-state), chatbots, dialogue system design, and ethical considerations.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">أنظمة الحوار</span>
+      <span class="tag">روبوتات الدردشة</span>
+      <span class="tag">الذكاء الاصطناعي التخاطبي</span>
+      <span class="tag">أفعال الكلام</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">Dialogue Systems</span>
+      <span class="tag">Chatbots</span>
+      <span class="tag">Conversational AI</span>
+      <span class="tag">Speech Acts</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>اكتساب خلفية أساسية عن خصائص المحادثة البشرية.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين أنواع أنظمة الحوار المختلفة.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم أساسيات أنظمة الحوار القائمة على المهام، بما في ذلك نظام GUS ونظام حالة الحوار.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم كيفية تدريب وضبط وتقييم روبوتات الدردشة (Chatbots).</span></li>
+      <li><span class="obj-icon">✦</span><span>استكشاف الاعتبارات الأخلاقية المرتبطة بأنظمة الحوار.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Gain a basic background of the properties of human conversation.</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between the types of dialogue systems.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the basics of task-based dialogue systems, including GUS and Dialogue-state system.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand training, fine-tuning and evaluating chatbots.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explore the ethical considerations associated with dialogue systems.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="properties-of-human-conversation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> خصائص المحادثة البشرية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Properties of Human Conversation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المحادثة البشرية ليست مجرد تبادل للكلمات، بل هي سلسلة معقدة من الأدوار، والأفعال، والتأسيس المشترك الذي يجعل من الصعب على الآلات محاكاتها.</p></template>
+    <template class="content-en"><p>Human conversation is a complex sequence of turns, acts, and grounding that makes it difficult for machines to naturally mimic.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لفهم كيفية بناء أنظمة حوار، يجب أولاً فهم خصائص المحادثة البشرية:</p><ul><li><b>الأدوار (Turns):</b> المحادثة هي تسلسل من الأدوار. يجب أن يعرف النظام متى يتوقف عن التحدث (عند المقاطعة) ومتى يبدأ (عندما ينتهي المستخدم).</li><li><b><span class="smart-term" data-term-en="Speech Acts" data-ar="أفعال الكلام" data-en-def="Actions performed by speaking, such as requesting, promising, or acknowledging.">أفعال الكلام<span class="smart-term-tooltip"></span></span> (Speech Acts):</b> كل دور هو نوع من الفعل (مثل: التوجيهات، الإقرارات، الوعود).</li><li><b><span class="smart-term" data-term-en="Grounding" data-ar="التأسيس المشترك" data-en-def="The process of establishing common ground between participants in a dialogue.">التأسيس المشترك<span class="smart-term-tooltip"></span></span> (Grounding):</b> اعتراف المستمع بأنه فهم المتحدث (مثل قول "حسناً" أو تكرار الكلام).</li><li><b>هيكل الحوار (Dialogue Structure):</b> يحتوي على أزواج متجاورة (Adjacency pairs) مثل (سؤال/جواب)، وقد تتخللها حوارات فرعية للتصحيح أو التوضيح.</li><li><b>المبادرة (Initiative):</b> قد تكون من النظام، أو المستخدم، أو مبادرة مختلطة (Mixed initiative) وهي الأكثر شيوعاً في الحوار البشري.</li><li><b>الاستنتاج (Inference):</b> يتوقع المتحدث من المستمع استنتاج معلومات غير مصرح بها حرفياً.</li></ul></template>
+    <template class="content-en"><p>To build dialogue systems, we must understand human conversation properties:</p><ul><li><b>Turns:</b> A sequence of contributions. Systems must know when to stop talking (interruptions) and when to start (detecting pauses vs. end of speech).</li><li><b><span class="smart-term" data-term-en="Speech Acts" data-ar="أفعال الكلام" data-en-def="Actions performed by speaking, such as requesting, promising, or acknowledging.">Speech Acts<span class="smart-term-tooltip"></span></span>:</b> Each turn is an action (Constatives, Directives, Commissives, Acknowledgments).</li><li><b><span class="smart-term" data-term-en="Grounding" data-ar="التأسيس المشترك" data-en-def="The process of establishing common ground between participants in a dialogue.">Grounding<span class="smart-term-tooltip"></span></span>:</b> Acknowledging understanding (e.g., saying "OK" or repeating).</li><li><b>Dialogue Structure:</b> Conversations have <span class="smart-term" data-term-en="Adjacency pairs" data-ar="الأزواج المتجاورة" data-en-def="Conversational structures where one act sets up an expectation for another (e.g., Question -&gt; Answer).">adjacency pairs<span class="smart-term-tooltip"></span></span> (Question/Answer) which can be separated by sub-dialogues (correction/clarification).</li><li><b>Initiative:</b> Can be system-initiative, user-initiative, or mixed initiative (common in human-human).</li><li><b>Inference:</b> Communicating more than exact words, expecting the hearer to draw conclusions.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تكمن صعوبة بناء أنظمة حوار طبيعية في أن البشر يعتمدون بشكل كبير على السياق غير المنطوق والإشارات الضمنية. على سبيل المثال، التأسيس المشترك (Grounding) ليس دائماً لفظياً؛ إضاءة زر المصعد هي شكل من أشكال التأسيس غير اللغوي.</p><p>علاوة على ذلك، المبادرة المختلطة (Mixed Initiative) تمثل تحدياً هندسياً كبيراً، حيث يجب أن يكون النظام قادراً على التبديل بسلاسة بين قيادة الحوار (طرح الأسئلة) والاستجابة السلبية لطلبات المستخدم، وهو ما تحاول النماذج اللغوية الكبيرة (LLMs) الحديثة الاقتراب منه.</p></template>
+    <template class="content-en"><p>The difficulty in building natural dialogue systems lies in humans' heavy reliance on unspoken context and implicit cues. For instance, Grounding isn't always verbal; an elevator button lighting up is a non-linguistic grounding action.</p><p>Furthermore, Full Mixed Initiative is a significant engineering challenge. The system must seamlessly switch between driving the conversation (asking questions) and passively responding to user queries, a feat modern LLMs are only just beginning to approximate.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لنظام الحوار التعامل مع مقاطعة المستخدم له في منتصف الجملة؟</template>
+      <template class="content-en">How can a dialogue system handle a user interrupting it mid-sentence?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب أن يمتلك النظام القدرة على اكتشاف نشاط الصوت (Voice Activity Detection) للمستخدم، وإيقاف توليد الصوت الخاص به (Barge-in)، ثم تحديث حالة الحوار بناءً على المدخلات الجديدة (مثل تصحيح معلومة).</p></template>
+      <template class="content-en"><p>The system must have Voice Activity Detection (VAD) to detect the user's speech, support 'barge-in' to stop its own Text-To-Speech (TTS), and update the dialogue state based on the new input (e.g., a correction).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="task-based-dialogue-systems-gus" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> أنظمة الحوار القائمة على المهام: بنية GUS</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Task-Based Dialogue Systems: GUS Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أنظمة مصممة لمساعدة المستخدم في إنجاز مهمة محددة (مثل حجز طيران) باستخدام هياكل تسمى الإطارات (Frames) والفتحات (Slots).</p></template>
+    <template class="content-en"><p>Systems designed to help users accomplish specific tasks (like booking a flight) using knowledge structures called Frames and Slots.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرف أنظمة الحوار القائمة على المهام أيضاً بالأنظمة القائمة على <span class="smart-term" data-term-en="Frame" data-ar="الإطار" data-en-def="A knowledge structure representing the details of a task specification.">الإطار<span class="smart-term-tooltip"></span></span>ات (Frame-based). الإطار هو هيكل معرفي يمثل تفاصيل المهمة، ويتكون من مجموعة من الفتحات (Slots) التي تأخذ قيماً محددة.</p><p>بنية GUS (نظام استخراج الفتحات الساذج) هي البنية الكلاسيكية:</p><ol><li><b>تصنيف المجال (Domain classification):</b> تحديد المجال العام (مثل: شركات الطيران).</li><li><b>تحديد النية (Intent determination):</b> تحديد هدف المستخدم (مثل: عرض رحلة).</li><li><b>ملء الفتحات (Slot filling):</b> استخراج القيم من نص المستخدم باستخدام قواعد مكتوبة يدوياً لملء الفتحات (مثل: مدينة المغادرة، وقت المغادرة).</li></ol><p>يطرح النظام أسئلة مبرمجة مسبقاً لملء الفتحات الفارغة حتى يكتمل الإطار.</p></template>
+    <template class="content-en"><p>Task-based dialogue systems are also called <span class="smart-term" data-term-en="Frame" data-ar="الإطار" data-en-def="A knowledge structure representing the details of a task specification.">frame<span class="smart-term-tooltip"></span></span>-based dialogue systems. A Frame is a knowledge structure representing task details, consisting of a collection of <span class="smart-term" data-term-en="Slot" data-ar="الفتحة" data-en-def="A specific attribute within a frame that needs to be filled with a value (e.g., Destination City).">Slot<span class="smart-term-tooltip"></span></span>s that take possible values.</p><p>The GUS (naive slot-extractor) architecture is the classic approach:</p><ol><li><b>Domain classification:</b> What general domain is the user talking about? (e.g., airlines).</li><li><b>Intent determination:</b> What task/goal is the user trying to accomplish? (e.g., Show a Flight).</li><li><b>Slot filling:</b> Extracting values using handwritten rules to fill the frame.</li></ol><p>The system asks pre-written template questions to fill empty slots until the frame is complete.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>رغم بساطة بنية GUS واعتمادها الواسع في الصناعة، إلا أنها تعاني من قيود كبيرة. فهي تعتمد على قواعد مكتوبة يدوياً (Handwritten rules) لملء الفتحات، مما يجعلها هشة أمام تنوع اللغة البشرية.</p><p>كما أن سياسة الحوار فيها بسيطة جداً: استمر في طرح الأسئلة حتى تمتلئ جميع الفتحات. لا يمكنها التعامل بسهولة مع الحوارات الفرعية المعقدة أو تصحيحات المستخدم المتكررة، مما مهد الطريق لظهور أنظمة حالة الحوار (Dialogue-state systems).</p></template>
+    <template class="content-en"><p>Despite its simplicity and widespread industrial use, the GUS architecture has significant limitations. It relies on handwritten rules for slot filling, making it brittle against the vast variability of natural language.</p><p>Its dialogue policy is also overly simplistic: just keep asking questions until all slots are full. It struggles to handle complex sub-dialogues, user corrections, or uncertainty, which paved the way for more sophisticated Dialogue-state systems.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A table representing a Frame for a flight booking system. Two columns: 'Slot' and 'Type'. Rows include: ORIGIN CITY (city), DESTINATION CITY (city), DEPARTURE TIME (time), DEPARTURE DATE (date). Next to it, an example user utterance: 'Show me morning flights from Boston to San Francisco on Tuesday'. Arrows pointing from words in the utterance to the filled slots in a resulting frame: DOMAIN: AIR-TRAVEL, INTENT: SHOW-FLIGHTS, ORIGIN-CITY: Boston, DESTINATION-CITY: San Francisco, ORIGIN-DATE: Tuesday, ORIGIN-TIME: morning. Style: educational, dark background #0d1117, accent colors for arrows, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Drop Shadow for Boxes -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+
+    <!-- Arrow Marker for Extraction Paths -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+
+    <!-- Arrow Marker for Instantiation -->
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Diagram Title -->
+  <text x="460" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Task-Based Dialogue: GUS Architecture</text>
+  <text x="460" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الحوار المبني على المهام: معمارية GUS</text>
+
+  <!-- ========================================== -->
+  <!-- UTTERANCE SECTION                          -->
+  <!-- ========================================== -->
+  
+  <!-- Utterance Box -->
+  <rect x="110" y="70" width="700" height="60" rx="10" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)"/>
+  <text x="460" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">"Show me morning flights from Boston to San Francisco on Tuesday"</text>
+  <text x="460" y="106" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">"أرني رحلات الصباح من بوسطن إلى سان فرانسيسكو يوم الثلاثاء"</text>
+
+  <!-- Extraction Dashed Lines -->
+  <line x1="180" y1="130" x2="180" y2="160" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="320" y1="130" x2="320" y2="160" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="460" y1="130" x2="460" y2="160" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="600" y1="130" x2="600" y2="160" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4 4"/>
+  <line x1="740" y1="130" x2="740" y2="160" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4 4"/>
+
+  <!-- Extracted Entity Chips -->
+  <!-- Chip 1: flights -->
+  <rect x="120" y="160" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="180" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">flights</text>
+  <text x="180" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">رحلات</text>
+
+  <!-- Chip 2: morning -->
+  <rect x="260" y="160" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="320" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">morning</text>
+  <text x="320" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الصباح</text>
+
+  <!-- Chip 3: Boston -->
+  <rect x="400" y="160" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="460" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Boston</text>
+  <text x="460" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بوسطن</text>
+
+  <!-- Chip 4: San Francisco -->
+  <rect x="540" y="160" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="600" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">San Francisco</text>
+  <text x="600" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">سان فرانسيسكو</text>
+
+  <!-- Chip 5: Tuesday -->
+  <rect x="680" y="160" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="740" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Tuesday</text>
+  <text x="740" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الثلاثاء</text>
+
+
+  <!-- ========================================== -->
+  <!-- FRAME DEFINITION (LEFT BOX)                -->
+  <!-- ========================================== -->
+  
+  <g filter="url(#shadow)">
+    <!-- Main Box Background -->
+    <rect x="60" y="260" width="360" height="280" rx="8" fill="var(--bg-elevated)"/>
+    
+    <!-- Header -->
+    <path d="M 60 268 A 8 8 0 0 1 68 260 L 412 260 A 8 8 0 0 1 420 268 L 420 310 L 60 310 Z" fill="var(--brand-500)"/>
+    <text x="240" y="292" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Frame Definition</text>
+    <text x="240" y="292" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">تعريف الإطار</text>
+
+    <!-- Table Headers -->
+    <rect x="60" y="310" width="360" height="40" fill="var(--bg-surface)"/>
+    <text x="180" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Slot</text>
+    <text x="180" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الخانة</text>
+    <text x="340" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Type</text>
+    <text x="340" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">النوع</text>
+
+    <!-- Table Rows (Zebra Striped) -->
+    <!-- Row 1 -->
+    <text x="180" y="382" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">ORIGIN CITY</text>
+    <text x="180" y="382" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مدينة الانطلاق</text>
+    <text x="340" y="382" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">city</text>
+    <text x="340" y="382" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مدينة</text>
+
+    <!-- Row 2 -->
+    <rect x="60" y="400" width="360" height="45" fill="var(--bg-surface)"/>
+    <text x="180" y="427" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">DESTINATION CITY</text>
+    <text x="180" y="427" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مدينة الوصول</text>
+    <text x="340" y="427" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">city</text>
+    <text x="340" y="427" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مدينة</text>
+
+    <!-- Row 3 -->
+    <text x="180" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">DEPARTURE TIME</text>
+    <text x="180" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">وقت المغادرة</text>
+    <text x="340" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">time</text>
+    <text x="340" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">وقت</text>
+
+    <!-- Row 4 -->
+    <rect x="60" y="490" width="360" height="45" fill="var(--bg-surface)"/>
+    <text x="180" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">DEPARTURE DATE</text>
+    <text x="180" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">تاريخ المغادرة</text>
+    <text x="340" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">date</text>
+    <text x="340" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">تاريخ</text>
+
+    <!-- Vertical Divider -->
+    <line x1="280" y1="310" x2="280" y2="540" stroke="var(--border-color)" stroke-width="1"/>
+    
+    <!-- Outer Border -->
+    <rect x="60" y="260" width="360" height="280" rx="8" fill="none" stroke="var(--border-color)" stroke-width="2"/>
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- INSTANTIATION ARROW                        -->
+  <!-- ========================================== -->
+  
+  <line x1="425" y1="400" x2="470" y2="400" stroke="var(--text-muted)" stroke-width="3" stroke-dasharray="6 4" marker-end="url(#arrow-muted)"/>
+  <text x="450" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Slot Filling</text>
+  <text x="450" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">ملء الخانات</text>
+
+
+  <!-- ========================================== -->
+  <!-- FILLED FRAME (RIGHT BOX)                   -->
+  <!-- ========================================== -->
+  
+  <g filter="url(#shadow)">
+    <!-- Main Box Background -->
+    <rect x="480" y="260" width="360" height="280" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    
+    <!-- Header -->
+    <path d="M 480 268 A 8 8 0 0 1 488 260 L 832 260 A 8 8 0 0 1 840 268 L 840 310 L 480 310 Z" fill="var(--brand-500)"/>
+    <text x="660" y="292" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Extracted Frame (GUS)</text>
+    <text x="660" y="292" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">الإطار المستخرج (GUS)</text>
+
+    <!-- Key-Value Pairs -->
+    <!-- Row 1: DOMAIN -->
+    <text x="560" y="342" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">DOMAIN</text>
+    <text x="560" y="342" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">النطاق</text>
+    <rect x="660" y="325" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="342" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">AIR-TRAVEL</text>
+    <text x="740" y="342" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">السفر الجوي</text>
+
+    <!-- Row 2: INTENT -->
+    <text x="560" y="377" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">INTENT</text>
+    <text x="560" y="377" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">القصد</text>
+    <rect x="660" y="360" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="377" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">SHOW-FLIGHTS</text>
+    <text x="740" y="377" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">عرض الرحلات</text>
+
+    <!-- Row 3: ORIGIN-CITY -->
+    <text x="560" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ORIGIN-CITY</text>
+    <text x="560" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">مدينة الانطلاق</text>
+    <rect x="660" y="395" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Boston</text>
+    <text x="740" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بوسطن</text>
+
+    <!-- Row 4: DESTINATION-CITY -->
+    <text x="560" y="447" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">DESTINATION-CITY</text>
+    <text x="560" y="447" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">مدينة الوصول</text>
+    <rect x="660" y="430" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="447" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">San Francisco</text>
+    <text x="740" y="447" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">سان فرانسيسكو</text>
+
+    <!-- Row 5: ORIGIN-DATE -->
+    <text x="560" y="482" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ORIGIN-DATE</text>
+    <text x="560" y="482" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">تاريخ الانطلاق</text>
+    <rect x="660" y="465" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="482" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Tuesday</text>
+    <text x="740" y="482" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الثلاثاء</text>
+
+    <!-- Row 6: ORIGIN-TIME -->
+    <text x="560" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ORIGIN-TIME</text>
+    <text x="560" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">وقت الانطلاق</text>
+    <rect x="660" y="500" width="160" height="24" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <text x="740" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">morning</text>
+    <text x="740" y="517" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الصباح</text>
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- ROUTING BUS (ARROWS FROM CHIPS TO FRAME)   -->
+  <!-- ========================================== -->
+  
+  <!-- Path 5: Tuesday -> ORIGIN-DATE -->
+  <path d="M 740 200 L 740 235 Q 740 240 745 240 L 850 240 Q 855 240 855 245 L 855 472 Q 855 477 850 477 L 825 477" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Path 4: San Francisco -> DESTINATION-CITY -->
+  <path d="M 600 200 L 600 230 Q 600 235 605 235 L 860 235 Q 865 235 865 240 L 865 437 Q 865 442 860 442 L 825 442" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Path 3: Boston -> ORIGIN-CITY -->
+  <path d="M 460 200 L 460 225 Q 460 230 465 230 L 870 230 Q 875 230 875 235 L 875 402 Q 875 407 870 407 L 825 407" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Path 2: morning -> ORIGIN-TIME -->
+  <path d="M 320 200 L 320 220 Q 320 225 325 225 L 880 225 Q 885 225 885 230 L 885 507 Q 885 512 880 512 L 825 512" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Path 1: flights -> INTENT -->
+  <path d="M 180 200 L 180 215 Q 180 220 185 220 L 890 220 Q 895 220 895 225 L 895 367 Q 895 372 890 372 L 825 372" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Path 1 Branch: flights -> DOMAIN -->
+  <path d="M 895 337 L 825 337" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  <circle cx="895" cy="337" r="3" fill="var(--brand-500)"/>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تصنيف المجال (Domain Classification) خطوة تسبق تحديد النية (Intent Determination)؟</template>
+      <template class="content-en">Why is Domain Classification a step that precedes Intent Determination?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن النوايا (Intents) غالباً ما تكون محددة ومرتبطة بمجال معين. معرفة أن المستخدم يتحدث عن 'المطاعم' يقلص مساحة النوايا المحتملة إلى (حجز طاولة، طلب قائمة طعام) بدلاً من البحث في جميع النوايا الممكنة لكل المجالات.</p></template>
+      <template class="content-en"><p></p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dialogue-state-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> بنية حالة الحوار (Dialogue-State System)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Dialogue-State System Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نسخة متطورة من الأنظمة القائمة على الإطارات تستخدم التعلم الآلي لتتبع حالة الحوار بأكملها وتحديد سياسة الرد المناسبة.</p></template>
+    <template class="content-en"><p>A sophisticated version of frame-based systems that uses machine learning to track the entire dialogue state and determine the appropriate response policy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون نظام حالة الحوار من 6 مكونات رئيسية:</p><ol><li><b>التعرف التلقائي على الكلام (ASR):</b> استقبال المدخلات الصوتية من المستخدم.</li><li><b>فهم اللغة المنطوقة (SLU):</b> استخراج قيم الفتحات باستخدام مصنفات التعلم الآلي (بدلاً من القواعد).</li><li><b><span class="smart-term" data-term-en="Dialogue State Tracker (DST)" data-ar="متتبع حالة الحوار" data-en-def="Component that maintains the entire state of the frame summarizing all user constraints up to the current point.">متتبع حالة الحوار<span class="smart-term-tooltip"></span></span> (DST):</b> يحدد الحالة الحالية للإطار (قيم الفتحات) وفعل الحوار الأخير للمستخدم. إنه يلخص <i>جميع</i> قيود المستخدم حتى هذه اللحظة.</li><li><b><span class="smart-term" data-term-en="Dialogue Policy" data-ar="سياسة الحوار" data-en-def="Component that decides what dialogue act the system should generate next (content planning).">سياسة الحوار<span class="smart-term-tooltip"></span></span> (Dialogue Policy):</b> تقرر فعل الحوار الذي يجب توليده (تخطيط المحتوى). تتضمن التأكيد الصريح/الضمني أو الرفض إذا لم يفهم النظام.</li><li><b>توليد اللغات الطبيعية (NLG):</b> تحويل فعل الحوار المختار إلى نص طبيعي (تحقيق الجملة).</li><li><b>تحويل النص إلى كلام (TTS):</b> إرجاع المخرجات الصوتية للمستخدم.</li></ol></template>
+    <template class="content-en"><p>A dialogue-state architecture consists of 6 components:</p><ol><li><b>Automatic Speech Recognition (ASR):</b> Receives audio input.</li><li><b>Spoken Language Understanding (SLU):</b> Extracts slot fillers using machine learning classifiers (instead of rules).</li><li><b><span class="smart-term" data-term-en="Dialogue State Tracker (DST)" data-ar="متتبع حالة الحوار" data-en-def="Component that maintains the entire state of the frame summarizing all user constraints up to the current point.">Dialogue State Tracker (DST)<span class="smart-term-tooltip"></span></span>:</b> Determines the current state of the frame and the user's recent dialogue act. It summarizes the <i>entire</i> state of user constraints at this point.</li><li><b><span class="smart-term" data-term-en="Dialogue Policy" data-ar="سياسة الحوار" data-en-def="Component that decides what dialogue act the system should generate next (content planning).">Dialogue Policy<span class="smart-term-tooltip"></span></span>:</b> Decides what dialogue act to generate (content planning), including explicit/implicit confirmations or rejections.</li><li><b>Natural Language Generation (NLG):</b> Generates the text of the response (sentence realization).</li><li><b>Text To Speech (TTS):</b> Returns audio output to the user.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين GUS ونظام حالة الحوار يكمن في مكوني DST و Dialogue Policy.</p><ul><li><strong>متتبع الحالة (DST)</strong> لا ينظر فقط إلى الجملة الحالية، بل يحافظ على سياق تراكمي (Context) طوال المحادثة، مما يسمح للمستخدم بتغيير رأيه أو الإشارة إلى معلومات سابقة.</li><li><strong>سياسة الحوار (Dialogue Policy)</strong> هنا ليست مجرد 'اسأل عن الفتحة التالية'. بل تتعامل مع عدم اليقين (Uncertainty) الناتج عن أخطاء التعرف على الكلام (ASR) من خلال استراتيجيات التأكيد (Confirmation):<ul><li><strong>التأكيد الصريح</strong> (هل تقصد كذا؟) أو</li><li><strong>التأكيد الضمني</strong> (حسناً، رحلة إلى كذا، متى تريد المغادرة؟).</li></ul></li></ul></template>
+    <template class="content-en"><p>The fundamental difference between GUS and Dialogue-State systems lies in the DST and Dialogue Policy components. The DST doesn't just look at the current sentence; it maintains a cumulative context, allowing users to change their minds or refer to past information.</p><p>The Dialogue Policy is not just 'ask for the next slot'. It handles uncertainty from ASR errors through Confirmation strategies: Explicit confirmation ('Did you mean X?') or Implicit confirmation ('Okay, a flight to X. When do you want to leave?').</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A block diagram showing the 6 components of a Dialogue-State System. User audio goes into ASR (Automatic Speech Recognition) -> text goes to SLU (Spoken Language Understanding) -> semantic representation goes to DST (Dialogue State Tracker) which loops with a state database. DST outputs state to Dialogue Policy -> abstract action goes to NLG (Natural Language Generation) -> text goes to TTS (Text to Speech) -> audio back to user. Include arrows showing the flow. Style: educational, dark background #0d1117, distinct colors for each block, viewBox 0 0 900 500. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="450" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dialogue-State System Architecture</text>
+  <text x="450" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية نظام حالة الحوار</text>
+
+  <!-- ================= ARROWS & FLOW ================= -->
+  <g id="arrows" fill="none" stroke="var(--brand-500)" stroke-width="2">
+    <!-- User to ASR -->
+    <path d="M 70 205 C 70 120, 110 120, 157 120" marker-end="url(#arrow)" />
+    <!-- ASR to SLU -->
+    <path d="M 313 120 L 377 120" marker-end="url(#arrow)" />
+    <!-- SLU to DST -->
+    <path d="M 533 120 L 597 120" marker-end="url(#arrow)" />
+    <!-- DST to DB (Right) -->
+    <path d="M 753 105 L 790 105" marker-end="url(#arrow)" />
+    <!-- DB to DST (Left) -->
+    <path d="M 795 135 L 758 135" marker-end="url(#arrow)" />
+    <!-- DST to Policy -->
+    <path d="M 680 163 L 680 327" marker-end="url(#arrow)" />
+    <!-- Policy to NLG -->
+    <path d="M 607 380 L 533 380" marker-end="url(#arrow)" />
+    <!-- NLG to TTS -->
+    <path d="M 387 380 L 313 380" marker-end="url(#arrow)" />
+    <!-- TTS to User -->
+    <path d="M 167 380 C 110 380, 70 350, 70 305" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- ================= ARROW LABELS ================= -->
+  <g id="arrow-labels" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">
+    <!-- User to ASR -->
+    <text x="115" y="145" class="gsvg-en">Audio Input</text>
+    <text x="115" y="145" class="gsvg-ar">إدخال صوتي</text>
+    
+    <!-- ASR to SLU -->
+    <text x="345" y="112" class="gsvg-en">Text</text>
+    <text x="345" y="112" class="gsvg-ar">نص</text>
+    
+    <!-- SLU to DST -->
+    <text x="565" y="112" class="gsvg-en">Semantic Rep.</text>
+    <text x="565" y="112" class="gsvg-ar">تمثيل دلالي</text>
+    
+    <!-- DST to DB -->
+    <text x="774" y="95" class="gsvg-en">State</text>
+    <text x="774" y="95" class="gsvg-ar">الحالة</text>
+    
+    <!-- DST to Policy -->
+    <text x="740" y="245" class="gsvg-en">Current State</text>
+    <text x="740" y="245" class="gsvg-ar">الحالة الحالية</text>
+    
+    <!-- Policy to NLG -->
+    <text x="570" y="372" class="gsvg-en">Abstract Action</text>
+    <text x="570" y="372" class="gsvg-ar">إجراء مجرد</text>
+    
+    <!-- NLG to TTS -->
+    <text x="350" y="372" class="gsvg-en">Text</text>
+    <text x="350" y="372" class="gsvg-ar">نص</text>
+    
+    <!-- TTS to User -->
+    <text x="115" y="345" class="gsvg-en">Audio Output</text>
+    <text x="115" y="345" class="gsvg-ar">مخرجات صوتية</text>
+  </g>
+
+  <!-- ================= NODES ================= -->
+  <g id="nodes">
+    <!-- User Node -->
+    <circle cx="70" cy="250" r="45" fill="var(--brand-500)" />
+    <circle cx="70" cy="235" r="14" fill="var(--on-brand-lo)" />
+    <path d="M 46 270 C 46 250, 94 250, 94 270 Z" fill="var(--on-brand-lo)" />
+    <text x="70" y="320" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">User</text>
+    <text x="70" y="320" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستخدم</text>
+
+    <!-- ASR Box -->
+    <rect x="167" y="77" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- SLU Box -->
+    <rect x="387" y="77" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- DST Box -->
+    <rect x="607" y="77" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- State DB -->
+    <path d="M 805 95 L 805 145 A 35 10 0 0 0 875 145 L 875 95 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <ellipse cx="840" cy="95" rx="35" ry="10" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Policy Box -->
+    <rect x="607" y="337" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- NLG Box -->
+    <rect x="387" y="337" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- TTS Box -->
+    <rect x="167" y="337" width="146" height="86" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- ================= NODE LABELS ================= -->
+  <g id="node-labels" text-anchor="middle">
+    <!-- ASR Text -->
+    <text x="240" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">ASR</text>
+    <text x="240" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">ASR</text>
+    <text x="240" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Speech Recognition</text>
+    <text x="240" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">التعرف على الكلام</text>
+    <text x="240" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-en">Receives audio</text>
+    <text x="240" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يستقبل الصوت</text>
+
+    <!-- SLU Text -->
+    <text x="460" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SLU</text>
+    <text x="460" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">SLU</text>
+    <text x="460" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Language Understanding</text>
+    <text x="460" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">فهم اللغة المنطوقة</text>
+    <text x="460" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-en">Extracts slots</text>
+    <text x="460" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يستخرج الخانات</text>
+
+    <!-- DST Text -->
+    <text x="680" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">DST</text>
+    <text x="680" y="100" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">DST</text>
+    <text x="680" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Dialogue State Tracker</text>
+    <text x="680" y="122" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">متتبع حالة الحوار</text>
+    <text x="680" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-en">Tracks constraints</text>
+    <text x="680" y="142" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يتتبع القيود</text>
+
+    <!-- State DB Text -->
+    <text x="840" y="128" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">State DB</text>
+    <text x="840" y="128" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قاعدة الحالة</text>
+
+    <!-- Policy Text -->
+    <text x="680" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Policy</text>
+    <text x="680" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">Policy</text>
+    <text x="680" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Dialogue Policy</text>
+    <text x="680" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">سياسة الحوار</text>
+    <text x="680" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-en">Decides next act</text>
+    <text x="680" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يحدد الإجراء التالي</text>
+
+    <!-- NLG Text -->
+    <text x="460" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">NLG</text>
+    <text x="460" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">NLG</text>
+    <text x="460" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Language Generation</text>
+    <text x="460" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">توليد اللغة الطبيعية</text>
+    <text x="460" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-en">Sentence realization</text>
+    <text x="460" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-ar">صياغة الجمل</text>
+
+    <!-- TTS Text -->
+    <text x="240" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">TTS</text>
+    <text x="240" y="360" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">TTS</text>
+    <text x="240" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Text-To-Speech</text>
+    <text x="240" y="382" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تحويل النص إلى كلام</text>
+    <text x="240" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-en">Returns audio</text>
+    <text x="240" y="402" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يرجع الصوت</text>
+  </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>GUS Architecture</th><th>Dialogue-State Architecture</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">آلية ملء الفتحات</template>
+          <template class="content-en">Slot Filling Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">قواعد مكتوبة يدوياً</template>
+          <template class="content-en">Handwritten rules</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مصنفات التعلم الآلي</template>
+          <template class="content-en">Machine learning classifiers</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تتبع السياق</template>
+          <template class="content-en">Context Tracking</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بسيط، يركز على الفتحات الفارغة</template>
+          <template class="content-en">Simple, focuses on empty slots</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتتبع حالة الحوار بأكملها (DST)</template>
+          <template class="content-en">Tracks entire dialogue state (DST)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع عدم اليقين</template>
+          <template class="content-en">Handling Uncertainty</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ضعيف</template>
+          <template class="content-en">Poor</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قوي (استراتيجيات التأكيد والرفض)</template>
+          <template class="content-en">Strong (Confirmation/Rejection strategies)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يجب على سياسة الحوار استخدام التأكيد الصريح بدلاً من التأكيد الضمني؟</template>
+      <template class="content-en">When should the Dialogue Policy use explicit confirmation instead of implicit confirmation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يُستخدم التأكيد الصريح عندما يكون مستوى الثقة (Confidence score) من نظام ASR أو SLU منخفضاً جداً، أو عندما تكون تكلفة الخطأ عالية جداً (مثل تأكيد تحويل مالي).</p></template>
+      <template class="content-en"><p>Explicit confirmation should be used when the confidence score from the ASR or SLU is very low, or when the cost of making an error is very high (e.g., confirming a financial transaction).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="chatbots-rule-vs-corpus" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> روبوتات الدردشة: القائمة على القواعد مقابل القائمة على المتون</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Chatbots: Rule-based vs. Corpus-based</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>روبوتات الدردشة مصممة لمحاكاة المحادثات البشرية غير المهيكلة، وتطورت من أنظمة تعتمد على قواعد بسيطة إلى نماذج لغوية ضخمة تعتمد على البيانات.</p></template>
+    <template class="content-en"><p>Chatbots are designed to mimic unstructured human conversations, evolving from simple rule-based systems to massive data-driven language models.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>روبوتات الدردشة (Chatbots) لا تهدف لإنجاز مهمة محددة، بل لإجراء محادثات ممتدة. تنقسم إلى نهجين رئيسيين:</p><ul><li><b>روبوتات الدردشة القائمة على القواعد (الأنظمة المبكرة):</b><ul><li><b>ELIZA:</b> استخدمت قواعد نمط-فعل (Pattern-action rules) لمحاكاة معالج نفسي.</li><li><b>PARRY:</b> أضافت 'حالة عقلية' (Mental state) إلى قواعد النمط-فعل، وكان أول نظام يجتاز اختبار تورنغ.</li></ul></li><li><b>روبوتات الدردشة القائمة على المتون (Corpus-based):</b><ul><li><b>الاستجابة بالاسترجاع (Response by retrieval):</b> استخدام استرجاع المعلومات (IR) لجلب استجابة مناسبة للسياق من قاعدة بيانات ضخمة (مثل نظام XiaoIce).</li><li><b><span class="smart-term" data-term-en="Response by generation" data-ar="الاستجابة بالتوليد" data-en-def="A chatbot approach that uses language models to dynamically create responses word-by-word based on context.">الاستجابة بالتوليد<span class="smart-term-tooltip"></span></span> (Response by generation):</b> استخدام نموذج لغوي (Language Model) أو بنية التشفير وفك التشفير (Encoder-Decoder) لتوليد استجابة جديدة بناءً على سياق الحوار (مثل BlenderBot و ChatGPT).</li></ul></li></ul></template>
+    <template class="content-en"><p>Chatbots aim to carry on extended, unstructured conversations rather than completing fixed tasks. There are two main approaches:</p><ul><li><b>Rule-based chatbots (early systems):</b><ul><li><b><span class="smart-term" data-term-en="ELIZA" data-ar="إليزا" data-en-def="An early rule-based chatbot that used pattern matching to simulate a psychotherapist.">ELIZA<span class="smart-term-tooltip"></span></span>:</b> Used simple pattern-action rules to mimic a Rogerian psychotherapist.</li><li><b>PARRY:</b> Combined pattern-action rules with a simulated 'mental state'. The first system to pass the Turing Test.</li></ul></li><li><b>Corpus-based chatbots:</b><ul><li><b>Response by retrieval:</b> Uses Information Retrieval (IR) to grab an appropriate response from a large corpus (e.g., XiaoIce).</li><li><b><span class="smart-term" data-term-en="Response by generation" data-ar="الاستجابة بالتوليد" data-en-def="A chatbot approach that uses language models to dynamically create responses word-by-word based on context.">Response by generation<span class="smart-term-tooltip"></span></span>:</b> Uses a language model or encoder-decoder architecture to generate a response given the dialogue context (e.g., BlenderBot, ChatGPT).</li></ul></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الأنظمة القائمة على القواعد مثل ELIZA كانت تعتمد على خدعة نفسية: إعادة صياغة كلام المستخدم في شكل سؤال، مما يعطي وهماً بالفهم دون أي فهم دلالي حقيقي.</p><p>أما الأنظمة التوليدية الحديثة، فتتطلب بيانات تدريب هائلة تتكون من جزأين: بيانات تدريب LLM القياسية (ويكيبيديا، كتب) وبيانات حوارية (Dialogue data). يتم تحويل بيانات وسائل التواصل الاجتماعي إلى 'شبه محادثات' (Pseudo-conversations) من خلال اعتبار المنشور كدور أول، والتعليقات كأدوار لاحقة.</p></template>
+    <template class="content-en"><p>Rule-based systems like ELIZA relied on a psychological trick: rephrasing user input as a question, giving the illusion of understanding without any real semantic comprehension.</p><p>Modern generative systems require massive training data consisting of two parts:</p><ul><li><strong>standard LLM data</strong> (Wikipedia, books) and</li><li><strong>specific Dialogue data</strong>.</li></ul><p>Social media data is often converted into 'pseudo-conversations' by treating a post as the first turn and replies as subsequent turns.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Two side-by-step diagrams showing Chatbot Training Architectures. Left side (Option 1): A standard causal language model (decoder-only) where input 'got promoted !' predicts '<s/> Congrats !' sequentially. Right side (Option 2): An Encoder-Decoder architecture where 'got promoted !' goes into an ENCODER block, which passes a representation to a DECODER block that generates 'Congrats !'. Style: educational, dark background #0d1117, clear labels, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <linearGradient id="modelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Center Divider -->
+  <line x1="400" y1="60" x2="400" y2="380" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- ========================================== -->
+  <!-- LEFT SIDE: Option 1 (Decoder-Only)         -->
+  <!-- ========================================== -->
+
+  <!-- Title -->
+  <text x="180" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Option 1: Decoder-Only</text>
+  <text x="180" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الخيار 1: وحدة فك التشفير فقط</text>
+
+  <!-- Input Node -->
+  <rect x="60" y="70" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="180" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Input: "got promoted !"</text>
+  <text x="180" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">المدخلات: "got promoted !"</text>
+
+  <!-- Arrow Down -->
+  <line x1="180" y1="110" x2="180" y2="172" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Decoder Block -->
+  <rect x="60" y="180" width="240" height="100" rx="8" fill="url(#modelGrad)" />
+  <text x="180" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Decoder Block</text>
+  <text x="180" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">كتلة فك التشفير</text>
+  <text x="180" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">(Causal Language Model)</text>
+  <text x="180" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">(نموذج لغوي سببي)</text>
+
+  <!-- Autoregressive Loop -->
+  <path d="M 300 210 C 340 210, 340 250, 300 250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="320" y="270" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Autoregressive</text>
+  <text x="320" y="270" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">انحدار ذاتي</text>
+
+  <!-- Arrow Down -->
+  <line x1="180" y1="280" x2="180" y2="342" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Output Node -->
+  <rect x="60" y="350" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="180" y="376" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Output: "&lt;s/&gt; Congrats !"</text>
+  <text x="180" y="376" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">المخرجات: "&lt;s/&gt; Congrats !"</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SIDE: Option 2 (Encoder-Decoder)     -->
+  <!-- ========================================== -->
+
+  <!-- Title -->
+  <text x="620" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Option 2: Encoder-Decoder</text>
+  <text x="620" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الخيار 2: التشفير وفك التشفير</text>
+
+  <!-- Input Node -->
+  <rect x="500" y="70" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="620" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Input: "got promoted !"</text>
+  <text x="620" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">المدخلات: "got promoted !"</text>
+
+  <!-- Arrow Down -->
+  <line x1="620" y1="110" x2="620" y2="132" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Encoder Block -->
+  <rect x="500" y="140" width="240" height="45" rx="8" fill="url(#modelGrad)" />
+  <text x="620" y="168" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Encoder Block</text>
+  <text x="620" y="168" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">كتلة التشفير</text>
+
+  <!-- Arrow Down -->
+  <line x1="620" y1="185" x2="620" y2="202" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Context Vector Node -->
+  <rect x="520" y="210" width="200" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="620" y="236" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Context Representation</text>
+  <text x="620" y="236" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">تمثيل السياق</text>
+
+  <!-- Arrow Down -->
+  <line x1="620" y1="250" x2="620" y2="272" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Decoder Block -->
+  <rect x="500" y="280" width="240" height="45" rx="8" fill="url(#modelGrad)" />
+  <text x="620" y="308" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Decoder Block</text>
+  <text x="620" y="308" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">كتلة فك التشفير</text>
+
+  <!-- Arrow Down -->
+  <line x1="620" y1="325" x2="620" y2="342" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Output Node -->
+  <rect x="500" y="350" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="620" y="376" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Output: "Congrats !"</text>
+  <text x="620" y="376" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">المخرجات: "Congrats !"</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي ميزة 'الاستجابة بالاسترجاع' مقارنة بـ 'الاستجابة بالتوليد' في روبوتات الدردشة؟</template>
+      <template class="content-en">What is the advantage of 'Response by retrieval' compared to 'Response by generation' in chatbots?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الاستجابة بالاسترجاع تضمن أن الجملة الناتجة صحيحة نحوياً وآمنة (إذا تم تنظيف قاعدة البيانات مسبقاً)، بينما الاستجابة بالتوليد قد تؤدي إلى الهلوسة أو توليد جمل غير منطقية أو مسيئة.</p></template>
+      <template class="content-en"><p>Response by retrieval ensures that the output sentence is grammatically correct and safe (if the corpus is pre-filtered), whereas generation can lead to hallucinations, nonsensical, or offensive outputs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="chatbot-finetuning-evaluation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> ضبط وتقييم روبوتات الدردشة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Chatbot Fine-Tuning and Evaluation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتاج روبوتات الدردشة إلى ضبط دقيق (Fine-tuning) بعد التدريب الأولي لتحسين جودة الحوار وضمان الأمان، ويتم تقييمها عادةً بواسطة البشر.</p></template>
+    <template class="content-en"><p>Chatbots require fine-tuning after initial pretraining to improve dialogue quality and ensure safety, and are typically evaluated by human judges.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Fine-tuning" data-ar="الضبط الدقيق" data-en-def="Using further labeled data to train a pre-trained model to improve specific behaviors like safety or quality.">الضبط الدقيق<span class="smart-term-tooltip"></span></span> (Fine-tuning):</b> استخدام بيانات مصنفة إضافية لتدريب النظام بعد التدريب الأولي. له وظيفتان:</p><ol><li><b>تحسين الجودة:</b> تدريب النظام على أمثلة إيجابية (محادثات عالية الجودة) لإنتاج ردود منطقية ومثيرة للاهتمام.</li><li><b>تحسين الأمان:</b> تدريب النظام على بيانات تمييزية (أمثلة سلبية) لتقليل وزن الردود الضارة أو منخفضة الجودة.</li></ol><p>مثال: نظام LaMDA يستخدم مرحلة توليدية (Generative) لإنتاج ردود، ثم مرحلة تمييزية (Discriminative) لتقييم وتصفية الردود غير الآمنة قبل عرضها للمستخدم.</p><p><b>تقييم روبوتات الدردشة:</b> يتم بواسطة البشر عبر طريقتين:</p><ul><li><b>تقييم المشارك (Participant evaluation):</b> يتحدث مقيّم بشري مع النموذج لعدة أدوار ويقيمه بناءً على أبعاد مثل الطلاقة، الاستماع، والجاذبية.</li><li><b>تقييم المراقب (Observer evaluation):</b> يقرأ طرف ثالث نص محادثة كاملة ويقيمه. مقياس (Acute-eval) هو مثال حيث يقارن المراقب بين محادثتين مختلفتين ويختار النظام الأفضل.</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Fine-tuning" data-ar="الضبط الدقيق" data-en-def="Using further labeled data to train a pre-trained model to improve specific behaviors like safety or quality.">Fine-tuning<span class="smart-term-tooltip"></span></span>:</b> Using further labeled data to train the system after initial pretraining. It serves two functions:</p><ol><li><b>Improve Quality:</b> Fine-tuning on positive examples (high-quality dialogues) to produce sensible and interesting responses.</li><li><b>Improve Safety:</b> Fine-tuning on discriminative data (negative examples) to downweigh low-quality and harmful responses.</li></ol><p>Example: The LaMDA system uses a generative phase to create potential responses, and a discriminative phase to rate and filter out unsafe responses before returning the best one to the user.</p><p><b>Evaluating Chatbots:</b> Done by humans who assign scores:</p><ul><li><b>Participant evaluation:</b> A human chats with the model for several turns and rates it on dimensions like fluency, listening, and engagingness.</li><li><b>Observer evaluation:</b> A third-party human reads a complete conversation transcript and scores it. The <i><span class="smart-term" data-term-en="Acute-eval" data-ar="التقييم الحاد (Acute-eval)" data-en-def="An observer evaluation metric where annotators compare two separate human-computer conversations and choose the better one.">acute-eval<span class="smart-term-tooltip"></span></span></i> metric involves annotators looking at two separate conversations and choosing the better system.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الاعتماد على التقييم البشري يبرز صعوبة إيجاد مقاييس تقييم آلية (مثل BLEU أو ROUGE المستخدمة في الترجمة) تكون فعالة في الحوار المفتوح. في الدردشة المفتوحة، هناك عدد لا نهائي من الردود الصحيحة المحتملة، مما يجعل المقاييس القائمة على تطابق الكلمات غير مجدية.</p><p>استخدام المرحلة التمييزية (Discriminative phase) في LaMDA هو تطبيق عملي لمفهوم 'الرفض الآمن' (Safe Rejection)، حيث يعمل النموذج اللغوي كمولد وناقد في نفس الوقت.</p></template>
+    <template class="content-en"><p>The reliance on human evaluation highlights the difficulty of finding automated metrics (like BLEU or ROUGE used in translation) that work for open-domain dialogue. In open chat, there are infinitely many valid responses, making word-overlap metrics useless.</p><p>Using a discriminative phase in LaMDA is a practical application of 'Safe Rejection', where the language model acts as both the generator and the critic simultaneously.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Participant Evaluation</th><th>Observer Evaluation</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دور المقيّم</template>
+          <template class="content-en">Evaluator Role</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتفاعل مباشرة مع النظام</template>
+          <template class="content-en">Interacts directly with the system</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يقرأ نصوص محادثات سابقة</template>
+          <template class="content-en">Reads transcripts of past conversations</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أمثلة على المقاييس</template>
+          <template class="content-en">Metric Examples</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقييم الطلاقة، الاستماع، الجاذبية بعد 6 أدوار</template>
+          <template class="content-en">Rating fluency, listening, engagingness after 6 turns</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مقياس Acute-eval (مقارنة نظامين)</template>
+          <template class="content-en">Acute-eval metric (comparing two systems)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نكتفي بالتدريب على الأمثلة الإيجابية فقط لضمان أمان روبوت الدردشة؟</template>
+      <template class="content-en">Why is training on positive examples alone insufficient to ensure chatbot safety?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التدريب على الأمثلة الإيجابية يعلم النظام كيف يجيب بشكل جيد، لكنه لا يعلمه صراحةً ما يجب تجنبه. التدريب التمييزي (الأمثلة السلبية) ضروري لتعليم النظام كيفية التعرف على المحتوى المسيء أو الضار وتجنب توليده.</p></template>
+      <template class="content-en"><p>Positive examples teach the system how to answer well, but don't explicitly teach it what to avoid. Discriminative training (negative examples) is necessary to teach the system to recognize and penalize offensive or harmful content.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dialogue-system-design-ethics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تصميم أنظمة الحوار والقضايا الأخلاقية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Dialogue System Design &amp; Ethical Issues</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يرتبط تصميم أنظمة الحوار ارتباطاً وثيقاً بالتفاعل بين الإنسان والحاسوب (HCI)، ويجب أن يعالج قضايا أخلاقية حاسمة مثل الأمان، الخصوصية، والتحيز.</p></template>
+    <template class="content-en"><p>Dialogue system design is closely linked to Human-Computer Interaction (HCI) and must address critical ethical issues like safety, privacy, and bias.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتبع تصميم استراتيجيات الحوار مبادئ التصميم المتمحور حول المستخدم (User-centered design):</p><ol><li><b>دراسة المستخدم والمهمة:</b> من خلال المقابلات ودراسة الحوارات البشرية المشابهة.</li><li><b>بناء المحاكاة والنماذج الأولية:</b> الأداة الحاسمة هنا هي <b>نظام ساحر أوز (Wizard-of-Oz)</b>، حيث يتفاعل المستخدمون مع ما يعتقدون أنه برنامج، ولكنه في الواقع إنسان 'ساحر' متخفٍ خلف واجهة برمجية.</li><li><b>الاختبار التكراري:</b> اختبار التصميم بشكل متكرر مع المستخدمين.</li></ol><p><b>القضايا الأخلاقية:</b></p><ul><li><b>الأمان (Safety):</b> خطورة تقديم نصائح طبية خاطئة، أو توليد محتوى مسيء وضار (Representational harms).</li><li><b>الخصوصية (Privacy):</b> يميل المستخدمون للكشف عن معلومات خاصة للروبوتات الشبيهة بالبشر. يجب إخفاء هوية البيانات (Anonymize PII) المستخدمة في التدريب.</li><li><b>التحيز (Bias):</b> تجنب الصور النمطية التي تحط من قدر مجموعات من الناس أو الأجناس.</li></ul></template>
+    <template class="content-en"><p>Dialogue strategy design follows user-centered design principles:</p><ol><li><b>Study the user and task:</b> Interview users and study related human-human dialogues.</li><li><b>Build simulations and prototypes:</b> A crucial tool is the <b><span class="smart-term" data-term-en="Wizard-of-Oz" data-ar="تجربة ساحر أوز" data-en-def="A prototyping method where users interact with a system they believe is automated, but is actually being operated by a hidden human.">Wizard-of-Oz<span class="smart-term-tooltip"></span></span> system</b>, where users interact with what they think is a program, but is actually a human 'wizard' disguised by a software interface.</li><li><b>Iteratively test:</b> Embedded user testing in the design cycle.</li></ol><p><b>Ethical Issues:</b></p><ul><li><b>Safety:</b> Risks in safety-critical situations (medical advice) or creating representational harms by generating abusive content.</li><li><b>Privacy:</b> Users are likely to disclose private info to human-like chatbots. Training data must anonymize Personally Identifiable Information (PII).</li><li><b>Bias:</b> Preventing stereotypes that demean groups of people or genders.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>أهمية تجربة 'ساحر أوز' تكمن في ظاهرة نفسية: البشر يغيرون طريقة تحدثهم عندما يعلمون أنهم يتحدثون إلى آلة (يستخدمون جملاً أقصر، وكلمات أبسط). إذا قمنا بتدريب النظام على حوارات بين إنسان وإنسان فقط، سيفشل النظام عند مواجهة لغة 'إنسان-آلة'. محاكاة الآلة عبر الساحر توفر بيانات تدريب واقعية.</p><p>فيما يخص الخصوصية، النماذج اللغوية الكبيرة تميل إلى 'حفظ' (Memorize) أجزاء من بيانات التدريب. إذا لم يتم تنظيف البيانات من المعلومات الشخصية (PII)، قد يقوم الروبوت بتسريب أرقام هواتف أو عناوين حقيقية لأشخاص آخرين أثناء الدردشة.</p></template>
+    <template class="content-en"><p>The importance of the 'Wizard-of-Oz' experiment lies in a psychological phenomenon: humans change how they speak when they know they are talking to a machine (using shorter sentences, simpler words). If trained only on human-human data, the system fails on human-machine language. The wizard simulation provides realistic training data.</p><p>Regarding privacy, Large Language Models tend to 'memorize' parts of their training data. If Personally Identifiable Information (PII) is not scrubbed, the chatbot might leak real phone numbers or addresses of individuals during a chat.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن أن يؤدي جعل روبوت الدردشة 'شبيهاً جداً بالبشر' إلى نتائج عكسية من منظور الخصوصية؟</template>
+      <template class="content-en">How can making a chatbot 'too human-like' backfire from a privacy perspective?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يبدو الروبوت بشرياً جداً ويتعاطف مع المستخدم، يقل حذر المستخدم ويميل إلى مشاركة معلومات شخصية وحساسة جداً (مثل الأسرار الطبية أو المالية) التي قد يتم تخزينها أو تسريبها بواسطة النظام.</p></template>
+      <template class="content-en"><p>When a chatbot appears very human-like and empathetic, users lower their guard and are more likely to share highly sensitive personal information (medical or financial secrets) that the system might store or leak.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الممتعة حول أنظمة الحوار. تخيلوا أنكم تحاولون تعليم كائن فضائي كيف يتحدث كالبشر؛ ستكتشفون أن كلامنا مليء بالقواعد غير المكتوبة: متى نقاطع، كيف نؤكد الفهم (Grounding)، وكيف نستنتج المعاني. هذا بالضبط ما نواجهه عند بناء أنظمة الحوار. في الامتحان، ركزوا جيداً على التمييز بين الأنظمة القائمة على المهام (مثل حجز تذكرة) وروبوتات الدردشة (التي تهدف للدردشة فقط). تذكروا بنية GUS الكلاسيكية وكيف تطورت إلى نظام 'حالة الحوار' (Dialogue-State) الذي يستخدم التعلم الآلي لتتبع سياق المحادثة بالكامل. ولا تنسوا أبداً الجانب الأخلاقي: لماذا نستخدم تجربة 'ساحر أوز'؟ وكيف نستخدم الضبط الدقيق (Fine-tuning) بالأمثلة السلبية لمنع الروبوت من قول أشياء مسيئة. هذه المفاهيم هي قلب الذكاء الاصطناعي التخاطبي الحديث!</template>
+    <template class="content-en">Welcome friends to this fascinating module on Dialogue Systems. Imagine teaching an alien to converse like a human; you'd realize our speech is full of unwritten rules: when to interrupt, how to confirm understanding (Grounding), and how to infer meaning. This is exactly the challenge in building dialogue systems. For the exam, focus heavily on the distinction between Task-based systems (like booking a flight) and Chatbots (designed just to chat). Remember the classic GUS architecture and how it evolved into the Dialogue-State system, which uses machine learning to track the entire context. And never forget the ethical and design aspects: why do we use the Wizard-of-Oz experiment? And how do we use fine-tuning with negative examples to stop a bot from saying offensive things? These concepts are the beating heart of modern Conversational AI!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يصعب على الآلات محاكاة المحادثة البشرية؟</template>
+          <template class="content-en">Why is it difficult for machines to mimic human conversation?</template>
+          <span class="content-target">لماذا يصعب على الآلات محاكاة المحادثة البشرية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن المحادثة البشرية تعتمد على خصائص معقدة مثل تبادل الأدوار السريع، أفعال الكلام الضمنية، التأسيس المشترك (تأكيد الفهم)، والمبادرة المختلطة، بالإضافة إلى الاعتماد الكبير على الاستنتاج والسياق.</template>
+          <template class="content-en">Because human conversation relies on complex properties like rapid turn-taking, implicit speech acts, grounding (confirming understanding), mixed initiative, and a heavy reliance on inference and context.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين أنظمة الحوار القائمة على المهام وروبوتات الدردشة؟</template>
+          <template class="content-en">What is the main difference between task-based dialogue systems and chatbots?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين أنظمة الحوار القائمة على المهام وروبوتات الدردشة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الأنظمة القائمة على المهام (مثل سيري) مصممة لإنجاز هدف محدد (مثل حجز مطعم) باستخدام إطارات وفتحات. أما روبوتات الدردشة (مثل ChatGPT) فمصممة لإجراء محادثات ممتدة وغير مهيكلة للترفيه أو المساعدة العامة.</template>
+          <template class="content-en">Task-based systems (like Siri) are designed to accomplish a specific goal (e.g., booking a restaurant) using frames and slots. Chatbots (like ChatGPT) are designed for extended, unstructured conversations for entertainment or general help.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل نظام GUS؟</template>
+          <template class="content-en">How does the GUS system work?</template>
+          <span class="content-target">كيف يعمل نظام GUS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو نظام قائم على الإطارات، يحدد أولاً مجال الحديث ونيّة المستخدم، ثم يستخدم قواعد مكتوبة يدوياً لاستخراج المعلومات وملء 'الفتحات' (Slots) الفارغة عن طريق طرح أسئلة مبرمجة مسبقاً.</template>
+          <template class="content-en">It is a frame-based system that first determines the domain and user intent, then uses handwritten rules to extract information and fill empty 'slots' by asking pre-programmed questions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة متتبع حالة الحوار (DST)؟</template>
+          <template class="content-en">What is the function of the Dialogue State Tracker (DST)?</template>
+          <span class="content-target">ما هي وظيفة متتبع حالة الحوار (DST)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم بتحديث والاحتفاظ بالحالة الحالية للإطار، ملخصاً جميع قيود ومعلومات المستخدم التي تم جمعها منذ بداية المحادثة، وليس فقط في الجملة الأخيرة.</template>
+          <template class="content-en">It updates and maintains the current state of the frame, summarizing all user constraints and information gathered since the beginning of the conversation, not just the last sentence.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين التأكيد الصريح والتأكيد الضمني في سياسة الحوار؟</template>
+          <template class="content-en">What is the difference between explicit and implicit confirmation in dialogue policy?</template>
+          <span class="content-target">ما الفرق بين التأكيد الصريح والتأكيد الضمني في سياسة الحوار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التأكيد الصريح يسأل المستخدم مباشرة (هل تقصد كذا؟) ويُستخدم عند انخفاض الثقة. التأكيد الضمني يدمج المعلومة في السؤال التالي (حسناً، رحلة إلى كذا، متى المغادرة؟) لضمان انسيابية الحوار.</template>
+          <template class="content-en">Explicit confirmation asks the user directly ('Did you mean X?') and is used when confidence is low. Implicit confirmation embeds the info in the next question ('Okay, a flight to X, when leaving?') for smoother dialogue.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تطورت روبوتات الدردشة من ELIZA إلى الأنظمة الحديثة؟</template>
+          <template class="content-en">How did chatbots evolve from ELIZA to modern systems?</template>
+          <span class="content-target">كيف تطورت روبوتات الدردشة من ELIZA إلى الأنظمة الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدأت بأنظمة تعتمد على قواعد مطابقة الأنماط (Pattern-matching) البسيطة والهشة مثل ELIZA، وتطورت إلى أنظمة تعتمد على المتون الضخمة (Corpus-based) التي تستخدم استرجاع المعلومات أو النماذج اللغوية التوليدية لإنشاء ردود سياقية.</template>
+          <template class="content-en">They started with simple, brittle pattern-matching rule systems like ELIZA, and evolved into massive Corpus-based systems that use Information Retrieval or Generative Language Models to create contextual responses.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى الضبط الدقيق (Fine-tuning) لروبوتات الدردشة؟</template>
+          <template class="content-en">Why do we need fine-tuning for chatbots?</template>
+          <span class="content-target">لماذا نحتاج إلى الضبط الدقيق (Fine-tuning) لروبوتات الدردشة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التدريب الأولي على نصوص الإنترنت العامة لا يكفي. الضبط الدقيق يعلم النظام كيف يكون محاوراً جيداً (باستخدام أمثلة إيجابية) وكيف يتجنب توليد محتوى ضار أو مسيء (باستخدام أمثلة سلبية تمييزية).</template>
+          <template class="content-en">Because initial pretraining on general internet text isn't enough. Fine-tuning teaches the system how to be a good conversationalist (using positive examples) and how to avoid generating harmful or offensive content (using discriminative negative examples).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي تجربة ساحر أوز (Wizard-of-Oz) ولماذا هي مهمة؟</template>
+          <template class="content-en">What is the Wizard-of-Oz experiment and why is it important?</template>
+          <span class="content-target">ما هي تجربة ساحر أوز (Wizard-of-Oz) ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي محاكاة يتفاعل فيها المستخدم مع واجهة يظن أنها آلية، بينما يتحكم بها إنسان. هي مهمة لجمع بيانات تدريب دقيقة تعكس كيف يتحدث البشر فعلياً مع الآلات، وهو أسلوب يختلف عن حديثهم مع البشر.</template>
+          <template class="content-en">It's a simulation where a user interacts with an interface they believe is automated, but is controlled by a human. It's crucial for collecting accurate training data reflecting how humans actually speak to machines, which differs from human-human speech.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تقييم روبوتات الدردشة الحديثة؟</template>
+          <template class="content-en">How are modern chatbots evaluated?</template>
+          <span class="content-target">كيف يتم تقييم روبوتات الدردشة الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نظراً لصعوبة التقييم الآلي، يتم الاعتماد على البشر. إما عبر 'تقييم المشارك' حيث يدردش المقيّم مع النظام ويقيمه، أو 'تقييم المراقب' (مثل Acute-eval) حيث يقرأ المقيّم محادثات سابقة ويقارن بين نظامين.</template>
+          <template class="content-en">Due to the difficulty of automated metrics, human evaluation is used. Either 'Participant evaluation' where the rater chats with the system, or 'Observer evaluation' (like Acute-eval) where the rater reads past transcripts and compares two systems.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أبرز التحديات الأخلاقية في أنظمة الحوار؟</template>
+          <template class="content-en">What are the main ethical challenges in dialogue systems?</template>
+          <span class="content-target">ما هي أبرز التحديات الأخلاقية في أنظمة الحوار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تشمل الأمان (تجنب النصائح الخطيرة أو المحتوى المسيء)، الخصوصية (منع تسريب البيانات الشخصية التي يشاركها المستخدمون مع الروبوتات الشبيهة بالبشر)، والتحيز (تجنب إعادة إنتاج الصور النمطية الموجودة في بيانات التدريب).</template>
+          <template class="content-en">They include Safety (avoiding dangerous advice or abusive content), Privacy (preventing leaks of personal data users share with human-like bots), and Bias (avoiding reproducing stereotypes present in training data).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الدور (Turn) في المحادثة؟",
+      "en": "What is a Turn in a conversation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مساهمة واحدة من متحدث واحد في الحوار.",
+        "en": "A single contribution from one speaker to the dialogue."
+      },
+      "example": {
+        "ar": "جملة واحدة، أو كلمة واحدة مثل 'نعم'، أو عدة جمل متتالية.",
+        "en": "A single sentence, a single word like 'OK', or multiple sentences."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي أفعال الكلام (Speech Acts)؟",
+      "en": "What are Speech Acts?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الفكرة القائلة بأن كل دور في الحوار هو نوع من الفعل (مثل الطلب، الوعد، الإقرار).",
+        "en": "The concept that each turn in a dialogue is a kind of action (e.g., requesting, promising, acknowledging)."
+      },
+      "example": {
+        "ar": "قول 'ارفع صوت الموسيقى' هو فعل توجيهي (Directive).",
+        "en": "Saying 'Turn up the music' is a DIRECTIVE act."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو التأسيس المشترك (Grounding)؟",
+      "en": "What is Grounding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "اعتراف المستمع بأنه فهم المتحدث لتأسيس أرضية مشتركة.",
+        "en": "Acknowledging that the hearer has understood the speaker to establish common ground."
+      },
+      "example": {
+        "ar": "قول 'حسناً' أو تكرار ما قاله الشخص الآخر.",
+        "en": "Explicitly saying 'OK' or repeating what the other person says."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي الأزواج المتجاورة (Adjacency pairs)؟",
+      "en": "What are Adjacency pairs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هيكل حواري حيث يحدد فعل معين توقعاً لفعل آخر يليه.",
+        "en": "A dialogue structure where one act sets up an expectation for another."
+      },
+      "example": {
+        "ar": "الأسئلة يتبعها إجابات، والاقتراحات يتبعها قبول أو رفض.",
+        "en": "QUESTIONS set up an expectation for an ANSWER."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي المبادرة المختلطة (Mixed initiative)؟",
+      "en": "What is Mixed initiative?"
+    },
+    "back": {
+      "definition": {
+        "ar": "انتقال السيطرة على الحوار (المبادرة) ذهاباً وإياباً بين المشاركين.",
+        "en": "When the conversational initiative shifts back and forth between the participants."
+      },
+      "example": {
+        "ar": "النظام يسأل سؤالاً، فيرد المستخدم بسؤال توضيحي بدلاً من الإجابة المباشرة.",
+        "en": "System asks a question, user responds with a clarification question instead of an answer."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الإطار (Frame) في أنظمة الحوار؟",
+      "en": "What is a Frame in dialogue systems?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هيكل معرفي يمثل تفاصيل مواصفات مهمة معينة، ويتكون من مجموعة من الفتحات.",
+        "en": "A knowledge structure representing the details of a task specification, consisting of a collection of slots."
+      },
+      "example": {
+        "ar": "إطار حجز فندق يحتوي على فتحات للتاريخ والموقع.",
+        "en": "A hotel reservation frame needs slots for dates and locations."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي الفتحة (Slot)؟",
+      "en": "What is a Slot?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سمة داخل الإطار تأخذ مجموعة من القيم المحتملة ويجب ملؤها لإنجاز المهمة.",
+        "en": "An attribute within a frame that can take a set of possible values and must be filled to complete the task."
+      },
+      "example": {
+        "ar": "فتحة 'مدينة المغادرة' في إطار حجز الطيران.",
+        "en": "The 'ORIGIN CITY' slot in a flight booking frame."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو نظام GUS؟",
+      "en": "What is the GUS system?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بنية كلاسيكية بسيطة لأنظمة الحوار تعتمد على استخراج الفتحات باستخدام قواعد مكتوبة يدوياً.",
+        "en": "A classic, naive slot-extractor frame-based architecture that uses handwritten rules."
+      },
+      "example": {
+        "ar": "معظم وكلاء الحوار التجاريين البسيطين لإنجاز المهام.",
+        "en": "Used in most simple industrial task-based dialogue agents."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو متتبع حالة الحوار (DST)؟",
+      "en": "What is the Dialogue State Tracker (DST)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكون يحدد الحالة الحالية للإطار ويلخص جميع قيود المستخدم حتى اللحظة الحالية.",
+        "en": "A component that determines the current state of the frame, summarizing all of the user's constraints at this point."
+      },
+      "example": {
+        "ar": "تذكر أن المستخدم طلب طعاماً إيطالياً في الجملة السابقة، ويبحث الآن عن السعر.",
+        "en": "Remembering the user wanted Italian food from turn 1 while processing turn 3 about price."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو دور سياسة الحوار (Dialogue Policy)؟",
+      "en": "What is the role of Dialogue Policy?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد فعل الحوار الذي يجب على النظام توليده (تخطيط المحتوى).",
+        "en": "Decides what dialogue act to generate (content planning)."
+      },
+      "example": {
+        "ar": "اتخاذ قرار بتأكيد فهم النظام صراحةً قبل المضي قدماً.",
+        "en": "Deciding to explicitly confirm the user's input before proceeding."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو توليد اللغات الطبيعية (NLG) في أنظمة الحوار؟",
+      "en": "What is Natural Language Generation (NLG) in dialogue systems?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تحويل فعل الحوار المختار إلى نص استجابة طبيعي للمستخدم.",
+        "en": "The process of generating the text of the response to the user once a dialogue act has been chosen."
+      },
+      "example": {
+        "ar": "تحويل أمر (تأكيد: مدينة=لندن) إلى الجملة 'هل تريد السفر إلى لندن؟'.",
+        "en": "Converting (confirm: city=London) into 'Do you want to travel to London?'."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو نظام ELIZA؟",
+      "en": "What is ELIZA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "روبوت دردشة مبكر يعتمد على قواعد النمط-فعل لمحاكاة محادثة.",
+        "en": "An early rule-based chatbot that used pattern-action rules."
+      },
+      "example": {
+        "ar": "محاكاة معالج نفسي يعيد صياغة كلام المريض.",
+        "en": "Mimicking a psychotherapist by rephrasing user statements as questions."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو نظام PARRY؟",
+      "en": "What is PARRY?"
+    },
+    "back": {
+      "definition": {
+        "ar": "روبوت دردشة مبكر أضاف 'حالة عقلية' إلى القواعد، وهو أول نظام يجتاز اختبار تورنغ.",
+        "en": "An early chatbot that added a mental state to pattern-action rules, the first to pass the Turing Test."
+      },
+      "example": {
+        "ar": "محاكاة مريض مصاب بجنون العظمة.",
+        "en": "Simulated a paranoid schizophrenic patient."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو نظام ساحر أوز (Wizard-of-Oz)؟",
+      "en": "What is a Wizard-of-Oz system?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أداة محاكاة يتفاعل فيها المستخدم مع واجهة يعتقد أنها آلية، بينما يتحكم بها إنسان متخفٍ.",
+        "en": "A simulation tool where users interact with what they think is a program, but is actually a human 'wizard'."
+      },
+      "example": {
+        "ar": "يُستخدم لجمع بيانات واقعية حول كيفية تحدث البشر مع الآلات قبل بناء النظام الفعلي.",
+        "en": "Used to collect realistic human-machine interaction data before building the actual system."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو مقياس Acute-eval؟",
+      "en": "What is the Acute-eval metric?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تقييم مراقب حيث يختار المقيّمون النظام الأفضل من خلال مقارنة محادثتين منفصلتين.",
+        "en": "An observer evaluation where annotators look at two separate human-computer conversations and choose the better system."
+      },
+      "example": {
+        "ar": "مقارنة محادثة لـ ChatGPT ومحادثة لـ BlenderBot واختيار الأكثر جاذبية.",
+        "en": "Comparing a ChatGPT log and a BlenderBot log to see which is more engaging."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل 'التأسيس المشترك' (Grounding) في المحادثة؟",
+      "en": "Which of the following represents 'Grounding' in a conversation?"
+    },
+    "options": {
+      "ar": [
+        "طرح سؤال جديد لتغيير الموضوع.",
+        "قول 'حسناً' أو تكرار كلام المتحدث لتأكيد الفهم.",
+        "مقاطعة المتحدث قبل أن ينهي جملته.",
+        "استنتاج معلومات غير مصرح بها."
+      ],
+      "en": [
+        "Asking a new question to change the topic.",
+        "Saying 'OK' or repeating the speaker's words to confirm understanding.",
+        "Interrupting the speaker before they finish.",
+        "Inferring unstated information."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التأسيس المشترك هو اعتراف المستمع بأنه فهم المتحدث، وغالباً ما يتم عبر كلمات مثل 'حسناً' أو التكرار.",
+      "en": "Grounding is acknowledging that the hearer has understood the speaker, often done via 'OK' or repetition."
+    },
+    "hint": {
+      "ar": "تذكر كيف تؤكد لصديقك أنك تسمعه على الهاتف.",
+      "en": "Think about how you confirm you are listening on a phone call."
+    },
+    "difficulty": "easy",
+    "conceptId": "properties-of-human-conversation"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في بنية GUS، ما هي الخطوة التي تلي مباشرة 'تصنيف المجال' (Domain classification)؟",
+      "en": "In the GUS architecture, what step immediately follows 'Domain classification'?"
+    },
+    "options": {
+      "ar": [
+        "توليد اللغات الطبيعية (NLG)",
+        "ملء الفتحات (Slot filling)",
+        "تحديد النية (Intent determination)",
+        "تحويل النص إلى كلام (TTS)"
+      ],
+      "en": [
+        "Natural Language Generation (NLG)",
+        "Slot filling",
+        "Intent determination",
+        "Text To Speech (TTS)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بعد تحديد المجال العام، يجب على النظام تحديد هدف المستخدم أو نيته (Intent determination) قبل البدء في ملء الفتحات.",
+      "en": "After determining the general domain, the system must determine the user's goal (Intent determination) before filling slots."
+    },
+    "hint": {
+      "ar": "بمجرد أن تعرف أننا نتحدث عن الطيران، ماذا تحتاج أن تعرف بعد ذلك؟",
+      "en": "Once you know we are talking about airlines, what do you need to know next?"
+    },
+    "difficulty": "medium",
+    "conceptId": "task-based-dialogue-systems-gus"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو المكون المسؤول عن الحفاظ على السياق وتلخيص جميع قيود المستخدم في نظام حالة الحوار؟",
+      "en": "Which component is responsible for maintaining context and summarizing all user constraints in a Dialogue-State system?"
+    },
+    "options": {
+      "ar": [
+        "فهم اللغة المنطوقة (SLU)",
+        "سياسة الحوار (Dialogue Policy)",
+        "متتبع حالة الحوار (DST)",
+        "توليد اللغات الطبيعية (NLG)"
+      ],
+      "en": [
+        "Spoken Language Understanding (SLU)",
+        "Dialogue Policy",
+        "Dialogue State Tracker (DST)",
+        "Natural Language Generation (NLG)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "متتبع حالة الحوار (DST) هو الذي يحدد الحالة الحالية للإطار ويحتفظ بالسياق التراكمي للمحادثة.",
+      "en": "The Dialogue State Tracker (DST) determines the current state of the frame and maintains the cumulative context."
+    },
+    "hint": {
+      "ar": "ابحث عن المكون الذي 'يتتبع' (Tracks) الحالة.",
+      "en": "Look for the component that 'tracks' the state."
+    },
+    "difficulty": "medium",
+    "conceptId": "dialogue-state-architecture"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من الأنظمة التالية يُعتبر روبوت دردشة مبكر يعتمد على قواعد النمط-فعل (Pattern-action rules)؟",
+      "en": "Which of the following is an early chatbot that relies on pattern-action rules?"
+    },
+    "options": {
+      "ar": [
+        "BlenderBot",
+        "ChatGPT",
+        "ELIZA",
+        "XiaoIce"
+      ],
+      "en": [
+        "BlenderBot",
+        "ChatGPT",
+        "ELIZA",
+        "XiaoIce"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ELIZA هو نظام مبكر يعتمد على القواعد، بينما البقية هي أنظمة حديثة تعتمد على المتون (Corpus-based).",
+      "en": "ELIZA is an early rule-based system, while the others are modern corpus-based systems."
+    },
+    "hint": {
+      "ar": "نظام يحاكي معالجاً نفسياً من الستينيات.",
+      "en": "A system simulating a psychotherapist from the 1960s."
+    },
+    "difficulty": "easy",
+    "conceptId": "chatbots-rule-vs-corpus"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "لماذا يتم تدريب روبوتات الدردشة على بيانات تمييزية (أمثلة سلبية) أثناء مرحلة الضبط الدقيق؟",
+      "en": "Why are chatbots trained on discriminative data (negative examples) during fine-tuning?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة سرعة استجابة النظام.",
+        "لتحسين الأمان وتقليل الردود الضارة أو منخفضة الجودة.",
+        "لتعليم النظام كيفية طرح الأسئلة.",
+        "لتحسين دقة التعرف على الصوت (ASR)."
+      ],
+      "en": [
+        "To increase the system's response speed.",
+        "To improve safety and downweigh harmful or low-quality responses.",
+        "To teach the system how to ask questions.",
+        "To improve voice recognition (ASR) accuracy."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البيانات التمييزية تُستخدم لتعليم النظام التعرف على المحتوى غير الآمن أو المسيء وتجنب توليده.",
+      "en": "Discriminative data is used to teach the system to recognize and avoid generating unsafe or offensive content."
+    },
+    "hint": {
+      "ar": "الأمثلة السلبية تعلم النظام ما يجب 'تجنبه'.",
+      "en": "Negative examples teach the system what to 'avoid'."
+    },
+    "difficulty": "medium",
+    "conceptId": "chatbot-finetuning-evaluation"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من استخدام نظام 'ساحر أوز' (Wizard-of-Oz) في تصميم أنظمة الحوار؟",
+      "en": "What is the primary purpose of using a Wizard-of-Oz system in dialogue system design?"
+    },
+    "options": {
+      "ar": [
+        "تقييم أداء خوارزميات التعلم العميق.",
+        "جمع بيانات واقعية حول كيفية تفاعل البشر مع الآلات قبل بناء النظام.",
+        "تسريع عملية تحويل النص إلى كلام (TTS).",
+        "إخفاء هوية المستخدمين لحماية الخصوصية."
+      ],
+      "en": [
+        "Evaluating the performance of deep learning algorithms.",
+        "Collecting realistic data on how humans interact with machines before building the system.",
+        "Speeding up the Text-To-Speech (TTS) process.",
+        "Anonymizing users to protect privacy."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يسمح نظام ساحر أوز للمصممين بجمع بيانات حول لغة 'إنسان-آلة' من خلال محاكاة النظام برجل مخفي.",
+      "en": "Wizard-of-Oz allows designers to collect 'human-machine' language data by simulating the system with a hidden human."
+    },
+    "hint": {
+      "ar": "إنه نموذج أولي (Prototype) يعتمد على الخداع لجمع البيانات.",
+      "en": "It's a prototype based on deception to gather data."
+    },
+    "difficulty": "medium",
+    "conceptId": "dialogue-system-design-ethics"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي من أفعال الكلام التالية يمثل التزاماً من المتحدث بمسار عمل مستقبلي (مثل الوعد)؟",
+      "en": "Which of the following speech acts represents a commitment by the speaker to a future course of action (like promising)?"
+    },
+    "options": {
+      "ar": [
+        "Constatives (التقريريات)",
+        "Directives (التوجيهات)",
+        "Commissives (الالتزامات)",
+        "Acknowledgments (الإقرارات)"
+      ],
+      "en": [
+        "Constatives",
+        "Directives",
+        "Commissives",
+        "Acknowledgments"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الالتزامات (Commissives) هي الأفعال التي تلزم المتحدث بفعل شيء في المستقبل، مثل الوعد أو التخطيط.",
+      "en": "Commissives commit the speaker to some future course of action, like promising or planning."
+    },
+    "hint": {
+      "ar": "الكلمة مشتقة من كلمة Commit (يلتزم).",
+      "en": "The word is derived from 'Commit'."
+    },
+    "difficulty": "hard",
+    "conceptId": "properties-of-human-conversation"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في سياق تقييم روبوتات الدردشة، ما هو مقياس Acute-eval؟",
+      "en": "In the context of chatbot evaluation, what is the Acute-eval metric?"
+    },
+    "options": {
+      "ar": [
+        "مقياس آلي يعتمد على تطابق الكلمات مثل BLEU.",
+        "تقييم مشارك حيث يتحدث المستخدم مع الروبوت لـ 6 أدوار.",
+        "تقييم مراقب حيث يقارن المقيّم بين محادثتين منفصلتين ويختار الأفضل.",
+        "مقياس لحساب معدل الخطأ في ملء الفتحات (Slot error rate)."
+      ],
+      "en": [
+        "An automated metric based on word overlap like BLEU.",
+        "A participant evaluation where the user chats for 6 turns.",
+        "An observer evaluation where the annotator compares two separate conversations and chooses the better one.",
+        "A metric to calculate the Slot error rate."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "Acute-eval هو تقييم مراقب (Observer evaluation) يعتمد على المقارنة المباشرة (A/B testing) بين نصوص محادثات لنظامين مختلفين.",
+      "en": "Acute-eval is an observer evaluation based on direct A/B comparison between conversation transcripts of two different systems."
+    },
+    "hint": {
+      "ar": "إنه تقييم يعتمد على 'المراقب' الذي يقارن بين شيئين.",
+      "en": "It's an 'observer' evaluation comparing two things."
+    },
+    "difficulty": "hard",
+    "conceptId": "chatbot-finetuning-evaluation"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين بنية GUS وبنية حالة الحوار (Dialogue-state) في استخراج الفتحات؟",
+      "en": "What is the main difference between GUS and Dialogue-state architecture in slot extraction?"
+    },
+    "options": {
+      "ar": [
+        "GUS يستخدم التعلم الآلي، بينما حالة الحوار تستخدم القواعد.",
+        "GUS يستخدم قواعد مكتوبة يدوياً، بينما حالة الحوار تستخدم مصنفات التعلم الآلي.",
+        "لا يوجد فرق، كلاهما يستخدم القواعد المكتوبة يدوياً.",
+        "GUS لا يستخدم الفتحات، بينما حالة الحوار تستخدمها."
+      ],
+      "en": [
+        "GUS uses machine learning, while Dialogue-state uses rules.",
+        "GUS uses handwritten rules, while Dialogue-state uses machine learning classifiers.",
+        "There is no difference; both use handwritten rules.",
+        "GUS does not use slots, while Dialogue-state does."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نظام GUS الساذج يعتمد على قواعد مكتوبة يدوياً، بينما نظام حالة الحوار المتطور يستخدم التعلم الآلي (SLU) لملء الفتحات.",
+      "en": "The naive GUS relies on handwritten rules, whereas the sophisticated Dialogue-state uses machine learning (SLU) for slot filling."
+    },
+    "hint": {
+      "ar": "GUS هو النظام الأقدم والأبسط.",
+      "en": "GUS is the older, simpler system."
+    },
+    "difficulty": "medium",
+    "conceptId": "task-based-dialogue-systems-gus"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "عندما يقول النظام: 'حسناً، متى تريد السفر إلى شنغهاي؟' بعد أن طلب المستخدم السفر إلى هناك، فهذا مثال على:",
+      "en": "When the system says: 'When do you want to travel to Shanghai?' after the user asked to travel there, this is an example of:"
+    },
+    "options": {
+      "ar": [
+        "التأكيد الصريح (Explicit confirmation)",
+        "الرفض (Rejection)",
+        "التأكيد الضمني (Implicit confirmation)",
+        "المبادرة الكاملة للمستخدم (Full user-initiative)"
+      ],
+      "en": [
+        "Explicit confirmation",
+        "Rejection",
+        "Implicit confirmation",
+        "Full user-initiative"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "النظام يؤكد فهمه للوجهة (شنغهاي) ضمنياً من خلال دمجها في سؤاله التالي، بدلاً من سؤال المستخدم صراحة 'هل تقصد شنغهاي؟'.",
+      "en": "The system implicitly confirms understanding the destination (Shanghai) by incorporating it into the next question, rather than explicitly asking 'Did you mean Shanghai?'."
+    },
+    "hint": {
+      "ar": "النظام لم يسأل 'هل هذا صحيح؟'، بل واصل المحادثة بناءً على المعلومة.",
+      "en": "The system didn't ask 'Is that correct?', it just moved on using the info."
+    },
+    "difficulty": "medium",
+    "conceptId": "dialogue-state-architecture"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن التأسيس المشترك (Grounding) يقتصر على الكلام فقط. خطأ! التأسيس يمكن أن يكون غير لغوي، مثل إضاءة زر المصعد لتأكيد استلام الطلب.</template>
+    <template class="content-en">You might think Grounding is strictly verbal. False! Grounding can be non-linguistic, like an elevator button lighting up to acknowledge it has been pressed.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">متتبع حالة الحوار (DST) لا ينظر فقط إلى الجملة الحالية. إنه يحافظ على 'حالة' تراكمية تلخص جميع قيود المستخدم منذ بداية المحادثة.</template>
+    <template class="content-en">The Dialogue State Tracker (DST) doesn't just look at the current sentence. It maintains a cumulative 'state' summarizing all user constraints since the conversation began.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تجربة 'ساحر أوز' ليست مجرد اختبار قابلية استخدام؛ إنها ضرورية لجمع بيانات التدريب. البشر يتحدثون مع الآلات بأسلوب مختلف (أبسط وأكثر مباشرة) مقارنة بتحدثهم مع البشر، وتدريب النظام على حوارات بشرية بحتة سيؤدي إلى فشله.</template>
+    <template class="content-en">The Wizard-of-Oz experiment isn't just a usability test; it's essential for gathering training data. Humans speak differently to machines (simpler, more direct) than to humans, and training on purely human-human data will cause the system to fail.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين 'الاستجابة بالاسترجاع' و 'الاستجابة بالتوليد'. الاسترجاع يبحث في قاعدة بيانات عن جملة جاهزة (آمن ولكن محدود)، بينما التوليد يبني الجملة كلمة بكلمة (مرن ولكنه قد يهلوس).</template>
+    <template class="content-en">Don't confuse 'Response by retrieval' with 'Response by generation'. Retrieval searches a database for a pre-written sentence (safe but limited), while generation builds the sentence word-by-word (flexible but prone to hallucination).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M12.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

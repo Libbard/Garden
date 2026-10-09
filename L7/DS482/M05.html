@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المقدمات: معالجة البيانات والجبر الخطي · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#tensors-and-data-manipulation" class="toc-link" data-bilingual>
+        <template class="content-ar">الموترات ومعالجة البيانات (Tensors &amp; Data Manipulation)</template>
+        <template class="content-en">Tensors and Data Manipulation</template>
+        <span class="content-target">الموترات ومعالجة البيانات (Tensors &amp; Data Manipulation)</span>
+      </a>
+      <a href="#tensor-operations-and-broadcasting" class="toc-link" data-bilingual>
+        <template class="content-ar">عمليات الموترات وآلية البث (Tensor Operations &amp; Broadcasting)</template>
+        <template class="content-en">Tensor Operations and Broadcasting</template>
+        <span class="content-target">عمليات الموترات وآلية البث (Tensor Operations &amp; Broadcasting)</span>
+      </a>
+      <a href="#memory-management-and-indexing" class="toc-link" data-bilingual>
+        <template class="content-ar">إدارة الذاكرة والفهرسة (Memory Management &amp; Indexing)</template>
+        <template class="content-en">Memory Management and Indexing</template>
+        <span class="content-target">إدارة الذاكرة والفهرسة (Memory Management &amp; Indexing)</span>
+      </a>
+      <a href="#data-preprocessing-pandas" class="toc-link" data-bilingual>
+        <template class="content-ar">المعالجة المسبقة للبيانات باستخدام Pandas</template>
+        <template class="content-en">Data Preprocessing with Pandas</template>
+        <span class="content-target">المعالجة المسبقة للبيانات باستخدام Pandas</span>
+      </a>
+      <a href="#linear-algebra-scalars-vectors-matrices" class="toc-link" data-bilingual>
+        <template class="content-ar">الجبر الخطي: الكميات القياسية، المتجهات، والمصفوفات</template>
+        <template class="content-en">Linear Algebra: Scalars, Vectors, and Matrices</template>
+        <span class="content-target">الجبر الخطي: الكميات القياسية، المتجهات، والمصفوفات</span>
+      </a>
+      <a href="#tensor-reduction-and-arithmetic" class="toc-link" data-bilingual>
+        <template class="content-ar">اختزال الموترات والعمليات الحسابية (Tensor Reduction &amp; Arithmetic)</template>
+        <template class="content-en">Tensor Reduction and Arithmetic</template>
+        <span class="content-target">اختزال الموترات والعمليات الحسابية (Tensor Reduction &amp; Arithmetic)</span>
+      </a>
+      <a href="#dot-products-and-matrix-multiplication" class="toc-link" data-bilingual>
+        <template class="content-ar">الضرب النقطي وضرب المصفوفات (Dot Products &amp; Matrix Multiplication)</template>
+        <template class="content-en">Dot Products and Matrix Multiplication</template>
+        <span class="content-target">الضرب النقطي وضرب المصفوفات (Dot Products &amp; Matrix Multiplication)</span>
+      </a>
+      <a href="#norms" class="toc-link" data-bilingual>
+        <template class="content-ar">المعايير (Norms)</template>
+        <template class="content-en">Norms</template>
+        <span class="content-target">المعايير (Norms)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المقدمات: معالجة البيانات والجبر الخطي</h1>
+      <p class="hero-description">تغطي هذه الوحدة المهارات النظرية والعملية لتخزين ومعالجة البيانات، والتحضير المسبق للبيانات باستخدام مكتبة Pandas، بالإضافة إلى تقنيات الجبر الخطي الأساسية للتعامل مع البيانات المجدولة في التعلم العميق.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Preliminaries: Data Manipulation and Linear Algebra</h1>
+      <p class="hero-description">This module covers theoretical and practical skills for storing and manipulating data, data preprocessing using pandas, and basic linear algebra techniques for working with tabular data in deep learning.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الموترات</span>
+      <span class="tag">معالجة البيانات</span>
+      <span class="tag">الجبر الخطي</span>
+      <span class="tag">بانداس</span>
+      <span class="tag">العمليات الحسابية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Tensors</span>
+      <span class="tag">Data Manipulation</span>
+      <span class="tag">Linear Algebra</span>
+      <span class="tag">Pandas</span>
+      <span class="tag">Arithmetic Operations</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تعلم المهارات النظرية والعملية لتخزين ومعالجة البيانات باستخدام الموترات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تعلم المهارات النظرية والعملية للمعالجة المسبقة للبيانات للتعامل مع القيم المفقودة والمتغيرات الفئوية.</span></li>
+      <li><span class="obj-icon">✦</span><span>تعلم تقنيات الجبر الخطي الأساسية للعمل مع البيانات المجدولة، بما في ذلك المتجهات والمصفوفات والمعايير (Norms).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>To learn the theoretical and practical skills for storing and manipulating data using tensors.</span></li>
+      <li><span class="obj-icon">✦</span><span>To learn the theoretical and practical skills for preprocessing data to handle missing values and categorical variables.</span></li>
+      <li><span class="obj-icon">✦</span><span>To learn basic Linear algebra techniques for working with tabular data, including vectors, matrices, and norms.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="tensors-and-data-manipulation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الموترات ومعالجة البيانات (Tensors &amp; Data Manipulation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Tensors and Data Manipulation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الموتر (Tensor) هو مصفوفة متعددة الأبعاد تمثل بنية البيانات الأساسية في التعلم العميق، تشبه مصفوفات NumPy ولكنها تدعم تسريع وحدة المعالجة الرسومية (GPU) والاشتقاق التلقائي.</p></template>
+    <template class="content-en"><p>A tensor is an n-dimensional array that serves as the fundamental data structure in deep learning, similar to NumPy arrays but with GPU acceleration and automatic differentiation support.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>للبدء في التعلم العميق، نحتاج إلى اكتساب البيانات ومعالجتها. الفئة الأساسية لذلك هي <span class="smart-term" data-term-en="Tensor" data-ar="الموتر" data-en-def="An n-dimensional array used as the primary data structure in deep learning.">الموتر<span class="smart-term-tooltip"></span></span> (Tensor). يمكن إنشاء الموترات بعدة طرق:</p><ul><li><code>np.arange(12)</code>: ينشئ متجهاً صفياً يحتوي على أول 12 عدداً صحيحاً.</li><li><code>x.shape</code>: للوصول إلى شكل الموتر (طول كل محور).</li><li><code>x.size</code>: لمعرفة العدد الإجمالي للعناصر.</li><li><code>x.reshape(3, 4)</code>: لتغيير شكل الموتر دون تغيير عناصره. يمكن استخدام <code>-1</code> لجعل النظام يستنتج البعد تلقائياً.</li><li><code>np.zeros</code> و <code>np.ones</code>: لإنشاء موترات مليئة بالأصفار أو الآحاد.</li><li><code>np.random.normal(0, 1, size=(3, 4))</code>: لأخذ عينات عشوائية من توزيع غاوسي (طبيعي).</li></ul></template>
+    <template class="content-en"><p>To begin deep learning, we need to acquire and process data. The fundamental class for this is the <span class="smart-term" data-term-en="Tensor" data-ar="الموتر" data-en-def="An n-dimensional array used as the primary data structure in deep learning.">Tensor<span class="smart-term-tooltip"></span></span>. Tensors can be created and manipulated in several ways:</p><ul><li><code>np.arange(12)</code>: Creates a row vector containing the first 12 integers.</li><li><code>x.shape</code>: Accesses a tensor's <span class="smart-term" data-term-en="Shape" data-ar="الشكل" data-en-def="A tuple that lists the length (dimensionality) along each axis of a tensor.">shape<span class="smart-term-tooltip"></span></span> (length along each axis).</li><li><code>x.size</code>: Gets the total number of elements.</li><li><code>x.reshape(3, 4)</code>: Changes the shape without altering elements. Using <code>-1</code> allows the system to automatically infer the dimension.</li><li><code>np.zeros</code> and <code>np.ones</code>: Create tensors filled with 0s or 1s.</li><li><code>np.random.normal(0, 1, size=(3, 4))</code>: Samples values randomly from a standard Gaussian (normal) distribution.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم فئة الموتر الخاصة بإطارات التعلم العميق بدلاً من NumPy القياسية؟ السبب الرئيسي هو أن الموترات تدعم بشكل جيد تسريع العمليات الحسابية باستخدام وحدات المعالجة الرسومية (GPUs)، بينما تدعم NumPy وحدات المعالجة المركزية (CPUs) فقط.</p><p>بالإضافة إلى ذلك، تدعم فئة الموتر الاشتقاق التلقائي (Automatic Differentiation)، وهو أمر بالغ الأهمية لتحسين النماذج (Optimization) وحساب التدرجات (Gradients) أثناء التدريب.</p></template>
+    <template class="content-en"><p>Why use the deep learning framework's tensor class instead of standard NumPy? The primary reason is that tensors are well-supported for GPU acceleration, whereas NumPy only supports CPU computation.</p><p>Additionally, the tensor class supports automatic differentiation, which is crucial for model optimization and calculating gradients during the training process.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import mxnet.np as np
+x = np.arange(12)
+X = x.reshape(-1, 4)
+Z = np.zeros((2, 3, 4))</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a visual representation of tensors of different dimensions. Show a scalar (single block), a vector (row of blocks), a matrix (grid of blocks), and a 3D tensor (cube of blocks). Use educational style, dark background #0d1117, accent colors like blue, green, and orange. Include labels: 'Scalar (0D)', 'Vector (1D)', 'Matrix (2D)', 'Tensor (3D)'. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrow Marker for Axes -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+
+        <!-- Reusable Block: 40x40 (Scalar) -->
+        <g id="block-40">
+            <rect width="40" height="40" rx="6" fill="var(--bg-elevated)" />
+            <rect width="40" height="40" rx="6" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" />
+        </g>
+
+        <!-- Reusable Block: 30x30 (Vector) -->
+        <g id="block-30">
+            <rect width="30" height="30" rx="4" fill="var(--bg-elevated)" />
+            <rect width="30" height="30" rx="4" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="1.5" />
+        </g>
+
+        <!-- Reusable Block: 25x25 (Matrix & Tensor) -->
+        <g id="block-25">
+            <rect width="25" height="25" rx="3" fill="var(--bg-elevated)" />
+            <rect width="25" height="25" rx="3" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="1.5" />
+        </g>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">Tensor Dimensions &amp; Data Structures</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">أبعاد الموترات وهياكل البيانات</text>
+
+    <!-- ========================================== -->
+    <!-- 1. SCALAR (0D)                             -->
+    <!-- ========================================== -->
+    <g transform="translate(100, 140)">
+        <!-- Shape -->
+        <use href="#block-40" x="-20" y="-20" />
+        
+        <!-- Labels -->
+        <text x="0" y="110" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Shape: []</text>
+        <text x="0" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الشكل: []</text>
+        
+        <text x="0" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Scalar (0D)</text>
+        <text x="0" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">كمية قياسية (0D)</text>
+
+        <!-- Code Snippet -->
+        <rect x="-50" y="160" width="100" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="178" text-anchor="middle" fill="var(--text-secondary)" font-family="monospace, sans-serif" font-size="13">np.array(7)</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- 2. VECTOR (1D)                             -->
+    <!-- ========================================== -->
+    <g transform="translate(300, 140)">
+        <!-- Shape -->
+        <use href="#block-30" x="-75" y="-15" />
+        <use href="#block-30" x="-45" y="-15" />
+        <use href="#block-30" x="-15" y="-15" />
+        <use href="#block-30" x="15" y="-15" />
+        <use href="#block-30" x="45" y="-15" />
+
+        <!-- Axis Arrow -->
+        <line x1="-75" y1="30" x2="75" y2="30" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="0" y="48" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 0 (Length)</text>
+        <text x="0" y="48" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 0 (الطول)</text>
+
+        <!-- Labels -->
+        <text x="0" y="110" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Shape: [5]</text>
+        <text x="0" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الشكل: [5]</text>
+        
+        <text x="0" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Vector (1D)</text>
+        <text x="0" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">متجه (1D)</text>
+
+        <!-- Code Snippet -->
+        <rect x="-55" y="160" width="110" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="178" text-anchor="middle" fill="var(--text-secondary)" font-family="monospace, sans-serif" font-size="13">np.arange(5)</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- 3. MATRIX (2D)                             -->
+    <!-- ========================================== -->
+    <g transform="translate(500, 140)">
+        <!-- Shape (4x4 Grid) -->
+        <!-- Row 0 -->
+        <use href="#block-25" x="-50" y="-50" />
+        <use href="#block-25" x="-25" y="-50" />
+        <use href="#block-25" x="0" y="-50" />
+        <use href="#block-25" x="25" y="-50" />
+        <!-- Row 1 -->
+        <use href="#block-25" x="-50" y="-25" />
+        <use href="#block-25" x="-25" y="-25" />
+        <use href="#block-25" x="0" y="-25" />
+        <use href="#block-25" x="25" y="-25" />
+        <!-- Row 2 -->
+        <use href="#block-25" x="-50" y="0" />
+        <use href="#block-25" x="-25" y="0" />
+        <use href="#block-25" x="0" y="0" />
+        <use href="#block-25" x="25" y="0" />
+        <!-- Row 3 -->
+        <use href="#block-25" x="-50" y="25" />
+        <use href="#block-25" x="-25" y="25" />
+        <use href="#block-25" x="0" y="25" />
+        <use href="#block-25" x="25" y="25" />
+
+        <!-- Axes Arrows -->
+        <!-- Axis 1 (Cols) -->
+        <line x1="-50" y1="65" x2="50" y2="65" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="0" y="82" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 1 (Cols)</text>
+        <text x="0" y="82" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 1 (الأعمدة)</text>
+        
+        <!-- Axis 0 (Rows) -->
+        <line x1="-65" y1="-50" x2="-65" y2="50" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="-75" y="0" text-anchor="middle" transform="rotate(-90, -75, 0)" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 0 (Rows)</text>
+        <text x="-75" y="0" text-anchor="middle" transform="rotate(-90, -75, 0)" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 0 (الصفوف)</text>
+
+        <!-- Labels -->
+        <text x="0" y="110" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Shape: [4, 4]</text>
+        <text x="0" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الشكل: [4, 4]</text>
+        
+        <text x="0" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Matrix (2D)</text>
+        <text x="0" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">مصفوفة (2D)</text>
+
+        <!-- Code Snippet -->
+        <rect x="-65" y="160" width="130" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="178" text-anchor="middle" fill="var(--text-secondary)" font-family="monospace, sans-serif" font-size="13">np.ones((4, 4))</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- 4. TENSOR (3D)                             -->
+    <!-- ========================================== -->
+    <g transform="translate(700, 140)">
+        <!-- Shape (3 Overlapping 3x3 Grids) -->
+        
+        <!-- Layer 1 (Back) -->
+        <g transform="translate(24, -24)">
+            <use href="#block-25" x="-37.5" y="-37.5" />
+            <use href="#block-25" x="-12.5" y="-37.5" />
+            <use href="#block-25" x="12.5" y="-37.5" />
+            <use href="#block-25" x="-37.5" y="-12.5" />
+            <use href="#block-25" x="-12.5" y="-12.5" />
+            <use href="#block-25" x="12.5" y="-12.5" />
+            <use href="#block-25" x="-37.5" y="12.5" />
+            <use href="#block-25" x="-12.5" y="12.5" />
+            <use href="#block-25" x="12.5" y="12.5" />
+        </g>
+
+        <!-- Layer 2 (Middle) -->
+        <g transform="translate(12, -12)">
+            <use href="#block-25" x="-37.5" y="-37.5" />
+            <use href="#block-25" x="-12.5" y="-37.5" />
+            <use href="#block-25" x="12.5" y="-37.5" />
+            <use href="#block-25" x="-37.5" y="-12.5" />
+            <use href="#block-25" x="-12.5" y="-12.5" />
+            <use href="#block-25" x="12.5" y="-12.5" />
+            <use href="#block-25" x="-37.5" y="12.5" />
+            <use href="#block-25" x="-12.5" y="12.5" />
+            <use href="#block-25" x="12.5" y="12.5" />
+        </g>
+
+        <!-- Layer 3 (Front) -->
+        <g transform="translate(0, 0)">
+            <use href="#block-25" x="-37.5" y="-37.5" />
+            <use href="#block-25" x="-12.5" y="-37.5" />
+            <use href="#block-25" x="12.5" y="-37.5" />
+            <use href="#block-25" x="-37.5" y="-12.5" />
+            <use href="#block-25" x="-12.5" y="-12.5" />
+            <use href="#block-25" x="12.5" y="-12.5" />
+            <use href="#block-25" x="-37.5" y="12.5" />
+            <use href="#block-25" x="-12.5" y="12.5" />
+            <use href="#block-25" x="12.5" y="12.5" />
+        </g>
+
+        <!-- Axes Arrows -->
+        <!-- Axis 2 (Cols) -->
+        <line x1="-37.5" y1="50" x2="37.5" y2="50" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="0" y="67" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 2 (Cols)</text>
+        <text x="0" y="67" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 2 (الأعمدة)</text>
+        
+        <!-- Axis 1 (Rows) -->
+        <line x1="-50" y1="-37.5" x2="-50" y2="37.5" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="-60" y="0" text-anchor="middle" transform="rotate(-90, -60, 0)" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 1 (Rows)</text>
+        <text x="-60" y="0" text-anchor="middle" transform="rotate(-90, -60, 0)" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 1 (الصفوف)</text>
+
+        <!-- Axis 0 (Depth) -->
+        <line x1="45" y1="-30" x2="69" y2="-54" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)" />
+        <text x="65" y="-35" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Axis 0 (Depth)</text>
+        <text x="65" y="-35" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور 0 (العمق)</text>
+
+        <!-- Labels -->
+        <text x="0" y="110" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Shape: [3, 3, 3]</text>
+        <text x="0" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الشكل: [3, 3, 3]</text>
+        
+        <text x="0" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Tensor (3D)</text>
+        <text x="0" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">موتر (3D)</text>
+
+        <!-- Code Snippet -->
+        <rect x="-75" y="160" width="150" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="178" text-anchor="middle" fill="var(--text-secondary)" font-family="monospace, sans-serif" font-size="13">np.zeros((3, 3, 3))</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك موتر بحجم 24 عنصراً، ما هي الأشكال (shapes) الممكنة التي يمكنك إعادة تشكيله (reshape) إليها؟</template>
+      <template class="content-en">If you have a tensor with a size of 24 elements, what are the possible shapes you can reshape it into?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أي مجموعة من الأبعاد يكون حاصل ضربها 24، مثل (24,)، (2, 12)، (3, 8)، (4, 6)، (2, 3, 4)، إلخ.</p></template>
+      <template class="content-en"><p>Any combination of dimensions whose product is 24, such as (24,), (2, 12), (3, 8), (4, 6), (2, 3, 4), etc.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tensor-operations-and-broadcasting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> عمليات الموترات وآلية البث (Tensor Operations &amp; Broadcasting)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Tensor Operations and Broadcasting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبق العمليات على مستوى العناصر (Elementwise) عملية قياسية على كل عنصر، بينما تسمح آلية البث (Broadcasting) بإجراء عمليات على موترات ذات أشكال مختلفة عن طريق توسيعها افتراضياً.</p></template>
+    <template class="content-en"><p>Elementwise operations apply a standard scalar operation to each element, while the broadcasting mechanism allows operations on tensors of different shapes by virtually expanding them.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تشمل العمليات الأساسية:</p><ol><li><b>العمليات على مستوى العناصر:</b> مثل الجمع <code>x + y</code>، الطرح <code>x - y</code>، الضرب <code>x * y</code>، والقوة <code>x ** y</code>. تطبق هذه العمليات على العناصر المتقابلة في الموترات ذات نفس الشكل.</li><li><b>الدمج (Concatenation):</b> يمكن دمج الموترات معاً باستخدام <code>np.concatenate</code>. المحور <code>axis=0</code> يدمج الصفوف، والمحور <code>axis=1</code> يدمج الأعمدة.</li><li><b>آلية <span class="smart-term" data-term-en="Broadcasting" data-ar="البث" data-en-def="A mechanism that allows elementwise operations between tensors of different shapes by virtually expanding them.">البث<span class="smart-term-tooltip"></span></span> (Broadcasting):</b> عندما تختلف أشكال الموترات، تقوم هذه الآلية بتوسيع مصفوفة أو كلتيهما عن طريق نسخ العناصر بشكل مناسب بحيث يكون للموترين نفس الشكل، ثم تنفذ العملية. عادة ما يتم البث على طول محور طوله 1.</li></ol></template>
+    <template class="content-en"><p>Basic operations include:</p><ol><li><b><span class="smart-term" data-term-en="Elementwise Operation" data-ar="عملية على مستوى العناصر" data-en-def="An operation applied independently to each corresponding element of the tensors.">Elementwise operation<span class="smart-term-tooltip"></span></span>s:</b> Such as addition <code>x + y</code>, subtraction <code>x - y</code>, multiplication <code>x * y</code>, and exponentiation <code>x ** y</code>. These apply to corresponding elements in tensors of the same shape.</li><li><b>Concatenation:</b> Tensors can be stacked end-to-end using <code>np.concatenate</code>. <code>axis=0</code> concatenates along rows, and <code>axis=1</code> concatenates along columns.</li><li><b><span class="smart-term" data-term-en="Broadcasting" data-ar="البث" data-en-def="A mechanism that allows elementwise operations between tensors of different shapes by virtually expanding them.">Broadcasting<span class="smart-term-tooltip"></span></span> Mechanism:</b> When shapes differ, this mechanism expands one or both arrays by copying elements appropriately so they have the same shape, then carries out the elementwise operation. It typically broadcasts along an axis with length 1.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر آلية البث قوية جداً لأنها توفر الذاكرة. بدلاً من إنشاء مصفوفات ضخمة مكررة صراحةً في الذاكرة لمطابقة الأبعاد، يقوم إطار العمل بمحاكاة هذا التوسع أثناء الحساب.</p><p>ومع ذلك، يجب الحذر عند استخدام البث، حيث يمكن أن يؤدي إلى أخطاء منطقية صامتة إذا تم بث أبعاد غير مقصودة، مما ينتج عنه موترات بأشكال غير متوقعة.</p></template>
+    <template class="content-en"><p>The broadcasting mechanism is highly powerful because it saves memory. Instead of explicitly creating massive duplicated arrays in memory to match dimensions, the framework simulates this expansion on the fly during computation.</p><p>However, one must be careful with broadcasting, as it can lead to silent logical bugs if unintended dimensions are broadcasted, resulting in tensors with unexpected shapes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>a = np.arange(3).reshape(3, 1)
+b = np.arange(2).reshape(1, 2)
+# Broadcasting: 'a' replicates columns, 'b' replicates rows
+result = a + b</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Illustrate the broadcasting mechanism. Show a 3x1 column vector 'a' and a 1x2 row vector 'b'. Show arrows pointing to a new 3x2 matrix where 'a' is duplicated across 2 columns and 'b' is duplicated across 3 rows, and then they are added together elementwise. Use dark theme #0d1117. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 880" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Standard Arrowhead -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Small Arrowhead for Broadcasting -->
+        <marker id="arrow-small" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="50" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Broadcasting Mechanism in Tensor Operations</text>
+    <text x="400" y="50" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">آلية البث في عمليات الموترات</text>
+
+    <!-- ================= STEP 1: ORIGINAL TENSORS ================= -->
+    <g id="step1">
+        <text x="400" y="100" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">1. Original Tensors</text>
+        <text x="400" y="100" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">1. الموترات الأصلية</text>
+
+        <!-- Matrix a (3x1) -->
+        <g id="matrix-a">
+            <!-- Cells -->
+            <rect x="225" y="130" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="225" y="180" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="225" y="230" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <!-- Values -->
+            <text x="250" y="155" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">1</text>
+            <text x="250" y="205" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">2</text>
+            <text x="250" y="255" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">3</text>
+            <!-- Label -->
+            <text x="250" y="310" font-size="16" fill="var(--text-secondary)" text-anchor="middle">a (3, 1)</text>
+        </g>
+
+        <!-- Plus Operator -->
+        <text x="400" y="205" font-size="36" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">+</text>
+
+        <!-- Matrix b (1x2) -->
+        <g id="matrix-b">
+            <!-- Cells -->
+            <rect x="500" y="180" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="550" y="180" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <!-- Values -->
+            <text x="525" y="205" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">10</text>
+            <text x="575" y="205" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">20</text>
+            <!-- Label -->
+            <text x="550" y="260" font-size="16" fill="var(--text-secondary)" text-anchor="middle">b (1, 2)</text>
+        </g>
+    </g>
+
+    <!-- Transition Arrow 1 -->
+    <line x1="400" y1="290" x2="400" y2="330" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- ================= STEP 2: BROADCASTING ================= -->
+    <g id="step2">
+        <text x="400" y="370" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">2. Virtual Broadcasting to Match Shapes</text>
+        <text x="400" y="370" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">2. البث الافتراضي لمطابقة الأشكال</text>
+
+        <!-- Broadcasted Matrix a' (3x2) -->
+        <g id="matrix-a-broadcast">
+            <!-- Original Column -->
+            <rect x="200" y="410" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="200" y="460" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="200" y="510" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <text x="225" y="435" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">1</text>
+            <text x="225" y="485" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">2</text>
+            <text x="225" y="535" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">3</text>
+
+            <!-- Copied Column -->
+            <rect x="250" y="410" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <rect x="250" y="460" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <rect x="250" y="510" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <text x="275" y="435" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">1</text>
+            <text x="275" y="485" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">2</text>
+            <text x="275" y="535" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">3</text>
+
+            <!-- Expansion Indicator -->
+            <path d="M 225 400 Q 250 380 275 400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-small)" />
+            <text x="250" y="370" font-size="14" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Broadcast</text>
+            <text x="250" y="370" font-size="14" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">بث</text>
+
+            <!-- Label -->
+            <text x="250" y="590" font-size="16" fill="var(--text-secondary)" text-anchor="middle">a' (3, 2)</text>
+        </g>
+
+        <!-- Plus Operator -->
+        <text x="400" y="485" font-size="36" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">+</text>
+
+        <!-- Broadcasted Matrix b' (3x2) -->
+        <g id="matrix-b-broadcast">
+            <!-- Original Row -->
+            <rect x="500" y="410" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <rect x="550" y="410" width="50" height="50" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+            <text x="525" y="435" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">10</text>
+            <text x="575" y="435" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">20</text>
+
+            <!-- Copied Rows -->
+            <rect x="500" y="460" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <rect x="550" y="460" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <text x="525" y="485" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">10</text>
+            <text x="575" y="485" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">20</text>
+
+            <rect x="500" y="510" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <rect x="550" y="510" width="50" height="50" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" rx="4" />
+            <text x="525" y="535" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">10</text>
+            <text x="575" y="535" font-size="18" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" dominant-baseline="middle">20</text>
+
+            <!-- Expansion Indicator -->
+            <path d="M 490 435 Q 465 485 490 535" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-small)" />
+            <text x="455" y="485" font-size="14" fill="var(--brand-ink)" text-anchor="end" dominant-baseline="middle" class="gsvg-en">Broadcast</text>
+            <text x="455" y="485" font-size="14" fill="var(--brand-ink)" text-anchor="end" dominant-baseline="middle" class="gsvg-ar">بث</text>
+
+            <!-- Label -->
+            <text x="550" y="590" font-size="16" fill="var(--text-secondary)" text-anchor="middle">b' (3, 2)</text>
+        </g>
+    </g>
+
+    <!-- Transition Arrow 2 -->
+    <line x1="400" y1="600" x2="400" y2="640" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- ================= STEP 3: RESULT ================= -->
+    <g id="step3">
+        <text x="400" y="670" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">3. Element-wise Addition</text>
+        <text x="400" y="670" font-size="18" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">3. إضافة عنصر بعنصر</text>
+
+        <!-- Result Matrix (3x2) -->
+        <g id="matrix-result">
+            <!-- Row 1 -->
+            <rect x="350" y="700" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <rect x="400" y="700" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <text x="375" y="725" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">11</text>
+            <text x="425" y="725" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">21</text>
+
+            <!-- Row 2 -->
+            <rect x="350" y="750" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <rect x="400" y="750" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <text x="375" y="775" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">12</text>
+            <text x="425" y="775" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">22</text>
+
+            <!-- Row 3 -->
+            <rect x="350" y="800" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <rect x="400" y="800" width="50" height="50" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" rx="4" />
+            <text x="375" y="825" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">13</text>
+            <text x="425" y="825" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">23</text>
+
+            <!-- Label -->
+            <text x="400" y="875" font-size="16" fill="var(--text-secondary)" text-anchor="middle">Result (3, 2)</text>
+        </g>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو شكل الموتر الناتج عن جمع موتر بشكله (4, 1) مع موتر بشكله (1, 5)؟</template>
+      <template class="content-en">What is the shape of the resulting tensor when adding a tensor of shape (4, 1) to a tensor of shape (1, 5)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشكل الناتج سيكون (4, 5) بسبب آلية البث.</p></template>
+      <template class="content-en"><p>The resulting shape will be (4, 5) due to the broadcasting mechanism.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="memory-management-and-indexing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> إدارة الذاكرة والفهرسة (Memory Management &amp; Indexing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Memory Management and Indexing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تخصيص ذاكرة جديدة لكل عملية يستهلك الموارد؛ لذا نستخدم العمليات الموضعية (In-place operations) لتحديث الموترات في نفس موقع الذاكرة.</p></template>
+    <template class="content-en"><p>Allocating new memory for every operation is resource-intensive; thus, we use in-place operations to update tensors in the same memory location.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الفهرسة والتقطيع (Indexing and Slicing):</b></p><ul><li>يتم الوصول إلى العناصر باستخدام الفهارس (تبدأ من 0).</li><li><code>X[-1]</code> يحدد العنصر الأخير.</li><li><code>X[1:3]</code> يحدد العناصر من الفهرس 1 إلى ما قبل 3.</li></ul><p><b>توفير الذاكرة:</b></p><ul><li>تشغيل عمليات مثل <code>Y = Y + X</code> يؤدي إلى تخصيص ذاكرة جديدة للنتيجة، مما يغير عنوان <code>id(Y)</code>.</li><li>في التعلم الآلي، نقوم بتحديث مئات الميجابايت من المعلمات عدة مرات في الثانية، لذا فإن التخصيص المستمر للذاكرة غير مرغوب فيه.</li><li>لإجراء عمليات موضعية (In-place)، نستخدم التقطيع: <code>Y[:] = Y + X</code> أو <code>Y += X</code>. هذا يضمن بقاء المتغير يشير إلى نفس موقع الذاكرة.</li></ul></template>
+    <template class="content-en"><p><b>Indexing and Slicing:</b></p><ul><li>Elements are accessed by index (starting at 0).</li><li><code>X[-1]</code> selects the last element.</li><li><code>X[1:3]</code> selects elements from index 1 up to, but not including, 3.</li></ul><p><b>Saving Memory:</b></p><ul><li>Running operations like <code>Y = Y + X</code> allocates new memory for the result, changing the <code>id(Y)</code>.</li><li>In machine learning, we update hundreds of megabytes of parameters multiple times per second, so constant memory allocation is highly undesirable.</li><li>To perform <span class="smart-term" data-term-en="In-place Operation" data-ar="عملية موضعية" data-en-def="An operation that updates the data structure directly in its original memory location without allocating new memory.">in-place operation<span class="smart-term-tooltip"></span></span>s, we use slice notation: <code>Y[:] = Y + X</code> or <code>Y += X</code>. This ensures the variable points to the same memory location.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تعتبر العمليات الموضعية حاسمة؟ إذا لم نقم بالتحديث في نفس الموقع، فإن المراجع الأخرى التي تشير إلى المعلمات القديمة ستظل تشير إلى موقع الذاكرة القديم. هذا قد يؤدي إلى استخدام أجزاء من الكود لمعلمات قديمة (Stale parameters) عن طريق الخطأ أثناء التدريب.</p><p>يمكن استخدام الدالة <code>id()</code> في بايثون للتحقق من عنوان الكائن في الذاكرة والتأكد من عدم حدوث تخصيص جديد.</p></template>
+    <template class="content-en"><p>Why are in-place operations critical? If we do not update in place, other references pointing to the old parameters will still point to the old memory location. This makes it possible for parts of our code to inadvertently reference stale parameters during training.</p><p>Python's <code>id()</code> function can be used to verify the exact address of the referenced object in memory and ensure no new allocation occurred.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>before = id(Y)
+Y = Y + X
+print(id(Y) == before) # False
+
+before = id(X)
+X += Y # In-place operation
+print(id(X) == before) # True</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعيد التعبير <code>id(Y) == id(Y + X)</code> القيمة False؟</template>
+      <template class="content-en">Why does the expression <code>id(Y) == id(Y + X)</code> return False?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن العملية <code>Y + X</code> تنشئ كائناً جديداً في الذاكرة لتخزين النتيجة، وبالتالي يكون له عنوان (id) مختلف عن <code>Y</code> الأصلي.</p></template>
+      <template class="content-en"><p>Because the operation <code>Y + X</code> creates a new object in memory to store the result, thus it has a different memory address (id) than the original <code>Y</code>.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-preprocessing-pandas" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> المعالجة المسبقة للبيانات باستخدام Pandas</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Data Preprocessing with Pandas</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قبل إدخال البيانات إلى الشبكة العصبية، يجب معالجتها للتعامل مع القيم المفقودة وتحويل البيانات الفئوية إلى أرقام باستخدام مكتبة <code>pandas</code>.</p></template>
+    <template class="content-en"><p>Before feeding data into a neural network, it must be preprocessed to handle missing values and convert categorical data into numbers using the <code>pandas</code> library.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتطبيق التعلم العميق على مشاكل العالم الحقيقي، نبدأ غالباً بمعالجة البيانات الخام:</p><ol><li><b>قراءة البيانات:</b> نستخدم <code>pd.read_csv()</code> لتحميل البيانات المجدولة.</li><li><b>التعامل مع البيانات المفقودة (NaN):</b><ul><li><b>الاستبدال (Imputation):</b> استبدال القيم المفقودة بقيم بديلة (مثل المتوسط <code>inputs.mean()</code>).</li><li><b>الحذف (Deletion):</b> تجاهل الصفوف أو الأعمدة التي تحتوي على قيم مفقودة.</li></ul></li><li><b>المتغيرات الفئوية (Categorical Variables):</b> لا تفهم الشبكات العصبية النصوص. نستخدم <code>pd.get_dummies(inputs, dummy_na=True)</code> لتحويل عمود فئوي إلى أعمدة ثنائية (0 أو 1). إذا كان هناك قيمة مفقودة، يتم اعتبارها فئة بحد ذاتها.</li><li><b>التحويل إلى موترات:</b> بمجرد أن تصبح جميع الإدخالات رقمية، يتم تحويلها إلى تنسيق الموتر باستخدام <code>np.array(inputs.values)</code>.</li></ol></template>
+    <template class="content-en"><p>To apply deep learning to real-world problems, we often begin with preprocessing raw data:</p><ol><li><b>Reading Data:</b> We use <code>pd.read_csv()</code> to load tabular data.</li><li><b>Handling Missing Data (NaN):</b><ul><li><b><span class="smart-term" data-term-en="Imputation" data-ar="الاستبدال / التعويض" data-en-def="The process of replacing missing data with substituted values, such as the mean of the column.">Imputation<span class="smart-term-tooltip"></span></span>:</b> Replaces missing values with substituted ones (e.g., the mean using <code>inputs.mean()</code>).</li><li><b>Deletion:</b> Ignores missing values by dropping rows/columns.</li></ul></li><li><b>Categorical Variables:</b> Neural networks don't understand text. We use <code>pd.get_dummies(inputs, dummy_na=True)</code> to convert a categorical column into binary columns (0 or 1). A missing value (NaN) can be treated as its own category.</li><li><b>Conversion to Tensors:</b> Once all entries are numerical, they are converted to tensor format using <code>np.array(inputs.values)</code>.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نفضل الاستبدال (Imputation) على الحذف (Deletion) في كثير من الأحيان؟ حذف البيانات التي تحتوي على قيم مفقودة قد يؤدي إلى فقدان معلومات قيمة، خاصة إذا كانت مجموعة البيانات صغيرة. استبدال القيم بالمتوسط يحافظ على حجم البيانات ويقلل من التحيز.</p><p>استخدام <span class="smart-term" data-term-en="Dummy Variables" data-ar="المتغيرات الوهمية" data-en-def="Binary columns created to represent categorical data numerically.">المتغيرات الوهمية<span class="smart-term-tooltip"></span></span> (Dummy Variables) أو التشفير الساخن الأحادي (One-Hot Encoding) يمنع النموذج من افتراض وجود ترتيب رياضي زائف بين الفئات (مثلاً، افتراض أن الفئة 2 أكبر من الفئة 1).</p></template>
+    <template class="content-en"><p>Why do we often prefer imputation over deletion? Dropping data with missing values can lead to the loss of valuable information, especially if the dataset is small. Imputing with the mean preserves dataset size and reduces bias.</p><p>Using <span class="smart-term" data-term-en="Dummy Variables" data-ar="المتغيرات الوهمية" data-en-def="Binary columns created to represent categorical data numerically.">dummy variables<span class="smart-term-tooltip"></span></span> (One-Hot Encoding) prevents the model from assuming a false mathematical ordering between categories (e.g., assuming category 2 is 'greater' than category 1).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>inputs = inputs.fillna(inputs.mean())
+inputs = pd.get_dummies(inputs, dummy_na=True)
+X = np.array(inputs.values)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك عمود 'اللون' يحتوي على القيم (أحمر، أزرق، NaN)، كم عدد الأعمدة الجديدة التي ستنتجها دالة <code>get_dummies</code> مع تفعيل <code>dummy_na=True</code>؟</template>
+      <template class="content-en">If you have a 'Color' column with values (Red, Blue, NaN), how many new columns will <code>get_dummies</code> with <code>dummy_na=True</code> produce?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستنتج 3 أعمدة: Color_Red، Color_Blue، و Color_nan.</p></template>
+      <template class="content-en"><p>It will produce 3 columns: Color_Red, Color_Blue, and Color_nan.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="linear-algebra-scalars-vectors-matrices" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الجبر الخطي: الكميات القياسية، المتجهات، والمصفوفات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Linear Algebra: Scalars, Vectors, and Matrices</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الكميات القياسية هي قيم مفردة، المتجهات هي قوائم من القيم (1D)، المصفوفات هي جداول (2D)، والموترات تعمم ذلك لأي عدد من الأبعاد (nD).</p></template>
+    <template class="content-en"><p>Scalars are single values, vectors are lists of values (1D), matrices are tables (2D), and tensors generalize this to any number of dimensions (nD).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الكميات القياسية (Scalars):</b> قيم تتكون من كمية عددية واحدة فقط. تُمثل بموتر يحتوي على عنصر واحد.</p><p><b>المتجهات (Vectors):</b> قائمة من القيم القياسية (موترات أحادية البعد). تُمثل أمثلة من مجموعة البيانات، حيث يتوافق كل مكون مع ميزة (Feature). طول المتجه يسمى بُعد المتجه (Dimension).</p><p><b>المصفوفات (Matrices):</b> تعمم المتجهات إلى البعد الثاني (موترات ثنائية الأبعاد). يُشار إلى المصفوفة $A \in \mathbb{R}^{m \times n}$ بأنها تتكون من $m$ صفوف و $n$ أعمدة.</p><ul><li><b><span class="smart-term" data-term-en="Transpose" data-ar="منقول المصفوفة" data-en-def="An operator which flips a matrix over its diagonal, switching the row and column indices of the matrix.">منقول المصفوفة<span class="smart-term-tooltip"></span></span> (Transpose):</b> تبديل الصفوف والأعمدة $A^\top$.</li><li><b>المصفوفة المتماثلة (Symmetric Matrix):</b> مصفوفة مربعة تتساوى مع منقولها $A = A^\top$.</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Scalar" data-ar="كمية قياسية" data-en-def="A single numerical value.">Scalar<span class="smart-term-tooltip"></span></span>s:</b> Values consisting of just one numerical quantity. Represented by a tensor with one element.</p><p><b>Vectors:</b> A list of scalar values (1D tensors). They represent examples from a dataset, where components correspond to features. The length of a vector is its dimension.</p><p><b>Matrices:</b> Generalize vectors to order two (2D tensors). Matrix $A \in \mathbb{R}^{m \times n}$ consists of $m$ rows and $n$ columns.</p><ul><li><b><span class="smart-term" data-term-en="Transpose" data-ar="منقول المصفوفة" data-en-def="An operator which flips a matrix over its diagonal, switching the row and column indices of the matrix.">Transpose<span class="smart-term-tooltip"></span></span>:</b> Exchanging a matrix's rows and columns, denoted $A^\top$.</li><li><b>Symmetric Matrix:</b> A square matrix equal to its transpose $A = A^\top$.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في سياق التعلم الآلي، غالباً ما يمثل المتجه نقطة بيانات واحدة (مثلاً، ميزات مريض)، بينما تمثل المصفوفة مجموعة بيانات كاملة (حيث تمثل الصفوف العينات والأعمدة الميزات).</p><p>يجب التمييز بين 'بُعد المتجه' (عدد عناصره) و 'بُعد الموتر' (عدد محاوره). متجه طوله 4 له بُعد 4، ولكنه موتر ذو محور واحد (1D).</p></template>
+    <template class="content-en"><p>In machine learning, a vector often represents a single data point (e.g., features of a patient), while a matrix represents an entire dataset (rows are samples, columns are features).</p><p>Distinguish between the 'dimension of a vector' (its length/number of elements) and the 'dimensionality of a tensor' (number of axes). A vector of length 4 has dimension 4, but it is a 1D tensor (one axis).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>منقول المصفوفة، حيث يصبح عنصر الصف i والعمود j هو عنصر الصف j والعمود i.</strong></template>
+      <template class="content-en"><strong>Matrix transpose, where the element at row i and column j becomes the element at row j and column i.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$A^\top \text{ where } b_{ij} = a_{ji}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>A = np.arange(20).reshape(5, 4)
+print(A.T) # Transpose
+
+B = np.array([[1,2,3],[2,0,4],[3,4,5]])
+print(B == B.T) # Check if symmetric</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن أن تكون المصفوفة غير المربعة مصفوفة متماثلة؟</template>
+      <template class="content-en">Can a non-square matrix be a symmetric matrix?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، المصفوفة المتماثلة يجب أن تكون مربعة لأن شرط التماثل هو \(A = A^T\)، وهذا يتطلب أن يكون عدد الصفوف مساوياً لعدد الأعمدة.</p></template>
+      <template class="content-en"><p>No, a symmetric matrix must be square because the condition is \(A = A^T\), which requires the number of rows to equal the number of columns.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tensor-reduction-and-arithmetic" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> اختزال الموترات والعمليات الحسابية (Tensor Reduction &amp; Arithmetic)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Tensor Reduction and Arithmetic</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكننا تلخيص بيانات الموتر عن طريق حساب المجموع أو المتوسط على طول محاور معينة (الاختزال)، أو ضرب المصفوفات عنصراً بعنصر (جداء هادامار).</p></template>
+    <template class="content-en"><p>We can summarize tensor data by calculating the sum or mean along specific axes (reduction), or multiply matrices element by element (Hadamard product).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Hadamard Product" data-ar="جداء هادامار" data-en-def="Elementwise multiplication of two matrices.">جداء هادامار<span class="smart-term-tooltip"></span></span> (Hadamard Product):</b> هو الضرب على مستوى العناصر لمصفوفتين لهما نفس الشكل، ويُرمز له بالرمز $\odot$.</p><p><b><span class="smart-term" data-term-en="Reduction" data-ar="الاختزال" data-en-def="An operation that lowers the dimensionality of a tensor, such as summing elements along an axis.">الاختزال<span class="smart-term-tooltip"></span></span> (Reduction):</b></p><ul><li>يمكن التعبير عن المجاميع باستخدام الدالة <code>sum()</code>. افتراضياً، تقوم باختزال الموتر على طول جميع محاوره إلى كمية قياسية.</li><li>يمكن تحديد المحور: <code>A.sum(axis=0)</code> يجمع عناصر الصفوف (يختزل بُعد الصفوف)، و <code>A.sum(axis=1)</code> يجمع عناصر الأعمدة.</li><li>المتوسط <code>mean()</code> يعمل بنفس الطريقة.</li></ul><p><b>الاحتفاظ بالأبعاد (Keepdims):</b></p><ul><li>استخدام <code>keepdims=True</code> يحافظ على عدد المحاور دون تغيير (يصبح طول المحور المختزل 1). هذا مفيد جداً لاستخدام النتيجة لاحقاً في عمليات البث (Broadcasting).</li><li><code>cumsum(axis=0)</code> يحسب المجموع التراكمي دون اختزال أي محور.</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Hadamard Product" data-ar="جداء هادامار" data-en-def="Elementwise multiplication of two matrices.">Hadamard Product<span class="smart-term-tooltip"></span></span>:</b> The elementwise multiplication of two matrices of the same shape, denoted by $\odot$.</p><p><b><span class="smart-term" data-term-en="Reduction" data-ar="الاختزال" data-en-def="An operation that lowers the dimensionality of a tensor, such as summing elements along an axis.">Reduction<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Sums are calculated using <code>sum()</code>. By default, it reduces a tensor along all its axes to a scalar.</li><li>Specifying an axis: <code>A.sum(axis=0)</code> sums up elements of all rows (reduces the row dimension), and <code>A.sum(axis=1)</code> reduces the column dimension.</li><li>The <code>mean()</code> function works similarly.</li></ul><p><b>Keeping Dimensions:</b></p><ul><li>Using <code>keepdims=True</code> keeps the number of axes unchanged (the reduced axis gets length 1). This is highly useful for subsequent broadcasting operations.</li><li><code>cumsum(axis=0)</code> calculates the cumulative sum without reducing the input tensor along any axis.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم <code>keepdims=True</code>؟ عند تسوية (Normalization) البيانات، نحتاج غالباً إلى قسمة كل صف على مجموعه.</p><ul><li>إذا استخدمنا <code>sum(axis=1)</code>، سنحصل على متجه 1D، ولن نتمكن من قسمة المصفوفة 2D عليه مباشرة بسبب قواعد البث.</li><li>باستخدام <code>keepdims=True</code>، نحصل على مصفوفة 2D بعمود واحد، والتي يمكن بثها بسهولة عبر جميع الأعمدة الأصلية.</li></ul></template>
+    <template class="content-en"><p>Why use <code>keepdims=True</code>? When normalizing data, we often need to divide each row by its sum.</p><ul><li>If we use <code>sum(axis=1)</code>, we get a 1D vector, and we cannot directly divide the 2D matrix by it due to broadcasting rules.</li><li>With <code>keepdims=True</code>, we get a 2D matrix with one column, which broadcasts seamlessly across the original columns.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>جداء هادامار (الضرب على مستوى العناصر).</strong></template>
+      <template class="content-en"><strong>Hadamard Product (elementwise multiplication).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$A \odot B = \begin{bmatrix} a_{11}b_{11} &amp; \cdots &amp; a_{1n}b_{1n} \\ \vdots &amp; \ddots &amp; \vdots \\ a_{m1}b_{m1} &amp; \cdots &amp; a_{mn}b_{mn} \end{bmatrix}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>A_sum_axis0 = A.sum(axis=0)
+sum_A = A.sum(axis=1, keepdims=True)
+normalized_A = A / sum_A # Broadcasting works here</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Hadamard Product (A * B)</th><th>Matrix Multiplication (np.dot(A, B))</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">متطلبات الشكل (Shape Requirements)</template>
+          <template class="content-en">Shape Requirements</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب أن يكون للمصفوفتين نفس الشكل تماماً.</template>
+          <template class="content-en">Both matrices must have the exact same shape.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب أن يتطابق عدد أعمدة الأولى مع عدد صفوف الثانية (n x k و k x m).</template>
+          <template class="content-en">Columns of first must match rows of second (n x k and k x m).</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبيعة العملية</template>
+          <template class="content-en">Nature of Operation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ضرب على مستوى العناصر (عنصر بعنصر).</template>
+          <template class="content-en">Elementwise multiplication.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حساب الضرب النقطي للصفوف والأعمدة (تحويل خطي).</template>
+          <template class="content-en">Computes dot products of rows and columns (linear transformation).</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت المصفوفة A بشكل (5, 4)، ما هو شكل النتيجة لـ <code>A.sum(axis=0)</code>؟</template>
+      <template class="content-en">If matrix A has shape (5, 4), what is the shape of the result for <code>A.sum(axis=0)</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشكل سيكون (4,) لأننا اختزلنا محور الصفوف (المحور 0).</p></template>
+      <template class="content-en"><p>The shape will be (4,) because we reduced the row axis (axis 0).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dot-products-and-matrix-multiplication" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الضرب النقطي وضرب المصفوفات (Dot Products &amp; Matrix Multiplication)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Dot Products and Matrix Multiplication</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الضرب النقطي يجمع حاصل ضرب العناصر المتقابلة لمتجهين، بينما ضرب المصفوفات يجمع عدة عمليات ضرب نقطي لتمثيل تحويلات خطية معقدة.</p></template>
+    <template class="content-en"><p>The dot product sums the products of corresponding elements of two vectors, while matrix multiplication combines multiple dot products to represent complex linear transformations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Dot Product" data-ar="الضرب النقطي" data-en-def="A sum over the products of the elements at the same position in two vectors.">الضرب النقطي<span class="smart-term-tooltip"></span></span> (Dot Product):</b> لمتجهين $x, y \in \mathbb{R}^d$، هو مجموع حاصل ضرب العناصر في نفس الموضع: $x^\top y = \sum x_i y_i$. يُستخدم لحساب المتوسط المرجح أو جيب التمام للزاوية بين المتجهات.</p><p><b>ضرب مصفوفة في متجه (Matrix-Vector Product):</b> ضرب المصفوفة $A \in \mathbb{R}^{m \times n}$ في المتجه $x \in \mathbb{R}^n$ هو تحويل يسقط المتجه من $\mathbb{R}^n$ إلى $\mathbb{R}^m$. يجب أن يتطابق بُعد أعمدة $A$ مع طول $x$.</p><p><b><span class="smart-term" data-term-en="Matrix Multiplication" data-ar="ضرب المصفوفات" data-en-def="An operation that produces a matrix from two matrices by computing dot products of rows and columns.">ضرب المصفوفات<span class="smart-term-tooltip"></span></span> (Matrix-Matrix Multiplication):</b> لضرب $A \in \mathbb{R}^{n \times k}$ و $B \in \mathbb{R}^{k \times m}$، نحسب الضرب النقطي لكل صف من $A$ مع كل عمود من $B$. النتيجة هي مصفوفة $C \in \mathbb{R}^{n \times m}$.</p><p>في الكود، نستخدم الدالة <code>np.dot()</code> لجميع هذه العمليات.</p></template>
+    <template class="content-en"><ul><li><b><span class="smart-term" data-term-en="Dot Product" data-ar="الضرب النقطي" data-en-def="A sum over the products of the elements at the same position in two vectors.">Dot Product<span class="smart-term-tooltip"></span></span>:</b> Given vectors $x, y \in \mathbb{R}^d$, it is the sum over the products of elements at the same position: $x^\top y = \sum x_i y_i$. Useful for weighted averages or cosine of the angle between vectors.</li><li><b>Matrix-Vector Product:</b> Multiplying matrix $A \in \mathbb{R}^{m \times n}$ by vector $x \in \mathbb{R}^n$ is a transformation projecting vectors from $\mathbb{R}^n$ to $\mathbb{R}^m$. The column dimension of $A$ must match the length of $x$.</li><li><b>Matrix-<span class="smart-term" data-term-en="Matrix Multiplication" data-ar="ضرب المصفوفات" data-en-def="An operation that produces a matrix from two matrices by computing dot products of rows and columns.">Matrix Multiplication<span class="smart-term-tooltip"></span></span>:</b> To multiply $A \in \mathbb{R}^{n \times k}$ and $B \in \mathbb{R}^{k \times m}$, we compute the dot product of each row of $A$ with each column of $B$. The result is $C \in \mathbb{R}^{n \times m}$.</li></ul><p>In code, we use the <code>np.dot()</code> function for all these operations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُعد ضرب المصفوفات العملية الأكثر كثافة حسابياً في الشبكات العصبية، حيث يمثل حساب كل طبقة بناءً على قيم الطبقة السابقة (الأوزان مضروبة في المدخلات).</p><p>من الأخطاء الشائعة الخلط بين ضرب المصفوفات <code>np.dot(A, B)</code> والضرب على مستوى العناصر <code>A * B</code> (جداء هادامار). ضرب المصفوفات يتطلب تطابق الأبعاد الداخلية ($k$)، بينما جداء هادامار يتطلب تطابق الشكل بالكامل.</p></template>
+    <template class="content-en"><p>Matrix-vector products describe the most intensive calculations required when computing each layer in a neural network given the values of the previous layer (weights multiplied by inputs).</p><p>A common trap is confusing matrix multiplication <code>np.dot(A, B)</code> with elementwise multiplication <code>A * B</code> (Hadamard product). Matrix multiplication requires matching inner dimensions ($k$), while Hadamard requires identical shapes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>ضرب المصفوفات، حيث كل عنصر هو ضرب نقطي لصف من A وعمود من B.</strong></template>
+      <template class="content-en"><strong>Matrix multiplication, where each element is the dot product of a row from A and a column from B.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$C = AB \implies c_{ij} = a_i^\top b_j$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>x = np.array([1, 2, 3])
+y = np.array([4, 5, 6])
+np.dot(x, y) # Dot product
+
+A = np.ones((3, 4))
+B = np.ones((4, 5))
+np.dot(A, B) # Matrix multiplication, result shape (3, 5)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Visualize Matrix-Matrix Multiplication. Show Matrix A (n x k) and Matrix B (k x m). Highlight a single row in A and a single column in B, with arrows pointing to a single cell in the resulting Matrix C (n x m). Add text explaining that the cell is the dot product of the highlighted row and column. Use dark theme #0d1117. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Gradients for highlighting -->
+        <linearGradient id="highlightGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+        
+        <!-- Arrowhead marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">Matrix-Matrix Multiplication</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">ضرب المصفوفات</text>
+
+    <!-- ========================================== -->
+    <!-- EXPLANATION BOX (Top Left)                 -->
+    <!-- ========================================== -->
+    <g transform="translate(40, 100)" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <rect width="400" height="140" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="8"/>
+        
+        <!-- Box Title -->
+        <text x="200" y="30" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">Dot Product (np.dot)</text>
+        <text x="200" y="30" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">الجداء النقطي (np.dot)</text>
+        
+        <!-- Visual Equation -->
+        <g transform="translate(200, 70)">
+            <!-- Row Vector -->
+            <rect x="-160" y="-15" width="120" height="30" fill="url(#highlightGrad)" rx="4"/>
+            <text x="-100" y="5" text-anchor="middle" fill="var(--on-brand-hi)" font-size="14" font-family="monospace">[ a₁, a₂, a₃, a₄ ]</text>
+            
+            <!-- Dot Operator -->
+            <circle cx="-20" cy="0" r="3" fill="var(--text-primary)"/>
+            
+            <!-- Column Vector (Transposed for inline display) -->
+            <rect x="0" y="-15" width="120" height="30" fill="url(#highlightGrad)" rx="4"/>
+            <text x="60" y="5" text-anchor="middle" fill="var(--on-brand-hi)" font-size="14" font-family="monospace">[ b₁, b₂, b₃, b₄ ]ᵀ</text>
+            
+            <!-- Equals Sign -->
+            <text x="140" y="5" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">=</text>
+            
+            <!-- Result Cell -->
+            <rect x="160" y="-15" width="30" height="30" fill="url(#highlightGrad)" rx="4"/>
+            <text x="175" y="5" text-anchor="middle" fill="var(--on-brand-hi)" font-size="14" font-weight="bold" font-family="monospace">c</text>
+        </g>
+        
+        <!-- Expanded Formula -->
+        <text x="200" y="120" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-family="monospace">
+            c = a₁b₁ + a₂b₂ + a₃b₃ + a₄b₄ = Σ aᵢbᵢ
+        </text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- MATRIX B (Top Right)                       -->
+    <!-- ========================================== -->
+    <g transform="translate(500, 80)" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Labels -->
+        <text x="40" y="-35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Matrix B</text>
+        <text x="40" y="-35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">المصفوفة B</text>
+        
+        <text x="40" y="-15" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">m cols</text>
+        <text x="40" y="-15" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">m أعمدة</text>
+        
+        <text x="95" y="80" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" transform="rotate(90, 95, 80)">k rows</text>
+        <text x="95" y="80" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" transform="rotate(90, 95, 80)">k صفوف</text>
+
+        <!-- Base Matrix -->
+        <rect width="80" height="160" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4"/>
+        
+        <!-- Highlighted Column -->
+        <rect x="40" y="0" width="40" height="160" fill="url(#highlightGrad)" rx="4"/>
+        
+        <!-- Grid Lines -->
+        <line x1="40" y1="0" x2="40" y2="160" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="40" x2="80" y2="40" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="80" y2="80" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="120" x2="80" y2="120" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Highlighted Values -->
+        <text x="60" y="25" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">b₁</text>
+        <text x="60" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">b₂</text>
+        <text x="60" y="105" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">b₃</text>
+        <text x="60" y="145" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">b₄</text>
+        
+        <!-- Non-highlighted Dots -->
+        <circle cx="20" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="20" cy="60" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="20" cy="100" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="20" cy="140" r="1.5" fill="var(--text-muted)"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- MATRIX A (Bottom Left)                     -->
+    <!-- ========================================== -->
+    <g transform="translate(260, 280)" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Labels -->
+        <text x="80" y="-15" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Matrix A</text>
+        <text x="80" y="-15" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">المصفوفة A</text>
+        
+        <text x="-15" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" transform="rotate(-90, -15, 60)">n rows</text>
+        <text x="-15" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" transform="rotate(-90, -15, 60)">n صفوف</text>
+        
+        <text x="80" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">k cols</text>
+        <text x="80" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">k أعمدة</text>
+
+        <!-- Base Matrix -->
+        <rect width="160" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4"/>
+        
+        <!-- Highlighted Row -->
+        <rect x="0" y="40" width="160" height="40" fill="url(#highlightGrad)" rx="4"/>
+        
+        <!-- Grid Lines -->
+        <line x1="0" y1="40" x2="160" y2="40" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="160" y2="80" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="40" y1="0" x2="40" y2="120" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="80" y1="0" x2="80" y2="120" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="120" y1="0" x2="120" y2="120" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Highlighted Values -->
+        <text x="20" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">a₁</text>
+        <text x="60" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">a₂</text>
+        <text x="100" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">a₃</text>
+        <text x="140" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="monospace">a₄</text>
+        
+        <!-- Non-highlighted Dots -->
+        <circle cx="20" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="60" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="100" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="140" cy="20" r="1.5" fill="var(--text-muted)"/>
+        
+        <circle cx="20" cy="100" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="60" cy="100" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="100" cy="100" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="140" cy="100" r="1.5" fill="var(--text-muted)"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- MATRIX C (Bottom Right)                    -->
+    <!-- ========================================== -->
+    <g transform="translate(500, 280)" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Labels -->
+        <text x="40" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Matrix C</text>
+        <text x="40" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">المصفوفة C</text>
+        
+        <text x="40" y="160" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">m cols</text>
+        <text x="40" y="160" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">m أعمدة</text>
+        
+        <text x="95" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" transform="rotate(90, 95, 60)">n rows</text>
+        <text x="95" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" transform="rotate(90, 95, 60)">n صفوف</text>
+
+        <!-- Base Matrix -->
+        <rect width="80" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4"/>
+        
+        <!-- Highlighted Cell -->
+        <rect x="40" y="40" width="40" height="40" fill="url(#highlightGrad)" rx="4"/>
+        
+        <!-- Grid Lines -->
+        <line x1="0" y1="40" x2="80" y2="40" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="80" y2="80" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="40" y1="0" x2="40" y2="120" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Highlighted Value -->
+        <text x="60" y="65" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-weight="bold" font-family="monospace">c</text>
+        
+        <!-- Non-highlighted Dots -->
+        <circle cx="20" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="60" cy="20" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="20" cy="60" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="20" cy="100" r="1.5" fill="var(--text-muted)"/>
+        <circle cx="60" cy="100" r="1.5" fill="var(--text-muted)"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PROJECTION ARROWS                          -->
+    <!-- ========================================== -->
+    <!-- Horizontal Arrow from A to C -->
+    <path d="M 430 340 L 485 340" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    
+    <!-- Vertical Arrow from B to C -->
+    <path d="M 560 250 L 560 265" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت A مصفوفة (10, 5) و B مصفوفة (5, 20)، ما هو شكل المصفوفة الناتجة عن ضربهما؟</template>
+      <template class="content-en">If A is a (10, 5) matrix and B is a (5, 20) matrix, what is the shape of the resulting matrix from their multiplication?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشكل سيكون (10, 20).</p></template>
+      <template class="content-en"><p>The shape will be (10, 20).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="norms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> المعايير (Norms)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Norms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المعيار (Norm) هو دالة تخبرنا بمدى "حجم" أو "طول" المتجه أو المصفوفة، ويُستخدم بكثرة كدالة هدف (Objective Function) في مشاكل التحسين.</p></template>
+    <template class="content-en"><p>A norm is a function that tells us how "big" a vector or matrix is, heavily used as an objective function in optimization problems.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المعيار هو دالة $f$ تعين المتجه إلى قيمة قياسية، وتحقق خصائص: التدرج (Scaling)، متباينة المثلث (Triangle inequality)، وعدم السلبية (Non-negative).</p><ul><li><b><span class="smart-term" data-term-en="L2 Norm" data-ar="معيار L2" data-en-def="The square root of the sum of the squares of the vector elements (Euclidean distance).">معيار L2<span class="smart-term-tooltip"></span></span> (المسافة الإقليدية):</b> الجذر التربيعي لمجموع مربعات عناصر المتجه $\|x\|_2 = \sqrt{\sum x_i^2}$. يُحسب باستخدام <code>np.linalg.norm(u)</code>.</li><li><b><span class="smart-term" data-term-en="L1 Norm" data-ar="معيار L1" data-en-def="The sum of the absolute values of the vector elements.">معيار L1<span class="smart-term-tooltip"></span></span>:</b> مجموع القيم المطلقة لعناصر المتجه $\|x\|_1 = \sum |x_i|$. أقل تأثراً بالقيم المتطرفة (Outliers) من L2. يُحسب باستخدام <code>np.abs(u).sum()</code>.</li><li><b><span class="smart-term" data-term-en="Frobenius Norm" data-ar="معيار فروبينيوس" data-en-def="The square root of the sum of the squares of the matrix elements.">معيار فروبينيوس<span class="smart-term-tooltip"></span></span> (Frobenius Norm):</b> الجذر التربيعي لمجموع مربعات عناصر المصفوفة. يتصرف وكأنه معيار L2 لمتجه على شكل مصفوفة.</li></ul></template>
+    <template class="content-en"><p>A norm is a function $f$ mapping a vector to a scalar, satisfying: scaling, triangle inequality, and non-negativity.</p><ul><li><b><span class="smart-term" data-term-en="L2 Norm" data-ar="معيار L2" data-en-def="The square root of the sum of the squares of the vector elements (Euclidean distance).">L2 Norm<span class="smart-term-tooltip"></span></span> (Euclidean distance):</b> The square root of the sum of the squares of the vector elements $\|x\|_2 = \sqrt{\sum x_i^2}$. Calculated via <code>np.linalg.norm(u)</code>.</li><li><b><span class="smart-term" data-term-en="L1 Norm" data-ar="معيار L1" data-en-def="The sum of the absolute values of the vector elements.">L1 Norm<span class="smart-term-tooltip"></span></span>:</b> The sum of the absolute values of the vector elements $\|x\|_1 = \sum |x_i|$. Less influenced by outliers than L2. Calculated via <code>np.abs(u).sum()</code>.</li><li><b><span class="smart-term" data-term-en="Frobenius Norm" data-ar="معيار فروبينيوس" data-en-def="The square root of the sum of the squares of the matrix elements.">Frobenius Norm<span class="smart-term-tooltip"></span></span>:</b> The square root of the sum of the squares of the matrix elements. Behaves as if it were an L2 norm of a matrix-shaped vector.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا المعايير مفيدة في التعلم العميق؟ نحن نحاول غالباً حل مشاكل التحسين (Optimization). على سبيل المثال، نريد تقليل المسافة بين تنبؤات النموذج والملاحظات الحقيقية (Ground-truth). يتم التعبير عن هذه المسافة كمعيار (Norm).</p><p>اختيار المعيار يؤثر على سلوك النموذج. معيار L2 يعاقب الأخطاء الكبيرة بشدة (بسبب التربيع)، بينما معيار L1 أكثر تسامحاً مع القيم المتطرفة ويشجع على التناثر (Sparsity) في الأوزان.</p></template>
+    <template class="content-en"><p>Why are norms useful in deep learning? We are often trying to solve optimization problems. For example, minimizing the distance between predictions and ground-truth observations. This distance is expressed as a norm.</p><p>The choice of norm affects model behavior. L2 heavily penalizes large errors (due to squaring), while L1 is more robust to outliers and encourages sparsity in weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الصيغة العامة لمعيار Lp.</strong></template>
+      <template class="content-en"><strong>The general formula for the Lp norm.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\|x\|_p = \left( \sum_i |x_i|^p \right)^{\frac{1}{p}}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>u = np.array([3, -4])
+l2_norm = np.linalg.norm(u) # 5.0
+l1_norm = np.abs(u).sum()   # 7.0
+
+# Frobenius norm of a matrix
+np.linalg.norm(np.ones((4,9))) # 6.0</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>L1 Norm</th><th>L2 Norm</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة الحساب</template>
+          <template class="content-en">Calculation Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مجموع القيم المطلقة.</template>
+          <template class="content-en">Sum of absolute values.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الجذر التربيعي لمجموع المربعات.</template>
+          <template class="content-en">Square root of sum of squares.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحساسية للقيم المتطرفة (Outliers)</template>
+          <template class="content-en">Sensitivity to Outliers</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أقل تأثراً.</template>
+          <template class="content-en">Less influenced.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">شديد التأثر (بسبب التربيع).</template>
+          <template class="content-en">Highly influenced (due to squaring).</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام معيار L1 بدلاً من معيار L2 كدالة خسارة (Loss function)؟</template>
+      <template class="content-en">When would you prefer to use the L1 norm instead of the L2 norm as a loss function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تحتوي البيانات على قيم متطرفة (Outliers) كثيرة، لأن معيار L1 أقل تأثراً بها مقارنة بمعيار L2 الذي يربع الأخطاء.</p></template>
+      <template class="content-en"><p>When the data contains many outliers, because the L1 norm is less influenced by them compared to the L2 norm which squares the errors.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة التأسيسية. قبل أن نبني شبكات عصبية معقدة، يجب أن نتقن لغة البيانات. الموترات (Tensors) هي الأبجدية هنا. تذكروا دائماً أن إدارة الذاكرة ليست مجرد تفصيل برمجي؛ في التعلم العميق، التحديث الموضعي (In-place) هو ما ينقذنا من انهيار الذاكرة أثناء التدريب. لقد رأينا كيف تنقذنا مكتبة Pandas من فوضى البيانات المفقودة والنصوص عبر الاستبدال والمتغيرات الوهمية. وأخيراً، الجبر الخطي هو المحرك. لا تخلطوا أبداً بين جداء هادامار وضرب المصفوفات في الامتحان! وتذكروا أن المعايير (Norms) هي طريقتنا الرياضية لقياس 'مدى سوء' أو 'مدى جودة' تنبؤات نموذجنا. ركزوا على أبعاد المصفوفات عند الضرب، فهي الفخ الأكثر شيوعاً.</template>
+    <template class="content-en">Welcome, friends, to this foundational module. Before we build complex neural networks, we must master the language of data. Tensors are our alphabet here. Always remember that memory management isn't just a coding detail; in deep learning, in-place updates save us from memory crashes during training. We've seen how Pandas rescues us from the chaos of missing data and text via imputation and dummy variables. Finally, linear algebra is the engine. Never confuse the Hadamard product with matrix multiplication on the exam! And remember, norms are our mathematical way of measuring 'how bad' or 'how good' our model's predictions are. Pay close attention to matrix dimensions during multiplication—it's the most common trap.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي باستخدام مصفوفات NumPy بدلاً من الموترات (Tensors)؟</template>
+          <template class="content-en">Why don't we just use NumPy arrays instead of Tensors?</template>
+          <span class="content-target">لماذا لا نكتفي باستخدام مصفوفات NumPy بدلاً من الموترات (Tensors)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الموترات تدعم تسريع العمليات باستخدام وحدات المعالجة الرسومية (GPU) وتدعم الاشتقاق التلقائي (Autograd)، وهما أمران حاسمان لتدريب نماذج التعلم العميق.</template>
+          <template class="content-en">Because tensors support GPU acceleration and automatic differentiation (Autograd), both of which are crucial for training deep learning models.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني استخدام <code>-1</code> في دالة <code>reshape</code>؟</template>
+          <template class="content-en">What does using <code>-1</code> in the <code>reshape</code> function mean?</template>
+          <span class="content-target">ماذا يعني استخدام <code>-1</code> في دالة <code>reshape</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يخبر إطار العمل بأن يستنتج هذا البعد تلقائياً بناءً على حجم الموتر والأبعاد الأخرى المحددة.</template>
+          <template class="content-en">It tells the framework to automatically infer this dimension based on the tensor's size and the other specified dimensions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف توفر آلية البث (Broadcasting) الذاكرة؟</template>
+          <template class="content-en">How does the broadcasting mechanism save memory?</template>
+          <span class="content-target">كيف توفر آلية البث (Broadcasting) الذاكرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من إنشاء مصفوفات جديدة ضخمة في الذاكرة لمطابقة الأشكال، تقوم الآلية بمحاكاة تكرار العناصر أثناء إجراء العملية الحسابية فقط.</template>
+          <template class="content-en">Instead of creating massive new arrays in memory to match shapes, the mechanism simulates the replication of elements on the fly during the computation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل استبدال القيم المفقودة (Imputation) بدلاً من حذفها؟</template>
+          <template class="content-en">Why do we prefer imputing missing values rather than deleting them?</template>
+          <span class="content-target">لماذا نفضل استبدال القيم المفقودة (Imputation) بدلاً من حذفها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الحذف يؤدي إلى فقدان بيانات قيمة قد تساعد النموذج على التعلم، خاصة إذا كانت مجموعة البيانات صغيرة.</template>
+          <template class="content-en">Because deletion leads to the loss of valuable data that could help the model learn, especially if the dataset is small.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المتغيرات الوهمية (Dummy Variables) ولماذا نحتاجها؟</template>
+          <template class="content-en">What are dummy variables and why do we need them?</template>
+          <span class="content-target">ما هي المتغيرات الوهمية (Dummy Variables) ولماذا نحتاجها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي أعمدة ثنائية (0 أو 1) تمثل الفئات. نحتاجها لأن الشبكات العصبية تتعامل مع الأرقام فقط ولا يمكنها معالجة النصوص مباشرة.</template>
+          <template class="content-en">They are binary columns (0 or 1) representing categories. We need them because neural networks only deal with numbers and cannot process text directly.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين <code>A.sum(axis=0)</code> و <code>A.sum(axis=1)</code>؟</template>
+          <template class="content-en">What is the difference between <code>A.sum(axis=0)</code> and <code>A.sum(axis=1)</code>?</template>
+          <span class="content-target">ما الفرق بين <code>A.sum(axis=0)</code> و <code>A.sum(axis=1)</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المحور 0 يختزل الصفوف (يجمع عمودياً)، بينما المحور 1 يختزل الأعمدة (يجمع أفقياً).</template>
+          <template class="content-en">Axis 0 reduces rows (sums vertically), while axis 1 reduces columns (sums horizontally).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يكون استخدام <code>keepdims=True</code> ضرورياً؟</template>
+          <template class="content-en">When is using <code>keepdims=True</code> necessary?</template>
+          <span class="content-target">متى يكون استخدام <code>keepdims=True</code> ضرورياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما تنوي استخدام نتيجة الاختزال (مثل المجموع أو المتوسط) في عملية بث (Broadcasting) لاحقة مع الموتر الأصلي، مثل تسوية البيانات.</template>
+          <template class="content-en">When you intend to use the reduction result (like sum or mean) in a subsequent broadcasting operation with the original tensor, such as data normalization.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين معيار L1 ومعيار L2؟</template>
+          <template class="content-en">What is the fundamental difference between the L1 norm and the L2 norm?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين معيار L1 ومعيار L2؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">معيار L2 يربع القيم مما يجعله شديد الحساسية للقيم المتطرفة (Outliers)، بينما معيار L1 يأخذ القيمة المطلقة وهو أكثر مقاومة للقيم المتطرفة.</template>
+          <template class="content-en">The L2 norm squares values, making it highly sensitive to outliers, while the L1 norm takes the absolute value and is more robust to outliers.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو معيار فروبينيوس؟</template>
+          <template class="content-en">What is the Frobenius norm?</template>
+          <span class="content-target">ما هو معيار فروبينيوس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو المعادل لمعيار L2 ولكن يطبق على المصفوفات؛ يحسب كالجذر التربيعي لمجموع مربعات جميع عناصر المصفوفة.</template>
+          <template class="content-en">It is the equivalent of the L2 norm but applied to matrices; calculated as the square root of the sum of the squares of all matrix elements.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نتأكد من أن العملية تمت في نفس موقع الذاكرة (In-place) في بايثون؟</template>
+          <template class="content-en">How do we verify that an operation occurred in-place in Python?</template>
+          <span class="content-target">كيف نتأكد من أن العملية تمت في نفس موقع الذاكرة (In-place) في بايثون؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام الدالة <code>id()</code> للتحقق مما إذا كان عنوان المتغير في الذاكرة قبل العملية يطابق عنوانه بعد العملية.</template>
+          <template class="content-en">By using the <code>id()</code> function to check if the variable's memory address before the operation matches its address after the operation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الموتر (Tensor)",
+      "en": "Tensor"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة متعددة الأبعاد تمثل بنية البيانات الأساسية في التعلم العميق.",
+        "en": "An n-dimensional array that serves as the fundamental data structure in deep learning."
+      },
+      "example": {
+        "ar": "صورة ملونة تُمثل كموتر ثلاثي الأبعاد (الارتفاع، العرض، قنوات الألوان).",
+        "en": "A color image represented as a 3D tensor (Height, Width, Color channels)."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الكمية القياسية (Scalar)",
+      "en": "Scalar"
+    },
+    "back": {
+      "definition": {
+        "ar": "قيمة تتكون من كمية عددية واحدة فقط (موتر ذو 0 محور).",
+        "en": "A value consisting of just one numerical quantity (a tensor with 0 axes)."
+      },
+      "example": {
+        "ar": "الرقم 5.",
+        "en": "The number 5."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "المتجه (Vector)",
+      "en": "Vector"
+    },
+    "back": {
+      "definition": {
+        "ar": "قائمة من القيم القياسية (موتر أحادي البعد).",
+        "en": "A list of scalar values (a 1D tensor)."
+      },
+      "example": {
+        "ar": "[1.0, 2.5, 3.1]",
+        "en": "[1.0, 2.5, 3.1]"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "المصفوفة (Matrix)",
+      "en": "Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول من الأرقام (موتر ثنائي الأبعاد) يتكون من صفوف وأعمدة.",
+        "en": "A table of numbers (a 2D tensor) consisting of rows and columns."
+      },
+      "example": {
+        "ar": "مجموعة بيانات حيث الصفوف هي المرضى والأعمدة هي الأعراض.",
+        "en": "A dataset where rows are patients and columns are symptoms."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "آلية البث (Broadcasting)",
+      "en": "Broadcasting Mechanism"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية تسمح بإجراء عمليات على مستوى العناصر بين موترات ذات أشكال مختلفة عن طريق توسيعها افتراضياً.",
+        "en": "A mechanism that allows elementwise operations between tensors of different shapes by virtually expanding them."
+      },
+      "example": {
+        "ar": "جمع مصفوفة (3x3) مع متجه (1x3).",
+        "en": "Adding a (3x3) matrix to a (1x3) vector."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "جداء هادامار (Hadamard Product)",
+      "en": "Hadamard Product"
+    },
+    "back": {
+      "definition": {
+        "ar": "الضرب على مستوى العناصر لمصفوفتين لهما نفس الشكل.",
+        "en": "The elementwise multiplication of two matrices of the same shape."
+      },
+      "example": {
+        "ar": "A * B في بايثون.",
+        "en": "A * B in Python."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ضرب المصفوفات (Matrix Multiplication)",
+      "en": "Matrix Multiplication"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تحسب الضرب النقطي لصفوف المصفوفة الأولى مع أعمدة المصفوفة الثانية.",
+        "en": "An operation computing dot products of rows of the first matrix with columns of the second."
+      },
+      "example": {
+        "ar": "np.dot(A, B)",
+        "en": "np.dot(A, B)"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "معيار L1 (L1 Norm)",
+      "en": "L1 Norm"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموع القيم المطلقة لعناصر المتجه.",
+        "en": "The sum of the absolute values of the vector elements."
+      },
+      "example": {
+        "ar": "np.abs(u).sum()",
+        "en": "np.abs(u).sum()"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "معيار L2 (L2 Norm)",
+      "en": "L2 Norm"
+    },
+    "back": {
+      "definition": {
+        "ar": "الجذر التربيعي لمجموع مربعات عناصر المتجه (المسافة الإقليدية).",
+        "en": "The square root of the sum of the squares of the vector elements (Euclidean distance)."
+      },
+      "example": {
+        "ar": "np.linalg.norm(u)",
+        "en": "np.linalg.norm(u)"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "معيار فروبينيوس (Frobenius Norm)",
+      "en": "Frobenius Norm"
+    },
+    "back": {
+      "definition": {
+        "ar": "الجذر التربيعي لمجموع مربعات عناصر المصفوفة.",
+        "en": "The square root of the sum of the squares of the matrix elements."
+      },
+      "example": {
+        "ar": "np.linalg.norm(Matrix)",
+        "en": "np.linalg.norm(Matrix)"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "منقول المصفوفة (Transpose)",
+      "en": "Transpose"
+    },
+    "back": {
+      "definition": {
+        "ar": "تبديل صفوف وأعمدة المصفوفة.",
+        "en": "Exchanging a matrix's rows and columns."
+      },
+      "example": {
+        "ar": "A.T",
+        "en": "A.T"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "المصفوفة المتماثلة (Symmetric Matrix)",
+      "en": "Symmetric Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة مربعة تتساوى مع منقولها.",
+        "en": "A square matrix equal to its transpose."
+      },
+      "example": {
+        "ar": "A == A.T",
+        "en": "A == A.T"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "الاستبدال (Imputation)",
+      "en": "Imputation"
+    },
+    "back": {
+      "definition": {
+        "ar": "استبدال القيم المفقودة في مجموعة البيانات بقيم بديلة (مثل المتوسط).",
+        "en": "Replacing missing values in a dataset with substituted ones (like the mean)."
+      },
+      "example": {
+        "ar": "inputs.fillna(inputs.mean())",
+        "en": "inputs.fillna(inputs.mean())"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الاحتفاظ بالأبعاد (keepdims=True)",
+      "en": "keepdims=True"
+    },
+    "back": {
+      "definition": {
+        "ar": "معامل في دوال الاختزال يحافظ على عدد المحاور دون تغيير (يجعل طول المحور المختزل 1).",
+        "en": "An argument in reduction functions that keeps the number of axes unchanged (reduced axis length becomes 1)."
+      },
+      "example": {
+        "ar": "A.sum(axis=1, keepdims=True)",
+        "en": "A.sum(axis=1, keepdims=True)"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "العملية الموضعية (In-place Operation)",
+      "en": "In-place Operation"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تقوم بتحديث المتغير في نفس موقع الذاكرة دون تخصيص ذاكرة جديدة.",
+        "en": "An operation that updates a variable in its original memory location without allocating new memory."
+      },
+      "example": {
+        "ar": "Y[:] = Y + X أو Y += X",
+        "en": "Y[:] = Y + X or Y += X"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "المتغيرات الوهمية (Dummy Variables)",
+      "en": "Dummy Variables"
+    },
+    "back": {
+      "definition": {
+        "ar": "أعمدة ثنائية (0 أو 1) تُنشأ لتمثيل البيانات الفئوية رقمياً.",
+        "en": "Binary columns (0 or 1) created to represent categorical data numerically."
+      },
+      "example": {
+        "ar": "pd.get_dummies(inputs)",
+        "en": "pd.get_dummies(inputs)"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لاستخدام فئة الموتر (Tensor) في إطارات التعلم العميق مقارنة بمصفوفات NumPy؟",
+      "en": "What is the main advantage of using the Tensor class in deep learning frameworks compared to NumPy arrays?"
+    },
+    "options": {
+      "ar": [
+        "تستهلك ذاكرة أقل دائماً.",
+        "تدعم تسريع وحدة المعالجة الرسومية (GPU) والاشتقاق التلقائي.",
+        "يمكنها فقط تخزين الأعداد الصحيحة.",
+        "لا تتطلب استيراد أي مكتبات."
+      ],
+      "en": [
+        "They always consume less memory.",
+        "They support GPU acceleration and automatic differentiation.",
+        "They can only store integers.",
+        "They do not require importing any libraries."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الموترات مصممة خصيصاً للتعلم العميق، لذا فهي تدعم حسابات GPU السريعة والاشتقاق التلقائي الضروري للتدريب.",
+      "en": "Tensors are specifically designed for deep learning, thus supporting fast GPU computations and automatic differentiation necessary for training."
+    },
+    "hint": {
+      "ar": "فكر في الأجهزة المستخدمة لتسريع تدريب النماذج.",
+      "en": "Think about the hardware used to accelerate model training."
+    },
+    "difficulty": "easy",
+    "conceptId": "tensors-and-data-manipulation"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من الأكواد التالية يمثل عملية موضعية (In-place) توفر الذاكرة؟",
+      "en": "Which of the following codes represents an in-place operation that saves memory?"
+    },
+    "options": {
+      "ar": [
+        "Y = Y + X",
+        "Z = X + Y",
+        "Y[:] = Y + X",
+        "Y = np.dot(X, Y)"
+      ],
+      "en": [
+        "Y = Y + X",
+        "Z = X + Y",
+        "Y[:] = Y + X",
+        "Y = np.dot(X, Y)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "استخدام التقطيع <code>Y[:]</code> يخبر بايثون بكتابة النتيجة في نفس موقع الذاكرة المخصص مسبقاً لـ Y.",
+      "en": "Using slice notation <code>Y[:]</code> tells Python to write the result into the previously allocated memory location of Y."
+    },
+    "hint": {
+      "ar": "ابحث عن الصيغة التي تستخدم التقطيع (Slicing) للتحديث.",
+      "en": "Look for the syntax that uses slicing for the update."
+    },
+    "difficulty": "medium",
+    "conceptId": "memory-management-and-indexing"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "إذا قمت بتطبيق <code>A.sum(axis=0)</code> على مصفوفة A ذات الشكل (5, 4)، فما هو شكل النتيجة؟",
+      "en": "If you apply <code>A.sum(axis=0)</code> to a matrix A of shape (5, 4), what is the shape of the result?"
+    },
+    "options": {
+      "ar": [
+        "(5,)",
+        "(4,)",
+        "(5, 4)",
+        "كمية قياسية (Scalar)"
+      ],
+      "en": [
+        "(5,)",
+        "(4,)",
+        "(5, 4)",
+        "Scalar"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المحور 0 يمثل الصفوف. جمع العناصر على طول الصفوف يختزل بُعد الصفوف، تاركاً بُعد الأعمدة فقط، وهو 4.",
+      "en": "Axis 0 represents rows. Summing along rows reduces the row dimension, leaving only the column dimension, which is 4."
+    },
+    "hint": {
+      "ar": "المحور 0 يختزل البعد الأول.",
+      "en": "Axis 0 reduces the first dimension."
+    },
+    "difficulty": "medium",
+    "conceptId": "tensor-reduction-and-arithmetic"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الدالة في مكتبة Pandas المستخدمة لتحويل المتغيرات الفئوية إلى متغيرات وهمية (أعمدة ثنائية)؟",
+      "en": "What is the function in the Pandas library used to convert categorical variables into dummy variables (binary columns)?"
+    },
+    "options": {
+      "ar": [
+        "pd.read_csv()",
+        "pd.fillna()",
+        "pd.get_dummies()",
+        "pd.to_tensor()"
+      ],
+      "en": [
+        "pd.read_csv()",
+        "pd.fillna()",
+        "pd.get_dummies()",
+        "pd.to_tensor()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة <code>get_dummies</code> تقوم بإنشاء أعمدة جديدة لكل فئة فريدة، وتحتوي على 0 أو 1.",
+      "en": "The <code>get_dummies</code> function creates new columns for each unique category, containing 0 or 1."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة 'dummies'.",
+      "en": "The name contains the word 'dummies'."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-preprocessing-pandas"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الشرط اللازم لضرب مصفوفتين A و B باستخدام <code>np.dot(A, B)</code>؟",
+      "en": "What is the necessary condition to multiply two matrices A and B using <code>np.dot(A, B)</code>?"
+    },
+    "options": {
+      "ar": [
+        "يجب أن يكون لهما نفس الشكل تماماً.",
+        "يجب أن يكون عدد أعمدة A مساوياً لعدد صفوف B.",
+        "يجب أن يكون عدد صفوف A مساوياً لعدد أعمدة B.",
+        "يجب أن تكون كلتا المصفوفتين مربعتين."
+      ],
+      "en": [
+        "They must have the exact same shape.",
+        "The number of columns in A must equal the number of rows in B.",
+        "The number of rows in A must equal the number of columns in B.",
+        "Both matrices must be square."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في ضرب المصفوفات، الأبعاد الداخلية يجب أن تتطابق: (n x k) مضروبة في (k x m).",
+      "en": "In matrix multiplication, the inner dimensions must match: (n x k) multiplied by (k x m)."
+    },
+    "hint": {
+      "ar": "تذكر قاعدة الأبعاد الداخلية.",
+      "en": "Remember the inner dimensions rule."
+    },
+    "difficulty": "medium",
+    "conceptId": "dot-products-and-matrix-multiplication"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي معيار (Norm) يُحسب كالجذر التربيعي لمجموع مربعات عناصر المتجه؟",
+      "en": "Which norm is calculated as the square root of the sum of the squares of the vector elements?"
+    },
+    "options": {
+      "ar": [
+        "معيار L1",
+        "معيار L2",
+        "معيار فروبينيوس للمتجهات",
+        "معيار L-infinity"
+      ],
+      "en": [
+        "L1 Norm",
+        "L2 Norm",
+        "Frobenius norm for vectors",
+        "L-infinity norm"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "معيار L2 يمثل المسافة الإقليدية ويُحسب بهذه الطريقة.",
+      "en": "The L2 norm represents the Euclidean distance and is calculated this way."
+    },
+    "hint": {
+      "ar": "يُعرف أيضاً بالمسافة الإقليدية.",
+      "en": "Also known as the Euclidean distance."
+    },
+    "difficulty": "easy",
+    "conceptId": "norms"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ماذا تفعل آلية البث (Broadcasting) عندما تختلف أشكال الموترات في عملية جمع؟",
+      "en": "What does the broadcasting mechanism do when tensor shapes differ in an addition operation?"
+    },
+    "options": {
+      "ar": [
+        "تُرجع خطأ (Error) فوراً.",
+        "تقوم بقص الموتر الأكبر ليطابق الأصغر.",
+        "تقوم بتوسيع الموترات افتراضياً عن طريق نسخ العناصر لتتطابق الأشكال.",
+        "تستبدل القيم المفقودة بالأصفار."
+      ],
+      "en": [
+        "It returns an error immediately.",
+        "It truncates the larger tensor to match the smaller one.",
+        "It virtually expands the tensors by copying elements to match shapes.",
+        "It replaces missing values with zeros."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "البث يوسع الأبعاد التي طولها 1 لتتطابق مع الموتر الآخر دون نسخ البيانات فعلياً في الذاكرة.",
+      "en": "Broadcasting expands dimensions of length 1 to match the other tensor without physically copying data in memory."
+    },
+    "hint": {
+      "ar": "فكر في كيفية جعل الأشكال متطابقة دون فقدان البيانات.",
+      "en": "Think about how to make shapes match without losing data."
+    },
+    "difficulty": "medium",
+    "conceptId": "tensor-operations-and-broadcasting"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو جداء هادامار (Hadamard Product)؟",
+      "en": "What is the Hadamard Product?"
+    },
+    "options": {
+      "ar": [
+        "ضرب مصفوفة في متجه.",
+        "الضرب النقطي لمتجهين.",
+        "الضرب على مستوى العناصر لمصفوفتين لهما نفس الشكل.",
+        "ضرب مصفوفتين باستخدام قاعدة الصف في العمود."
+      ],
+      "en": [
+        "Multiplying a matrix by a vector.",
+        "The dot product of two vectors.",
+        "The elementwise multiplication of two matrices of the same shape.",
+        "Multiplying two matrices using the row-by-column rule."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "جداء هادامار يُرمز له بـ A * B في بايثون، وهو يضرب كل عنصر بالعنصر المقابل له.",
+      "en": "The Hadamard product is denoted by A * B in Python, multiplying each element by its corresponding element."
+    },
+    "hint": {
+      "ar": "إنه ليس ضرب المصفوفات التقليدي.",
+      "en": "It is not traditional matrix multiplication."
+    },
+    "difficulty": "easy",
+    "conceptId": "tensor-reduction-and-arithmetic"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "لماذا نستخدم <code>keepdims=True</code> عند اختزال موتر (مثلاً بحساب المجموع)؟",
+      "en": "Why do we use <code>keepdims=True</code> when reducing a tensor (e.g., calculating the sum)?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عملية الحساب.",
+        "للحفاظ على عدد المحاور كما هو، مما يسهل عمليات البث (Broadcasting) اللاحقة.",
+        "لمنع حدوث أخطاء الذاكرة.",
+        "لتحويل المصفوفة إلى متجه أحادي البعد."
+      ],
+      "en": [
+        "To speed up the computation.",
+        "To keep the number of axes unchanged, facilitating subsequent broadcasting operations.",
+        "To prevent memory errors.",
+        "To convert the matrix into a 1D vector."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بدون <code>keepdims</code>، يتم إسقاط المحور المختزل. مع <code>keepdims</code>، يصبح طوله 1، مما يسمح ببث النتيجة بسهولة مع الموتر الأصلي.",
+      "en": "Without <code>keepdims</code>, the reduced axis is dropped. With it, its length becomes 1, allowing the result to broadcast easily with the original tensor."
+    },
+    "hint": {
+      "ar": "فكر في التوافق مع العمليات اللاحقة.",
+      "en": "Think about compatibility with subsequent operations."
+    },
+    "difficulty": "hard",
+    "conceptId": "tensor-reduction-and-arithmetic"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو معيار فروبينيوس (Frobenius Norm)؟",
+      "en": "What is the Frobenius Norm?"
+    },
+    "options": {
+      "ar": [
+        "مجموع القيم المطلقة لعناصر المصفوفة.",
+        "أكبر قيمة في المصفوفة.",
+        "الجذر التربيعي لمجموع مربعات جميع عناصر المصفوفة.",
+        "حاصل ضرب عناصر القطر الرئيسي."
+      ],
+      "en": [
+        "The sum of the absolute values of the matrix elements.",
+        "The maximum value in the matrix.",
+        "The square root of the sum of the squares of all matrix elements.",
+        "The product of the main diagonal elements."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "معيار فروبينيوس هو المعادل لمعيار L2 ولكن للمصفوفات.",
+      "en": "The Frobenius norm is the equivalent of the L2 norm but for matrices."
+    },
+    "hint": {
+      "ar": "إنه يشبه معيار L2 ولكن يطبق على المصفوفات.",
+      "en": "It is similar to the L2 norm but applied to matrices."
+    },
+    "difficulty": "medium",
+    "conceptId": "norms"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين <code>A * B</code> و <code>np.dot(A, B)</code>. الأول هو جداء هادامار (عنصر بعنصر) ويتطلب أشكالاً متطابقة. الثاني هو ضرب المصفوفات ويتطلب تطابق الأبعاد الداخلية.</template>
+    <template class="content-en">Confusing <code>A * B</code> with <code>np.dot(A, B)</code>. The first is the Hadamard product (elementwise) and requires identical shapes. The second is matrix multiplication and requires matching inner dimensions.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">كتابة <code>Y = Y + X</code> تخصص ذاكرة جديدة، مما يبطئ التدريب. استخدم دائماً <code>Y += X</code> أو <code>Y[:] = Y + X</code> لتحديث الأوزان في نفس الموقع (In-place).</template>
+    <template class="content-en">Writing <code>Y = Y + X</code> allocates new memory, slowing down training. Always use <code>Y += X</code> or <code>Y[:] = Y + X</code> to update weights in-place.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">آلية البث (Broadcasting) لا تقوم بنسخ البيانات فعلياً في الذاكرة، بل تحاكي التوسع أثناء الحساب، مما يجعلها فعالة جداً من حيث استهلاك الذاكرة.</template>
+    <template class="content-en">The Broadcasting mechanism does not physically copy data in memory; it simulates the expansion during computation, making it highly memory-efficient.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند استخدام <code>sum(axis=0)</code>، أنت لا تجمع الصف الأول فقط، بل تجمع *عبر* الصفوف (تختزل بُعد الصفوف)، والنتيجة هي متجه يحتوي على مجاميع الأعمدة.</template>
+    <template class="content-en">When using <code>sum(axis=0)</code>, you are not just summing the first row; you are summing *across* rows (reducing the row dimension), resulting in a vector of column sums.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

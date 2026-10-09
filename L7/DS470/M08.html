@@ -1,0 +1,2075 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS470" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن أنظمة التشغيل وتدقيق الأمن · DS470 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS470" data-page-title-en="DS470">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=DS470"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#system-security-planning-hardening" class="toc-link" data-bilingual>
+        <template class="content-ar">تخطيط أمن النظام وتقسية نظام التشغيل</template>
+        <template class="content-en">System Security Planning and OS Hardening</template>
+        <span class="content-target">تخطيط أمن النظام وتقسية نظام التشغيل</span>
+      </a>
+      <a href="#linux-unix-security" class="toc-link" data-bilingual>
+        <template class="content-ar">أمن أنظمة لينكس/يونكس</template>
+        <template class="content-en">Linux/Unix Security</template>
+        <span class="content-target">أمن أنظمة لينكس/يونكس</span>
+      </a>
+      <a href="#windows-security" class="toc-link" data-bilingual>
+        <template class="content-ar">أمن أنظمة ويندوز</template>
+        <template class="content-en">Windows Security</template>
+        <span class="content-target">أمن أنظمة ويندوز</span>
+      </a>
+      <a href="#virtualization-security" class="toc-link" data-bilingual>
+        <template class="content-ar">أمن المحاكاة الافتراضية</template>
+        <template class="content-en">Virtualization Security</template>
+        <span class="content-target">أمن المحاكاة الافتراضية</span>
+      </a>
+      <a href="#security-auditing-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">معمارية تدقيق الأمن</template>
+        <template class="content-en">Security Auditing Architecture</template>
+        <span class="content-target">معمارية تدقيق الأمن</span>
+      </a>
+      <a href="#audit-trail-protection-logging" class="toc-link" data-bilingual>
+        <template class="content-ar">حماية مسار التدقيق وتنفيذ التسجيل</template>
+        <template class="content-en">Audit Trail Protection and Logging Implementation</template>
+        <span class="content-target">حماية مسار التدقيق وتنفيذ التسجيل</span>
+      </a>
+      <a href="#os-specific-logging" class="toc-link" data-bilingual>
+        <template class="content-ar">التسجيل الخاص بأنظمة التشغيل (ويندوز ويونكس)</template>
+        <template class="content-en">OS-Specific Logging (Windows and UNIX)</template>
+        <span class="content-target">التسجيل الخاص بأنظمة التشغيل (ويندوز ويونكس)</span>
+      </a>
+      <a href="#application-level-logging" class="toc-link" data-bilingual>
+        <template class="content-ar">التسجيل على مستوى التطبيق</template>
+        <template class="content-en">Logging at Application Level</template>
+        <span class="content-target">التسجيل على مستوى التطبيق</span>
+      </a>
+      <a href="#audit-trail-analysis-siem" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل مسار التدقيق وأنظمة SIEM</template>
+        <template class="content-en">Audit Trail Analysis and SIEM Systems</template>
+        <span class="content-target">تحليل مسار التدقيق وأنظمة SIEM</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · DS470
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن أنظمة التشغيل وتدقيق الأمن</h1>
+      <p class="hero-description">تغطي هذه الوحدة تخطيط أمن النظام، وتقسية أنظمة التشغيل (ويندوز ولينكس)، وأمن المحاكاة الافتراضية، بالإضافة إلى معمارية تدقيق الأمن، وسجلات الأحداث، وأنظمة إدارة المعلومات والأحداث الأمنية (SIEM).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Operating Systems Security and Security Auditing</h1>
+      <p class="hero-description">This module covers system security planning, OS hardening (Windows and Linux), virtualization security, as well as security audit architecture, event logging, and SIEM systems.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن أنظمة التشغيل</span>
+      <span class="tag">تقسية النظام</span>
+      <span class="tag">المحاكاة الافتراضية</span>
+      <span class="tag">تدقيق الأمن</span>
+      <span class="tag">SIEM</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">OS Security</span>
+      <span class="tag">System Hardening</span>
+      <span class="tag">Virtualization</span>
+      <span class="tag">Security Auditing</span>
+      <span class="tag">SIEM</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح الحاجة إلى تخطيط أمن النظام والخطوات المستخدمة لتأمين نظام التشغيل الأساسي.</span></li>
+      <li><span class="obj-icon">✦</span><span>سرد الإجراءات للحفاظ على الأمن في الأنظمة الافتراضية.</span></li>
+      <li><span class="obj-icon">✦</span><span>سرد ومناقشة مكونات معمارية تدقيق الأمن.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف العوامل الرئيسية في تنفيذ وظيفة التسجيل لتدقيق الأمن.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the need for system security planning and the steps used to secure the base operating system.</span></li>
+      <li><span class="obj-icon">✦</span><span>List the procedure to maintain security in virtual systems.</span></li>
+      <li><span class="obj-icon">✦</span><span>List and discuss the components of security audit architecture.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the main factors in implementing logging function for security auditing.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="system-security-planning-hardening" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تخطيط أمن النظام وتقسية نظام التشغيل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> System Security Planning and OS Hardening</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقسية النظام هي عملية تقليل مساحة الهجوم من خلال إزالة البرامج غير الضرورية وتطبيق التحديثات، تماماً مثل تحصين قلعة بإغلاق الأبواب غير المستخدمة.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="OS Hardening" data-ar="تقسية نظام التشغيل" data-en-def="The process of securing a system by reducing its surface of vulnerability, typically by removing unnecessary software, unnecessary usernames or logins, and disabling or removing unnecessary services.">OS Hardening<span class="smart-term-tooltip"></span></span> is the process of reducing the attack surface by removing unnecessary software and applying patches, much like fortifying a castle by sealing unused doors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُنظر إلى النظام على أنه يتكون من عدة طبقات (الأجهزة المادية، نواة نظام التشغيل، واجهات برمجة التطبيقات، وتطبيقات المستخدم). كل طبقة عرضة للهجوم من الأسفل إذا لم يتم تأمين الطبقات السفلية بشكل مناسب.</p><p>تتضمن الخطوات الأساسية ل<span class="smart-term" data-term-en="OS Hardening" data-ar="تقسية نظام التشغيل" data-en-def="The process of securing a system by reducing its surface of vulnerability, typically by removing unnecessary software, unnecessary usernames or logins, and disabling or removing unnecessary services.">تقسية نظام التشغيل<span class="smart-term-tooltip"></span></span> (OS Hardening) ما يلي:</p><ol><li>تثبيت نظام التشغيل وتطبيق أحدث التصحيحات (Patching).</li><li>إزالة الخدمات والتطبيقات والبروتوكولات غير الضرورية.</li><li>تكوين المستخدمين والمجموعات والصلاحيات.</li><li>تكوين التحكم في استخدام الموارد.</li><li>تثبيت وتكوين ضوابط أمنية إضافية (مثل برامج مكافحة الفيروسات، وجدران الحماية المستندة إلى المضيف، وأنظمة كشف التسلل IDS).</li><li>اختبار أمن نظام التشغيل الأساسي للتأكد من تلبية الاحتياجات الأمنية.</li></ol><p>تشير مديرية الإشارات الأسترالية (ASD) إلى أن أهم أربع استراتيجيات للتخفيف من المخاطر هي: القائمة البيضاء للتطبيقات المعتمدة، وتصحيح تطبيقات الطرف الثالث ونظام التشغيل، وتقييد الامتيازات الإدارية، وإنشاء نظام دفاع متعمق.</p></template>
+    <template class="content-en"><p>A system is viewed as having multiple layers (Physical hardware, OS kernel, APIs, User applications). Each layer is vulnerable to attack from below if the lower layers are not secured appropriately.</p><p>The basic steps for Operating System Hardening include:</p><ol><li>Install the operating system and apply up-to-date patches.</li><li>Remove unnecessary services, applications, and protocols.</li><li>Configure users, groups, and permissions.</li><li>Configure resource usage control.</li><li>Install and configure additional security controls (e.g., anti-virus, host-based firewalls, IDS).</li><li>Test the security of the basic operating system to ensure needs are met.</li></ol><p>The Australian Signals Directorate (ASD) lists the top four mitigation strategies as: White-list approved applications, Patch third-party applications and OS vulnerabilities, Restrict administrative privileges, and Create a <span class="smart-term" data-term-en="Defense-in-depth" data-ar="الدفاع المتعمق" data-en-def="An information assurance concept in which multiple layers of security controls are placed throughout an IT system.">defense-in-depth<span class="smart-term-tooltip"></span></span> system.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تبدأ عملية التقسية حتى قبل نشر النظام؛ حيث يجب بناء الأنظمة الجديدة على شبكة محمية. لا ينبغي أبداً استخدام الإعدادات الافتراضية المرفقة أثناء التثبيت الأولي، لأنها مصممة لزيادة سهولة الاستخدام والوظائف بدلاً من الأمن.</p><p>يجب أن يحدد تخطيط النظام فئات المستخدمين، والامتيازات التي يمتلكونها، وأنواع المعلومات التي يمكنهم الوصول إليها. يجب تقييد الامتيازات المرتفعة (Elevated privileges) لتقتصر على المستخدمين الذين يحتاجون إليها فقط، وفقط عند الحاجة لأداء مهمة محددة.</p><p>يعد اختبار النظام الخطوة النهائية الحاسمة. يتم استخدام أدوات وبرامج مصممة خصيصاً لمراجعة النظام مقابل متطلبات الأمن الأساسية والبحث عن نقاط الضعف المعروفة وممارسات التكوين السيئة.</p></template>
+    <template class="content-en"><p>The hardening process begins even before deployment; new systems should ideally be constructed on a protected network. Supplied defaults should never be used during initial installation, as default configurations are set to maximize ease of use and functionality rather than security.</p><p>System planning must identify categories of users, their privileges, and the types of information they can access. Elevated privileges should be strictly restricted to only those users that require them, and then only when they are actively needed to perform a task.</p><p>System testing is the critical final step. Specialized programs are used to review a system against basic security requirements and scan for known vulnerabilities and poor configuration practices.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر الإعدادات الافتراضية لنظام التشغيل خطراً أمنياً عند نشر خادم جديد في بيئة إنتاج؟</template>
+      <template class="content-en">Why are default OS configurations considered a security risk when deploying a new server in a production environment?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الإعدادات الافتراضية مصممة لتسهيل الاستخدام وتوفير أقصى قدر من الوظائف، مما يعني غالباً ترك منافذ مفتوحة، وخدمات غير ضرورية قيد التشغيل، وحسابات افتراضية بكلمات مرور معروفة، مما يزيد من مساحة الهجوم.</p></template>
+      <template class="content-en"><p>Because default configurations are designed to maximize ease of use and functionality, which often means leaving ports open, unnecessary services running, and default accounts with known passwords active, thereby increasing the attack surface.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="linux-unix-security" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> أمن أنظمة لينكس/يونكس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Linux/Unix Security</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد أمن لينكس على إدارة التصحيحات، وتكوين ملفات النظام في مجلد /etc، والتحكم الصارم في صلاحيات المستخدمين، واستخدام تقنيات العزل مثل chroot jail.</p></template>
+    <template class="content-en"><p>Linux security relies on patch management, configuring system files in the /etc directory, strict user permission control, and isolation techniques like chroot jail.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتضمن الجوانب الرئيسية لأمن أنظمة لينكس/يونكس ما يلي:</p><ul><li><b>إدارة التصحيحات (Patch Management):</b> الحفاظ على تحديث تصحيحات الأمان هو تحكم حاسم.</li><li><b>تكوين التطبيقات والخدمات:</b> يتم تنفيذها عادةً باستخدام ملفات نصية منفصلة لكل تطبيق، توجد غالباً داخل دليل <code>/etc</code>. توجد تكوينات المستخدم الفردية في ملفات "dot" المخفية في الدليل الرئيسي لكل مستخدم.</li><li><b>المستخدمون والمجموعات والصلاحيات:</b> يتم تحديد الوصول كمنح صلاحيات القراءة والكتابة والتنفيذ (read, write, execute) لكل من المالك والمجموعة والآخرين.</li><li><b><span class="smart-term" data-term-en="chroot jail" data-ar="سجن الجذر" data-en-def="An operation that changes the apparent root directory for the current running process and its children, isolating them from the rest of the system.">سجن الجذر<span class="smart-term-tooltip"></span></span> (chroot jail):</b> يقيد رؤية الخادم لنظام الملفات بجزء محدد فقط. يستخدم استدعاء النظام <code>chroot</code> لحصر عملية ما عن طريق تعيين جذر نظام الملفات إلى دليل آخر.</li></ul><p>تتوفر أدوات تجارية ومفتوحة المصدر لإجراء فحص أمني للنظام واختبار نقاط الضعف، ومن أشهرها أداة "Nessus".</p></template>
+    <template class="content-en"><p>Key aspects of Linux/Unix security include:</p><ul><li><b>Patch Management:</b> Keeping security patches up to date is a critical control.</li><li><b>Application and Service Configuration:</b> Commonly implemented using separate text files for each application, generally located inside the <code>/etc</code> directory. Individual user configurations are in hidden "dot" files in each user's home directory.</li><li><b>Users, Groups, and Permissions:</b> Access is specified as granting read, write, and execute permissions to each of the owner, group, and others for each resource.</li><li><b><span class="smart-term" data-term-en="chroot jail" data-ar="سجن الجذر" data-en-def="An operation that changes the apparent root directory for the current running process and its children, isolating them from the rest of the system.">chroot jail<span class="smart-term-tooltip"></span></span>:</b> Restricts the server’s view of the file system to just a specified portion. It uses the <code>chroot</code> system call to confine a process by mapping the root of the filesystem to some other directory.</li></ul><p>Commercial and open-source tools are available to perform system security scanning and vulnerability testing, with "<span class="smart-term" data-term-en="Nessus" data-ar="نيسوس" data-en-def="A widely used proprietary vulnerability scanner.">Nessus<span class="smart-term-tooltip"></span></span>" being one of the best known.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يجب التمييز بين نوعين من الاستغلال في أنظمة لينكس:</p><ul><li><strong>الاستغلال المحلي (Local exploit)</strong> وهو ثغرة برمجية يمكن للمهاجم استغلالها للحصول على امتيازات مرتفعة بعد وصوله للنظام،</li><li>و<strong>الاستغلال عن بُعد (Remote exploit)</strong> وهو ثغرة في خادم الشبكة يمكن تشغيلها بواسطة مهاجم عن بُعد.</li></ul><p>على الرغم من أن تقنية <code>chroot jail</code> توفر طبقة عزل قوية تمنع العملية من رؤية أو الوصول إلى أدلة خارج السجن، إلا أن عيبها الرئيسي هو التعقيد الإضافي في إعدادها وصيانتها، حيث يجب توفير جميع المكتبات والملفات التي يحتاجها التطبيق داخل هذا السجن.</p></template>
+    <template class="content-en"><p>It is important to distinguish between two types of exploits in Linux: A local exploit is a software vulnerability that can be exploited by an attacker who already has access to gain elevated privileges. A remote exploit is a vulnerability in a network server that could be triggered by a remote attacker.</p><p>While a <code>chroot jail</code> provides a strong isolation layer preventing a process from seeing or reaching directories outside the jail, its main disadvantage is added complexity. All libraries and files required by the application must be meticulously replicated or linked within the jail environment.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو التحدي الرئيسي عند إعداد خدمة ويب لتعمل داخل chroot jail؟</template>
+      <template class="content-en">What is the main challenge when setting up a web service to run inside a chroot jail?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التحدي الرئيسي هو التعقيد؛ حيث يجب نسخ جميع التبعيات والمكتبات وملفات التكوين التي تحتاجها خدمة الويب للعمل بشكل صحيح إلى داخل الدليل المخصص كـ chroot jail، وإلا فلن تعمل الخدمة.</p></template>
+      <template class="content-en"><p>The main challenge is complexity; all dependencies, libraries, and configuration files that the web service needs to function correctly must be copied into the designated chroot jail directory, otherwise the service will fail to run.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="windows-security" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> أمن أنظمة ويندوز</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Windows Security</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد أمن ويندوز على إدارة التحديثات (WSUS)، والتحكم في حساب المستخدم (UAC)، وضوابط النزاهة الإلزامية، وتأمين السجل (Registry)، واستخدام التشفير (BitLocker).</p></template>
+    <template class="content-en"><p>Windows security relies on update management (WSUS), User Account Control (UAC), mandatory integrity controls, securing the Registry, and encryption (BitLocker).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نظراً لانتشارها الواسع، تُستهدف أنظمة ويندوز بشكل كبير. تشمل ضوابط الأمن الرئيسية ما يلي:</p><ul><li><b>إدارة التصحيحات:</b> استخدام "Windows Update" و "Windows Server Update Service (WSUS)" للصيانة الدورية.</li><li><b>إدارة المستخدمين وضوابط الوصول:</b> تطبق الأنظمة ضوابط وصول تقديرية (Discretionary). بدءاً من نظام Vista، تم تضمين <b><span class="smart-term" data-term-en="Mandatory Integrity Controls" data-ar="ضوابط النزاهة الإلزامية" data-en-def="A core security feature in Windows that adds Integrity Levels to processes and objects, implementing a form of the Biba integrity model.">ضوابط النزاهة الإلزامية<span class="smart-term-tooltip"></span></span> (Mandatory Integrity Controls)</b>، حيث يتم تصنيف الكائنات بمستويات نزاهة (منخفضة، متوسطة، عالية، أو نظام). يضمن النظام أن نزاهة الفاعل (Subject) تساوي أو تزيد عن مستوى الكائن (تطبيق لنموذج Biba للنزاهة).</li><li><b><span class="smart-term" data-term-en="UAC (User Account Control)" data-ar="التحكم في حساب المستخدم" data-en-def="A Windows security feature that helps prevent unauthorized changes to the operating system by prompting for permission when a task requires administrative rights.">التحكم في حساب المستخدم<span class="smart-term-tooltip"></span></span> (UAC):</b> يضمن أن المستخدمين ذوي الحقوق الإدارية لا يستخدمونها إلا عند الحاجة، وإلا فإنهم يصلون إلى النظام كمستخدم عادي.</li><li><b>تكوين التطبيقات والخدمات:</b> تتركز معلومات التكوين في <b>السجل (Registry)</b>، وهو قاعدة بيانات للمفاتيح والقيم.</li><li><b>التشفير:</b> تشفير الملفات والأدلة باستخدام (EFS)، وتشفير القرص بالكامل باستخدام (BitLocker) مع خوارزمية AES.</li></ul></template>
+    <template class="content-en"><p>Due to their widespread use, Windows systems are heavily targeted. Key security controls include:</p><ul><li><b>Patch Management:</b> Using "Windows Update" and "Windows Server Update Service (WSUS)" for regular maintenance.</li><li><b>User Administration and Access Controls:</b> Systems implement discretionary access controls. Vista and later systems include <b><span class="smart-term" data-term-en="Mandatory Integrity Controls" data-ar="ضوابط النزاهة الإلزامية" data-en-def="A core security feature in Windows that adds Integrity Levels to processes and objects, implementing a form of the Biba integrity model.">Mandatory Integrity Controls<span class="smart-term-tooltip"></span></span></b>, where objects are labeled with integrity levels (low, medium, high, or system). The system ensures the subject's integrity is equal to or higher than the object's level (implementing a form of the Biba Integrity model).</li><li><b>User Account Control (UAC):</b> Assists with ensuring users with administrative rights only use them when required, otherwise accessing the system as a normal user.</li><li><b>Application and Service Configuration:</b> Configuration information is centralized in the <b>Registry</b>, a database of keys and values.</li><li><b>Encryption:</b> Encrypting files and directories using Encrypting File System (EFS), and full-disk encryption with AES using BitLocker.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعد السجل (Registry) في ويندوز نقطة ضعف وقوة في نفس الوقت. نظراً لأنه مركزي، يمكن إجراء تغييرات مجمعة بسهولة باستخدام "Registry Editor" ودفعها عبر مجال الشبكة (Network Domain). ومع ذلك، فإن اختراق السجل يعني اختراق تكوينات النظام بأكمله.</p><p>تستخدم أنظمة ويندوز أيضاً "حسابات خدمة منخفضة الامتيازات" (Low Privilege Service Accounts) لعمليات الخدمة طويلة الأمد مثل خدمات الملفات والطباعة و DNS، لتقليل الضرر المحتمل إذا تم اختراق إحدى هذه الخدمات.</p><p>لتقييم الأمن، توفر مايكروسوفت أداة مجانية وبسيطة تسمى (Microsoft Baseline Security Analyzer - MBSA) للتحقق من الامتثال لتوصيات الأمان الخاصة بها.</p></template>
+    <template class="content-en"><p>The Windows Registry is both a strength and a vulnerability. Because it is centralized, bulk changes can be easily made using the "Registry Editor" and pushed out across a network domain. However, compromising the registry means compromising the entire system's configurations.</p><p>Windows systems also utilize "Low Privilege Service Accounts" for long-lived service processes such as file, print, and DNS services, minimizing potential damage if one of these services is compromised.</p><p>For security assessment, Microsoft provides a simple, free tool called the Microsoft Baseline Security Analyzer (MBSA) that checks for compliance with Microsoft’s security recommendations.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يطبق نظام ويندوز نموذج Biba للنزاهة؟</template>
+      <template class="content-en">How does Windows implement the Biba Integrity model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال ضوابط النزاهة الإلزامية (MIC)، حيث يتم تعيين مستوى نزاهة (منخفض، متوسط، عالي، نظام) لكل كائن وعملية. يمنع النظام العمليات ذات مستوى النزاهة المنخفض من تعديل الكائنات ذات مستوى النزاهة الأعلى (لا كتابة لأعلى).</p></template>
+      <template class="content-en"><p>Through Mandatory Integrity Controls (MIC), where each object and process is assigned an integrity level (low, medium, high, system). The system prevents lower-integrity processes from modifying higher-integrity objects (no write-up).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="virtualization-security" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> أمن المحاكاة الافتراضية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Virtualization Security</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المحاكاة الافتراضية تشارك موارد الأجهزة عبر أجهزة افتراضية (VMs) يديرها برنامج Hypervisor، مما يتطلب تأمين هذا البرنامج وعزل الأجهزة الافتراضية عن بعضها البعض.</p></template>
+    <template class="content-en"><p>Virtualization shares hardware resources across VMs managed by a Hypervisor, requiring the hypervisor to be secured and VMs to be isolated from one another.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المحاكاة الافتراضية هي تقنية توفر تجريداً للموارد. البرنامج الذي يجلس بين الأجهزة والأجهزة الافتراضية يسمى <b>Hypervisor (VMM)</b>، ويعمل كوسيط للموارد.</p><p>بدائل المحاكاة الافتراضية:</p><ul><li><b>المحاكاة الافتراضية الأصلية (Native - Type 1):</b> ينفذ الـ Hypervisor مباشرة على الأجهزة الأساسية. يعتبر أكثر أماناً لوجود طبقات أقل.</li><li><b>المحاكاة الافتراضية المستضافة (Hosted - Type 2):</b> يعمل نظام تشغيل مضيف، ويعمل الـ Hypervisor كتطبيق فوقه. يضيف طبقات إضافية مما يزيد من المخاوف الأمنية.</li><li><b><span class="smart-term" data-term-en="Containers" data-ar="الحاويات" data-en-def="Application virtualization that provides an isolated execution environment where all containerized applications share a common OS kernel.">الحاويات<span class="smart-term-tooltip"></span></span> (Containers / Application Virtualization):</b> تعمل الحاويات داخل نواة نظام التشغيل المضيف. تتشارك جميع التطبيقات في الحاويات نفس النواة. تتميز بعبء أقل ولكنها تقدم نقاط ضعف أمنية أكبر مقارنة بالأجهزة الافتراضية.</li></ul><p>تشمل قضايا أمن المحاكاة الافتراضية: عزل نظام التشغيل الضيف، ومراقبة نظام التشغيل الضيف بواسطة الـ Hypervisor، وأمن بيئة المحاكاة (إدارة الصور واللقطات Snapshots).</p></template>
+    <template class="content-en"><p>Virtualization provides an abstraction of resources. The software sitting between hardware and VMs is the <b><span class="smart-term" data-term-en="Hypervisor" data-ar="مراقب الأجهزة الافتراضية" data-en-def="Software that sits between the hardware and the VMs, acting as a resource broker and allowing multiple VMs to safely coexist.">Hypervisor<span class="smart-term-tooltip"></span></span> (Virtual Machine Monitor - VMM)</b>, acting as a resource broker.</p><p>Virtualization Alternatives:</p><ul><li><b>Native Virtualization (Type 1):</b> Hypervisor executes directly on underlying hardware. More secure due to fewer layers.</li><li><b>Hosted Virtualization (Type 2):</b> Hosted OS runs along with other apps. Adds additional layers, increasing security concerns.</li><li><b><span class="smart-term" data-term-en="Containers" data-ar="الحاويات" data-en-def="Application virtualization that provides an isolated execution environment where all containerized applications share a common OS kernel.">Containers<span class="smart-term-tooltip"></span></span> (Application Virtualization):</b> Runs within the host OS kernel. All containerized apps share a common OS kernel. Incurs lower overhead but introduces greater security vulnerabilities compared to VMs.</li></ul><p>Security issues include: Guest OS isolation, Guest OS monitoring by the hypervisor, and Virtualized environment security (image and snapshot management).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يجب تأمين الـ Hypervisor نفسه باستخدام عملية مشابهة لتقسية نظام التشغيل: تثبيته في بيئة معزولة، وتحديثه تلقائياً، ومراقبته، وتقييد الوصول الإداري إليه.</p><p>تستخدم البنية التحتية الافتراضية <b>الشبكات المعرفة بالبرمجيات (SDNs)</b> لتمكين أجزاء الشبكة من الامتداد منطقياً عبر خوادم متعددة. يمكن استخدام شبكات التراكب (Overlay networks) مثل VXLAN لتجريد عناوين الطبقة 2 و 3.</p><p>نظراً لأن حركة مرور الشبكة بين الأجهزة الافتراضية على نفس المضيف قد لا تخرج إلى الشبكة المادية، يتم استخدام <b>جدران الحماية الافتراضية (Virtual Firewalls)</b> (مثل جدار حماية Hypervisor أو جدار حماية مستند إلى المضيف الافتراضي) لفحص وتأمين هذه الحركة الداخلية.</p></template>
+    <template class="content-en"><p>The Hypervisor itself must be secured using a process similar to OS hardening:</p><ul><li>installed in an isolated environment,</li><li>updated automatically,</li><li>monitored,</li><li>and restricted to authorized administration only.</li></ul><p>Virtualized infrastructures utilize <b>Software Defined Networks (SDNs)</b> to enable network segments to logically span multiple servers.</p><p>Overlay networks using standards like VXLAN abstract Layer 2 and 3 addresses from the underlying physical network.</p><p>Because network traffic between VMs on the same host might not route out to a physical network, <b>Virtual Firewalls</b> (e.g., Hypervisor Firewall, VM Host-Based Firewall) are required to inspect and secure this internal traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Create a diagram comparing three virtualization types side-by-side. 1) Native (Type 1): Hardware at bottom, Hypervisor above it, then multiple Guest OSs with Apps. 2) Hosted (Type 2): Hardware at bottom, Host OS above it, Hypervisor above Host OS, then Guest OSs with Apps. 3) Containers: Hardware at bottom, Host OS above it, Container Engine above Host OS, then Apps with libraries (no Guest OS). Use dark background #0d1117, distinct colors for Hardware, OS, Hypervisor/Engine, and Apps. Include English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Gradients for distinct layers -->
+        <linearGradient id="hypGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)" />
+            <stop offset="100%" stop-color="var(--brand-800)" />
+        </linearGradient>
+        <linearGradient id="appGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-400)" />
+            <stop offset="100%" stop-color="var(--brand-500)" />
+        </linearGradient>
+        
+        <!-- Security Shield Icon -->
+        <g id="shield">
+            <path d="M 0 0 L 12 -5 L 24 0 L 24 10 C 24 18 12 24 12 24 C 12 24 0 18 0 10 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M 7 10 L 11 14 L 18 6" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="450" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Virtualization Architectures &amp; Security</text>
+    <text x="450" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">بنى المحاكاة الافتراضية والأمان</text>
+
+    <!-- Column Titles -->
+    <text x="160" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Native (Type 1)</text>
+    <text x="160" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">أصلية (النوع 1)</text>
+
+    <text x="450" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Hosted (Type 2)</text>
+    <text x="450" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مستضافة (النوع 2)</text>
+
+    <text x="740" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Containers</text>
+    <text x="740" y="80" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">حاويات</text>
+
+    <!-- ================= COLUMN 1: NATIVE (TYPE 1) ================= -->
+    
+    <!-- VM 1 -->
+    <rect x="30" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="92.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">VM 1</text>
+    <text x="92.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">آلة افتراضية 1</text>
+    
+    <rect x="40" y="130" width="105" height="50" fill="url(#appGrad)" rx="4" />
+    <text x="92.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App A</text>
+    <text x="92.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق أ</text>
+
+    <rect x="40" y="190" width="105" height="50" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="92.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="92.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <rect x="40" y="250" width="105" height="60" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+    <text x="92.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Guest OS</text>
+    <text x="92.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام ضيف</text>
+
+    <!-- VM 2 -->
+    <rect x="165" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="227.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">VM 2</text>
+    <text x="227.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">آلة افتراضية 2</text>
+    
+    <rect x="175" y="130" width="105" height="50" fill="url(#appGrad)" rx="4" />
+    <text x="227.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App B</text>
+    <text x="227.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق ب</text>
+
+    <rect x="175" y="190" width="105" height="50" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="227.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="227.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <rect x="175" y="250" width="105" height="60" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+    <text x="227.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Guest OS</text>
+    <text x="227.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام ضيف</text>
+
+    <!-- Hypervisor (Type 1 spans down to hardware) -->
+    <rect x="30" y="335" width="260" height="130" fill="url(#hypGrad)" rx="6" />
+    <text x="160" y="405" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Hypervisor (VMM)</text>
+    <text x="160" y="405" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">مراقب افتراضي</text>
+
+    <!-- Hardware -->
+    <rect x="30" y="475" width="260" height="60" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+    <text x="160" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Hardware</text>
+    <text x="160" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الأجهزة</text>
+
+    <!-- Security Note -->
+    <rect x="30" y="545" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" rx="6" />
+    <use href="#shield" x="148" y="552" />
+    <text x="160" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">High isolation, fewer layers</text>
+    <text x="160" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">عزل عالي، طبقات أقل</text>
+
+
+    <!-- ================= COLUMN 2: HOSTED (TYPE 2) ================= -->
+    
+    <!-- VM 1 -->
+    <rect x="320" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="382.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">VM 1</text>
+    <text x="382.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">آلة افتراضية 1</text>
+    
+    <rect x="330" y="130" width="105" height="50" fill="url(#appGrad)" rx="4" />
+    <text x="382.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App A</text>
+    <text x="382.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق أ</text>
+
+    <rect x="330" y="190" width="105" height="50" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="382.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="382.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <rect x="330" y="250" width="105" height="60" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+    <text x="382.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Guest OS</text>
+    <text x="382.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام ضيف</text>
+
+    <!-- VM 2 -->
+    <rect x="455" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="517.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">VM 2</text>
+    <text x="517.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">آلة افتراضية 2</text>
+    
+    <rect x="465" y="130" width="105" height="50" fill="url(#appGrad)" rx="4" />
+    <text x="517.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App B</text>
+    <text x="517.5" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق ب</text>
+
+    <rect x="465" y="190" width="105" height="50" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="517.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="517.5" y="220" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <rect x="465" y="250" width="105" height="60" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+    <text x="517.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Guest OS</text>
+    <text x="517.5" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام ضيف</text>
+
+    <!-- Hypervisor -->
+    <rect x="320" y="335" width="260" height="60" fill="url(#hypGrad)" rx="6" />
+    <text x="450" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Hypervisor (VMM)</text>
+    <text x="450" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">مراقب افتراضي</text>
+
+    <!-- Host OS -->
+    <rect x="320" y="405" width="260" height="60" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" rx="6" />
+    <text x="450" y="440" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Host OS</text>
+    <text x="450" y="440" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام مضيف</text>
+
+    <!-- Hardware -->
+    <rect x="320" y="475" width="260" height="60" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+    <text x="450" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Hardware</text>
+    <text x="450" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الأجهزة</text>
+
+    <!-- Security Note -->
+    <rect x="320" y="545" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" rx="6" />
+    <use href="#shield" x="438" y="552" />
+    <text x="450" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">OS adds attack surface</text>
+    <text x="450" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">نظام المضيف يزيد مساحة الهجوم</text>
+
+
+    <!-- ================= COLUMN 3: CONTAINERS ================= -->
+    
+    <!-- Container 1 -->
+    <rect x="610" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="672.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Container</text>
+    <text x="672.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">حاوية</text>
+    
+    <rect x="620" y="130" width="105" height="80" fill="url(#appGrad)" rx="4" />
+    <text x="672.5" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App A</text>
+    <text x="672.5" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق أ</text>
+
+    <rect x="620" y="220" width="105" height="90" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="672.5" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="672.5" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <!-- Container 2 -->
+    <rect x="745" y="95" width="125" height="225" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" rx="8" />
+    <text x="807.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Container</text>
+    <text x="807.5" y="118" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">حاوية</text>
+    
+    <rect x="755" y="130" width="105" height="80" fill="url(#appGrad)" rx="4" />
+    <text x="807.5" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">App B</text>
+    <text x="807.5" y="175" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">تطبيق ب</text>
+
+    <rect x="755" y="220" width="105" height="90" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" rx="4" />
+    <text x="807.5" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bins / Libs</text>
+    <text x="807.5" y="270" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مكتبات</text>
+
+    <!-- Container Engine -->
+    <rect x="610" y="335" width="260" height="60" fill="url(#hypGrad)" rx="6" />
+    <text x="740" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Container Engine</text>
+    <text x="740" y="370" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">محرك الحاويات</text>
+
+    <!-- Host OS -->
+    <rect x="610" y="405" width="260" height="60" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" rx="6" />
+    <text x="740" y="440" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Host OS</text>
+    <text x="740" y="440" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نظام مضيف</text>
+
+    <!-- Hardware -->
+    <rect x="610" y="475" width="260" height="60" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+    <text x="740" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Hardware</text>
+    <text x="740" y="510" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الأجهزة</text>
+
+    <!-- Security Note -->
+    <rect x="610" y="545" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" rx="6" />
+    <use href="#shield" x="728" y="552" />
+    <text x="740" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Shared kernel, lower isolation</text>
+    <text x="740" y="598" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">نواة مشتركة، عزل أقل</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Native (Type 1)</th><th>Hosted (Type 2)</th><th>Containers</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الموقع المعماري</template>
+          <template class="content-en">Architectural Position</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يعمل مباشرة على الأجهزة</template>
+          <template class="content-en">Executes directly on hardware</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يعمل فوق نظام تشغيل مضيف</template>
+          <template class="content-en">Runs on top of a Host OS</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يعمل داخل نواة نظام التشغيل المضيف</template>
+          <template class="content-en">Runs within Host OS kernel</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الأمن والعزل</template>
+          <template class="content-en">Security &amp; Isolation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أكثر أماناً (طبقات أقل، عزل كامل)</template>
+          <template class="content-en">More secure (fewer layers, full isolation)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أقل أماناً (طبقات إضافية)</template>
+          <template class="content-en">Less secure (additional layers)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أقل أماناً (يتشارك النواة مع الحاويات الأخرى)</template>
+          <template class="content-en">Least secure (shares kernel with other containers)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">العبء (Overhead)</template>
+          <template class="content-en">Overhead</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسط</template>
+          <template class="content-en">Medium</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي</template>
+          <template class="content-en">bad</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض جداً</template>
+          <template class="content-en">Very low</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر الحاويات (Containers) أقل أماناً من الأجهزة الافتراضية (VMs) التي تعتمد على Hypervisor؟</template>
+      <template class="content-en">Why are containers considered less secure than hypervisor-based VMs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن جميع الحاويات على المضيف تتشارك في نفس نواة نظام التشغيل (OS Kernel). إذا تمكن مهاجم من استغلال ثغرة في النواة من داخل حاوية واحدة، فيمكنه اختراق المضيف بأكمله وجميع الحاويات الأخرى. بينما في الأجهزة الافتراضية، كل جهاز له نواة مستقلة.</p></template>
+      <template class="content-en"><p>Because all containers on a host share the same underlying OS kernel. If an attacker exploits a kernel vulnerability from within one container, they can potentially compromise the entire host and all other containers. In contrast, VMs each have their own isolated kernel.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="security-auditing-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> معمارية تدقيق الأمن</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Security Auditing Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تدقيق الأمن هو مراجعة مستقلة لسجلات النظام لتحديد مدى كفاية الضوابط الأمنية، ويعتمد على معمارية X.816 لجمع وتحليل مسارات التدقيق.</p></template>
+    <template class="content-en"><p>Security auditing is an independent review of system records to determine the adequacy of security controls, relying on the X.816 architecture to collect and analyze audit trails.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرّف (RFC 4949) تدقيق الأمن بأنه مراجعة وفحص مستقل لسجلات وأنشطة النظام لتحديد مدى كفاية ضوابط النظام، وضمان الامتثال للسياسات، والتوصية بالتغييرات. الهدف هو إنشاء مساءلة (Accountability) للكيانات التي تبدأ أحداثاً ذات صلة بالأمن.</p><p><b><span class="smart-term" data-term-en="Security Audit Trail" data-ar="مسار التدقيق الأمني" data-en-def="A chronological record of system activities that is sufficient to enable the reconstruction and examination of a security-relevant transaction.">مسار التدقيق الأمني<span class="smart-term-tooltip"></span></span> (Security Audit Trail):</b> سجل زمني لأنشطة النظام يكفي لإعادة بناء وفحص تسلسل البيئات والأنشطة المحيطة بحدث أمني.</p><p>تحدد معمارية <b>X.816</b> الوظائف التالية لتدقيق الأمن:</p><ul><li><b>توليد البيانات (Data generation):</b> يحدد مستوى التدقيق وأنواع الأحداث القابلة للتدقيق.</li><li><b>اختيار الأحداث (Event selection):</b> تضمين أو استبعاد الأحداث من المجموعة القابلة للتدقيق.</li><li><b>تخزين الأحداث (Event storage):</b> إنشاء وصيانة مسار التدقيق الآمن.</li><li><b>الاستجابة التلقائية (Automatic response):</b> ردود الفعل المتخذة عند اكتشاف انتهاك أمني محتمل.</li><li><b>تحليل التدقيق (Audit analysis):</b> آليات آلية لتحليل بيانات التدقيق بحثاً عن الانتهاكات.</li><li><b>مراجعة التدقيق (Audit review):</b> إتاحة البيانات للمستخدمين المصرح لهم للمراجعة.</li></ul></template>
+    <template class="content-en"><p>RFC 4949 defines Security Auditing as an independent review and examination of a system's records and activities to determine the adequacy of system controls, ensure compliance, and recommend changes. The objective is to establish accountability for system entities that initiate security-relevant events.</p><p><b><span class="smart-term" data-term-en="Security Audit Trail" data-ar="مسار التدقيق الأمني" data-en-def="A chronological record of system activities that is sufficient to enable the reconstruction and examination of a security-relevant transaction.">Security Audit Trail<span class="smart-term-tooltip"></span></span>:</b> A chronological record of system activities sufficient to enable the reconstruction and examination of the sequence of environments and activities surrounding a security-relevant event.</p><p>The <b><span class="smart-term" data-term-en="X.816" data-ar="معيار X.816" data-en-def="A standard model defining the architecture and functions for security auditing and alarms.">X.816<span class="smart-term-tooltip"></span></span></b> architecture defines the following Security Auditing Functions:</p><ul><li><b>Data generation:</b> Identifies the level of auditing and enumerates auditable events.</li><li><b>Event selection:</b> Inclusion or exclusion of events from the auditable set.</li><li><b>Event storage:</b> Creation and maintenance of the secure audit trail.</li><li><b>Automatic response:</b> Reactions taken if a possible security violation event is detected.</li><li><b>Audit analysis:</b> Automated mechanisms to analyze audit data in search of security violations.</li><li><b>Audit review:</b> Available to authorized users to assist in audit data review.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يقترح المعيار المشترك (Common Criteria) أحداثاً محددة يجب تدقيقها، مثل: إدخال/حذف الكائنات، توزيع/إلغاء حقوق الوصول، التغييرات في سمات الأمن، استخدام حقوق الوصول لتجاوز فحص السياسة، واستيراد/تصدير البيانات من/إلى الوسائط القابلة للإزالة.</p><p>تتطلب متطلبات التنفيذ (حسب ISO) أن تكون فحوصات التدقيق مقتصرة على الوصول للقراءة فقط (Read-only) للبرامج والبيانات، وأن يتم مراقبة وتسجيل جميع عمليات الوصول التي يقوم بها المدققون أنفسهم، لضمان عدم تلاعبهم بالنظام.</p></template>
+    <template class="content-en"><p>The Common Criteria suggests specific auditable events, such as:</p><ul><li>introduction/deletion of objects,</li><li>distribution/revocation of access rights,</li><li>changes to security attributes,</li><li>use of access rights to bypass a policy check,</li><li>and import/export of data from/to removable media.</li></ul><p>Implementation requirements (per ISO) dictate that audit checks must be limited to read-only access to software and data.</p><p>Furthermore, all access by the auditors themselves should be monitored and logged to ensure the integrity of the audit process.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Create a block diagram of the Security Audit and Alarms Model (X.816). Show 'Event discriminator' sending 'Audit message' to 'Audit recorder' and 'Alarm' to 'Alarm processor'. 'Audit recorder' writes 'Audit record' to 'Security audit trail'. 'Audit analyzer' reads from 'Audit recorder' and sends 'Alarm' to 'Alarm processor'. 'Audit provider' reads from 'Security audit trail' and sends to 'Audit trail examiner'. 'Audit archiver' creates 'Archives'. Use dark theme, clear directional arrows. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+
+        <!-- Drop Shadow for Nodes -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15"/>
+        </filter>
+
+        <!-- Gradient for Storage Nodes -->
+        <linearGradient id="storageGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)" />
+            <stop offset="100%" stop-color="var(--brand-800)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Diagram Title -->
+    <text x="550" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Security Audit and Alarms Model (X.816)</text>
+    <text x="550" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">نموذج تدقيق الأمان والإنذارات (X.816)</text>
+
+    <!-- ARROWS & CONNECTIONS -->
+    <g id="arrows" fill="none" stroke="var(--brand-500)" stroke-width="2" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Event Discriminator to Audit Recorder -->
+        <path d="M 200 135 L 200 205" marker-end="url(#arrow)"/>
+        <text x="210" y="175" text-anchor="start" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Audit message</text>
+        <text x="210" y="175" text-anchor="start" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">رسالة تدقيق</text>
+
+        <!-- Event Discriminator to Alarm Processor -->
+        <path d="M 295 100 L 795 100" marker-end="url(#arrow)"/>
+        <text x="547" y="90" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Alarm</text>
+        <text x="547" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">إنذار</text>
+
+        <!-- Audit Recorder to Security Audit Trail -->
+        <path d="M 200 285 L 200 340" marker-end="url(#arrow)"/>
+        <text x="210" y="320" text-anchor="start" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Audit record</text>
+        <text x="210" y="320" text-anchor="start" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">سجل التدقيق</text>
+
+        <!-- Audit Recorder to Audit Analyzer -->
+        <path d="M 295 250 L 445 250" marker-end="url(#arrow)"/>
+        <text x="370" y="240" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Read records</text>
+        <text x="370" y="240" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">قراءة السجلات</text>
+
+        <!-- Audit Analyzer to Alarm Processor -->
+        <path d="M 550 215 L 550 170 L 900 170 L 900 145" marker-end="url(#arrow)" stroke-linejoin="round"/>
+        <text x="725" y="160" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Alarm</text>
+        <text x="725" y="160" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">إنذار</text>
+
+        <!-- Security Audit Trail to Audit Provider -->
+        <path d="M 295 400 L 445 400" marker-end="url(#arrow)"/>
+        <text x="370" y="390" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Audit data</text>
+        <text x="370" y="390" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">بيانات التدقيق</text>
+
+        <!-- Audit Provider to Audit Trail Examiner -->
+        <path d="M 645 400 L 795 400" marker-end="url(#arrow)"/>
+        <text x="720" y="390" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Review data</text>
+        <text x="720" y="390" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">مراجعة البيانات</text>
+
+        <!-- Security Audit Trail to Audit Archiver -->
+        <path d="M 200 450 L 200 505" marker-end="url(#arrow)"/>
+        <text x="210" y="480" text-anchor="start" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Archive trigger</text>
+        <text x="210" y="480" text-anchor="start" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">نقل للأرشيف</text>
+
+        <!-- Audit Archiver to Archives -->
+        <path d="M 295 550 L 445 550" marker-end="url(#arrow)"/>
+        <text x="370" y="540" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">Archived data</text>
+        <text x="370" y="540" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="600" stroke="none">بيانات مؤرشفة</text>
+    </g>
+
+    <!-- NODES -->
+    <g id="nodes" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Event Discriminator -->
+        <rect x="105" y="65" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="200" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Event discriminator</text>
+        <text x="200" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">مميز الأحداث</text>
+        <text x="200" y="115" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Data generation</text>
+        <text x="200" y="115" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">توليد البيانات</text>
+
+        <!-- Alarm Processor -->
+        <rect x="805" y="65" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="900" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Alarm processor</text>
+        <text x="900" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">معالج الإنذارات</text>
+        <text x="900" y="115" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Automatic response</text>
+        <text x="900" y="115" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">استجابة تلقائية</text>
+
+        <!-- Audit Recorder -->
+        <rect x="105" y="215" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="200" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Audit recorder</text>
+        <text x="200" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">مسجل التدقيق</text>
+        <text x="200" y="265" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Event storage</text>
+        <text x="200" y="265" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">تخزين الأحداث</text>
+
+        <!-- Audit Analyzer -->
+        <rect x="455" y="215" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="550" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Audit analyzer</text>
+        <text x="550" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">محلل التدقيق</text>
+        <text x="550" y="265" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Audit analysis</text>
+        <text x="550" y="265" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">تحليل التدقيق</text>
+
+        <!-- Security Audit Trail (Cylinder) -->
+        <g filter="url(#shadow)">
+            <path d="M 105 365 L 105 435 A 95 15 0 0 0 295 435 L 295 365 Z" fill="url(#storageGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+            <ellipse cx="200" cy="365" rx="95" ry="15" fill="var(--brand-600)" stroke="var(--brand-500)" stroke-width="2"/>
+        </g>
+        <text x="200" y="405" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">Security audit trail</text>
+        <text x="200" y="405" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">سجل تدقيق الأمان</text>
+        <text x="200" y="425" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" opacity="0.85" font-size="13">Secure storage</text>
+        <text x="200" y="425" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" opacity="0.85" font-size="13">تخزين آمن</text>
+
+        <!-- Audit Provider -->
+        <rect x="455" y="365" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="550" y="395" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Audit provider</text>
+        <text x="550" y="395" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">مزود التدقيق</text>
+        <text x="550" y="415" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Audit review</text>
+        <text x="550" y="415" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">مراجعة التدقيق</text>
+
+        <!-- Audit Trail Examiner -->
+        <rect x="805" y="365" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="900" y="395" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Audit trail examiner</text>
+        <text x="900" y="395" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">فاحص سجل التدقيق</text>
+        <text x="900" y="415" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Audit review</text>
+        <text x="900" y="415" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">مراجعة التدقيق</text>
+
+        <!-- Audit Archiver -->
+        <rect x="105" y="515" width="190" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="200" y="545" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Audit archiver</text>
+        <text x="200" y="545" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">مؤرشف التدقيق</text>
+        <text x="200" y="565" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Long-term storage</text>
+        <text x="200" y="565" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">تخزين طويل الأمد</text>
+
+        <!-- Archives (Cylinder) -->
+        <g filter="url(#shadow)">
+            <path d="M 455 515 L 455 585 A 95 15 0 0 0 645 585 L 645 515 Z" fill="url(#storageGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+            <ellipse cx="550" cy="515" rx="95" ry="15" fill="var(--brand-600)" stroke="var(--brand-500)" stroke-width="2"/>
+        </g>
+        <text x="550" y="555" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">Archives</text>
+        <text x="550" y="555" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">الأرشيف</text>
+        <text x="550" y="575" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" opacity="0.85" font-size="13">Offline storage</text>
+        <text x="550" y="575" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" opacity="0.85" font-size="13">تخزين غير متصل</text>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يجب أن تكون وظيفة التدقيق نفسها محمية أمنياً؟</template>
+      <template class="content-en">Why must the auditing function itself be securely protected?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المهاجمين غالباً ما يحاولون مسح أو تعديل سجلات التدقيق لإخفاء مساراتهم. إذا لم تكن برامج التدقيق وبيانات التخزين محمية، فلن يكون مسار التدقيق موثوقاً به لإعادة بناء الحدث الأمني.</p></template>
+      <template class="content-en"><p>Because attackers often attempt to erase or modify audit logs to cover their tracks. If the auditing software and storage data are not protected, the audit trail cannot be trusted to accurately reconstruct the security event.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="audit-trail-protection-logging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> حماية مسار التدقيق وتنفيذ التسجيل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Audit Trail Protection and Logging Implementation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يجب حماية سجلات التدقيق من التلاعب، وتتراوح طرق التخزين من الملفات العادية (سهلة ولكن ضعيفة) إلى أجهزة الكتابة مرة واحدة (آمنة جداً).</p></template>
+    <template class="content-en"><p>Audit logs must be protected from tampering, with storage methods ranging from regular files (easy but vulnerable) to write-once devices (highly secure).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الشرط الأساسي لتدقيق الأمن هو الالتقاط الأولي غير المتلاعب به لبيانات التدقيق. يجب أن تتضمن البرامج نقاط التقاط (Hooks) تؤدي إلى جمع البيانات عند حدوث أحداث محددة مسبقاً.</p><p>طرق حماية بيانات مسار التدقيق:</p><ul><li><b>ملف قراءة/كتابة على المضيف (Read/write file on host):</b> سهل، يستهلك موارد أقل، وصول فوري. لكنه <b>عرضة للهجوم</b> من قبل المتسللين الذين قد يمسحون سجلاتهم.</li><li><b>جهاز <span class="smart-term" data-term-en="Write-once/read-many (WORM)" data-ar="كتابة مرة واحدة/قراءة متعددة" data-en-def="A data storage device in which information, once written, cannot be modified, ensuring high integrity for audit logs.">كتابة مرة واحدة/قراءة متعددة<span class="smart-term-tooltip"></span></span> (Write-once/read-many device):</b> مثل الأقراص الضوئية. أكثر أماناً ولكنه أقل ملاءمة، ويحتاج إلى إمداد مستمر بالوسائط، وقد يتأخر الوصول إليه.</li><li><b>جهاز كتابة فقط (Write-only device):</b> يوفر مساراً ورقياً (طابعة). غير عملي لالتقاط بيانات التدقيق التفصيلية على الأنظمة الكبيرة، ولكنه مفيد عندما يكون السجل الدائم المتاح فوراً مطلوباً.</li></ul><p>يجب حماية كل من <b>النزاهة (Integrity)</b> و <b>السرية (Confidentiality)</b> لسجلات التدقيق باستخدام التشفير، والتواقيع الرقمية، وضوابط الوصول.</p></template>
+    <template class="content-en"><p>The fundamental provision of security auditing is the initial, untampered capture of audit data. Software must include hooks (capture points) that trigger data collection and storage as preselected events occur.</p><p>Methods for Protecting Audit Trail Data:</p><ul><li><b>Read/write file on host:</b> Easy, least resource-intensive, instant access. However, it is <b>vulnerable to attack</b> by an intruder who might alter logs.</li><li><b>Write-once/read-many device:</b> (e.g., optical media). More secure but less convenient, needs a steady supply of recordable media, and access may be delayed.</li><li><b>Write-only device:</b> Provides a paper trail (printer). Impractical for capturing detailed audit data on large systems, but useful when a permanent, immediately available log is required.</li></ul><p>Must protect both <b>integrity</b> and <b>confidentiality</b> of logs using encryption, digital signatures, and access controls.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مصدر القلق الشائع في تنفيذ التسجيل هو <b>حجم البيانات المتولدة</b>. يمكن أن يؤدي تسجيل كل استدعاء نظام (System call) إلى إغراق مساحة التخزين بسرعة وجعل التحليل مستحيلاً. لذلك، يجب تحديد نطاق البيانات المكتسبة بعناية خلال مرحلة تخطيط النظام.</p><p>بالإضافة إلى السجلات المنطقية، يتم إنشاء مسارات تدقيق الوصول المادي (Physical Access) بواسطة أجهزة مثل أنظمة البطاقات الذكية وأجهزة الإنذار، والتي تسجل محاولات الوصول الصالحة وغير الصالحة، ويتم إرسالها إلى مضيف مركزي للتحليل.</p></template>
+    <template class="content-en"><p>A common concern in implementing logging is the <b>amount of data generated</b>. Logging every system call can quickly exhaust storage space and make analysis impossible. Therefore, the range of data acquired must be carefully determined during the system planning stage.</p><p>In addition to logical logs, Physical Access Audit Trails are generated by devices like card-key systems and alarms, recording both valid and invalid access attempts, which are sent to a central host for analysis and storage.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يكفي الاعتماد فقط على ملفات القراءة/الكتابة المحلية لتخزين سجلات التدقيق؟</template>
+      <template class="content-en">Why is it insufficient to rely solely on local read/write files for storing audit logs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه إذا تم اختراق المضيف، يمكن للمهاجم بسهولة تعديل أو حذف ملفات السجل المحلية لإخفاء نشاطه، مما يفقد السجلات نزاهتها وموثوقيتها.</p></template>
+      <template class="content-en"><p>Because if the host is compromised, an attacker can easily modify or delete the local log files to hide their activity, destroying the integrity and reliability of the audit trail.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="os-specific-logging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التسجيل الخاص بأنظمة التشغيل (ويندوز ويونكس)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> OS-Specific Logging (Windows and UNIX)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم ويندوز سجل الأحداث (Event Log) المقسم إلى النظام والتطبيقات والأمن، بينما يستخدم يونكس آلية Syslog التي تصنف الرسائل حسب المرفق (Facility) والخطورة (Severity).</p></template>
+    <template class="content-en"><p>Windows uses the Event Log divided into System, Application, and Security, while UNIX uses Syslog, which categorizes messages by Facility and Severity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>سجل أحداث ويندوز (Windows Event Log):</b></p><ul><li>كل حدث هو كيان يصف حدوثاً مهماً، ويحتوي على معرف رقمي (ID)، ومجموعة من السمات، وبيانات مستخدم اختيارية (يُعرض كـ XML أو بيانات ثنائية).</li><li>ثلاثة أنواع من سجلات الأحداث:<ul><li><b>النظام (System):</b> التطبيقات وبرامج التشغيل المتعلقة بالنظام.</li><li><b>التطبيق (Application):</b> تطبيقات مستوى المستخدم.</li><li><b>الأمن (Security):</b> مخصص لهيئة الأمن المحلي (LSA) فقط. يسجل أحداث تسجيل الدخول، وإدارة الحسابات، والوصول إلى الكائنات، وتغييرات السياسة.</li></ul></li></ul><p><b>سجل يونكس (UNIX Syslog):</b></p><ul><li>آلية التسجيل للأغراض العامة في UNIX/Linux.</li><li>العناصر: واجهة برمجة التطبيقات <code>syslog()</code>، أمر <code>logger</code>، ملف التكوين <code>/etc/syslog.conf</code>، والخفي (daemon) <code>syslogd</code> لتلقي/توجيه الأحداث.</li><li>بروتوكول Syslog (RFC3164) يرسل رسائل تحتوي على:<ul><li><b>المرفق (Facility):</b> يحدد التطبيق/المكون الذي أنشأ الرسالة (مثل kern, mail, auth).</li><li><b>الخطورة (Severity):</b> تشير إلى مستوى الخطورة (مثل emerg, alert, err, warning, info, debug).</li></ul></li></ul></template>
+    <template class="content-en"><p><b>Windows Event Log:</b></p><ul><li>Each event is an entity describing an occurrence, containing a numeric ID, attributes, and optional user data (presented as XML or binary).</li><li>Three types of event logs:<ul><li><b>System:</b> System-related apps & drivers.</li><li><b>Application:</b> User-level apps.</li><li><b>Security:</b> For Local Security Authority (LSA) only. Logs logon events, account management, object access, and policy changes.</li></ul></li></ul><p><b>UNIX <span class="smart-term" data-term-en="Syslog" data-ar="سجل النظام (Syslog)" data-en-def="A standard for message logging in Unix-like systems, allowing separation of the software that generates messages, the system that stores them, and the software that reports and analyzes them.">Syslog<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>UNIX's general-purpose logging mechanism.</li><li>Elements: <code>syslog()</code> API, <code>logger</code> command, <code>/etc/syslog.conf</code> configuration file, and <code>syslogd</code> daemon to receive/route events.</li><li>Syslog Protocol (RFC3164) sends messages containing:<ul><li><b>Facility:</b> Identifies the application/component generating the message (e.g., kern, mail, auth).</li><li><b>Severity:</b> Indicates the relative severity (e.g., emerg, alert, err, warning, info, debug).</li></ul></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في ويندوز، يعتبر سجل "الأمن" (Security Log) بالغ الأهمية لأنه لا يمكن الكتابة إليه إلا بواسطة نظام التشغيل نفسه (LSA)، مما يمنع تطبيقات المستخدم العادية من تزوير أحداث أمنية.</p><p>تشمل فئات الأحداث تتبع العمليات (Process tracking) واستخدام الامتيازات.</p><p>في يونكس، يوفر بروتوكول Syslog وسيلة نقل تسمح للمضيفين بإرسال رسائل إعلام بأحداث IP إلى خوادم syslog مركزية.</p><p>هذا يسمح بتجميع السجلات من أجهزة متعددة في مكان واحد.</p><p>يمكن استخدام مستويات الخطورة (Severity) للتصفية البدائية (مثلاً، إرسال رسائل 'emerg' فقط إلى هاتف المسؤول).</p></template>
+    <template class="content-en"><p>In Windows, the "Security" log is critical because it can only be written to by the Local Security Authority (LSA), preventing normal user applications from spoofing security events. Event categories include process tracking and privilege use.</p><p>In UNIX, the Syslog protocol provides a transport allowing hosts to send IP event notification messages to centralized syslog servers. This allows aggregating logs from multiple machines. Severity levels can be used for rudimentary filtering (e.g., sending only 'emerg' messages to an administrator's pager).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>bash</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>Mar 1 07:16:53 server1 sshd[22938]: reverse mapping checking getaddrinfo for ip10.165.nist.gov failed - POSSIBLE BREAKIN ATTEMPT!</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في سجلات ويندوز، لماذا يتم فصل سجل الأمن (Security Log) عن سجل التطبيقات (Application Log)؟</template>
+      <template class="content-en">In Windows logs, why is the Security Log separated from the Application Log?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان النزاهة؛ سجل الأمن محمي ولا يمكن الكتابة فيه إلا بواسطة هيئة الأمن المحلي (LSA)، مما يمنع التطبيقات الخبيثة من إدراج أحداث أمنية مزيفة أو مسح مساراتها، بينما يمكن لتطبيقات المستخدم الكتابة في سجل التطبيقات.</p></template>
+      <template class="content-en"><p>To ensure integrity; the Security Log is protected and can only be written to by the Local Security Authority (LSA), preventing malicious apps from inserting fake security events or clearing their tracks, whereas user apps can write to the Application Log.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="application-level-logging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التسجيل على مستوى التطبيق</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Logging at Application Level</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>سجلات النظام لا تكفي لاكتشاف ثغرات التطبيقات (مثل تجاوز سعة التخزين المؤقت)، لذا نستخدم تقنيات مثل المكتبات القابلة للتداخل وإعادة الكتابة الثنائية لالتقاط سلوك التطبيق بدقة.</p></template>
+    <template class="content-en"><p>System logs are insufficient to detect application vulnerabilities (like buffer overflows), so techniques like interposable libraries and dynamic binary rewriting are used to capture precise app behavior.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التطبيقات ذات الامتيازات لها مشكلات أمنية قد لا تراها بيانات تدقيق مستوى النظام/المستخدم. نسبة كبيرة من نقاط الضعف (مثل الفشل في التحقق من بيانات الإدخال مما يؤدي إلى تجاوز سعة التخزين المؤقت Buffer Overflow) تحدث داخل منطق التطبيق. لذلك، من الضروري التقاط سلوك التطبيق بما يتجاوز وصوله إلى خدمات النظام.</p><p>هناك نهجان لجمع بيانات التدقيق على مستوى التطبيق دون الحاجة إلى إعادة تجميع (Recompile) الكود المصدري:</p><ol><li><b><span class="smart-term" data-term-en="Interposable Libraries" data-ar="المكتبات القابلة للتداخل" data-en-def="A technique that intercepts calls to shared libraries to inject custom code (like auditing) without modifying the original application source code.">المكتبات القابلة للتداخل<span class="smart-term-tooltip"></span></span> (Interposable Libraries):</b> تستغل استخدام المكتبات الديناميكية في UNIX. تعترض الاستدعاءات لمئات من وظائف المكتبة المشتركة، ويمكنها تنفيذ وظائف متعلقة بالتدقيق قبل تمرير الاستدعاء إلى الوظيفة الحقيقية.</li><li><b><span class="smart-term" data-term-en="Dynamic Binary Rewriting" data-ar="إعادة الكتابة الثنائية الديناميكية" data-en-def="A post-compilation technique that modifies the binary code of an executable in memory at load time to insert monitoring or auditing instructions.">إعادة الكتابة الثنائية الديناميكية<span class="smart-term-tooltip"></span></span> (Dynamic Binary Rewriting):</b> تقنية ما بعد التجميع (Post-compilation). تقوم بتغيير الكود الثنائي للملفات التنفيذية مباشرة في وقت التحميل (Load time) وتعديل صورة الذاكرة للبرنامج فقط. يتم تنفيذها في لينكس باستخدام وحدة نواة قابلة للتحميل وخفي مراقبة (Monitoring daemon).</li></ol></template>
+    <template class="content-en"><p>Privileged applications have security issues which system/user-level audit data may not see. A large percentage of vulnerabilities (e.g., failure to adequately check input data leading to buffer overflows) occur within application logic. Hence, it is necessary to capture application behavior beyond its access to system services.</p><p>There are two approaches to collecting audit data at the application level without needing to recompile the source code:</p><ol><li><b><span class="smart-term" data-term-en="Interposable Libraries" data-ar="المكتبات القابلة للتداخل" data-en-def="A technique that intercepts calls to shared libraries to inject custom code (like auditing) without modifying the original application source code.">Interposable Libraries<span class="smart-term-tooltip"></span></span>:</b> Exploits the use of dynamic libraries in UNIX. It intercepts calls to shared library functions and can carry out audit-related functions before passing the call to the actual function.</li><li><b><span class="smart-term" data-term-en="Dynamic Binary Rewriting" data-ar="إعادة الكتابة الثنائية الديناميكية" data-en-def="A post-compilation technique that modifies the binary code of an executable in memory at load time to insert monitoring or auditing instructions.">Dynamic Binary Rewriting<span class="smart-term-tooltip"></span></span>:</b> A post-compilation technique. It directly changes the binary code of executables at load time, modifying only the memory image of a program. Implemented on Linux using a loadable kernel module and a monitoring daemon.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر <b>المكتبات القابلة للتداخل</b> فعالة جداً لأنها تسمح بتوليد بيانات التدقيق دون تغيير المكتبات المشتركة للنظام أو الحاجة إلى الوصول إلى الكود المصدري للتطبيق. يتم ذلك عن طريق توجيه استدعاء الوظيفة (مثل <code>strcpy</code>) إلى غلاف (Wrapper) يسجل الحدث ثم يستدعي الوظيفة الأصلية.</p><p><b>إعادة الكتابة الثنائية الديناميكية</b> أكثر قوة لأنها يمكن استخدامها مع كل من البرامج المرتبطة ديناميكياً (Dynamically linked) والمرتبطة بشكل ثابت (Statically linked). نظراً لأن التعديل يحدث في الذاكرة عند وقت التحميل، يظل الملف الثنائي على القرص دون تغيير، مما يحافظ على توقيعات الملفات ويمنع كسر آليات التحقق من النزاهة.</p></template>
+    <template class="content-en"><p><b>Interposable Libraries</b> are highly effective because they allow the generation of audit data without changing the system’s shared libraries or needing access to the executable's source code. This is done by routing a function call (like <code>strcpy</code>) to a wrapper that logs the event and then calls the original function.</p><p><b>Dynamic Binary Rewriting</b> is more robust as it can be used with both statically and dynamically linked programs. Because the modification happens in memory at load time, the binary file on disk remains unchanged, preserving file signatures and preventing the breakage of integrity checking mechanisms.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Diagram showing Interposable Libraries concept. Left side: 'Application program' calls 'Call foo()'. Arrow goes to 'Interposable library' which has 'Function foo()'. Inside this wrapper, it logs data, then sends arrow to 'Shared library' which has the actual 'Function foo()'. Arrow returns back to application. Dark theme, clear labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Interposable Libraries: Application-Level Logging</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المكتبات القابلة للتداخل: التسجيل على مستوى التطبيق</text>
+
+    <!-- ========================================== -->
+    <!-- ZONE 1: Application Program                -->
+    <!-- ========================================== -->
+    <rect x="30" y="80" width="200" height="340" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="130" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Application Program</text>
+    <text x="130" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">برنامج التطبيق</text>
+
+    <!-- App Node 1 -->
+    <rect x="50" y="145" width="160" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="130" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Call foo()</text>
+    <text x="130" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">استدعاء foo()</text>
+
+    <!-- App Waiting Line -->
+    <line x1="130" y1="175" x2="130" y2="355" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+
+    <!-- App Node 2 -->
+    <rect x="50" y="355" width="160" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="130" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Resume Execution</text>
+    <text x="130" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">استئناف التنفيذ</text>
+
+
+    <!-- ========================================== -->
+    <!-- ZONE 2: Interposable Library (Wrapper)     -->
+    <!-- ========================================== -->
+    <rect x="290" y="80" width="220" height="340" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Interposable Library (Wrapper)</text>
+    <text x="400" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مكتبة قابلة للتداخل (غلاف)</text>
+
+    <!-- Int Node 1 -->
+    <rect x="310" y="145" width="180" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Intercept foo()</text>
+    <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">اعتراض foo()</text>
+
+    <line x1="400" y1="175" x2="400" y2="191" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Int Node 2 (Highlighted Log Action) -->
+    <rect x="310" y="195" width="180" height="40" rx="4" fill="var(--brand-500)" />
+    <!-- Document Icon -->
+    <g transform="translate(325, 205)" fill="none" stroke="var(--on-brand-lo)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="0" y="0" width="14" height="18" rx="2" />
+        <line x1="4" y1="6" x2="10" y2="6" />
+        <line x1="4" y1="10" x2="10" y2="10" />
+        <line x1="4" y1="14" x2="8" y2="14" />
+    </g>
+    <text x="415" y="220" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">2. Log Audit Data</text>
+    <text x="415" y="220" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">2. تسجيل بيانات التدقيق</text>
+
+    <line x1="400" y1="235" x2="400" y2="251" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Int Node 3 -->
+    <rect x="310" y="255" width="180" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Call actual foo()</text>
+    <text x="400" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">استدعاء foo() الفعلي</text>
+
+    <!-- Int Waiting Line -->
+    <line x1="400" y1="285" x2="400" y2="301" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+
+    <!-- Int Node 4 -->
+    <rect x="310" y="305" width="180" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Receive result</text>
+    <text x="400" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">استلام النتيجة</text>
+
+    <line x1="400" y1="335" x2="400" y2="351" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Int Node 5 -->
+    <rect x="310" y="355" width="180" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Return to App</text>
+    <text x="400" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">العودة للتطبيق</text>
+
+
+    <!-- ========================================== -->
+    <!-- ZONE 3: Shared Library                     -->
+    <!-- ========================================== -->
+    <rect x="570" y="80" width="200" height="340" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="670" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Shared Library</text>
+    <text x="670" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مكتبة مشتركة</text>
+
+    <!-- Shared Node 1 -->
+    <rect x="590" y="255" width="160" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="670" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Execute actual foo()</text>
+    <text x="670" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">تنفيذ foo() الفعلي</text>
+
+    <line x1="670" y1="285" x2="670" y2="301" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Shared Node 2 -->
+    <rect x="590" y="305" width="160" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="670" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Return result</text>
+    <text x="670" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">إرجاع النتيجة</text>
+
+
+    <!-- ========================================== -->
+    <!-- HORIZONTAL FLOW ARROWS                     -->
+    <!-- ========================================== -->
+
+    <!-- Arrow 1: App -> Int -->
+    <line x1="210" y1="160" x2="306" y2="160" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="260" y="152" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">1. Call</text>
+    <text x="260" y="152" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">1. استدعاء</text>
+
+    <!-- Arrow 2: Int -> Shared -->
+    <line x1="490" y1="270" x2="586" y2="270" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="540" y="262" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">3. Call actual</text>
+    <text x="540" y="262" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">3. استدعاء الفعلي</text>
+
+    <!-- Arrow 3: Shared -> Int -->
+    <line x1="590" y1="320" x2="494" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="540" y="312" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">4. Return</text>
+    <text x="540" y="312" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">4. إرجاع</text>
+
+    <!-- Arrow 4: Int -> App -->
+    <line x1="310" y1="370" x2="214" y2="370" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="260" y="362" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">5. Return</text>
+    <text x="260" y="362" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">5. إرجاع</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل استخدام 'إعادة الكتابة الثنائية الديناميكية' بدلاً من تعديل الكود المصدري للتطبيق لإضافة ميزات التدقيق؟</template>
+      <template class="content-en">Why prefer 'Dynamic Binary Rewriting' over modifying the application's source code to add auditing features?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الكود المصدري قد لا يكون متاحاً (برامج تجارية مغلقة)، ولأن إعادة التجميع تتطلب وقتاً وجهداً. إعادة الكتابة الثنائية تسمح بإضافة التدقيق للبرامج الجاهزة فوراً في وقت التحميل دون المساس بالملف الأصلي على القرص.</p></template>
+      <template class="content-en"><p>Because the source code might not be available (closed-source commercial software), and recompiling requires time and effort. Binary rewriting allows adding auditing to off-the-shelf programs instantly at load time without altering the original file on disk.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="audit-trail-analysis-siem" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تحليل مسار التدقيق وأنظمة SIEM</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Audit Trail Analysis and SIEM Systems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظراً للحجم الهائل لسجلات التدقيق، نستخدم أنظمة SIEM لجمع وتوحيد وتحليل السجلات من مصادر متعددة تلقائياً لاكتشاف التهديدات المعقدة.</p></template>
+    <template class="content-en"><p>Due to the massive volume of audit logs, SIEM systems are used to automatically collect, normalize, and analyze logs from multiple sources to detect complex threats.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتنوع برامج وإجراءات تحليل مسار التدقيق بشكل كبير. يجب فهم سياق إدخالات السجل (معلومات ذات صلة في سجلات أخرى، احتمالية وجود إدخالات غير موثوقة). تشمل أساليب تحليل البيانات:</p><ul><li><b>التنبيه الأساسي (Basic alerting):</b> الإشارة إلى حدوث نوع مثير للاهتمام من الأحداث.</li><li><b>تحديد خط الأساس (Baselining / Anomaly detection):</b> تحديد الأحداث/الأنماط العادية مقابل غير العادية.</li><li><b>تحديد العتبة (Thresholding):</b> مثل عدد الاتصالات المرفوضة.</li><li><b>النوافذ (Windowing):</b> تحليل الأحداث ضمن مجموعة من المعلمات (مثل الوقت).</li><li><b><span class="smart-term" data-term-en="Correlation" data-ar="الارتباط" data-en-def="The process of finding relationships between different events in various logs to identify a larger security incident.">الارتباط<span class="smart-term-tooltip"></span></span> (Correlation):</b> البحث عن العلاقات بين الأحداث المختلفة.</li></ul><p>نظراً لأن حجم بيانات التدقيق يجعل التحليل اليدوي غير عملي، تبرز الحاجة إلى <b>نظام <span class="smart-term" data-term-en="SIEM" data-ar="إدارة المعلومات والأحداث الأمنية" data-en-def="Security Information and Event Management; software products and services that combine security information management and security event management to provide real-time analysis of security alerts.">إدارة المعلومات والأحداث الأمنية<span class="smart-term-tooltip"></span></span> (SIEM)</b>. وهو حزمة تسجيل وتحليل مركزية تقوم بـ:</p><ol><li>التعرف على مجموعة واسعة من تنسيقات السجلات وتوحيدها (Normalizes).</li><li>تحليل البيانات المجمعة وربط الأحداث (Correlates) بين إدخالات السجل.</li><li>تحديد وترتيب أولويات الأحداث المهمة.</li><li>بدء الاستجابات للأحداث إذا لزم الأمر.</li></ol></template>
+    <template class="content-en"><p>Audit trail analysis programs vary widely. One must understand the context of log entries. Approaches to analyze data include:</p><ul><li><b>Basic alerting:</b> Indicate an interesting type of event has occurred.</li><li><b>Baselining (anomaly detection):</b> Define normal vs unusual events/patterns.</li><li><b>Thresholding:</b> e.g., number of refused connections.</li><li><b>Windowing:</b> Events within a set of parameters (e.g., time).</li><li><b><span class="smart-term" data-term-en="Correlation" data-ar="الارتباط" data-en-def="The process of finding relationships between different events in various logs to identify a larger security incident.">Correlation<span class="smart-term-tooltip"></span></span>:</b> Seek relationships among events.</li></ul><p>Because the volume of audit data makes manual analysis impractical, a <b>Security Information and Event Management (<span class="smart-term" data-term-en="SIEM" data-ar="إدارة المعلومات والأحداث الأمنية" data-en-def="Security Information and Event Management; software products and services that combine security information management and security event management to provide real-time analysis of security alerts.">SIEM<span class="smart-term-tooltip"></span></span>)</b> system is needed. It is a centralized logging and analysis package that:</p><ol><li>Recognizes and normalizes a wide range of log formats.</li><li>Analyzes aggregated data and correlates events among log entries.</li><li>Identifies and prioritizes significant events.</li><li>Initiates responses to events if desired.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تأتي أنظمة SIEM في نهجين عامين للتكوين: <b>بدون وكيل (Agentless)</b> حيث يتلقى خادم SIEM البيانات من المضيفين الفرديين دون الحاجة إلى تثبيت برامج خاصة عليهم (يعتمد على بروتوكولات مثل Syslog)، و <b>قائم على الوكيل (Agent-based)</b> حيث يتم تثبيت برنامج وكيل على المضيف لتصفية الأحداث وتجميعها وتوحيدها قبل إرسالها إلى خادم SIEM، مما يقلل من استهلاك عرض النطاق الترددي للشبكة ويوزع عبء المعالجة.</p><p>تعتبر عملية <b>التوحيد (Normalization)</b> حاسمة في SIEM؛ حيث تقوم بتحويل إدخالات السجل المختلفة (مثل سجلات جدار الحماية، وسجلات ويندوز، وسجلات قواعد البيانات) إلى تنسيق موحد لنفس عنصر البيانات، مما يسمح لمحرك الارتباط (Correlation engine) باكتشاف هجوم معقد يمتد عبر أنظمة متعددة.</p></template>
+    <template class="content-en"><p>SIEM systems have two general configuration approaches: <b>Agentless</b>, where the SIEM server receives data from hosts without special software installed (relying on native protocols like Syslog), and <b>Agent-based</b>, where an agent program is installed on the host to perform event filtering, aggregation, and normalization before transmitting to the SIEM, reducing network bandwidth and distributing processing load.</p><p>The <b>Normalization</b> process is critical in SIEM; it converts various log entries (e.g., firewall logs, Windows logs, database logs) so that a uniform format is used for the same data item. This allows the correlation engine to detect a complex, multi-stage attack spanning different systems.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Agentless</th><th>Agent-based</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تثبيت البرامج على المضيف</template>
+          <template class="content-en">Software Installation on Host</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يتطلب برامج خاصة</template>
+          <template class="content-en">No special software needed</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتطلب تثبيت برنامج وكيل</template>
+          <template class="content-en">Requires agent program installation</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك الشبكة</template>
+          <template class="content-en">Network Bandwidth Usage</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي (يرسل السجلات الخام)</template>
+          <template class="content-en">High (sends raw logs)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (يصفي ويجمع البيانات محلياً)</template>
+          <template class="content-en">Low (filters and aggregates locally)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي الميزة الرئيسية لاستخدام نهج SIEM القائم على الوكيل (Agent-based) مقارنة بالنهج بدون وكيل (Agentless)؟</template>
+      <template class="content-en">What is the main advantage of using an Agent-based SIEM approach compared to an Agentless approach?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>النهج القائم على الوكيل يسمح بتصفية السجلات وتجميعها وتوحيدها محلياً على المضيف قبل إرسالها، مما يقلل بشكل كبير من حركة مرور الشبكة ويخفف عبء المعالجة عن الخادم المركزي لـ SIEM.</p></template>
+      <template class="content-en"><p>The agent-based approach allows logs to be filtered, aggregated, and normalized locally on the host before transmission, which significantly reduces network traffic and offloads processing overhead from the central SIEM server.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الدسمة والمهمة جداً. تخيلوا أن نظام التشغيل هو قلعة؛ 'تقسية النظام' (Hardening) هي عملية إغلاق الأبواب والنوافذ غير الضرورية وبناء أسوار عالية. لقد ناقشنا كيف نقوم بذلك في لينكس (مثل استخدام chroot jail) وفي ويندوز (مثل UAC و MIC). لكن القلعة تحتاج إلى حراس وكاميرات مراقبة، وهنا يأتي دور 'تدقيق الأمن' (Security Auditing). لقد تعلمنا معمارية X.816 وكيف نجمع السجلات (Logs) باستخدام Syslog في يونكس و Event Log في ويندوز. تذكروا دائماً فخ الاعتماد على سجلات النظام فقط؛ فالتطبيقات تحتاج إلى مراقبة دقيقة باستخدام تقنيات مثل 'المكتبات القابلة للتداخل'. وأخيراً، لأن كاميرات المراقبة تسجل آلاف الساعات، نحتاج إلى نظام ذكي يحلل ويربط الأحداث، وهو نظام SIEM. ركزوا في الامتحان على الفروق بين أنواع المحاكاة الافتراضية، وكيفية حماية مسار التدقيق، ووظائف SIEM الأساسية. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this dense and highly important module. Imagine the OS as a castle; 'System Hardening' is the process of sealing unnecessary doors and building high walls. We discussed how to do this in Linux (e.g., chroot jail) and Windows (e.g., UAC, MIC). But a castle needs guards and surveillance cameras, which is where 'Security Auditing' comes in. We learned the X.816 architecture and how to collect logs using Syslog in UNIX and Event Log in Windows. Always remember the trap of relying only on system logs; applications need precise monitoring using techniques like 'Interposable Libraries'. Finally, because surveillance cameras record thousands of hours, we need a smart system to analyze and correlate events—the SIEM system. For the exam, focus on the differences between virtualization types, how to protect the audit trail, and the core functions of SIEM. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخطوة الأولى والأهم في تأمين أي نظام جديد؟</template>
+          <template class="content-en">What is the first and most important step in securing any new system?</template>
+          <span class="content-target">ما هي الخطوة الأولى والأهم في تأمين أي نظام جديد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخطوة الأولى هي 'تقسية نظام التشغيل الأساسي' (OS Hardening)، والتي تبدأ بتثبيت النظام على شبكة محمية، وتطبيق أحدث التصحيحات، وإزالة أي خدمات أو تطبيقات غير ضرورية لتقليل مساحة الهجوم.</template>
+          <template class="content-en">The first step is 'Base OS Hardening', which begins with installing the system on a protected network, applying the latest patches, and removing any unnecessary services or applications to reduce the attack surface.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف 'chroot jail' عن المحاكاة الافتراضية الكاملة؟</template>
+          <template class="content-en">How does a 'chroot jail' differ from full virtualization?</template>
+          <span class="content-target">كيف يختلف 'chroot jail' عن المحاكاة الافتراضية الكاملة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">chroot jail ليس محاكاة افتراضية للأجهزة؛ إنه مجرد تقييد لعملية معينة بحيث ترى دليلاً محدداً على أنه الجذر (Root) لنظام الملفات. المحاكاة الافتراضية الكاملة (VM) تشغل نظام تشغيل كامل ومنفصل فوق Hypervisor.</template>
+          <template class="content-en">A chroot jail is not hardware virtualization; it merely restricts a specific process so it sees a designated directory as the root of the file system. Full virtualization (VM) runs a complete, separate OS on top of a Hypervisor.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر الحاويات (Containers) تحدياً أمنياً أكبر من الأجهزة الافتراضية (VMs)؟</template>
+          <template class="content-en">Why do we consider Containers a greater security challenge than VMs?</template>
+          <span class="content-target">لماذا نعتبر الحاويات (Containers) تحدياً أمنياً أكبر من الأجهزة الافتراضية (VMs)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن جميع الحاويات تتشارك في نفس نواة نظام التشغيل (OS Kernel) الخاص بالمضيف. إذا تم اختراق النواة من داخل حاوية واحدة، فإن المضيف بأكمله وجميع الحاويات الأخرى تصبح في خطر.</template>
+          <template class="content-en">Because all containers share the same host OS kernel. If the kernel is compromised from within one container, the entire host and all other containers are at risk.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف الرئيسي من 'مسار التدقيق الأمني' (Security Audit Trail)؟</template>
+          <template class="content-en">What is the main objective of a 'Security Audit Trail'?</template>
+          <span class="content-target">ما هو الهدف الرئيسي من 'مسار التدقيق الأمني' (Security Audit Trail)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الهدف هو إنشاء 'مساءلة' (Accountability). يجب أن يوفر مسار التدقيق سجلاً زمنياً كافياً لإعادة بناء وفحص تسلسل الأحداث التي أدت إلى انتهاك أمني، لمعرفة من فعل ماذا ومتى.</template>
+          <template class="content-en">The objective is to establish 'Accountability'. The audit trail must provide a chronological record sufficient to reconstruct and examine the sequence of events leading to a security violation, to know who did what and when.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا يجب أن نستخدم ملفات القراءة/الكتابة العادية لتخزين سجلات التدقيق الحساسة؟</template>
+          <template class="content-en">Why shouldn't we use regular read/write files to store sensitive audit logs?</template>
+          <span class="content-target">لماذا لا يجب أن نستخدم ملفات القراءة/الكتابة العادية لتخزين سجلات التدقيق الحساسة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها عرضة للتلاعب. إذا تمكن مهاجم من اختراق النظام، يمكنه بسهولة تعديل أو حذف هذه الملفات لإخفاء آثاره. يفضل استخدام أجهزة 'الكتابة مرة واحدة' (WORM) أو إرسال السجلات لخادم مركزي آمن.</template>
+          <template class="content-en">Because they are vulnerable to tampering. If an attacker compromises the system, they can easily modify or delete these files to cover their tracks. It's better to use 'Write-once' (WORM) devices or send logs to a secure central server.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في سجل أحداث ويندوز، ما الذي يميز 'سجل الأمن' (Security Log) عن غيره؟</template>
+          <template class="content-en">In the Windows Event Log, what distinguishes the 'Security Log' from others?</template>
+          <span class="content-target">في سجل أحداث ويندوز، ما الذي يميز 'سجل الأمن' (Security Log) عن غيره؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سجل الأمن محمي بشكل صارم ولا يمكن الكتابة فيه إلا بواسطة 'هيئة الأمن المحلي' (LSA) الخاصة بنظام التشغيل. هذا يمنع التطبيقات العادية أو الخبيثة من تزوير الأحداث الأمنية.</template>
+          <template class="content-en">The Security Log is strictly protected and can only be written to by the OS's 'Local Security Authority' (LSA). This prevents normal or malicious applications from spoofing security events.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة التي تحلها 'المكتبات القابلة للتداخل' (Interposable Libraries) في تدقيق الأمن؟</template>
+          <template class="content-en">What problem do 'Interposable Libraries' solve in security auditing?</template>
+          <span class="content-target">ما هي المشكلة التي تحلها 'المكتبات القابلة للتداخل' (Interposable Libraries) في تدقيق الأمن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحل مشكلة عدم قدرة سجلات النظام على رؤية ما يحدث داخل منطق التطبيق (مثل تجاوز سعة التخزين المؤقت). هذه المكتبات تعترض استدعاءات الوظائف لتسجيل سلوك التطبيق دون الحاجة لتعديل الكود المصدري للتطبيق.</template>
+          <template class="content-en">They solve the problem of system logs being unable to see what happens inside application logic (like buffer overflows). These libraries intercept function calls to log app behavior without needing to modify the app's source code.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل 'إعادة الكتابة الثنائية الديناميكية' (Dynamic Binary Rewriting)؟</template>
+          <template class="content-en">How does 'Dynamic Binary Rewriting' work?</template>
+          <span class="content-target">كيف تعمل 'إعادة الكتابة الثنائية الديناميكية' (Dynamic Binary Rewriting)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي تقنية تقوم بتعديل الكود الثنائي للبرنامج مباشرة في الذاكرة (RAM) في وقت التحميل (Load time) لإضافة تعليمات المراقبة، دون المساس بالملف التنفيذي الأصلي الموجود على القرص الصلب.</template>
+          <template class="content-en">It is a technique that modifies the binary code of a program directly in memory (RAM) at load time to insert monitoring instructions, without altering the original executable file on the hard disk.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور 'التوحيد' (Normalization) في أنظمة SIEM؟</template>
+          <template class="content-en">What is the role of 'Normalization' in SIEM systems?</template>
+          <span class="content-target">ما هو دور 'التوحيد' (Normalization) في أنظمة SIEM؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التوحيد هو تحويل السجلات القادمة من مصادر مختلفة (والتي تستخدم تنسيقات مختلفة) إلى تنسيق قياسي واحد. هذا ضروري لكي يتمكن نظام SIEM من مقارنة وربط الأحداث عبر الأنظمة المختلفة.</template>
+          <template class="content-en">Normalization is converting logs coming from different sources (which use different formats) into a single standard format. This is essential for the SIEM to be able to compare and correlate events across different systems.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين نهج SIEM 'بدون وكيل' (Agentless) و 'القائم على الوكيل' (Agent-based)؟</template>
+          <template class="content-en">What is the difference between 'Agentless' and 'Agent-based' SIEM approaches?</template>
+          <span class="content-target">ما الفرق بين نهج SIEM 'بدون وكيل' (Agentless) و 'القائم على الوكيل' (Agent-based)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدون وكيل يعتمد على إرسال المضيف للسجلات الخام مباشرة إلى الخادم (يستهلك شبكة أكثر). القائم على الوكيل يتطلب تثبيت برنامج على المضيف يقوم بتصفية وتوحيد السجلات محلياً قبل إرسالها (يقلل استهلاك الشبكة ويوزع العبء).</template>
+          <template class="content-en">Agentless relies on the host sending raw logs directly to the server (consumes more network). Agent-based requires installing software on the host that filters and normalizes logs locally before sending (reduces network usage and distributes load).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "تقسية نظام التشغيل (OS Hardening)",
+      "en": "OS Hardening"
+    },
+    "back": {
+      "definition": {
+        "ar": "الخطوة الأولى لتأمين النظام، تتضمن تثبيت التصحيحات، إزالة الخدمات غير الضرورية، وتكوين الصلاحيات.",
+        "en": "The first key step toward securing a system, involving installing patches, removing unnecessary services, and configuring permissions."
+      },
+      "example": {
+        "ar": "تعطيل بروتوكول Telnet غير الآمن واستخدام SSH بدلاً منه.",
+        "en": "Disabling the insecure Telnet protocol and using SSH instead."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "سجن الجذر (chroot jail)",
+      "en": "chroot jail"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية في لينكس تقيد رؤية الخادم لنظام الملفات بجزء محدد فقط لعزل العمليات.",
+        "en": "A Linux mechanism that restricts the server’s view of the file system to just a specified portion to isolate processes."
+      },
+      "example": {
+        "ar": "تشغيل خادم ويب داخل chroot بحيث لا يمكنه الوصول إلى ملفات كلمات المرور في /etc.",
+        "en": "Running a web server inside a chroot so it cannot access password files in /etc."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "التحكم في حساب المستخدم (UAC)",
+      "en": "User Account Control (UAC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "ميزة في ويندوز تضمن أن المستخدمين ذوي الحقوق الإدارية لا يستخدمونها إلا عند الحاجة.",
+        "en": "A Windows feature that assists with ensuring users with administrative rights only use them when required."
+      },
+      "example": {
+        "ar": "ظهور نافذة تطلب الموافقة عند محاولة تثبيت برنامج جديد.",
+        "en": "A prompt appearing asking for permission when attempting to install a new program."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ضوابط النزاهة الإلزامية (MIC)",
+      "en": "Mandatory Integrity Controls (MIC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "ميزة في ويندوز تصنف الكائنات بمستويات نزاهة وتطبق نموذج Biba لمنع العمليات المنخفضة من تعديل الكائنات العالية.",
+        "en": "A Windows feature that labels objects with integrity levels and implements the Biba model to prevent low-integrity processes from modifying high-integrity objects."
+      },
+      "example": {
+        "ar": "منع متصفح الويب (نزاهة منخفضة) من تعديل ملفات النظام (نزاهة عالية).",
+        "en": "Preventing a web browser (low integrity) from modifying system files (high integrity)."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مراقب الأجهزة الافتراضية (Hypervisor)",
+      "en": "Hypervisor"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج يجلس بين الأجهزة والأجهزة الافتراضية ويعمل كوسيط للموارد.",
+        "en": "Software that sits between the hardware and the VMs, acting as a resource broker."
+      },
+      "example": {
+        "ar": "VMware ESXi أو Microsoft Hyper-V.",
+        "en": "VMware ESXi or Microsoft Hyper-V."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "المحاكاة الافتراضية الأصلية (Type 1)",
+      "en": "Native Virtualization (Type 1)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نوع من المحاكاة الافتراضية حيث يعمل الـ Hypervisor مباشرة على الأجهزة الأساسية.",
+        "en": "A type of virtualization where the hypervisor executes directly on the underlying hardware."
+      },
+      "example": {
+        "ar": "استخدام خادم مخصص يعمل بنظام ESXi فقط لإدارة الأجهزة الافتراضية.",
+        "en": "Using a dedicated server running only ESXi to manage VMs."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "الحاويات (Containers)",
+      "en": "Containers"
+    },
+    "back": {
+      "definition": {
+        "ar": "محاكاة افتراضية للتطبيقات حيث تتشارك جميع التطبيقات في نفس نواة نظام التشغيل المضيف.",
+        "en": "Application virtualization where all containerized applications share a common host OS kernel."
+      },
+      "example": {
+        "ar": "استخدام Docker لتشغيل تطبيقات معزولة على نفس خادم لينكس.",
+        "en": "Using Docker to run isolated applications on the same Linux server."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "مسار التدقيق الأمني (Security Audit Trail)",
+      "en": "Security Audit Trail"
+    },
+    "back": {
+      "definition": {
+        "ar": "سجل زمني لأنشطة النظام يكفي لإعادة بناء وفحص حدث أمني.",
+        "en": "A chronological record of system activities sufficient to enable the reconstruction and examination of a security-relevant event."
+      },
+      "example": {
+        "ar": "ملف سجل يحتوي على جميع محاولات تسجيل الدخول الفاشلة والناجحة مع الطوابع الزمنية.",
+        "en": "A log file containing all failed and successful login attempts with timestamps."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "معمارية X.816",
+      "en": "X.816 Architecture"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج قياسي يحدد مكونات ووظائف تدقيق الأمن والإنذارات.",
+        "en": "A standard model defining the components and functions of security auditing and alarms."
+      },
+      "example": {
+        "ar": "يتضمن مكونات مثل مميز الأحداث (Event discriminator) ومسجل التدقيق (Audit recorder).",
+        "en": "Includes components like the Event discriminator and Audit recorder."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "سجل الأمن في ويندوز (Windows Security Log)",
+      "en": "Windows Security Log"
+    },
+    "back": {
+      "definition": {
+        "ar": "سجل أحداث مخصص لهيئة الأمن المحلي (LSA) فقط، يسجل أحداثاً مثل تسجيل الدخول والوصول للكائنات.",
+        "en": "An event log exclusively for the Local Security Authority (LSA), logging events like logons and object access."
+      },
+      "example": {
+        "ar": "تسجيل حدث عند قيام مسؤول بتغيير سياسة كلمة المرور.",
+        "en": "Logging an event when an administrator changes the password policy."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "Syslog",
+      "en": "Syslog"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية التسجيل للأغراض العامة في أنظمة UNIX/Linux، تصنف الرسائل حسب المرفق والخطورة.",
+        "en": "The general-purpose logging mechanism in UNIX/Linux, categorizing messages by facility and severity."
+      },
+      "example": {
+        "ar": "توجيه جميع رسائل الخطورة 'emerg' إلى خادم سجل مركزي.",
+        "en": "Routing all 'emerg' severity messages to a central log server."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "المكتبات القابلة للتداخل (Interposable Libraries)",
+      "en": "Interposable Libraries"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لاعتراض استدعاءات وظائف المكتبة المشتركة لإضافة وظائف التدقيق دون إعادة تجميع التطبيق.",
+        "en": "A technique to intercept shared library function calls to add auditing functions without recompiling the application."
+      },
+      "example": {
+        "ar": "اعتراض استدعاء strcpy لتسجيل طول السلسلة قبل تنفيذ النسخ الفعلي.",
+        "en": "Intercepting a strcpy call to log the string length before executing the actual copy."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "إعادة الكتابة الثنائية الديناميكية (Dynamic Binary Rewriting)",
+      "en": "Dynamic Binary Rewriting"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغيير الكود الثنائي للملفات التنفيذية مباشرة في الذاكرة وقت التحميل لإضافة المراقبة.",
+        "en": "Directly changing the binary code of executables in memory at load time to add monitoring."
+      },
+      "example": {
+        "ar": "إضافة تعليمات تسجيل إلى برنامج تجاري مغلق المصدر أثناء تشغيله.",
+        "en": "Adding logging instructions to a closed-source commercial program as it runs."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "SIEM",
+      "en": "SIEM"
+    },
+    "back": {
+      "definition": {
+        "ar": "نظام إدارة المعلومات والأحداث الأمنية؛ يجمع ويوحد ويحلل السجلات من مصادر متعددة.",
+        "en": "Security Information and Event Management system; collects, normalizes, and analyzes logs from multiple sources."
+      },
+      "example": {
+        "ar": "ربط حدث تسجيل دخول فاشل في ويندوز مع تنبيه من جدار الحماية لاكتشاف هجوم.",
+        "en": "Correlating a failed Windows login event with a firewall alert to detect an attack."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "تحديد خط الأساس (Baselining)",
+      "en": "Baselining (Anomaly Detection)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نهج لتحليل مسار التدقيق يحدد السلوك العادي للنظام لاكتشاف الأنماط غير العادية (الشذوذ).",
+        "en": "An audit trail analysis approach that defines normal system behavior to detect unusual patterns (anomalies)."
+      },
+      "example": {
+        "ar": "إطلاق إنذار إذا قام مستخدم بتنزيل 10 جيجابايت من البيانات، بينما متوسطه المعتاد هو 100 ميجابايت.",
+        "en": "Triggering an alert if a user downloads 10GB of data, when their normal baseline is 100MB."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "وفقاً لمديرية الإشارات الأسترالية (ASD)، أي مما يلي يعتبر من أهم أربع استراتيجيات للتخفيف من المخاطر؟",
+      "en": "According to the Australian Signals Directorate (ASD), which of the following is one of the top four mitigation strategies?"
+    },
+    "options": {
+      "ar": [
+        "استخدام التشفير المتماثل فقط",
+        "القائمة البيضاء للتطبيقات المعتمدة",
+        "تعطيل جدران الحماية المستندة إلى المضيف",
+        "استخدام الإعدادات الافتراضية للنظام"
+      ],
+      "en": [
+        "Using only symmetric encryption",
+        "White-list approved applications",
+        "Disabling host-based firewalls",
+        "Using system default configurations"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الاستراتيجيات الأربع هي: القائمة البيضاء للتطبيقات، تصحيح التطبيقات ونظام التشغيل، تقييد الامتيازات الإدارية، وإنشاء نظام دفاع متعمق.",
+      "en": "The top four strategies are: White-list approved applications, Patch applications and OS, Restrict administrative privileges, and Create a defense-in-depth system."
+    },
+    "hint": {
+      "ar": "تذكر استراتيجية تمنع تشغيل البرامج غير المصرح بها.",
+      "en": "Remember a strategy that prevents unauthorized software from running."
+    },
+    "difficulty": "medium",
+    "conceptId": "system-security-planning-hardening"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من استخدام 'chroot jail' في أنظمة لينكس؟",
+      "en": "What is the primary purpose of using a 'chroot jail' in Linux systems?"
+    },
+    "options": {
+      "ar": [
+        "تشفير نظام الملفات بأكمله",
+        "منع هجمات حجب الخدمة (DoS)",
+        "تقييد رؤية الخادم لنظام الملفات بجزء محدد فقط",
+        "تحديث نواة لينكس تلقائياً"
+      ],
+      "en": [
+        "Encrypting the entire file system",
+        "Preventing Denial of Service (DoS) attacks",
+        "Restricting the server’s view of the file system to just a specified portion",
+        "Automatically updating the Linux kernel"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يستخدم chroot jail لعزل العمليات عن طريق تعيين جذر نظام الملفات إلى دليل آخر، مما يمنعها من الوصول إلى ملفات النظام الحساسة.",
+      "en": "A chroot jail is used to isolate processes by mapping the root of the filesystem to another directory, preventing access to sensitive system files."
+    },
+    "hint": {
+      "ar": "فكر في كلمة 'سجن' (jail) وكيف تقيد الحركة.",
+      "en": "Think about the word 'jail' and how it restricts movement."
+    },
+    "difficulty": "medium",
+    "conceptId": "linux-unix-security"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي نموذج أمني تطبقه 'ضوابط النزاهة الإلزامية' (MIC) في أنظمة ويندوز؟",
+      "en": "Which security model is implemented by 'Mandatory Integrity Controls' (MIC) in Windows systems?"
+    },
+    "options": {
+      "ar": [
+        "نموذج Bell-LaPadula",
+        "نموذج Biba",
+        "نموذج Clark-Wilson",
+        "نموذج RBAC"
+      ],
+      "en": [
+        "Bell-LaPadula model",
+        "Biba model",
+        "Clark-Wilson model",
+        "RBAC model"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تطبق ضوابط النزاهة الإلزامية في ويندوز شكلاً من أشكال نموذج Biba للنزاهة، حيث تمنع العمليات ذات النزاهة المنخفضة من تعديل الكائنات ذات النزاهة العالية.",
+      "en": "Windows MIC implements a form of the Biba Integrity model, preventing low-integrity processes from modifying high-integrity objects."
+    },
+    "hint": {
+      "ar": "هذا النموذج يركز على 'النزاهة' (Integrity) وليس 'السرية' (Confidentiality).",
+      "en": "This model focuses on 'Integrity' rather than 'Confidentiality'."
+    },
+    "difficulty": "hard",
+    "conceptId": "windows-security"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من تقنيات المحاكاة الافتراضية التالية تتشارك فيها جميع التطبيقات نفس نواة نظام التشغيل المضيف؟",
+      "en": "In which of the following virtualization technologies do all applications share the same host OS kernel?"
+    },
+    "options": {
+      "ar": [
+        "المحاكاة الافتراضية الأصلية (Type 1)",
+        "المحاكاة الافتراضية المستضافة (Type 2)",
+        "الحاويات (Containers)",
+        "الشبكات المعرفة بالبرمجيات (SDN)"
+      ],
+      "en": [
+        "Native Virtualization (Type 1)",
+        "Hosted Virtualization (Type 2)",
+        "Containers",
+        "Software Defined Networks (SDN)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في الحاويات (Containers)، لا يتم محاكاة أجهزة كاملة، بل تعمل التطبيقات المعزولة وتتشارك نفس نواة نظام التشغيل المضيف.",
+      "en": "In Containers, full hardware is not emulated; instead, isolated applications run and share the same host OS kernel."
+    },
+    "hint": {
+      "ar": "تعرف أيضاً باسم المحاكاة الافتراضية للتطبيقات (Application Virtualization).",
+      "en": "Also known as Application Virtualization."
+    },
+    "difficulty": "medium",
+    "conceptId": "virtualization-security"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في معمارية X.816 لتدقيق الأمن، ما هي وظيفة 'تخزين الأحداث' (Event storage)؟",
+      "en": "In the X.816 Security Audit Architecture, what is the function of 'Event storage'?"
+    },
+    "options": {
+      "ar": [
+        "تحديد مستوى التدقيق",
+        "إنشاء وصيانة مسار التدقيق الآمن",
+        "تحليل بيانات التدقيق بحثاً عن الانتهاكات",
+        "اتخاذ ردود فعل تلقائية عند اكتشاف انتهاك"
+      ],
+      "en": [
+        "Identifying the level of auditing",
+        "Creation and maintenance of the secure audit trail",
+        "Analyzing audit data in search of violations",
+        "Taking automatic reactions when a violation is detected"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "وظيفة تخزين الأحداث مسؤولة عن إنشاء وصيانة مسار التدقيق الآمن (Secure audit trail) لضمان توفر البيانات.",
+      "en": "The Event storage function is responsible for the creation and maintenance of the secure audit trail to ensure data availability."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بحفظ البيانات بشكل آمن بعد جمعها.",
+      "en": "It relates to securely saving the data after it is collected."
+    },
+    "difficulty": "easy",
+    "conceptId": "security-auditing-architecture"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من طرق تخزين مسار التدقيق التالية توفر أعلى مستوى من الأمان ضد تلاعب المهاجمين بالسجلات؟",
+      "en": "Which of the following audit trail storage methods provides the highest level of security against attackers tampering with logs?"
+    },
+    "options": {
+      "ar": [
+        "ملف قراءة/كتابة على المضيف",
+        "جهاز كتابة مرة واحدة/قراءة متعددة (WORM)",
+        "قاعدة بيانات SQL محلية",
+        "ذاكرة التخزين المؤقت (RAM)"
+      ],
+      "en": [
+        "Read/write file on host",
+        "Write-once/read-many (WORM) device",
+        "Local SQL database",
+        "Random Access Memory (RAM)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "أجهزة الكتابة مرة واحدة (مثل الأقراص الضوئية) تمنع أي تعديل أو حذف للبيانات بعد كتابتها، مما يجعلها آمنة جداً ضد التلاعب.",
+      "en": "Write-once devices (like optical media) prevent any modification or deletion of data once written, making them highly secure against tampering."
+    },
+    "hint": {
+      "ar": "ابحث عن الطريقة التي تمنع التعديل فيزيائياً.",
+      "en": "Look for the method that physically prevents modification."
+    },
+    "difficulty": "medium",
+    "conceptId": "audit-trail-protection-logging"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في نظام ويندوز، أي سجل أحداث مخصص حصرياً لهيئة الأمن المحلي (LSA) ولا يمكن لتطبيقات المستخدم الكتابة فيه؟",
+      "en": "In Windows, which event log is exclusively for the Local Security Authority (LSA) and cannot be written to by user applications?"
+    },
+    "options": {
+      "ar": [
+        "سجل النظام (System Log)",
+        "سجل التطبيقات (Application Log)",
+        "سجل الأمن (Security Log)",
+        "سجل الإعداد (Setup Log)"
+      ],
+      "en": [
+        "System Log",
+        "Application Log",
+        "Security Log",
+        "Setup Log"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "سجل الأمن (Security Log) محمي بواسطة نظام التشغيل ولا يمكن الكتابة فيه إلا بواسطة LSA لضمان نزاهة الأحداث الأمنية.",
+      "en": "The Security Log is protected by the OS and can only be written to by the LSA to ensure the integrity of security events."
+    },
+    "hint": {
+      "ar": "الاسم يدل على وظيفته المتعلقة بحماية النظام.",
+      "en": "The name indicates its function related to protecting the system."
+    },
+    "difficulty": "easy",
+    "conceptId": "os-specific-logging"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي التقنية التي تسمح بجمع بيانات التدقيق على مستوى التطبيق عن طريق تغيير الكود الثنائي للملف التنفيذي في الذاكرة وقت التحميل؟",
+      "en": "Which technique allows collecting application-level audit data by changing the binary code of the executable in memory at load time?"
+    },
+    "options": {
+      "ar": [
+        "المكتبات القابلة للتداخل (Interposable Libraries)",
+        "إعادة الكتابة الثنائية الديناميكية (Dynamic Binary Rewriting)",
+        "سجن الجذر (chroot jail)",
+        "تحديد خط الأساس (Baselining)"
+      ],
+      "en": [
+        "Interposable Libraries",
+        "Dynamic Binary Rewriting",
+        "chroot jail",
+        "Baselining"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إعادة الكتابة الثنائية الديناميكية هي تقنية ما بعد التجميع تقوم بتعديل صورة الذاكرة للبرنامج في وقت التحميل لإضافة تعليمات التدقيق.",
+      "en": "Dynamic Binary Rewriting is a post-compilation technique that modifies the memory image of a program at load time to insert auditing instructions."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على 'الثنائية' (Binary) و 'وقت التحميل' (Dynamic).",
+      "en": "The name contains 'Binary' and implies action at load time (Dynamic)."
+    },
+    "difficulty": "hard",
+    "conceptId": "application-level-logging"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الوظيفة الأساسية لعملية 'التوحيد' (Normalization) في أنظمة SIEM؟",
+      "en": "What is the primary function of the 'Normalization' process in SIEM systems?"
+    },
+    "options": {
+      "ar": [
+        "تشفير جميع السجلات قبل تخزينها",
+        "حذف السجلات القديمة لتوفير المساحة",
+        "تحويل إدخالات السجل المختلفة إلى تنسيق موحد لنفس عنصر البيانات",
+        "تثبيت وكلاء (Agents) على جميع الأجهزة المضيفة"
+      ],
+      "en": [
+        "Encrypting all logs before storage",
+        "Deleting old logs to save space",
+        "Converting various log entries so that a uniform format is used for the same data item",
+        "Installing agents on all host machines"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التوحيد (Normalization) يقوم بتحويل السجلات من مصادر مختلفة (ويندوز، لينكس، جدران حماية) إلى تنسيق قياسي واحد لتسهيل التحليل والارتباط.",
+      "en": "Normalization converts logs from different sources (Windows, Linux, firewalls) into a single standard format to facilitate analysis and correlation."
+    },
+    "hint": {
+      "ar": "فكر في جعل الأشياء 'طبيعية' أو 'موحدة' (Normal/Uniform).",
+      "en": "Think about making things 'normal' or 'uniform'."
+    },
+    "difficulty": "medium",
+    "conceptId": "audit-trail-analysis-siem"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من أساليب تحليل مسار التدقيق يبحث عن العلاقات بين الأحداث المختلفة لاكتشاف هجوم معقد؟",
+      "en": "Which audit trail analysis approach seeks relationships among different events to detect a complex attack?"
+    },
+    "options": {
+      "ar": [
+        "التنبيه الأساسي (Basic alerting)",
+        "تحديد العتبة (Thresholding)",
+        "تحديد خط الأساس (Baselining)",
+        "الارتباط (Correlation)"
+      ],
+      "en": [
+        "Basic alerting",
+        "Thresholding",
+        "Baselining",
+        "Correlation"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الارتباط (Correlation) هو عملية ربط الأحداث المنفصلة من سجلات مختلفة لفهم الصورة الأكبر واكتشاف الهجمات الموزعة.",
+      "en": "Correlation is the process of linking separate events from different logs to understand the bigger picture and detect distributed attacks."
+    },
+    "hint": {
+      "ar": "الكلمة تعني 'علاقة متبادلة' بين شيئين أو أكثر.",
+      "en": "The word means a mutual relationship or connection between two or more things."
+    }
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الحاويات (Containers) توفر نفس مستوى العزل الأمني الذي توفره الأجهزة الافتراضية (VMs). الحاويات تتشارك في نواة نظام التشغيل، مما يجعلها أكثر عرضة لاختراق المضيف بأكمله إذا تم استغلال ثغرة في النواة.</template>
+    <template class="content-en">Believing that Containers provide the same level of security isolation as VMs. Containers share the OS kernel, making them more vulnerable to full host compromise if a kernel vulnerability is exploited.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تطبق أنظمة ويندوز (بدءاً من Vista) نموذج Biba للنزاهة بشكل خفي من خلال 'ضوابط النزاهة الإلزامية' (MIC)، حيث تمنع العمليات ذات النزاهة المنخفضة من تعديل ملفات النظام ذات النزاهة العالية.</template>
+    <template class="content-en">Windows systems (since Vista) subtly implement the Biba Integrity model through 'Mandatory Integrity Controls' (MIC), preventing low-integrity processes from modifying high-integrity system files.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الشرط الأساسي والأهم لتدقيق الأمن هو 'الالتقاط الأولي غير المتلاعب به لبيانات التدقيق'. إذا تم اختراق البيانات عند نقطة الالتقاط، فإن كل التحليلات اللاحقة تصبح عديمة القيمة.</template>
+    <template class="content-en">The most fundamental provision of security auditing is the 'initial, untampered capture of audit data'. If data is compromised at the point of capture, all subsequent analysis is worthless.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتماد فقط على سجلات النظام (System Logs) لاكتشاف الهجمات. العديد من الثغرات (مثل تجاوز سعة التخزين المؤقت) تحدث داخل منطق التطبيق ولا تظهر في سجلات النظام، مما يتطلب 'تسجيلاً على مستوى التطبيق'.</template>
+    <template class="content-en">Relying solely on System Logs to detect attacks. Many vulnerabilities (like buffer overflows) occur within application logic and don't appear in system logs, requiring 'Application-Level Logging'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">أنظمة SIEM ضرورية ليس فقط لجمع السجلات، بل لعملية 'التوحيد' (Normalization) و 'الارتباط' (Correlation)، والتي بدونها يستحيل على البشر تحليل الحجم الهائل من البيانات لاكتشاف التهديدات المتقدمة.</template>
+    <template class="content-en">SIEM systems are essential not just for collecting logs, but for 'Normalization' and 'Correlation', without which it is impossible for humans to analyze the massive volume of data to detect advanced threats.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

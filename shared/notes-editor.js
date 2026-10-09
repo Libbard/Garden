@@ -2195,6 +2195,12 @@
       ? '<i class="fa-solid fa-palette" aria-hidden="true"></i><span>' + B().esc(L('أكملِ التلوين في المرسم', 'Keep coloring in the studio')) + '</span>'
       : '<i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span>' + B().esc(L('تعديلُ الصورة', 'Edit image')) + '</span>';
     acts.appendChild(edB);
+    var cpB = el('button', 'gsf-btn gsf-btn--ghost ne-img-copy', { type: 'button', 'data-imgcopy': '1' });
+    cpB.innerHTML = '<i class="fa-solid fa-copy" aria-hidden="true"></i><span>' + B().esc(L('انسخِ الصورة', 'Copy image')) + '</span>';
+    acts.appendChild(cpB);
+    var svB = el('button', 'gsf-btn gsf-btn--ghost ne-img-save', { type: 'button', 'data-imgsave': '1' });
+    svB.innerHTML = '<i class="fa-solid fa-download" aria-hidden="true"></i><span>' + B().esc(L('نزّلْها صورة', 'Download')) + '</span>';
+    acts.appendChild(svB);
     if (B().imgSrc(b.was)) {
       var orB = el('button', 'gsf-btn gsf-btn--ghost ne-img-orig', { type: 'button', 'data-imgorig': '1' });
       orB.innerHTML = '<i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i><span>' +
@@ -2958,6 +2964,59 @@
       self.imgNote('تعذّر فتحُ محرّرِ الصورة — تحقّقْ من الاتّصال.', 'Could not open the image editor — check the connection.');
     });
   };
+  function imgBlobOf(b) {
+    var u = B().imgSrc(b && b.url) || '';
+    if (/^byte-local:/.test(u)) {
+      var St = window.GardenNotesStore;
+      if (!St || !St.getImage) return Promise.reject(new Error('store'));
+      return St.getImage(u.slice(11)).then(function (r) { if (!r || !r.blob) throw new Error('missing'); return r.blob; });
+    }
+    return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.blob(); });
+  }
+  function pngOf(blob) {
+    if (blob && blob.type === 'image/png') return Promise.resolve(blob);
+    var dec = window.createImageBitmap ? createImageBitmap(blob) : new Promise(function (ok, no) {
+      var u = URL.createObjectURL(blob), im = new Image();
+      im.onload = function () { ok(im); setTimeout(function () { URL.revokeObjectURL(u); }, 0); };
+      im.onerror = function () { URL.revokeObjectURL(u); no(new Error('decode')); };
+      im.src = u;
+    });
+    return dec.then(function (bm) {
+      var c = document.createElement('canvas'); c.width = bm.width || bm.naturalWidth; c.height = bm.height || bm.naturalHeight;
+      c.getContext('2d').drawImage(bm, 0, 0); if (bm.close) bm.close();
+      return new Promise(function (ok, no) { c.toBlob(function (o) { if (o) ok(o); else no(new Error('png')); }, 'image/png'); });
+    });
+  }
+  Editor.prototype.imgNote = function (m) { if (this.opts && this.opts.onNote) this.opts.onNote(m); };
+  Editor.prototype.imgCopy = function (id, quiet) {
+    var hit = this.blockAt(id), self = this;
+    if (!hit || !B().imgSrc(hit.b.url)) return Promise.resolve(false);
+    var png = imgBlobOf(hit.b).then(pngOf);
+    var w;
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.write || typeof ClipboardItem !== 'function') throw new Error('no-clip');
+      w = navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+    } catch (e) { w = Promise.reject(e); }
+    return w.then(function () {
+      if (!quiet) self.imgNote(L('نُسخت الصورة — الصقْها حيث شئت.', 'Image copied — paste it anywhere.'));
+      return true;
+    }, function () {
+      if (!quiet) self.imgNote(L('لم يسمحِ المتصفّحُ بالنسخ — نزّلِ الصورةَ بدلاً منه.', 'The browser blocked copying — download the image instead.'));
+      return false;
+    });
+  };
+  Editor.prototype.imgSave = function (id) {
+    var hit = this.blockAt(id), self = this;
+    if (!hit || !B().imgSrc(hit.b.url)) return Promise.resolve(false);
+    return imgBlobOf(hit.b).then(pngOf).then(function (png) {
+      var a = document.createElement('a'), u = URL.createObjectURL(png);
+      var nm = String(hit.b.alt || (hit.b.ms ? L('رسمتي', 'my-drawing') : L('صورة', 'image'))).replace(/[\/:*?"<>|]+/g, ' ').trim().slice(0, 60) || 'image';
+      a.href = u; a.download = nm + '.png'; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+      return true;
+    }, function () { self.imgNote(L('تعذّر تنزيلُ الصورة.', 'Could not download the image.')); return false; });
+  };
+
   Editor.prototype.imgOrig = function (id) {
     var hit = this.blockAt(id);
     var was = hit ? B().imgSrc(hit.b.was) : '';
@@ -4897,6 +4956,7 @@
     this.readAll();
     Editor.clip = JSON.parse(JSON.stringify(picked.map(function (h) { return h.b; })));
     clipStore(Editor.clip);
+    if (Editor.clip.length === 1 && Editor.clip[0].ty === 'img') { this.imgCopy(Editor.clip[0].id, true); return 1; }
     var B2 = B();
     try {
       var txt = Editor.clip.map(function (b) { return B2.blockToText ? B2.blockToText(b) : ''; })
@@ -9584,10 +9644,27 @@
   /*@3.NOEJ.602*/
   Editor.prototype.floatsImg = function (b) {
     if (!(window.HTMLElement && HTMLElement.prototype.showPopover)) return false;
-    return !!((this.root && this.root.closest && this.root.closest('.gpi-fed')) || (b && b.stk));
+    return true;
   };
   Editor.prototype.floatImgPanel = function (node, pan, fig) {
     if (!imgPanOpen(pan)) { try { pan.showPopover(); } catch (eS) { return false; } }
+    if (!this._imgFollow) {
+      var edS = this, rafS = 0;
+      this._imgFollow = function () {
+        if (rafS || !edS.root) return;
+        rafS = requestAnimationFrame(function () {
+          rafS = 0;
+          var open = edS.root.querySelectorAll('.ne-img-edit--float');
+          for (var i = 0; i < open.length; i++) {
+            var nd = open[i].closest('[data-bid]');
+            if (!nd || open[i].hidden || !imgPanOpen(open[i]) || (edS._imgFloat && edS._imgFloat[nd.getAttribute('data-bid')])) continue;
+            var fg = nd.querySelector('.ne-fig'); if (fg) edS.floatImgPanel(nd, open[i], fg);
+          }
+        });
+      };
+      window.addEventListener('scroll', this._imgFollow, { capture: true, passive: true });
+      window.addEventListener('resize', this._imgFollow, { passive: true });
+    }
     pan.classList.add('ne-img-edit--float');
     pan.style.insetInlineStart = ''; pan.style.right = '';
     var vw = window.innerWidth || 800, vh = window.innerHeight || 600;
@@ -10331,6 +10408,8 @@
       if (e.target.closest('[data-imglnk]')) { if (!self.readOnly) self.imgLinkGo(node, id); return; }
       if (e.target.closest('[data-imgedit]')) { if (!self.readOnly) self.imgEdit(id); return; }
       if (e.target.closest('[data-imgorig]')) { if (!self.readOnly) self.imgOrig(id); return; }
+      if (e.target.closest('[data-imgcopy]')) { self.imgCopy(id); return; }
+      if (e.target.closest('[data-imgsave]')) { self.imgSave(id); return; }
       var pickZ = e.target.closest('.ne-img-pick');
       if (pickZ && !e.target.closest('[data-imguns]')) return;
       var imf = pickZ ? null : e.target.closest('.ne-fig');

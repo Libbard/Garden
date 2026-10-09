@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT478" data-module="9" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن بروتوكول الإنترنت (IPsec) · IT478 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT478" data-page-title-en="IT478">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=IT478"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#ipsec-overview" class="toc-link" data-bilingual>
+        <template class="content-ar">نظرة عامة على أمن بروتوكول الإنترنت (IPsec)</template>
+        <template class="content-en">IP Security (IPsec) Overview</template>
+        <span class="content-target">نظرة عامة على أمن بروتوكول الإنترنت (IPsec)</span>
+      </a>
+      <a href="#transport-vs-tunnel-modes" class="toc-link" data-bilingual>
+        <template class="content-ar">أوضاع النقل والنفق (Transport and Tunnel Modes)</template>
+        <template class="content-en">Transport and Tunnel Modes</template>
+        <span class="content-target">أوضاع النقل والنفق (Transport and Tunnel Modes)</span>
+      </a>
+      <a href="#security-associations" class="toc-link" data-bilingual>
+        <template class="content-ar">الارتباطات الأمنية (Security Associations - SA)</template>
+        <template class="content-en">Security Associations (SA)</template>
+        <span class="content-target">الارتباطات الأمنية (Security Associations - SA)</span>
+      </a>
+      <a href="#security-policy-database" class="toc-link" data-bilingual>
+        <template class="content-ar">قاعدة بيانات سياسة الأمان (SPD)</template>
+        <template class="content-en">Security Policy Database (SPD)</template>
+        <span class="content-target">قاعدة بيانات سياسة الأمان (SPD)</span>
+      </a>
+      <a href="#encapsulating-security-payload" class="toc-link" data-bilingual>
+        <template class="content-ar">حمولة الأمان المغلفة (ESP)</template>
+        <template class="content-en">Encapsulating Security Payload (ESP)</template>
+        <span class="content-target">حمولة الأمان المغلفة (ESP)</span>
+      </a>
+      <a href="#anti-replay-service" class="toc-link" data-bilingual>
+        <template class="content-ar">خدمة منع إعادة الإرسال (Anti-Replay Service)</template>
+        <template class="content-en">Anti-Replay Service</template>
+        <span class="content-target">خدمة منع إعادة الإرسال (Anti-Replay Service)</span>
+      </a>
+      <a href="#combining-security-associations" class="toc-link" data-bilingual>
+        <template class="content-ar">دمج الارتباطات الأمنية (Combining Security Associations)</template>
+        <template class="content-en">Combining Security Associations</template>
+        <span class="content-target">دمج الارتباطات الأمنية (Combining Security Associations)</span>
+      </a>
+      <a href="#ipsec-key-management" class="toc-link" data-bilingual>
+        <template class="content-ar">إدارة مفاتيح IPsec (Oakley و ISAKMP)</template>
+        <template class="content-en">IPSec Key Management (Oakley &amp; ISAKMP)</template>
+        <span class="content-target">إدارة مفاتيح IPsec (Oakley و ISAKMP)</span>
+      </a>
+      <a href="#cryptographic-suites" class="toc-link" data-bilingual>
+        <template class="content-ar">أطقم التشفير (Cryptographic Suites)</template>
+        <template class="content-en">Cryptographic Suites</template>
+        <span class="content-target">أطقم التشفير (Cryptographic Suites)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · IT478
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن بروتوكول الإنترنت (IPsec)</h1>
+      <p class="hero-description">نظرة عامة على إطار عمل أمن بروتوكول الإنترنت (IPsec)، بما في ذلك أوضاع النقل والنفق، الارتباطات الأمنية، حمولة الأمان المغلفة (ESP)، وإدارة المفاتيح.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">IP Security (IPsec)</h1>
+      <p class="hero-description">Overview of the IPsec security framework, including transport and tunnel modes, Security Associations, Encapsulating Security Payload (ESP), and key management.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن الشبكات</span>
+      <span class="tag">IPsec</span>
+      <span class="tag">التشفير</span>
+      <span class="tag">الشبكات الافتراضية الخاصة</span>
+      <span class="tag">إدارة المفاتيح</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Security</span>
+      <span class="tag">IPsec</span>
+      <span class="tag">Cryptography</span>
+      <span class="tag">VPN</span>
+      <span class="tag">Key Management</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح الحاجة إلى وضع النقل ووضع النفق في أمن الشبكات.</span></li>
+      <li><span class="obj-icon">✦</span><span>عرض المبادئ الأساسية لأمن بروتوكول الإنترنت (IPsec)، وقاعدة بيانات الارتباط الأمني، وقاعدة بيانات سياسة الأمان.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقديم نظرة عامة على حمولة الأمان المغلفة (ESP) وتبادل مفاتيح الإنترنت (IKE).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the needs for a transport mode and tunnel mode security overview.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present the basic principles of IP security (IPsec), security association database, and the security policy database.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present an overview of Encapsulating Security Payload (ESP) and Internet Key Exchange (IKE).</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="ipsec-overview" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> نظرة عامة على أمن بروتوكول الإنترنت (IPsec)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> IP Security (IPsec) Overview</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مجموعة من البروتوكولات المصممة لضمان سلامة وسرية ومصادقة اتصالات البيانات عبر شبكات IP، وتعمل كحارس أمني غير مرئي لجميع التطبيقات.</p></template>
+    <template class="content-en"><p>A suite of protocols developed to ensure the integrity, confidentiality, and authentication of data communications over an IP network, acting as an invisible security guard for all applications.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر IPsec آليات أمنية عامة تشمل</p><ul><li>المصادقة،</li><li>السرية،</li><li>وإدارة المفاتيح.</li></ul><p>يمكن تطبيقه عبر الشبكات المحلية (LANs)، الشبكات الواسعة (WANs) العامة والخاصة، والإنترنت.</p><p>من فوائد IPsec أنه عندما يتم تنفيذه في جدار حماية أو موجه (Router)، فإنه يوفر أماناً قوياً لجميع حركات المرور التي تعبر المحيط، ويكون مقاوماً للتجاوز (Bypass).</p><p>نظراً لأنه يعمل تحت طبقة النقل (Transport Layer)، فهو شفاف تماماً للتطبيقات والمستخدمين النهائيين، ويؤمن بنية التوجيه (Routing Architecture).</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="IPsec" data-ar="أمن بروتوكول الإنترنت" data-en-def="A suite of protocols for securing IP communications by authenticating and encrypting each IP packet of a communication session.">IPsec<span class="smart-term-tooltip"></span></span> provides general security mechanisms including authentication, confidentiality, and key management. It is applicable for use over LANs, across public and private WANs, and for the Internet.</p><p>Benefits of IPsec include providing strong security to all traffic crossing the perimeter when implemented in a firewall/router, and being resistant to bypass. Because it operates below the transport layer, it is transparent to applications and end-users, and secures the routing architecture.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تم تصميم IPsec في طبقة الشبكة؟ على عكس S/MIME أو SSL/HTTPS التي تؤمن تطبيقات محددة، فإن وضع الأمان في طبقة IP يضمن حماية جميع حركات المرور الصادرة والواردة دون الحاجة إلى تعديل التطبيقات الفردية.</p><p>تتكون بنية IPsec من عدة مكونات معقدة محددة في وثائق RFC، بما في ذلك بنية الأمان (RFC4301)، ترويسة المصادقة AH (RFC4302)، حمولة الأمان المغلفة ESP (RFC4303)، وبروتوكول تبادل المفاتيح IKEv2 (RFC4306).</p></template>
+    <template class="content-en"><p>Why was IPsec designed at the network layer? Unlike S/MIME or SSL/HTTPS which secure specific applications, placing security at the IP layer ensures all outgoing and incoming traffic is protected without needing to modify individual applications.</p><p>The IPsec architecture is quite complex and specified across multiple RFCs, including Security Architecture (RFC4301), Authentication Header AH (RFC4302), Encapsulating Security Payload ESP (RFC4303), and Internet Key Exchange IKEv2 (RFC4306).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A network diagram showing IPsec uses. Show an internal network connected to a router/firewall (Networking device with IPsec), which connects via the Internet to another corporate network. Show a 'Secure IP Payload' tunnel between the two networking devices. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="gatewayGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-800)"/>
+      <stop offset="100%" stop-color="var(--brand-600)"/>
+    </linearGradient>
+    
+    <!-- Drop Shadows -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+    
+    <!-- Arrow Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 5 5 L 0 8 z" fill="var(--text-muted)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">IPsec Site-to-Site VPN Architecture</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية الشبكة الخاصة الافتراضية (VPN) باستخدام IPsec</text>
+
+  <!-- Connections (Base Layer) -->
+  <!-- LAN A to Gateway A -->
+  <line x1="160" y1="180" x2="200" y2="180" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,2"/>
+  <!-- Gateway A to Internet -->
+  <line x1="280" y1="180" x2="340" y2="180" stroke="var(--text-muted)" stroke-width="2"/>
+  <!-- Internet to Gateway B -->
+  <line x1="470" y1="180" x2="520" y2="180" stroke="var(--text-muted)" stroke-width="2"/>
+  <!-- Gateway B to LAN B -->
+  <line x1="600" y1="180" x2="640" y2="180" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,2"/>
+
+  <!-- Secure IPsec Tunnel -->
+  <!-- Tunnel Glow -->
+  <path d="M 240 220 Q 400 320 560 220" fill="none" stroke="var(--brand-500)" stroke-width="10" opacity="0.15"/>
+  <!-- Tunnel Core -->
+  <path d="M 240 220 Q 400 320 560 220" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="8,4"/>
+  <!-- Tunnel Endpoints -->
+  <circle cx="240" cy="220" r="4" fill="var(--brand-500)"/>
+  <circle cx="560" cy="220" r="4" fill="var(--brand-500)"/>
+
+  <!-- Corporate LAN A -->
+  <rect x="40" y="120" width="120" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)"/>
+  <!-- LAN A Devices -->
+  <g stroke="var(--text-muted)" stroke-width="2" fill="var(--bg-surface)">
+    <!-- Desktop -->
+    <rect x="60" y="145" width="24" height="18" rx="2"/>
+    <path d="M 67 163 L 77 163 M 72 163 L 72 168 M 62 168 L 82 168" fill="none"/>
+    <!-- Server -->
+    <rect x="105" y="135" width="24" height="36" rx="2"/>
+    <line x1="110" y1="143" x2="124" y2="143"/>
+    <line x1="110" y1="151" x2="124" y2="151"/>
+    <line x1="110" y1="159" x2="124" y2="159"/>
+  </g>
+  <text x="100" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Corporate LAN A</text>
+  <text x="100" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شبكة الشركة (أ)</text>
+  <text x="100" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Internal Network</text>
+  <text x="100" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">الشبكة الداخلية</text>
+
+  <!-- Corporate LAN B -->
+  <rect x="640" y="120" width="120" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)"/>
+  <!-- LAN B Devices -->
+  <g stroke="var(--text-muted)" stroke-width="2" fill="var(--bg-surface)">
+    <!-- Desktop -->
+    <rect x="660" y="145" width="24" height="18" rx="2"/>
+    <path d="M 667 163 L 677 163 M 672 163 L 672 168 M 662 168 L 682 168" fill="none"/>
+    <!-- Server -->
+    <rect x="705" y="135" width="24" height="36" rx="2"/>
+    <line x1="710" y1="143" x2="724" y2="143"/>
+    <line x1="710" y1="151" x2="724" y2="151"/>
+    <line x1="710" y1="159" x2="724" y2="159"/>
+  </g>
+  <text x="700" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Corporate LAN B</text>
+  <text x="700" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شبكة الشركة (ب)</text>
+  <text x="700" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Internal Network</text>
+  <text x="700" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">الشبكة الداخلية</text>
+
+  <!-- Internet Cloud -->
+  <path d="M 320 170 a 30 30 0 0 1 20 -50 a 40 40 0 0 1 70 -10 a 40 40 0 0 1 60 20 a 30 30 0 0 1 20 50 a 20 20 0 0 1 -20 20 l -130 0 a 20 20 0 0 1 -20 -30 z" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Internet</text>
+  <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإنترنت</text>
+  <text x="400" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Insecure WAN)</text>
+  <text x="400" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(شبكة واسعة غير آمنة)</text>
+
+  <!-- Gateway A (IPsec Router/Firewall) -->
+  <rect x="200" y="140" width="80" height="80" rx="12" fill="url(#gatewayGrad)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+  <!-- Lock Icon -->
+  <rect x="232" y="163" width="16" height="12" rx="2" fill="var(--on-brand-hi)"/>
+  <path d="M 235 163 V 157 A 5 5 0 0 1 245 157 V 163" fill="none" stroke="var(--on-brand-hi)" stroke-width="2"/>
+  <text x="240" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">IPsec</text>
+  <text x="240" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">IPsec</text>
+  <text x="240" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">Gateway</text>
+  <text x="240" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">بوابة</text>
+
+  <!-- Gateway B (IPsec Router/Firewall) -->
+  <rect x="520" y="140" width="80" height="80" rx="12" fill="url(#gatewayGrad)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+  <!-- Lock Icon -->
+  <rect x="552" y="163" width="16" height="12" rx="2" fill="var(--on-brand-hi)"/>
+  <path d="M 555 163 V 157 A 5 5 0 0 1 565 157 V 163" fill="none" stroke="var(--on-brand-hi)" stroke-width="2"/>
+  <text x="560" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">IPsec</text>
+  <text x="560" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">IPsec</text>
+  <text x="560" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">Gateway</text>
+  <text x="560" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">بوابة</text>
+
+  <!-- Tunnel Shield Icon & Label -->
+  <path d="M 390 260 L 400 255 L 410 260 V 270 C 410 280 400 285 400 285 C 400 285 390 280 390 270 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+  <path d="M 395 270 L 399 274 L 405 265" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+  
+  <text x="400" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Secure IP Payload (Tunnel)</text>
+  <text x="400" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حمولة IP آمنة (نفق)</text>
+  <text x="400" y="323" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Encrypted &amp; Authenticated</text>
+  <text x="400" y="323" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">مشفرة وموثقة</text>
+
+  <!-- Annotations / Benefits -->
+  <!-- Box 1 -->
+  <rect x="65" y="350" width="210" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="170" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transparent to Apps</text>
+  <text x="170" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شفاف للتطبيقات</text>
+  <text x="170" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Operates below Transport Layer</text>
+  <text x="170" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">يعمل تحت طبقة النقل</text>
+
+  <!-- Box 2 -->
+  <rect x="295" y="350" width="210" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="400" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Secures Routing</text>
+  <text x="400" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">يؤمن التوجيه</text>
+  <text x="400" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Protects routing architecture</text>
+  <text x="400" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">يحمي بنية التوجيه</text>
+
+  <!-- Box 3 -->
+  <rect x="525" y="350" width="210" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="630" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Strong Perimeter</text>
+  <text x="630" y="370" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">محيط أمني قوي</text>
+  <text x="630" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Resistant to bypass</text>
+  <text x="630" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">مقاوم للتجاوز</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تنفيذ IPsec في جدار الحماية مقاوماً للتجاوز (Bypass)؟</template>
+      <template class="content-en">Why is implementing IPsec in a firewall considered resistant to bypass?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن جدار الحماية يمثل نقطة الاختناق الوحيدة (Chokepoint) بين الشبكة الداخلية والإنترنت، مما يجبر جميع حركات المرور على المرور عبره والخضوع لسياسات IPsec قبل الخروج أو الدخول.</p></template>
+      <template class="content-en"><p>Because the firewall acts as the single chokepoint between the internal network and the Internet, forcing all traffic to pass through it and be subjected to IPsec policies before exiting or entering.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transport-vs-tunnel-modes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> أوضاع النقل والنفق (Transport and Tunnel Modes)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Transport and Tunnel Modes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>وضع النقل يشفّر بيانات الحمولة فقط ويحافظ على ترويسة IP الأصلية، بينما وضع النفق يشفّر الحزمة بأكملها ويضيف ترويسة IP جديدة.</p></template>
+    <template class="content-en"><p>Transport mode encrypts only the payload data and keeps the original IP header, while Tunnel mode encrypts the entire packet and adds a new IP header.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Transport Mode" data-ar="وضع النقل" data-en-def="An IPsec mode that encrypts only the payload and ESP trailer; the original IP header is not encrypted.">وضع النقل<span class="smart-term-tooltip"></span></span> (Transport Mode):</b></p><ul><li>يستخدم لتشفير ومصادقة بيانات IP (الحمولة) بشكل اختياري.</li><li>يسمح بتحليل حركة المرور (Traffic Analysis) لأن ترويسة IP الأصلية تظل مرئية.</li><li>يعتبر فعالاً ومناسباً لحركة المرور من مضيف إلى مضيف (Host-to-Host).</li></ul><p><b><span class="smart-term" data-term-en="Tunnel Mode" data-ar="وضع النفق" data-en-def="An IPsec mode that encrypts the entire original IP packet and adds a new IP header for routing.">وضع النفق<span class="smart-term-tooltip"></span></span> (Tunnel Mode):</b></p><ul><li>يشفّر حزمة IP بأكملها (الترويسة والحمولة).</li><li>يضيف ترويسة IP جديدة للقفزة التالية (Next Hop).</li><li>لا يمكن للموجهات (Routers) في الطريق فحص ترويسة IP الداخلية.</li><li>مناسب جداً للشبكات الافتراضية الخاصة (VPNs) وأمن البوابة إلى البوابة (Gateway-to-Gateway).</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Transport Mode" data-ar="وضع النقل" data-en-def="An IPsec mode that encrypts only the payload and ESP trailer; the original IP header is not encrypted.">Transport Mode<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Used to encrypt and optionally authenticate IP data (payload).</li><li>Can do traffic analysis because the original IP header is visible, but is efficient.</li><li>Good for ESP Host-to-Host traffic.</li></ul><p><b><span class="smart-term" data-term-en="Tunnel Mode" data-ar="وضع النفق" data-en-def="An IPsec mode that encrypts the entire original IP packet and adds a new IP header for routing.">Tunnel Mode<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Encrypts the entire IP packet.</li><li>Adds a new IP header for the next hop.</li><li>No routers on the way can examine the inner IP header.</li><li>Good for VPNs and Gateway-to-Gateway security.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في وضع النقل، يتم إدراج ترويسة IPsec (مثل ESP) بعد ترويسة IP الأصلية وقبل ترويسة TCP/UDP. هذا يجعله خفيف الوزن ولكنه يكشف عناوين المصدر والوجهة الحقيقية للمهاجمين.</p><p>في وضع النفق، تصبح حزمة IP الأصلية بأكملها حمولة لحزمة IP جديدة. الترويسة الجديدة تحتوي عادة على عناوين بوابات الأمان (مثل جدران الحماية)، مما يخفي الهيكل الداخلي للشبكة ويوفر سرية تدفق حركة المرور.</p></template>
+    <template class="content-en"><p>In transport mode, the IPsec header (like ESP) is inserted after the original IP header and before the TCP/UDP header. This makes it lightweight but exposes the true source and destination addresses to attackers.</p><p>In tunnel mode, the entire original IP packet becomes the payload of a new IP packet. The new header typically contains the addresses of the security gateways (e.g., firewalls), hiding the internal network topology and providing traffic flow confidentiality.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Two side-by-side packet structures. Left: Transport mode showing [Original IP Hdr | IPsec Hdr | TCP Hdr | Data]. Right: Tunnel mode showing [New IP Hdr | IPsec Hdr | Original IP Hdr | TCP Hdr | Data]. Use distinct colors for headers to highlight the difference. Style: educational, dark background #0d1117, accent color #28a745, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0,0 L 10,5 L 0,10 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Drop Shadow for Packets -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+
+    <!-- Lock Icon -->
+    <g id="lock">
+      <path d="M 4,0 C 1.8,0 0,1.8 0,4 L 0,5 L -1,5 L -1,12 L 9,12 L 9,5 L 8,5 L 8,4 C 8,1.8 6.2,0 4,0 Z M 4,2 C 5.1,2 6,2.9 6,4 L 6,5 L 2,5 L 2,4 C 2,2.9 2.9,2 4,2 Z" fill="var(--brand-500)" />
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ================= ORIGINAL PACKET ================= -->
+  <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">Original IP Packet</text>
+  <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">حزمة IP الأصلية</text>
+
+  <g filter="url(#shadow)">
+    <!-- Orig IP -->
+    <rect x="250" y="60" width="88" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="294" y="85" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Orig IP Hdr</text>
+    <text x="294" y="85" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">ترويسة IP</text>
+
+    <!-- TCP -->
+    <rect x="340" y="60" width="68" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="374" y="85" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">TCP Hdr</text>
+    <text x="374" y="85" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">ترويسة TCP</text>
+
+    <!-- Payload -->
+    <rect x="410" y="60" width="140" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="480" y="85" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Data (Payload)</text>
+    <text x="480" y="85" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">البيانات (الحمولة)</text>
+  </g>
+
+  <!-- ================= ARROWS ================= -->
+  <path d="M 320,115 C 320,170 200,160 200,230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 4" />
+  <path d="M 480,115 C 480,170 600,160 600,230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 4" />
+
+
+  <!-- ================= TRANSPORT MODE ================= -->
+  <text x="200" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">Transport Mode</text>
+  <text x="200" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">وضع النقل (Transport)</text>
+
+  <g filter="url(#shadow)">
+    <!-- Orig IP -->
+    <rect x="30" y="240" width="78" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="69" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Orig IP</text>
+    <text x="69" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">IP الأصلي</text>
+
+    <!-- IPsec -->
+    <rect x="110" y="240" width="68" height="40" rx="4" fill="var(--brand-500)" />
+    <text x="144" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">IPsec</text>
+    <text x="144" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">IPsec</text>
+
+    <!-- TCP -->
+    <rect x="180" y="240" width="58" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="209" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">TCP</text>
+    <text x="209" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">TCP</text>
+
+    <!-- Payload -->
+    <rect x="240" y="240" width="130" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="305" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Data</text>
+    <text x="305" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">البيانات</text>
+  </g>
+
+  <!-- Transport Encrypted Bracket -->
+  <path d="M 180,285 L 180,295 Q 180,300 185,300 L 260,300" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 290,300 L 365,300 Q 370,300 370,295 L 370,285" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <use href="#lock" x="271" y="294" />
+  
+  <text x="275" y="325" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Encrypted</text>
+  <text x="275" y="325" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">مشفر</text>
+
+  <!-- Transport Summary -->
+  <text x="200" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Host-to-Host</text>
+  <text x="200" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">من مضيف إلى مضيف</text>
+  <text x="200" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">Original IP is visible</text>
+  <text x="200" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">عنوان IP الأصلي مرئي</text>
+
+
+  <!-- ================= TUNNEL MODE ================= -->
+  <text x="600" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">Tunnel Mode</text>
+  <text x="600" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">وضع النفق (Tunnel)</text>
+
+  <g filter="url(#shadow)">
+    <!-- New IP -->
+    <rect x="410" y="240" width="68" height="40" rx="4" fill="var(--brand-800)" />
+    <text x="444" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)">New IP</text>
+    <text x="444" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)">IP جديد</text>
+
+    <!-- IPsec -->
+    <rect x="480" y="240" width="68" height="40" rx="4" fill="var(--brand-500)" />
+    <text x="514" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">IPsec</text>
+    <text x="514" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">IPsec</text>
+
+    <!-- Orig IP -->
+    <rect x="550" y="240" width="68" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="584" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Orig IP</text>
+    <text x="584" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">IP الأصلي</text>
+
+    <!-- TCP -->
+    <rect x="620" y="240" width="48" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="644" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">TCP</text>
+    <text x="644" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">TCP</text>
+
+    <!-- Payload -->
+    <rect x="670" y="240" width="110" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="725" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">Data</text>
+    <text x="725" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">البيانات</text>
+  </g>
+
+  <!-- Tunnel Encrypted Bracket -->
+  <path d="M 550,285 L 550,295 Q 550,300 555,300 L 650,300" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 680,300 L 775,300 Q 780,300 780,295 L 780,285" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <use href="#lock" x="661" y="294" />
+
+  <text x="665" y="325" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Encrypted</text>
+  <text x="665" y="325" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">مشفر</text>
+
+  <!-- Tunnel Summary -->
+  <text x="600" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Gateway-to-Gateway (VPN)</text>
+  <text x="600" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">من بوابة إلى بوابة (VPN)</text>
+  <text x="600" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">Entire original packet hidden</text>
+  <text x="600" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">الحزمة الأصلية مخفية بالكامل</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Transport Mode</th><th>Tunnel Mode</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تشفير ترويسة IP الأصلية</template>
+          <template class="content-en">Original IP Header Encryption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير مشفرة (مرئية)</template>
+          <template class="content-en">Not encrypted (Visible)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مشفرة (مخفية)</template>
+          <template class="content-en">Encrypted (Hidden)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">إضافة ترويسة IP جديدة</template>
+          <template class="content-en">New IP Header Addition</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يضيف</template>
+          <template class="content-en">Does not add</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يضيف ترويسة جديدة</template>
+          <template class="content-en">Adds new header</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالة الاستخدام المثلى</template>
+          <template class="content-en">Best Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">من مضيف إلى مضيف (Host-to-Host)</template>
+          <template class="content-en">Host-to-Host</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الشبكات الافتراضية الخاصة (VPNs) والبوابات</template>
+          <template class="content-en">VPNs and Gateways</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تحليل حركة المرور (Traffic Analysis)</template>
+          <template class="content-en">Traffic Analysis Vulnerability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عرضة للتحليل</template>
+          <template class="content-en">Vulnerable to analysis</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">محمي من التحليل</template>
+          <template class="content-en">Protected from analysis</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كنت تريد ربط فرعين لشركة عبر الإنترنت دون الكشف عن عناوين IP للأجهزة الداخلية، فأي وضع ستستخدم ولماذا؟</template>
+      <template class="content-en">If you want to connect two company branches over the Internet without revealing the IP addresses of internal devices, which mode would you use and why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم وضع النفق (Tunnel Mode)، لأنه يغلف حزمة IP الأصلية بالكامل ويضيف ترويسة جديدة تحتوي فقط على عناوين بوابات الشركة، مما يخفي عناوين IP الداخلية.</p></template>
+      <template class="content-en"><p>I would use Tunnel Mode, because it encapsulates the entire original IP packet and adds a new header containing only the gateway addresses, thereby hiding the internal IP addresses.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="security-associations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الارتباطات الأمنية (Security Associations - SA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Security Associations (SA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>علاقة أحادية الاتجاه بين المرسل والمستقبل توفر الأمان لتدفق حركة المرور، وتُعرّف بثلاثة معلمات رئيسية.</p></template>
+    <template class="content-en"><p>A one-way relationship between a sender and a receiver that affords security for traffic flow, defined by three main parameters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الارتباط الأمني (SA) هو علاقة منطقية أحادية الاتجاه. يتم تعريفه بواسطة 3 معلمات أساسية:</p><ol><li><b><span class="smart-term" data-term-en="Security Parameters Index (SPI)" data-ar="مؤشر معلمات الأمان" data-en-def="A 32-bit value used to identify a specific Security Association (SA) for an incoming packet.">مؤشر معلمات الأمان<span class="smart-term-tooltip"></span></span> (SPI):</b> رقم فريد يحدد الارتباط الأمني.</li><li><b>عنوان IP للوجهة (IP destination address).</b></li><li><b>معرف بروتوكول الأمان (Security protocol identifier):</b> يحدد ما إذا كان البروتوكول المستخدم هو AH أو ESP.</li></ol><p>يحتوي الارتباط الأمني أيضاً على معلمات أخرى مثل رقم التسلسل (Seq no)، معلومات AH و ESP، وفترة الصلاحية (Lifetime). يتم تخزين هذه الارتباطات في قاعدة بيانات الارتباطات الأمنية (SAD).</p></template>
+    <template class="content-en"><p>A Security Association (SA) is a one-way logical relationship. It is defined by 3 core parameters:</p><ol><li><b><span class="smart-term" data-term-en="Security Parameters Index (SPI)" data-ar="مؤشر معلمات الأمان" data-en-def="A 32-bit value used to identify a specific Security Association (SA) for an incoming packet.">Security Parameters Index (SPI)<span class="smart-term-tooltip"></span></span>:</b> A unique number identifying the SA.</li><li><b>IP destination address.</b></li><li><b>Security protocol identifier:</b> Indicates whether AH or ESP is used.</li></ol><p>An SA also has a number of other parameters such as sequence number, AH & ESP info, and lifetime. These are stored in a database of security associations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نظراً لأن الارتباط الأمني (SA) أحادي الاتجاه، فإن الاتصال ثنائي الاتجاه (مثل جلسة TCP) يتطلب ارتباطين أمنيين على الأقل (واحد لكل اتجاه).</p><p>يعمل مؤشر SPI كعنصر حاسم؛ عندما يستلم المضيف حزمة IPsec، فإنه يستخدم عنوان الوجهة وبروتوكول الأمان و SPI للبحث في قاعدة بيانات SAD للعثور على المفاتيح والخوارزميات الصحيحة لفك تشفير الحزمة أو التحقق منها.</p></template>
+    <template class="content-en"><p>Because an SA is strictly one-way, a typical bidirectional communication (like a TCP session) requires at least two SAs (one for each direction).</p><p>The SPI acts as a crucial index; when a host receives an IPsec packet, it uses the destination address, security protocol, and SPI to look up the SAD database to find the correct keys and algorithms to decrypt or verify the packet.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى مؤشر SPI بدلاً من الاعتماد فقط على عناوين IP لتحديد الارتباط الأمني؟</template>
+      <template class="content-en">Why do we need an SPI instead of just relying on IP addresses to identify an SA?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن جهازاً واحداً (مثل جدار الحماية) قد يكون لديه ارتباطات أمنية متعددة مع نفس الوجهة (مثلاً، سياسات أمان مختلفة لتطبيقات مختلفة). الـ SPI يميز بين هذه الارتباطات المتعددة.</p></template>
+      <template class="content-en"><p>Because a single device (like a firewall) might have multiple SAs with the exact same destination IP (e.g., different security policies for different applications). The SPI uniquely distinguishes between these multiple SAs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="security-policy-database" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> قاعدة بيانات سياسة الأمان (SPD)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Security Policy Database (SPD)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قاعدة بيانات تحدد كيفية معالجة حركة مرور IP (تجاوز، تجاهل، أو حماية) بناءً على محددات مثل عناوين IP والمنافذ.</p></template>
+    <template class="content-en"><p>A database that determines how IP traffic should be processed (bypass, discard, or protect) based on selectors like IP addresses and ports.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تربط قاعدة بيانات سياسة الأمان (SPD) حركة مرور IP بارتباطات أمنية (SAs) محددة. تقوم بمطابقة مجموعة فرعية من حركة مرور IP مع الارتباط الأمني المناسب.</p><p>تستخدم الـ SPD <b>محددات (Selectors)</b> لتصفية حركة المرور الصادرة لتعيينها. تعتمد هذه <span class="smart-term" data-term-en="Selectors" data-ar="المحددات" data-en-def="Criteria used in the SPD (like IP addresses and ports) to classify traffic and determine the IPsec action.">المحددات<span class="smart-term-tooltip"></span></span> على:</p><ul><li>عناوين IP المحلية والبعيدة.</li><li>بروتوكول الطبقة التالية (مثل TCP أو UDP).</li><li>الاسم.</li><li>المنافذ المحلية والبعيدة.</li></ul><p>الإجراءات الممكنة هي: BYPASS (تجاوز بدون تشفير)، DISCARD (تجاهل/إسقاط)، أو PROTECT (حماية باستخدام IPsec).</p></template>
+    <template class="content-en"><p>The Security Policy Database (SPD) relates IP traffic to specific SAs. It matches a subset of IP traffic to the relevant SA.</p><p>It uses <b><span class="smart-term" data-term-en="Selectors" data-ar="المحددات" data-en-def="Criteria used in the SPD (like IP addresses and ports) to classify traffic and determine the IPsec action.">selectors<span class="smart-term-tooltip"></span></span></b> to filter outgoing traffic to map it. These selectors are based on:</p><ul><li>Local & remote IP addresses.</li><li>Next layer protocol (e.g., TCP, UDP).</li><li>Name.</li><li>Local & remote ports.</li></ul><p>Possible actions are: BYPASS (send without IPsec), DISCARD (drop packet), or PROTECT (apply IPsec).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعمل SPD كعقل مفكر لـ IPsec. لكل حزمة صادرة، يتم فحص SPD أولاً.</p><p>إذا كان الإجراء هو PROTECT، يبحث النظام عن SA موجود في قاعدة بيانات SAD. إذا لم يوجد، يتم تشغيل بروتوكول IKE لإنشاء SA جديد.</p><p>يسمح هذا التصميم بمرونة عالية؛ على سبيل المثال، يمكن تكوين النظام لتجاوز (BYPASS) حركة مرور الويب العادية (المنفذ 80) ولكن حماية (PROTECT) حركة مرور قواعد البيانات الحساسة.</p></template>
+    <template class="content-en"><p>The SPD acts as the brain of IPsec. For every outbound packet, the SPD is checked first.</p><p>If the action is PROTECT, the system looks for an existing SA in the SAD. If none exists, it triggers IKE to negotiate a new SA.</p><p>This design allows highly granular control; for instance, a system can be configured to BYPASS normal web traffic (port 80) but PROTECT sensitive database traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استلم موجه IPsec حزمة ولم يجد لها أي قاعدة مطابقة في SPD؟</template>
+      <template class="content-en">What happens if an IPsec router receives a packet and finds no matching rule in the SPD?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عادةً، في الأنظمة الآمنة، يتم تطبيق قاعدة الرفض الافتراضي (Default Deny)، مما يعني أنه سيتم تجاهل (DISCARD) الحزمة إذا لم تتطابق مع أي سياسة صريحة.</p></template>
+      <template class="content-en"><p>Typically, in secure systems, a 'default deny' rule applies, meaning the packet will be DISCARDED if it does not match any explicit policy.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="encapsulating-security-payload" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> حمولة الأمان المغلفة (ESP)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Encapsulating Security Payload (ESP)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول ضمن IPsec يوفر سرية محتوى الرسالة (التشفير)، مصادقة مصدر البيانات، وسلامة البيانات.</p></template>
+    <template class="content-en"><p>A protocol within IPsec that provides message content confidentiality (encryption), data origin authentication, and data integrity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر بروتوكول ESP الخدمات التالية:</p><ul><li>سرية محتوى الرسالة (Confidentiality).</li><li>مصادقة مصدر البيانات (Data origin authentication).</li><li>سلامة البيانات بدون اتصال (Connectionless integrity).</li><li>خدمة منع إعادة الإرسال (Anti-replay service).</li><li>سرية محدودة لتدفق حركة المرور (Limited traffic flow confidentiality).</li></ul><p>تعتمد الخدمات المقدمة على الخيارات المحددة عند إنشاء الارتباط الأمني (SA). يمكن لـ ESP استخدام مجموعة متنوعة من خوارزميات التشفير والمصادقة. يمكن لـ ESP تشفير بيانات الحمولة، الحشو (Padding)، طول الحشو، وحقول الترويسة التالية. يتم حساب <span class="smart-term" data-term-en="Integrity Check Value (ICV)" data-ar="قيمة التحقق من السلامة" data-en-def="A cryptographic checksum used in ESP to verify that the packet has not been altered in transit.">قيمة التحقق من السلامة<span class="smart-term-tooltip"></span></span> (ICV) <b>بعد</b> إجراء التشفير.</p></template>
+    <template class="content-en"><p>The ESP protocol provides the following services:</p><ul><li>Message content confidentiality.</li><li>Data origin authentication.</li><li>Connectionless integrity.</li><li>Anti-replay service.</li><li>Limited traffic flow confidentiality.</li></ul><p>Services depend on options selected when establishing the Security Association (SA). ESP can use a variety of encryption and authentication algorithms. ESP can encrypt payload data, padding, pad length, and next header fields. The <span class="smart-term" data-term-en="Integrity Check Value (ICV)" data-ar="قيمة التحقق من السلامة" data-en-def="A cryptographic checksum used in ESP to verify that the packet has not been altered in transit.">Integrity Check Value (ICV)<span class="smart-term-tooltip"></span></span> is computed <b>after</b> encryption is performed.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يستخدم ESP الحشو (Padding) لعدة أسباب تقنية وأمنية:</p><ol><li>توسيع النص العادي للوصول إلى الطول المطلوب لخوارزميات التشفير الكتلية (Block Ciphers).</li><li>محاذاة حقول طول الحشو والترويسة التالية (Align pad length and next header fields).</li><li>توفير سرية جزئية لتدفق حركة المرور عن طريق إخفاء الطول الحقيقي للحمولة، مما يصعب على المهاجمين استنتاج نوع البيانات المرسلة.</li></ol><p>حساب ICV بعد التشفير (Encrypt-then-MAC) هو ممارسة أمنية قياسية تمنع العديد من الهجمات التشفيرية، حيث يمكن للمستقبل التحقق من سلامة الحزمة قبل محاولة فك تشفيرها، مما يوفر موارد المعالجة ويمنع هجمات حشو التشفير.</p></template>
+    <template class="content-en"><p>ESP uses padding for several technical and security reasons:</p><ol><li>To expand plaintext to the required length for block ciphers.</li><li>To align pad length and next header fields.</li><li>To provide partial traffic flow confidentiality by hiding the true length of the payload, making it harder for attackers to infer the type of data being transmitted.</li></ol><p>Computing the ICV after encryption (Encrypt-then-MAC) is a standard security best practice that prevents many cryptographic attacks. The receiver can verify the packet's integrity before attempting to decrypt it, saving processing resources and preventing padding oracle attacks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Diagram of the ESP packet format. Show fields: Security Parameters Index (SPI), Sequence Number, Payload Data (variable), Padding (0-255 bytes), Pad Length, Next Header, and Integrity Check Value (ICV). Indicate that encryption covers Payload Data to Next Header, and ICV coverage includes everything from SPI to Next Header. Style: educational, dark background #0d1117, accent color #ffc107, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <linearGradient id="encryptGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">ESP Packet Format</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تنسيق حزمة ESP</text>
+
+    <!-- Authentication Coverage Bracket (Top) -->
+    <path d="M 50,160 L 50,140 L 610,140 L 610,160" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="330" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Authenticated (ICV Coverage)</text>
+    <text x="330" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نطاق المصادقة (تغطية ICV)</text>
+
+    <!-- Group Labels -->
+    <text x="130" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ESP Header</text>
+    <text x="130" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">ترويسة ESP</text>
+
+    <text x="490" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ESP Trailer</text>
+    <text x="490" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">ذيل ESP</text>
+
+    <text x="680" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">ESP Auth</text>
+    <text x="680" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">مصادقة ESP</text>
+
+    <!-- Packet Fields Backgrounds -->
+    <!-- Plaintext Fields -->
+    <rect x="50" y="200" width="80" height="80" fill="var(--bg-elevated)"/>
+    <rect x="130" y="200" width="80" height="80" fill="var(--bg-elevated)"/>
+    <rect x="610" y="200" width="140" height="80" fill="var(--bg-elevated)"/>
+    
+    <!-- Encrypted Fields -->
+    <rect x="210" y="200" width="400" height="80" fill="url(#encryptGrad)"/>
+
+    <!-- Packet Grid Lines -->
+    <g fill="none" stroke="var(--brand-500)" stroke-width="2">
+        <rect x="50" y="200" width="700" height="80"/>
+        <path d="M 130 200 L 130 280"/>
+        <path d="M 210 200 L 210 280"/>
+        <path d="M 370 200 L 370 280"/>
+        <path d="M 460 200 L 460 280"/>
+        <path d="M 535 200 L 535 280"/>
+        <path d="M 610 200 L 610 280"/>
+    </g>
+
+    <!-- Field Texts -->
+    <!-- SPI -->
+    <text x="90" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SPI</text>
+    <text x="90" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">32 bits</text>
+    <text x="90" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مؤشر SPI</text>
+    <text x="90" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">32 بت</text>
+
+    <!-- Sequence Number -->
+    <text x="170" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Seq Num</text>
+    <text x="170" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">32 bits</text>
+    <text x="170" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">رقم التسلسل</text>
+    <text x="170" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">32 بت</text>
+
+    <!-- Payload Data -->
+    <text x="290" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Payload Data</text>
+    <text x="290" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">Variable</text>
+    <text x="290" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">بيانات الحمولة</text>
+    <text x="290" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">متغيرة</text>
+
+    <!-- Padding -->
+    <text x="415" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Padding</text>
+    <text x="415" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">0-255 B</text>
+    <text x="415" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">حشو</text>
+    <text x="415" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">0-255 بايت</text>
+
+    <!-- Pad Length -->
+    <text x="497.5" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Pad Len</text>
+    <text x="497.5" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">8 bits</text>
+    <text x="497.5" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">طول الحشو</text>
+    <text x="497.5" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">8 بت</text>
+
+    <!-- Next Header -->
+    <text x="572.5" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Next Hdr</text>
+    <text x="572.5" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-en">8 bits</text>
+    <text x="572.5" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">الترويسة التالية</text>
+    <text x="572.5" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)" class="gsvg-ar">8 بت</text>
+
+    <!-- ICV -->
+    <text x="680" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">ICV</text>
+    <text x="680" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Variable</text>
+    <text x="680" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قيمة التحقق</text>
+    <text x="680" y="260" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">متغيرة</text>
+
+    <!-- Encryption Coverage Bracket (Bottom) -->
+    <path d="M 210,290 L 210,310 L 610,310 L 610,290" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="410" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Encrypted</text>
+    <text x="410" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نطاق التشفير</text>
+
+    <!-- Legend -->
+    <rect x="270" y="380" width="20" height="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="330" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Plaintext</text>
+    <text x="330" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">نص صريح</text>
+
+    <rect x="410" y="380" width="20" height="20" fill="url(#encryptGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="470" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Encrypted</text>
+    <text x="470" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مشفر</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم حساب ICV بعد التشفير وليس قبله؟</template>
+      <template class="content-en">Why is the ICV computed after encryption rather than before?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>للسماح للمستقبل بالتحقق من صحة الحزمة وسلامتها قبل استهلاك موارد وحدة المعالجة المركزية في فك التشفير، وللحماية من هجمات التشفير المعينة (مثل Padding Oracle).</p></template>
+      <template class="content-en"><p>To allow the receiver to verify the packet's authenticity and integrity before consuming CPU resources on decryption, and to protect against certain cryptographic attacks (like Padding Oracle).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="anti-replay-service" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> خدمة منع إعادة الإرسال (Anti-Replay Service)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Anti-Replay Service</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>آلية تمنع المهاجمين من التقاط حزمة مصادق عليها وإعادة إرسالها لاحقاً، وذلك باستخدام أرقام تسلسلية ونافذة منزلقة.</p></template>
+    <template class="content-en"><p>A mechanism that prevents attackers from capturing an authenticated packet and resending it later, using sequence numbers and a sliding window.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>إعادة الإرسال (Replay) تحدث عندما يقوم المهاجم بإعادة إرسال نسخة من حزمة تمت مصادقتها مسبقاً. لإحباط هذا الهجوم، يستخدم IPsec <b>رقم التسلسل (Sequence Number)</b>.</p><ul><li>يقوم المرسل بتهيئة رقم التسلسل إلى 0 عند إنشاء ارتباط أمني (SA) جديد.</li><li>يتم زيادة الرقم بمقدار 1 لكل حزمة مرسلة.</li><li>يجب ألا يتجاوز الرقم الحد الأقصى وهو $2^{32} - 1$.</li><li>يقبل المستقبل الحزم التي تقع أرقامها التسلسلية ضمن نافذة محددة (Window) بحجم $W$، وتحديداً ضمن النطاق $(N - W + 1)$ حيث $N$ هو أعلى رقم تسلسل تم استلامه بنجاح.</li></ul></template>
+    <template class="content-en"><p>A <span class="smart-term" data-term-en="Replay Attack" data-ar="هجوم إعادة الإرسال" data-en-def="A network attack in which a valid data transmission is maliciously or fraudulently repeated or delayed.">replay attack<span class="smart-term-tooltip"></span></span> is when an attacker resends a copy of an authenticated packet. To thwart this attack, IPsec uses a <b>sequence number</b>.</p><ul><li>The sender initializes the sequence number to 0 when a new SA is established.</li><li>It increments for each packet.</li><li>It must not exceed the limit of $2^{32} - 1$.</li><li>The receiver then accepts packets with a sequence number within a window of $(N - W + 1)$, where $N$ is the highest validated sequence number received.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم نافذة (Window) بدلاً من مجرد قبول الرقم التسلسلي التالي فقط؟ لأن بروتوكول IP لا يضمن تسليم الحزم بالترتيب (Out-of-order delivery). قد تسلك الحزم مسارات مختلفة وتصل بترتيب مختلف.</p><p>تسمح النافذة المنزلقة (Sliding Window) للمستقبل بقبول الحزم المتأخرة قليلاً طالما أنها لم تُستلم من قبل وتقع ضمن النافذة. إذا وصل رقم التسلسل إلى الحد الأقصى ($2^{32} - 1$)، يجب إنهاء الارتباط الأمني الحالي وإنشاء واحد جديد بمفاتيح جديدة لمنع تكرار الأرقام.</p></template>
+    <template class="content-en"><p>Why use a window instead of just expecting the exact next sequence number? Because IP does not guarantee in-order delivery. Packets might take different routes and arrive out of order.</p><p>The sliding window allows the receiver to accept slightly delayed packets as long as they haven't been received before and fall within the window. If the sequence number reaches its maximum ($2^{32} - 1$), the current SA must be terminated and a new one negotiated with fresh keys to prevent sequence number rollover.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الحد الأدنى للنافذة المقبولة، حيث N هو أعلى رقم تسلسل تم استلامه، و W هو حجم النافذة.</strong></template>
+      <template class="content-en"><strong>The lower bound of the acceptable window, where N is the highest received sequence number, and W is the window size.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$N - W + 1$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يجب أن يفعل المرسل والمستقبل عندما يصل رقم التسلسل إلى الحد الأقصى؟</template>
+      <template class="content-en">What must the sender and receiver do when the sequence number reaches its maximum limit?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب عليهم إنهاء الارتباط الأمني (SA) الحالي وإنشاء ارتباط أمني جديد بمفاتيح جديدة لإعادة تعيين رقم التسلسل إلى الصفر.</p></template>
+      <template class="content-en"><p>They must terminate the current Security Association (SA) and negotiate a new SA with fresh keys to reset the sequence number back to zero.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="combining-security-associations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> دمج الارتباطات الأمنية (Combining Security Associations)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Combining Security Associations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تجميع عدة ارتباطات أمنية (SAs) معاً لتوفير طبقات متعددة من الأمان، مثل تطبيق كل من المصادقة والتشفير معاً.</p></template>
+    <template class="content-en"><p>The process of bundling multiple SAs together to provide multiple layers of security, such as applying both authentication and encryption.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن للارتباط الأمني (SA) تنفيذ إما AH أو ESP. لتنفيذ كليهما، نحتاج إلى دمج الارتباطات الأمنية لتشكيل <b>حزمة ارتباط أمني (Security Association Bundle)</b>.</p><p>يمكن أن تنتهي هذه الارتباطات عند نفس نقاط النهاية أو نقاط مختلفة. يتم الدمج بطريقتين رئيسيتين:</p><ol><li><b>التجاور في النقل (Transport Adjacency):</b> تطبيق أكثر من بروتوكول أمان واحد على نفس حزمة IP دون استخدام الأنفاق.</li><li><b>الأنفاق المتكررة (Iterated Tunneling):</b> تطبيق بروتوكولات أمان متعددة من خلال إنشاء أنفاق داخل أنفاق.</li></ol><p>أمثلة على دمج المصادقة والتشفير: ESP مع المصادقة، حزمة ESP داخلي و AH خارجي، أو حزمة نقل داخلي و ESP خارجي.</p></template>
+    <template class="content-en"><p>An SA can implement either AH or ESP. To implement both, we need to combine SAs to form a <b><span class="smart-term" data-term-en="Security Association Bundle" data-ar="حزمة الارتباط الأمني" data-en-def="A sequence of SAs through which traffic must be processed to satisfy a security policy.">Security Association Bundle<span class="smart-term-tooltip"></span></span></b>.</p><p>These SAs may terminate at different or the same endpoints. They are combined by:</p><ol><li><b>Transport Adjacency:</b> Applying more than one security protocol to the same IP packet without invoking tunneling.</li><li><b>Iterated Tunneling:</b> Applying multiple layers of security protocols through nested tunnels.</li></ol><p>Examples of combining authentication & encryption: ESP with authentication, bundled inner ESP & outer AH, bundled inner transport & outer ESP.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعد دمج الارتباطات الأمنية ضرورياً في السيناريوهات المعقدة. على سبيل المثال، قد يرغب مضيف في شبكة داخلية في إنشاء نفق ESP آمن إلى جدار حماية الشركة (لتجاوز الإنترنت غير الآمن)، وداخل هذا النفق، ينشئ ارتباط نقل ESP من مضيف إلى مضيف مع الخادم الوجهة لضمان التشفير من النهاية إلى النهاية.</p><p>هذا يعني أن الحزمة الواحدة قد تحتوي على ترويسات IPsec متعددة متداخلة، وكل ترويسة تتوافق مع SA مختلف في قاعدة بيانات SAD.</p></template>
+    <template class="content-en"><p>Combining SAs is essential in complex scenarios. For example, a host in an internal network might want to establish a secure ESP tunnel to a corporate firewall (to traverse the untrusted Internet), and within that tunnel, establish a host-to-host ESP transport SA with the destination server to ensure end-to-end encryption.</p><p>This means a single packet might have multiple nested IPsec headers, each corresponding to a different SA in the SAD.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق بين التجاور في النقل (Transport Adjacency) والأنفاق المتكررة (Iterated Tunneling)؟</template>
+      <template class="content-en">What is the difference between Transport Adjacency and Iterated Tunneling?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التجاور في النقل يطبق بروتوكولات متعددة (مثل AH و ESP) على نفس حزمة IP دون إضافة ترويسات IP جديدة، بينما الأنفاق المتكررة تغلف الحزمة بالكامل داخل حزمة IP جديدة لكل طبقة أمان إضافية.</p></template>
+      <template class="content-en"><p>Transport Adjacency applies multiple protocols (like AH and ESP) to the same IP packet without adding new IP headers, whereas Iterated Tunneling encapsulates the entire packet within a new IP packet for each additional security layer.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ipsec-key-management" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> إدارة مفاتيح IPsec (Oakley و ISAKMP)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> IPSec Key Management (Oakley &amp; ISAKMP)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الأنظمة المسؤولة عن إنشاء وتوزيع المفاتيح التشفيرية، حيث يتطلب الاتصال النموذجي 4 مفاتيح (زوجين) للاتجاهين.</p></template>
+    <template class="content-en"><p>The systems responsible for generating and distributing cryptographic keys, where typical bidirectional communication requires 4 keys (2 pairs).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتعامل إدارة المفاتيح مع إنشاء وتوزيع المفاتيح. يتطلب الاتصال النموذجي زوجين من المفاتيح (مفتاحان لكل اتجاه لـ AH و ESP). يمكن أن تكون الإدارة:</p><ul><li><b>يدوية (Manual):</b> يقوم مسؤول النظام بتكوين كل نظام يدوياً.</li><li><b>آلية (Automated):</b> نظام آلي لإنشاء المفاتيح عند الطلب للأنظمة الكبيرة. يعتمد على عناصر Oakley و ISAKMP.</li></ul><p><b>بروتوكول Oakley:</b> بروتوكول لتبادل المفاتيح يعتمد على تبادل Diffie-Hellman (DH). يضيف ميزات لمعالجة نقاط ضعف DH (مثل هجوم رجل في المنتصف) عن طريق إضافة ملفات تعريف الارتباط (Cookies)، المجموعات (Global params)، والأرقام العشوائية (Nonces) لمصادقة الأطراف.</p><p><b>بروتوكول ISAKMP:</b> يوفر إطار عمل (Framework) لإدارة المفاتيح. يحدد الإجراءات وتنسيقات الحزم لإنشاء، التفاوض، تعديل، وحذف الارتباطات الأمنية (SAs). وهو مستقل عن بروتوكول تبادل المفاتيح أو خوارزمية التشفير المحددة.</p></template>
+    <template class="content-en"><p>Key management handles key generation and distribution. Typically, 2 pairs of keys are needed (2 per direction for AH & ESP). It can be:</p><ul><li><b>Manual:</b> Sysadmin manually configures every system.</li><li><b>Automated:</b> Automated system for on-demand creation of keys for SAs in large systems. It has <span class="smart-term" data-term-en="Oakley" data-ar="بروتوكول أوكلي" data-en-def="A key exchange protocol based on Diffie-Hellman that adds authentication to prevent man-in-the-middle attacks.">Oakley<span class="smart-term-tooltip"></span></span> & <span class="smart-term" data-term-en="ISAKMP" data-ar="بروتوكول إدارة مفاتيح وارتباطات أمان الإنترنت" data-en-def="A protocol framework that defines payload formats and procedures for negotiating security associations.">ISAKMP<span class="smart-term-tooltip"></span></span> elements.</li></ul><p><b>Oakley Protocol:</b> A key exchange protocol based on Diffie-Hellman (DH). It adds features to address DH weaknesses (like man-in-the-middle attacks) by adding cookies, groups (global params), and nonces to authenticate parties.</p><p><b>ISAKMP:</b> Internet Security Association and Key Management Protocol. It provides a framework for key management and defines procedures and packet formats to establish, negotiate, modify, & delete SAs. It is independent of the specific key exchange protocol, encryption algorithm, and authentication method.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الإصدارات الحديثة (IKEv2)، لم يعد يتم استخدام مصطلحات Oakley و ISAKMP بشكل منفصل، بل تم دمج وظائفها الأساسية في بروتوكول IKEv2 الموحد.</p><p>تعتبر ملفات تعريف الارتباط (Cookies) في Oakley حاسمة لمنع هجمات حجب الخدمة (DoS) المتمثلة في إغراق الخادم بطلبات تبادل مفاتيح وهمية، حيث يجب على المهاجم إثبات قدرته على استلام الردود قبل أن يخصص الخادم موارد حسابية ثقيلة لعملية Diffie-Hellman.</p></template>
+    <template class="content-en"><p>In modern implementations (IKEv2), the terms Oakley and ISAKMP are no longer explicitly used, but their basic functionality is integrated into the unified IKEv2 protocol.</p><p>The cookies in Oakley are critical for preventing Denial of Service (DoS) attacks (like state exhaustion). The initiator must prove they can receive responses at their claimed IP address before the responder commits heavy computational resources to the Diffie-Hellman exchange.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Diagram showing the ISAKMP Header format. Fields include: Initiator's SPI (64 bits), Responder's SPI (64 bits), Next Payload (8 bits), MjVer/MnVer (8 bits), Exchange Type (8 bits), Flags (8 bits), Message ID (32 bits), and Length (32 bits). Style: educational, dark background #0d1117, accent color #17a2b8, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      text {
+        font-family: system-ui, 'Cairo', 'Inter', sans-serif;
+      }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="45" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">ISAKMP Header Format</text>
+  <text x="400" y="45" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">تنسيق ترويسة ISAKMP</text>
+
+  <!-- Bit Scale (0 to 31) -->
+  <g fill="var(--text-muted)" font-size="13" text-anchor="middle">
+    <text x="80" y="90">0</text>
+    <text x="160" y="90">4</text>
+    <text x="240" y="90">8</text>
+    <text x="400" y="90">16</text>
+    <text x="560" y="90">24</text>
+    <text x="720" y="90">31</text>
+  </g>
+
+  <!-- Bit Scale Tick Marks -->
+  <path d="M80,95 v5 M160,95 v5 M240,95 v5 M400,95 v5 M560,95 v5 M720,95 v5" stroke="var(--text-muted)" stroke-width="1.5" />
+
+  <!-- Main Header Table -->
+  <g>
+    <!-- Outer Border and Background -->
+    <rect x="80" y="100" width="640" height="270" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="2" />
+
+    <!-- Internal Grid Lines -->
+    <path d="
+      M80,160 H720 
+      M80,220 H720 
+      M80,270 H720 
+      M80,320 H720 
+      M240,220 V270 
+      M320,220 V270 
+      M400,220 V270 
+      M560,220 V270" 
+      stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- Field Labels -->
+  <g fill="var(--text-primary)">
+    <!-- Initiator's SPI -->
+    <text x="400" y="136" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold">Initiator's SPI (64 bits)</text>
+    <text x="400" y="136" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold">دليل معلمات الأمان للمبادر (64 بت)</text>
+
+    <!-- Responder's SPI -->
+    <text x="400" y="196" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold">Responder's SPI (64 bits)</text>
+    <text x="400" y="196" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold">دليل معلمات الأمان للمستجيب (64 بت)</text>
+
+    <!-- Next Payload -->
+    <text x="160" y="251" text-anchor="middle" class="gsvg-en" font-size="15">Next Payload</text>
+    <text x="160" y="251" text-anchor="middle" class="gsvg-ar" font-size="15">الحمولة التالية</text>
+
+    <!-- MjVer -->
+    <text x="280" y="251" text-anchor="middle" class="gsvg-en" font-size="14">MjVer</text>
+    <text x="280" y="251" text-anchor="middle" class="gsvg-ar" font-size="14">رئيسي</text>
+
+    <!-- MnVer -->
+    <text x="360" y="251" text-anchor="middle" class="gsvg-en" font-size="14">MnVer</text>
+    <text x="360" y="251" text-anchor="middle" class="gsvg-ar" font-size="14">فرعي</text>
+
+    <!-- Exchange Type -->
+    <text x="480" y="251" text-anchor="middle" class="gsvg-en" font-size="15">Exchange Type</text>
+    <text x="480" y="251" text-anchor="middle" class="gsvg-ar" font-size="15">نوع التبادل</text>
+
+    <!-- Flags -->
+    <text x="640" y="251" text-anchor="middle" class="gsvg-en" font-size="15">Flags</text>
+    <text x="640" y="251" text-anchor="middle" class="gsvg-ar" font-size="15">العلامات</text>
+
+    <!-- Message ID -->
+    <text x="400" y="301" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold">Message ID (32 bits)</text>
+    <text x="400" y="301" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold">معرف الرسالة (32 بت)</text>
+
+    <!-- Length -->
+    <text x="400" y="351" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold">Length (32 bits)</text>
+    <text x="400" y="351" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold">الطول (32 بت)</text>
+  </g>
+
+  <!-- Educational Legend / Description -->
+  <g>
+    <rect x="80" y="395" width="640" height="45" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" />
+    <text x="400" y="423" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">ISAKMP provides a framework for key management and SA negotiation.</text>
+    <text x="400" y="423" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">يوفر ISAKMP إطار عمل لإدارة المفاتيح والتفاوض على اقتران الأمان (SA).</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر بروتوكول Diffie-Hellman الأساسي غير آمن بمفرده، وكيف يحل Oakley هذه المشكلة؟</template>
+      <template class="content-en">Why is the basic Diffie-Hellman protocol insecure on its own, and how does Oakley solve this?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>DH الأساسي لا يوفر مصادقة للأطراف، مما يجعله عرضة لهجوم رجل في المنتصف (Man-in-the-Middle). يحل Oakley ذلك بإضافة آليات مصادقة (مثل التواقيع الرقمية) وأرقام عشوائية (Nonces) للتحقق من هوية الأطراف.</p></template>
+      <template class="content-en"><p>Basic DH provides no authentication of the parties, making it vulnerable to Man-in-the-Middle attacks. Oakley solves this by adding authentication mechanisms (like digital signatures) and nonces to verify the identities of the communicating parties.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cryptographic-suites" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> أطقم التشفير (Cryptographic Suites)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Cryptographic Suites</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مجموعات موحدة من خوارزميات التشفير المحددة في وثائق RFC لضمان التوافقية بين أجهزة VPN المختلفة.</p></template>
+    <template class="content-en"><p>Standardized sets of cryptographic algorithms defined in RFCs to promote interoperability between different VPN devices.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتعزيز التوافقية (Interoperability) بين الأجهزة المختلفة، تم تعريف أطقم تشفير قياسية للشبكات الافتراضية الخاصة (VPN):</p><ul><li><b>RFC4308:</b> يحدد أطقم تشفير VPN.<ul><li><b>VPN-A:</b> يطابق أمان VPN للشركات الشائعة باستخدام 3DES و HMAC.</li><li><b>VPN-B:</b> يوفر أماناً أقوى لشبكات VPN الجديدة التي تنفذ IPsecv3 و IKEv2 باستخدام AES.</li></ul></li><li><b>RFC4869:</b> يحدد أربعة أطقم تشفير متوافقة مع مواصفات وكالة الأمن القومي الأمريكية (US NSA). توفر خيارات لـ ESP و IKE مثل AES-GCM، AES-CBC، HMAC-SHA، ECP، و ECDSA.</li></ul></template>
+    <template class="content-en"><p>To promote interoperability, standard VPN cryptographic suites have been defined:</p><ul><li><b>RFC4308:</b> Defines VPN cryptographic suites.<ul><li><b>VPN-A:</b> Matches common corporate VPN security using 3DES & HMAC.</li><li><b><span class="smart-term" data-term-en="VPN-B" data-ar="طقم تشفير VPN-B" data-en-def="A cryptographic suite for IPsec that mandates the use of AES for stronger security compared to older 3DES standards.">VPN-B<span class="smart-term-tooltip"></span></span>:</b> Has stronger security for new VPNs implementing IPsecv3 and IKEv2 using AES.</li></ul></li><li><b>RFC4869:</b> Defines four cryptographic suites compatible with US NSA specs. They provide choices for ESP & IKE such as AES-GCM, AES-CBC, HMAC-SHA, ECP, and ECDSA.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الانتقال من VPN-A إلى VPN-B يعكس التطور في علم التشفير؛ حيث تم إيقاف استخدام 3DES بسبب بطئه وضعفه النسبي أمام الهجمات الحديثة، وتم استبداله بـ AES الذي يوفر أماناً وكفاءة أعلى بكثير.</p><p>إدراج خوارزميات مثل ECDSA (التوقيع الرقمي بالمنحنيات الإهليلجية) في RFC4869 يوضح التحول نحو تشفير المنحنيات الإهليلجية (ECC) الذي يوفر أماناً قوياً بمفاتيح أقصر بكثير مقارنة بـ RSA، مما يقلل من العبء الحسابي وحجم الحزم.</p></template>
+    <template class="content-en"><p>The transition from VPN-A to VPN-B reflects the evolution of cryptography; 3DES has been deprecated due to its slow performance and relative vulnerability to modern attacks, replaced by AES which offers much higher security and efficiency.</p><p>The inclusion of algorithms like ECDSA (Elliptic Curve Digital Signature Algorithm) in RFC4869 highlights the shift towards Elliptic Curve Cryptography (ECC), which provides strong security with much shorter keys compared to RSA, reducing computational overhead and packet size.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر التوافقية (Interoperability) سبباً رئيسياً لتعريف أطقم التشفير (Suites) بدلاً من السماح باختيار الخوارزميات بشكل فردي؟</template>
+      <template class="content-en">Why is interoperability a primary reason for defining cryptographic suites rather than allowing individual algorithm selection?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن السماح باختيار كل خوارزمية على حدة قد يؤدي إلى عدم وجود خوارزميات مشتركة بين جهازين من بائعين مختلفين. الأطقم تضمن وجود حد أدنى من المعايير المشتركة التي يجب أن يدعمها الجميع للاتصال بنجاح.</p></template>
+      <template class="content-en"><p>Because allowing individual selection might result in two devices from different vendors having no algorithms in common. Suites ensure a baseline of common standards that all compliant devices must support to communicate successfully.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الأسبوع الحادي عشر. موضوعنا اليوم، IPsec، هو حجر الزاوية في أمن الشبكات الحديثة ومضمون ظهوره في الامتحان. أريدكم أن تركزوا بشدة على التمييز بين وضع النقل (Transport Mode) ووضع النفق (Tunnel Mode)؛ تذكروا دائماً أن النفق يضيف ترويسة IP جديدة ويخفي العناوين الأصلية. المفهوم الثاني الحاسم هو الارتباط الأمني (SA) - لا تنسوا أبداً أنه أحادي الاتجاه ويُعرّف بثلاثة معلمات رئيسية (SPI، الوجهة، والبروتوكول). أخيراً، افهموا لماذا نستخدم الحشو (Padding) في ESP ولماذا يتم حساب ICV بعد التشفير. هذه التفاصيل الدقيقة هي ما يميز المهندس الفاهم عن غيره، وهي بالضبط ما سأختبركم فيه.</template>
+    <template class="content-en">Welcome to Module 9. Today's topic, IPsec, is the cornerstone of modern network security and guaranteed to be on the exam. I want you to focus heavily on distinguishing between Transport Mode and Tunnel Mode; always remember that Tunnel mode adds a new IP header and hides the original addresses. The second critical concept is the Security Association (SA) - never forget that it is strictly one-way and defined by three main parameters (SPI, Destination, and Protocol). Finally, understand why we use padding in ESP and why the ICV is computed after encryption. These subtle details separate a true engineer from the rest, and they are exactly what I will test you on.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى IPsec إذا كان لدينا بروتوكولات مثل SSL/HTTPS؟</template>
+          <template class="content-en">Why do we need IPsec if we have protocols like SSL/HTTPS?</template>
+          <span class="content-target">لماذا نحتاج إلى IPsec إذا كان لدينا بروتوكولات مثل SSL/HTTPS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بروتوكولات SSL/HTTPS تعمل في طبقة التطبيق وتحمي تطبيقات محددة فقط (مثل متصفح الويب). IPsec يعمل في طبقة الشبكة، مما يعني أنه يحمي جميع حركات المرور بين جهازين بغض النظر عن التطبيق المستخدم، ويكون شفافاً تماماً للمستخدمين.</template>
+          <template class="content-en">SSL/HTTPS operate at the application layer and protect only specific applications (like a web browser). IPsec operates at the network layer, meaning it protects all traffic between two devices regardless of the application used, and is completely transparent to users.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين وضع النقل ووضع النفق؟</template>
+          <template class="content-en">What is the primary difference between Transport and Tunnel mode?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين وضع النقل ووضع النفق؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">وضع النقل يشفّر الحمولة فقط ويحتفظ بترويسة IP الأصلية، مما يجعله عرضة لتحليل حركة المرور. وضع النفق يشفّر الحزمة بأكملها ويضيف ترويسة IP جديدة، مما يخفي العناوين الأصلية ويوفر أماناً أعلى لشبكات VPN.</template>
+          <template class="content-en">Transport mode encrypts only the payload and keeps the original IP header, leaving it vulnerable to traffic analysis. Tunnel mode encrypts the entire packet and adds a new IP header, hiding original addresses and providing higher security for VPNs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل الارتباط الأمني (SA) ثنائي الاتجاه؟</template>
+          <template class="content-en">Is a Security Association (SA) bidirectional?</template>
+          <span class="content-target">هل الارتباط الأمني (SA) ثنائي الاتجاه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، الارتباط الأمني أحادي الاتجاه (One-way). لتأمين اتصال ذهاباً وإياباً، يجب إنشاء ارتباطين أمنيين على الأقل.</template>
+          <template class="content-en">No, a Security Association is strictly one-way. To secure a two-way communication, at least two SAs must be established.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المعلمات التي تحدد الارتباط الأمني (SA) بشكل فريد؟</template>
+          <template class="content-en">What parameters uniquely identify a Security Association (SA)?</template>
+          <span class="content-target">ما هي المعلمات التي تحدد الارتباط الأمني (SA) بشكل فريد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم تحديده بواسطة ثلاثة معلمات: مؤشر معلمات الأمان (SPI)، عنوان IP للوجهة، ومعرف بروتوكول الأمان (AH أو ESP).</template>
+          <template class="content-en">It is identified by three parameters: Security Parameters Index (SPI), IP destination address, and Security protocol identifier (AH or ESP).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور قاعدة بيانات سياسة الأمان (SPD)؟</template>
+          <template class="content-en">What is the role of the Security Policy Database (SPD)?</template>
+          <span class="content-target">ما هو دور قاعدة بيانات سياسة الأمان (SPD)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعمل كعقل لـ IPsec؛ حيث تفحص حركة المرور الصادرة وتستخدم محددات (مثل عناوين IP والمنافذ) لتقرر ما إذا كان يجب تجاوز الحزمة، تجاهلها، أو حمايتها باستخدام ارتباط أمني معين.</template>
+          <template class="content-en">It acts as the brain of IPsec; it inspects outbound traffic and uses selectors (like IPs and ports) to decide whether the packet should bypass IPsec, be discarded, or be protected using a specific SA.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يستخدم بروتوكول ESP الحشو (Padding)؟</template>
+          <template class="content-en">Why does the ESP protocol use Padding?</template>
+          <span class="content-target">لماذا يستخدم بروتوكول ESP الحشو (Padding)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لثلاثة أسباب: توسيع النص العادي ليتناسب مع متطلبات خوارزمية التشفير، محاذاة حقول الترويسة، وتوفير سرية جزئية لتدفق حركة المرور عن طريق إخفاء حجم الرسالة الحقيقي.</template>
+          <template class="content-en">For three reasons: to expand plaintext to fit encryption algorithm requirements, to align header fields, and to provide partial traffic flow confidentiality by hiding the true message size.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمنع IPsec هجمات إعادة الإرسال (Replay Attacks)؟</template>
+          <template class="content-en">How does IPsec prevent Replay Attacks?</template>
+          <span class="content-target">كيف يمنع IPsec هجمات إعادة الإرسال (Replay Attacks)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام أرقام تسلسلية متزايدة لكل حزمة. يحتفظ المستقبل بنافذة منزلقة (Sliding Window) ويرفض أي حزمة تحمل رقم تسلسل قديم تم استلامه مسبقاً أو يقع خارج النافذة.</template>
+          <template class="content-en">By using incrementing sequence numbers for each packet. The receiver maintains a sliding window and rejects any packet with an old sequence number that has already been received or falls outside the window.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين التجاور في النقل والأنفاق المتكررة عند دمج الارتباطات الأمنية؟</template>
+          <template class="content-en">What is the difference between Transport Adjacency and Iterated Tunneling when combining SAs?</template>
+          <span class="content-target">ما الفرق بين التجاور في النقل والأنفاق المتكررة عند دمج الارتباطات الأمنية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التجاور في النقل يطبق بروتوكولات متعددة (مثل AH و ESP) على نفس الحزمة دون إضافة ترويسات IP جديدة. الأنفاق المتكررة تغلف الحزمة بالكامل داخل حزمة IP جديدة لكل طبقة أمان.</template>
+          <template class="content-en">Transport Adjacency applies multiple protocols (like AH and ESP) to the same packet without adding new IP headers. Iterated Tunneling encapsulates the entire packet within a new IP packet for each security layer.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعالج بروتوكول Oakley نقاط ضعف Diffie-Hellman؟</template>
+          <template class="content-en">How does the Oakley protocol address Diffie-Hellman weaknesses?</template>
+          <span class="content-target">كيف يعالج بروتوكول Oakley نقاط ضعف Diffie-Hellman؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يضيف Oakley آليات مصادقة لمنع هجمات رجل في المنتصف، ويستخدم ملفات تعريف الارتباط (Cookies) والأرقام العشوائية (Nonces) للتحقق من هوية الأطراف قبل تخصيص موارد حسابية.</template>
+          <template class="content-en">Oakley adds authentication mechanisms to prevent man-in-the-middle attacks, and uses cookies and nonces to verify the identity of parties before committing computational resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تم الانتقال من طقم التشفير VPN-A إلى VPN-B؟</template>
+          <template class="content-en">Why was there a transition from the VPN-A to VPN-B cryptographic suite?</template>
+          <span class="content-target">لماذا تم الانتقال من طقم التشفير VPN-A إلى VPN-B؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن VPN-A يعتمد على خوارزمية 3DES القديمة والبطيئة، بينما VPN-B يفرض استخدام خوارزمية AES التي توفر أماناً أقوى بكثير وأداءً أفضل للشبكات الحديثة.</template>
+          <template class="content-en">Because VPN-A relies on the older and slower 3DES algorithm, whereas VPN-B mandates the use of AES, which provides much stronger security and better performance for modern networks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض الرئيسي من IPsec؟",
+      "en": "What is the main purpose of IPsec?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ضمان سلامة وسرية ومصادقة اتصالات البيانات عبر شبكة IP.",
+        "en": "To ensure the integrity, confidentiality, and authentication of data communications over an IP network."
+      },
+      "example": {
+        "ar": "تأمين حركة المرور بين فرعين لشركة عبر الإنترنت.",
+        "en": "Securing traffic between two company branches over the Internet."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي ميزة وضع IPsec في طبقة الشبكة (Network Layer)؟",
+      "en": "What is the advantage of placing IPsec at the Network Layer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يكون شفافاً للتطبيقات والمستخدمين النهائيين، ويوفر الأمان لجميع حركات المرور دون تعديل التطبيقات.",
+        "en": "It is transparent to applications and end-users, providing security for all traffic without modifying applications."
+      },
+      "example": {
+        "ar": "لا يحتاج متصفح الويب أو تطبيق البريد الإلكتروني إلى أي تعديل للعمل عبر نفق IPsec.",
+        "en": "A web browser or email client needs no modification to work over an IPsec tunnel."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو وضع النقل (Transport Mode)؟",
+      "en": "What is Transport Mode?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع يشفّر بيانات الحمولة فقط ويترك ترويسة IP الأصلية مرئية.",
+        "en": "A mode that encrypts only the payload data and leaves the original IP header visible."
+      },
+      "example": {
+        "ar": "اتصال آمن مباشر بين جهازي كمبيوتر (Host-to-Host).",
+        "en": "A direct secure connection between two computers (Host-to-Host)."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو وضع النفق (Tunnel Mode)؟",
+      "en": "What is Tunnel Mode?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع يشفّر حزمة IP بأكملها ويضيف ترويسة IP جديدة للتوجيه.",
+        "en": "A mode that encrypts the entire IP packet and adds a new IP header for routing."
+      },
+      "example": {
+        "ar": "اتصال VPN بين جداري حماية لشركتين مختلفتين.",
+        "en": "A VPN connection between two firewalls of different companies."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الارتباط الأمني (SA)؟",
+      "en": "What is a Security Association (SA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "علاقة منطقية أحادية الاتجاه بين مرسل ومستقبل توفر الأمان لتدفق حركة المرور.",
+        "en": "A one-way logical relationship between a sender and receiver that affords security for traffic flow."
+      },
+      "example": {
+        "ar": "يحتاج الاتصال ثنائي الاتجاه إلى ارتباطين أمنيين (SAs) على الأقل.",
+        "en": "A bidirectional connection requires at least two SAs."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي المعلمات الثلاثة التي تُعرّف الارتباط الأمني (SA)؟",
+      "en": "What are the 3 parameters that define a Security Association (SA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مؤشر معلمات الأمان (SPI)، عنوان IP للوجهة، ومعرف بروتوكول الأمان.",
+        "en": "Security Parameters Index (SPI), IP destination address, and Security protocol identifier."
+      },
+      "example": {
+        "ar": "SPI: 12345, Dest: 192.168.1.1, Protocol: ESP.",
+        "en": "SPI: 12345, Dest: 192.168.1.1, Protocol: ESP."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي قاعدة بيانات سياسة الأمان (SPD)؟",
+      "en": "What is the Security Policy Database (SPD)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاعدة بيانات تستخدم محددات لربط حركة مرور IP بارتباطات أمنية محددة وتحديد الإجراء (تجاوز، تجاهل، حماية).",
+        "en": "A database that uses selectors to relate IP traffic to specific SAs and determine the action (bypass, discard, protect)."
+      },
+      "example": {
+        "ar": "قاعدة تنص على حماية (PROTECT) جميع حركات المرور المتجهة إلى المنفذ 443.",
+        "en": "A rule stating to PROTECT all traffic heading to port 443."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي الخدمات التي يوفرها بروتوكول ESP؟",
+      "en": "What services does the ESP protocol provide?"
+    },
+    "back": {
+      "definition": {
+        "ar": "السرية (التشفير)، مصادقة مصدر البيانات، سلامة البيانات، ومنع إعادة الإرسال.",
+        "en": "Confidentiality (encryption), data origin authentication, data integrity, and anti-replay."
+      },
+      "example": {
+        "ar": "تشفير محتوى البريد الإلكتروني أثناء عبوره الإنترنت.",
+        "en": "Encrypting the content of an email as it crosses the Internet."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "لماذا يستخدم ESP الحشو (Padding)؟",
+      "en": "Why does ESP use padding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لتوسيع النص العادي للطول المطلوب، محاذاة الحقول، وتوفير سرية جزئية لتدفق حركة المرور.",
+        "en": "To expand plaintext to required length, align fields, and provide partial traffic flow confidentiality."
+      },
+      "example": {
+        "ar": "إضافة بايتات عشوائية لجعل طول الرسالة مضاعفاً لـ 16 بايت لخوارزمية AES.",
+        "en": "Adding random bytes to make the message length a multiple of 16 bytes for AES."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف تعمل خدمة منع إعادة الإرسال (Anti-Replay) في IPsec؟",
+      "en": "How does the Anti-Replay service work in IPsec?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم أرقاماً تسلسلية متزايدة لكل حزمة ونافذة منزلقة لدى المستقبل لرفض الحزم القديمة المكررة.",
+        "en": "It uses incrementing sequence numbers for each packet and a sliding window at the receiver to reject old, duplicated packets."
+      },
+      "example": {
+        "ar": "إذا استلم المستقبل حزمة برقم تسلسل تم استلامه مسبقاً، يتم إسقاطها.",
+        "en": "If the receiver gets a packet with a sequence number it already processed, it drops it."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو دمج الارتباطات الأمنية (Combining SAs)؟",
+      "en": "What is combining Security Associations?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق ارتباطات أمنية متعددة (مثل AH و ESP معاً) لتشكيل حزمة ارتباط أمني.",
+        "en": "Applying multiple SAs (like AH and ESP together) to form a security association bundle."
+      },
+      "example": {
+        "ar": "استخدام ESP للتشفير الداخلي و AH للمصادقة الخارجية.",
+        "en": "Using ESP for inner encryption and AH for outer authentication."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما الفرق بين التجاور في النقل والأنفاق المتكررة؟",
+      "en": "What is the difference between Transport Adjacency and Iterated Tunneling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التجاور يطبق بروتوكولات متعددة على نفس الحزمة، بينما الأنفاق المتكررة تغلف الحزمة داخل حزم IP جديدة متعددة.",
+        "en": "Adjacency applies multiple protocols to the same packet, while iterated tunneling encapsulates the packet inside multiple new IP packets."
+      },
+      "example": {
+        "ar": "نفق داخل نفق (Iterated Tunneling).",
+        "en": "A tunnel inside a tunnel (Iterated Tunneling)."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو بروتوكول Oakley؟",
+      "en": "What is the Oakley protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول لتبادل المفاتيح يعتمد على Diffie-Hellman ويضيف ميزات المصادقة لمنع هجمات رجل في المنتصف.",
+        "en": "A key exchange protocol based on Diffie-Hellman that adds authentication features to prevent man-in-the-middle attacks."
+      },
+      "example": {
+        "ar": "يستخدم ملفات تعريف الارتباط (Cookies) والأرقام العشوائية (Nonces) للتحقق من الأطراف.",
+        "en": "It uses cookies and nonces to verify parties."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو دور ISAKMP؟",
+      "en": "What is the role of ISAKMP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يوفر إطار عمل لإدارة المفاتيح ويحدد تنسيقات الحزم لإنشاء وتعديل الارتباطات الأمنية.",
+        "en": "It provides a framework for key management and defines packet formats to establish and modify SAs."
+      },
+      "example": {
+        "ar": "يحدد هيكل الحزمة الذي يحمل بيانات تبادل المفاتيح.",
+        "en": "It defines the packet structure that carries the key exchange data."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما الفرق بين طقم التشفير VPN-A و VPN-B؟",
+      "en": "What is the difference between VPN-A and VPN-B cryptographic suites?"
+    },
+    "back": {
+      "definition": {
+        "ar": "VPN-A يستخدم 3DES و HMAC (أقدم)، بينما VPN-B يستخدم AES لتوفير أمان أقوى للشبكات الحديثة.",
+        "en": "VPN-A uses 3DES & HMAC (older), while VPN-B uses AES for stronger security in modern VPNs."
+      },
+      "example": {
+        "ar": "الترقية إلى VPN-B مطلوبة للامتثال لمعايير الأمان الحديثة.",
+        "en": "Upgrading to VPN-B is required to comply with modern security standards."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي وضع من أوضاع IPsec يقوم بتشفير حزمة IP بأكملها ويضيف ترويسة IP جديدة؟",
+      "en": "Which IPsec mode encrypts the entire IP packet and adds a new IP header?"
+    },
+    "options": {
+      "ar": [
+        "وضع النقل (Transport Mode)",
+        "وضع النفق (Tunnel Mode)",
+        "وضع التجاور (Adjacency Mode)",
+        "وضع التغليف (Encapsulation Mode)"
+      ],
+      "en": [
+        "Transport Mode",
+        "Tunnel Mode",
+        "Adjacency Mode",
+        "Encapsulation Mode"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "وضع النفق يغلف الحزمة الأصلية بالكامل ويضيف ترويسة جديدة، مما يجعله مثالياً لشبكات VPN.",
+      "en": "Tunnel mode encapsulates the entire original packet and adds a new header, making it ideal for VPNs."
+    },
+    "hint": {
+      "ar": "فكر في كيفية إخفاء عناوين IP الداخلية عند الاتصال بين بوابتين.",
+      "en": "Think about how internal IP addresses are hidden when connecting two gateways."
+    },
+    "difficulty": "easy",
+    "conceptId": "transport-vs-tunnel-modes"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من المعلمات التالية لا يُستخدم لتعريف الارتباط الأمني (SA)؟",
+      "en": "Which of the following parameters is NOT used to define a Security Association (SA)?"
+    },
+    "options": {
+      "ar": [
+        "مؤشر معلمات الأمان (SPI)",
+        "عنوان IP للوجهة",
+        "عنوان IP للمصدر",
+        "معرف بروتوكول الأمان"
+      ],
+      "en": [
+        "Security Parameters Index (SPI)",
+        "IP destination address",
+        "IP source address",
+        "Security protocol identifier"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم تعريف SA بواسطة SPI، عنوان الوجهة، ومعرف البروتوكول. عنوان المصدر ليس جزءاً من التعريف الأساسي لـ SA.",
+      "en": "An SA is defined by the SPI, destination address, and protocol identifier. The source address is not part of the core definition."
+    },
+    "hint": {
+      "ar": "الارتباط الأمني هو علاقة أحادية الاتجاه تركز على المستلم.",
+      "en": "An SA is a one-way relationship focused on the receiver."
+    },
+    "difficulty": "medium",
+    "conceptId": "security-associations"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض من قاعدة بيانات سياسة الأمان (SPD)؟",
+      "en": "What is the purpose of the Security Policy Database (SPD)?"
+    },
+    "options": {
+      "ar": [
+        "تخزين المفاتيح التشفيرية",
+        "ربط حركة مرور IP بارتباطات أمنية محددة",
+        "حساب قيمة التحقق من السلامة (ICV)",
+        "منع هجمات إعادة الإرسال"
+      ],
+      "en": [
+        "Storing cryptographic keys",
+        "Relating IP traffic to specific SAs",
+        "Computing the Integrity Check Value (ICV)",
+        "Preventing replay attacks"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تستخدم SPD محددات لمطابقة حركة المرور الصادرة مع الارتباط الأمني (SA) المناسب وتحديد الإجراء المطلوب.",
+      "en": "The SPD uses selectors to match outbound traffic to the appropriate SA and determine the required action."
+    },
+    "hint": {
+      "ar": "إنها تعمل كعقل مفكر يقرر ما يجب فعله بكل حزمة.",
+      "en": "It acts as the brain deciding what to do with each packet."
+    },
+    "difficulty": "medium",
+    "conceptId": "security-policy-database"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "متى يتم حساب قيمة التحقق من السلامة (ICV) في بروتوكول ESP؟",
+      "en": "When is the Integrity Check Value (ICV) computed in the ESP protocol?"
+    },
+    "options": {
+      "ar": [
+        "قبل إجراء التشفير",
+        "بعد إجراء التشفير",
+        "في نفس وقت التشفير",
+        "فقط إذا تم استخدام وضع النفق"
+      ],
+      "en": [
+        "Before encryption is performed",
+        "After encryption is performed",
+        "Simultaneously with encryption",
+        "Only if tunnel mode is used"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في ESP، يتم حساب ICV بعد التشفير (Encrypt-then-MAC) لتعزيز الأمان والسماح بالتحقق قبل فك التشفير.",
+      "en": "In ESP, the ICV is computed after encryption (Encrypt-then-MAC) to enhance security and allow verification before decryption."
+    },
+    "hint": {
+      "ar": "فكر في النهج الأكثر أماناً: هل تتحقق من الرسالة المشفرة أم تفك تشفيرها أولاً؟",
+      "en": "Think about the most secure approach: verify the ciphertext or decrypt first?"
+    },
+    "difficulty": "hard",
+    "conceptId": "encapsulating-security-payload"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي القيمة الأولية لرقم التسلسل عند إنشاء ارتباط أمني (SA) جديد؟",
+      "en": "What is the initial value of the sequence number when a new SA is established?"
+    },
+    "options": {
+      "ar": [
+        "1",
+        "0",
+        "رقم عشوائي",
+        "255"
+      ],
+      "en": [
+        "1",
+        "0",
+        "A random number",
+        "255"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يقوم المرسل بتهيئة رقم التسلسل إلى 0 عند إنشاء SA جديد، ويتم زيادته لكل حزمة.",
+      "en": "The sender initializes the sequence number to 0 when a new SA is established, incrementing it for each packet."
+    },
+    "hint": {
+      "ar": "يبدأ العد من البداية المطلقة.",
+      "en": "Counting starts from the absolute beginning."
+    },
+    "difficulty": "easy",
+    "conceptId": "anti-replay-service"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي بروتوكول يضيف ميزات لمعالجة نقاط ضعف تبادل مفاتيح Diffie-Hellman مثل هجوم رجل في المنتصف؟",
+      "en": "Which protocol adds features to address Diffie-Hellman key exchange weaknesses like man-in-the-middle attacks?"
+    },
+    "options": {
+      "ar": [
+        "ESP",
+        "AH",
+        "Oakley",
+        "ISAKMP"
+      ],
+      "en": [
+        "ESP",
+        "AH",
+        "Oakley",
+        "ISAKMP"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بروتوكول Oakley يعتمد على DH ويضيف ملفات تعريف الارتباط والأرقام العشوائية لمصادقة الأطراف.",
+      "en": "The Oakley protocol is based on DH and adds cookies and nonces to authenticate parties."
+    },
+    "hint": {
+      "ar": "إنه أحد عنصري إدارة المفاتيح الآلية، ويركز تحديداً على تبادل المفاتيح.",
+      "en": "It is one of the two automated key management elements, specifically focused on key exchange."
+    },
+    "difficulty": "medium",
+    "conceptId": "ipsec-key-management"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كم عدد المفاتيح المطلوبة عادةً لاتصال IPsec ثنائي الاتجاه يستخدم كلاً من AH و ESP؟",
+      "en": "How many keys are typically needed for a bidirectional IPsec communication using both AH and ESP?"
+    },
+    "options": {
+      "ar": [
+        "مفتاح واحد",
+        "مفتاحان (زوج واحد)",
+        "4 مفاتيح (زوجان)",
+        "8 مفاتيح"
+      ],
+      "en": [
+        "1 key",
+        "2 keys (1 pair)",
+        "4 keys (2 pairs)",
+        "8 keys"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتطلب الاتصال النموذجي زوجين من المفاتيح: مفتاحان لكل اتجاه (واحد لـ AH وواحد لـ ESP).",
+      "en": "Typical communication requires 2 pairs of keys: 2 per direction for AH & ESP."
+    },
+    "hint": {
+      "ar": "احسب: اتجاهان × بروتوكولان (AH و ESP).",
+      "en": "Calculate: 2 directions × 2 protocols (AH and ESP)."
+    },
+    "difficulty": "hard",
+    "conceptId": "ipsec-key-management"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي طقم تشفير (Cryptographic Suite) يستخدم خوارزمية AES لتوفير أمان أقوى لشبكات VPN الجديدة؟",
+      "en": "Which cryptographic suite uses the AES algorithm to provide stronger security for new VPNs?"
+    },
+    "options": {
+      "ar": [
+        "VPN-A",
+        "VPN-B",
+        "VPN-C",
+        "VPN-Legacy"
+      ],
+      "en": [
+        "VPN-A",
+        "VPN-B",
+        "VPN-C",
+        "VPN-Legacy"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يحدد RFC4308 طقم VPN-B الذي يستخدم AES للأمان القوي، بينما يستخدم VPN-A خوارزمية 3DES الأقدم.",
+      "en": "RFC4308 defines VPN-B which uses AES for stronger security, whereas VPN-A uses the older 3DES."
+    },
+    "hint": {
+      "ar": "الحرف الثاني في الأبجدية يمثل المعيار الأحدث هنا.",
+      "en": "The second letter in the alphabet represents the newer standard here."
+    },
+    "difficulty": "easy",
+    "conceptId": "cryptographic-suites"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الطريقة التي يتم بها دمج الارتباطات الأمنية بتطبيق بروتوكولات متعددة من خلال إنشاء أنفاق داخل أنفاق؟",
+      "en": "What is the method of combining SAs by applying multiple protocols through nested tunnels called?"
+    },
+    "options": {
+      "ar": [
+        "التجاور في النقل (Transport Adjacency)",
+        "الأنفاق المتكررة (Iterated Tunneling)",
+        "تعدد الإرسال (Multiplexing)",
+        "تغليف الحمولة (Payload Encapsulation)"
+      ],
+      "en": [
+        "Transport Adjacency",
+        "Iterated Tunneling",
+        "Multiplexing",
+        "Payload Encapsulation"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الأنفاق المتكررة (Iterated Tunneling) تعني تغليف الحزمة بالكامل داخل حزمة IP جديدة لكل طبقة أمان إضافية.",
+      "en": "Iterated Tunneling means encapsulating the entire packet within a new IP packet for each additional security layer."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة تعني 'نفق'.",
+      "en": "The name contains a word meaning 'tunnel'."
+    },
+    "difficulty": "medium",
+    "conceptId": "combining-security-associations"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي مما يلي ليس من أسباب استخدام الحشو (Padding) في بروتوكول ESP؟",
+      "en": "Which of the following is NOT a reason for using padding in the ESP protocol?"
+    },
+    "options": {
+      "ar": [
+        "توسيع النص العادي للطول المطلوب",
+        "محاذاة حقول طول الحشو والترويسة التالية",
+        "توفير سرية جزئية لتدفق حركة المرور",
+        "تقليل حجم الحزمة لتسريع النقل"
+      ],
+      "en": [
+        "To expand plaintext to required length",
+        "To align pad length and next header fields",
+        "To provide partial traffic flow confidentiality",
+        "To reduce packet size for faster transmission"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الحشو يزيد من حجم الحزمة ولا يقللها. الأسباب الصحيحة هي التوسيع، المحاذاة، وسرية تدفق حركة المرور.",
+      "en": "Padding increases packet size, it does not reduce it. Valid reasons are expansion, alignment, and traffic flow confidentiality."
+    },
+    "hint": {
+      "ar": "إضافة بيانات إضافية (حشو) لا يمكن أن يقلل الحجم.",
+      "en": "Adding extra data (padding) cannot reduce the size."
+    },
+    "difficulty": "medium",
+    "conceptId": "encapsulating-security-payload"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الارتباط الأمني (SA) ثنائي الاتجاه. الحقيقة: SA هو علاقة أحادية الاتجاه (One-way). للاتصال الكامل، تحتاج إلى ارتباطين على الأقل.</template>
+    <template class="content-en">Thinking a Security Association (SA) is bidirectional. Fact: An SA is strictly one-way. For full communication, you need at least two SAs.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في بروتوكول ESP، يتم حساب قيمة التحقق من السلامة (ICV) بعد إجراء التشفير (Encrypt-then-MAC). هذا يمنع المهاجمين من استغلال عملية فك التشفير قبل التحقق من صحة الحزمة.</template>
+    <template class="content-en">In ESP, the Integrity Check Value (ICV) is computed AFTER encryption (Encrypt-then-MAC). This prevents attackers from exploiting the decryption process before the packet is authenticated.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين وضع النقل والنفق: وضع النفق يضيف ترويسة IP جديدة تماماً، مما يخفي عناوين IP الأصلية للمرسل والمستقبل، وهو أمر حيوي لشبكات VPN.</template>
+    <template class="content-en">The core difference between Transport and Tunnel mode: Tunnel mode adds a completely NEW IP header, hiding the original source and destination IPs, which is vital for VPNs.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين Oakley و ISAKMP. تذكر: Oakley هو لتبادل المفاتيح (يحل مشاكل Diffie-Hellman)، بينما ISAKMP هو إطار العمل (Framework) الذي يحدد شكل الحزم والإجراءات.</template>
+    <template class="content-en">Confusing Oakley with ISAKMP. Remember: Oakley is for key exchange (fixes Diffie-Hellman issues), while ISAKMP is the framework that defines packet formats and procedures.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

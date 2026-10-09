@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="10" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>مقدمة إلى الشبكات العصبية الاصطناعية باستخدام كيراس · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M09.html" data-gh-next="M11.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#intro-to-keras" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة إلى كيراس (Keras)</template>
+        <template class="content-en">Introduction to Keras</template>
+        <span class="content-target">مقدمة إلى كيراس (Keras)</span>
+      </a>
+      <a href="#sequential-api-classifier" class="toc-link" data-bilingual>
+        <template class="content-ar">بناء مصنف صور باستخدام Sequential API</template>
+        <template class="content-en">Building an Image Classifier Using the Sequential API</template>
+        <span class="content-target">بناء مصنف صور باستخدام Sequential API</span>
+      </a>
+      <a href="#regression-mlp" class="toc-link" data-bilingual>
+        <template class="content-ar">بناء نموذج انحدار (Regression MLP)</template>
+        <template class="content-en">Building a Regression MLP Using Keras</template>
+        <span class="content-target">بناء نموذج انحدار (Regression MLP)</span>
+      </a>
+      <a href="#functional-api" class="toc-link" data-bilingual>
+        <template class="content-ar">بناء نماذج معقدة باستخدام Functional API</template>
+        <template class="content-en">Building Complex Models with the Functional API</template>
+        <span class="content-target">بناء نماذج معقدة باستخدام Functional API</span>
+      </a>
+      <a href="#saving-restoring-models" class="toc-link" data-bilingual>
+        <template class="content-ar">حفظ واستعادة النماذج</template>
+        <template class="content-en">Saving and Restoring a Keras Model</template>
+        <span class="content-target">حفظ واستعادة النماذج</span>
+      </a>
+      <a href="#callbacks-early-stopping" class="toc-link" data-bilingual>
+        <template class="content-ar">الاستدعاءات (Callbacks) والتوقف المبكر</template>
+        <template class="content-en">Callbacks and Early Stopping</template>
+        <span class="content-target">الاستدعاءات (Callbacks) والتوقف المبكر</span>
+      </a>
+      <a href="#tensorboard-visualization" class="toc-link" data-bilingual>
+        <template class="content-ar">التصور باستخدام TensorBoard</template>
+        <template class="content-en">Visualization using TensorBoard</template>
+        <span class="content-target">التصور باستخدام TensorBoard</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 10</template>
+      <template class="content-en">Module 10</template>
+      <span class="content-target">الوحدة 10</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">مقدمة إلى الشبكات العصبية الاصطناعية باستخدام كيراس</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية بناء وتدريب الشبكات العصبية البسيطة والمعقدة باستخدام واجهة برمجة تطبيقات Keras، بما في ذلك التصنيف والانحدار، واستخدام الاستدعاءات (Callbacks)، والتصور باستخدام TensorBoard.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Introduction to Artificial Neural Networks with Keras</h1>
+      <p class="hero-description">This module covers building and training simple and complex neural networks using the Keras API, including classification and regression tasks, utilizing Callbacks, and visualization with TensorBoard.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم الآلي</span>
+      <span class="tag">الشبكات العصبية</span>
+      <span class="tag">كيراس</span>
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">التصنيف</span>
+      <span class="tag">الانحدار</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Neural Networks</span>
+      <span class="tag">Keras</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Classification</span>
+      <span class="tag">Regression</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>بناء وتدريب شبكة عصبية بسيطة باستخدام Keras لتصنيف الصور أو الانحدار.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام استدعاءات Keras (Callbacks) لمراقبة عملية التدريب والتحكم فيها.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام TensorBoard لتصور عملية التدريب وبنية النموذج.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Build and train a simple neural network using Keras for image classification or regression.</span></li>
+      <li><span class="obj-icon">✦</span><span>Use Keras callbacks to monitor and control the training process.</span></li>
+      <li><span class="obj-icon">✦</span><span>Utilize TensorBoard to visualize the training process and model architecture.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="intro-to-keras" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة إلى كيراس (Keras)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Keras</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كيراس هي واجهة برمجة تطبيقات (API) عالية المستوى للتعلم العميق، تُستخدم لبناء وتدريب الشبكات العصبية بسهولة ومرونة.</p></template>
+    <template class="content-en"><p>Keras is a high-level Deep Learning API used for building and training neural networks with ease and flexibility.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تطوير Keras بواسطة François Chollet وتم إصدارها في عام 2015 كمشروع مفتوح المصدر. تتميز بسهولة الاستخدام، المرونة، والتصميم الجميل.</p><p>تعتمد Keras على مكتبات خلفية (Backend) مثل TensorFlow و CNTK و Theano لإجراء الحسابات الثقيلة. هناك نسختان رئيسيتان:</p><ul><li><code>keras-team</code>: التنفيذ العام لـ Keras.</li><li><code>tf.keras</code>: التنفيذ الخاص بـ TensorFlow والذي يحتوي على ميزات إضافية.</li></ul></template>
+    <template class="content-en"><p>Developed by François Chollet and released in 2015 as an open-source project, Keras features ease-of-use, flexibility, and beautiful design.</p><p>Keras uses backend libraries like TensorFlow, CNTK, and Theano for heavy computations. There are two main versions:</p><ul><li><code>keras-team</code>: The generic Keras implementation.</li><li><code>tf.keras</code>: The TensorFlow-specific implementation with extra features.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم واجهة عالية المستوى؟ لأنها تخفي تعقيدات الحسابات الرياضية وتفاضل المصفوفات، مما يسمح للمطورين بالتركيز على تصميم بنية الشبكة العصبية.</p><p>دمج Keras داخل TensorFlow (كـ tf.keras) جعلها المعيار الصناعي الافتراضي لبناء النماذج في بيئة TensorFlow، مما يوفر دعماً مدمجاً لتوزيع الحسابات على وحدات معالجة الرسومات (GPUs).</p></template>
+    <template class="content-en"><p>Why use a high-level <span class="smart-term" data-term-en="API" data-ar="واجهة برمجة التطبيقات" data-en-def="Application Programming Interface, a set of functions and procedures allowing the creation of applications.">API<span class="smart-term-tooltip"></span></span>? It abstracts away the complexities of mathematical computations and matrix differentiation, allowing developers to focus on designing the neural network architecture.</p><p>The integration of Keras into TensorFlow (as tf.keras) made it the default industry standard for building models in the TensorFlow ecosystem, providing built-in support for distributed computing on GPUs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import tensorflow as tf
+from tensorflow import keras
+print(tf.__version__)
+print(keras.__version__)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي الميزة الرئيسية لاستخدام tf.keras بدلاً من مكتبة Keras المستقلة؟</template>
+      <template class="content-en">What is the main advantage of using tf.keras over the standalone Keras library?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>توفر tf.keras تكاملاً أعمق مع ميزات TensorFlow المتقدمة مثل tf.data و TPU support.</p></template>
+      <template class="content-en"><p>tf.keras provides deeper integration with advanced TensorFlow features like tf.data and TPU support.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="sequential-api-classifier" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> بناء مصنف صور باستخدام Sequential API</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Building an Image Classifier Using the Sequential API</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تسمح واجهة Sequential API ببناء نماذج من خلال تكديس الطبقات (Layers) بشكل تسلسلي، طبقة تلو الأخرى.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Sequential API" data-ar="واجهة برمجة التطبيقات التسلسلية" data-en-def="A Keras API for creating models layer-by-layer in a linear stack.">Sequential API<span class="smart-term-tooltip"></span></span> allows building models by stacking layers sequentially, one after the other.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لبناء مصنف صور (مثل مجموعة بيانات Fashion MNIST)، نستخدم بنية MLP (Perceptron متعدد الطبقات):</p><ol><li><b>طبقة الإدخال (Flatten):</b> تقوم بتحويل الصورة ثنائية الأبعاد (28x28) إلى مصفوفة أحادية الأبعاد.</li><li><b>الطبقات المخفية (Dense):</b> طبقات متصلة بالكامل (Fully connected) تستخدم دالة التنشيط <code>relu</code>.</li><li><b>طبقة الإخراج (Dense):</b> تحتوي على 10 خلايا عصبية (للفئات العشر) وتستخدم دالة التنشيط <code>softmax</code> للحصول على الاحتمالات.</li></ol><p>قبل التدريب، يجب تجميع النموذج (Compile) باستخدام دالة التكلفة <code>sparse_categorical_crossentropy</code> (لأن التسميات عبارة عن أرقام صحيحة متفرقة) ومُحسّن مثل <code>sgd</code>.</p></template>
+    <template class="content-en"><p>To build an image classifier (e.g., for the Fashion MNIST dataset), we use an MLP (Multi-Layer Perceptron) architecture:</p><ol><li><b>Input Layer (Flatten):</b> Reshapes the 2D image (28x28) into a 1D array.</li><li><b>Hidden Layers (Dense):</b> Fully connected layers using the <code>relu</code> activation function.</li><li><b>Output Layer (Dense):</b> Contains 10 neurons (for the 10 classes) and uses the <code>softmax</code> activation function to output probabilities.</li></ol><p>Before training, the model must be compiled using the <code>sparse_categorical_crossentropy</code> loss function (because labels are sparse integers) and an optimizer like <code>sgd</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم <code>sparse_categorical_crossentropy</code> بدلاً من <code>categorical_crossentropy</code>؟ نستخدم الأولى عندما تكون التسميات (Labels) عبارة عن أرقام صحيحة (مثل 0، 1، 2). بينما نستخدم الثانية إذا كانت التسميات مشفرة بطريقة One-Hot Encoding (مثل [0, 0, 1, 0]).</p><p>تُستخدم دالة <code>softmax</code> في طبقة الإخراج لضمان أن مجموع مخرجات الخلايا العصبية العشر يساوي 1، مما يمثل توزيعاً احتمالياً للفئات.</p></template>
+    <template class="content-en"><p>Why use <code>sparse_categorical_crossentropy</code> instead of <code>categorical_crossentropy</code>? We use the former when labels are integers (e.g., 0, 1, 2). We use the latter if labels are one-hot encoded vectors (e.g., [0, 0, 1, 0]).</p><p>The <code>softmax</code> function is used in the output layer to ensure that the sum of the 10 output neurons equals 1, representing a valid probability distribution across classes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>model = keras.models.Sequential([
+ keras.layers.Flatten(input_shape=[28, 28]),
+ keras.layers.Dense(300, activation="relu"),
+ keras.layers.Dense(100, activation="relu"),
+ keras.layers.Dense(10, activation="softmax")
+])
+
+model.compile(
+ loss="sparse_categorical_crossentropy",
+ optimizer="sgd",
+ metrics=["accuracy"]
+)
+
+history = model.fit(X_train, y_train, epochs=30, validation_data=(X_valid, y_valid))</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A neural network architecture diagram. Left side: Input layer labeled 'Flatten (28x28 -> 784)'. Middle: Two hidden layers labeled 'Dense (300, relu)' and 'Dense (100, relu)'. Right side: Output layer labeled 'Dense (10, softmax)'. Arrows connecting all nodes from left to right indicating a fully connected feedforward network. Style: educational, dark background #0d1117, accent color #4CAF50, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Marker for network connections -->
+        <marker id="net-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" opacity="0.8"/>
+        </marker>
+        <!-- Marker for solid arrows -->
+        <marker id="solid-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Layer Bounding Boxes -->
+    <!-- Input Layer Box -->
+    <rect x="135" y="130" width="50" height="160" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="4 4"/>
+    <!-- Hidden Layer 1 Box -->
+    <rect x="285" y="110" width="50" height="200" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="4 4"/>
+    <!-- Hidden Layer 2 Box -->
+    <rect x="435" y="110" width="50" height="200" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="4 4"/>
+    <!-- Output Layer Box -->
+    <rect x="585" y="130" width="50" height="160" rx="25" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="4 4"/>
+
+    <!-- Network Connections (Lines) -->
+    <g stroke="var(--brand-400)" stroke-width="1.2" opacity="0.35" marker-end="url(#net-arrow)">
+        <!-- L1 to L2 -->
+        <line x1="172" y1="150" x2="298" y2="130"/>
+        <line x1="172" y1="150" x2="298" y2="170"/>
+        <line x1="172" y1="150" x2="298" y2="210"/>
+        <line x1="172" y1="150" x2="298" y2="290"/>
+        
+        <line x1="172" y1="190" x2="298" y2="130"/>
+        <line x1="172" y1="190" x2="298" y2="170"/>
+        <line x1="172" y1="190" x2="298" y2="210"/>
+        <line x1="172" y1="190" x2="298" y2="290"/>
+        
+        <line x1="172" y1="270" x2="298" y2="130"/>
+        <line x1="172" y1="270" x2="298" y2="170"/>
+        <line x1="172" y1="270" x2="298" y2="210"/>
+        <line x1="172" y1="270" x2="298" y2="290"/>
+
+        <!-- L2 to L3 -->
+        <line x1="322" y1="130" x2="448" y2="130"/>
+        <line x1="322" y1="130" x2="448" y2="170"/>
+        <line x1="322" y1="130" x2="448" y2="210"/>
+        <line x1="322" y1="130" x2="448" y2="290"/>
+
+        <line x1="322" y1="170" x2="448" y2="130"/>
+        <line x1="322" y1="170" x2="448" y2="170"/>
+        <line x1="322" y1="170" x2="448" y2="210"/>
+        <line x1="322" y1="170" x2="448" y2="290"/>
+
+        <line x1="322" y1="210" x2="448" y2="130"/>
+        <line x1="322" y1="210" x2="448" y2="170"/>
+        <line x1="322" y1="210" x2="448" y2="210"/>
+        <line x1="322" y1="210" x2="448" y2="290"/>
+
+        <line x1="322" y1="290" x2="448" y2="130"/>
+        <line x1="322" y1="290" x2="448" y2="170"/>
+        <line x1="322" y1="290" x2="448" y2="210"/>
+        <line x1="322" y1="290" x2="448" y2="290"/>
+
+        <!-- L3 to L4 -->
+        <line x1="472" y1="130" x2="598" y2="150"/>
+        <line x1="472" y1="130" x2="598" y2="190"/>
+        <line x1="472" y1="130" x2="598" y2="270"/>
+
+        <line x1="472" y1="170" x2="598" y2="150"/>
+        <line x1="472" y1="170" x2="598" y2="190"/>
+        <line x1="472" y1="170" x2="598" y2="270"/>
+
+        <line x1="472" y1="210" x2="598" y2="150"/>
+        <line x1="472" y1="210" x2="598" y2="190"/>
+        <line x1="472" y1="210" x2="598" y2="270"/>
+
+        <line x1="472" y1="290" x2="598" y2="150"/>
+        <line x1="472" y1="290" x2="598" y2="190"/>
+        <line x1="472" y1="290" x2="598" y2="270"/>
+    </g>
+
+    <!-- Nodes (Neurons) -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        <!-- Input Layer (L1) -->
+        <circle cx="160" cy="150" r="12"/>
+        <circle cx="160" cy="190" r="12"/>
+        <circle cx="160" cy="270" r="12"/>
+
+        <!-- Hidden Layer 1 (L2) -->
+        <circle cx="310" cy="130" r="12"/>
+        <circle cx="310" cy="170" r="12"/>
+        <circle cx="310" cy="210" r="12"/>
+        <circle cx="310" cy="290" r="12"/>
+
+        <!-- Hidden Layer 2 (L3) -->
+        <circle cx="460" cy="130" r="12"/>
+        <circle cx="460" cy="170" r="12"/>
+        <circle cx="460" cy="210" r="12"/>
+        <circle cx="460" cy="290" r="12"/>
+
+        <!-- Output Layer (L4) -->
+        <circle cx="610" cy="150" r="12"/>
+        <circle cx="610" cy="190" r="12"/>
+        <circle cx="610" cy="270" r="12"/>
+    </g>
+
+    <!-- Ellipses (Dots indicating many nodes) -->
+    <g fill="var(--brand-500)">
+        <!-- L1 Dots -->
+        <circle cx="160" cy="222" r="2.5"/>
+        <circle cx="160" cy="230" r="2.5"/>
+        <circle cx="160" cy="238" r="2.5"/>
+        <!-- L2 Dots -->
+        <circle cx="310" cy="242" r="2.5"/>
+        <circle cx="310" cy="250" r="2.5"/>
+        <circle cx="310" cy="258" r="2.5"/>
+        <!-- L3 Dots -->
+        <circle cx="460" cy="242" r="2.5"/>
+        <circle cx="460" cy="250" r="2.5"/>
+        <circle cx="460" cy="258" r="2.5"/>
+        <!-- L4 Dots -->
+        <circle cx="610" cy="222" r="2.5"/>
+        <circle cx="610" cy="230" r="2.5"/>
+        <circle cx="610" cy="238" r="2.5"/>
+    </g>
+
+    <!-- 2D Image Representation -->
+    <g stroke="var(--border-color)" stroke-width="1">
+        <rect x="27.5" y="187.5" width="15" height="15" fill="var(--bg-elevated)"/>
+        <rect x="42.5" y="187.5" width="15" height="15" fill="var(--brand-500)" opacity="0.8"/>
+        <rect x="57.5" y="187.5" width="15" height="15" fill="var(--bg-elevated)"/>
+        
+        <rect x="27.5" y="202.5" width="15" height="15" fill="var(--brand-500)" opacity="0.5"/>
+        <rect x="42.5" y="202.5" width="15" height="15" fill="var(--brand-500)"/>
+        <rect x="57.5" y="202.5" width="15" height="15" fill="var(--brand-500)" opacity="0.5"/>
+        
+        <rect x="27.5" y="217.5" width="15" height="15" fill="var(--bg-elevated)"/>
+        <rect x="42.5" y="217.5" width="15" height="15" fill="var(--brand-500)" opacity="0.8"/>
+        <rect x="57.5" y="217.5" width="15" height="15" fill="var(--bg-elevated)"/>
+    </g>
+    <text class="gsvg-en" x="50" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">28x28 Image</text>
+    <text class="gsvg-ar" x="50" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">صورة 28×28</text>
+
+    <!-- Flatten Arrow -->
+    <line x1="80" y1="210" x2="125" y2="210" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#solid-arrow)"/>
+    <text class="gsvg-en" x="102.5" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">Flatten</text>
+    <text class="gsvg-ar" x="102.5" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">تسطيح</text>
+
+    <!-- Output Arrows & Labels -->
+    <g stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#solid-arrow)">
+        <line x1="622" y1="150" x2="650" y2="150"/>
+        <line x1="622" y1="190" x2="650" y2="190"/>
+        <line x1="622" y1="270" x2="650" y2="270"/>
+    </g>
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">
+        <text class="gsvg-en" x="658" y="154" text-anchor="start">P(Class 0)</text>
+        <text class="gsvg-ar" x="658" y="154" text-anchor="start">احتمال (فئة 0)</text>
+        
+        <text class="gsvg-en" x="658" y="194" text-anchor="start">P(Class 1)</text>
+        <text class="gsvg-ar" x="658" y="194" text-anchor="start">احتمال (فئة 1)</text>
+        
+        <text class="gsvg-en" x="658" y="274" text-anchor="start">P(Class 9)</text>
+        <text class="gsvg-ar" x="658" y="274" text-anchor="start">احتمال (فئة 9)</text>
+    </g>
+    <g fill="var(--text-muted)">
+        <circle cx="665" cy="222" r="1.5"/>
+        <circle cx="665" cy="230" r="1.5"/>
+        <circle cx="665" cy="238" r="1.5"/>
+    </g>
+
+    <!-- Layer Titles & Subtitles -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle">
+        <!-- L1 -->
+        <text class="gsvg-en" x="160" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">Input Layer</text>
+        <text class="gsvg-ar" x="160" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">طبقة الإدخال</text>
+        <text class="gsvg-en" x="160" y="75" font-size="14" fill="var(--brand-ink)">Flatten (28x28 → 784)</text>
+        <text class="gsvg-ar" x="160" y="75" font-size="14" fill="var(--brand-ink)">Flatten (28x28 → 784)</text>
+
+        <!-- L2 -->
+        <text class="gsvg-en" x="310" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">Hidden Layer 1</text>
+        <text class="gsvg-ar" x="310" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">الطبقة المخفية 1</text>
+        <text class="gsvg-en" x="310" y="75" font-size="14" fill="var(--brand-ink)">Dense (300, relu)</text>
+        <text class="gsvg-ar" x="310" y="75" font-size="14" fill="var(--brand-ink)">Dense (300, relu)</text>
+
+        <!-- L3 -->
+        <text class="gsvg-en" x="460" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">Hidden Layer 2</text>
+        <text class="gsvg-ar" x="460" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">الطبقة المخفية 2</text>
+        <text class="gsvg-en" x="460" y="75" font-size="14" fill="var(--brand-ink)">Dense (100, relu)</text>
+        <text class="gsvg-ar" x="460" y="75" font-size="14" fill="var(--brand-ink)">Dense (100, relu)</text>
+
+        <!-- L4 -->
+        <text class="gsvg-en" x="610" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">Output Layer</text>
+        <text class="gsvg-ar" x="610" y="50" font-size="16" font-weight="bold" fill="var(--text-primary)">طبقة الإخراج</text>
+        <text class="gsvg-en" x="610" y="75" font-size="14" fill="var(--brand-ink)">Dense (10, softmax)</text>
+        <text class="gsvg-ar" x="610" y="75" font-size="14" fill="var(--brand-ink)">Dense (10, softmax)</text>
+    </g>
+
+    <!-- Compilation Info Box -->
+    <rect x="100" y="340" width="600" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text class="gsvg-en" x="400" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">
+        Compile: Optimizer = <tspan fill="var(--brand-ink)" font-family="monospace">sgd</tspan>, Loss = <tspan fill="var(--brand-ink)" font-family="monospace">sparse_categorical_crossentropy</tspan>
+    </text>
+    <text class="gsvg-ar" x="400" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">
+        تجميع النموذج: المُحسّن = <tspan fill="var(--brand-ink)" font-family="monospace">sgd</tspan>، دالة الخسارة = <tspan fill="var(--brand-ink)" font-family="monospace">sparse_categorical_crossentropy</tspan>
+    </text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا نسينا إضافة طبقة Flatten قبل الطبقات الكثيفة (Dense) عند التعامل مع الصور؟</template>
+      <template class="content-en">What would happen if we forgot to add the Flatten layer before the Dense layers when dealing with images?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحدث خطأ في الأبعاد (Shape Error) لأن الطبقة الكثيفة تتوقع مدخلات أحادية الأبعاد (1D)، بينما الصور تكون ثنائية الأبعاد (2D).</p></template>
+      <template class="content-en"><p>A shape error would occur because the Dense layer expects 1D inputs, whereas the images are 2D arrays.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="regression-mlp" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> بناء نموذج انحدار (Regression MLP)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Building a Regression MLP Using Keras</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم نماذج الانحدار للتنبؤ بقيم مستمرة (مثل أسعار المنازل) بدلاً من الفئات، وتتميز بطبقة إخراج تحتوي على خلية عصبية واحدة بدون دالة تنشيط.</p></template>
+    <template class="content-en"><p>Regression models are used to predict continuous values (like housing prices) instead of classes, characterized by an output layer with a single neuron and no activation function.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند بناء نموذج انحدار (مثل التنبؤ بأسعار المنازل في كاليفورنيا):</p><ol><li><b>البيانات:</b> نستخدم ميزات عددية فقط (مثل الدخل، عمر المنزل). يجب تقسيم البيانات وتوسيع نطاقها (Scaling) باستخدام <code>StandardScaler</code>.</li><li><b>بنية النموذج:</b> طبقة إدخال/مخفية (مثلاً 30 خلية عصبية مع <code>relu</code>)، وطبقة إخراج تحتوي على خلية عصبية واحدة (1 neuron) <b>بدون دالة تنشيط</b>.</li><li><b>دالة التكلفة:</b> نستخدم <span class="smart-term" data-term-en="Mean Squared Error (MSE)" data-ar="متوسط الخطأ التربيعي" data-en-def="A common loss function for regression tasks that measures the average of the squares of the errors.">متوسط الخطأ التربيعي<span class="smart-term-tooltip"></span></span> <code>mean_squared_error</code> (MSE).</li></ol></template>
+    <template class="content-en"><p>When building a regression model (e.g., predicting California housing prices):</p><ol><li><b>Data:</b> We use only numerical features (e.g., median income, house age). Data must be split and scaled using <code>StandardScaler</code>.</li><li><b>Model Architecture:</b> An input/hidden layer (e.g., 30 neurons with <code>relu</code>), and an output layer with exactly 1 neuron and <b>no activation function</b>.</li><li><b>Loss Function:</b> We use Mean Squared Error <code>mean_squared_error</code> (MSE).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا نستخدم دالة تنشيط في طبقة الإخراج؟ لأن دوال التنشيط مثل Sigmoid أو Tanh تقيد المخرجات بنطاق معين (مثل 0 إلى 1). في الانحدار، نريد أن يكون النموذج قادراً على التنبؤ بأي قيمة مستمرة (نطاق غير مقيد).</p><p>توسيع نطاق الميزات (Feature Scaling) أمر بالغ الأهمية في الشبكات العصبية للانحدار، حيث يضمن تقارب خوارزمية الهبوط الاشتقاقي (Gradient Descent) بشكل أسرع ويمنع الميزات ذات النطاقات الكبيرة من السيطرة على التحديثات.</p></template>
+    <template class="content-en"><p>Why is there no activation function in the output layer? Activation functions like Sigmoid or Tanh constrain the output to a specific range (e.g., 0 to 1). In regression, we want the model to predict any continuous value (unbounded range).</p><p>Feature scaling is critical in neural networks for regression, as it ensures faster convergence of Gradient Descent and prevents features with large scales from dominating the weight updates.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>model = keras.models.Sequential([
+ keras.layers.Dense(30, activation="relu", input_shape=X_train.shape[1:]),
+ keras.layers.Dense(1)
+])
+
+model.compile(loss="mean_squared_error", optimizer="sgd")
+history = model.fit(X_train_scaled, y_train, epochs=20, validation_data=(X_valid_scaled, y_valid))</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردنا التنبؤ بأسعار منازل لا يمكن أن تكون سالبة أبداً، هل يمكننا استخدام دالة تنشيط معينة في طبقة الإخراج؟</template>
+      <template class="content-en">If we want to predict housing prices that can never be negative, could we use a specific activation function in the output layer?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، يمكننا استخدام دالة التنشيط ReLU في طبقة الإخراج لضمان أن التنبؤات ستكون دائماً صفراً أو قيماً موجبة.</p></template>
+      <template class="content-en"><p>Yes, we could use the ReLU activation function in the output layer to ensure predictions are always zero or positive.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="functional-api" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> بناء نماذج معقدة باستخدام Functional API</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Building Complex Models with the Functional API</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم واجهة Functional API لبناء بنيات شبكات عصبية غير خطية ومعقدة، مثل الشبكات التي تحتوي على مدخلات أو مخرجات متعددة.</p></template>
+    <template class="content-en"><p>The Functional API is used to build complex, non-linear neural network architectures, such as networks with multiple inputs or outputs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>على عكس Sequential API، تتيح Functional API مرونة أكبر (مثل شبكات Wide & Deep). يتم ذلك عن طريق تمرير مخرجات طبقة كمدخلات للطبقة التالية كأنها دالة.</p><p><b>حالات الاستخدام:</b></p><ul><li>مدخلات متعددة (Multiple Inputs): إرسال ميزات مختلفة عبر مسارات مختلفة في الشبكة.</li><li>مخرجات متعددة (Multiple Outputs): مفيدة لمهام التنظيم (Regularization) أو التنبؤ بمهام متعددة في وقت واحد.</li></ul><p>نستخدم <code>keras.layers.Concatenate()</code> لدمج المسارات المختلفة قبل طبقة الإخراج.</p></template>
+    <template class="content-en"><p>Unlike the Sequential API, the <span class="smart-term" data-term-en="Functional API" data-ar="واجهة برمجة التطبيقات الوظيفية" data-en-def="A Keras API that allows building complex models with non-linear topologies, shared layers, and multiple inputs/outputs.">Functional API<span class="smart-term-tooltip"></span></span> allows for more flexibility (e.g., Wide & Deep networks). This is done by passing the output of one layer as the input to the next layer, treating them like functions.</p><p><b>Use Cases:</b></p><ul><li>Multiple Inputs: Sending different features through different paths in the network.</li><li>Multiple Outputs: Useful for regularization tasks or predicting multiple targets simultaneously.</li></ul><p>We use <code>keras.layers.Concatenate()</code> to merge different paths before the output layer.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند استخدام مخرجات متعددة، يجب تحديد دالة تكلفة (Loss) لكل مخرج. يمكن لـ Keras حساب التكلفة الإجمالية عن طريق جمعها. يمكننا أيضاً تعيين أوزان (Loss Weights) لإعطاء أهمية أكبر لمخرج رئيسي مقارنة بمخرج مساعد (Auxiliary Output).</p></template>
+    <template class="content-en"><p>When using multiple outputs, a loss function must be specified for each output. Keras computes the total loss by summing them. We can also assign <code>loss_weights</code> to give more importance to the main output compared to an auxiliary output.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>input = keras.layers.Input(shape=X_train.shape[1:])
+hidden1 = keras.layers.Dense(30, activation="relu")(input)
+hidden2 = keras.layers.Dense(30, activation="relu")(hidden1)
+concat = keras.layers.Concatenate()([input, hidden2])
+output = keras.layers.Dense(1)(concat)
+model = keras.models.Model(inputs=[input], outputs=[output])</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram showing a Wide & Deep neural network architecture. An 'Input' node splits into two paths. Path 1 goes directly to a 'Concatenate' node (Wide path). Path 2 goes through 'Hidden 1' then 'Hidden 2' before reaching the 'Concatenate' node (Deep path). The 'Concatenate' node then connects to the 'Output' node. Style: educational, dark background #0d1117, accent color #2196F3, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="concatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Wide &amp; Deep Network Architecture</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">بنية الشبكة العريضة والعميقة (Wide &amp; Deep)</text>
+
+    <text x="400" y="65" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Functional API allows merging multiple paths (e.g., direct features + learned representations)</text>
+    <text x="400" y="65" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تسمح الواجهة الوظيفية (Functional API) بدمج مسارات متعددة (خصائص مباشرة + تمثيلات متعلمة)</text>
+
+    <rect x="170" y="235" width="360" height="135" rx="12" fill="none" stroke="var(--brand-400)" stroke-dasharray="6,6" stroke-width="2" />
+    <text x="350" y="255" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Deep Path Layers</text>
+    <text x="350" y="255" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">طبقات المسار العميق</text>
+
+    <path d="M 140 185 C 250 80, 430 80, 525 185" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="335" y="95" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Wide Path</text>
+    <text x="335" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المسار العريض</text>
+
+    <path d="M 140 215 C 170 215, 170 305, 195 305" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <line x1="320" y1="305" x2="375" y2="305" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <path d="M 500 305 C 520 305, 520 215, 525 215" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <line x1="670" y1="200" x2="715" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <rect x="40" y="175" width="100" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="55" cy="190" r="3" fill="var(--brand-500)" />
+    <circle cx="55" cy="200" r="3" fill="var(--brand-500)" />
+    <circle cx="55" cy="210" r="3" fill="var(--brand-500)" />
+    <text x="95" y="205" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Input</text>
+    <text x="95" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المدخلات</text>
+    <text x="90" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13" font-family="monospace">Input(shape=...)</text>
+    <text x="90" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13" font-family="monospace">Input(shape=...)</text>
+
+    <rect x="200" y="280" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="260" y="310" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Hidden 1</text>
+    <text x="260" y="310" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الطبقة المخفية 1</text>
+    <text x="260" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13" font-family="monospace">Dense(64, ...)</text>
+    <text x="260" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13" font-family="monospace">Dense(64, ...)</text>
+
+    <rect x="380" y="280" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="440" y="310" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Hidden 2</text>
+    <text x="440" y="310" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الطبقة المخفية 2</text>
+    <text x="440" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13" font-family="monospace">Dense(32, ...)</text>
+    <text x="440" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13" font-family="monospace">Dense(32, ...)</text>
+
+    <rect x="530" y="175" width="140" height="50" rx="8" fill="url(#concatGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="600" y="205" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Concatenate</text>
+    <text x="600" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">دمج (Concatenate)</text>
+    <text x="600" y="245" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="13" font-family="monospace">layers.Concatenate()</text>
+    <text x="600" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="13" font-family="monospace">layers.Concatenate()</text>
+
+    <rect x="720" y="175" width="80" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="785" cy="200" r="4" fill="var(--brand-500)" />
+    <text x="750" y="205" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Output</text>
+    <text x="750" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المخرجات</text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Sequential API</th><th>Functional API</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعقيد والمرونة</template>
+          <template class="content-en">Complexity and Flexibility</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بسيط، خطي (طبقة تلو الأخرى)</template>
+          <template class="content-en">Simple, linear (layer-by-layer)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مرن جداً، يدعم البنيات غير الخطية</template>
+          <template class="content-en">Highly flexible, supports non-linear topologies</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المدخلات والمخرجات</template>
+          <template class="content-en">Inputs and Outputs</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مدخل واحد ومخرج واحد فقط</template>
+          <template class="content-en">Single input and single output only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يدعم مدخلات ومخرجات متعددة</template>
+          <template class="content-en">Supports multiple inputs and outputs</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالة الاستخدام</template>
+          <template class="content-en">Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">النماذج القياسية (مثل تصنيف الصور البسيط)</template>
+          <template class="content-en">Standard models (e.g., simple image classification)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">النماذج المعقدة (مثل Wide &amp; Deep)</template>
+          <template class="content-en">Complex models (e.g., Wide &amp; Deep)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قد نحتاج إلى مخرج مساعد (Auxiliary Output) في شبكة عصبية عميقة؟</template>
+      <template class="content-en">Why might we need an auxiliary output in a deep neural network?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يُستخدم المخرج المساعد لضمان أن الطبقات السفلية من الشبكة تتعلم ميزات مفيدة بحد ذاتها، مما يعمل كشكل من أشكال التنظيم (Regularization) ويساعد في تدفق التدرجات (Gradients).</p></template>
+      <template class="content-en"><p>An auxiliary output is used to ensure that the lower layers of the network learn useful features on their own, acting as a form of regularization and helping with gradient flow.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="saving-restoring-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> حفظ واستعادة النماذج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Saving and Restoring a Keras Model</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن حفظ النماذج المدربة بالكامل إلى القرص واستعادتها لاحقاً لإجراء التنبؤات أو استئناف التدريب.</p></template>
+    <template class="content-en"><p>Fully trained models can be saved to disk and restored later to make predictions or resume training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحفظ نموذج Keras، نستخدم الدالة <code>model.save("my_model.h5")</code>. هذا يحفظ:</p><ul><li>بنية النموذج (Architecture).</li><li>المعلمات (الأوزان والتحيزات - Weights & Biases).</li><li>حالة المُحسّن (Optimizer state)، مما يسمح باستئناف التدريب من حيث توقف.</li></ul><p>لاستعادة النموذج، نستخدم <code>keras.models.load_model("my_model.h5")</code>.</p></template>
+    <template class="content-en"><p>To save a Keras model, we use <code>model.save("my_model.h5")</code>. This saves:</p><ul><li>The model architecture.</li><li>The parameters (weights & biases).</li><li>The optimizer state, allowing training to resume exactly where it left off.</li></ul><p>To restore the model, we use <code>keras.models.load_model("my_model.h5")</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يتم تخزين النماذج عادةً ب<span class="smart-term" data-term-en="HDF5" data-ar="تنسيق HDF5" data-en-def="Hierarchical Data Format version 5, a file format designed to store and organize large amounts of data, commonly used for saving Keras models.">تنسيق HDF5<span class="smart-term-tooltip"></span></span>. ومع ذلك، إذا كنت تستخدم الفئات الفرعية للنماذج (Model Subclassing) في Keras، فإن <code>model.save()</code> لن يعمل لحفظ البنية. في هذه الحالة، يجب استخدام <code>save_weights()</code> و <code>load_weights()</code> لحفظ واستعادة المعلمات فقط، ويجب إعادة بناء البنية برمجياً.</p></template>
+    <template class="content-en"><p>Models are typically stored in the <span class="smart-term" data-term-en="HDF5" data-ar="تنسيق HDF5" data-en-def="Hierarchical Data Format version 5, a file format designed to store and organize large amounts of data, commonly used for saving Keras models.">HDF5<span class="smart-term-tooltip"></span></span> format. However, if you are using Model Subclassing in Keras, <code>model.save()</code> will not work to save the architecture. In this case, you must use <code>save_weights()</code> and <code>load_weights()</code> to save/restore parameters only, and the architecture must be rebuilt programmatically.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Saving the model
+model.save("my_keras_model.h5")
+
+# Restoring the model
+loaded_model = keras.models.load_model("my_keras_model.h5")</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا من المهم حفظ حالة المُحسّن (Optimizer state) مع أوزان النموذج؟</template>
+      <template class="content-en">Why is it important to save the optimizer state along with the model weights?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن بعض المُحسّنات (مثل Adam) تحتفظ بحالة داخلية (مثل الزخم - Momentum) لكل وزن. حفظ هذه الحالة يسمح باستئناف التدريب بسلاسة دون فقدان التقدم.</p></template>
+      <template class="content-en"><p>Because some optimizers (like Adam) maintain internal state (like momentum) for each weight. Saving this state allows training to resume smoothly without losing progress.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="callbacks-early-stopping" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الاستدعاءات (Callbacks) والتوقف المبكر</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Callbacks and Early Stopping</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاستدعاءات هي كائنات تُمرر إلى النموذج لتنفيذ إجراءات معينة في مراحل مختلفة من التدريب، مثل حفظ أفضل نموذج أو إيقاف التدريب مبكراً.</p></template>
+    <template class="content-en"><p>Callbacks are objects passed to the model to perform specific actions at various stages of training, such as saving the best model or stopping training early.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أهم <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">الاستدعاءات<span class="smart-term-tooltip"></span></span> المدمجة في Keras:</p><ol><li><b>ModelCheckpoint:</b> يحفظ النموذج على فترات منتظمة. باستخدام <code>save_best_only=True</code>، سيتم حفظ النموذج فقط إذا تحسن أداؤه على مجموعة التحقق (Validation set).</li><li><b>EarlyStopping:</b> يوقف التدريب تلقائياً إذا لم يتحسن أداء النموذج على مجموعة التحقق لعدد معين من الحقب (Epochs)، والذي يُحدد بواسطة المعلمة <code>patience</code>.</li></ol><p>يمكن دمج الاستدعاءات معاً وتمريرها كقائمة إلى دالة <code>model.fit()</code>.</p></template>
+    <template class="content-en"><p>Key built-in <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">callbacks<span class="smart-term-tooltip"></span></span> in Keras:</p><ol><li><b>ModelCheckpoint:</b> Saves the model at regular intervals. With <code>save_best_only=True</code>, it only saves the model if its performance on the validation set improves.</li><li><b>EarlyStopping:</b> Automatically stops training if the model's performance on the validation set doesn't improve for a certain number of epochs, defined by the <code>patience</code> parameter.</li></ol><p>Callbacks can be combined and passed as a list to the <code>model.fit()</code> function.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعد <span class="smart-term" data-term-en="Early Stopping" data-ar="التوقف المبكر" data-en-def="A regularization technique that stops training when the validation error stops decreasing.">التوقف المبكر<span class="smart-term-tooltip"></span></span> (Early Stopping) تقنية قوية لمنع الإفراط في التخصيص (Overfitting). من خلال تعيين <code>restore_best_weights=True</code>، سيقوم النموذج تلقائياً بالعودة إلى الأوزان التي حققت أفضل أداء، مما يلغي الحاجة إلى استعادة النموذج المحفوظ يدوياً.</p><p>يمكن أيضاً إنشاء استدعاءات مخصصة (Custom Callbacks) عن طريق وراثة الفئة <code>keras.callbacks.Callback</code> وتجاوز دوال مثل <code>on_epoch_end()</code> لتنفيذ منطق مخصص (مثل طباعة نسبة الخسارة).</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Early Stopping" data-ar="التوقف المبكر" data-en-def="A regularization technique that stops training when the validation error stops decreasing.">Early Stopping<span class="smart-term-tooltip"></span></span> is a powerful technique to prevent overfitting. By setting <code>restore_best_weights=True</code>, the model will automatically revert to the weights that achieved the best performance, eliminating the need to manually restore the saved model.</p><p>Custom callbacks can also be created by subclassing <code>keras.callbacks.Callback</code> and overriding methods like <code>on_epoch_end()</code> to implement custom logic (e.g., printing loss ratios).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>checkpoint_cb = keras.callbacks.ModelCheckpoint("my_keras_model.h5", save_best_only=True)
+early_stopping_cb = keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)
+
+history = model.fit(X_train, y_train, epochs=100, 
+                    validation_data=(X_valid, y_valid),
+                    callbacks=[checkpoint_cb, early_stopping_cb])</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم مجموعة التحقق (Validation Set) بدلاً من مجموعة الاختبار (Test Set) في التوقف المبكر؟</template>
+      <template class="content-en">Why do we use the Validation Set instead of the Test Set for Early Stopping?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مجموعة الاختبار يجب أن تظل غير مرئية تماماً للنموذج حتى التقييم النهائي. استخدامها للتوقف المبكر سيؤدي إلى تسريب المعلومات (Data Leakage) وجعل التقييم غير دقيق.</p></template>
+      <template class="content-en"><p>Because the test set must remain completely unseen by the model until final evaluation. Using it for early stopping would cause data leakage and make the evaluation biased.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tensorboard-visualization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التصور باستخدام TensorBoard</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Visualization using TensorBoard</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>TensorBoard هي أداة تصور تفاعلية تُستخدم لمراقبة وتصحيح أخطاء نماذج التعلم الآلي أثناء وبعد التدريب.</p></template>
+    <template class="content-en"><p>TensorBoard is an interactive visualization tool used for monitoring and debugging machine learning models during and after training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم تضمين TensorBoard تلقائياً عند تثبيت TensorFlow. يسمح لك بـ:</p><ul><li>تصور منحنيات التعلم (Learning curves) مثل الخسارة والدقة بمرور الوقت.</li><li>مقارنة عمليات تشغيل متعددة (Multiple runs) لضبط المعلمات الفائقة (Hyperparameters).</li><li>تحليل الرسوم البيانية الحسابية (Computation graphs).</li></ul><p>لاستخدامه، يجب إنشاء دليل سجلات (Log directory) فريد لكل عملية تشغيل، ثم تمرير <code>keras.callbacks.TensorBoard</code> كاستدعاء أثناء التدريب.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="TensorBoard" data-ar="تنسوربورد" data-en-def="A suite of web applications for inspecting and understanding your TensorFlow runs and graphs.">TensorBoard<span class="smart-term-tooltip"></span></span> is automatically included when TensorFlow is installed. It allows you to:</p><ul><li>Visualize learning curves (like loss and accuracy) over time.</li><li>Compare multiple training runs for hyperparameter tuning.</li><li>Analyze computation graphs.</li></ul><p>To use it, you must create a unique log directory for each run, and then pass <code>keras.callbacks.TensorBoard</code> as a callback during training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعد إنشاء دليل سجلات فريد (باستخدام طوابع زمنية) أمراً بالغ الأهمية. إذا قمت بالكتابة فوق نفس الدليل، فسيقوم TensorBoard بدمج البيانات، مما يجعل الرسوم البيانية فوضوية وغير قابلة للقراءة.</p><p>لتشغيل الخادم، استخدم الأمر <code>tensorboard --logdir=./my_logs --port=6006</code> في سطر الأوامر، ثم افتح المتصفح على <code>http://localhost:6006</code>.</p></template>
+    <template class="content-en"><p>Creating a unique log directory (using timestamps) is crucial. If you overwrite the same directory, TensorBoard will merge the data, making the graphs messy and unreadable.</p><p>To start the server, use the command <code>tensorboard --logdir=./my_logs --port=6006</code> in the terminal, then open a browser at <code>http://localhost:6006</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import os
+import time
+
+root_logdir = os.path.join(os.curdir, "my_logs")
+def get_run_logdir():
+    run_id = time.strftime("run_%Y_%m_%d-%H_%M_%S")
+    return os.path.join(root_logdir, run_id)
+
+run_logdir = get_run_logdir()
+tensorboard_cb = keras.callbacks.TensorBoard(run_logdir)
+
+history = model.fit(X_train, y_train, epochs=30, 
+                    validation_data=(X_valid, y_valid),
+                    callbacks=[tensorboard_cb])</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لـ TensorBoard مساعدتك في اكتشاف الإفراط في التخصيص (Overfitting) مبكراً؟</template>
+      <template class="content-en">How can TensorBoard help you detect overfitting early?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال مراقبة منحنيات الخسارة (Loss curves). إذا استمرت خسارة التدريب في الانخفاض بينما بدأت خسارة التحقق في الارتفاع، فهذا مؤشر واضح على الإفراط في التخصيص.</p></template>
+      <template class="content-en"><p>By monitoring the loss curves. If the training loss continues to decrease while the validation loss starts to increase, it is a clear indicator of overfitting.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. لقد انتقلنا الآن من الخوارزميات التقليدية إلى عالم 'التعلم العميق' باستخدام Keras. في الامتحان، ركزوا جيداً على متى نستخدم Sequential API (للمهام البسيطة الخطية) ومتى نلجأ إلى Functional API (للمهام المعقدة ذات المدخلات/المخرجات المتعددة). تذكروا دائماً دوال التكلفة: متى نستخدم Sparse Categorical Crossentropy؟ (عندما تكون التسميات أرقاماً). وماذا عن الانحدار؟ (نستخدم MSE ولا نضع دالة تنشيط في النهاية). لا تنسوا أيضاً أهمية الاستدعاءات (Callbacks)؛ فالتوقف المبكر (Early Stopping) هو سلاحكم السري لمنع الإفراط في التخصيص. وأخيراً، تذكروا أن TensorBoard هو عينكم التي ترون بها ما يحدث داخل 'الصندوق الأسود' للشبكة العصبية. راجعوا الأكواد جيداً، ففهم كيفية تجميع (Compile) وتدريب (Fit) النموذج أمر لا غنى عنه.</template>
+    <template class="content-en">Welcome, my friends, to this crucial module. We have now transitioned from traditional algorithms into the realm of 'Deep Learning' using Keras. For the exam, focus heavily on when to use the Sequential API (for simple, linear tasks) versus the Functional API (for complex tasks with multiple inputs/outputs). Always remember your loss functions: when do we use Sparse Categorical Crossentropy? (When labels are integers). What about regression? (We use MSE and no activation function at the end). Do not forget the importance of Callbacks; Early Stopping is your secret weapon against overfitting. Finally, remember that TensorBoard is your eye into the 'black box' of the neural network. Review the code snippets carefully; understanding how to compile and fit a model is indispensable.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين Sequential API و Functional API؟</template>
+          <template class="content-en">What is the fundamental difference between the Sequential API and the Functional API?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين Sequential API و Functional API؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">Sequential API تبني النماذج كخط مستقيم (طبقة تلو الأخرى)، بينما Functional API تسمح ببناء شبكات معقدة غير خطية، مثل تلك التي تحتوي على مسارات متعددة أو مدخلات/مخرجات متعددة.</template>
+          <template class="content-en">The Sequential API builds models as a straight line (layer-by-layer), whereas the Functional API allows building complex, non-linear networks, such as those with multiple paths or multiple inputs/outputs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقوم بقسمة قيم بكسل الصور على 255.0 قبل التدريب؟</template>
+          <template class="content-en">Why do we divide image pixel values by 255.0 before training?</template>
+          <span class="content-target">لماذا نقوم بقسمة قيم بكسل الصور على 255.0 قبل التدريب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لتوسيع نطاق (Scale) قيم البكسل من النطاق [0, 255] إلى النطاق [0, 1]. الشبكات العصبية تتقارب بشكل أسرع وتعمل بشكل أفضل عندما تكون المدخلات صغيرة وموحدة النطاق.</template>
+          <template class="content-en">To scale the pixel values from the range [0, 255] down to the range [0, 1]. Neural networks converge faster and perform better when inputs are small and uniformly scaled.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب استخدام دالة التكلفة <code>sparse_categorical_crossentropy</code>؟</template>
+          <template class="content-en">When should you use the <code>sparse_categorical_crossentropy</code> loss function?</template>
+          <span class="content-target">متى يجب استخدام دالة التكلفة <code>sparse_categorical_crossentropy</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمها في مهام التصنيف متعدد الفئات عندما تكون التسميات (Labels) المستهدفة عبارة عن أرقام صحيحة (مثل 0، 1، 2...) بدلاً من متجهات مشفرة بـ One-Hot.</template>
+          <template class="content-en">We use it in multi-class classification tasks when the target labels are integers (e.g., 0, 1, 2...) rather than One-Hot encoded vectors.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمنع الاستدعاء <code>EarlyStopping</code> الإفراط في التخصيص (Overfitting)؟</template>
+          <template class="content-en">How does the <code>EarlyStopping</code> callback prevent overfitting?</template>
+          <span class="content-target">كيف يمنع الاستدعاء <code>EarlyStopping</code> الإفراط في التخصيص (Overfitting)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم بمراقبة أداء النموذج على مجموعة التحقق (Validation set). إذا توقف الأداء عن التحسن لعدد معين من الحقب (Patience)، فإنه يوقف التدريب تلقائياً قبل أن يبدأ النموذج في حفظ بيانات التدريب.</template>
+          <template class="content-en">It monitors the model's performance on a validation set. If the performance stops improving for a set number of epochs (Patience), it automatically halts training before the model starts memorizing the training data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الذي يتم حفظه بالضبط عند استخدام <code>model.save()</code> في Keras؟</template>
+          <template class="content-en">What exactly is saved when using <code>model.save()</code> in Keras?</template>
+          <span class="content-target">ما الذي يتم حفظه بالضبط عند استخدام <code>model.save()</code> في Keras؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم حفظ بنية النموذج (Architecture)، والأوزان والتحيزات (Weights & Biases)، وحالة المُحسّن (Optimizer state) مما يسمح باستئناف التدريب لاحقاً.</template>
+          <template class="content-en">It saves the model architecture, the weights and biases, and the optimizer state, which allows training to be resumed later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا قد نستخدم مخرجات متعددة (Multiple Outputs) في شبكة عصبية؟</template>
+          <template class="content-en">Why might we use multiple outputs in a neural network?</template>
+          <span class="content-target">لماذا قد نستخدم مخرجات متعددة (Multiple Outputs) في شبكة عصبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكن استخدامها للتنبؤ بمهام متعددة في وقت واحد (مثل التنبؤ بعمر الشخص وجنسه من نفس الصورة)، أو كتقنية تنظيم (Regularization) باستخدام مخرج مساعد لضمان تعلم الطبقات السفلية ميزات مفيدة.</template>
+          <template class="content-en">They can be used to predict multiple tasks simultaneously (e.g., predicting age and gender from the same image), or as a regularization technique using an auxiliary output to ensure lower layers learn useful features.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور طبقة <code>Flatten</code> في مصنف الصور؟</template>
+          <template class="content-en">What is the role of the <code>Flatten</code> layer in an image classifier?</template>
+          <span class="content-target">ما هو دور طبقة <code>Flatten</code> في مصنف الصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم بتحويل مصفوفة الصورة ثنائية الأبعاد (مثل 28x28) إلى مصفوفة أحادية الأبعاد (784) لأن الطبقات الكثيفة (Dense) تتطلب مدخلات أحادية الأبعاد.</template>
+          <template class="content-en">It reshapes the 2D image array (e.g., 28x28) into a 1D array (784) because Dense layers require 1D inputs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنك إنشاء استدعاء مخصص (Custom Callback) في Keras؟</template>
+          <template class="content-en">How can you create a custom callback in Keras?</template>
+          <span class="content-target">كيف يمكنك إنشاء استدعاء مخصص (Custom Callback) في Keras؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق إنشاء فئة (Class) ترث من <code>keras.callbacks.Callback</code> وتجاوز دوال معينة مثل <code>on_epoch_end()</code> لتنفيذ الكود الخاص بك في تلك المرحلة المحددة.</template>
+          <template class="content-en">By creating a class that inherits from <code>keras.callbacks.Callback</code> and overriding specific methods like <code>on_epoch_end()</code> to execute your custom code at that specific stage.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة الرئيسية لاستخدام TensorBoard؟</template>
+          <template class="content-en">What is the main benefit of using TensorBoard?</template>
+          <span class="content-target">ما هي الفائدة الرئيسية لاستخدام TensorBoard؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يوفر واجهة مرئية تفاعلية لمراقبة مقاييس التدريب (مثل الخسارة والدقة) في الوقت الفعلي، ومقارنة النماذج المختلفة، وتصور بنية الشبكة العصبية لاكتشاف المشاكل مبكراً.</template>
+          <template class="content-en">It provides an interactive visual interface to monitor training metrics (like loss and accuracy) in real-time, compare different models, and visualize the neural network architecture to detect issues early.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا تحتوي طبقة الإخراج في نموذج الانحدار (Regression) على دالة تنشيط؟</template>
+          <template class="content-en">Why does the output layer in a regression model have no activation function?</template>
+          <span class="content-target">لماذا لا تحتوي طبقة الإخراج في نموذج الانحدار (Regression) على دالة تنشيط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن دوال التنشيط تقيد المخرجات بنطاق معين (مثل 0 إلى 1). في الانحدار، نريد أن يكون النموذج قادراً على التنبؤ بأي قيمة عددية مستمرة دون قيود.</template>
+          <template class="content-en">Because activation functions constrain the output to a specific range (like 0 to 1). In regression, we want the model to be able to predict any continuous numerical value without constraints.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "كيراس (Keras)",
+      "en": "Keras"
+    },
+    "back": {
+      "definition": {
+        "ar": "واجهة برمجة تطبيقات عالية المستوى للتعلم العميق لبناء وتدريب الشبكات العصبية.",
+        "en": "A high-level Deep Learning API for building and training neural networks."
+      },
+      "example": {
+        "ar": "استخدام Keras لبناء نموذج تصنيف صور ببضعة أسطر من التعليمات البرمجية.",
+        "en": "Using Keras to build an image classification model in a few lines of code."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "Sequential API",
+      "en": "Sequential API"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة في Keras لبناء النماذج عن طريق تكديس الطبقات بشكل خطي.",
+        "en": "A method in Keras to build models by stacking layers linearly."
+      },
+      "example": {
+        "ar": "model = keras.models.Sequential([...])",
+        "en": "model = keras.models.Sequential([...])"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "Functional API",
+      "en": "Functional API"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة في Keras لبناء نماذج معقدة تدعم مدخلات/مخرجات متعددة وبنيات غير خطية.",
+        "en": "A method in Keras to build complex models supporting multiple inputs/outputs and non-linear topologies."
+      },
+      "example": {
+        "ar": "بناء شبكة Wide & Deep.",
+        "en": "Building a Wide & Deep network."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "طبقة التسطيح (Flatten Layer)",
+      "en": "Flatten Layer"
+    },
+    "back": {
+      "definition": {
+        "ar": "طبقة تقوم بتحويل البيانات متعددة الأبعاد (مثل الصور) إلى مصفوفة أحادية الأبعاد.",
+        "en": "A layer that reshapes multi-dimensional data (like images) into a 1D array."
+      },
+      "example": {
+        "ar": "تحويل صورة 28x28 إلى مصفوفة بحجم 784.",
+        "en": "Converting a 28x28 image into an array of size 784."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "الطبقة الكثيفة (Dense Layer)",
+      "en": "Dense Layer"
+    },
+    "back": {
+      "definition": {
+        "ar": "طبقة شبكة عصبية متصلة بالكامل حيث تتصل كل خلية بجميع الخلايا في الطبقة السابقة.",
+        "en": "A fully connected neural network layer where each neuron connects to all neurons in the previous layer."
+      },
+      "example": {
+        "ar": "keras.layers.Dense(300, activation='relu')",
+        "en": "keras.layers.Dense(300, activation='relu')"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "دالة Softmax",
+      "en": "Softmax Activation"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تنشيط تُستخدم في طبقة الإخراج للتصنيف متعدد الفئات، تحول المخرجات إلى احتمالات مجموعها 1.",
+        "en": "An activation function used in the output layer for multi-class classification, converting outputs to probabilities summing to 1."
+      },
+      "example": {
+        "ar": "التنبؤ باحتمالية أن تكون الصورة قميصاً أو حذاءً.",
+        "en": "Predicting the probability of an image being a shirt or a shoe."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "Sparse Categorical Crossentropy",
+      "en": "Sparse Categorical Crossentropy"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تكلفة تُستخدم عندما تكون التسميات (Labels) عبارة عن أرقام صحيحة متفرقة (مثل 0، 1، 2).",
+        "en": "A loss function used when labels are sparse integers (e.g., 0, 1, 2)."
+      },
+      "example": {
+        "ar": "استخدامها مع مجموعة بيانات Fashion MNIST حيث التسميات من 0 إلى 9.",
+        "en": "Using it with the Fashion MNIST dataset where labels are 0 to 9."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "متوسط الخطأ التربيعي (MSE)",
+      "en": "Mean Squared Error (MSE)"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة التكلفة القياسية لمهام الانحدار (Regression).",
+        "en": "The standard loss function for regression tasks."
+      },
+      "example": {
+        "ar": "حساب الخطأ في التنبؤ بأسعار المنازل.",
+        "en": "Calculating the error in predicting housing prices."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "تنسيق HDF5",
+      "en": "HDF5 Format"
+    },
+    "back": {
+      "definition": {
+        "ar": "التنسيق الافتراضي الذي تستخدمه Keras لحفظ النماذج (البنية والأوزان).",
+        "en": "The default format used by Keras to save models (architecture and weights)."
+      },
+      "example": {
+        "ar": "model.save('my_model.h5')",
+        "en": "model.save('my_model.h5')"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "الاستدعاءات (Callbacks)",
+      "en": "Callbacks"
+    },
+    "back": {
+      "definition": {
+        "ar": "وظائف تُنفذ في مراحل معينة من التدريب (مثل نهاية كل حقبة) لمراقبة العملية أو التحكم فيها.",
+        "en": "Functions executed at specific stages of training (e.g., end of an epoch) to monitor or control the process."
+      },
+      "example": {
+        "ar": "استخدام استدعاء لطباعة نسبة الخسارة بعد كل حقبة.",
+        "en": "Using a callback to print the loss ratio after each epoch."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ModelCheckpoint",
+      "en": "ModelCheckpoint"
+    },
+    "back": {
+      "definition": {
+        "ar": "استدعاء (Callback) يقوم بحفظ النموذج على فترات منتظمة أثناء التدريب.",
+        "en": "A callback that saves the model at regular intervals during training."
+      },
+      "example": {
+        "ar": "حفظ أفضل نموذج فقط بناءً على أداء مجموعة التحقق.",
+        "en": "Saving only the best model based on validation performance."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "التوقف المبكر (EarlyStopping)",
+      "en": "EarlyStopping"
+    },
+    "back": {
+      "definition": {
+        "ar": "استدعاء يوقف التدريب تلقائياً عندما يتوقف أداء النموذج عن التحسن لمنع الإفراط في التخصيص.",
+        "en": "A callback that automatically stops training when model performance stops improving to prevent overfitting."
+      },
+      "example": {
+        "ar": "إيقاف التدريب إذا لم تنخفض خسارة التحقق لمدة 10 حقب.",
+        "en": "Stopping training if validation loss doesn't decrease for 10 epochs."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "معلمة الصبر (Patience)",
+      "en": "Patience Parameter"
+    },
+    "back": {
+      "definition": {
+        "ar": "عدد الحقب (Epochs) التي يجب انتظارها دون تحسن قبل إيقاف التدريب في EarlyStopping.",
+        "en": "The number of epochs to wait with no improvement before stopping training in EarlyStopping."
+      },
+      "example": {
+        "ar": "patience=10 تعني الانتظار 10 حقب قبل التوقف.",
+        "en": "patience=10 means waiting 10 epochs before stopping."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "تنسوربورد (TensorBoard)",
+      "en": "TensorBoard"
+    },
+    "back": {
+      "definition": {
+        "ar": "أداة تصور تفاعلية لمراقبة وتصحيح أخطاء نماذج التعلم الآلي.",
+        "en": "An interactive visualization tool for monitoring and debugging machine learning models."
+      },
+      "example": {
+        "ar": "عرض منحنيات الخسارة والدقة أثناء التدريب.",
+        "en": "Viewing loss and accuracy curves during training."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "Fashion MNIST",
+      "en": "Fashion MNIST"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة بيانات بديلة لـ MNIST تحتوي على 70,000 صورة لعناصر أزياء بدلاً من الأرقام المكتوبة بخط اليد.",
+        "en": "A drop-in replacement dataset for MNIST containing 70,000 images of fashion items instead of handwritten digits."
+      },
+      "example": {
+        "ar": "تصنيف صورة كـ 'قميص' أو 'حذاء رياضي'.",
+        "en": "Classifying an image as a 'Shirt' or 'Sneaker'."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هي واجهة برمجة التطبيقات (API) عالية المستوى المستخدمة لبناء الشبكات العصبية في TensorFlow؟",
+      "en": "What is the high-level API used for building neural networks in TensorFlow?"
+    },
+    "options": {
+      "ar": [
+        "Scikit-Learn",
+        "Keras",
+        "Pandas",
+        "Matplotlib"
+      ],
+      "en": [
+        "Scikit-Learn",
+        "Keras",
+        "Pandas",
+        "Matplotlib"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "Keras هي واجهة برمجة التطبيقات عالية المستوى المدمجة في TensorFlow (كـ tf.keras) لبناء وتدريب الشبكات العصبية.",
+      "en": "Keras is the high-level API integrated into TensorFlow (as tf.keras) for building and training neural networks."
+    },
+    "hint": {
+      "ar": "تم تطويرها بواسطة François Chollet.",
+      "en": "Developed by François Chollet."
+    },
+    "difficulty": "easy",
+    "conceptId": "intro-to-keras"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي دالة تكلفة (Loss function) يجب استخدامها لتصنيف متعدد الفئات إذا كانت التسميات (Labels) عبارة عن أرقام صحيحة (مثل 0، 1، 2)؟",
+      "en": "Which loss function should be used for multi-class classification if the labels are integers (e.g., 0, 1, 2)?"
+    },
+    "options": {
+      "ar": [
+        "mean_squared_error",
+        "binary_crossentropy",
+        "categorical_crossentropy",
+        "sparse_categorical_crossentropy"
+      ],
+      "en": [
+        "mean_squared_error",
+        "binary_crossentropy",
+        "categorical_crossentropy",
+        "sparse_categorical_crossentropy"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "تُستخدم sparse_categorical_crossentropy عندما تكون التسميات أرقاماً صحيحة متفرقة، بينما تُستخدم categorical_crossentropy للتسميات المشفرة بـ one-hot.",
+      "en": "sparse_categorical_crossentropy is used when labels are sparse integers, whereas categorical_crossentropy is for one-hot encoded labels."
+    },
+    "hint": {
+      "ar": "ابحث عن الكلمة التي تعني 'متفرق'.",
+      "en": "Look for the word that means 'sparse'."
+    },
+    "difficulty": "medium",
+    "conceptId": "sequential-api-classifier"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي دالة التنشيط المناسبة لطبقة الإخراج في نموذج انحدار (Regression)؟",
+      "en": "What is the appropriate activation function for the output layer in a regression model?"
+    },
+    "options": {
+      "ar": [
+        "relu",
+        "softmax",
+        "sigmoid",
+        "لا توجد دالة تنشيط (None)"
+      ],
+      "en": [
+        "relu",
+        "softmax",
+        "sigmoid",
+        "No activation function (None)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "في الانحدار، نريد التنبؤ بقيم مستمرة غير مقيدة، لذا لا نستخدم دالة تنشيط في طبقة الإخراج.",
+      "en": "In regression, we want to predict unbounded continuous values, so we do not use an activation function in the output layer."
+    },
+    "hint": {
+      "ar": "هل نريد تقييد المخرجات بنطاق معين؟",
+      "en": "Do we want to constrain the output to a specific range?"
+    },
+    "difficulty": "medium",
+    "conceptId": "regression-mlp"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي واجهة في Keras تسمح ببناء نماذج ذات مدخلات ومخرجات متعددة؟",
+      "en": "Which Keras API allows building models with multiple inputs and outputs?"
+    },
+    "options": {
+      "ar": [
+        "Sequential API",
+        "Functional API",
+        "Subclassing API",
+        "Estimator API"
+      ],
+      "en": [
+        "Sequential API",
+        "Functional API",
+        "Subclassing API",
+        "Estimator API"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتيح Functional API مرونة بناء بنيات غير خطية، بما في ذلك المدخلات والمخرجات المتعددة.",
+      "en": "The Functional API provides the flexibility to build non-linear topologies, including multiple inputs and outputs."
+    },
+    "hint": {
+      "ar": "تتعامل مع الطبقات كأنها دوال (Functions).",
+      "en": "It treats layers like functions."
+    },
+    "difficulty": "easy",
+    "conceptId": "functional-api"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو التنسيق الافتراضي الذي يتم فيه حفظ نماذج Keras عند استخدام model.save()؟",
+      "en": "What is the default format in which Keras models are saved when using model.save()?"
+    },
+    "options": {
+      "ar": [
+        ".csv",
+        ".json",
+        ".h5 (HDF5)",
+        ".pkl (Pickle)"
+      ],
+      "en": [
+        ".csv",
+        ".json",
+        ".h5 (HDF5)",
+        ".pkl (Pickle)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم حفظ نماذج Keras افتراضياً بتنسيق HDF5 (.h5)، والذي يخزن البنية والأوزان وحالة المُحسّن.",
+      "en": "Keras models are saved by default in the HDF5 (.h5) format, which stores architecture, weights, and optimizer state."
+    },
+    "hint": {
+      "ar": "تنسيق بيانات هرمي.",
+      "en": "Hierarchical Data Format."
+    },
+    "difficulty": "easy",
+    "conceptId": "saving-restoring-models"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض من الاستدعاء EarlyStopping؟",
+      "en": "What is the purpose of the EarlyStopping callback?"
+    },
+    "options": {
+      "ar": [
+        "حفظ النموذج كل 10 حقب.",
+        "إيقاف التدريب إذا لم يتحسن الأداء على مجموعة التحقق لمنع الإفراط في التخصيص.",
+        "تقليل معدل التعلم تدريجياً.",
+        "إيقاف التدريب بمجرد وصول الدقة إلى 100%."
+      ],
+      "en": [
+        "Save the model every 10 epochs.",
+        "Stop training if validation performance stops improving to prevent overfitting.",
+        "Gradually reduce the learning rate.",
+        "Stop training once accuracy reaches 100%."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُستخدم EarlyStopping لمراقبة مقياس (مثل خسارة التحقق) وإيقاف التدريب عندما يتوقف عن التحسن، مما يوفر الوقت ويمنع Overfitting.",
+      "en": "EarlyStopping is used to monitor a metric (like validation loss) and halt training when it stops improving, saving time and preventing overfitting."
+    },
+    "hint": {
+      "ar": "يمنع النموذج من حفظ بيانات التدريب عن ظهر قلب.",
+      "en": "Prevents the model from memorizing the training data."
+    },
+    "difficulty": "medium",
+    "conceptId": "callbacks-early-stopping"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ماذا تفعل المعلمة 'patience' في EarlyStopping؟",
+      "en": "What does the 'patience' parameter do in EarlyStopping?"
+    },
+    "options": {
+      "ar": [
+        "تحدد عدد الحقب التي يجب انتظارها دون تحسن قبل إيقاف التدريب.",
+        "تحدد الحد الأقصى لعدد الحقب للتدريب.",
+        "تحدد معدل التعلم.",
+        "تحدد عدد النماذج التي سيتم حفظها."
+      ],
+      "en": [
+        "Defines the number of epochs to wait with no improvement before stopping.",
+        "Defines the maximum number of epochs for training.",
+        "Defines the learning rate.",
+        "Defines how many models to save."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "تخبر المعلمة patience النموذج بعدد الحقب التي يجب أن يستمر فيها في التدريب دون رؤية أي تحسن قبل أن يتوقف فعلياً.",
+      "en": "The patience parameter tells the model how many epochs to continue training without seeing improvement before actually stopping."
+    },
+    "hint": {
+      "ar": "كم من الوقت يجب أن 'يصبر' النموذج؟",
+      "en": "How long should the model be 'patient'?"
+    },
+    "difficulty": "medium",
+    "conceptId": "callbacks-early-stopping"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الأداة المستخدمة لتصور منحنيات التعلم والرسوم البيانية الحسابية في TensorFlow؟",
+      "en": "Which tool is used to visualize learning curves and computation graphs in TensorFlow?"
+    },
+    "options": {
+      "ar": [
+        "Matplotlib",
+        "Seaborn",
+        "TensorBoard",
+        "Keras-Vis"
+      ],
+      "en": [
+        "Matplotlib",
+        "Seaborn",
+        "TensorBoard",
+        "Keras-Vis"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "TensorBoard هي أداة التصور الرسمية المدمجة مع TensorFlow لمراقبة عملية التدريب.",
+      "en": "TensorBoard is the official visualization tool integrated with TensorFlow for monitoring the training process."
+    },
+    "hint": {
+      "ar": "تحتوي على كلمة Tensor في اسمها.",
+      "en": "Has the word Tensor in its name."
+    },
+    "difficulty": "easy",
+    "conceptId": "tensorboard-visualization"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "لماذا نستخدم طبقة Flatten كأول طبقة عند معالجة الصور في Sequential API؟",
+      "en": "Why do we use a Flatten layer as the first layer when processing images in the Sequential API?"
+    },
+    "options": {
+      "ar": [
+        "لتقليل حجم الصورة.",
+        "لتحويل مصفوفة الصورة ثنائية الأبعاد إلى مصفوفة أحادية الأبعاد تقبلها الطبقات الكثيفة (Dense).",
+        "لتطبيق دالة التنشيط.",
+        "لتطبيع (Normalize) قيم البكسل."
+      ],
+      "en": [
+        "To reduce the image size.",
+        "To reshape the 2D image array into a 1D array accepted by Dense layers.",
+        "To apply an activation function.",
+        "To normalize pixel values."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الطبقات الكثيفة (Dense) تتوقع مدخلات أحادية الأبعاد (1D)، لذا يجب تسطيح الصور ثنائية الأبعاد (مثل 28x28) إلى 1D (784) أولاً.",
+      "en": "Dense layers expect 1D inputs, so 2D images (like 28x28) must be flattened into 1D (784) first."
+    },
+    "hint": {
+      "ar": "تغيير الأبعاد (Reshape).",
+      "en": "Changing dimensions (Reshape)."
+    },
+    "difficulty": "medium",
+    "conceptId": "sequential-api-classifier"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ماذا يحدث إذا لم تقم بإنشاء دليل سجلات (Log directory) فريد لكل عملية تشغيل عند استخدام TensorBoard؟",
+      "en": "What happens if you do not create a unique log directory for each run when using TensorBoard?"
+    },
+    "options": {
+      "ar": [
+        "سيتوقف التدريب بخطأ.",
+        "سيتم دمج بيانات عمليات التشغيل المختلفة، مما يجعل الرسوم البيانية فوضوية.",
+        "سيقوم TensorBoard بإنشاء دليل فريد تلقائياً.",
+        "لن يتم حفظ النموذج."
+      ],
+      "en": [
+        "Training will crash with an error.",
+        "Data from different runs will be merged, making the graphs messy.",
+        "TensorBoard will automatically create a unique directory.",
+        "The model will not be saved."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يقرأ TensorBoard جميع السجلات في الدليل المحدد. إذا تمت الكتابة فوق نفس الدليل، فسيقوم بدمج البيانات، مما يؤدي إلى رسوم بيانية غير قابلة للقراءة.",
+      "en": "TensorBoard reads all logs in the specified directory. If the same directory is overwritten, it merges the data, resulting in unreadable graphs."
+    },
+    "hint": {
+      "ar": "فكر في كيفية تعامل البرامج مع الملفات التي لها نفس الاسم.",
+      "en": "Think about how programs handle files with the same name."
+    },
+    "difficulty": "hard",
+    "conceptId": "tensorboard-visualization"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>categorical_crossentropy</code> بدلاً من <code>sparse_categorical_crossentropy</code> عندما تكون التسميات (Labels) أرقاماً صحيحة. سيؤدي هذا إلى خطأ في الأبعاد أثناء التدريب. تذكر: Sparse للأرقام الصحيحة، Categorical للمتجهات المشفرة بـ One-Hot.</template>
+    <template class="content-en">Using <code>categorical_crossentropy</code> instead of <code>sparse_categorical_crossentropy</code> when labels are integers. This will cause a shape error during training. Remember: Sparse for integers, Categorical for One-Hot encoded vectors.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في Functional API، الطبقات قابلة للاستدعاء (Callable) مثل الدوال. عندما تكتب <code>Dense(30)(input)</code>، فأنت تقوم بإنشاء الطبقة وتمرير <code>input</code> إليها في نفس السطر، مما يربط الرسم البياني الحسابي ببعضه.</template>
+    <template class="content-en">In the Functional API, layers are callable like functions. When you write <code>Dense(30)(input)</code>, you are instantiating the layer and passing <code>input</code> to it in the same line, wiring the computation graph together.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التوقف المبكر (Early Stopping) مع <code>restore_best_weights=True</code> هو أفضل صديق لك. فهو يسمح لك بتعيين عدد كبير جداً من الحقب (Epochs) دون القلق بشأن الإفراط في التخصيص (Overfitting)، لأن التدريب سيتوقف تلقائياً في الوقت المناسب.</template>
+    <template class="content-en">Early Stopping with <code>restore_best_weights=True</code> is your best friend. It allows you to set a very high number of epochs without worrying about overfitting, because training will automatically halt at the optimal time.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان توسيع نطاق البيانات (Scaling) قبل تدريب الشبكة العصبية. الشبكات العصبية حساسة جداً لنطاق الميزات. عدم استخدام <code>StandardScaler</code> أو قسمة قيم البكسل على 255 سيؤدي إلى بطء شديد في التقارب أو فشل النموذج في التعلم.</template>
+    <template class="content-en">Forgetting to scale data before training a neural network. Neural networks are highly sensitive to feature scales. Not using <code>StandardScaler</code> or dividing pixel values by 255 will result in very slow convergence or the model failing to learn.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M09.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M11.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

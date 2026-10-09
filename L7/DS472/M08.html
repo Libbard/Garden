@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS472" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تحليل العناقيد: المفاهيم الأساسية والطرق · DS472 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS472" data-page-title-en="DS472">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=DS472"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#cluster-analysis-fundamentals" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات تحليل العناقيد (Cluster Analysis)</template>
+        <template class="content-en">Cluster Analysis Fundamentals</template>
+        <span class="content-target">أساسيات تحليل العناقيد (Cluster Analysis)</span>
+      </a>
+      <a href="#partitioning-methods-kmeans" class="toc-link" data-bilingual>
+        <template class="content-ar">الطرق التقسيمية: k-Means و k-Medoids</template>
+        <template class="content-en">Partitioning Methods: k-Means &amp; k-Medoids</template>
+        <span class="content-target">الطرق التقسيمية: k-Means و k-Medoids</span>
+      </a>
+      <a href="#hierarchical-methods" class="toc-link" data-bilingual>
+        <template class="content-ar">الطرق الهرمية (Hierarchical Methods)</template>
+        <template class="content-en">Hierarchical Methods</template>
+        <span class="content-target">الطرق الهرمية (Hierarchical Methods)</span>
+      </a>
+      <a href="#density-based-methods-dbscan" class="toc-link" data-bilingual>
+        <template class="content-ar">الطرق القائمة على الكثافة: DBSCAN و OPTICS</template>
+        <template class="content-en">Density-Based Methods: DBSCAN &amp; OPTICS</template>
+        <span class="content-target">الطرق القائمة على الكثافة: DBSCAN و OPTICS</span>
+      </a>
+      <a href="#grid-based-methods" class="toc-link" data-bilingual>
+        <template class="content-ar">الطرق القائمة على الشبكة: STING و CLIQUE</template>
+        <template class="content-en">Grid-Based Methods: STING &amp; CLIQUE</template>
+        <span class="content-target">الطرق القائمة على الشبكة: STING و CLIQUE</span>
+      </a>
+      <a href="#clustering-evaluation" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم التجميع (Clustering Evaluation)</template>
+        <template class="content-en">Clustering Evaluation</template>
+        <span class="content-target">تقييم التجميع (Clustering Evaluation)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · DS472
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تحليل العناقيد: المفاهيم الأساسية والطرق</h1>
+      <p class="hero-description">مقدمة شاملة لخوارزميات التجميع (Clustering)، تشمل الطرق التقسيمية، الهرمية، القائمة على الكثافة، والقائمة على الشبكة، بالإضافة إلى طرق تقييم جودة التجميع.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Cluster Analysis: Basic Concepts and Methods</h1>
+      <p class="hero-description">A comprehensive introduction to clustering algorithms, covering partitioning, hierarchical, density-based, and grid-based methods, as well as clustering evaluation techniques.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التجميع</span>
+      <span class="tag">التعلم غير الخاضع للإشراف</span>
+      <span class="tag">k-Means</span>
+      <span class="tag">DBSCAN</span>
+      <span class="tag">التجميع الهرمي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Clustering</span>
+      <span class="tag">Unsupervised Learning</span>
+      <span class="tag">k-Means</span>
+      <span class="tag">DBSCAN</span>
+      <span class="tag">Hierarchical Clustering</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح خوارزميات التجميع المختلفة ومبادئ عملها.</span></li>
+      <li><span class="obj-icon">✦</span><span>توظيف خوارزميات التجميع لحل مشاكل العالم الحقيقي.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم خوارزميات التجميع لحل مهام محددة باستخدام مقاييس الجودة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain clustering algorithms and their working principles.</span></li>
+      <li><span class="obj-icon">✦</span><span>Employ clustering algorithms to real world problems.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate clustering algorithms for solving a specific task using quality metrics.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="cluster-analysis-fundamentals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات تحليل العناقيد (Cluster Analysis)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Cluster Analysis Fundamentals</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تقسيم مجموعة من كائنات البيانات إلى مجموعات فرعية (عناقيد) بحيث تكون الكائنات داخل العنقود الواحد متشابهة، ومختلفة عن كائنات العناقيد الأخرى.</p></template>
+    <template class="content-en"><p>The process of partitioning a set of data objects into subsets (clusters) such that objects in a cluster are similar to one another, yet dissimilar to objects in other clusters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرف التجميع بأنه <b>تعلم غير خاضع للإشراف (Unsupervised Learning)</b> لعدم وجود معلومات مسبقة عن تسميات الفئات (Class labels). يمكن استخدامه كأداة مستقلة لفهم توزيع البيانات، أو كخطوة معالجة مسبقة (Preprocessing) لخوارزميات أخرى مثل التصنيف أو اكتشاف القيم المتطرفة (Outliers).</p><p>متطلبات تحليل العناقيد الجيد تشمل:</p><ul><li>قابلية التوسع (Scalability).</li><li>القدرة على اكتشاف عناقيد بأشكال عشوائية (Arbitrary shape).</li><li>القدرة على التعامل مع البيانات الصاخبة (Noisy data).</li><li>القدرة على تجميع البيانات عالية الأبعاد.</li><li>قابلية التفسير والاستخدام.</li></ul></template>
+    <template class="content-en"><p>Clustering is known as <b><span class="smart-term" data-term-en="Unsupervised Learning" data-ar="التعلم غير الخاضع للإشراف" data-en-def="Machine learning methods that draw inferences from datasets consisting of input data without labeled responses.">unsupervised learning<span class="smart-term-tooltip"></span></span></b> because class label information is not present. It can be used as a stand-alone tool to gain insight into data distribution, or as a preprocessing step for other algorithms like classification or <span class="smart-term" data-term-en="Outlier" data-ar="القيمة المتطرفة" data-en-def="A data object that deviates significantly from the rest of the objects, as if it were generated by a different mechanism.">outlier<span class="smart-term-tooltip"></span></span> detection.</p><p>Requirements for good cluster analysis include:</p><ul><li>Scalability of the algorithm.</li><li>Discovery of clusters with arbitrary shape.</li><li>Ability to deal with noisy data.</li><li>Capability of clustering high-dimensionality data.</li><li>Interpretability and usability.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تختلف خوارزميات التجميع بناءً على معايير التقسيم (مستوى واحد مقابل هرمي)، وفصل العناقيد (حصري مقابل غير حصري)، ومقاييس التشابه (قائمة على المسافة مقابل قائمة على الاتصال).</p><p>اكتشاف القيم المتطرفة (Outlier detection) هو تطبيق ثانوي مهم للتجميع، حيث تعتبر القيم البعيدة عن أي عنقود حالات شاذة قد تكون أكثر أهمية من الحالات الشائعة في بعض التطبيقات (مثل كشف الاحتيال).</p></template>
+    <template class="content-en"><p>Clustering algorithms differ based on partitioning criteria (single level vs. hierarchical), separation of clusters (mutually exclusive vs. non-exclusive), and similarity measures (distance-based vs. connectivity-based).</p><p>Outlier detection is a crucial byproduct of clustering. Values that are 'far away' from any cluster may be more interesting than common cases, especially in domains like fraud detection.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a scatter plot of unlabelled data points (e.g., red apples and strawberries mixed). An arrow points to a 'Machine Learning Model' gear icon. Another arrow points to the output: two distinct, separated groups (clusters) - one for apples, one for strawberries. Labels: 'Unlabelled Data', 'Training', 'Output: Groups/clusters formed based on similarity'. Style: educational, dark background #0d1117, accent color #58a6ff. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Drop Shadow for Elevated Elements -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- LEFT SECTION: UNLABELLED DATA              -->
+  <!-- ========================================== -->
+  
+  <!-- Left Box Background -->
+  <rect x="30" y="60" width="230" height="310" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+  
+  <!-- Left Box Titles -->
+  <text x="145" y="90" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">Unlabelled Data</text>
+  <text x="145" y="90" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">بيانات غير مصنفة</text>
+  
+  <text x="145" y="115" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">e.g., apples &amp; strawberries mixed</text>
+  <text x="145" y="115" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">مثل: تفاح وفراولة مختلطة</text>
+
+  <!-- Left Plot Grid -->
+  <path d="M 60 260 L 240 260 M 60 200 L 240 200 M 120 320 L 120 140 M 180 320 L 180 140" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" opacity="0.6" />
+  
+  <!-- Left Plot Axes -->
+  <path d="M 60 140 L 60 320 L 240 320" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+  
+  <!-- Left Axis Labels -->
+  <text x="150" y="345" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Feature 1 (e.g., Color)</text>
+  <text x="150" y="345" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">الميزة 1 (مثل اللون)</text>
+  
+  <text x="-230" y="45" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" transform="rotate(-90)">Feature 2 (e.g., Size)</text>
+  <text x="-230" y="45" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" transform="rotate(-90)">الميزة 2 (مثل الحجم)</text>
+
+  <!-- Left Plot Points (All uniform color to show they are unlabelled) -->
+  <g fill="var(--text-muted)">
+    <!-- Latent Group A -->
+    <circle cx="90" cy="190" r="5" />
+    <circle cx="110" cy="170" r="5" />
+    <circle cx="130" cy="200" r="5" />
+    <circle cx="100" cy="220" r="5" />
+    <circle cx="140" cy="180" r="5" />
+    <circle cx="120" cy="230" r="5" />
+    <circle cx="150" cy="210" r="5" />
+    <circle cx="80" cy="205" r="5" />
+    <circle cx="105" cy="195" r="5" />
+    <circle cx="125" cy="185" r="5" />
+    <circle cx="115" cy="210" r="5" />
+    <circle cx="95" cy="175" r="5" />
+    
+    <!-- Latent Group B -->
+    <circle cx="180" cy="270" r="5" />
+    <circle cx="210" cy="250" r="5" />
+    <circle cx="230" cy="280" r="5" />
+    <circle cx="190" cy="300" r="5" />
+    <circle cx="240" cy="260" r="5" />
+    <circle cx="200" cy="310" r="5" />
+    <circle cx="220" cy="290" r="5" />
+    <circle cx="170" cy="290" r="5" />
+    <circle cx="195" cy="265" r="5" />
+    <circle cx="215" cy="275" r="5" />
+    <circle cx="205" cy="285" r="5" />
+    <circle cx="225" cy="255" r="5" />
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- MIDDLE SECTION: MACHINE LEARNING MODEL     -->
+  <!-- ========================================== -->
+  
+  <!-- Training Phase Label -->
+  <text x="400" y="115" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Training Phase</text>
+  <text x="400" y="115" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">مرحلة التدريب</text>
+
+  <!-- Arrows -->
+  <path d="M 265 200 L 310 200" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+  <path d="M 485 200 L 530 200" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <!-- Middle Box Background -->
+  <rect x="320" y="135" width="160" height="130" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+  
+  <!-- Gear Icon -->
+  <g transform="translate(382, 145) scale(1.5)" fill="var(--brand-500)">
+    <path d="M19.4 13c0-0.3 0.1-0.6 0.1-1s0-0.7-0.1-1l2.1-1.7c0.2-0.2 0.2-0.4 0.1-0.6l-2-3.5c-0.1-0.2-0.4-0.3-0.6-0.2l-2.5 1c-0.5-0.4-1.1-0.7-1.7-1l-0.4-2.6c0-0.2-0.2-0.4-0.5-0.4h-4c-0.3 0-0.5 0.2-0.5 0.4l-0.4 2.6c-0.6 0.3-1.2 0.6-1.7 1l-2.5-1c-0.2-0.1-0.5 0-0.6 0.2l-2 3.5c-0.1 0.2-0.1 0.5 0.1 0.6l2.1 1.7c0 0.3-0.1 0.6-0.1 1s0 0.7 0.1 1l-2.1 1.7c-0.2 0.2-0.2 0.4-0.1 0.6l2 3.5c0.1 0.2 0.4 0.3 0.6 0.2l2.5-1c0.5 0.4 1.1 0.7 1.7 1l0.4 2.6c0 0.2 0.2 0.4 0.5 0.4h4c0.3 0 0.5-0.2 0.5-0.4l0.4-2.6c0.6-0.3 1.2-0.6 1.7-1l2.5 1c0.2 0.1 0.5 0 0.6-0.2l2-3.5c0.1-0.2 0.1-0.5-0.1-0.6l-2.1-1.7zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z" />
+  </g>
+
+  <!-- Middle Box Text -->
+  <text x="400" y="210" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Clustering</text>
+  <text x="400" y="210" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">تجميع</text>
+  
+  <text x="400" y="230" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Algorithm</text>
+  <text x="400" y="230" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">خوارزمية</text>
+  
+  <text x="400" y="250" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(Unsupervised)</text>
+  <text x="400" y="250" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(تعلم غير خاضع للإشراف)</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SECTION: CLUSTERED OUTPUT            -->
+  <!-- ========================================== -->
+  
+  <!-- Right Box Background -->
+  <rect x="540" y="60" width="230" height="310" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+  
+  <!-- Right Box Titles -->
+  <text x="655" y="90" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">Clustered Output</text>
+  <text x="655" y="90" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">المخرجات المجمعة</text>
+  
+  <text x="655" y="115" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Grouped by features (similarity)</text>
+  <text x="655" y="115" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">مجمعة حسب الميزات (التشابه)</text>
+
+  <!-- Right Plot Grid -->
+  <path d="M 570 260 L 750 260 M 570 200 L 750 200 M 630 320 L 630 140 M 690 320 L 690 140" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" opacity="0.6" />
+  
+  <!-- Right Plot Axes -->
+  <path d="M 570 140 L 570 320 L 750 320" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+  
+  <!-- Right Axis Labels -->
+  <text x="660" y="345" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Feature 1 (e.g., Color)</text>
+  <text x="660" y="345" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">الميزة 1 (مثل اللون)</text>
+  
+  <text x="-230" y="555" class="gsvg-en" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" transform="rotate(-90)">Feature 2 (e.g., Size)</text>
+  <text x="-230" y="555" class="gsvg-ar" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" transform="rotate(-90)">الميزة 2 (مثل الحجم)</text>
+
+  <!-- Cluster Hulls (Dashed boundaries) -->
+  <path d="M 580 205 Q 600 150 640 160 Q 680 170 670 220 Q 650 250 610 240 Q 570 230 580 205 Z" fill="var(--brand-500)" fill-opacity="0.1" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" />
+  <path d="M 670 290 Q 700 230 740 240 Q 770 250 760 290 Q 740 330 700 320 Q 660 310 670 290 Z" fill="var(--text-secondary)" fill-opacity="0.1" stroke="var(--text-secondary)" stroke-width="2" stroke-dasharray="6 4" />
+
+  <!-- Right Plot Points (Colored by Cluster) -->
+  <!-- Cluster 1 -->
+  <g fill="var(--brand-500)">
+    <circle cx="600" cy="190" r="5" />
+    <circle cx="620" cy="170" r="5" />
+    <circle cx="640" cy="200" r="5" />
+    <circle cx="610" cy="220" r="5" />
+    <circle cx="650" cy="180" r="5" />
+    <circle cx="630" cy="230" r="5" />
+    <circle cx="660" cy="210" r="5" />
+    <circle cx="590" cy="205" r="5" />
+    <circle cx="615" cy="195" r="5" />
+    <circle cx="635" cy="185" r="5" />
+    <circle cx="625" cy="210" r="5" />
+    <circle cx="605" cy="175" r="5" />
+  </g>
+  
+  <!-- Cluster 2 -->
+  <g fill="var(--text-secondary)">
+    <circle cx="690" cy="270" r="5" />
+    <circle cx="720" cy="250" r="5" />
+    <circle cx="740" cy="280" r="5" />
+    <circle cx="700" cy="300" r="5" />
+    <circle cx="750" cy="260" r="5" />
+    <circle cx="710" cy="310" r="5" />
+    <circle cx="730" cy="290" r="5" />
+    <circle cx="680" cy="290" r="5" />
+    <circle cx="705" cy="265" r="5" />
+    <circle cx="725" cy="275" r="5" />
+    <circle cx="715" cy="285" r="5" />
+    <circle cx="735" cy="255" r="5" />
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر التجميع خطوة معالجة مسبقة مفيدة لخوارزميات التصنيف؟</template>
+      <template class="content-en">Why is clustering considered a useful preprocessing step for classification algorithms?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكن للتجميع تجميع البيانات المتشابهة معًا، مما يسمح باكتشاف الميزات المخفية أو تقليل الأبعاد، مما يسهل على خوارزمية التصنيف لاحقًا رسم حدود قرار أكثر دقة.</p></template>
+      <template class="content-en"><p>Clustering can group similar data together, allowing for the discovery of hidden features or dimensionality reduction, which makes it easier for a subsequent classification algorithm to draw more accurate decision boundaries.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="partitioning-methods-kmeans" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الطرق التقسيمية: k-Means و k-Medoids</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Partitioning Methods: k-Means &amp; k-Medoids</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقوم ببناء $k$ من الأقسام الحصرية للبيانات. تستخدم خوارزمية k-Means المتوسط الحسابي (Centroid) كمركز للعنقود، بينما تستخدم k-Medoids كائناً حقيقياً من البيانات لتقليل الحساسية للقيم المتطرفة.</p></template>
+    <template class="content-en"><p>Constructs $k$ exclusive partitions of the data. k-Means uses the mean (centroid) as the cluster center, while k-Medoids uses an actual data object to reduce sensitivity to outliers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>خوارزمية k-Means:</b></p><ol><li>تختار عشوائياً $k$ من الكائنات لتمثل مراكز العناقيد الأولية.</li><li>يتم تعيين كل كائن متبقي للعنقود الأقرب بناءً على المسافة الإقليدية.</li><li>يتم حساب المتوسط الجديد لكل عنقود باستخدام الكائنات المعينة له.</li><li>تستمر التكرارات حتى يستقر التعيين (لا تتغير العناقيد).</li></ol><p><b>خوارزمية k-Medoids:</b> للتغلب على حساسية k-Means للقيم المتطرفة، تختار k-Medoids كائنات فعلية (Medoids) لتمثيل العناقيد. تقوم بتبديل الكائنات عشوائياً وتحسب التكلفة الإجمالية للتبديل، وتحتفظ بالتبديل إذا أدى إلى تحسين الجودة.</p></template>
+    <template class="content-en"><p><b>k-Means Algorithm:</b></p><ol><li>Randomly selects $k$ objects to initially represent cluster means (<span class="smart-term" data-term-en="Centroid" data-ar="المركز (المتوسط)" data-en-def="The mean position of all the points in all of the coordinate directions within a cluster.">centroid<span class="smart-term-tooltip"></span></span>s).</li><li>Each remaining object is assigned to the cluster to which it is most similar, based on Euclidean distance.</li><li>Computes the new mean for each cluster using the assigned objects.</li><li>Iterations continue until the assignment is stable.</li></ol><p><b>k-<span class="smart-term" data-term-en="Medoid" data-ar="الكائن الممثل (الميدويد)" data-en-def="A representative object of a cluster in a dataset whose average dissimilarity to all the objects in the cluster is minimal.">Medoid<span class="smart-term-tooltip"></span></span>s Algorithm:</b> To overcome k-means' sensitivity to outliers, k-Medoids picks actual objects (medoids) to represent clusters. It randomly swaps objects and computes the total cost of swapping, keeping the swap if quality improves.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>جودة k-Means تُقاس بـ <b>التباين داخل العنقود (Within-cluster variation)</b>، وهو مجموع الخطأ التربيعي بين الكائنات والمركز. تحاول الخوارزمية جعل العناقيد مضغوطة ومنفصلة قدر الإمكان.</p><p>عيوب k-Means: غير مضمونة للوصول إلى الحل الأمثل العالمي (غالباً ما تتوقف عند حل محلي)، تتطلب تحديد $k$ مسبقاً، حساسة جداً للقيم المتطرفة، وغير مناسبة للعناقيد ذات الأشكال غير المحدبة (Non-convex) أو الأحجام المختلفة جداً.</p><p>بالنسبة للبيانات الفئوية (Nominal)، يُستخدم متغير يسمى <b>k-modes</b> والذي يستبدل المتوسطات بالمنوال (Modes).</p></template>
+    <template class="content-en"><p>The quality of k-Means is measured by the <b>within-cluster variation</b>, which is the sum of squared errors between objects and the centroid. It tries to make clusters compact and separate.</p><p>Disadvantages of k-Means: Not guaranteed to converge to the global optimum (often terminates at a local optimum), requires specifying $k$ in advance, highly sensitive to noise/outliers, and not suitable for non-convex shapes or clusters of very different sizes.</p><p>For nominal data, a variant called <b>k-modes</b> is used, replacing means with modes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A 4-step flow diagram showing k-Means clustering. Step 1: Scatter plot with randomly chosen initial cluster centers (stars). Step 2: Points assigned to nearest center (color-coded). Step 3: Centers moved to the mean of their assigned points. Step 4: Reassignment of points based on new centers. Arrows connect the steps. Labels: 'Choose K objects as initial centers', 'Assign points to similar center', 'Identify new cluster centroids', 'Reassign points'. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for standard brand-colored arrows -->
+        <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Arrowhead for text-primary colored arrows -->
+        <marker id="arrow-head-text" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+
+        <!-- Arrowhead for loop arrow -->
+        <marker id="arrow-head-loop" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+
+        <!-- Data Point -->
+        <circle id="pt" r="6" />
+
+        <!-- Centroid Star -->
+        <path id="star" d="M 0 -12 L 3 -4 L 11 -4 L 5 2 L 7 10 L 0 5 L -7 10 L -5 2 L -11 -4 L -3 -4 Z" stroke="var(--bg-surface)" stroke-width="2" />
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="600" y="45" class="gsvg-en" text-anchor="middle" font-size="24" font-weight="700" fill="var(--text-primary)">k-Means Clustering Algorithm</text>
+    <text x="600" y="45" class="gsvg-ar" text-anchor="middle" font-size="24" font-weight="700" fill="var(--text-primary)">خوارزمية التجميع k-Means</text>
+
+    <!-- Legend -->
+    <g transform="translate(1050, 35)">
+        <g transform="translate(-60, -5) scale(0.8)">
+            <use href="#star" x="0" y="0" fill="var(--text-muted)" />
+        </g>
+        <text x="-20" y="0" class="gsvg-en" font-size="13" font-weight="500" fill="var(--text-secondary)" text-anchor="middle">Centroid</text>
+        <text x="-20" y="0" class="gsvg-ar" font-size="13" font-weight="500" fill="var(--text-secondary)" text-anchor="middle">المركز</text>
+        
+        <use href="#pt" x="30" y="-5" fill="var(--text-muted)" />
+        <text x="70" y="0" class="gsvg-en" font-size="13" font-weight="500" fill="var(--text-secondary)" text-anchor="middle">Data Point</text>
+        <text x="70" y="0" class="gsvg-ar" font-size="13" font-weight="500" fill="var(--text-secondary)" text-anchor="middle">نقطة بيانات</text>
+    </g>
+
+    <!-- Connecting Arrows Between Panels -->
+    <g stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-head)">
+        <line x1="270" y1="200" x2="325" y2="200" />
+        <line x1="570" y1="200" x2="625" y2="200" />
+        <line x1="870" y1="200" x2="925" y2="200" />
+    </g>
+
+    <!-- Loop Arrow (Repeat until stable) -->
+    <path d="M 1050 360 Q 750 460 450 360" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow-head-loop)" />
+    
+    <!-- Loop Arrow Label -->
+    <rect x="650" y="395" width="200" height="30" rx="15" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="750" y="415" class="gsvg-en" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)">Repeat until stable</text>
+    <text x="750" y="415" class="gsvg-ar" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)">كرر حتى الاستقرار</text>
+
+    <!-- ========================================== -->
+    <!-- PANEL 1: Initialization                    -->
+    <!-- ========================================== -->
+    <g transform="translate(0, 0)">
+        <!-- Panel Background & Grid -->
+        <rect x="40" y="90" width="220" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+            <line x1="40" y1="200" x2="260" y2="200" />
+            <line x1="150" y1="90" x2="150" y2="310" />
+        </g>
+        
+        <!-- Panel Label -->
+        <text x="150" y="340" class="gsvg-en" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">1. Choose K=2 initial centers</text>
+        <text x="150" y="340" class="gsvg-ar" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">1. اختر K=2 مراكز أولية</text>
+
+        <!-- Data Points (Unassigned) -->
+        <g transform="translate(150, 200)" fill="var(--text-muted)">
+            <!-- Cluster A region -->
+            <use href="#pt" x="-40" y="-50" />
+            <use href="#pt" x="-20" y="-70" />
+            <use href="#pt" x="-60" y="-30" />
+            <use href="#pt" x="-10" y="-20" />
+            <use href="#pt" x="-50" y="-60" />
+            <use href="#pt" x="-30" y="-40" />
+            <!-- Cluster B region -->
+            <use href="#pt" x="40" y="50" />
+            <use href="#pt" x="20" y="70" />
+            <use href="#pt" x="60" y="30" />
+            <use href="#pt" x="10" y="20" />
+            <use href="#pt" x="50" y="60" />
+            <use href="#pt" x="30" y="40" />
+        </g>
+
+        <!-- Initial Centroids -->
+        <g transform="translate(150, 200)">
+            <use href="#star" x="0" y="-60" fill="var(--brand-500)" />
+            <use href="#star" x="-30" y="20" fill="var(--text-primary)" />
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PANEL 2: Assignment                        -->
+    <!-- ========================================== -->
+    <g transform="translate(300, 0)">
+        <!-- Panel Background & Grid -->
+        <rect x="40" y="90" width="220" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+            <line x1="40" y1="200" x2="260" y2="200" />
+            <line x1="150" y1="90" x2="150" y2="310" />
+        </g>
+        
+        <!-- Panel Label -->
+        <text x="150" y="340" class="gsvg-en" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">2. Assign points to nearest center</text>
+        <text x="150" y="340" class="gsvg-ar" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">2. تعيين النقاط لأقرب مركز</text>
+
+        <!-- Assignment Lines -->
+        <g transform="translate(150, 200)">
+            <g stroke="var(--brand-500)" stroke-width="1" opacity="0.4">
+                <line x1="-40" y1="-50" x2="0" y2="-60" />
+                <line x1="-20" y1="-70" x2="0" y2="-60" />
+                <line x1="-10" y1="-20" x2="0" y2="-60" />
+                <line x1="-50" y1="-60" x2="0" y2="-60" />
+                <line x1="-30" y1="-40" x2="0" y2="-60" />
+            </g>
+            <g stroke="var(--text-primary)" stroke-width="1" opacity="0.3">
+                <line x1="-60" y1="-30" x2="-30" y2="20" />
+                <line x1="40" y1="50" x2="-30" y2="20" />
+                <line x1="20" y1="70" x2="-30" y2="20" />
+                <line x1="60" y1="30" x2="-30" y2="20" />
+                <line x1="10" y1="20" x2="-30" y2="20" />
+                <line x1="50" y1="60" x2="-30" y2="20" />
+                <line x1="30" y1="40" x2="-30" y2="20" />
+            </g>
+        </g>
+
+        <!-- Data Points (Assigned) -->
+        <g transform="translate(150, 200)">
+            <g fill="var(--brand-500)">
+                <use href="#pt" x="-40" y="-50" />
+                <use href="#pt" x="-20" y="-70" />
+                <use href="#pt" x="-10" y="-20" />
+                <use href="#pt" x="-50" y="-60" />
+                <use href="#pt" x="-30" y="-40" />
+            </g>
+            <g fill="var(--text-primary)">
+                <use href="#pt" x="-60" y="-30" /> <!-- Misclassified point -->
+                <use href="#pt" x="40" y="50" />
+                <use href="#pt" x="20" y="70" />
+                <use href="#pt" x="60" y="30" />
+                <use href="#pt" x="10" y="20" />
+                <use href="#pt" x="50" y="60" />
+                <use href="#pt" x="30" y="40" />
+            </g>
+        </g>
+
+        <!-- Centroids -->
+        <g transform="translate(150, 200)">
+            <use href="#star" x="0" y="-60" fill="var(--brand-500)" />
+            <use href="#star" x="-30" y="20" fill="var(--text-primary)" />
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PANEL 3: Update Centroids                  -->
+    <!-- ========================================== -->
+    <g transform="translate(600, 0)">
+        <!-- Panel Background & Grid -->
+        <rect x="40" y="90" width="220" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+            <line x1="40" y1="200" x2="260" y2="200" />
+            <line x1="150" y1="90" x2="150" y2="310" />
+        </g>
+        
+        <!-- Panel Label -->
+        <text x="150" y="340" class="gsvg-en" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">3. Identify new centroids (Mean)</text>
+        <text x="150" y="340" class="gsvg-ar" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">3. تحديد المراكز الجديدة (المتوسط)</text>
+
+        <!-- Data Points -->
+        <g transform="translate(150, 200)">
+            <g fill="var(--brand-500)">
+                <use href="#pt" x="-40" y="-50" />
+                <use href="#pt" x="-20" y="-70" />
+                <use href="#pt" x="-10" y="-20" />
+                <use href="#pt" x="-50" y="-60" />
+                <use href="#pt" x="-30" y="-40" />
+            </g>
+            <g fill="var(--text-primary)">
+                <use href="#pt" x="-60" y="-30" />
+                <use href="#pt" x="40" y="50" />
+                <use href="#pt" x="20" y="70" />
+                <use href="#pt" x="60" y="30" />
+                <use href="#pt" x="10" y="20" />
+                <use href="#pt" x="50" y="60" />
+                <use href="#pt" x="30" y="40" />
+            </g>
+        </g>
+
+        <!-- Old Centroids (Faded) -->
+        <g transform="translate(150, 200)" opacity="0.3">
+            <use href="#star" x="0" y="-60" fill="var(--brand-500)" />
+            <use href="#star" x="-30" y="20" fill="var(--text-primary)" />
+        </g>
+
+        <!-- Movement Arrows -->
+        <g transform="translate(150, 200)">
+            <line x1="0" y1="-60" x2="-25" y2="-50" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-head)" />
+            <line x1="-30" y1="20" x2="15" y2="32" stroke="var(--text-primary)" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrow-head-text)" />
+        </g>
+
+        <!-- New Centroids -->
+        <g transform="translate(150, 200)">
+            <use href="#star" x="-30" y="-48" fill="var(--brand-500)" />
+            <use href="#star" x="21" y="34" fill="var(--text-primary)" />
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PANEL 4: Reassignment                      -->
+    <!-- ========================================== -->
+    <g transform="translate(900, 0)">
+        <!-- Panel Background & Grid -->
+        <rect x="40" y="90" width="220" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+            <line x1="40" y1="200" x2="260" y2="200" />
+            <line x1="150" y1="90" x2="150" y2="310" />
+        </g>
+        
+        <!-- Panel Label -->
+        <text x="150" y="340" class="gsvg-en" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">4. Reassign points</text>
+        <text x="150" y="340" class="gsvg-ar" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)">4. إعادة تعيين النقاط</text>
+
+        <!-- Assignment Lines -->
+        <g transform="translate(150, 200)">
+            <g stroke="var(--brand-500)" stroke-width="1" opacity="0.4">
+                <line x1="-40" y1="-50" x2="-30" y2="-48" />
+                <line x1="-20" y1="-70" x2="-30" y2="-48" />
+                <line x1="-10" y1="-20" x2="-30" y2="-48" />
+                <line x1="-50" y1="-60" x2="-30" y2="-48" />
+                <line x1="-30" y1="-40" x2="-30" y2="-48" />
+                <line x1="-60" y1="-30" x2="-30" y2="-48" /> <!-- Reassigned point line -->
+            </g>
+            <g stroke="var(--text-primary)" stroke-width="1" opacity="0.3">
+                <line x1="40" y1="50" x2="21" y2="34" />
+                <line x1="20" y1="70" x2="21" y2="34" />
+                <line x1="60" y1="30" x2="21" y2="34" />
+                <line x1="10" y1="20" x2="21" y2="34" />
+                <line x1="50" y1="60" x2="21" y2="34" />
+                <line x1="30" y1="40" x2="21" y2="34" />
+            </g>
+        </g>
+
+        <!-- Highlight for Reassigned Point -->
+        <g transform="translate(150, 200)">
+            <circle cx="-60" cy="-30" r="12" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="3,3" />
+        </g>
+
+        <!-- Data Points (Reassigned) -->
+        <g transform="translate(150, 200)">
+            <g fill="var(--brand-500)">
+                <use href="#pt" x="-40" y="-50" />
+                <use href="#pt" x="-20" y="-70" />
+                <use href="#pt" x="-10" y="-20" />
+                <use href="#pt" x="-50" y="-60" />
+                <use href="#pt" x="-30" y="-40" />
+                <use href="#pt" x="-60" y="-30" /> <!-- Reassigned point -->
+            </g>
+            <g fill="var(--text-primary)">
+                <use href="#pt" x="40" y="50" />
+                <use href="#pt" x="20" y="70" />
+                <use href="#pt" x="60" y="30" />
+                <use href="#pt" x="10" y="20" />
+                <use href="#pt" x="50" y="60" />
+                <use href="#pt" x="30" y="40" />
+            </g>
+        </g>
+
+        <!-- Centroids -->
+        <g transform="translate(150, 200)">
+            <use href="#star" x="-30" y="-48" fill="var(--brand-500)" />
+            <use href="#star" x="21" y="34" fill="var(--text-primary)" />
+        </g>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر خوارزمية k-Medoids أكثر مقاومة للقيم المتطرفة مقارنة بـ k-Means؟</template>
+      <template class="content-en">Why is the k-Medoids algorithm more robust to outliers compared to k-Means?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن k-Means تحسب المتوسط الحسابي، والقيمة المتطرفة الواحدة يمكن أن تسحب المتوسط بعيداً بشكل كبير. بينما k-Medoids تختار نقطة بيانات فعلية كمركز، مما يقلل من تأثير القيم المتطرفة الشديدة على موقع المركز.</p></template>
+      <template class="content-en"><p>Because k-Means calculates the arithmetic mean, a single extreme outlier can pull the mean significantly. k-Medoids selects an actual data point as the center, reducing the leverage a single extreme outlier has on the center's location.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hierarchical-methods" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الطرق الهرمية (Hierarchical Methods)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Hierarchical Methods</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقوم بتجميع البيانات في تسلسل هرمي أو شجرة من العناقيد (Dendrogram). إما من أسفل إلى أعلى (Agglomerative) أو من أعلى إلى أسفل (Divisive).</p></template>
+    <template class="content-en"><p>Groups data objects into a hierarchy or 'tree' of clusters (<span class="smart-term" data-term-en="Dendrogram" data-ar="المخطط الشجري (ديندروجرام)" data-en-def="A tree-like diagram that records the sequences of merges or splits in hierarchical clustering.">Dendrogram<span class="smart-term-tooltip"></span></span>). It uses either a bottom-up (Agglomerative) or top-down (Divisive) strategy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التجميع الهرمي التجميعي (Agglomerative - AGNES):</b></p><ul><li>يستخدم استراتيجية من أسفل إلى أعلى (Bottom-up).</li><li>يبدأ بجعل كل كائن عنقوداً مستقلاً.</li><li>يدمج العناقيد بشكل تكراري بناءً على الأقرب (الأقل اختلافاً) حتى تصبح جميع الكائنات في عنقود واحد.</li><li>يعتمد نهج <span class="smart-term" data-term-en="Single-linkage" data-ar="الرابط الفردي" data-en-def="A method of calculating distance between clusters based on the minimum distance between any single pair of points from the two clusters.">الرابط الفردي<span class="smart-term-tooltip"></span></span> (Single-linkage).</li></ul><p><b>التجميع الهرمي التقسيمي (Divisive - DIANA):</b></p><ul><li>يستخدم استراتيجية من أعلى إلى أسفل (Top-down).</li><li>يضع جميع الكائنات في عنقود واحد (الجذر).</li><li>يقسم العنقود بشكل متكرر إلى عناقيد أصغر بناءً على أقصى مسافة إقليدية حتى يحتوي كل عنقود على كائن واحد.</li></ul></template>
+    <template class="content-en"><p><b>Agglomerative Hierarchical Clustering (AGNES):</b></p><ul><li>Uses a bottom-up strategy.</li><li>Starts by letting each object form its own cluster.</li><li>Iteratively merges clusters into larger ones based on the closest (least dissimilar) pairs until all objects are in a single cluster.</li><li>Adopts a <span class="smart-term" data-term-en="Single-linkage" data-ar="الرابط الفردي" data-en-def="A method of calculating distance between clusters based on the minimum distance between any single pair of points from the two clusters.">single-linkage<span class="smart-term-tooltip"></span></span> approach.</li></ul><p><b>Divisive Hierarchical Clustering (DIANA):</b></p><ul><li>Uses a top-down strategy.</li><li>Starts by placing all objects in one cluster (the root).</li><li>Recursively partitions clusters into smaller ones based on maximum Euclidean distance until each cluster contains a single object.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العيب الرئيسي للطرق الهرمية هو أنها <b>لا تتوسع بشكل جيد (Do not scale well)</b>، وبمجرد اتخاذ قرار الدمج أو التقسيم، <b>لا يمكن التراجع عنه أبداً</b>. لتحسين الجودة، يتم دمجها غالباً مع تقنيات أخرى (Clustering متعدد المراحل).</p><p><b>مقاييس المسافة:</b></p><ul><li>المسافة الدنيا (Minimum) والقصوى (Maximum): حساسة جداً للقيم المتطرفة.</li><li>متوسط المسافة (Mean) والمسافة المتوسطة (Average): المسافة المتوسطة يمكنها التعامل مع البيانات الفئوية والرقمية بشكل أفضل.</li></ul></template>
+    <template class="content-en"><p>The main drawback of hierarchical methods is that they <b>do not scale well</b>, and once a step (merge or split) is done, <b>it can never be undone</b>. To improve quality, they are often integrated with other techniques (multiphase clustering).</p><p><b>Distance Measures:</b></p><ul><li>Minimum and Maximum distance: Overly sensitive to outliers or noisy data.</li><li>Mean and Average distance: The average distance can handle categoric as well as numeric data effectively.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A Dendrogram representation showing both Agglomerative (AGNES) and Divisive (DIANA) approaches. X-axis has data points {a, b, c, d, e}. Y-axis represents 'Similarity scale' (0.0 to 1.0). Tree branches connect points: 'a' and 'b' merge first, then 'd' and 'e', then 'c' merges with 'de', and finally 'ab' merges with 'cde'. Arrows point right for AGNES (Step 0 to Step 4) and left for DIANA (Step 0 to Step 4). Style: educational, dark background #0d1117, clear contrasting lines. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      text {
+        font-family: system-ui, 'Cairo', 'Inter', sans-serif;
+      }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Hierarchical Clustering: AGNES vs DIANA</text>
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التجميع الهرمي: AGNES مقابل DIANA</text>
+
+  <!-- Y-Axis -->
+  <line x1="120" y1="420" x2="120" y2="100" stroke="var(--text-muted)" stroke-width="2"/>
+  
+  <!-- Y-Axis Ticks & Labels -->
+  <g font-size="13" fill="var(--text-secondary)" text-anchor="end">
+    <line x1="115" y1="420" x2="120" y2="420" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="424">0.0</text>
+    
+    <line x1="115" y1="356" x2="120" y2="356" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="360">0.2</text>
+    
+    <line x1="115" y1="292" x2="120" y2="292" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="296">0.4</text>
+    
+    <line x1="115" y1="228" x2="120" y2="228" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="232">0.6</text>
+    
+    <line x1="115" y1="164" x2="120" y2="164" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="168">0.8</text>
+    
+    <line x1="115" y1="100" x2="120" y2="100" stroke="var(--text-muted)" stroke-width="2"/>
+    <text x="110" y="104">1.0</text>
+  </g>
+
+  <!-- Y-Axis Title -->
+  <text x="-260" y="70" transform="rotate(-90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Distance / Dissimilarity</text>
+  <text x="-260" y="70" transform="rotate(-90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">المسافة / عدم التشابه</text>
+
+  <!-- Horizontal Dashed Step Lines -->
+  <g stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="5,5" opacity="0.6">
+    <line x1="120" y1="420" x2="680" y2="420"/>
+    <line x1="120" y1="356" x2="680" y2="356"/>
+    <line x1="120" y1="292" x2="680" y2="292"/>
+    <line x1="120" y1="228" x2="680" y2="228"/>
+    <line x1="120" y1="100" x2="680" y2="100"/>
+  </g>
+
+  <!-- Cluster Count Labels (Right Side) -->
+  <g font-size="13" font-weight="bold" fill="var(--text-secondary)" text-anchor="start">
+    <text x="690" y="424" class="gsvg-en">5 Clusters</text>
+    <text x="690" y="424" class="gsvg-ar">5 عناقيد</text>
+    
+    <text x="690" y="360" class="gsvg-en">4 Clusters</text>
+    <text x="690" y="360" class="gsvg-ar">4 عناقيد</text>
+    
+    <text x="690" y="296" class="gsvg-en">3 Clusters</text>
+    <text x="690" y="296" class="gsvg-ar">3 عناقيد</text>
+    
+    <text x="690" y="232" class="gsvg-en">2 Clusters</text>
+    <text x="690" y="232" class="gsvg-ar">عنقودان</text>
+    
+    <text x="690" y="104" class="gsvg-en">1 Cluster</text>
+    <text x="690" y="104" class="gsvg-ar">عنقود واحد</text>
+  </g>
+
+  <!-- Dendrogram Paths -->
+  <g stroke="var(--brand-500)" stroke-width="3" fill="none">
+    <!-- Merge 1: a and b -->
+    <path d="M 220 420 L 220 356 L 300 356 L 300 420"/>
+    <path d="M 260 356 L 260 100"/>
+    
+    <!-- Merge 2: d and e -->
+    <path d="M 500 420 L 500 292 L 580 292 L 580 420"/>
+    <path d="M 540 292 L 540 228"/>
+    
+    <!-- Merge 3: c and de -->
+    <path d="M 400 420 L 400 228 L 540 228"/>
+    <path d="M 470 228 L 470 100"/>
+    
+    <!-- Merge 4: ab and cde -->
+    <path d="M 260 100 L 470 100"/>
+    <path d="M 365 100 L 365 70"/>
+  </g>
+
+  <!-- Merge Point Dots -->
+  <g fill="var(--brand-500)">
+    <circle cx="260" cy="356" r="5"/>
+    <circle cx="540" cy="292" r="5"/>
+    <circle cx="470" cy="228" r="5"/>
+    <circle cx="365" cy="100" r="5"/>
+  </g>
+
+  <!-- Data Point Nodes (Bottom) -->
+  <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+    <circle cx="220" cy="420" r="14"/>
+    <circle cx="300" cy="420" r="14"/>
+    <circle cx="400" cy="420" r="14"/>
+    <circle cx="500" cy="420" r="14"/>
+    <circle cx="580" cy="420" r="14"/>
+  </g>
+
+  <!-- Data Point Labels -->
+  <g font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+    <text x="220" y="425">a</text>
+    <text x="300" y="425">b</text>
+    <text x="400" y="425">c</text>
+    <text x="500" y="425">d</text>
+    <text x="580" y="425">e</text>
+  </g>
+
+  <!-- Vertical Process Arrows -->
+  <!-- AGNES (Left) -->
+  <line x1="40" y1="420" x2="40" y2="100" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="-260" y="25" transform="rotate(-90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">AGNES (Bottom-Up)</text>
+  <text x="-260" y="25" transform="rotate(-90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">AGNES (من الأسفل للأعلى)</text>
+
+  <!-- DIANA (Right) -->
+  <line x1="760" y1="100" x2="760" y2="420" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="260" y="-775" transform="rotate(90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">DIANA (Top-Down)</text>
+  <text x="260" y="-775" transform="rotate(90)" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">DIANA (من الأعلى للأسفل)</text>
+
+  <!-- Bottom Timeline Box -->
+  <rect x="40" y="450" width="720" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+
+  <!-- Timeline Labels -->
+  <text x="120" y="480" text-anchor="end" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">AGNES:</text>
+  <text x="120" y="480" text-anchor="end" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">AGNES:</text>
+  
+  <text x="120" y="515" text-anchor="end" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">DIANA:</text>
+  <text x="120" y="515" text-anchor="end" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">DIANA:</text>
+
+  <!-- Timeline Steps -->
+  <g font-size="14" fill="var(--text-primary)" text-anchor="middle">
+    <!-- X = 200 -->
+    <text x="200" y="480" class="gsvg-en">Step 0</text>
+    <text x="200" y="480" class="gsvg-ar">الخطوة 0</text>
+    <text x="200" y="515" class="gsvg-en">Step 4</text>
+    <text x="200" y="515" class="gsvg-ar">الخطوة 4</text>
+
+    <!-- X = 300 -->
+    <text x="300" y="480" class="gsvg-en">Step 1</text>
+    <text x="300" y="480" class="gsvg-ar">الخطوة 1</text>
+    <text x="300" y="515" class="gsvg-en">Step 3</text>
+    <text x="300" y="515" class="gsvg-ar">الخطوة 3</text>
+
+    <!-- X = 400 -->
+    <text x="400" y="480" class="gsvg-en">Step 2</text>
+    <text x="400" y="480" class="gsvg-ar">الخطوة 2</text>
+    <text x="400" y="515" class="gsvg-en">Step 2</text>
+    <text x="400" y="515" class="gsvg-ar">الخطوة 2</text>
+
+    <!-- X = 500 -->
+    <text x="500" y="480" class="gsvg-en">Step 3</text>
+    <text x="500" y="480" class="gsvg-ar">الخطوة 3</text>
+    <text x="500" y="515" class="gsvg-en">Step 1</text>
+    <text x="500" y="515" class="gsvg-ar">الخطوة 1</text>
+
+    <!-- X = 600 -->
+    <text x="600" y="480" class="gsvg-en">Step 4</text>
+    <text x="600" y="480" class="gsvg-ar">الخطوة 4</text>
+    <text x="600" y="515" class="gsvg-en">Step 0</text>
+    <text x="600" y="515" class="gsvg-ar">الخطوة 0</text>
+  </g>
+
+  <!-- Timeline Arrows -->
+  <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)">
+    <!-- AGNES Arrows (Right) -->
+    <line x1="235" y1="475" x2="265" y2="475"/>
+    <line x1="335" y1="475" x2="365" y2="475"/>
+    <line x1="435" y1="475" x2="465" y2="475"/>
+    <line x1="535" y1="475" x2="565" y2="475"/>
+
+    <!-- DIANA Arrows (Left) -->
+    <line x1="265" y1="510" x2="235" y2="510"/>
+    <line x1="365" y1="510" x2="335" y2="510"/>
+    <line x1="465" y1="510" x2="435" y2="510"/>
+    <line x1="565" y1="510" x2="535" y2="510"/>
+  </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Partitioning</th><th>Hierarchical</th><th>Density-based</th><th>Grid-based</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">شكل العناقيد المكتشفة</template>
+          <template class="content-en">Shape of discovered clusters</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">كروية (Spherical)</template>
+          <template class="content-en">Spherical</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">يعتمد على مقياس المسافة</template>
+          <template class="content-en">Depends on distance measure</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أشكال عشوائية (Arbitrary)</template>
+          <template class="content-en">Arbitrary shapes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">حدود أفقية/رأسية</template>
+          <template class="content-en">Horizontal/vertical boundaries</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع القيم المتطرفة (Outliers)</template>
+          <template class="content-en">Handling of Outliers</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">حساسة (خاصة k-Means)</template>
+          <template class="content-en">Sensitive (especially k-Means)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">حساسة لبعض المقاييس (Min/Max)</template>
+          <template class="content-en">Sensitive for some measures (Min/Max)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقوم بتصفية القيم المتطرفة كضوضاء</template>
+          <template class="content-en">Filters out outliers as noise</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مقاومة نسبياً</template>
+          <template class="content-en">Relatively robust</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">وقت المعالجة / قابلية التوسع</template>
+          <template class="content-en">Processing Time / Scalability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">فعال للبيانات الصغيرة والمتوسطة</template>
+          <template class="content-en">Effective for small to medium data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يتوسع بشكل جيد</template>
+          <template class="content-en">Does not scale well</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يحتاج مسحة واحدة (One scan)</template>
+          <template class="content-en">Needs only one scan</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع جداً (مستقل عن عدد الكائنات)</template>
+          <template class="content-en">Very fast (independent of object count)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر عدم القدرة على التراجع عن الدمج أو التقسيم عيباً كبيراً في التجميع الهرمي؟</template>
+      <template class="content-en">Why is the inability to undo a merge or split considered a major drawback in hierarchical clustering?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه إذا تم اتخاذ قرار خاطئ في المراحل المبكرة (مثلاً بسبب قيمة متطرفة)، فإن هذا الخطأ سينتشر عبر الشجرة بأكملها ولا يمكن تصحيحه لاحقاً، مما يؤدي إلى عناقيد نهائية غير دقيقة.</p></template>
+      <template class="content-en"><p>Because if a poor decision is made early on (e.g., due to an outlier), this error propagates through the entire tree and cannot be corrected later, leading to suboptimal final clusters.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="density-based-methods-dbscan" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الطرق القائمة على الكثافة: DBSCAN و OPTICS</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Density-Based Methods: DBSCAN &amp; OPTICS</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تكتشف العناقيد ذات الأشكال العشوائية من خلال البحث عن مناطق عالية الكثافة من النقاط مفصولة بمناطق منخفضة الكثافة. تتعامل بفعالية مع البيانات الصاخبة (<span class="smart-term" data-term-en="Noise" data-ar="الضوضاء" data-en-def="Data points that do not belong to any cluster and are not density-reachable from any core object.">الضوضاء<span class="smart-term-tooltip"></span></span>).</p></template>
+    <template class="content-en"><p>Discovers clusters of arbitrary shape by finding dense regions of points separated by low-density regions. It deals effectively with noisy data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>خوارزمية DBSCAN:</b> تعتمد على معلمتين يحددهما المستخدم:</p><ul><li><b>$\epsilon$ (Epsilon):</b> الحد الأقصى لنصف قطر الجوار.</li><li><b>MinPts:</b> الحد الأدنى لعدد النقاط المطلوبة داخل جوار $\epsilon$ لاعتبار النقطة "كائناً أساسياً" (Core object).</li></ul><p>تقوم الخوارزمية بربط الكائنات الأساسية وجيرانها لتشكيل مناطق كثيفة كعناقيد. النقاط التي لا تنتمي لأي عنقود تعتبر ضوضاء (Noise).</p><p><b>خوارزمية OPTICS:</b> طريقة لترتيب العناقيد لا تتطلب من المستخدم توفير حد كثافة محدد مسبقاً، وتوفر تصوراً مرئياً لهيكل التجميع الداخلي.</p></template>
+    <template class="content-en"><p><b>DBSCAN Algorithm:</b> Relies on two user-specified parameters:</p><ul><li><b>$\epsilon$ (Epsilon):</b> The maximum radius of a neighborhood.</li><li><b>MinPts:</b> The minimum number of points required in the $\epsilon$-neighborhood of a <span class="smart-term" data-term-en="Core Object" data-ar="الكائن الأساسي" data-en-def="An object that has at least MinPts objects within its epsilon-neighborhood.">core object<span class="smart-term-tooltip"></span></span>.</li></ul><p>It connects core objects and their neighborhoods to form dense regions as clusters. Points not belonging to any cluster are marked as <span class="smart-term" data-term-en="Noise" data-ar="الضوضاء" data-en-def="Data points that do not belong to any cluster and are not density-reachable from any core object.">noise<span class="smart-term-tooltip"></span></span>.</p><p><b>OPTICS Algorithm:</b> A cluster-ordering method that does not require the user to provide a specific density threshold. It derives the intrinsic clustering structure and provides a visualization of the clustering.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مفاهيم أساسية في DBSCAN:</p><ul><li><b>إمكانية الوصول عبر الكثافة (Density-reachability):</b> النقطة X يمكن الوصول إليها من Y إذا كانت X داخل جوار $\epsilon$ لـ Y (حيث Y كائن أساسي).</li><li><b>الاتصال عبر الكثافة (Density-connectivity):</b> النقطتان X و Y متصلتان إذا كان هناك كائن Z يمكن الوصول منه إلى كل من X و Y.</li></ul><p>ميزة DBSCAN أنها تحتاج إلى مسحة واحدة (One scan) للبيانات وتكتشف أشكالاً معقدة، لكنها تعاني إذا كانت العناقيد ذات كثافات متفاوتة بشكل كبير (وهنا يأتي دور OPTICS).</p></template>
+    <template class="content-en"><p>Key concepts in DBSCAN:</p><ul><li><b>Density-reachability:</b> Object X is directly density-reachable from Y if X is within the $\epsilon$-neighborhood of Y (where Y is a core object).</li><li><b>Density-connectivity:</b> Two objects X and Y are density-connected if there is an object Z such that both X and Y are density-reachable from Z.</li></ul><p>DBSCAN's advantage is needing only one scan and finding complex shapes, but it struggles with clusters of varying densities (which OPTICS addresses).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Two diagrams illustrating Density-reachability and Density-connectivity. Left diagram: Core object Y (red) with a circle representing epsilon radius. Object X is inside the circle. Arrow from Y to X. Label: 'X is density reachable from Y'. Right diagram: Object Z (red) with epsilon circle containing intermediate points, which in turn have circles reaching X and Y. Label: 'X and Y are density connected by Z'. Style: educational, dark background #0d1117, distinct colors for core vs border points. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Main Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Legend -->
+    <g transform="translate(0, 30)">
+        <!-- Core Object -->
+        <circle cx="160" cy="0" r="7" fill="var(--brand-500)" />
+        <text x="220" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Core Object</text>
+        <text x="220" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">كائن أساسي</text>
+
+        <!-- Border Object -->
+        <circle cx="340" cy="0" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="405" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Border Object</text>
+        <text x="405" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">كائن حدودي</text>
+
+        <!-- Epsilon Neighborhood -->
+        <circle cx="530" cy="0" r="10" fill="none" stroke="var(--brand-400)" stroke-dasharray="3,3" />
+        <text x="610" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">ε-Neighborhood</text>
+        <text x="610" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">جوار إبسيلون (ε)</text>
+    </g>
+
+    <!-- Left Panel: Density-Reachability -->
+    <g id="left-panel">
+        <!-- Panel Border -->
+        <rect x="20" y="70" width="360" height="350" fill="none" stroke="var(--border-color)" stroke-width="2" rx="12" />
+        
+        <!-- Epsilon Neighborhood for Y -->
+        <circle cx="200" cy="180" r="75" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" />
+        
+        <!-- Radius Line and Label -->
+        <line x1="200" y1="180" x2="253" y2="233" stroke="var(--text-muted)" stroke-dasharray="4,4" />
+        <text x="235" y="220" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">ε</text>
+        <text x="235" y="220" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">ε</text>
+
+        <!-- Background Cluster Points -->
+        <circle cx="160" cy="150" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="170" cy="210" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="220" cy="230" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="240" cy="190" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="140" cy="180" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+
+        <!-- Arrow Y -> X -->
+        <line x1="206" y1="175" x2="248" y2="145" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Core Point Y -->
+        <circle cx="200" cy="180" r="8" fill="var(--brand-500)" />
+        <text x="200" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Y</text>
+        <text x="200" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">Y</text>
+
+        <!-- Reachable Point X -->
+        <circle cx="255" cy="140" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="255" y="125" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">X</text>
+        <text x="255" y="125" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">X</text>
+
+        <!-- Captions -->
+        <text x="200" y="360" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Density-Reachable</text>
+        <text x="200" y="360" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">يمكن الوصول إليه كثافياً</text>
+
+        <text x="200" y="385" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">X is density reachable from Y</text>
+        <text x="200" y="385" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">X يمكن الوصول إليها كثافياً من Y</text>
+    </g>
+
+    <!-- Right Panel: Density-Connectivity -->
+    <g id="right-panel">
+        <!-- Panel Border -->
+        <rect x="420" y="70" width="360" height="350" fill="none" stroke="var(--border-color)" stroke-width="2" rx="12" />
+
+        <!-- Epsilon Neighborhoods -->
+        <circle cx="600" cy="180" r="75" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" />
+        <circle cx="550" cy="140" r="75" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" />
+        <circle cx="650" cy="220" r="75" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" />
+
+        <!-- Background Cluster Points -->
+        <circle cx="580" cy="130" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="630" cy="150" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="570" cy="230" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="610" cy="240" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="510" cy="170" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="530" cy="100" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="680" cy="180" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="690" cy="210" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="460" cy="130" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+        <circle cx="730" cy="220" r="4" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="1.5" />
+
+        <!-- Arrows -->
+        <line x1="594" y1="175" x2="556" y2="145" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="542" y1="136" x2="498" y2="114" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="606" y1="185" x2="644" y2="215" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="658" y1="224" x2="702" y2="246" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Core Point Z -->
+        <circle cx="600" cy="180" r="8" fill="var(--brand-500)" />
+        <text x="600" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Z</text>
+        <text x="600" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">Z</text>
+
+        <!-- Intermediate Core Point P1 -->
+        <circle cx="550" cy="140" r="8" fill="var(--brand-500)" />
+        
+        <!-- Intermediate Core Point P2 -->
+        <circle cx="650" cy="220" r="8" fill="var(--brand-500)" />
+
+        <!-- Reachable Point X -->
+        <circle cx="490" cy="110" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="490" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">X</text>
+        <text x="490" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">X</text>
+
+        <!-- Reachable Point Y -->
+        <circle cx="710" cy="250" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="710" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Y</text>
+        <text x="710" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">Y</text>
+
+        <!-- Captions -->
+        <text x="600" y="360" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Density-Connected</text>
+        <text x="600" y="360" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">متصل كثافياً</text>
+
+        <text x="600" y="385" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">X and Y are density connected by Z</text>
+        <text x="600" y="385" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">X و Y متصلان كثافياً بواسطة Z</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث في DBSCAN إذا اخترنا قيمة $\epsilon$ كبيرة جداً؟</template>
+      <template class="content-en">What happens in DBSCAN if we choose an $\epsilon$ value that is too large?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا كانت $\epsilon$ كبيرة جداً، سيتم دمج معظم النقاط (أو كلها) في عنقود واحد ضخم، ولن نتمكن من التمييز بين المجموعات المختلفة.</p></template>
+      <template class="content-en"><p>If $\epsilon$ is too large, most (or all) points will be merged into a single massive cluster, and we will fail to distinguish between different underlying groups.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="grid-based-methods" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الطرق القائمة على الشبكة: STING و CLIQUE</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Grid-Based Methods: STING &amp; CLIQUE</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقوم بتقسيم مساحة البيانات إلى عدد محدود من الخلايا لتشكيل هيكل شبكي، وتتم عمليات التجميع على هذه الشبكة. تتميز بسرعة المعالجة العالية.</p></template>
+    <template class="content-en"><p>Quantizes the object space into a finite number of cells forming a grid structure, and performs clustering operations on this grid. Known for fast processing time.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>خوارزمية STING (الشبكة المعلوماتية الإحصائية):</b></p><ul><li>تقسم المساحة بشكل هرمي ومتكرر إلى خلايا مستطيلة.</li><li>يتم حساب المعلومات الإحصائية (المتوسط، الحد الأقصى، الحد الأدنى) مسبقاً لكل خلية وتخزينها.</li><li>تعتمد جودة التجميع على دقة (Granularity) المستوى الأدنى للشبكة.</li><li><b>العيب:</b> جميع حدود العناقيد تكون أفقية أو رأسية فقط، ولا يتم اكتشاف حدود قطرية.</li></ul><p><b>خوارزمية CLIQUE:</b></p><ul><li>طريقة شبكية بسيطة لإيجاد العناقيد القائمة على الكثافة في المساحات الفرعية (Subspaces).</li><li>تستخدم مبدأ Apriori للتعرف على المساحات الفرعية التي تحتوي على عناقيد.</li><li>تعتبر الخلية "كثيفة" إذا تجاوز عدد الكائنات المعينة لها حد الكثافة.</li></ul></template>
+    <template class="content-en"><p><b>STING (Statistical Information Grid):</b></p><ul><li>Divides space hierarchically and recursively into rectangular cells.</li><li>Statistical info (mean, max, min) for each cell is precomputed and stored.</li><li>Quality depends on the granularity of the lowest level of the grid.</li><li><b>Disadvantage:</b> All cluster boundaries are either horizontal or vertical; no diagonal boundaries are detected.</li></ul><p><b>CLIQUE (Clustering In QUEst):</b></p><ul><li>A simple grid-based method for finding density-based clusters in subspaces.</li><li>Uses the <span class="smart-term" data-term-en="Apriori Principle" data-ar="مبدأ أبريوري" data-en-def="If a collection of items is frequent, then all of its subsets must also be frequent. Used in CLIQUE to find dense subspaces.">Apriori principle<span class="smart-term-tooltip"></span></span> to recognize subspaces that have clusters.</li><li>A cell is dense if the number of objects mapped to it exceeds the density threshold.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الميزة الكبرى للطرق القائمة على الشبكة هي <b>وقت المعالجة السريع</b>. وقت المعالجة يكون مستقلاً عادةً عن عدد كائنات البيانات، ويعتمد فقط على عدد الخلايا في كل بُعد في المساحة المكممة (Quantized space).</p><p>في STING، تبدأ معالجة الاستعلام من طبقة عليا، ويتم حساب فترة الثقة (Confidence interval) لكل خلية. الخلايا غير ذات الصلة يتم استبعادها، وتستمر العملية للطبقات السفلى فقط للخلايا ذات الصلة.</p></template>
+    <template class="content-en"><p>The major advantage of grid-based methods is <b>fast processing time</b>. The processing time is typically independent of the number of data objects, depending only on the number of cells in each dimension in the quantized space.</p><p>In STING, query processing starts at a higher layer, computing a confidence interval for each cell. Irrelevant cells are removed, and the process repeats down to the bottom layer only for relevant cells.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A 3D pyramid-like hierarchical grid structure representing STING. The top layer has a few large rectangular cells. The layer below has more, smaller cells. The bottom layer has a fine grid of many small cells. Lines connect the boundaries of upper cells to the corresponding subdivisions in the lower cells. Labels: 'First layer', '(i-1)st layer', 'ith layer'. Style: wireframe, educational, dark background #0d1117, neon blue lines. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for callout pointer -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0,1 L 10,5 L 0,9 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="400" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">STING: Hierarchical Grid Structure</text>
+        <text x="400" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">STING: هيكل الشبكة الهرمية</text>
+    </g>
+
+    <!-- Outer Connecting Lines (Pyramid Edges) -->
+    <g fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4">
+        <path d="M 320,100 L 240,400" />
+        <path d="M 480,100 L 560,400" />
+        <path d="M 400,60 L 400,320" />
+        <path d="M 400,140 L 400,480" />
+    </g>
+
+    <!-- Highlighted Projection Lines (Hierarchical Beam) -->
+    <g fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" opacity="0.7">
+        <path d="M 400,100 L 400,400" />
+        <path d="M 440,120 L 480,440" />
+        <path d="M 400,140 L 400,480" />
+        <path d="M 360,120 L 320,440" />
+    </g>
+
+    <!-- ================= GRID 3 (BOTTOM - 8x8) ================= -->
+    <g id="grid3">
+        <!-- Base Plane -->
+        <polygon points="400,320 560,400 400,480 240,400" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Fine Grid Lines (8x8) -->
+        <path d="M 260,390 L 420,470 M 280,380 L 440,460 M 300,370 L 460,450 M 320,360 L 480,440 M 340,350 L 500,430 M 360,340 L 520,420 M 380,330 L 540,410 M 260,410 L 420,330 M 280,420 L 440,340 M 300,430 L 460,350 M 320,440 L 480,360 M 340,450 L 500,370 M 360,460 L 520,380 M 380,470 L 540,390" fill="none" stroke="var(--brand-400)" stroke-width="1" opacity="0.3"/>
+        
+        <!-- Highlighted Quadrant (Bottom-Right) -->
+        <polygon points="400,400 480,440 400,480 320,440" fill="var(--brand-500)" opacity="0.1"/>
+        <path d="M 400,400 L 480,440 L 400,480 L 320,440 Z" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        
+        <!-- Internal Lines for Highlighted Quadrant -->
+        <path d="M 340,430 L 420,470 M 360,420 L 440,460 M 380,410 L 460,450 M 340,450 L 420,410 M 360,460 L 440,420 M 380,470 L 460,430" fill="none" stroke="var(--brand-500)" stroke-width="1.5" opacity="0.7"/>
+    </g>
+
+    <!-- ================= GRID 2 (MIDDLE - 4x4) ================= -->
+    <g id="grid2">
+        <!-- Base Plane -->
+        <polygon points="400,180 520,240 400,300 280,240" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Medium Grid Lines (4x4) -->
+        <path d="M 310,225 L 430,285 M 340,210 L 460,270 M 370,195 L 490,255 M 310,255 L 430,195 M 340,270 L 460,210 M 370,285 L 490,225" fill="none" stroke="var(--brand-400)" stroke-width="1" opacity="0.4"/>
+        
+        <!-- Highlighted Quadrant (Bottom-Right) -->
+        <polygon points="400,240 460,270 400,300 340,270" fill="var(--brand-500)" opacity="0.2"/>
+        <path d="M 400,240 L 460,270 L 400,300 L 340,270 Z" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+        
+        <!-- Internal Lines for Highlighted Quadrant -->
+        <path d="M 370,255 L 430,285 M 370,285 L 430,255" fill="none" stroke="var(--brand-500)" stroke-width="1.5" opacity="0.8"/>
+    </g>
+
+    <!-- ================= GRID 1 (TOP - 2x2) ================= -->
+    <g id="grid1">
+        <!-- Base Plane -->
+        <polygon points="400,60 480,100 400,140 320,100" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Coarse Grid Lines (2x2) -->
+        <path d="M 360,80 L 440,120 M 360,120 L 440,80" fill="none" stroke="var(--brand-400)" stroke-width="1" opacity="0.6"/>
+        
+        <!-- Highlighted Cell (Bottom-Right) -->
+        <polygon points="400,100 440,120 400,140 360,120" fill="var(--brand-500)" opacity="0.3"/>
+        <path d="M 400,100 L 440,120 L 400,140 L 360,120 Z" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+
+    <!-- ================= ANNOTATIONS & LABELS ================= -->
+    
+    <!-- Callout Box for Statistical Info -->
+    <g id="callout">
+        <!-- Pointer Line -->
+        <path d="M 250,100 C 300,100 330,110 370,110" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        
+        <!-- Box -->
+        <rect x="100" y="50" width="150" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <!-- Text Content -->
+        <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+            <!-- English Callout -->
+            <text x="175" y="75" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Cell Stats</text>
+            <text x="175" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">count (n)</text>
+            <text x="175" y="115" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">mean, min, max</text>
+            <text x="175" y="135" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">distribution</text>
+            
+            <!-- Arabic Callout -->
+            <text x="175" y="75" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">إحصائيات الخلية</text>
+            <text x="175" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">العدد (n)</text>
+            <text x="175" y="115" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">المتوسط، الأدنى، الأقصى</text>
+            <text x="175" y="135" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">التوزيع</text>
+        </g>
+    </g>
+
+    <!-- Right-Side Layer Labels -->
+    <g id="layer-labels" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Pointers -->
+        <path d="M 610,100 L 490,100 M 610,240 L 530,240 M 610,400 L 570,400" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <circle cx="490" cy="100" r="3" fill="var(--brand-500)"/>
+        <circle cx="530" cy="240" r="3" fill="var(--brand-500)"/>
+        <circle cx="570" cy="400" r="3" fill="var(--brand-500)"/>
+
+        <!-- Grid 1 Label -->
+        <text x="660" y="105" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">First layer</text>
+        <text x="660" y="105" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">الطبقة الأولى</text>
+        <text x="660" y="125" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Coarsest grid</text>
+        <text x="660" y="125" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">الشبكة الأكثر خشونة</text>
+
+        <!-- Grid 2 Label -->
+        <text x="660" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">(i-1)st layer</text>
+        <text x="660" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">الطبقة (i-1)</text>
+
+        <!-- Grid 3 Label -->
+        <text x="660" y="405" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">ith layer</text>
+        <text x="660" y="405" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">الطبقة i</text>
+        <text x="660" y="425" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Finest grid</text>
+        <text x="660" y="425" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">الشبكة الأكثر دقة</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استقلال وقت المعالجة عن عدد كائنات البيانات ميزة هائلة في قواعد البيانات الضخمة؟</template>
+      <template class="content-en">Why is processing time independence from the number of data objects a massive advantage in huge databases?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يسمح للخوارزمية بالتوسع للتعامل مع ملايين أو مليارات السجلات دون زيادة كبيرة في وقت التنفيذ، حيث يتم تلخيص البيانات في شبكة ثابتة الحجم.</p></template>
+      <template class="content-en"><p>Because it allows the algorithm to scale to handle millions or billions of records without a significant increase in execution time, as the data is summarized into a fixed-size grid.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="clustering-evaluation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تقييم التجميع (Clustering Evaluation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Clustering Evaluation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتضمن تقييم التجميع ثلاث مهام: تقييم قابلية البيانات للتجميع (Tendency)، تحديد العدد الأمثل للعناقيد ($k$)، وقياس جودة العناقيد الناتجة (طرق داخلية وخارجية).</p></template>
+    <template class="content-en"><p>Clustering evaluation involves three tasks: assessing clustering tendency, determining the optimal number of clusters ($k$), and measuring clustering quality (extrinsic vs intrinsic methods).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>1. تقييم قابلية التجميع (Tendency):</b> تحديد ما إذا كانت البيانات تحتوي على هيكل غير عشوائي. يُقاس العشوائية المكانية باستخدام <b><span class="smart-term" data-term-en="Hopkins Statistic" data-ar="إحصائية هوبكنز" data-en-def="A statistical test used to assess the clustering tendency of a dataset by measuring its spatial randomness.">إحصائية هوبكنز<span class="smart-term-tooltip"></span></span> (Hopkins Statistic)</b>.</p><p><b>2. تحديد عدد العناقيد:</b></p><ul><li><b>الطريقة التجريبية (Empirical):</b> تعيين العدد إلى حوالي $\sqrt{n/2}$ لمجموعة بيانات بحجم $n$.</li><li><b>طريقة الكوع (Elbow method):</b> رسم التباين داخل العنقود مقابل $k$ واختيار نقطة الانعطاف.</li><li><b>التحقق المتقاطع (Cross validation):</b> تقسيم البيانات واختبار الجودة لمتغيرات $k$ مختلفة.</li></ul><p><b>3. قياس جودة التجميع:</b></p><ul><li><b>الطرق الخارجية (Extrinsic):</b> تُستخدم إذا كانت <span class="smart-term" data-term-en="Ground Truth" data-ar="الحقيقة الأساسية" data-en-def="The actual, true labels or categories of the data, used as a benchmark for evaluating clustering algorithms.">الحقيقة الأساسية<span class="smart-term-tooltip"></span></span> (Ground truth) متاحة. تقيس التجانس (Homogeneity)، الاكتمال (Completeness)، معيار كيس الخرق (Rag bag)، والحفاظ على العناقيد الصغيرة.</li><li><b>الطرق الداخلية (Intrinsic):</b> تُستخدم إذا لم تكن الحقيقة الأساسية متاحة. تقيم مدى انفصال العناقيد باستخدام مقاييس مثل <b>معامل الصورة الظلية (Silhouette coefficient)</b>.</li></ul></template>
+    <template class="content-en"><p><b>1. Assessing Clustering Tendency:</b> Determines if data has a non-random structure. Spatial randomness is measured using the <b><span class="smart-term" data-term-en="Hopkins Statistic" data-ar="إحصائية هوبكنز" data-en-def="A statistical test used to assess the clustering tendency of a dataset by measuring its spatial randomness.">Hopkins Statistic<span class="smart-term-tooltip"></span></span></b>.</p><p><b>2. Determining Number of Clusters:</b></p><ul><li><b>Empirical method:</b> Set clusters to about $\sqrt{n/2}$ for $n$ points.</li><li><b>Elbow method:</b> Plot within-cluster variance vs $k$ and find the turning point.</li><li><b>Cross validation:</b> Divide data, build models, and test quality across different $k$ values.</li></ul><p><b>3. Measuring Clustering Quality:</b></p><ul><li><b>Extrinsic methods:</b> Used if <span class="smart-term" data-term-en="Ground Truth" data-ar="الحقيقة الأساسية" data-en-def="The actual, true labels or categories of the data, used as a benchmark for evaluating clustering algorithms.">ground truth<span class="smart-term-tooltip"></span></span> is available. Measures Cluster homogeneity, Cluster completeness, Rag bag criterion, and Small cluster preservation.</li><li><b>Intrinsic methods:</b> Used if ground truth is unavailable. Evaluates cluster separation using metrics like the <b>Silhouette coefficient</b>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>معايير الجودة الخارجية (Extrinsic):</p><ol><li><b>التجانس (Homogeneity):</b> كلما كانت العناقيد نقية (تحتوي على فئة واحدة)، كان التجميع أفضل.</li><li><b>الاكتمال (Completeness):</b> يجب تعيين الكائنات من نفس الفئة لنفس العنقود.</li><li><b>معيار كيس الخرق (Rag bag):</b> وضع كائن غير متجانس في عنقود نقي يجب أن يُعاقب أكثر من وضعه في عنقود مختلط (كيس خرق).</li><li><b>الحفاظ على العناقيد الصغيرة:</b> تقسيم فئة صغيرة إلى أجزاء أكثر ضرراً من تقسيم فئة كبيرة.</li></ol></template>
+    <template class="content-en"><p>Extrinsic Quality Criteria:</p><ol><li><b>Cluster homogeneity:</b> The purer the clusters, the better.</li><li><b>Cluster completeness:</b> Objects belonging to the same category should be assigned to the same cluster.</li><li><b>Rag bag criterion:</b> Putting a heterogeneous object into a pure cluster should be penalized more than putting it into a rag bag (miscellaneous) cluster.</li><li><b>Small cluster preservation:</b> Splitting a small category into pieces is more harmful than splitting a large category.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الطريقة التجريبية لتقدير عدد العناقيد (k) بناءً على عدد نقاط البيانات (n).</strong></template>
+      <template class="content-en"><strong>Empirical method to estimate the number of clusters (k) based on the number of data points (n).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$k \approx \sqrt{\frac{n}{2}}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى طرق تقييم داخلية (Intrinsic) إذا كانت الطرق الخارجية (Extrinsic) أكثر دقة بمقارنتها بالحقيقة الأساسية؟</template>
+      <template class="content-en">Why do we need intrinsic evaluation methods if extrinsic methods are more accurate by comparing to the ground truth?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التجميع هو تعلم غير خاضع للإشراف، وفي معظم تطبيقات العالم الحقيقي، الحقيقة الأساسية (التسميات الصحيحة) غير موجودة أصلاً. لذلك نعتمد على الطرق الداخلية لقياس تماسك وانفصال العناقيد.</p></template>
+      <template class="content-en"><p>Because clustering is unsupervised learning, and in most real-world applications, the ground truth (correct labels) simply does not exist. Therefore, we must rely on intrinsic methods to measure cluster cohesion and separation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبطال علوم البيانات في هذه المراجعة الشاملة لتحليل العناقيد. تخيلوا أنكم دخلتم مكتبة ضخمة حيث الكتب ملقاة على الأرض عشوائياً، ومهمتكم هي ترتيبها في مجموعات متشابهة دون معرفة تصنيفاتها المسبقة؛ هذا بالضبط هو 'التعلم غير الخاضع للإشراف'. في هذا الفصل، درسنا أربع عائلات رئيسية من الخوارزميات: أولاً، 'الطرق التقسيمية' مثل k-Means السريعة ولكن الحساسة للقيم المتطرفة، و k-Medoids التي تحل هذه المشكلة. ثانياً، 'الطرق الهرمية' مثل AGNES و DIANA التي تبني شجرة قرارات (Dendrogram) ولكن عيبها القاتل أنه لا تراجع عن أي خطوة. ثالثاً، 'الطرق القائمة على الكثافة' مثل DBSCAN التي تبحث عن التجمعات المكتظة وتتجاهل الضوضاء، مما يسمح لها باكتشاف أشكال غريبة. وأخيراً، 'الطرق القائمة على الشبكة' مثل STING التي تقسم المساحة إلى مربعات لتسريع المعالجة بشكل مذهل. ليلة الامتحان، ركزوا جيداً على مقارنة هذه الطرق (متى نستخدم كل منها؟)، ولا تنسوا مقاييس التقييم: كيف نحدد عدد العناقيد (طريقة الكوع)، وكيف نقيم الجودة (الداخلية مقابل الخارجية). بالتوفيق!</template>
+    <template class="content-en">Welcome, Data Science champions, to this comprehensive review of Cluster Analysis. Imagine walking into a massive library where books are scattered randomly, and your job is to group similar ones without knowing their predefined categories; this is exactly 'Unsupervised Learning'. In this module, we explored four main algorithm families: First, 'Partitioning Methods' like the fast but outlier-sensitive k-Means, and its robust cousin k-Medoids. Second, 'Hierarchical Methods' like AGNES and DIANA that build a Dendrogram, though their fatal flaw is that steps cannot be undone. Third, 'Density-Based Methods' like DBSCAN that hunt for crowded regions and ignore noise, allowing them to find arbitrary shapes. Finally, 'Grid-Based Methods' like STING that divide space into cells for incredibly fast processing. For the exam, focus heavily on comparing these methods (when to use which?), and don't forget the evaluation metrics: how to determine the number of clusters (Elbow method) and how to measure quality (Intrinsic vs Extrinsic). Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نلجأ لاستخدام k-Medoids بدلاً من k-Means؟</template>
+          <template class="content-en">Why do we resort to using k-Medoids instead of k-Means?</template>
+          <span class="content-target">لماذا نلجأ لاستخدام k-Medoids بدلاً من k-Means؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن k-Means تستخدم المتوسط الحسابي الذي يتأثر بشدة بالقيم المتطرفة (Outliers). k-Medoids تستخدم نقطة بيانات فعلية كمركز، مما يجعلها أكثر استقراراً ومقاومة للضوضاء.</template>
+          <template class="content-en">Because k-Means uses the arithmetic mean, which is highly influenced by outliers. k-Medoids uses an actual data point as the center, making it more stable and robust to noise.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الجوهري بين AGNES و DIANA؟</template>
+          <template class="content-en">What is the fundamental difference between AGNES and DIANA?</template>
+          <span class="content-target">ما هو الفرق الجوهري بين AGNES و DIANA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">AGNES تعمل من أسفل إلى أعلى (تدمج النقاط الفردية لتكوين عناقيد أكبر)، بينما DIANA تعمل من أعلى إلى أسفل (تبدأ بعنقود واحد ضخم وتقسمه).</template>
+          <template class="content-en">AGNES works bottom-up (merges individual points to form larger clusters), while DIANA works top-down (starts with one massive cluster and splits it).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تكتشف خوارزمية DBSCAN القيم المتطرفة؟</template>
+          <template class="content-en">How does the DBSCAN algorithm detect outliers?</template>
+          <span class="content-target">كيف تكتشف خوارزمية DBSCAN القيم المتطرفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">أي نقطة بيانات لا تستوفي شروط الكثافة (ليست كائناً أساسياً) ولا يمكن الوصول إليها عبر الكثافة من أي كائن أساسي آخر، يتم تصنيفها تلقائياً كضوضاء (Noise/Outlier).</template>
+          <template class="content-en">Any data point that does not meet the density requirements (is not a core object) and is not density-reachable from any other core object is automatically classified as noise/outlier.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة التي تحلها خوارزمية OPTICS مقارنة بـ DBSCAN؟</template>
+          <template class="content-en">What problem does the OPTICS algorithm solve compared to DBSCAN?</template>
+          <span class="content-target">ما هي المشكلة التي تحلها خوارزمية OPTICS مقارنة بـ DBSCAN؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">DBSCAN تعاني عندما تحتوي البيانات على عناقيد ذات كثافات متفاوتة بشكل كبير لأنها تستخدم حد كثافة ثابت (إبسيلون). OPTICS تحل هذا بإنشاء ترتيب للعناقيد دون الحاجة لحد كثافة صارم.</template>
+          <template class="content-en">DBSCAN struggles when data contains clusters of widely varying densities because it uses a global density threshold (epsilon). OPTICS solves this by creating a cluster ordering without needing a strict density threshold.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر الطرق القائمة على الشبكة (Grid-based) سريعة جداً؟</template>
+          <template class="content-en">Why are Grid-based methods considered very fast?</template>
+          <span class="content-target">لماذا تعتبر الطرق القائمة على الشبكة (Grid-based) سريعة جداً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تقوم بتلخيص البيانات في خلايا شبكية، وتتم عمليات التجميع على هذه الخلايا بدلاً من نقاط البيانات الفردية. لذا، وقت المعالجة يعتمد على حجم الشبكة وليس حجم البيانات.</template>
+          <template class="content-en">Because they summarize data into grid cells, and clustering operations are performed on these cells rather than individual data points. Thus, processing time depends on grid size, not data size.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مبدأ Apriori وكيف يُستخدم في خوارزمية CLIQUE؟</template>
+          <template class="content-en">What is the Apriori principle and how is it used in the CLIQUE algorithm?</template>
+          <span class="content-target">ما هو مبدأ Apriori وكيف يُستخدم في خوارزمية CLIQUE؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ينص المبدأ على أنه إذا كانت مجموعة متكررة، فإن جميع مجموعاتها الفرعية متكررة أيضاً. تستخدمه CLIQUE للبحث بكفاءة عن العناقيد الكثيفة في المساحات الفرعية (Subspaces) للبيانات عالية الأبعاد.</template>
+          <template class="content-en">The principle states that if a collection is frequent, all its subsets are also frequent. CLIQUE uses it to efficiently search for dense clusters in subspaces of high-dimensional data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم طرق التقييم الخارجية (Extrinsic) ومتى نستخدم الداخلية (Intrinsic)؟</template>
+          <template class="content-en">When do we use Extrinsic evaluation methods and when do we use Intrinsic?</template>
+          <span class="content-target">متى نستخدم طرق التقييم الخارجية (Extrinsic) ومتى نستخدم الداخلية (Intrinsic)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم الخارجية عندما تكون الحقيقة الأساسية (التصنيفات الصحيحة) متاحة للمقارنة. ونستخدم الداخلية عندما لا تكون الحقيقة الأساسية متاحة، حيث نقيس مدى تماسك وانفصال العناقيد.</template>
+          <template class="content-en">We use Extrinsic when the ground truth (correct labels) is available for comparison. We use Intrinsic when ground truth is unavailable, measuring the cohesion and separation of the clusters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو معيار 'كيس الخرق' (Rag bag) في تقييم التجميع؟</template>
+          <template class="content-en">What is the 'Rag bag' criterion in clustering evaluation?</template>
+          <span class="content-target">ما هو معيار 'كيس الخرق' (Rag bag) في تقييم التجميع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو مبدأ ينص على أن الخوارزمية يجب أن تُعاقب بشدة إذا وضعت عنصراً غريباً في عنقود نقي جداً، مقارنة بوضعه في عنقود هو أصلاً مختلط وغير متجانس (كيس خرق).</template>
+          <template class="content-en">It is a principle stating that an algorithm should be penalized more heavily for putting a heterogeneous item into a very pure cluster, compared to putting it into an already mixed cluster (a rag bag).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل طريقة الكوع (Elbow method) لتحديد عدد العناقيد؟</template>
+          <template class="content-en">How does the Elbow method work to determine the number of clusters?</template>
+          <span class="content-target">كيف تعمل طريقة الكوع (Elbow method) لتحديد عدد العناقيد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نقوم برسم التباين داخل العناقيد مقابل قيم مختلفة لـ k. التباين ينخفض مع زيادة k. النقطة التي يبدأ عندها الانخفاض بالتباطؤ بشكل ملحوظ (تشكل زاوية كالكوع) هي القيمة المثلى لـ k.</template>
+          <template class="content-en">We plot the within-cluster variance against different values of k. Variance drops as k increases. The point where the drop significantly slows down (forming an angle like an elbow) is the optimal value for k.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي إحصائية هوبكنز (Hopkins Statistic) ولماذا هي مهمة قبل التجميع؟</template>
+          <template class="content-en">What is the Hopkins Statistic and why is it important before clustering?</template>
+          <span class="content-target">ما هي إحصائية هوبكنز (Hopkins Statistic) ولماذا هي مهمة قبل التجميع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي مقياس إحصائي يحدد ما إذا كانت البيانات موزعة بشكل عشوائي أم أنها تحتوي على هيكل عنقودي حقيقي. من المهم حسابها لتجنب تطبيق خوارزميات التجميع على بيانات لا تحتوي أصلاً على عناقيد.</template>
+          <template class="content-en">It is a statistical measure that determines whether data is randomly distributed or contains a real clustered structure. It's important to calculate it to avoid applying clustering algorithms to data that inherently has no clusters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو التجميع (Clustering)؟",
+      "en": "What is Clustering?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تقسيم مجموعة من كائنات البيانات إلى مجموعات فرعية بحيث تكون الكائنات داخل العنقود متشابهة ومختلفة عن العناقيد الأخرى.",
+        "en": "The process of partitioning a set of data objects into subsets such that objects in a cluster are similar to one another, yet dissimilar to objects in other clusters."
+      },
+      "example": {
+        "ar": "تجميع العملاء بناءً على سلوك الشراء.",
+        "en": "Grouping customers based on purchasing behavior."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "لماذا يُعرف التجميع بالتعلم غير الخاضع للإشراف؟",
+      "en": "Why is clustering known as unsupervised learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن معلومات تسمية الفئة (Class label) غير موجودة مسبقاً في البيانات.",
+        "en": "Because the class label information is not present in the data."
+      },
+      "example": {
+        "ar": "إعطاء الخوارزمية صوراً لحيوانات دون إخبارها بأنها قطط أو كلاب.",
+        "en": "Giving the algorithm pictures of animals without telling it they are cats or dogs."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي خوارزمية k-Means؟",
+      "en": "What is the k-Means algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تقسيمية تعين الكائنات لأقرب مركز عنقود (المتوسط) وتحدث المراكز تكرارياً حتى الاستقرار.",
+        "en": "A partitioning method that assigns objects to the nearest cluster center (mean) and iteratively updates centers until stable."
+      },
+      "example": {
+        "ar": "تقسيم نقاط على خريطة إلى 3 مناطق بناءً على المسافة الإقليدية للمركز.",
+        "en": "Partitioning points on a map into 3 regions based on Euclidean distance to the center."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو الفرق الرئيسي بين k-Means و k-Medoids؟",
+      "en": "What is the main difference between k-Means and k-Medoids?"
+    },
+    "back": {
+      "definition": {
+        "ar": "k-Means تستخدم المتوسط الحسابي كمركز، بينما k-Medoids تستخدم كائناً حقيقياً من البيانات كمركز لتقليل الحساسية للقيم المتطرفة.",
+        "en": "k-Means uses the arithmetic mean as the center, while k-Medoids uses an actual data object as the center to reduce sensitivity to outliers."
+      },
+      "example": {
+        "ar": "في مجموعة (1, 2, 100)، المتوسط هو 34.3 (k-means)، بينما الميدويد سيكون 2 (k-medoids).",
+        "en": "In set (1, 2, 100), mean is 34.3 (k-means), medoid would be 2 (k-medoids)."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي خوارزمية AGNES؟",
+      "en": "What is the AGNES algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تجميع هرمية تجميعية (من أسفل إلى أعلى) تدمج العناقيد الأقل اختلافاً تدريجياً.",
+        "en": "An agglomerative hierarchical clustering method (bottom-up) that progressively merges the least dissimilar clusters."
+      },
+      "example": {
+        "ar": "دمج أوراق الشجرة لتكوين الفروع ثم الجذع.",
+        "en": "Merging leaves of a tree to form branches, then the trunk."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي خوارزمية DIANA؟",
+      "en": "What is the DIANA algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تجميع هرمية تقسيمية (من أعلى إلى أسفل) تبدأ بعنقود واحد وتقسمه تكرارياً.",
+        "en": "A divisive hierarchical clustering method (top-down) that starts with one cluster and recursively splits it."
+      },
+      "example": {
+        "ar": "تقسيم شركة كبيرة إلى أقسام، ثم إلى فرق صغيرة.",
+        "en": "Splitting a large company into departments, then into small teams."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو العيب الرئيسي للطرق الهرمية؟",
+      "en": "What is the main drawback of hierarchical methods?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا تتوسع بشكل جيد، وبمجرد اتخاذ قرار الدمج أو التقسيم، لا يمكن التراجع عنه أبداً.",
+        "en": "They do not scale well, and once a merge or split step is done, it can never be undone."
+      },
+      "example": {
+        "ar": "إذا تم دمج نقطتين بالخطأ في البداية، سيبقى هذا الخطأ حتى النهاية.",
+        "en": "If two points are mistakenly merged early on, the error remains until the end."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي المعلمتان الأساسيتان في خوارزمية DBSCAN؟",
+      "en": "What are the two main parameters in the DBSCAN algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إبسيلون ($\\epsilon$) وهو الحد الأقصى لنصف قطر الجوار، و MinPts وهو الحد الأدنى لعدد النقاط المطلوبة في هذا الجوار.",
+        "en": "Epsilon ($\\epsilon$) which is the maximum radius of a neighborhood, and MinPts which is the minimum number of points required in that neighborhood."
+      },
+      "example": {
+        "ar": "اعتبار النقطة مركزية إذا كان حولها 5 نقاط (MinPts) ضمن مسافة 2 متر ($\\epsilon$).",
+        "en": "Considering a point core if it has 5 points (MinPts) within a 2-meter distance ($\\epsilon$)."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف تتعامل DBSCAN مع القيم المتطرفة؟",
+      "en": "How does DBSCAN handle outliers?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصنف النقاط التي لا تنتمي لأي عنقود كثيف (لا يمكن الوصول إليها عبر الكثافة) على أنها ضوضاء (Noise).",
+        "en": "It classifies points that do not belong to any dense cluster (not density-reachable) as noise."
+      },
+      "example": {
+        "ar": "نقطة معزولة بعيدة عن جميع المجموعات الكثيفة يتم تجاهلها كضوضاء.",
+        "en": "An isolated point far from all dense groups is ignored as noise."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي الميزة الرئيسية للطرق القائمة على الشبكة (Grid-based)؟",
+      "en": "What is the main advantage of Grid-based methods?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وقت المعالجة السريع جداً، والذي يعتمد على حجم الشبكة وليس على عدد كائنات البيانات.",
+        "en": "Very fast processing time, which depends on the grid size rather than the number of data objects."
+      },
+      "example": {
+        "ar": "معالجة مليون نقطة تستغرق نفس وقت معالجة ألف نقطة إذا تم تقسيم المساحة إلى نفس عدد الخلايا.",
+        "en": "Processing 1 million points takes the same time as 1000 points if the space is divided into the same number of cells."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي خوارزمية STING؟",
+      "en": "What is the STING algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة شبكية تقسم المساحة هرمياً وتخزن المعلومات الإحصائية (المتوسط، الحد الأقصى) مسبقاً في كل خلية.",
+        "en": "A grid-based method that divides space hierarchically and precomputes statistical information (mean, max) in each cell."
+      },
+      "example": {
+        "ar": "حساب متوسط درجات الحرارة لكل مربع في خريطة جغرافية مسبقاً لتسريع الاستعلامات.",
+        "en": "Precomputing average temperatures for each square on a map to speed up queries."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الغرض من إحصائية هوبكنز (Hopkins Statistic)؟",
+      "en": "What is the purpose of the Hopkins Statistic?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقييم قابلية التجميع (Clustering tendency) عن طريق قياس العشوائية المكانية للبيانات.",
+        "en": "Assessing clustering tendency by measuring the spatial randomness of the data."
+      },
+      "example": {
+        "ar": "التأكد مما إذا كانت البيانات تحتوي فعلاً على مجموعات قبل تطبيق خوارزمية التجميع.",
+        "en": "Checking if the data actually contains groups before applying a clustering algorithm."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف تعمل طريقة الكوع (Elbow method)؟",
+      "en": "How does the Elbow method work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لتحديد عدد العناقيد (k) برسم التباين داخل العنقود مقابل k، واختيار نقطة الانعطاف (الكوع).",
+        "en": "Used to determine the number of clusters (k) by plotting within-cluster variance against k, and selecting the turning point (elbow)."
+      },
+      "example": {
+        "ar": "عندما يتوقف التباين عن الانخفاض بشكل حاد عند k=3، نختار 3 كعدد أمثل.",
+        "en": "When variance stops dropping sharply at k=3, we choose 3 as the optimal number."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما الفرق بين طرق التقييم الخارجية (Extrinsic) والداخلية (Intrinsic)؟",
+      "en": "What is the difference between Extrinsic and Intrinsic evaluation methods?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الخارجية تقارن التجميع بالحقيقة الأساسية (Ground truth)، بينما الداخلية تقيم جودة الفصل والتماسك بدون حقيقة أساسية.",
+        "en": "Extrinsic compares clustering against ground truth, while intrinsic evaluates separation and cohesion without ground truth."
+      },
+      "example": {
+        "ar": "الخارجية: التجانس (Homogeneity). الداخلية: معامل الصورة الظلية (Silhouette coefficient).",
+        "en": "Extrinsic: Homogeneity. Intrinsic: Silhouette coefficient."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو معيار كيس الخرق (Rag bag criterion) في التقييم الخارجي؟",
+      "en": "What is the Rag bag criterion in extrinsic evaluation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ينص على أن وضع كائن غير متجانس في عنقود نقي يجب أن يُعاقب أكثر من وضعه في عنقود مختلط (كيس خرق).",
+        "en": "States that putting a heterogeneous object into a pure cluster should be penalized more than putting it into a miscellaneous (rag bag) cluster."
+      },
+      "example": {
+        "ar": "وضع تفاحة في صندوق مليء بالبرتقال أسوأ من وضعها في صندوق فواكه مشكلة.",
+        "en": "Putting an apple in a box full of oranges is worse than putting it in a mixed fruit box."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "لماذا يُعتبر التجميع (Clustering) تعلماً غير خاضع للإشراف؟",
+      "en": "Why is clustering considered unsupervised learning?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يتطلب تدخل بشري مستمر.",
+        "لأن معلومات تسمية الفئة (Class label) غير موجودة.",
+        "لأنه يستخدم فقط للبيانات الرقمية.",
+        "لأنه يتنبأ بقيم مستمرة."
+      ],
+      "en": [
+        "Because it requires continuous human intervention.",
+        "Because the class label information is not present.",
+        "Because it is only used for numeric data.",
+        "Because it predicts continuous values."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التجميع يكتشف الهياكل المخفية في البيانات دون وجود إجابات صحيحة مسبقة (تسميات).",
+      "en": "Clustering discovers hidden structures in data without pre-existing correct answers (labels)."
+    },
+    "hint": {
+      "ar": "فكر في الفرق بين التصنيف والتجميع.",
+      "en": "Think about the difference between classification and clustering."
+    },
+    "difficulty": "easy",
+    "conceptId": "cluster-analysis-fundamentals"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من الخوارزميات التالية تستخدم كائناً حقيقياً من البيانات لتمثيل العنقود لتقليل الحساسية للقيم المتطرفة؟",
+      "en": "Which of the following algorithms uses an actual data object to represent the cluster to reduce sensitivity to outliers?"
+    },
+    "options": {
+      "ar": [
+        "k-Means",
+        "k-Medoids",
+        "AGNES",
+        "STING"
+      ],
+      "en": [
+        "k-Means",
+        "k-Medoids",
+        "AGNES",
+        "STING"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خوارزمية k-Medoids تختار نقطة بيانات فعلية (Medoid) بدلاً من حساب المتوسط الحسابي، مما يجعلها أكثر مقاومة للقيم المتطرفة.",
+      "en": "The k-Medoids algorithm selects an actual data point (Medoid) instead of calculating the arithmetic mean, making it more robust to outliers."
+    },
+    "hint": {
+      "ar": "الاسم مشتق من كلمة Median (الوسيط).",
+      "en": "The name is related to the concept of a Median."
+    },
+    "difficulty": "medium",
+    "conceptId": "partitioning-methods-kmeans"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي الاستراتيجية التي تتبعها خوارزمية AGNES في التجميع الهرمي؟",
+      "en": "What strategy does the AGNES algorithm follow in hierarchical clustering?"
+    },
+    "options": {
+      "ar": [
+        "من أعلى إلى أسفل (Top-down)",
+        "من أسفل إلى أعلى (Bottom-up)",
+        "التقسيم العشوائي",
+        "التقسيم الشبكي"
+      ],
+      "en": [
+        "Top-down",
+        "Bottom-up",
+        "Random partitioning",
+        "Grid partitioning"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "AGNES هي خوارزمية تجميعية (Agglomerative) تبدأ بجعل كل كائن عنقوداً مستقلاً وتدمجها تدريجياً (من أسفل إلى أعلى).",
+      "en": "AGNES is an agglomerative algorithm that starts by letting each object form its own cluster and gradually merges them (bottom-up)."
+    },
+    "hint": {
+      "ar": "حرف A في AGNES يرمز إلى Agglomerative.",
+      "en": "The A in AGNES stands for Agglomerative."
+    },
+    "difficulty": "easy",
+    "conceptId": "hierarchical-methods"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في خوارزمية DBSCAN، ما هو تعريف 'الكائن الأساسي' (Core Object)؟",
+      "en": "In the DBSCAN algorithm, what is the definition of a 'Core Object'?"
+    },
+    "options": {
+      "ar": [
+        "الكائن الذي يقع في مركز الشبكة.",
+        "الكائن الذي يحتوي على الأقل على MinPts من الكائنات داخل جوار إبسيلون الخاص به.",
+        "الكائن الأبعد عن جميع الكائنات الأخرى.",
+        "الكائن الذي يمثل المتوسط الحسابي للعنقود."
+      ],
+      "en": [
+        "The object located at the center of the grid.",
+        "An object that has at least MinPts objects within its epsilon-neighborhood.",
+        "The object farthest from all other objects.",
+        "The object representing the arithmetic mean of the cluster."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الكائن الأساسي هو النقطة التي تقع في منطقة كثيفة، وتُعرف الكثافة بوجود عدد أدنى من النقاط (MinPts) ضمن مسافة معينة (إبسيلون).",
+      "en": "A core object is a point in a dense region, defined by having a minimum number of points (MinPts) within a specific distance (epsilon)."
+    },
+    "hint": {
+      "ar": "تذكر المعلمتين الأساسيتين لـ DBSCAN.",
+      "en": "Remember the two main parameters of DBSCAN."
+    },
+    "difficulty": "medium",
+    "conceptId": "density-based-methods-dbscan"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الميزة التنافسية الكبرى للطرق القائمة على الشبكة (Grid-based) مثل STING؟",
+      "en": "What is the major competitive advantage of Grid-based methods like STING?"
+    },
+    "options": {
+      "ar": [
+        "قدرتها على اكتشاف العناقيد ذات الأشكال غير المحدبة بدقة متناهية.",
+        "وقت المعالجة السريع الذي يعتمد على حجم الشبكة وليس عدد الكائنات.",
+        "عدم حاجتها لأي معلمات إدخال من المستخدم.",
+        "قدرتها على التراجع عن قرارات الدمج الخاطئة."
+      ],
+      "en": [
+        "Ability to detect non-convex shaped clusters with extreme precision.",
+        "Fast processing time that depends on grid size, not the number of objects.",
+        "No need for any user input parameters.",
+        "Ability to undo wrong merge decisions."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الطرق الشبكية تلخص البيانات في خلايا، مما يجعل وقت المعالجة مستقلاً عن حجم البيانات الفعلي، مما يوفر سرعة هائلة.",
+      "en": "Grid methods summarize data into cells, making processing time independent of the actual data size, providing massive speed."
+    },
+    "hint": {
+      "ar": "فكر في قابلية التوسع لقواعد البيانات الضخمة.",
+      "en": "Think about scalability for huge databases."
+    },
+    "difficulty": "medium",
+    "conceptId": "grid-based-methods"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من المقاييس التالية يُستخدم لتقييم 'قابلية التجميع' (Clustering Tendency) للبيانات؟",
+      "en": "Which of the following metrics is used to assess the 'Clustering Tendency' of data?"
+    },
+    "options": {
+      "ar": [
+        "معامل الصورة الظلية (Silhouette coefficient)",
+        "إحصائية هوبكنز (Hopkins Statistic)",
+        "معيار كيس الخرق (Rag bag criterion)",
+        "مبدأ أبريوري (Apriori principle)"
+      ],
+      "en": [
+        "Silhouette coefficient",
+        "Hopkins Statistic",
+        "Rag bag criterion",
+        "Apriori principle"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إحصائية هوبكنز تقيس العشوائية المكانية للبيانات لتحديد ما إذا كان هناك هيكل عنقودي حقيقي قبل تطبيق الخوارزميات.",
+      "en": "The Hopkins Statistic measures the spatial randomness of data to determine if a real cluster structure exists before applying algorithms."
+    },
+    "hint": {
+      "ar": "يبدأ بحرف H.",
+      "en": "Starts with the letter H."
+    },
+    "difficulty": "hard",
+    "conceptId": "clustering-evaluation"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "وفقاً للطريقة التجريبية (Empirical method)، ما هو العدد المقدر للعناقيد (k) لمجموعة بيانات تحتوي على 200 نقطة؟",
+      "en": "According to the Empirical method, what is the estimated number of clusters (k) for a dataset of 200 points?"
+    },
+    "options": {
+      "ar": [
+        "10",
+        "14",
+        "20",
+        "100"
+      ],
+      "en": [
+        "10",
+        "14",
+        "20",
+        "100"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "المعادلة هي جذر (n/2). جذر (200/2) = جذر (100) = 10.",
+      "en": "The formula is sqrt(n/2). sqrt(200/2) = sqrt(100) = 10."
+    },
+    "hint": {
+      "ar": "استخدم المعادلة: k = sqrt(n/2).",
+      "en": "Use the formula: k = sqrt(n/2)."
+    },
+    "difficulty": "medium",
+    "conceptId": "clustering-evaluation"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لخوارزمية STING؟",
+      "en": "What is the main disadvantage of the STING algorithm?"
+    },
+    "options": {
+      "ar": [
+        "بطيئة جداً مع البيانات الكبيرة.",
+        "حساسة جداً للقيم المتطرفة.",
+        "جميع حدود العناقيد تكون أفقية أو رأسية فقط.",
+        "تتطلب تحديد عدد العناقيد مسبقاً."
+      ],
+      "en": [
+        "Very slow with large data.",
+        "Highly sensitive to outliers.",
+        "All cluster boundaries are either horizontal or vertical only.",
+        "Requires specifying the number of clusters in advance."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بسبب طبيعة الشبكة المستطيلة، لا يمكن لـ STING اكتشاف حدود قطرية (Diagonal) للعناقيد.",
+      "en": "Due to the rectangular grid nature, STING cannot detect diagonal boundaries for clusters."
+    },
+    "hint": {
+      "ar": "فكر في شكل الخلايا في الشبكة.",
+      "en": "Think about the shape of the cells in the grid."
+    },
+    "difficulty": "medium",
+    "conceptId": "grid-based-methods"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في تقييم جودة التجميع الخارجي، ماذا يعني معيار 'التجانس' (Homogeneity)؟",
+      "en": "In extrinsic clustering quality evaluation, what does the 'Homogeneity' criterion mean?"
+    },
+    "options": {
+      "ar": [
+        "يجب تعيين جميع الكائنات من نفس الفئة لنفس العنقود.",
+        "كلما كانت العناقيد نقية (تحتوي على فئة واحدة)، كان التجميع أفضل.",
+        "تقسيم فئة صغيرة أسوأ من تقسيم فئة كبيرة.",
+        "العناقيد يجب أن تكون كروية الشكل."
+      ],
+      "en": [
+        "All objects from the same category must be assigned to the same cluster.",
+        "The purer the clusters (containing one category), the better the clustering.",
+        "Splitting a small category is worse than splitting a large one.",
+        "Clusters must be spherical in shape."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التجانس يقيس مدى نقاء العنقود. العنقود المثالي يحتوي فقط على نقاط بيانات تنتمي إلى فئة حقيقية واحدة.",
+      "en": "Homogeneity measures cluster purity. An ideal cluster contains only data points belonging to a single true class."
+    },
+    "hint": {
+      "ar": "التجانس يعني أن الأشياء من نفس النوع.",
+      "en": "Homogeneous means of the same kind."
+    },
+    "difficulty": "medium",
+    "conceptId": "clustering-evaluation"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من الخوارزميات التالية تستخدم مبدأ Apriori لاكتشاف العناقيد في المساحات الفرعية (Subspaces)؟",
+      "en": "Which of the following algorithms uses the Apriori principle to discover clusters in subspaces?"
+    },
+    "options": {
+      "ar": [
+        "DBSCAN",
+        "OPTICS",
+        "CLIQUE",
+        "DIANA"
+      ],
+      "en": [
+        "DBSCAN",
+        "OPTICS",
+        "CLIQUE",
+        "DIANA"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خوارزمية CLIQUE هي طريقة شبكية تستخدم مبدأ Apriori للتعرف بكفاءة على المساحات الفرعية الكثيفة.",
+      "en": "The CLIQUE algorithm is a grid-based method that uses the Apriori principle to efficiently identify dense subspaces."
+    },
+    "hint": {
+      "ar": "إنها خوارزمية قائمة على الشبكة (Grid-based).",
+      "en": "It is a grid-based algorithm."
+    },
+    "difficulty": "hard",
+    "conceptId": "grid-based-methods"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن خوارزمية k-Means ستجد دائماً أفضل تقسيم ممكن (Global Optimum). في الواقع، غالباً ما تتوقف عند حل محلي (Local Optimum) يعتمد على الاختيار العشوائي الأولي للمراكز.</template>
+    <template class="content-en">Believing that k-Means will always find the best possible partition (Global Optimum). In reality, it often terminates at a Local Optimum depending on the initial random selection of centroids.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">سر سرعة الطرق القائمة على الشبكة (Grid-based) هو أن وقت المعالجة يعتمد على عدد الخلايا (Grid size) وليس على عدد نقاط البيانات. هذا يجعلها مثالية للبيانات الضخمة جداً.</template>
+    <template class="content-en">The secret to the speed of Grid-based methods is that processing time depends on the number of cells (Grid size), not the number of data points. This makes them ideal for massive datasets.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في التجميع الهرمي، لا يمكن التراجع عن أي خطوة دمج أو تقسيم. هذا هو السبب الرئيسي لعدم قابليتها للتوسع بشكل جيد وحاجتها للدمج مع خوارزميات أخرى.</template>
+    <template class="content-en">In hierarchical clustering, a merge or split step can NEVER be undone. This is the primary reason they do not scale well and often need to be integrated with other algorithms.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين التجانس (Homogeneity) والاكتمال (Completeness) في التقييم الخارجي. التجانس يعني 'هل العنقود نقي؟'، بينما الاكتمال يعني 'هل كل عناصر الفئة تجمعت في نفس العنقود؟'.</template>
+    <template class="content-en">Confusing Homogeneity and Completeness in extrinsic evaluation. Homogeneity asks 'Is the cluster pure?', while Completeness asks 'Are all members of a class grouped in the same cluster?'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">خوارزمية DBSCAN ممتازة في اكتشاف العناقيد ذات الأشكال العشوائية وعزل الضوضاء، لكنها تفشل عندما تكون العناقيد ذات كثافات متفاوتة بشكل كبير. هنا يأتي دور خوارزمية OPTICS.</template>
+    <template class="content-en">DBSCAN is excellent at finding arbitrary-shaped clusters and isolating noise, but it fails when clusters have widely varying densities. This is where the OPTICS algorithm comes in.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

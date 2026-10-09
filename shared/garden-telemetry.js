@@ -295,6 +295,8 @@
   }
 
 
+  /*@3.GATJ.42*/
+  var pg = rid().slice(0, 8);
   var attn = 0;
   var lastAct = Date.now();
   var maxScroll = 0;
@@ -513,7 +515,7 @@
   }
 
   function leave() {
-    ev('p_leave', { a: Math.round(attn / 1000), sd: Math.max(maxScroll, scrollDepth()) });
+    ev('p_leave', { a: Math.round(attn / 1000), sd: Math.max(maxScroll, scrollDepth()), pg: pg });
     /*@3.GATJ.35*/
     if (!perfSent && (perf.lcp || perf.inp || perf.cls || perf.ttfb)) {
       perfSent = true;
@@ -542,6 +544,7 @@
 
     if (fresh) ev('s_start', Object.assign({ r: refHost() }, utm()));
     ev('p_view', {
+      pg: pg,
       u: cleanPath(),
       s: document.documentElement.getAttribute('data-subject') || '',
       m: document.documentElement.getAttribute('data-module') || ''

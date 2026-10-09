@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT233" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>بنية مجموعة التعليمات: CISC مقابل RISC · IT233 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT233" data-page-title-en="IT233">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="M13.html" data-gh-card="../../hub/course.html?code=IT233"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#instruction-set-architecture-isa" class="toc-link" data-bilingual>
+        <template class="content-ar">بنية مجموعة التعليمات (ISA)</template>
+        <template class="content-en">Instruction Set Architecture (ISA)</template>
+        <span class="content-target">بنية مجموعة التعليمات (ISA)</span>
+      </a>
+      <a href="#number-of-addresses" class="toc-link" data-bilingual>
+        <template class="content-ar">عدد العناوين في التعليمة</template>
+        <template class="content-en">Number of Addresses</template>
+        <span class="content-target">عدد العناوين في التعليمة</span>
+      </a>
+      <a href="#cisc-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">معمارية CISC (حاسوب مجموعة التعليمات المعقدة)</template>
+        <template class="content-en">CISC Architecture (Complex Instruction Set Computer)</template>
+        <span class="content-target">معمارية CISC (حاسوب مجموعة التعليمات المعقدة)</span>
+      </a>
+      <a href="#risc-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">معمارية RISC (حاسوب مجموعة التعليمات المخفضة)</template>
+        <template class="content-en">RISC Architecture (Reduced Instruction Set Computer)</template>
+        <span class="content-target">معمارية RISC (حاسوب مجموعة التعليمات المخفضة)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · IT233
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">بنية مجموعة التعليمات: CISC مقابل RISC</h1>
+      <p class="hero-description">دراسة شاملة لبنية مجموعة التعليمات (ISA)، عناصر التعليمات، أنواع العناوين، والمقارنة المعمارية بين حواسيب مجموعة التعليمات المعقدة (CISC) والمخفضة (RISC).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Instruction Set Architecture: CISC vs RISC</h1>
+      <p class="hero-description">A comprehensive study of Instruction Set Architecture (ISA), instruction elements, address types, and the architectural comparison between CISC and RISC.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بنية الحاسوب</span>
+      <span class="tag">مجموعة التعليمات</span>
+      <span class="tag">CISC</span>
+      <span class="tag">RISC</span>
+      <span class="tag">عناوين الذاكرة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Computer Architecture</span>
+      <span class="tag">Instruction Set</span>
+      <span class="tag">CISC</span>
+      <span class="tag">RISC</span>
+      <span class="tag">Memory Addressing</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم دور بنية مجموعة التعليمات (ISA) كواجهة بين البرمجيات والأجهزة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد العناصر الأساسية لتعليمة الآلة ودورة تنفيذها.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل تأثير عدد العناوين (0، 1، 2، 3) على تصميم التعليمات وأداء البرنامج.</span></li>
+      <li><span class="obj-icon">✦</span><span>المقارنة بين معماريتي CISC و RISC من حيث التصميم، المزايا، والعيوب.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the role of Instruction Set Architecture (ISA) as an interface between software and hardware.</span></li>
+      <li><span class="obj-icon">✦</span><span>Identify the basic elements of a machine instruction and its execution cycle.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze the impact of the number of addresses (0, 1, 2, 3) on instruction design and program performance.</span></li>
+      <li><span class="obj-icon">✦</span><span>Compare CISC and RISC architectures in terms of design, advantages, and disadvantages.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="instruction-set-architecture-isa" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> بنية مجموعة التعليمات (ISA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Instruction Set Architecture (ISA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هي الواجهة الوسيطة بين البرمجيات والأجهزة، والتي تخبر العتاد بما يجب القيام به.</p></template>
+    <template class="content-en"><p>The interface between software and hardware that tells the hardware what should be done.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بنية مجموعة التعليمات (ISA) هي المجموعة الكاملة من التعليمات التي يفهمها المعالج (CPU). تُمثل عادةً برمز الآلة (Machine Code) أو النظام الثنائي (Binary)، وتُعرض للمبرمجين باستخدام لغة التجميع (Assembly).</p><p>تعمل ISA كآلية تقوم من خلالها البرمجيات (مثل الكود المكتوب بلغات عالية المستوى كـ C++ أو Java بعد ترجمته بواسطة المترجم والمُجمّع) بتوجيه الأجهزة لتنفيذ عمليات محددة.</p><p>تتكون التعليمة من عدة عناصر أساسية:</p><ol><li><b><span class="smart-term" data-term-en="Opcode" data-ar="رمز العملية" data-en-def="The part of a machine instruction that specifies the operation to be performed.">رمز العملية<span class="smart-term-tooltip"></span></span> (Opcode):</b> يحدد العملية المراد تنفيذها (مثل ADD, SUB).</li><li><b>مرجع <span class="smart-term" data-term-en="Operand" data-ar="المعامل" data-en-def="The part of a computer instruction that specifies data that is to be operating on or manipulated.">المعامل<span class="smart-term-tooltip"></span></span> المصدر (Source Operand):</b> يحدد البيانات التي ستتم عليها العملية.</li><li><b>مرجع معامل النتيجة (Result Operand):</b> يحدد مكان تخزين النتيجة.</li><li><b>مرجع التعليمة التالية (Next Instruction):</b> يحدد التعليمة التي سيتم تنفيذها بعد الانتهاء من التعليمة الحالية.</li></ol></template>
+    <template class="content-en"><p>The Instruction Set Architecture (ISA) is the complete collection of instructions understood by a CPU. It is represented by machine code (binary) and usually represented for human consumption by assembly codes.</p><p>The ISA serves as an interface between software and hardware. It provides a mechanism by which the software (high-level language code translated by a compiler and assembler) tells the hardware what should be done.</p><p>An instruction consists of several key elements:</p><ol><li><b>Operation code (<span class="smart-term" data-term-en="Opcode" data-ar="رمز العملية" data-en-def="The part of a machine instruction that specifies the operation to be performed.">Opcode<span class="smart-term-tooltip"></span></span>):</b> Specifies the operation to be performed (e.g., ADD, SUB).</li><li><b>Source <span class="smart-term" data-term-en="Operand" data-ar="المعامل" data-en-def="The part of a computer instruction that specifies data that is to be operating on or manipulated.">Operand<span class="smart-term-tooltip"></span></span> reference:</b> Specifies the input data for the operation.</li><li><b>Result Operand reference:</b> Specifies where to put the answer.</li><li><b>Next Instruction Reference:</b> Tells the CPU where to fetch the next instruction after the current one is completed.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تصميم ISA هو قرار حاسم يحدد مدى تعقيد المعالج وكفاءة المترجمات. إذا كانت التعليمات معقدة للغاية، سيحتاج المعالج إلى دوائر إلكترونية معقدة لفك تشفيرها. وإذا كانت بسيطة للغاية، ستحتاج البرامج إلى عدد هائل من التعليمات لإنجاز مهام بسيطة.</p><p>تتضمن قرارات التصميم تحديد عدد العمليات المتاحة، أنواع البيانات المدعومة، تنسيقات التعليمات (طول حقل رمز العملية)، وعدد العناوين المستخدمة في كل تعليمة.</p><p>تتضمن دورة التعليمة حالات متعددة: جلب التعليمة، حساب عنوان التعليمة، فك تشفير العملية، حساب عنوان المعامل، جلب المعامل، تنفيذ العملية، وتخزين النتيجة.</p></template>
+    <template class="content-en"><p>Designing an ISA is a critical decision that dictates processor complexity and compiler efficiency. If instructions are too complex, the CPU requires intricate decoding logic. If too simple, programs require a massive number of instructions to accomplish basic tasks.</p><p>Design decisions include the operation repertoire (how many ops, their complexity), data types, instruction formats (length of opcode field), and the number of addresses.</p><p>The instruction cycle involves multiple states: Instruction fetch, instruction address calculation, instruction operation decoding, operand address calculation, operand fetch, data operation, and operand store.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a state diagram showing the 'Instruction Cycle State Diagram'. Use circles for states: 'Instruction fetch', 'Instruction operation decoding', 'Operand address calculation', 'Operand fetch', 'Data Operation', 'Operand store', 'Instruction address calculation'. Draw directed arrows showing the flow between these states, including loops for 'Multiple operands' and 'Multiple results', and a return path for 'string or vector data'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 500, English labels as per the source PDF. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">Instruction Cycle State Diagram</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="24" font-weight="bold">مخطط حالة دورة التعليمة</text>
+
+    <!-- Phase Boxes -->
+    <!-- Fetch & Decode Phase Box -->
+    <rect x="25" y="70" width="750" height="150" rx="15" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+    <text x="40" y="95" text-anchor="start" class="gsvg-en" fill="var(--text-muted)" font-size="13" font-weight="bold" letter-spacing="1">FETCH &amp; DECODE PHASE</text>
+    <text x="760" y="95" text-anchor="end" class="gsvg-ar" fill="var(--text-muted)" font-size="14" font-weight="bold">مرحلة الجلب وفك الشفرة</text>
+
+    <!-- Execution Phase Box -->
+    <rect x="25" y="270" width="750" height="150" rx="15" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+    <text x="40" y="295" text-anchor="start" class="gsvg-en" fill="var(--text-muted)" font-size="13" font-weight="bold" letter-spacing="1">EXECUTION PHASE</text>
+    <text x="760" y="295" text-anchor="end" class="gsvg-ar" fill="var(--text-muted)" font-size="14" font-weight="bold">مرحلة التنفيذ</text>
+
+    <!-- Edges (Lines and Paths) -->
+    <!-- IAC to IF -->
+    <line x1="160" y1="150" x2="330" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- IF to IOD -->
+    <line x1="460" y1="150" x2="630" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- IOD to OAC -->
+    <line x1="700" y1="210" x2="700" y2="280" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- OAC to OF -->
+    <line x1="640" y1="350" x2="570" y2="350" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- OF to DO -->
+    <line x1="440" y1="350" x2="370" y2="350" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- DO to OS -->
+    <line x1="240" y1="350" x2="170" y2="350" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- OS to IAC (Next Instruction) -->
+    <line x1="100" y1="290" x2="100" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="110" y="255" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Next Instruction</text>
+    <text x="110" y="255" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">التعليمة التالية</text>
+
+    <!-- IOD to DO (No Operand - Optional standard path) -->
+    <path d="M 645 180 C 550 240, 450 280, 350 320" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <text x="500" y="265" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">No Operand</text>
+    <text x="500" y="265" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">بدون معامل</text>
+
+    <!-- OS to IF (String or Vector Data) -->
+    <path d="M 140 305 C 200 230, 280 190, 345 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="240" y="200" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="13" font-weight="bold">String or Vector Data</text>
+    <text x="240" y="200" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">بيانات نصية أو متجهية</text>
+
+    <!-- OF to OAC (Multiple Operands Loop) -->
+    <path d="M 520 406 C 560 460, 640 460, 680 406" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="600" y="465" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="13" font-weight="bold">Multiple Operands</text>
+    <text x="600" y="465" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">معاملات متعددة</text>
+
+    <!-- OS to OAC (Multiple Results Loop) -->
+    <path d="M 120 406 C 250 580, 550 580, 715 408" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="400" y="550" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="13" font-weight="bold">Multiple Results</text>
+    <text x="400" y="550" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">نتائج متعددة</text>
+
+    <!-- Nodes (States) -->
+    <!-- IAC: Instruction Address Calculation -->
+    <circle cx="100" cy="150" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="100" y="134" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="13" font-weight="bold">
+        <tspan x="100" dy="0">Instruction</tspan>
+        <tspan x="100" dy="16">Address</tspan>
+        <tspan x="100" dy="16">Calculation</tspan>
+    </text>
+    <text x="100" y="141" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="100" dy="0">حساب</tspan>
+        <tspan x="100" dy="20">عنوان التعليمة</tspan>
+    </text>
+
+    <!-- IF: Instruction Fetch -->
+    <circle cx="400" cy="150" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="141" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="400" dy="0">Instruction</tspan>
+        <tspan x="400" dy="18">Fetch</tspan>
+    </text>
+    <text x="400" y="141" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">
+        <tspan x="400" dy="0">جلب</tspan>
+        <tspan x="400" dy="20">التعليمة</tspan>
+    </text>
+
+    <!-- IOD: Instruction Operation Decoding -->
+    <circle cx="700" cy="150" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="700" y="134" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="13" font-weight="bold">
+        <tspan x="700" dy="0">Instruction</tspan>
+        <tspan x="700" dy="16">Operation</tspan>
+        <tspan x="700" dy="16">Decoding</tspan>
+    </text>
+    <text x="700" y="141" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="700" dy="0">فك شفرة</tspan>
+        <tspan x="700" dy="20">التعليمة</tspan>
+    </text>
+
+    <!-- OAC: Operand Address Calculation -->
+    <circle cx="700" cy="350" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="700" y="334" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="13" font-weight="bold">
+        <tspan x="700" dy="0">Operand</tspan>
+        <tspan x="700" dy="16">Address</tspan>
+        <tspan x="700" dy="16">Calculation</tspan>
+    </text>
+    <text x="700" y="341" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="700" dy="0">حساب</tspan>
+        <tspan x="700" dy="20">عنوان المعامل</tspan>
+    </text>
+
+    <!-- OF: Operand Fetch -->
+    <circle cx="500" cy="350" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="500" y="341" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="500" dy="0">Operand</tspan>
+        <tspan x="500" dy="18">Fetch</tspan>
+    </text>
+    <text x="500" y="341" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">
+        <tspan x="500" dy="0">جلب</tspan>
+        <tspan x="500" dy="20">المعامل</tspan>
+    </text>
+
+    <!-- DO: Data Operation -->
+    <circle cx="300" cy="350" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="300" y="341" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="300" dy="0">Data</tspan>
+        <tspan x="300" dy="18">Operation</tspan>
+    </text>
+    <text x="300" y="341" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">
+        <tspan x="300" dy="0">عملية</tspan>
+        <tspan x="300" dy="20">البيانات</tspan>
+    </text>
+
+    <!-- OS: Operand Store -->
+    <circle cx="100" cy="350" r="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="100" y="341" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">
+        <tspan x="100" dy="0">Operand</tspan>
+        <tspan x="100" dy="18">Store</tspan>
+    </text>
+    <text x="100" y="341" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">
+        <tspan x="100" dy="0">تخزين</tspan>
+        <tspan x="100" dy="20">المعامل</tspan>
+    </text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى 'مرجع التعليمة التالية' إذا كانت التعليمات تُنفذ عادةً بشكل تسلسلي؟</template>
+      <template class="content-en">Why do we need a 'Next Instruction Reference' if instructions are usually executed sequentially?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>على الرغم من أن التنفيذ الافتراضي تسلسلي، إلا أن برامج الحاسوب تعتمد بشكل كبير على التفرع (Branching) والحلقات (Loops) واستدعاء الدوال. مرجع التعليمة التالية ضروري لتغيير مسار التنفيذ عند استيفاء شروط معينة.</p></template>
+      <template class="content-en"><p>While default execution is sequential, computer programs rely heavily on branching, loops, and function calls. The next instruction reference is essential for altering the control flow when specific conditions are met.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="number-of-addresses" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> عدد العناوين في التعليمة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Number of Addresses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحدد عدد المعاملات (العناوين) التي يمكن تضمينها في تعليمة واحدة، ويتراوح عادة من 0 إلى 3 عناوين.</p></template>
+    <template class="content-en"><p>Determines how many operands (addresses) can be included in a single instruction, typically ranging from 0 to 3 addresses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تصميم التعليمات يختلف بناءً على عدد العناوين التي تدعمها التعليمة الواحدة. لنأخذ المعادلة <code>a = (a * b + c) - d * e</code> كمثال:</p><ol><li><b>3 عناوين (3 Addresses):</b> تحتوي التعليمة على معاملين مصدر ونتيجة واحدة (مثل: <code>ADD a, b, c</code> تعني a = b + c). هذا النوع غير شائع لأنه يتطلب كلمات طويلة جداً لاحتواء كل العناوين.</li><li><b>عنوانان (2 Addresses):</b> أحد العناوين يعمل كمعامل مصدر ووجهة للنتيجة في نفس الوقت (مثل: <code>ADD a, b</code> تعني a = a + b). يقلل هذا من طول التعليمة ولكنه يتطلب عملاً إضافياً وتخزيناً مؤقتاً للنتائج.</li><li><b>عنوان واحد (1 Address):</b> يحتوي على عنوان صريح واحد، بينما يكون العنوان الثاني ضمنياً، وعادة ما يكون مسجلاً خاصاً يسمى <span class="smart-term" data-term-en="Accumulator" data-ar="المُراكم" data-en-def="A register in a CPU in which intermediate arithmetic and logic results are stored, heavily used in 1-address architectures.">المُراكم<span class="smart-term-tooltip"></span></span> (Accumulator). كان هذا شائعاً في الأجهزة القديمة.</li><li><b>صفر عنوان (0 Addresses):</b> جميع العناوين ضمنية. يعتمد هذا التصميم على بنية <span class="smart-term" data-term-en="Stack" data-ar="المكدس" data-en-def="A Last-In-First-Out (LIFO) data structure used implicitly in 0-address instruction architectures.">المكدس<span class="smart-term-tooltip"></span></span> (Stack). العمليات مثل <code>push</code> و <code>pop</code> و <code>add</code> تتعامل مباشرة مع قمة المكدس.</li></ol></template>
+    <template class="content-en"><p>Instruction design varies based on the number of addresses supported per instruction. Consider the equation <code>a = (a * b + c) - d * e</code>:</p><ol><li><b>3 addresses:</b> Contains Operand 1, Operand 2, and Result (e.g., <code>a = b + c</code>). It is not common because it needs very long words to hold everything.</li><li><b>2 addresses:</b> One address doubles as operand and result (e.g., <code>a = a + b</code>). This reduces the length of the instruction but requires some extra work and temporary storage to hold some results.</li><li><b>1 address:</b> Has an implicit second address, usually a register called an <span class="smart-term" data-term-en="Accumulator" data-ar="المُراكم" data-en-def="A register in a CPU in which intermediate arithmetic and logic results are stored, heavily used in 1-address architectures.">accumulator<span class="smart-term-tooltip"></span></span>. This was common on early machines.</li><li><b>0 (zero) addresses:</b> All addresses are implicit. This architecture uses a <span class="smart-term" data-term-en="Stack" data-ar="المكدس" data-en-def="A Last-In-First-Out (LIFO) data structure used implicitly in 0-address instruction architectures.">stack<span class="smart-term-tooltip"></span></span> (e.g., <code>push a</code>, <code>push b</code>, <code>add</code>).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هناك مقايضة (Trade-off) واضحة عند اختيار عدد العناوين. استخدام <b>عناوين أكثر</b> يؤدي إلى تعليمات أكثر تعقيداً وقوة، ويتطلب مسجلات أكثر، مما يجعل العمليات بين المسجلات أسرع ويقلل من إجمالي عدد التعليمات في البرنامج.</p><p>بالمقابل، استخدام <b>عناوين أقل</b> يؤدي إلى تعليمات أقل تعقيداً، مما يزيد من عدد التعليمات المطلوبة لإنجاز البرنامج، ولكنه يسمح بجلب وتنفيذ التعليمات بشكل أسرع بسبب بساطتها وقصر طولها.</p></template>
+    <template class="content-en"><p>There is a clear trade-off when choosing the number of addresses. Using <b>more addresses</b> leads to more complex (powerful) instructions and requires more registers. Inter-register operations are quicker, resulting in fewer instructions per program.</p><p>Conversely, using <b>fewer addresses</b> results in less complex instructions, which means more instructions are needed per program. However, this allows for faster fetch and execution of individual instructions due to their simplicity and shorter length.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة رياضية تُستخدم كمثال لتوضيح كيفية تنفيذ العمليات المعقدة باستخدام أعداد مختلفة من العناوين.</strong></template>
+      <template class="content-en"><strong>A mathematical equation used as an example to illustrate how complex operations are executed using different numbers of addresses.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$a=(a*b+c)-d*e$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في معمارية الصفر عنوان (المكدس)، كيف يتم تنفيذ عملية الجمع <code>a + b</code>؟</template>
+      <template class="content-en">In a 0-address (stack) architecture, how is the addition <code>a + b</code> executed?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم دفع القيمتين إلى المكدس أولاً: <code>push a</code> ثم <code>push b</code>. بعد ذلك تُستدعى تعليمة <code>add</code> (بدون معاملات)، والتي تقوم تلقائياً بسحب (pop) أعلى قيمتين من المكدس، تجمعهما، ثم تدفع (push) النتيجة مرة أخرى إلى قمة المكدس.</p></template>
+      <template class="content-en"><p>The values are first pushed onto the stack: <code>push a</code> then <code>push b</code>. Then the <code>add</code> instruction is called (with no operands), which automatically pops the top two values, adds them, and pushes the result back onto the top of the stack.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cisc-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> معمارية CISC (حاسوب مجموعة التعليمات المعقدة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> CISC Architecture (Complex Instruction Set Computer)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>فلسفة تصميم تركز على الأجهزة (Hardware) من خلال توفير تعليمات معقدة قادرة على تنفيذ عمليات متعددة (مثل جلب البيانات من الذاكرة، معالجتها، وإعادتها) في تعليمة واحدة.</p></template>
+    <template class="content-en"><p>A design philosophy emphasizing hardware by providing complex instructions capable of executing multiple operations (like memory-to-memory manipulation) in a single instruction.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>CISC هو اختصار لـ Complex Instruction Set Computer. تم تطوير هذه المعمارية في وقت كانت فيه الذاكرة بطيئة ومكلفة، وكانت البرمجة تتم بلغة التجميع. الهدف كان جعل البرمجة أسهل واستخدام الذاكرة بكفاءة أكبر.</p><p><b>خصائص CISC:</b></p><ul><li>تنسيق ثنائي المعاملات (2-operand format) يسمح بعمليات من الذاكرة إلى الذاكرة (Memory-to-memory).</li><li>تعليمات متغيرة الطول (Variable length instructions) تختلف حسب وضع العنونة.</li><li>تتطلب التعليمات دورات ساعة متعددة (Multiple clock cycles) لتنفيذها.</li><li>منطق فك تشفير معقد (Complex instruction-decoding logic).</li><li>عدد قليل من مسجلات الأغراض العامة (General purpose registers).</li><li>استخدام مسجل '<span class="smart-term" data-term-en="Condition Code" data-ar="رمز الحالة" data-en-def="A register that reflects whether the result of the last operation is less than, equal to, or greater than zero, often set as a side-effect in CISC.">رمز الحالة<span class="smart-term-tooltip"></span></span>' (Condition code register) الذي يتأثر كأثر جانبي لمعظم التعليمات.</li><li>الاعتماد على <span class="smart-term" data-term-en="Microprogramming" data-ar="البرمجة الدقيقة" data-en-def="A technique used in CISC where complex machine instructions are implemented using a series of simpler micro-instructions stored in a special memory.">البرمجة الدقيقة<span class="smart-term-tooltip"></span></span> (Microprogramming) لتنفيذ التعليمات المعقدة.</li></ul></template>
+    <template class="content-en"><p>CISC stands for Complex Instruction Set Computer. It was developed when memory was slow and expensive, and machines were programmed in assembly language. The goal was to make programming easier and use memory efficiently.</p><p><b>CISC Attributes:</b></p><ul><li>A 2-operand format allowing memory-to-memory commands.</li><li>Variable length instructions depending on the addressing mode.</li><li>Instructions require multiple clock cycles to execute.</li><li>Complex instruction-decoding logic.</li><li>A small number of general-purpose registers.</li><li>A '<span class="smart-term" data-term-en="Condition Code" data-ar="رمز الحالة" data-en-def="A register that reflects whether the result of the last operation is less than, equal to, or greater than zero, often set as a side-effect in CISC.">Condition code<span class="smart-term-tooltip"></span></span>' register set as a side-effect of most instructions.</li><li>Relies on <span class="smart-term" data-term-en="Microprogramming" data-ar="البرمجة الدقيقة" data-en-def="A technique used in CISC where complex machine instructions are implemented using a series of simpler micro-instructions stored in a special memory.">Microprogramming<span class="smart-term-tooltip"></span></span>, which is less expensive than hardwiring a control unit.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم تطوير CISC لتخفيف العبء عن المترجمات (Compilers). بدلاً من أن يكتب المترجم سلسلة طويلة من التعليمات البسيطة لحساب الجذر التربيعي مثلاً، يوفر معالج CISC تعليمة واحدة مبنية داخلياً للقيام بذلك.</p><p><b>عيوب CISC:</b> مع تطور الأجيال، أصبحت الأجهزة أكثر تعقيداً لأنها تحتفظ بتعليمات الأجيال السابقة للتوافق. التعليمات متغيرة الطول تبطئ الأداء العام. والأهم من ذلك، أظهرت الدراسات أن حوالي 20% فقط من التعليمات المعقدة المتاحة يتم استخدامها فعلياً في البرامج النموذجية، مما يعني هدراً في مساحة الشريحة.</p></template>
+    <template class="content-en"><p>CISC was developed to make compiler development simpler. It shifts the burden of generating machine instructions to the processor hardware. For example, instead of a compiler writing long machine instructions to calculate a square root, a CISC processor has a built-in ability to do this.</p><p><b>CISC Disadvantages:</b></p><ul><li>As processor families evolve, they retain older instructions for backward compatibility, increasing hardware complexity.</li><li>Variable-length instructions take different amounts of clock time, slowing overall performance.</li><li>Crucially, many specialized instructions are rarely used (only ~20% are used in typical programs), wasting valuable chip space.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا كان وجود عدد قليل من المسجلات مقبولاً في معمارية CISC القديمة؟</template>
+      <template class="content-en">Why was having a small number of registers acceptable in early CISC architectures?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تعليمات CISC كانت قادرة على العمل مباشرة على البيانات الموجودة في الذاكرة (Memory-to-memory)، فلم تكن هناك حاجة كبيرة لجلب البيانات إلى المسجلات أولاً قبل معالجتها.</p></template>
+      <template class="content-en"><p>Because CISC instructions were capable of operating directly on memory (memory-to-memory operations), there was less need to fetch data into registers first before processing it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="risc-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> معمارية RISC (حاسوب مجموعة التعليمات المخفضة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> RISC Architecture (Reduced Instruction Set Computer)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>فلسفة تصميم تركز على البرمجيات (Software) من خلال توفير مجموعة صغيرة ومحسنة من التعليمات البسيطة التي تُنفذ في دورة ساعة واحدة، مع الاعتماد الكبير على المسجلات.</p></template>
+    <template class="content-en"><p>A design philosophy emphasizing software by providing a small, highly-optimized set of simple instructions that execute in a single clock cycle, relying heavily on registers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>RISC هو اختصار لـ Reduced Instruction Set Computer. ظهرت هذه المعمارية في أواخر السبعينيات وأوائل الثمانينيات (مثل مشاريع IBM 801 و Stanford MIPS) كرد فعل على تعقيد CISC.</p><p><b>خصائص RISC:</b></p><ul><li>مجموعة تعليمات مخفضة وبسيطة (Reduced instruction set).</li><li>وحدة تحكم وتعليمات آلة موصلة بأسلاك صلبة (Hardwired control unit)، بدلاً من البرمجة الدقيقة.</li><li>وقت تنفيذ يستغرق دورة واحدة (One cycle execution time) لكل تعليمة.</li><li>الاعتماد على تقنية <span class="smart-term" data-term-en="Pipelining" data-ar="خطوط الأنابيب" data-en-def="A technique that allows for simultaneous execution of parts, or stages, of instructions to more efficiently process them.">خطوط الأنابيب<span class="smart-term-tooltip"></span></span> (Pipelining) لزيادة الكفاءة.</li><li>عدد كبير من المسجلات (Large number of registers) لتقليل التفاعل مع الذاكرة البطيئة.</li><li>عمليات من مسجل إلى مسجل (Register-to-register)، مع حصر الوصول للذاكرة في تعليمتين فقط: LOAD و STORE.</li></ul></template>
+    <template class="content-en"><p>RISC stands for Reduced Instruction Set Computer. It emerged in the late 70s and early 80s (e.g., IBM 801, Stanford MIPS) as a reaction to the growing complexity of CISC.</p><p><b>RISC Attributes:</b></p><ul><li>Reduced, less complex, simple instructions.</li><li>Hardwired control unit and machine instructions (no microprogramming).</li><li>One cycle execution time (CPI of one cycle).</li><li>Utilizes <span class="smart-term" data-term-en="Pipelining" data-ar="خطوط الأنابيب" data-en-def="A technique that allows for simultaneous execution of parts, or stages, of instructions to more efficiently process them.">Pipelining<span class="smart-term-tooltip"></span></span> for simultaneous execution of instruction stages.</li><li>A large number of symmetric registers organized into a register file to prevent large amounts of memory interaction.</li><li>Register-to-register operations, with memory access restricted to only two basic instructions: LOAD and STORE.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>خطوط الأنابيب (Pipelining):</b> هي تقنية تسمح بالتنفيذ المتزامن لأجزاء (مراحل) مختلفة من تعليمات متعددة. في معالج MIPS R3000، تتكون المراحل من: جلب التعليمة، قراءة المسجلات وفك التشفير، التنفيذ أو حساب العنوان، الوصول للذاكرة، وكتابة النتيجة في المسجل.</p><p><b>عيوب RISC:</b> من خلال تبسيط الأجهزة، تضع معمارية RISC عبئاً أكبر على البرمجيات (المترجمات) التي يجب عليها الآن تحسين الكود وتفكيك العمليات المعقدة إلى سلسلة من التعليمات البسيطة. يجادل البعض حول ما إذا كان هذا العبء مبرراً في ظل رخص وسرعة المعالجات التقليدية اليوم.</p><p><b>الخلاصة:</b> مع زيادة سرعة الذاكرة وتطور لغات البرمجة عالية المستوى، اختفت الأسباب الرئيسية لـ CISC. أدرك المصممون أن سلسلة من التعليمات البسيطة (RISC) يمكن أن تنتج نفس النتائج بتصميم أجهزة أبسط وأسرع.</p></template>
+    <template class="content-en"><p><b>Pipelining:</b> A technique that allows for simultaneous execution of parts, or stages, of instructions. In the MIPS R3000, stages include: fetch instruction, read registers/decode, execute/calculate address, access data memory, and write result to register.</p><p><b>RISC Disadvantages:</b> By making the hardware simpler, RISC puts a greater burden on the software (compilers), which must now optimize code and break down complex operations into many simple instructions. There is controversy over whether this software burden is worth the trouble given that conventional microprocessors are fast and cheap anyway.</p><p><b>Summation:</b> As memory speed increased and high-level languages displaced assembly, the reasons for CISC disappeared. Designers realized a sequence of simple instructions produces the same results as complex ones, but with simpler, faster hardware.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>CISC</th><th>RISC</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التركيز الأساسي</template>
+          <template class="content-en">Primary Emphasis</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">التركيز على الأجهزة (Hardware)</template>
+          <template class="content-en">Emphasis on hardware</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">التركيز على البرمجيات (Software)</template>
+          <template class="content-en">Emphasis on software</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دورات الساعة للتعليمة</template>
+          <template class="content-en">Clock Cycles per Instruction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">تعليمات معقدة متعددة الدورات (Multi-clock)</template>
+          <template class="content-en">Includes multi-clock complex instructions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">دورة واحدة للتعليمة (Single-clock)</template>
+          <template class="content-en">Single-clock, reduced instruction only</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع الذاكرة</template>
+          <template class="content-en">Memory Interaction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">من الذاكرة إلى الذاكرة (مدمجة في التعليمات)</template>
+          <template class="content-en">Memory-to-memory: LOAD and STORE incorporated in instructions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">من مسجل إلى مسجل (LOAD و STORE مستقلتان)</template>
+          <template class="content-en">Register to register: LOAD and STORE are independent instructions</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حجم الكود والدورات</template>
+          <template class="content-en">Code Size &amp; Cycles</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">حجم كود صغير، دورات عالية في الثانية</template>
+          <template class="content-en">Small code sizes, high cycles per second</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">حجم كود كبير، دورات منخفضة في الثانية</template>
+          <template class="content-en">Low cycles per second, large code sizes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استخدام الترانزستورات</template>
+          <template class="content-en">Transistor Usage</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">تُستخدم لتخزين التعليمات المعقدة</template>
+          <template class="content-en">Transistors used for storing complex instructions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تُستخدم لزيادة مسجلات الذاكرة</template>
+          <template class="content-en">Spends more transistors on memory registers</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر تقنية خطوط الأنابيب (Pipelining) أسهل في التطبيق على معمارية RISC مقارنة بـ CISC؟</template>
+      <template class="content-en">Why is pipelining easier to implement in RISC architecture compared to CISC?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تعليمات RISC بسيطة، ذات طول ثابت، وتستغرق دورة ساعة واحدة للتنفيذ، مما يجعل تدفقها عبر مراحل خط الأنابيب متوقعاً ومنتظماً. في المقابل، تعليمات CISC متغيرة الطول وتستغرق دورات متعددة، مما يسبب اختناقات في خط الأنابيب.</p></template>
+      <template class="content-en"><p>Because RISC instructions are simple, fixed-length, and execute in a single clock cycle, making their flow through pipeline stages predictable and uniform. CISC instructions are variable-length and multi-cycle, causing pipeline stalls and bottlenecks.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه المراجعة السريعة والمركزة. إذا كنتم تستعدون للامتحان، فهذا ما يجب أن يرسخ في أذهانكم: بنية مجموعة التعليمات (ISA) هي العقد المبرم بين البرمجيات والعتاد. لقد رأينا كيف تطور هذا العقد من خلال عدد العناوين؛ من 3 عناوين معقدة إلى صفر عنوان يعتمد على المكدس. لكن المعركة الحقيقية في هذا المنهج هي بين CISC و RISC. تذكروا دائماً: CISC (القديم) صُمم عندما كانت الذاكرة غالية، لذا حاولوا حشر أكبر قدر من العمليات في تعليمة واحدة معقدة (Hardware Emphasis). أما RISC (الحديث)، فجاء ليقول: 'لنبسط العتاد، لنجعل التعليمات سريعة وتأخذ دورة واحدة، ولنترك المترجم (Software) يقوم بالعمل الشاق'. لا تنسوا تقنية خطوط الأنابيب (Pipelining) التي تعتبر قلب RISC النابض، وكيف أن المعالجات الحديثة اليوم أصبحت هجينة تجمع بين أفضل ما في العالمين. ركزوا على جداول المقارنة، فهي مصدر خصب لأسئلة الاختيار من متعدد. بالتوفيق!</template>
+    <template class="content-en">Welcome, future engineers, to this quick and focused review. If you're prepping for the exam, here is what must stick: The ISA is the contract between software and hardware. We saw how this contract evolved through the number of addresses, from complex 3-address formats to stack-based 0-address formats. But the real battle in this module is CISC vs. RISC. Always remember: CISC (the older approach) was designed when memory was expensive, so they crammed multiple operations into single, complex instructions (Hardware Emphasis). RISC (the newer approach) came along and said, 'Let's simplify the hardware, make instructions fast (one cycle), and let the compiler (Software) do the heavy lifting.' Don't forget Pipelining, the beating heart of RISC, and how modern processors have become hybrids combining the best of both worlds. Focus heavily on the comparison tables; they are a goldmine for MCQ questions. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الغرض الأساسي من بنية مجموعة التعليمات (ISA)؟</template>
+          <template class="content-en">What is the primary purpose of the Instruction Set Architecture (ISA)?</template>
+          <span class="content-target">ما هو الغرض الأساسي من بنية مجموعة التعليمات (ISA)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعمل كواجهة بين البرمجيات والأجهزة، وتوفر الآلية التي تخبر بها البرمجيات العتاد بما يجب تنفيذه.</template>
+          <template class="content-en">It serves as an interface between software and hardware, providing the mechanism by which software tells the hardware what to execute.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي العناصر الأربعة الأساسية لأي تعليمة؟</template>
+          <template class="content-en">What are the four basic elements of any instruction?</template>
+          <span class="content-target">ما هي العناصر الأربعة الأساسية لأي تعليمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">رمز العملية (Opcode)، مرجع المعامل المصدر، مرجع معامل النتيجة، ومرجع التعليمة التالية.</template>
+          <template class="content-en">Operation code (Opcode), Source Operand reference, Result Operand reference, and Next Instruction Reference.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل معمارية العنوان الواحد (1 Address)؟</template>
+          <template class="content-en">How does a 1-address architecture work?</template>
+          <span class="content-target">كيف تعمل معمارية العنوان الواحد (1 Address)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحتوي التعليمة على عنوان صريح واحد، بينما يكون العنوان الثاني ضمنياً وهو مسجل خاص يُعرف بالمُراكم (Accumulator).</template>
+          <template class="content-en">The instruction contains one explicit address, while the second address is implicit, usually a special register known as the Accumulator.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تم تطوير معمارية CISC في البداية؟</template>
+          <template class="content-en">Why was the CISC architecture initially developed?</template>
+          <span class="content-target">لماذا تم تطوير معمارية CISC في البداية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الذاكرة كانت بطيئة ومكلفة، وكان الهدف تقليل حجم البرامج وتسهيل عمل المترجمات (Compilers) بتوفير تعليمات معقدة تنفذ مهام متعددة.</template>
+          <template class="content-en">Because memory was slow and expensive, the goal was to reduce program size and simplify compilers by providing complex instructions that perform multiple tasks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أبرز عيوب معمارية CISC؟</template>
+          <template class="content-en">What are the most prominent disadvantages of CISC architecture?</template>
+          <span class="content-target">ما هي أبرز عيوب معمارية CISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعقيد الأجهزة، التعليمات متغيرة الطول التي تبطئ الأداء، وحقيقة أن حوالي 20% فقط من التعليمات المعقدة يتم استخدامها فعلياً، مما يهدر مساحة الشريحة.</template>
+          <template class="content-en">Hardware complexity, variable-length instructions that slow performance, and the fact that only about 20% of complex instructions are actually used, wasting chip space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخصائص الرئيسية لمعمارية RISC؟</template>
+          <template class="content-en">What are the main characteristics of RISC architecture?</template>
+          <span class="content-target">ما هي الخصائص الرئيسية لمعمارية RISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعليمات بسيطة، تنفيذ في دورة ساعة واحدة، الاعتماد على خطوط الأنابيب (Pipelining)، عدد كبير من المسجلات، وعمليات من مسجل إلى مسجل (LOAD/STORE فقط للذاكرة).</template>
+          <template class="content-en">Simple instructions, one clock cycle execution, reliance on pipelining, a large number of registers, and register-to-register operations (only LOAD/STORE access memory).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تختلف طريقة التعامل مع الذاكرة بين CISC و RISC؟</template>
+          <template class="content-en">How does memory interaction differ between CISC and RISC?</template>
+          <span class="content-target">كيف تختلف طريقة التعامل مع الذاكرة بين CISC و RISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في CISC، يمكن للتعليمات التعامل مباشرة من الذاكرة إلى الذاكرة. في RISC، العمليات تتم فقط بين المسجلات، والوصول للذاكرة محصور بتعليمتي LOAD و STORE.</template>
+          <template class="content-en">In CISC, instructions can operate directly memory-to-memory. In RISC, operations are strictly register-to-register, with memory access limited to LOAD and STORE instructions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور تقنية خطوط الأنابيب (Pipelining) في RISC؟</template>
+          <template class="content-en">What is the role of Pipelining in RISC?</template>
+          <span class="content-target">ما هو دور تقنية خطوط الأنابيب (Pipelining) في RISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تسمح بالتنفيذ المتزامن لمراحل مختلفة من تعليمات متعددة (مثل الجلب، فك التشفير، التنفيذ)، مما يزيد من كفاءة وسرعة المعالج بشكل كبير.</template>
+          <template class="content-en">It allows for the simultaneous execution of different stages of multiple instructions (e.g., fetch, decode, execute), significantly increasing processor efficiency and speed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">أين يتم استهلاك الترانزستورات في كل من CISC و RISC؟</template>
+          <template class="content-en">Where are transistors consumed in both CISC and RISC?</template>
+          <span class="content-target">أين يتم استهلاك الترانزستورات في كل من CISC و RISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في CISC، تُستخدم الترانزستورات لتخزين التعليمات المعقدة ومنطق فك التشفير. في RISC، تُستخدم لتوفير عدد كبير من مسجلات الذاكرة السريعة.</template>
+          <template class="content-en">In CISC, transistors are used for storing complex instructions and decoding logic. In RISC, they are used to provide a large number of fast memory registers.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل المعالجات الحديثة تعتبر CISC أم RISC؟</template>
+          <template class="content-en">Are modern processors considered CISC or RISC?</template>
+          <span class="content-target">هل المعالجات الحديثة تعتبر CISC أم RISC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">أصبحت المعالجات الحديثة هجينة (Hybrids). تدعم شرائح CISC اليوم العديد من تقنيات RISC (مثل تفكيك التعليمات المعقدة داخلياً إلى تعليمات بسيطة سريعة التنفيذ).</template>
+          <template class="content-en">Modern processors have become hybrids. Today's CISC chips support many RISC techniques (like breaking down complex instructions internally into simple, fast-executing micro-operations).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو تعريف بنية مجموعة التعليمات (ISA)؟",
+      "en": "What is the definition of Instruction Set Architecture (ISA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي المجموعة الكاملة من التعليمات التي يفهمها المعالج، وتعمل كواجهة بين البرمجيات والأجهزة.",
+        "en": "The complete collection of instructions understood by a CPU, serving as an interface between software and hardware."
+      },
+      "example": {
+        "ar": "كود لغة التجميع (Assembly) الذي يمثل تعليمات الآلة.",
+        "en": "Assembly language code representing machine instructions."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو رمز العملية (Opcode)؟",
+      "en": "What is an Operation code (Opcode)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جزء من التعليمة يحدد العملية التي يجب على المعالج تنفيذها.",
+        "en": "The part of an instruction that specifies the operation the CPU should perform."
+      },
+      "example": {
+        "ar": "ADD, SUB, LOAD",
+        "en": "ADD, SUB, LOAD"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي معمارية الـ 3 عناوين (3 Addresses)؟",
+      "en": "What is a 3-address architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق تعليمة يحتوي على معاملين مصدر ومعامل نتيجة واحد.",
+        "en": "An instruction format containing two source operands and one result operand."
+      },
+      "example": {
+        "ar": "ADD a, b, c (بمعنى a = b + c)",
+        "en": "ADD a, b, c (meaning a = b + c)"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي معمارية الـ 2 عنوان (2 Addresses)؟",
+      "en": "What is a 2-address architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق تعليمة حيث يعمل أحد العناوين كمعامل مصدر ووجهة للنتيجة في نفس الوقت.",
+        "en": "An instruction format where one address doubles as both a source operand and the result destination."
+      },
+      "example": {
+        "ar": "ADD a, b (بمعنى a = a + b)",
+        "en": "ADD a, b (meaning a = a + b)"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي معمارية العنوان الواحد (1 Address)؟",
+      "en": "What is a 1-address architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق تعليمة يحتوي على عنوان صريح واحد، بينما يكون العنوان الثاني ضمنياً (عادة المُراكم).",
+        "en": "An instruction format with one explicit address and an implicit second address (usually the accumulator)."
+      },
+      "example": {
+        "ar": "LOAD A (يحمل القيمة A إلى المُراكم)",
+        "en": "LOAD A (loads value A into the accumulator)"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي معمارية الصفر عنوان (0 Addresses)؟",
+      "en": "What is a 0-address architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق تعليمة تكون فيه جميع العناوين ضمنية، وتعتمد على بنية المكدس (Stack).",
+        "en": "An instruction format where all addresses are implicit, relying on a stack architecture."
+      },
+      "example": {
+        "ar": "تعليمة ADD (تسحب قيمتين من المكدس وتجمعهم)",
+        "en": "ADD instruction (pops two values from stack and adds them)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ماذا يعني اختصار CISC؟",
+      "en": "What does CISC stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حاسوب مجموعة التعليمات المعقدة.",
+        "en": "Complex Instruction Set Computer."
+      },
+      "example": {
+        "ar": "معالجات Intel 80x86 القديمة.",
+        "en": "Early Intel 80x86 processors."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ماذا يعني اختصار RISC؟",
+      "en": "What does RISC stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حاسوب مجموعة التعليمات المخفضة.",
+        "en": "Reduced Instruction Set Computer."
+      },
+      "example": {
+        "ar": "معالجات MIPS و PowerPC.",
+        "en": "MIPS and PowerPC processors."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي تقنية خطوط الأنابيب (Pipelining)؟",
+      "en": "What is Pipelining?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تسمح بالتنفيذ المتزامن لأجزاء أو مراحل مختلفة من تعليمات متعددة لزيادة الكفاءة.",
+        "en": "A technique that allows for simultaneous execution of parts, or stages, of instructions to increase efficiency."
+      },
+      "example": {
+        "ar": "جلب تعليمة بينما يتم فك تشفير تعليمة أخرى.",
+        "en": "Fetching one instruction while decoding another."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "أين يقع عبء التعقيد في معمارية CISC؟",
+      "en": "Where does the burden of complexity lie in CISC architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقع العبء على الأجهزة (Hardware) لتسهيل عمل المترجمات.",
+        "en": "The burden lies on the hardware to make compiler development simpler."
+      },
+      "example": {
+        "ar": "وجود تعليمة واحدة معقدة لحساب الجذر التربيعي.",
+        "en": "Having a single complex instruction to calculate a square root."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "أين يقع عبء التعقيد في معمارية RISC؟",
+      "en": "Where does the burden of complexity lie in RISC architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقع العبء على البرمجيات (المترجمات) لتبسيط الأجهزة.",
+        "en": "The burden lies on the software (compilers) to allow for simpler hardware."
+      },
+      "example": {
+        "ar": "المترجم يفكك عملية معقدة إلى عدة تعليمات بسيطة.",
+        "en": "The compiler breaks down a complex operation into multiple simple instructions."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي التعليمات الوحيدة التي تصل للذاكرة في معمارية RISC؟",
+      "en": "What are the only instructions that access memory in RISC architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعليمات التحميل (LOAD) والتخزين (STORE).",
+        "en": "LOAD and STORE instructions."
+      },
+      "example": {
+        "ar": "باقي العمليات تتم من مسجل إلى مسجل (Register-to-register).",
+        "en": "All other operations are Register-to-register."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو مسجل 'رمز الحالة' (Condition Code) في CISC؟",
+      "en": "What is the 'Condition Code' register in CISC?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مسجل يعكس ما إذا كانت نتيجة العملية الأخيرة أقل من، تساوي، أو أكبر من الصفر، ويتم تعيينه كأثر جانبي لمعظم التعليمات.",
+        "en": "A register reflecting if the last operation's result is less than, equal to, or greater than zero, set as a side-effect of most instructions."
+      },
+      "example": {
+        "ar": "يستخدم لتحديد مسار التفرع (Branching).",
+        "en": "Used to determine branching paths."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي البرمجة الدقيقة (Microprogramming)؟",
+      "en": "What is Microprogramming?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة مستخدمة في CISC لتنفيذ التعليمات المعقدة، وهي أسهل وأرخص من بناء وحدة تحكم بأسلاك صلبة.",
+        "en": "A method used in CISC to implement complex instructions, easier and less expensive than hardwiring a control unit."
+      },
+      "example": {
+        "ar": "كتابة كود مصغر داخل المعالج لتنفيذ تعليمة معقدة.",
+        "en": "Writing micro-code inside the processor to execute a complex instruction."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف تتعامل معمارية CISC مع طول التعليمات؟",
+      "en": "How does CISC architecture handle instruction length?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم تعليمات متغيرة الطول (Variable length instructions) لتوفير مساحة الذاكرة.",
+        "en": "It uses variable length instructions to save memory space."
+      },
+      "example": {
+        "ar": "تعليمة قد تكون بطول 1 بايت وأخرى بطول 4 بايت حسب وضع العنونة.",
+        "en": "One instruction might be 1 byte long, another 4 bytes depending on addressing mode."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل الواجهة بين البرمجيات والأجهزة في الحاسوب؟",
+      "en": "Which of the following represents the interface between software and hardware in a computer?"
+    },
+    "options": {
+      "ar": [
+        "المترجم (Compiler)",
+        "بنية مجموعة التعليمات (ISA)",
+        "نظام التشغيل (OS)",
+        "الذاكرة الرئيسية (Main Memory)"
+      ],
+      "en": [
+        "Compiler",
+        "Instruction Set Architecture (ISA)",
+        "Operating System (OS)",
+        "Main Memory"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بنية مجموعة التعليمات (ISA) هي الآلية التي تخبر من خلالها البرمجيات الأجهزة بما يجب القيام به.",
+      "en": "The Instruction Set Architecture (ISA) is the mechanism by which software tells the hardware what to do."
+    },
+    "hint": {
+      "ar": "فكر في 'اللغة' المشتركة التي يفهمها المعالج.",
+      "en": "Think of the common 'language' understood by the CPU."
+    },
+    "difficulty": "easy",
+    "conceptId": "instruction-set-architecture-isa"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في معمارية العنوان الواحد (1 Address)، ما هو المسجل الضمني المستخدم عادةً؟",
+      "en": "In a 1-address architecture, what is the commonly used implicit register?"
+    },
+    "options": {
+      "ar": [
+        "عداد البرنامج (Program Counter)",
+        "مؤشر المكدس (Stack Pointer)",
+        "المُراكم (Accumulator)",
+        "مسجل الحالة (Condition Code)"
+      ],
+      "en": [
+        "Program Counter",
+        "Stack Pointer",
+        "Accumulator",
+        "Condition Code"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في معمارية العنوان الواحد، يكون العنوان الثاني ضمنياً وهو دائماً المُراكم (Accumulator).",
+      "en": "In a 1-address architecture, the second address is implicit and is always the Accumulator."
+    },
+    "hint": {
+      "ar": "يبدأ بحرف الميم.",
+      "en": "Starts with an 'A'."
+    },
+    "difficulty": "medium",
+    "conceptId": "number-of-addresses"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي معمارية تعتمد بشكل كامل على المكدس (Stack) لتنفيذ العمليات؟",
+      "en": "Which architecture relies entirely on a Stack to execute operations?"
+    },
+    "options": {
+      "ar": [
+        "3 عناوين",
+        "2 عنوان",
+        "1 عنوان",
+        "0 عنوان"
+      ],
+      "en": [
+        "3 addresses",
+        "2 addresses",
+        "1 address",
+        "0 addresses"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "معمارية الصفر عنوان لا تحتوي على معاملات صريحة، بل تستخدم المكدس ضمنياً لجلب البيانات وتخزين النتائج.",
+      "en": "0-address architecture has no explicit operands; it implicitly uses the stack to fetch data and store results."
+    },
+    "hint": {
+      "ar": "لا توجد عناوين صريحة.",
+      "en": "There are no explicit addresses."
+    },
+    "difficulty": "easy",
+    "conceptId": "number-of-addresses"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو السبب الرئيسي لتطوير معمارية CISC في البداية؟",
+      "en": "What was the primary reason for developing CISC architecture initially?"
+    },
+    "options": {
+      "ar": [
+        "لجعل المعالجات أسرع في تنفيذ دورة واحدة.",
+        "لأن الذاكرة كانت بطيئة ومكلفة، ولتسهيل تطوير المترجمات.",
+        "لتقليل عدد الترانزستورات على الشريحة.",
+        "لزيادة عدد المسجلات المتاحة للمبرمج."
+      ],
+      "en": [
+        "To make processors faster in executing a single cycle.",
+        "Because memory was slow and expensive, and to simplify compiler development.",
+        "To reduce the number of transistors on the chip.",
+        "To increase the number of registers available to the programmer."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تم تصميم CISC لتقليل حجم البرامج (بسبب غلاء الذاكرة) ولتخفيف العبء عن المترجمات بتوفير تعليمات معقدة جاهزة.",
+      "en": "CISC was designed to reduce program size (due to expensive memory) and to ease compiler burden by providing ready-made complex instructions."
+    },
+    "hint": {
+      "ar": "فكر في قيود التكنولوجيا في السبعينيات.",
+      "en": "Think about the technological constraints of the 1970s."
+    },
+    "difficulty": "medium",
+    "conceptId": "cisc-architecture"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من الخصائص التالية تُميز معمارية RISC؟",
+      "en": "Which of the following characteristics distinguishes RISC architecture?"
+    },
+    "options": {
+      "ar": [
+        "تعليمات متغيرة الطول.",
+        "عمليات من الذاكرة إلى الذاكرة (Memory-to-memory).",
+        "وقت تنفيذ يستغرق دورة ساعة واحدة (One cycle execution).",
+        "الاعتماد الكبير على البرمجة الدقيقة (Microprogramming)."
+      ],
+      "en": [
+        "Variable length instructions.",
+        "Memory-to-memory operations.",
+        "One cycle execution time.",
+        "Heavy reliance on Microprogramming."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تتميز RISC بتعليمات بسيطة تُنفذ في دورة ساعة واحدة، بينما الخيارات الأخرى هي من خصائص CISC.",
+      "en": "RISC is characterized by simple instructions that execute in one clock cycle, whereas the other options are CISC attributes."
+    },
+    "hint": {
+      "ar": "RISC يهدف إلى السرعة والبساطة في العتاد.",
+      "en": "RISC aims for speed and hardware simplicity."
+    },
+    "difficulty": "medium",
+    "conceptId": "risc-architecture"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في معمارية RISC، ما هي التعليمات الوحيدة المسموح لها بالوصول إلى الذاكرة؟",
+      "en": "In RISC architecture, what are the only instructions allowed to access memory?"
+    },
+    "options": {
+      "ar": [
+        "ADD و SUB",
+        "PUSH و POP",
+        "LOAD و STORE",
+        "JUMP و BRANCH"
+      ],
+      "en": [
+        "ADD and SUB",
+        "PUSH and POP",
+        "LOAD and STORE",
+        "JUMP and BRANCH"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تستخدم RISC معمارية التحميل/التخزين (LOAD/STORE)، حيث تتم جميع العمليات الحسابية داخل المسجلات فقط.",
+      "en": "RISC uses a LOAD/STORE architecture, where all arithmetic operations are performed only within registers."
+    },
+    "hint": {
+      "ar": "تعليمات القراءة والكتابة من وإلى الذاكرة.",
+      "en": "Instructions for reading and writing to/from memory."
+    },
+    "difficulty": "easy",
+    "conceptId": "risc-architecture"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لمعمارية CISC المذكور في النص؟",
+      "en": "What is a major disadvantage of CISC architecture mentioned in the text?"
+    },
+    "options": {
+      "ar": [
+        "تضع عبئاً كبيراً على المترجمات (Compilers).",
+        "حوالي 20% فقط من التعليمات المتاحة يتم استخدامها فعلياً.",
+        "تتطلب عدد هائل من المسجلات.",
+        "لا تدعم البرمجة الدقيقة (Microprogramming)."
+      ],
+      "en": [
+        "It puts a heavy burden on compilers.",
+        "Only about 20% of available instructions are actually used.",
+        "It requires a massive number of registers.",
+        "It does not support microprogramming."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بسبب إضافة العديد من التعليمات المعقدة والمتخصصة، وجد المصممون أن معظمها (80%) لا يُستخدم في البرامج العادية، مما يهدر مساحة الشريحة.",
+      "en": "Due to adding many complex, specialized instructions, designers found that most (80%) are rarely used in typical programs, wasting chip space."
+    },
+    "hint": {
+      "ar": "فكر في كفاءة استخدام المساحة والتعليمات.",
+      "en": "Think about the efficiency of space and instruction usage."
+    },
+    "difficulty": "medium",
+    "conceptId": "cisc-architecture"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "كيف يتم استخدام الترانزستورات بشكل مختلف بين CISC و RISC؟",
+      "en": "How are transistors used differently between CISC and RISC?"
+    },
+    "options": {
+      "ar": [
+        "CISC تستخدمها للمسجلات، RISC تستخدمها للتعليمات المعقدة.",
+        "CISC تستخدمها للتعليمات المعقدة، RISC تستخدمها لزيادة مسجلات الذاكرة.",
+        "كلاهما يستخدم الترانزستورات بنفس الطريقة تماماً.",
+        "RISC لا تستخدم الترانزستورات في تصميمها."
+      ],
+      "en": [
+        "CISC uses them for registers, RISC uses them for complex instructions.",
+        "CISC uses them for complex instructions, RISC uses them for memory registers.",
+        "Both use transistors in exactly the same way.",
+        "RISC does not use transistors in its design."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في CISC، تُستهلك الترانزستورات في بناء منطق فك التشفير المعقد والبرمجة الدقيقة. في RISC، تُستثمر هذه الترانزستورات في توفير عدد كبير من المسجلات.",
+      "en": "In CISC, transistors are consumed building complex decoding logic and microprogramming. In RISC, they are invested in providing a large number of registers."
+    },
+    "hint": {
+      "ar": "أين تكمن قوة كل معمارية؟ (العتاد المعقد مقابل المسجلات الكثيرة).",
+      "en": "Where does the strength of each architecture lie? (Complex hardware vs many registers)."
+    },
+    "difficulty": "hard",
+    "conceptId": "cisc-vs-risc"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي النتيجة الحالية للجدل بين CISC و RISC في المعالجات الحديثة؟",
+      "en": "What is the current outcome of the CISC vs RISC debate in modern processors?"
+    },
+    "options": {
+      "ar": [
+        "CISC اختفت تماماً من السوق.",
+        "RISC أثبتت فشلها وتم التخلي عنها.",
+        "أصبحا أكثر تشابهاً (Hybrids)، حيث تستخدم شرائح CISC تقنيات RISC والعكس.",
+        "لا يزالان منفصلين تماماً ولا توجد أي تقاطعات بينهما."
+      ],
+      "en": [
+        "CISC has completely disappeared from the market.",
+        "RISC proved to be a failure and was abandoned.",
+        "They are becoming more alike (Hybrids), with CISC chips using RISC techniques and vice versa.",
+        "They remain completely separate with no intersections."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعالجات الحديثة (مثل Pentium) هي هجينة؛ فهي تقبل تعليمات CISC من الخارج ولكنها تفككها داخلياً إلى تعليمات تشبه RISC لتنفيذها بسرعة.",
+      "en": "Modern processors (like Pentium) are hybrids; they accept CISC instructions externally but break them down internally into RISC-like micro-operations for fast execution."
+    },
+    "hint": {
+      "ar": "اقرأ شريحة 'الخلاصة' (Summation).",
+      "en": "Read the 'Summation' slide."
+    },
+    "difficulty": "medium",
+    "conceptId": "cisc-vs-risc"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي تقنية خطوط الأنابيب (Pipelining) في معمارية RISC؟",
+      "en": "What is Pipelining in RISC architecture?"
+    },
+    "options": {
+      "ar": [
+        "تقنية لتقليل عدد المسجلات المطلوبة.",
+        "تقنية تسمح بالتنفيذ المتزامن لمراحل مختلفة من تعليمات متعددة.",
+        "طريقة لبرمجة التعليمات المعقدة داخل المعالج.",
+        "آلية للوصول المباشر إلى الذاكرة دون المرور بالمعالج."
+      ],
+      "en": [
+        "A technique to reduce the number of required registers.",
+        "A technique that allows for simultaneous execution of different stages of multiple instructions.",
+        "A method to program complex instructions inside the processor.",
+        "A mechanism for direct memory access bypassing the CPU."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خطوط الأنابيب تقسم تنفيذ التعليمة إلى مراحل (مثل الجلب، فك التشفير، التنفيذ) وتسمح بتداخل هذه المراحل لتعليمات مختلفة، مما يرفع الكفاءة.",
+      "en": "Pipelining divides instruction execution into stages (e.g., fetch, decode, execute) and allows these stages to overlap for different instructions, increasing efficiency."
+    },
+    "hint": {
+      "ar": "فكر في خط تجميع السيارات في المصنع.",
+      "en": "Think of a car assembly line in a factory."
+    },
+    "difficulty": "medium",
+    "conceptId": "risc-architecture"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن 'صفر عنوان' (0-address) يعني أن التعليمة لا تحتوي على بيانات للعمل عليها. الحقيقة هي أن البيانات موجودة ولكن عناوينها 'ضمنية' لأنها تعتمد على قمة المكدس (Stack).</template>
+    <template class="content-en">Believing that '0-address' means the instruction has no data to work on. The truth is the data exists, but its addresses are 'implicit' because it relies on the top of the Stack.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري: CISC ينقل عبء التعقيد إلى الأجهزة (Hardware) لتسهيل البرمجة، بينما RISC ينقل عبء التعقيد إلى البرمجيات (المترجمات) لتبسيط وتسريع الأجهزة.</template>
+    <template class="content-en">The core difference: CISC shifts the burden of complexity to the Hardware to ease programming, while RISC shifts the burden to the Software (compilers) to simplify and speed up the Hardware.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">السبب الخفي وراء بطء CISC هو 'التعليمات متغيرة الطول'. المعالج لا يعرف طول التعليمة التالية حتى يقرأ الحالية، مما يجعل تقنية خطوط الأنابيب (Pipelining) صعبة جداً مقارنة بـ RISC ذات الطول الثابت.</template>
+    <template class="content-en">The hidden reason behind CISC's slowness is 'variable length instructions'. The CPU doesn't know the length of the next instruction until it reads the current one, making Pipelining very difficult compared to fixed-length RISC.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الظن بأن معالجات اليوم (مثل Intel Core) هي CISC نقية. في الواقع، هي معالجات هجينة (Hybrids)؛ تستقبل تعليمات CISC من الخارج ولكنها تفككها داخلياً إلى عمليات RISC دقيقة وسريعة.</template>
+    <template class="content-en">Assuming today's processors (like Intel Core) are pure CISC. In reality, they are Hybrids; they accept CISC instructions externally but break them down internally into fast, RISC-like micro-operations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M13.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 3 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

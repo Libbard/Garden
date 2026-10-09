@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT363" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة SNMP: الإصدار الثاني (SNMPv2) · IT363 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT363" data-page-title-en="IT363">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=IT363"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#snmpv2-enhancements-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">تحسينات وبنية SNMPv2</template>
+        <template class="content-en">SNMPv2 Enhancements &amp; Architecture</template>
+        <span class="content-target">تحسينات وبنية SNMPv2</span>
+      </a>
+      <a href="#table-expansion-augmentation" class="toc-link" data-bilingual>
+        <template class="content-ar">توسيع الجداول (Table Expansion)</template>
+        <template class="content-en">Table Expansion (Augmentation)</template>
+        <span class="content-target">توسيع الجداول (Table Expansion)</span>
+      </a>
+      <a href="#row-creation-deletion-rowstatus" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء وحذف الصفوف (RowStatus)</template>
+        <template class="content-en">Row Creation and Deletion (RowStatus)</template>
+        <span class="content-target">إنشاء وحذف الصفوف (RowStatus)</span>
+      </a>
+      <a href="#get-bulk-request-operation" class="toc-link" data-bilingual>
+        <template class="content-ar">عملية Get-Bulk-Request</template>
+        <template class="content-en">Get-Bulk-Request Operation</template>
+        <span class="content-target">عملية Get-Bulk-Request</span>
+      </a>
+      <a href="#snmpv2-trap-inform" class="toc-link" data-bilingual>
+        <template class="content-ar">رسائل Trap و Inform في SNMPv2</template>
+        <template class="content-en">SNMPv2 Trap and Inform-Request</template>
+        <span class="content-target">رسائل Trap و Inform في SNMPv2</span>
+      </a>
+      <a href="#compatibility-snmpv1" class="toc-link" data-bilingual>
+        <template class="content-ar">التوافقية مع SNMPv1</template>
+        <template class="content-en">Compatibility with SNMPv1</template>
+        <span class="content-target">التوافقية مع SNMPv1</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · IT363
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">إدارة SNMP: الإصدار الثاني (SNMPv2)</h1>
+      <p class="hero-description">تغطية شاملة للتحسينات في الإصدار الثاني من بروتوكول SNMP، بما في ذلك توسيع الجداول، إنشاء وحذف الصفوف، العمليات الجديدة مثل GetBulk و Inform، وآليات التوافق مع الإصدار الأول.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">SNMP Management: SNMPv2</h1>
+      <p class="hero-description">Comprehensive coverage of SNMPv2 enhancements, including table expansion, row creation/deletion, new operations like GetBulk and Inform, and compatibility mechanisms with SNMPv1.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">إدارة الشبكات</span>
+      <span class="tag">SNMPv2</span>
+      <span class="tag">توسيع الجداول</span>
+      <span class="tag">GetBulkRequest</span>
+      <span class="tag">التوافقية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Management</span>
+      <span class="tag">SNMPv2</span>
+      <span class="tag">Table Expansion</span>
+      <span class="tag">GetBulkRequest</span>
+      <span class="tag">Compatibility</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم التحسينات المعمارية والهيكلية في الإصدار الثاني من SNMPv2.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل تعديلات قاعدة معلومات الإدارة (MIB) وتوسيع الجداول.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق عمليات إنشاء وحذف الصفوف باستخدام RowStatus.</span></li>
+      <li><span class="obj-icon">✦</span><span>استيعاب الرسائل والعمليات الجديدة مثل GetBulkRequest و InformRequest.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم آليات التوافق مع الإصدار الأول SNMPv1 باستخدام الخوادم الوكيلة والمدير ثنائي اللغة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the architectural and structural enhancements in SNMPv2.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze SNMP MIB modifications and table expansion.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply row creation and deletion operations using RowStatus.</span></li>
+      <li><span class="obj-icon">✦</span><span>Comprehend new messages and operations like GetBulkRequest and InformRequest.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate compatibility mechanisms with SNMPv1 using Proxy servers and Bilingual managers.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="snmpv2-enhancements-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تحسينات وبنية SNMPv2</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> SNMPv2 Enhancements &amp; Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإصدار الثاني من SNMP يقدم رسائل جديدة لنقل البيانات الضخمة والتواصل بين المديرين، مع تحسينات في تعريفات البيانات.</p></template>
+    <template class="content-en"><p>SNMPv2 introduces new messages for bulk data transfer and manager-to-manager communication, along with enhanced data definitions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يقدم SNMPv2 تغييرات رئيسية تشمل:</p><ul><li><b>رسالتان جديدتان:</b> <code>get-bulk-request</code> لتسريع جلب البيانات من الجداول، و <code>inform-request</code> للتواصل بين المديرين.</li><li><b>تحسينات SMIv2:</b> تشمل وحدات الماكرو <code>MODULE-IDENTITY</code>، <code>OBJECT-TYPE</code>، و <code>NOTIFICATION-TYPE</code>.</li><li><b>الاصطلاحات النصية (Textual Conventions):</b> لتعريف أنواع بيانات جديدة وجعلها مقروءة للبشر.</li><li><b>بيانات المطابقة (Conformance statements):</b> لمساعدة العملاء في مقارنة المنتجات.</li></ul></template>
+    <template class="content-en"><p>SNMPv2 introduces major changes including:</p><ul><li><b>Two new messages:</b> <code>get-bulk-request</code> to speed up table data retrieval, and <code>inform-request</code> for manager-to-manager interoperability.</li><li><b>SMIv2 Enhancements:</b> Includes macros like <code>MODULE-IDENTITY</code>, <code>OBJECT-TYPE</code>, and <code>NOTIFICATION-TYPE</code>.</li><li><b><span class="smart-term" data-term-en="Textual Convention" data-ar="الاصطلاح النصي" data-en-def="Enables defining new data types in SNMPv2, making semantics consistent and human-readable.">Textual Convention<span class="smart-term-tooltip"></span></span>s:</b> Defines new data types making semantics consistent and human-readable.</li><li><b>Conformance statements:</b> Helps customers compare products and ensures vendor honesty.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم تصميم SNMPv2 لمعالجة أوجه القصور في الإصدار الأول، خاصة في كفاءة استرداد البيانات. رسالة <code>get-bulk-request</code> تقلل بشكل كبير من حركة مرور الشبكة (Network Traffic) عند قراءة جداول كبيرة.</p><p>من المثير للاهتمام أن ميزات الأمان التي كان من المفترض أن تكون في SNMPv2 تم نقلها لاحقاً إلى SNMPv3، مما ترك SNMPv2 يعتمد على نفس إطار العمل الإداري القائم على المجتمع (Community-based) مثل SNMPv1.</p><p>رسالة <code>report</code> تم تعريفها ولكن لم يتم تحديد استخدامها، وتُركت للموردين.</p></template>
+    <template class="content-en"><p>SNMPv2 was designed to address the inefficiencies of v1, particularly in data retrieval. The <code>get-bulk-request</code> significantly reduces network traffic overhead when reading large tables.</p><p>Interestingly, the robust security features originally slated for SNMPv2 were eventually moved to SNMPv3, leaving SNMPv2 with the same community-based administrative framework as SNMPv1.</p><p>The <code>report</code> message was defined but its usage was not specified, leaving it up to individual vendors to implement.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A block diagram showing SNMPv2 Network Management Architecture. Two 'SNMP Manager' blocks and one 'SNMP Agent' block. Show protocol stack: Application PDU -> SNMP PDU -> UDP -> IP -> DLC -> PHY. Arrows showing 'inform-request' between the two managers. Arrows showing 'get-request', 'get-next-request', 'get-bulk-request', 'set-request', 'response', and 'snmpV2-trap' between Manager and Agent. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 720" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Markers -->
+    <marker id="arrow-right" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-left" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M10,1 L0,5 L10,9 Z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-up" viewBox="0 0 10 10" refX="5" refY="1" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M1,10 L5,0 L9,10 Z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M1,0 L5,10 L9,0 Z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- SNMPv2 Badge -->
+    <g id="v2-badge">
+      <rect x="-18" y="-10" width="36" height="20" rx="10" fill="var(--brand-500)" />
+      <text x="0" y="4" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">v2</text>
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- MANAGER 2 (Top Left)                       -->
+  <!-- ========================================== -->
+  <rect x="80" y="30" width="260" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="210" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">SNMP Manager 2</text>
+  <text x="210" y="75" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مدير SNMP 2</text>
+
+  <!-- ========================================== -->
+  <!-- MANAGER 1 (Bottom Left)                    -->
+  <!-- ========================================== -->
+  <rect x="80" y="180" width="260" height="510" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="210" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">SNMP Manager 1</text>
+  <text x="210" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مدير SNMP 1</text>
+
+  <!-- Manager 1: Protocol Operations -->
+  <rect x="100" y="230" width="220" height="210" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <text x="210" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">SNMP Protocol Operations</text>
+  <text x="210" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">عمليات بروتوكول SNMP</text>
+
+  <!-- Manager 1: Protocol Stack -->
+  <rect x="100" y="450" width="220" height="220" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="210" y="475" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Protocol Stack</text>
+  <text x="210" y="475" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">حزمة البروتوكولات</text>
+
+  <!-- Layers -->
+  <rect x="110" y="490" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="507" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Application PDU</text>
+  <text x="210" y="507" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وحدة بيانات التطبيق (PDU)</text>
+
+  <rect x="110" y="520" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="537" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">SNMP PDU</text>
+  <text x="210" y="537" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وحدة بيانات SNMP</text>
+
+  <rect x="110" y="550" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="567" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">UDP</text>
+  <text x="210" y="567" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">UDP</text>
+
+  <rect x="110" y="580" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="597" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">IP</text>
+  <text x="210" y="597" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">IP</text>
+
+  <rect x="110" y="610" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="627" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">DLC</text>
+  <text x="210" y="627" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">DLC</text>
+
+  <rect x="110" y="640" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="210" y="657" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">PHY</text>
+  <text x="210" y="657" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الطبقة الفيزيائية (PHY)</text>
+
+
+  <!-- ========================================== -->
+  <!-- AGENT (Bottom Right)                       -->
+  <!-- ========================================== -->
+  <rect x="660" y="180" width="260" height="510" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="790" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">SNMP Agent</text>
+  <text x="790" y="215" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وكيل SNMP</text>
+
+  <!-- Agent: Protocol Operations -->
+  <rect x="680" y="230" width="220" height="210" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <text x="790" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">SNMP Protocol Operations</text>
+  <text x="790" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">عمليات بروتوكول SNMP</text>
+
+  <!-- Agent: Protocol Stack -->
+  <rect x="680" y="450" width="220" height="220" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="790" y="475" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Protocol Stack</text>
+  <text x="790" y="475" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">حزمة البروتوكولات</text>
+
+  <!-- Layers -->
+  <rect x="690" y="490" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="507" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Application PDU</text>
+  <text x="790" y="507" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وحدة بيانات التطبيق (PDU)</text>
+
+  <rect x="690" y="520" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="537" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">SNMP PDU</text>
+  <text x="790" y="537" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وحدة بيانات SNMP</text>
+
+  <rect x="690" y="550" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="567" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">UDP</text>
+  <text x="790" y="567" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">UDP</text>
+
+  <rect x="690" y="580" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="597" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">IP</text>
+  <text x="790" y="597" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">IP</text>
+
+  <rect x="690" y="610" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="627" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">DLC</text>
+  <text x="790" y="627" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">DLC</text>
+
+  <rect x="690" y="640" width="200" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+  <text x="790" y="657" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">PHY</text>
+  <text x="790" y="657" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الطبقة الفيزيائية (PHY)</text>
+
+
+  <!-- ========================================== -->
+  <!-- ARROWS: Manager 1 <-> Manager 2            -->
+  <!-- ========================================== -->
+  <!-- Up Arrow (inform-request) -->
+  <line x1="160" y1="170" x2="160" y2="120" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-up)" />
+  <text x="90" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">inform-request</text>
+  <text x="90" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">طلب إعلام (inform-request)</text>
+  <use href="#v2-badge" x="160" y="145" />
+
+  <!-- Down Arrow (response) -->
+  <line x1="260" y1="120" x2="260" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-down)" />
+  <text x="330" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">response</text>
+  <text x="330" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">استجابة (response)</text>
+
+
+  <!-- ========================================== -->
+  <!-- ARROWS: Manager 1 <-> Agent                -->
+  <!-- ========================================== -->
+  <!-- get-request -->
+  <line x1="350" y1="275" x2="650" y2="275" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+  <text x="500" y="268" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">get-request</text>
+  <text x="500" y="268" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">طلب الحصول (get-request)</text>
+
+  <!-- get-next-request -->
+  <line x1="350" y1="305" x2="650" y2="305" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+  <text x="500" y="298" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">get-next-request</text>
+  <text x="500" y="298" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">طلب التالي (get-next-request)</text>
+
+  <!-- get-bulk-request (SNMPv2) -->
+  <line x1="350" y1="335" x2="650" y2="335" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-right)" />
+  <text x="500" y="328" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">get-bulk-request</text>
+  <text x="500" y="328" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">طلب مجمع (get-bulk-request)</text>
+  <use href="#v2-badge" x="610" y="335" />
+
+  <!-- set-request -->
+  <line x1="350" y1="365" x2="650" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+  <text x="500" y="358" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">set-request</text>
+  <text x="500" y="358" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">طلب تعيين (set-request)</text>
+
+  <!-- response -->
+  <line x1="650" y1="395" x2="350" y2="395" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-left)" />
+  <text x="500" y="388" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">response</text>
+  <text x="500" y="388" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">استجابة (response)</text>
+
+  <!-- snmpV2-trap (SNMPv2) -->
+  <line x1="650" y1="425" x2="350" y2="425" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-left)" />
+  <text x="500" y="418" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">snmpV2-trap</text>
+  <text x="500" y="418" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">فخ (snmpV2-trap)</text>
+  <use href="#v2-badge" x="390" y="425" />
+
+
+  <!-- ========================================== -->
+  <!-- PHYSICAL MEDIUM LINK                       -->
+  <!-- ========================================== -->
+  <line x1="310" y1="652" x2="690" y2="652" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8 8" />
+  <text x="500" y="645" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Physical Medium</text>
+  <text x="500" y="645" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الوسط الفيزيائي</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Create-and-Go</th><th>Create-and-Wait</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">عدد الخطوات</template>
+          <template class="content-en">Number of Steps</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">خطوة واحدة (تفعيل فوري)</template>
+          <template class="content-en">One step (immediate activation)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">خطوات متعددة (إنشاء ثم تعبئة ثم تفعيل)</template>
+          <template class="content-en">Multiple steps (create, populate, activate)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قيمة RowStatus الأولية</template>
+          <template class="content-en">Initial RowStatus Value</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">4</template>
+          <template class="content-en">4</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">5</template>
+          <template class="content-en">5</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تم تأجيل ميزات الأمان من SNMPv2 إلى SNMPv3؟</template>
+      <template class="content-en">Why were the security features deferred from SNMPv2 to SNMPv3?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بسبب الخلافات المعقدة حول معايير الأمان وإدارة المفاتيح خلال تطوير SNMPv2، تم إصدار النسخة بدونها لتسريع توفير ميزات الأداء (مثل GetBulk)، وتم تخصيص SNMPv3 لاحقاً لحل مشكلة الأمان بشكل جذري.</p></template>
+      <template class="content-en"><p>Due to complex disagreements over security standards and key management during SNMPv2's development, it was released without them to quickly provide performance features (like GetBulk). SNMPv3 was later dedicated entirely to solving the security framework.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="table-expansion-augmentation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> توسيع الجداول (Table Expansion)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Table Expansion (Augmentation)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>توسيع الجداول يسمح بإضافة أعمدة جديدة إلى جدول موجود (الجدول الأساسي) لإنشاء جدول تابع (<span class="smart-term" data-term-en="Augmented Table" data-ar="الجدول الموسع" data-en-def="A dependent table that adds additional columns to an existing base table, sharing the same index.">الجدول الموسع<span class="smart-term-tooltip"></span></span>).</p></template>
+    <template class="content-en"><p>Table expansion allows adding new columns to an existing table (base table) to create a dependent table (augmented table).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم توسيع الجدول عندما تزيد الحاجة لأعمدة جديدة أو لتنظيم الكائنات هرمياً. هناك نوعان:</p><ul><li><b>الجدول الكثيف (Dense table):</b> يتيح إضافة المزيد من الصفوف للجدول الأساسي.</li><li><b>الجدول المتناثر (Sparse table):</b> يضيف صفوفاً أقل للجدول الأساسي.</li></ul><p><b>قيود التوسيع (Augmentation):</b></p><ol><li>عدد الصفوف المفاهيمية لا يتأثر بالإضافة.</li><li>يوجد تطابق واحد-لواحد (one-to-one) بين صفوف الجدولين.</li><li>الفهرس (INDEX) للجدول الثاني هو نفس فهرس الجدول الأول.</li></ol></template>
+    <template class="content-en"><p>Table expansion is done when the number of columnar objects needs to be increased, or for hierarchical organization. There are two types:</p><ul><li><b>Dense table:</b> Enables addition of more rows to a <span class="smart-term" data-term-en="Base Table" data-ar="الجدول الأساسي" data-en-def="The original table in SNMP that is being extended or augmented.">base table<span class="smart-term-tooltip"></span></span>.</li><li><b>Sparse table:</b> Supplements fewer rows to a base table.</li></ul><p><b>Augmentation Restrictions:</b></p><ol><li>The number of conceptual rows is not affected by the addition.</li><li>There is a one-to-one correspondence between the rows of the two tables.</li><li>The INDEX of the second table is the same as that of the first table.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مفهوم التوسيع (Augmentation) يحل مشكلة تحديث قواعد MIB القديمة دون كسر التوافقية. بدلاً من تعديل الجدول الأصلي (مما قد يسبب أخطاء في الأنظمة القديمة)، يتم إنشاء جدول جديد يشارك نفس الفهرس.</p><p>على سبيل المثال، إذا كان <code>IpAddrTable</code> هو <span class="smart-term" data-term-en="Base Table" data-ar="الجدول الأساسي" data-en-def="The original table in SNMP that is being extended or augmented.">الجدول الأساسي<span class="smart-term-tooltip"></span></span>، يمكن إنشاء <code>ipAugAddrTable</code> كجدول موسع لإضافة معلومات اللوحة والمنفذ، مع الحفاظ على نفس <code>ipAdEntIfIndex</code>.</p></template>
+    <template class="content-en"><p>The concept of Augmentation solves the problem of updating legacy MIBs without breaking backward compatibility. Instead of modifying the original table (which could break older managers), a new table is created that shares the exact same index.</p><p>For example, if <code>IpAddrTable</code> is the base table, <code>ipAugAddrTable</code> can be created as an <span class="smart-term" data-term-en="Augmented Table" data-ar="الجدول الموسع" data-en-def="A dependent table that adds additional columns to an existing base table, sharing the same index.">augmented table<span class="smart-term-tooltip"></span></span> to add board and port information, while strictly maintaining the same <code>ipAdEntIfIndex</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram showing Table Augmentation. On the left, 'Table 1 (Base Table)' with columns T1.E1.C1, T1.E1.C2, T1.E1.C3 and 4 rows. On the right, 'Table 2 (Augmented Table)' with columns T2.E2.C4, T2.E2.C5 and 4 rows. Double-headed arrows connect each row of Table 1 to the corresponding row in Table 2, illustrating the one-to-one correspondence. Style: educational, dark background #0d1117, accent color #2ea043, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Start Marker (Left-pointing) -->
+        <marker id="arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 0 L 0 5 L 10 10 Z" fill="var(--brand-500)" />
+        </marker>
+        <!-- End Marker (Right-pointing) -->
+        <marker id="arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table Augmentation (Expansion)</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">توسيع الجدول (Table Augmentation)</text>
+
+    <!-- Table 1 Title -->
+    <text x="215" y="80" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table 1 (Base Table)</text>
+    <text x="215" y="80" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول 1 (الجدول الأساسي)</text>
+
+    <!-- Table 2 Title -->
+    <text x="585" y="80" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table 2 (Augmented Table)</text>
+    <text x="585" y="80" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول 2 (الجدول الموسع)</text>
+
+    <!-- ================= TABLE 1 (BASE TABLE) ================= -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Table Container -->
+        <rect x="80" y="100" width="270" height="200" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        
+        <!-- Header Background -->
+        <path d="M 86 100 L 344 100 A 6 6 0 0 1 350 106 L 350 140 L 80 140 L 80 106 A 6 6 0 0 1 86 100 Z" fill="var(--brand-500)" />
+        
+        <!-- Grid Lines -->
+        <line x1="80" y1="140" x2="350" y2="140" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="80" y1="180" x2="350" y2="180" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="80" y1="220" x2="350" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="80" y1="260" x2="350" y2="260" stroke="var(--border-color)" stroke-width="1" />
+        
+        <line x1="170" y1="100" x2="170" y2="300" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="260" y1="100" x2="260" y2="300" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Header Text -->
+        <text x="125" y="120" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">T1.E1.C1</text>
+        <text x="215" y="120" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">T1.E1.C2</text>
+        <text x="305" y="120" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">T1.E1.C3</text>
+
+        <!-- Data Rows -->
+        <!-- Row 1 -->
+        <text x="125" y="160" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">1</text>
+        <text x="215" y="160" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A1</text>
+        <text x="305" y="160" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B1</text>
+        <!-- Row 2 -->
+        <text x="125" y="200" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">2</text>
+        <text x="215" y="200" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A2</text>
+        <text x="305" y="200" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B2</text>
+        <!-- Row 3 -->
+        <text x="125" y="240" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">3</text>
+        <text x="215" y="240" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A3</text>
+        <text x="305" y="240" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B3</text>
+        <!-- Row 4 -->
+        <text x="125" y="280" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">4</text>
+        <text x="215" y="280" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A4</text>
+        <text x="305" y="280" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">B4</text>
+    </g>
+
+    <!-- ================= TABLE 2 (AUGMENTED TABLE) ================= -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Table Container -->
+        <rect x="450" y="100" width="270" height="200" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        
+        <!-- Header Background -->
+        <path d="M 456 100 L 714 100 A 6 6 0 0 1 720 106 L 720 140 L 450 140 L 450 106 A 6 6 0 0 1 456 100 Z" fill="var(--brand-500)" />
+        
+        <!-- Grid Lines -->
+        <line x1="450" y1="140" x2="720" y2="140" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="450" y1="180" x2="720" y2="180" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="450" y1="220" x2="720" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="450" y1="260" x2="720" y2="260" stroke="var(--border-color)" stroke-width="1" />
+        
+        <line x1="585" y1="100" x2="585" y2="300" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Header Text -->
+        <text x="517.5" y="120" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">T2.E2.C4</text>
+        <text x="652.5" y="120" dy="0.35em" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">T2.E2.C5</text>
+
+        <!-- Data Rows -->
+        <!-- Row 1 -->
+        <text x="517.5" y="160" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">C1</text>
+        <text x="652.5" y="160" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">D1</text>
+        <!-- Row 2 -->
+        <text x="517.5" y="200" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">C2</text>
+        <text x="652.5" y="200" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">D2</text>
+        <!-- Row 3 -->
+        <text x="517.5" y="240" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">C3</text>
+        <text x="652.5" y="240" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">D3</text>
+        <!-- Row 4 -->
+        <text x="517.5" y="280" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">C4</text>
+        <text x="652.5" y="280" dy="0.35em" text-anchor="middle" font-size="14" fill="var(--text-secondary)">D4</text>
+    </g>
+
+    <!-- ================= CONNECTIONS ================= -->
+    <!-- Double-headed arrows -->
+    <line x1="362" y1="160" x2="438" y2="160" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <line x1="362" y1="200" x2="438" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <line x1="362" y1="240" x2="438" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <line x1="362" y1="280" x2="438" y2="280" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+
+    <!-- 1:1 Correspondence Label -->
+    <rect x="310" y="315" width="180" height="30" rx="15" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4 2" />
+    <text x="400" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">1:1 Correspondence</text>
+    <text x="400" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تطابق واحد لواحد</text>
+
+    <!-- Bottom Note -->
+    <text x="400" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">The INDEX of the second table is the same as that of the first table.</text>
+    <text x="400" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">فهرس الجدول الثاني هو نفس فهرس الجدول الأول.</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يشترط أن يكون فهرس الجدول الموسع هو نفس فهرس الجدول الأساسي؟</template>
+      <template class="content-en">Why is it required that the index of the augmented table be the same as the base table?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان التطابق التام (واحد-لواحد) بين الصفوف، مما يسمح لمدير الشبكة بالاستعلام عن البيانات الإضافية لنفس الكيان (مثل واجهة شبكة معينة) باستخدام نفس المعرف دون تعقيد إضافي.</p></template>
+      <template class="content-en"><p>To ensure a strict one-to-one correspondence between rows, allowing the network manager to query additional data for the exact same entity (e.g., a specific network interface) using the same identifier without added complexity.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="row-creation-deletion-rowstatus" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> إنشاء وحذف الصفوف (RowStatus)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Row Creation and Deletion (RowStatus)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم SNMPv2 عموداً خاصاً يسمى <code>RowStatus</code> للتحكم في دورة حياة الصفوف (إنشاء، تفعيل، حذف) داخل الجداول بشكل ديناميكي.</p></template>
+    <template class="content-en"><p>SNMPv2 uses a special column called <code>RowStatus</code> to dynamically control the lifecycle of rows (creation, activation, deletion) within tables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الـ <code>RowStatus</code> هو اصطلاح نصي (Textual Convention) يضيف عموداً جديداً للجدول المفاهيمي. قيمه عبارة عن أعداد صحيحة (Enumerated INTEGER) تمثل 6 حالات:</p><ol><li><b>active (1):</b> الصف موجود ويعمل.</li><li><b>notInService (2):</b> الصف موجود لكن العملية معلقة.</li><li><b>notReady (3):</b> الصف يفتقر لبعض الكائنات العمودية المطلوبة.</li><li><b>createAndGo (4):</b> إنشاء الصف وتفعيله فوراً (خطوة واحدة).</li><li><b>createAndWait (5):</b> إنشاء الصف والانتظار حتى يتم إكمال البيانات (خطوات متعددة).</li><li><b>destroy (6):</b> حذف الصف.</li></ol><p>الحالات الثلاث الأولى يستخدمها الوكيل (Agent) للرد، بينما الحالات 1، 4، 5، 6 يستخدمها المدير (Manager) للطلب.</p></template>
+    <template class="content-en"><p><code>RowStatus</code> is a Textual Convention that adds a new column to the conceptual table. Its values are Enumerated INTEGERs representing 6 states:</p><ol><li><b>active (1):</b> Row exists and is operational.</li><li><b>notInService (2):</b> Operation on the row is suspended.</li><li><b>notReady (3):</b> Row does not have all the columnar objects needed.</li><li><b><span class="smart-term" data-term-en="createAndGo" data-ar="إنشاء وانطلاق" data-en-def="A one-step row creation process where the row immediately becomes active.">createAndGo<span class="smart-term-tooltip"></span></span> (4):</b> One-step process of creation; immediately goes active.</li><li><b><span class="smart-term" data-term-en="createAndWait" data-ar="إنشاء وانتظار" data-en-def="A multi-step row creation process where the row is created but waits for further configuration before becoming active.">createAndWait<span class="smart-term-tooltip"></span></span> (5):</b> Row is under creation and should not be commissioned into service yet.</li><li><b>destroy (6):</b> Row should be deleted.</li></ol><p>The first 3 states are used by the agent to respond, while states 1, 4, 5, and 6 are used by the manager to make requests.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عملية <b>Create-and-Go</b> بسيطة: يرسل المدير طلب <code>SetRequest</code> مع <code>status=4</code> والبيانات المطلوبة. يرد الوكيل بـ <code>status=1</code> (نشط) إذا نجح.</p><p>عملية <b>Create-and-Wait</b> معقدة وتستخدم عندما يحتاج المدير لإنشاء صف لكنه لا يملك كل البيانات فوراً.</p><p>يرسل <code>status=5</code>. يرد الوكيل بـ <code>notReady (3)</code>. يقوم المدير بتعبئة البيانات تدريجياً عبر <code>SetRequest</code>.</p><p>عندما تكتمل البيانات، يصبح الصف <code>notInService (2)</code>. أخيراً، يرسل المدير <code>status=1</code> لتفعيله.</p><p>لحذف صف، يرسل المدير ببساطة <code>SetRequest</code> مع <code>status=6 (destroy)</code>، وبغض النظر عن <span class="smart-term" data-term-en="RowStatus" data-ar="حالة الصف" data-en-def="A textual convention in SNMPv2 used to manage the creation, activation, and deletion of conceptual rows in a table.">حالة الصف<span class="smart-term-tooltip"></span></span> الحالية، يتم حذفه.</p></template>
+    <template class="content-en"><p><b>Create-and-Go</b> is straightforward: The manager sends a <code>SetRequest</code> with <code>status=4</code> and the required data. The agent responds with <code>status=1</code> (active) upon success.</p><p><b>Create-and-Wait</b> is a state machine used when the manager needs to create a row but doesn't have all mandatory data at once.</p><p>It sends <code>status=5</code>. The agent replies <code>notReady (3)</code>. The manager populates data via subsequent <code>SetRequest</code>s.</p><p>Once all mandatory data is present, the state shifts to <code>notInService (2)</code>. Finally, the manager sends <code>status=1</code> to activate it.</p><p>To delete a row, the manager simply sends a <code>SetRequest</code> with <code>status=6 (destroy)</code>. Independently of the row's current state, the agent deletes it.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A sequence diagram showing 'Create-and-Wait Row Creation'. Manager Process on left, Agent Process on right. 1. Manager sends SetRequest(status=5, index=3). 2. Agent replies Response(status=3, index=3). 3. Manager sends GetRequest(data.3). 4. Agent replies Response(data.3=noSuchInstance). 5. Manager sends SetRequest(data.3=DefData). 6. Agent replies Response(status=2, data.3=DefData). 7. Manager sends SetRequest(status=1). 8. Agent replies Response(status=1). Style: educational, dark background #0d1117, accent color #d2a8ff, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 750" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for Manager to Agent requests (Solid) -->
+    <marker id="arrow-req" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+    <!-- Arrowhead for Agent to Manager responses (Dashed) -->
+    <marker id="arrow-res" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Diagram Title -->
+  <text x="400" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">Create-and-Wait Row Creation</text>
+  <text x="400" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">إنشاء صف بطريقة Create-and-Wait</text>
+
+  <!-- Lifelines -->
+  <line x1="200" y1="110" x2="200" y2="700" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6"/>
+  <line x1="600" y1="110" x2="600" y2="700" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- Manager Process Header -->
+  <rect x="120" y="70" width="160" height="40" rx="6" fill="var(--brand-500)"/>
+  <text x="200" y="95" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Manager Process</text>
+  <text x="200" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">عملية المدير</text>
+
+  <!-- Agent Process Header -->
+  <rect x="520" y="70" width="160" height="40" rx="6" fill="var(--brand-500)"/>
+  <text x="600" y="95" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Agent Process</text>
+  <text x="600" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">عملية الوكيل</text>
+
+  <!-- Row State Column Header -->
+  <text x="690" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">Row State</text>
+  <text x="690" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">حالة الصف</text>
+
+  <!-- ========================================== -->
+  <!-- Message 1: SetRequest (createAndWait)      -->
+  <!-- ========================================== -->
+  <line x1="200" y1="170" x2="590" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)"/>
+  
+  <text x="400" y="145" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">1. Create row (createAndWait)</text>
+  <text x="400" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">1. إنشاء صف (createAndWait)</text>
+  
+  <text x="400" y="163" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(status=5, index=3)</text>
+  <text x="400" y="163" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(status=5, index=3)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 2: Response (notReady)             -->
+  <!-- ========================================== -->
+  <line x1="600" y1="240" x2="210" y2="240" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-res)"/>
+  
+  <text x="400" y="215" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">2. Row created, missing data</text>
+  <text x="400" y="215" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">2. تم إنشاء الصف، بيانات مفقودة</text>
+  
+  <text x="400" y="233" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=3, index=3)</text>
+  <text x="400" y="233" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=3, index=3)</text>
+
+  <!-- State Box 1: notReady -->
+  <rect x="630" y="225" width="120" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="690" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">notReady (3)</text>
+  <text x="690" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">غير جاهز (3)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 3: GetRequest (data.3)             -->
+  <!-- ========================================== -->
+  <line x1="200" y1="310" x2="590" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)"/>
+  
+  <text x="400" y="285" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">3. Check missing columns</text>
+  <text x="400" y="285" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">3. التحقق من الأعمدة المفقودة</text>
+  
+  <text x="400" y="303" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">GetRequest(data.3)</text>
+  <text x="400" y="303" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">GetRequest(data.3)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 4: Response (noSuchInstance)       -->
+  <!-- ========================================== -->
+  <line x1="600" y1="380" x2="210" y2="380" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-res)"/>
+  
+  <text x="400" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">4. Column does not exist</text>
+  <text x="400" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">4. العمود غير موجود</text>
+  
+  <text x="400" y="373" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(data.3=noSuchInstance)</text>
+  <text x="400" y="373" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(data.3=noSuchInstance)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 5: SetRequest (data.3=DefData)     -->
+  <!-- ========================================== -->
+  <line x1="200" y1="450" x2="590" y2="450" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)"/>
+  
+  <text x="400" y="425" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">5. Provide missing data</text>
+  <text x="400" y="425" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">5. توفير البيانات المفقودة</text>
+  
+  <text x="400" y="443" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(data.3=DefData)</text>
+  <text x="400" y="443" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(data.3=DefData)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 6: Response (notInService)         -->
+  <!-- ========================================== -->
+  <line x1="600" y1="520" x2="210" y2="520" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-res)"/>
+  
+  <text x="400" y="495" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">6. Data set, row suspended</text>
+  <text x="400" y="495" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">6. تم تعيين البيانات، الصف معلق</text>
+  
+  <text x="400" y="513" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=2, data.3=DefData)</text>
+  <text x="400" y="513" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=2, data.3=DefData)</text>
+
+  <!-- State Box 2: notInService -->
+  <rect x="630" y="505" width="120" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="690" y="525" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">notInService (2)</text>
+  <text x="690" y="525" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">خارج الخدمة (2)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 7: SetRequest (active)             -->
+  <!-- ========================================== -->
+  <line x1="200" y1="590" x2="590" y2="590" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)"/>
+  
+  <text x="400" y="565" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">7. Activate row</text>
+  <text x="400" y="565" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">7. تفعيل الصف</text>
+  
+  <text x="400" y="583" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(status=1)</text>
+  <text x="400" y="583" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">SetRequest(status=1)</text>
+
+  <!-- ========================================== -->
+  <!-- Message 8: Response (active)               -->
+  <!-- ========================================== -->
+  <line x1="600" y1="660" x2="210" y2="660" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-res)"/>
+  
+  <text x="400" y="635" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">8. Row is operational</text>
+  <text x="400" y="635" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">8. الصف قيد التشغيل</text>
+  
+  <text x="400" y="653" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=1)</text>
+  <text x="400" y="653" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="monospace" font-size="13">Response(status=1)</text>
+
+  <!-- State Box 3: active -->
+  <rect x="630" y="645" width="120" height="30" rx="4" fill="var(--brand-500)" stroke="var(--brand-500)"/>
+  <text x="690" y="665" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">active (1)</text>
+  <text x="690" y="665" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">نشط (1)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون من الضروري استخدام Create-and-Wait بدلاً من Create-and-Go؟</template>
+      <template class="content-en">When is it necessary to use Create-and-Wait instead of Create-and-Go?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون الجدول يحتوي على العديد من الأعمدة الإلزامية التي لا يمكن إرسالها جميعاً في حزمة PDU واحدة بسبب قيود حجم الحزمة، أو عندما يحتاج المدير إلى التفاوض على قيم معينة مع الوكيل قبل التفعيل.</p></template>
+      <template class="content-en"><p>When a table has many mandatory columns that cannot all fit into a single SetRequest PDU due to size limits, or when the manager needs to negotiate or verify certain values with the agent before activating the row.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="get-bulk-request-operation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> عملية Get-Bulk-Request</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Get-Bulk-Request Operation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>رسالة <code>GetBulkRequest</code> تسمح للمدير باسترداد كميات كبيرة من البيانات (مثل جداول كاملة) بكفاءة عالية في طلب واحد، مما يقلل من العبء على الشبكة.</p></template>
+    <template class="content-en"><p>The <code>GetBulkRequest</code> message allows the manager to retrieve large amounts of data (like entire tables) highly efficiently in a single request, reducing network overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في رسالة <code>GetBulkRequest</code>، تم استبدال حقلي حالة الخطأ (Error status) ومؤشر الخطأ (Error index) بحقلين جديدين:</p><ul><li><b>Non-repeaters (<span class="smart-term" data-term-en="Non-repeaters" data-ar="غير المكررة" data-en-def="A field in GetBulkRequest specifying the number of scalar variables to retrieve exactly once.">غير المكررة<span class="smart-term-tooltip"></span></span>):</b> يحدد عدد الكائنات الفردية (Scalar) في بداية قائمة المتغيرات التي يجب جلبها مرة واحدة فقط.</li><li><b>Max-repetitions (<span class="smart-term" data-term-en="Max-repetitions" data-ar="الحد الأقصى للتكرار" data-en-def="A field in GetBulkRequest specifying the maximum number of rows to retrieve for the columnar objects.">الحد الأقصى للتكرار<span class="smart-term-tooltip"></span></span>):</b> يحدد الحد الأقصى لعدد الصفوف التي يجب جلبها للكائنات المتبقية (التي تمثل أعمدة في جدول).</li></ul><p>لا توجد علاقة واحد-لواحد بين الطلب والاستجابة؛ الاستجابة ستكون أكبر بكثير من الطلب.</p></template>
+    <template class="content-en"><p>In the <code>GetBulkRequest</code> PDU, the Error status and Error index fields are replaced by two new fields:</p><ul><li><b><span class="smart-term" data-term-en="Non-repeaters" data-ar="غير المكررة" data-en-def="A field in GetBulkRequest specifying the number of scalar variables to retrieve exactly once.">Non-repeaters<span class="smart-term-tooltip"></span></span>:</b> Specifies the number of non-repetitive scalar values at the beginning of the variable binding list to be retrieved just once.</li><li><b><span class="smart-term" data-term-en="Max-repetitions" data-ar="الحد الأقصى للتكرار" data-en-def="A field in GetBulkRequest specifying the maximum number of rows to retrieve for the columnar objects.">Max-repetitions<span class="smart-term-tooltip"></span></span>:</b> Specifies the maximum number of table rows to retrieve for the remaining objects in the list.</li></ul><p>There is no one-to-one relationship between request and response; the response will be significantly larger than the request.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه العملية تحل أكبر مشكلة في SNMPv1 وهي بطء استرداد الجداول باستخدام <code>GetNextRequest</code> المتكرر. بدلاً من إرسال طلب لكل خلية أو صف، يطلب المدير من الوكيل الاستمرار في جلب البيانات حتى يصل إلى <code>Max-repetitions</code> أو نهاية الجدول.</p><p>إذا وصل الوكيل إلى نهاية الجدول قبل استنفاد <code>Max-repetitions</code>، فإنه يرجع الكيان المعجمي التالي (Next lexicographic entity) ويرسل رسالة خطأ <code>endOfMibView</code> ليعلم المدير بانتهاء الجدول.</p></template>
+    <template class="content-en"><p>This operation solves SNMPv1's biggest bottleneck: the slow retrieval of tables using repetitive <code>GetNextRequest</code>s. Instead of a request per cell/row, the manager tells the agent to keep fetching data until <code>Max-repetitions</code> is reached or the table ends.</p><p>If the agent reaches the end of the table before exhausting <code>Max-repetitions</code>, it returns the next lexicographic entity and an <code>endOfMibView</code> exception, signaling to the manager that the table has ended.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A diagram comparing GetNextRequest vs GetBulkRequest. Top half: Manager sends multiple GetNextRequests, Agent replies with multiple GetResponses (showing high traffic). Bottom half: Manager sends a single GetBulkRequest(Non-repeaters=0, Max-repetitions=3), Agent replies with a single large Response containing 3 rows of data. Style: educational, dark background #0d1117, accent color #ff7b72, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow-req" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-res" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Lifelines -->
+    <line x1="200" y1="70" x2="200" y2="570" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+    <line x1="600" y1="70" x2="600" y2="570" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+    <!-- Manager Node -->
+    <rect x="120" y="30" width="160" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="200" y="55" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SNMP Manager</text>
+    <text x="200" y="55" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مدير SNMP</text>
+
+    <!-- Agent Node -->
+    <rect x="520" y="30" width="160" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="600" y="55" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SNMP Agent</text>
+    <text x="600" y="55" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">وكيل SNMP</text>
+
+    <!-- ================= TOP SECTION: GetNextRequest ================= -->
+    <text x="400" y="100" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Multiple GetNextRequests (High Traffic)</text>
+    <text x="400" y="100" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">طلبات GetNext متعددة (حركة مرور عالية)</text>
+
+    <!-- Request 1 -->
+    <line x1="200" y1="140" x2="585" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)" />
+    <text x="400" y="132" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">GetNextRequest (OID 1)</text>
+    <text x="400" y="132" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">GetNextRequest (كائن 1)</text>
+
+    <!-- Response 1 -->
+    <line x1="600" y1="170" x2="215" y2="170" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-res)" />
+    <text x="400" y="162" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Response (Value 1)</text>
+    <text x="400" y="162" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">استجابة (قيمة 1)</text>
+
+    <!-- Request 2 -->
+    <line x1="200" y1="210" x2="585" y2="210" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)" />
+    <text x="400" y="202" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">GetNextRequest (OID 2)</text>
+    <text x="400" y="202" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">GetNextRequest (كائن 2)</text>
+
+    <!-- Response 2 -->
+    <line x1="600" y1="240" x2="215" y2="240" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-res)" />
+    <text x="400" y="232" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Response (Value 2)</text>
+    <text x="400" y="232" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">استجابة (قيمة 2)</text>
+
+    <!-- Request 3 -->
+    <line x1="200" y1="280" x2="585" y2="280" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-req)" />
+    <text x="400" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">GetNextRequest (OID 3)</text>
+    <text x="400" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">GetNextRequest (كائن 3)</text>
+
+    <!-- Response 3 -->
+    <line x1="600" y1="310" x2="215" y2="310" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-res)" />
+    <text x="400" y="302" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Response (Value 3)</text>
+    <text x="400" y="302" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">استجابة (قيمة 3)</text>
+
+    <!-- ================= DIVIDER ================= -->
+    <line x1="80" y1="350" x2="370" y2="350" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+    <line x1="430" y1="350" x2="720" y2="350" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+    <circle cx="400" cy="350" r="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="355" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">VS</text>
+    <text x="400" y="355" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">ضد</text>
+
+    <!-- ================= BOTTOM SECTION: GetBulkRequest ================= -->
+    <text x="400" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Single GetBulkRequest (High Efficiency)</text>
+    <text x="400" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">طلب GetBulk واحد (كفاءة عالية)</text>
+
+    <!-- Bulk Request -->
+    <line x1="200" y1="440" x2="585" y2="440" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-req)" />
+    <text x="400" y="432" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">GetBulkRequest</text>
+    <text x="400" y="432" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">GetBulkRequest</text>
+    
+    <!-- Bulk Request Parameters Box -->
+    <rect x="260" y="450" width="280" height="28" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-dasharray="3,3" />
+    <text x="400" y="469" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Non-repeaters = 0, Max-repetitions = 3</text>
+    <text x="400" y="469" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">Non-repeaters = 0, Max-repetitions = 3</text>
+
+    <!-- Bulk Response -->
+    <line x1="600" y1="530" x2="215" y2="530" stroke="var(--brand-400)" stroke-width="4" stroke-dasharray="6,6" marker-end="url(#arrow-res)" />
+    <text x="400" y="495" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Large Response (3 Rows of Data)</text>
+    <text x="400" y="495" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">استجابة كبيرة (3 صفوف من البيانات)</text>
+
+    <!-- Bulk Response Data Box -->
+    <rect x="270" y="505" width="260" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <line x1="270" y1="528" x2="530" y2="528" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="522" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Response PDU</text>
+    <text x="400" y="522" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">وحدة بيانات الاستجابة</text>
+    <text x="400" y="546" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Row 1 | Row 2 | Row 3</text>
+    <text x="400" y="546" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">صف 1 | صف 2 | صف 3</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا كانت قيمة Max-repetitions كبيرة جداً بحيث تتجاوز الاستجابة الحد الأقصى لحجم حزمة الشبكة (MTU)؟</template>
+      <template class="content-en">What happens if the Max-repetitions value is so large that the response exceeds the network's Maximum Transmission Unit (MTU)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيقوم الوكيل (Agent) بملء حزمة الاستجابة بالبيانات حتى تصل إلى الحد الأقصى المسموح به لحجم الحزمة، ثم يتوقف ويرسل الحزمة. لن يقوم بتوليد خطأ tooBig، بل سيعيد ما استطاع تعبئته فقط.</p></template>
+      <template class="content-en"><p>The agent will fill the response PDU with data up to the maximum allowed message size limit. It will not generate a 'tooBig' error; it simply truncates the operation and returns what fits.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="snmpv2-trap-inform" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> رسائل Trap و Inform في SNMPv2</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> SNMPv2 Trap and Inform-Request</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تم توحيد تنسيق رسالة Trap في SNMPv2 لتطابق الرسائل الأخرى، وتم تقديم <code>Inform-Request</code> كرسالة تنبيه موثوقة (تتطلب رداً) بين المديرين.</p></template>
+    <template class="content-en"><p>The Trap message format in SNMPv2 was standardized to match other PDUs, and <code>Inform-Request</code> was introduced as a reliable (acknowledged) notification between managers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>SNMPv2 Trap:</b></p><ul><li>تمت إضافة الماكرو <code>NOTIFICATION-TYPE</code>.</li><li>تنسيق PDU أصبح موحداً (نفس تنسيق Get/Set).</li><li>أول متغيرين (VarBinds) في القائمة هما دائماً: <code>sysUpTime</code> و <code>snmpTrapOID</code>.</li></ul><p><b>Inform-Request:</b></p><ul><li>تتصرف مثل Trap (رسالة غير مطلوبة unsolicited).</li><li>تُستخدم للتواصل من مدير إلى مدير (Manager-to-Manager).</li><li>على عكس Trap (التي تُستقبل سلبياً)، فإن المدير المستلم لـ Inform <b>يجب أن يرسل استجابة (Response)</b> للمدير المرسل، مما يجعلها موثوقة.</li></ul></template>
+    <template class="content-en"><p><b>SNMPv2 Trap:</b></p><ul><li>Addition of the <code>NOTIFICATION-TYPE</code> macro.</li><li>PDU format is standardized (same as Get/Set).</li><li>Positions 1 and 2 in the VarBindList are strictly: <code>sysUpTime</code> and <code>snmpTrapOID</code>.</li></ul><p><b><span class="smart-term" data-term-en="Inform-Request" data-ar="طلب إبلاغ" data-en-def="An acknowledged, unsolicited message sent from one manager to another in SNMPv2.">Inform-Request<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Behaves like a trap (unsolicited message).</li><li>Used for manager-to-manager communication.</li><li>Unlike a trap (which is passively received), the receiving manager <b>sends a response</b> to the sending manager, making it a reliable notification.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في SNMPv1، كان لرسالة Trap تنسيق PDU مختلف تماماً عن باقي الرسائل، مما زاد من تعقيد المعالجة. في SNMPv2، تم توحيد التنسيق، وتم دمج معلومات نوع الـ Trap داخل قائمة المتغيرات (VarBindList) باستخدام <code>snmpTrapOID</code>.</p><p>رسالة <code>Inform-Request</code> تعتبر نقلة نوعية للشبكات الموزعة، حيث يمكن لمدير محلي (Local Manager) جمع البيانات وإرسال تنبيهات موثوقة لمدير مركزي (Central Manager)، مع ضمان وصول الرسالة بفضل الاستجابة الإلزامية.</p></template>
+    <template class="content-en"><p>In SNMPv1, the Trap PDU had a completely different format from other messages, complicating parsing. In SNMPv2, the format is unified, and the trap type information is embedded inside the VarBindList using <code>snmpTrapOID</code>.</p><p>The <code>Inform-Request</code> is a paradigm shift for distributed network management. A local manager can aggregate data and send reliable notifications to a central manager, ensuring delivery because an acknowledgment (Response PDU) is required.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر Inform-Request أفضل من Trap في البيئات الحرجة؟</template>
+      <template class="content-en">Why is Inform-Request considered better than a Trap in critical environments?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن Inform-Request يتطلب استجابة (Acknowledgment). إذا لم يتلق المرسل الاستجابة، يمكنه إعادة إرسال الرسالة، مما يضمن عدم ضياع التنبيهات الحرجة بسبب مشاكل الشبكة، عكس Trap الذي يُرسل ولا يُنتظر له رد (Fire and forget).</p></template>
+      <template class="content-en"><p>Because Inform-Request requires an acknowledgment (Response). If the sender doesn't receive it, it can retransmit the message, ensuring critical alerts are not lost due to network drops. Traps are 'fire and forget' with no delivery guarantee.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="compatibility-snmpv1" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التوافقية مع SNMPv1</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Compatibility with SNMPv1</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لضمان عمل أنظمة SNMPv2 الجديدة مع وكلاء SNMPv1 القدامى، يتم استخدام طريقتين: المدير ثنائي اللغة (Bilingual Manager) أو الخادم الوكيل (Proxy Server).</p></template>
+    <template class="content-en"><p>To ensure new SNMPv2 systems can work with legacy SNMPv1 agents, two methods are used: a Bilingual Manager or a Proxy Server.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تحقيق التوافقية بطريقتين:</p><ol><li><b><span class="smart-term" data-term-en="Bilingual Manager" data-ar="المدير ثنائي اللغة" data-en-def="A network manager that natively understands and translates both SNMPv1 and SNMPv2 protocols, though it is resource-intensive.">المدير ثنائي اللغة<span class="smart-term-tooltip"></span></span> (Bilingual Manager):</b><ul><li>ينفذ وحدات مترجم لكل من v1 و v2.</li><li>يقوم بجميع التحويلات لمتغيرات MIB وعمليات البروتوكول في كلا الاتجاهين.</li><li><b>العيب:</b> مكلف من حيث الموارد والتشغيل.</li></ul></li><li><b><span class="smart-term" data-term-en="Proxy Server" data-ar="الخادم الوكيل" data-en-def="An intermediary entity that translates SNMPv2 requests into SNMPv1 requests for legacy agents, and vice versa.">الخادم الوكيل<span class="smart-term-tooltip"></span></span> (Proxy Server):</b><ul><li>تمر رسائل SNMPv2 دون تغيير إذا كانت موجهة لوكيل v2.</li><li>إذا كانت موجهة لوكيل v1، يقوم الوكيل بالترجمة.</li><li>يتم تحويل <code>GetBulkRequest</code> إلى <code>GetNextRequest</code> (بضبط non-repeaters و max-repetitions إلى 0).</li><li>يتم تمرير <code>GetResponse</code> من v1 كما هو، إلا إذا كان يحتوي على خطأ <code>tooBig</code>، حيث يتم إزالة حقل المتغيرات.</li><li>يتم تحويل Trap الخاص بـ v1 إلى v2 عن طريق إضافة <code>sysUpTime</code> و <code>snmpTrapOID</code> في بداية قائمة المتغيرات.</li></ul></li></ol></template>
+    <template class="content-en"><p>Compatibility can be achieved in two ways:</p><ol><li><b><span class="smart-term" data-term-en="Bilingual Manager" data-ar="المدير ثنائي اللغة" data-en-def="A network manager that natively understands and translates both SNMPv1 and SNMPv2 protocols, though it is resource-intensive.">Bilingual Manager<span class="smart-term-tooltip"></span></span>:</b><ul><li>Implements both v1 and v2 interpreter modules.</li><li>Handles all conversions of MIB variables and protocol operations in both directions.</li><li><b>Disadvantage:</b> Expensive in terms of resources and operation.</li></ul></li><li><b><span class="smart-term" data-term-en="Proxy Server" data-ar="الخادم الوكيل" data-en-def="An intermediary entity that translates SNMPv2 requests into SNMPv1 requests for legacy agents, and vice versa.">Proxy Server<span class="smart-term-tooltip"></span></span>:</b><ul><li>SNMPv2 messages pass through unchanged to v2 agents.</li><li>For v1 agents, the proxy translates.</li><li><code>GetBulkRequest</code> is converted to <code>GetNextRequest</code> (setting non-repeaters and max-repetitions to 0).</li><li><code>GetResponse</code> from v1 is passed unaltered, unless it has a <code>tooBig</code> error, in which case the variable binding field is removed.</li><li>v1 Traps are prepended with <code>sysUpTime.0</code> and <code>snmpTrapOID.0</code> to match the v2 Trap format.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخادم الوكيل (Proxy Server) يعتبر الحل الأكثر أناقة وقابلية للتوسع. فهو يعفي مدير الشبكة (NMS) من عبء الترجمة المستمرة. </p><p>التعامل مع خطأ <code>tooBig</code> مثير للاهتمام: في v1، إذا كانت الاستجابة كبيرة جداً، يرسل الوكيل خطأ <code>tooBig</code> مع نفس قائمة المتغيرات. الخادم الوكيل لـ v2 يقوم بإزالة هذه المتغيرات قبل تمريرها للمدير، لأن SNMPv2 يتعامل مع الأخطاء بشكل مختلف ولا يتوقع عودة المتغيرات مع هذا الخطأ.</p></template>
+    <template class="content-en"><p>The Proxy Server is the more elegant and scalable solution, offloading the translation burden from the core Network Management System (NMS).</p><p>The handling of the <code>tooBig</code> error is a specific edge case: In v1, a tooBig error returns the original variable bindings. The v2-v1 proxy strips these bindings out before forwarding to the v2 manager, aligning with v2's expectation of error handling where bindings aren't returned for size errors.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A diagram showing SNMP v2-v1 Proxy Server translation. Left side: SNMPv2 Manager. Middle: Proxy Server. Right side: SNMPv1 Agent. Arrows show: GetRequest -> Pass-Through -> GetRequest. GetBulkRequest -> Proxy converts (Set non-repeaters=0, max-repetitions=0) -> GetNextRequest. Response (with tooBig error) <- Proxy removes varbinds <- GetResponse. SNMPv2-Trap <- Proxy prepends sysUpTime.0 and snmpTrapOID.0 <- Trap. Style: educational, dark background #0d1117, accent color #f0883e, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- MAIN COLUMNS                               -->
+  <!-- ========================================== -->
+
+  <!-- SNMPv2 Manager -->
+  <rect x="20" y="20" width="120" height="480" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <line x1="20" y1="70" x2="140" y2="70" stroke="var(--border-color)" stroke-width="2" />
+  <text class="gsvg-en" x="80" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">SNMPv2 Manager</text>
+  <text class="gsvg-ar" x="80" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">مدير SNMPv2</text>
+
+  <!-- Proxy Server -->
+  <rect x="280" y="20" width="240" height="480" rx="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" />
+  <line x1="280" y1="70" x2="520" y2="70" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" />
+  <text class="gsvg-en" x="400" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">Proxy Server</text>
+  <text class="gsvg-ar" x="400" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">خادم الوكيل (Proxy)</text>
+
+  <!-- SNMPv1 Agent -->
+  <rect x="660" y="20" width="120" height="480" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <line x1="660" y1="70" x2="780" y2="70" stroke="var(--border-color)" stroke-width="2" />
+  <text class="gsvg-en" x="720" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">SNMPv1 Agent</text>
+  <text class="gsvg-ar" x="720" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">وكيل SNMPv1</text>
+
+
+  <!-- ========================================== -->
+  <!-- INTERACTION 1: GetRequest (Pass-Through)   -->
+  <!-- ========================================== -->
+  
+  <!-- Left Arrow -->
+  <line x1="140" y1="120" x2="280" y2="120" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="210" y="112" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetRequest</text>
+  <text class="gsvg-ar" x="210" y="112" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetRequest</text>
+
+  <!-- Right Arrow -->
+  <line x1="520" y1="120" x2="660" y2="120" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="590" y="112" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetRequest</text>
+  <text class="gsvg-ar" x="590" y="112" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetRequest</text>
+
+  <!-- Proxy Action -->
+  <rect x="290" y="100" width="220" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <text class="gsvg-en" x="400" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Pass-Through (Unchanged)</text>
+  <text class="gsvg-ar" x="400" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">تمرير مباشر (بدون تغيير)</text>
+
+
+  <!-- ========================================== -->
+  <!-- INTERACTION 2: GetBulkRequest Translation  -->
+  <!-- ========================================== -->
+
+  <!-- Left Arrow -->
+  <line x1="140" y1="220" x2="280" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="210" y="212" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetBulkRequest</text>
+  <text class="gsvg-ar" x="210" y="212" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetBulkRequest</text>
+
+  <!-- Right Arrow -->
+  <line x1="520" y1="220" x2="660" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="590" y="212" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetNextRequest</text>
+  <text class="gsvg-ar" x="590" y="212" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetNextRequest</text>
+
+  <!-- Proxy Action -->
+  <rect x="290" y="190" width="220" height="60" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+  <text class="gsvg-en" x="400" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">Convert to GetNextRequest</text>
+  <text class="gsvg-ar" x="400" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">تحويل إلى GetNextRequest</text>
+  
+  <text class="gsvg-en" x="400" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">non-repeaters=0, max-rep=0</text>
+  <text class="gsvg-ar" x="400" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">non-repeaters=0, max-rep=0</text>
+
+
+  <!-- ========================================== -->
+  <!-- INTERACTION 3: GetResponse (tooBig)        -->
+  <!-- ========================================== -->
+
+  <!-- Right Arrow (Agent to Proxy) -->
+  <line x1="660" y1="320" x2="520" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="590" y="300" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetResponse</text>
+  <text class="gsvg-ar" x="590" y="300" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">GetResponse</text>
+  
+  <text class="gsvg-en" x="590" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(tooBig error)</text>
+  <text class="gsvg-ar" x="590" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(خطأ tooBig)</text>
+
+  <!-- Left Arrow (Proxy to Manager) -->
+  <line x1="280" y1="320" x2="140" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="210" y="300" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">Response</text>
+  <text class="gsvg-ar" x="210" y="300" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">Response</text>
+  
+  <text class="gsvg-en" x="210" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(tooBig error)</text>
+  <text class="gsvg-ar" x="210" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(خطأ tooBig)</text>
+
+  <!-- Proxy Action -->
+  <rect x="290" y="290" width="220" height="60" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+  <text class="gsvg-en" x="400" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">Remove variable bindings</text>
+  <text class="gsvg-ar" x="400" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">إزالة ارتباطات المتغيرات</text>
+  
+  <text class="gsvg-en" x="400" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">(if tooBig error)</text>
+  <text class="gsvg-ar" x="400" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">(في حال خطأ tooBig)</text>
+
+
+  <!-- ========================================== -->
+  <!-- INTERACTION 4: Trap Translation            -->
+  <!-- ========================================== -->
+
+  <!-- Right Arrow (Agent to Proxy) -->
+  <line x1="660" y1="420" x2="520" y2="420" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="590" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">Trap</text>
+  <text class="gsvg-ar" x="590" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">Trap</text>
+
+  <!-- Left Arrow (Proxy to Manager) -->
+  <line x1="280" y1="420" x2="140" y2="420" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <text class="gsvg-en" x="210" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">SNMPv2-Trap</text>
+  <text class="gsvg-ar" x="210" y="412" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)">SNMPv2-Trap</text>
+
+  <!-- Proxy Action -->
+  <rect x="290" y="390" width="220" height="60" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+  <text class="gsvg-en" x="400" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">Prepend sysUpTime.0</text>
+  <text class="gsvg-ar" x="400" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)">إضافة sysUpTime.0 في البداية</text>
+  
+  <text class="gsvg-en" x="400" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">&amp; snmpTrapOID.0</text>
+  <text class="gsvg-ar" x="400" y="435" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">و snmpTrapOID.0</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Bilingual Manager</th><th>Proxy Server</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك الموارد</template>
+          <template class="content-en">Resource Consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مكلف وعالي الاستهلاك</template>
+          <template class="content-en">Expensive and high consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أكثر كفاءة، يوزع العبء</template>
+          <template class="content-en">More efficient, distributes load</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">موقع الترجمة</template>
+          <template class="content-en">Translation Location</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">داخل نظام إدارة الشبكة (NMS)</template>
+          <template class="content-en">Inside the Network Management System (NMS)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">في عقدة وسيطة على الشبكة</template>
+          <template class="content-en">At an intermediary node on the network</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يقوم الخادم الوكيل بتحويل GetBulkRequest إلى GetNextRequest بدلاً من رفضه؟</template>
+      <template class="content-en">Why does the proxy server convert GetBulkRequest to GetNextRequest instead of rejecting it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>للحفاظ على شفافية العمليات للمدير (Manager). المدير يستخدم GetBulk لطلب البيانات، والوكيل يقوم بأفضل محاولة لتلبيتها من وكيل v1 القديم عن طريق تحويلها إلى GetNext (طلب عنصر واحد)، مما يضمن استمرار عمل النظام دون الحاجة لتعديل سلوك المدير.</p></template>
+      <template class="content-en"><p>To maintain operational transparency for the Manager. The manager uses GetBulk to request data, and the proxy makes a 'best effort' to fulfill it from the legacy v1 agent by converting it to a GetNext (requesting one item), ensuring the system works without forcing the manager to change its behavior.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي الشبكات في هذه الوحدة المحورية. لقد رأينا كيف كان الإصدار الأول من SNMP بطيئاً في جلب الجداول الكبيرة. هنا يأتي SNMPv2 كبطل الأداء! ركزوا جيداً على رسالة GetBulkRequest؛ إنها سؤال امتحاني مؤكد. افهموا كيف يقلل حقلا Non-repeaters و Max-repetitions من الضغط على الشبكة. المفهوم الثاني الأهم هو RowStatus؛ تخيلوه كجهاز تحكم عن بعد لصفوف الجدول (إنشاء، تفعيل، حذف). لا تنسوا الفرق بين Create-and-Go (السريع) و Create-and-Wait (المتأني). أخيراً، في عالم الشبكات الحقيقي، لن تختفي الأجهزة القديمة فجأة، لذا فإن فهم كيفية عمل الخادم الوكيل (Proxy Server) لترجمة رسائل v2 إلى v1 هو مهارة هندسية حاسمة. راجعوا هذه النقاط وستكونون مستعدين تماماً!</template>
+    <template class="content-en">Welcome, network engineers, to this pivotal module. We saw how SNMPv1 struggled with large tables. Enter SNMPv2, the performance hero! Pay close attention to the GetBulkRequest; it's a guaranteed exam topic. Understand how Non-repeaters and Max-repetitions reduce network overhead. The second major concept is RowStatus; think of it as a remote control for table rows (create, activate, delete). Don't forget the difference between the swift Create-and-Go and the deliberate Create-and-Wait. Finally, in the real world, legacy devices don't vanish overnight, so understanding how a Proxy Server translates v2 to v1 is a critical engineering skill. Master these, and you'll ace the exam!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هما الرسالتان الجديدتان اللتان تمت إضافتهما في SNMPv2؟</template>
+          <template class="content-en">What are the two new messages added in SNMPv2?</template>
+          <span class="content-target">ما هما الرسالتان الجديدتان اللتان تمت إضافتهما في SNMPv2؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">رسالة GetBulkRequest لتسريع جلب البيانات الضخمة، ورسالة InformRequest للتواصل الموثوق بين المديرين.</template>
+          <template class="content-en">GetBulkRequest for speeding up bulk data retrieval, and InformRequest for reliable manager-to-manager communication.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل SNMPv2 مشكلة بطء استرداد الجداول؟</template>
+          <template class="content-en">How does SNMPv2 solve the slow table retrieval problem?</template>
+          <span class="content-target">كيف يحل SNMPv2 مشكلة بطء استرداد الجداول؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام GetBulkRequest، الذي يسمح للمدير بطلب صفوف متعددة في رسالة واحدة باستخدام حقل Max-repetitions، بدلاً من إرسال طلبات GetNext متكررة.</template>
+          <template class="content-en">By using GetBulkRequest, which allows the manager to request multiple rows in a single message using the Max-repetitions field, instead of sending repetitive GetNext requests.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الغرض من الاصطلاح النصي RowStatus؟</template>
+          <template class="content-en">What is the purpose of the RowStatus textual convention?</template>
+          <span class="content-target">ما هو الغرض من الاصطلاح النصي RowStatus؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يُستخدم لإضافة عمود تحكم إلى الجداول، مما يسمح للمدير بإنشاء، تفعيل، تعليق، أو حذف الصفوف ديناميكياً.</template>
+          <template class="content-en">It is used to add a control column to tables, allowing the manager to dynamically create, activate, suspend, or delete rows.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين Create-and-Go و Create-and-Wait؟</template>
+          <template class="content-en">What is the difference between Create-and-Go and Create-and-Wait?</template>
+          <span class="content-target">ما الفرق بين Create-and-Go و Create-and-Wait؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">Create-and-Go ينشئ الصف ويفعله في خطوة واحدة (status=4). Create-and-Wait ينشئ الصف وينتظر (status=5) حتى يقوم المدير بتعبئة باقي البيانات المطلوبة قبل تفعيله.</template>
+          <template class="content-en">Create-and-Go creates and activates the row in one step (status=4). Create-and-Wait creates the row and waits (status=5) for the manager to populate remaining required data before activation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي قيود توسيع الجداول (Augmentation)؟</template>
+          <template class="content-en">What are the restrictions of table augmentation?</template>
+          <span class="content-target">ما هي قيود توسيع الجداول (Augmentation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب أن يكون هناك تطابق واحد-لواحد بين الصفوف، ولا يتغير عدد الصفوف، ويجب أن يستخدم الجدول الموسع نفس الفهرس (INDEX) للجدول الأساسي.</template>
+          <template class="content-en">There must be a one-to-one correspondence between rows, the number of rows doesn't change, and the augmented table must use the exact same INDEX as the base table.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف InformRequest عن Trap؟</template>
+          <template class="content-en">How does InformRequest differ from a Trap?</template>
+          <span class="content-target">كيف يختلف InformRequest عن Trap؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كلاهما رسائل غير مطلوبة (unsolicited)، لكن InformRequest يتطلب من المستلم إرسال استجابة (Response) لتأكيد الاستلام، مما يجعله موثوقاً.</template>
+          <template class="content-en">Both are unsolicited messages, but InformRequest requires the receiver to send a Response acknowledging receipt, making it reliable.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تم توحيد رسالة Trap في SNMPv2؟</template>
+          <template class="content-en">How was the Trap message standardized in SNMPv2?</template>
+          <span class="content-target">كيف تم توحيد رسالة Trap في SNMPv2؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">أصبح لها نفس تنسيق PDU مثل رسائل Get/Set، وتم تحديد أن أول متغيرين في القائمة يجب أن يكونا sysUpTime و snmpTrapOID.</template>
+          <template class="content-en">It now uses the same PDU format as Get/Set messages, and it specifies that the first two variables in the list must be sysUpTime and snmpTrapOID.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة الخادم الوكيل (Proxy Server) في بيئة مختلطة؟</template>
+          <template class="content-en">What is the function of a Proxy Server in a mixed environment?</template>
+          <span class="content-target">ما هي وظيفة الخادم الوكيل (Proxy Server) في بيئة مختلطة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعمل كوسيط يترجم طلبات SNMPv2 من المدير إلى طلبات SNMPv1 يفهمها الوكيل القديم، ويترجم الاستجابات والفخاخ بالعكس.</template>
+          <template class="content-en">It acts as an intermediary that translates SNMPv2 requests from the manager into SNMPv1 requests understood by legacy agents, and translates responses and traps back.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يترجم الخادم الوكيل رسالة GetBulkRequest؟</template>
+          <template class="content-en">How does the Proxy Server translate a GetBulkRequest?</template>
+          <span class="content-target">كيف يترجم الخادم الوكيل رسالة GetBulkRequest؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بما أن v1 لا يدعمها، يقوم الوكيل بتحويلها إلى GetNextRequest عن طريق تعيين قيم non-repeaters و max-repetitions إلى صفر.</template>
+          <template class="content-en">Since v1 doesn't support it, the proxy converts it to a GetNextRequest by setting the non-repeaters and max-repetitions values to zero.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر المدير ثنائي اللغة (Bilingual Manager) حلاً مكلفاً؟</template>
+          <template class="content-en">Why is a Bilingual Manager considered an expensive solution?</template>
+          <span class="content-target">لماذا يعتبر المدير ثنائي اللغة (Bilingual Manager) حلاً مكلفاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يتطلب من نظام إدارة الشبكة (NMS) تشغيل مترجمين للبروتوكولين والقيام بجميع عمليات التحويل داخلياً، مما يستهلك موارد المعالجة.</template>
+          <template class="content-en">Because it requires the Network Management System (NMS) to run interpreters for both protocols and perform all conversions internally, consuming processing resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي وظيفة رسالة get-bulk-request؟",
+      "en": "What is the function of the get-bulk-request message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسريع جلب البيانات من الجداول واسترداد كميات كبيرة من البيانات في طلب واحد.",
+        "en": "Speeds up data retrieval from tables and retrieves large amounts of data in a single request."
+      },
+      "example": {
+        "ar": "استرداد جدول توجيه كامل بدلاً من طلب كل صف على حدة.",
+        "en": "Retrieving an entire routing table instead of requesting each row individually."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي وظيفة رسالة inform-request؟",
+      "en": "What is the function of the inform-request message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم للتواصل بين المديرين (Manager-to-manager) وتتطلب استجابة لتأكيد الاستلام.",
+        "en": "Used for manager-to-manager communication and requires an acknowledgment response."
+      },
+      "example": {
+        "ar": "مدير فرعي يرسل تنبيهاً لمدير مركزي وينتظر تأكيداً.",
+        "en": "A subordinate manager sending an alert to a central manager and waiting for confirmation."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الغرض من الاصطلاحات النصية (Textual Conventions) في SNMPv2؟",
+      "en": "What is the purpose of Textual Conventions in SNMPv2?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعريف أنواع بيانات جديدة وجعل دلالات البيانات متسقة ومقروءة للبشر.",
+        "en": "Defines new data types and makes semantics of data types consistent and human-readable."
+      },
+      "example": {
+        "ar": "استخدام RowStatus كنوع بيانات لإدارة الصفوف.",
+        "en": "Using RowStatus as a data type to manage rows."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو الجدول الكثيف (Dense table)؟",
+      "en": "What is a Dense table?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول موسع يتيح إضافة المزيد من الصفوف للجدول الأساسي.",
+        "en": "An augmented table that enables the addition of more rows to a base table."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الجدول المتناثر (Sparse table)؟",
+      "en": "What is a Sparse table?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول موسع يضيف صفوفاً أقل للجدول الأساسي.",
+        "en": "An augmented table that supplements fewer rows to a base table."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي القيود الثلاثة لتوسيع الجداول (Table Augmentation)؟",
+      "en": "What are the 3 restrictions for Table Augmentation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1. عدد الصفوف لا يتأثر. 2. تطابق واحد-لواحد بين الصفوف. 3. نفس الفهرس (INDEX) للجدولين.",
+        "en": "1. Number of conceptual rows is not affected. 2. One-to-one correspondence between rows. 3. INDEX of the second table is the same as the first."
+      },
+      "example": {
+        "ar": "جدول ipAugAddrTable يشارك نفس فهرس ipAddrTable.",
+        "en": "ipAugAddrTable sharing the exact same index as ipAddrTable."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو RowStatus؟",
+      "en": "What is RowStatus?"
+    },
+    "back": {
+      "definition": {
+        "ar": "اصطلاح نصي يضيف عموداً للجدول للتحكم في إنشاء وحذف الصفوف.",
+        "en": "A textual convention that adds a column to a table to control the creation and deletion of rows."
+      },
+      "example": {
+        "ar": "تعيين RowStatus إلى 6 لحذف صف.",
+        "en": "Setting RowStatus to 6 to delete a row."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ماذا تعني حالة notReady (3) في RowStatus؟",
+      "en": "What does the notReady (3) state mean in RowStatus?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الصف موجود ولكنه يفتقر إلى بعض الكائنات العمودية المطلوبة لتفعيله.",
+        "en": "The row exists but does not have all the columnar objects needed to become active."
+      },
+      "example": {
+        "ar": "رد الوكيل بعد تلقي طلب createAndWait (5).",
+        "en": "The agent's response after receiving a createAndWait (5) request."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو حقل Non-repeaters في GetBulkRequest؟",
+      "en": "What is the Non-repeaters field in GetBulkRequest?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدد عدد الكائنات الفردية (Scalar) في بداية الطلب التي يجب جلبها مرة واحدة فقط.",
+        "en": "Specifies the number of non-repetitive scalar values at the beginning of the request to be retrieved just once."
+      },
+      "example": {
+        "ar": "طلب قيمة sysUpTime مرة واحدة فقط أثناء جلب جدول.",
+        "en": "Requesting sysUpTime exactly once while fetching a table."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو حقل Max-repetitions في GetBulkRequest؟",
+      "en": "What is the Max-repetitions field in GetBulkRequest?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدد الحد الأقصى لعدد الصفوف التي يجب جلبها للكائنات العمودية المطلوبة.",
+        "en": "Specifies the maximum number of table rows to retrieve for the requested columnar objects."
+      },
+      "example": {
+        "ar": "تعيين Max-repetitions إلى 10 لجلب 10 صفوف من جدول التوجيه دفعة واحدة.",
+        "en": "Setting Max-repetitions to 10 to fetch 10 rows of a routing table at once."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هما المتغيران الأولان دائماً في رسالة SNMPv2 Trap؟",
+      "en": "What are always the first two variables in an SNMPv2 Trap message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "sysUpTime و snmpTrapOID.",
+        "en": "sysUpTime and snmpTrapOID."
+      },
+      "example": {
+        "ar": "تحديد وقت تشغيل النظام ونوع الفخ (مثل linkUp) في بداية قائمة المتغيرات.",
+        "en": "Specifying system uptime and trap type (e.g., linkUp) at the start of the VarBindList."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "كيف يحقق المدير ثنائي اللغة (Bilingual Manager) التوافقية؟",
+      "en": "How does a Bilingual Manager achieve compatibility?"
+    },
+    "back": {
+      "definition": {
+        "ar": "من خلال تنفيذ وحدات مترجم لكل من SNMPv1 و SNMPv2، وإجراء جميع التحويلات داخلياً.",
+        "en": "By implementing both SNMPv1 and SNMPv2 interpreter modules, performing all conversions internally."
+      },
+      "example": {
+        "ar": "نظام إدارة شبكة ضخم يعالج رسائل v1 من الموجهات القديمة ورسائل v2 من الخوادم الحديثة.",
+        "en": "A large NMS processing v1 messages from legacy routers and v2 messages from modern servers."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يتعامل الخادم الوكيل (Proxy Server) مع GetBulkRequest الموجه لوكيل v1؟",
+      "en": "How does a Proxy Server handle a GetBulkRequest destined for a v1 agent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقوم بتحويله إلى GetNextRequest عن طريق تعيين non-repeaters و max-repetitions إلى 0.",
+        "en": "It converts it to a GetNextRequest by setting non-repeaters and max-repetitions to 0."
+      },
+      "example": {
+        "ar": "ترجمة طلب جلب جماعي إلى طلب عنصر واحد ليتوافق مع قدرات الوكيل القديم.",
+        "en": "Translating a bulk request into a single-item request to match the legacy agent's capabilities."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف يتعامل الخادم الوكيل مع خطأ tooBig القادم من وكيل v1؟",
+      "en": "How does a Proxy Server handle a tooBig error coming from a v1 agent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقوم بإزالة محتويات حقل المتغيرات (variable-bindings) قبل تمرير الاستجابة لمدير v2.",
+        "en": "It removes the contents of the variable-bindings field before passing the response to the v2 manager."
+      },
+      "example": {
+        "ar": "تجريد البيانات الزائدة لتتوافق مع معايير معالجة الأخطاء في SNMPv2.",
+        "en": "Stripping excess data to comply with SNMPv2 error handling standards."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الماكرو المستخدم لتعريف الإشعارات في SNMPv2؟",
+      "en": "What macro is used to define notifications in SNMPv2?"
+    },
+    "back": {
+      "definition": {
+        "ar": "NOTIFICATION-TYPE",
+        "en": "NOTIFICATION-TYPE"
+      },
+      "example": {
+        "ar": "تعريف فخ linkUp باستخدام NOTIFICATION-TYPE.",
+        "en": "Defining a linkUp trap using NOTIFICATION-TYPE."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الرسائل التالية تم تقديمها في SNMPv2 لتسريع جلب البيانات من الجداول؟",
+      "en": "Which of the following messages was introduced in SNMPv2 to speed up data retrieval from tables?"
+    },
+    "options": {
+      "ar": [
+        "GetNextRequest",
+        "GetBulkRequest",
+        "InformRequest",
+        "SetRequest"
+      ],
+      "en": [
+        "GetNextRequest",
+        "GetBulkRequest",
+        "InformRequest",
+        "SetRequest"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "رسالة GetBulkRequest مصممة خصيصاً لاسترداد كميات كبيرة من البيانات (مثل الجداول) بكفاءة عالية.",
+      "en": "The GetBulkRequest message is specifically designed to retrieve large amounts of data (like tables) highly efficiently."
+    },
+    "hint": {
+      "ar": "تحتوي على كلمة تعني 'كمية كبيرة'.",
+      "en": "Contains a word meaning 'large quantity'."
+    },
+    "difficulty": "easy",
+    "conceptId": "get-bulk-request-operation"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي القيمة التي يجب تعيينها لـ RowStatus لحذف صف موجود؟",
+      "en": "What value must be set for RowStatus to delete an existing row?"
+    },
+    "options": {
+      "ar": [
+        "1 (active)",
+        "4 (createAndGo)",
+        "5 (createAndWait)",
+        "6 (destroy)"
+      ],
+      "en": [
+        "1 (active)",
+        "4 (createAndGo)",
+        "5 (createAndWait)",
+        "6 (destroy)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "القيمة 6 (destroy) تُستخدم بواسطة المدير لطلب حذف صف، وبغض النظر عن حالته الحالية، يتم حذفه.",
+      "en": "Value 6 (destroy) is used by the manager to request row deletion, and independently of its current state, it is deleted."
+    },
+    "hint": {
+      "ar": "الرقم الأخير في قائمة حالات RowStatus.",
+      "en": "The last number in the RowStatus states list."
+    },
+    "difficulty": "medium",
+    "conceptId": "row-creation-deletion-rowstatus"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في عملية توسيع الجداول (Augmentation)، أي من القيود التالية صحيح؟",
+      "en": "In Table Augmentation, which of the following restrictions is true?"
+    },
+    "options": {
+      "ar": [
+        "الجدول الموسع يجب أن يحتوي على صفوف أكثر من الجدول الأساسي.",
+        "فهرس (INDEX) الجدول الموسع يختلف عن فهرس الجدول الأساسي.",
+        "يوجد تطابق واحد-لواحد (one-to-one) بين صفوف الجدولين.",
+        "لا يمكن إضافة أكثر من عمودين في الجدول الموسع."
+      ],
+      "en": [
+        "The augmented table must have more rows than the base table.",
+        "The INDEX of the augmented table is different from the base table.",
+        "There is a one-to-one correspondence between the rows of the two tables.",
+        "No more than two columns can be added in the augmented table."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "من قيود التوسيع أن يكون هناك تطابق تام (واحد-لواحد) بين الصفوف، وأن يتشاركا نفس الفهرس.",
+      "en": "A restriction of augmentation is that there must be a strict one-to-one correspondence between rows, and they must share the same INDEX."
+    },
+    "hint": {
+      "ar": "فكر في العلاقة المباشرة بين الجدول القديم والجديد.",
+      "en": "Think about the direct relationship between the old and new table."
+    },
+    "difficulty": "medium",
+    "conceptId": "table-expansion-augmentation"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي حقل في GetBulkRequest يحدد عدد الكائنات التي يجب جلبها مرة واحدة فقط؟",
+      "en": "Which field in GetBulkRequest specifies the number of objects to be retrieved just once?"
+    },
+    "options": {
+      "ar": [
+        "Max-repetitions",
+        "Non-repeaters",
+        "Error-status",
+        "Error-index"
+      ],
+      "en": [
+        "Max-repetitions",
+        "Non-repeaters",
+        "Error-status",
+        "Error-index"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حقل Non-repeaters يحدد عدد الكائنات الفردية (Scalar) في بداية القائمة التي لا ينبغي تكرار جلبها.",
+      "en": "The Non-repeaters field specifies the number of scalar objects at the beginning of the list that should not be repetitively fetched."
+    },
+    "hint": {
+      "ar": "الاسم يعكس عدم التكرار.",
+      "en": "The name reflects 'no repetition'."
+    },
+    "difficulty": "medium",
+    "conceptId": "get-bulk-request-operation"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لرسالة Inform-Request مقارنة بـ Trap؟",
+      "en": "What is the main advantage of the Inform-Request message compared to a Trap?"
+    },
+    "options": {
+      "ar": [
+        "تستخدم عرض نطاق ترددي أقل.",
+        "تتطلب استجابة (Response) مما يجعلها موثوقة.",
+        "يمكن إرسالها من الوكيل إلى المدير فقط.",
+        "لا تحتوي على حقل snmpTrapOID."
+      ],
+      "en": [
+        "It uses less bandwidth.",
+        "It requires a Response, making it reliable.",
+        "It can only be sent from agent to manager.",
+        "It does not contain the snmpTrapOID field."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "رسالة Inform-Request تتطلب من المستلم إرسال استجابة، مما يضمن وصول التنبيه (موثوقية)، عكس Trap.",
+      "en": "An Inform-Request requires the receiver to send a response, ensuring the alert was delivered (reliability), unlike a Trap."
+    },
+    "hint": {
+      "ar": "فكر في كيفية التأكد من استلام رسالة نصية.",
+      "en": "Think about how you confirm a text message was received."
+    },
+    "difficulty": "medium",
+    "conceptId": "snmpv2-trap-inform"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف يقوم الخادم الوكيل (Proxy Server) بتحويل رسالة GetBulkRequest عند إرسالها لوكيل SNMPv1؟",
+      "en": "How does a Proxy Server convert a GetBulkRequest when sending it to an SNMPv1 agent?"
+    },
+    "options": {
+      "ar": [
+        "يحولها إلى GetRequest.",
+        "يرفضها ويرسل رسالة خطأ للمدير.",
+        "يحولها إلى GetNextRequest مع تعيين non-repeaters و max-repetitions إلى 0.",
+        "يمررها كما هي دون تغيير."
+      ],
+      "en": [
+        "Converts it to a GetRequest.",
+        "Rejects it and sends an error to the manager.",
+        "Converts it to a GetNextRequest setting non-repeaters and max-repetitions to 0.",
+        "Passes it through unchanged."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بما أن SNMPv1 لا يدعم GetBulk، يقوم الوكيل بتحويلها إلى GetNextRequest لطلب عنصر واحد.",
+      "en": "Since SNMPv1 doesn't support GetBulk, the proxy converts it to a GetNextRequest to ask for a single item."
+    },
+    "hint": {
+      "ar": "يستخدم العملية الأقرب في v1 لجلب العنصر التالي.",
+      "en": "It uses the closest v1 operation to fetch the next item."
+    },
+    "difficulty": "hard",
+    "conceptId": "compatibility-snmpv1"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هما المتغيران اللذان يتم إضافتهما دائماً في بداية قائمة المتغيرات (VarBindList) لرسالة SNMPv2 Trap؟",
+      "en": "What are the two variables always prepended to the VarBindList of an SNMPv2 Trap message?"
+    },
+    "options": {
+      "ar": [
+        "sysDescr و sysUpTime",
+        "sysUpTime و snmpTrapOID",
+        "snmpTrapOID و errorStatus",
+        "agentAddr و genericTrap"
+      ],
+      "en": [
+        "sysDescr and sysUpTime",
+        "sysUpTime and snmpTrapOID",
+        "snmpTrapOID and errorStatus",
+        "agentAddr and genericTrap"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في SNMPv2، تم توحيد تنسيق Trap، ويجب أن يكون المتغيران الأولان هما وقت التشغيل (sysUpTime) ومعرف الفخ (snmpTrapOID).",
+      "en": "In SNMPv2, the Trap format is standardized, and the first two variables must be the uptime (sysUpTime) and the trap identifier (snmpTrapOID)."
+    },
+    "hint": {
+      "ar": "الوقت ونوع الفخ.",
+      "en": "Time and Trap type."
+    },
+    "difficulty": "hard",
+    "conceptId": "snmpv2-trap-inform"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي حالة RowStatus التي يرسلها الوكيل (Agent) ليعني أن الصف موجود ولكن تنقصه بيانات ليكون جاهزاً؟",
+      "en": "Which RowStatus state does the Agent send to mean the row exists but lacks data to be ready?"
+    },
+    "options": {
+      "ar": [
+        "active (1)",
+        "notInService (2)",
+        "notReady (3)",
+        "createAndWait (5)"
+      ],
+      "en": [
+        "active (1)",
+        "notInService (2)",
+        "notReady (3)",
+        "createAndWait (5)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "حالة notReady (3) تعني أن الصف تم إنشاؤه ولكنه يفتقر إلى بعض الكائنات العمودية المطلوبة.",
+      "en": "The notReady (3) state means the row is created but does not have all the columnar objects needed."
+    },
+    "hint": {
+      "ar": "الاسم يعني 'غير جاهز'.",
+      "en": "The name means 'not ready'."
+    },
+    "difficulty": "medium",
+    "conceptId": "row-creation-deletion-rowstatus"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من الماكرو التالية يُستخدم لتعريف دلالات وحدة المعلومات (semantics of information module) في SMIv2؟",
+      "en": "Which of the following macros is used to define the semantics of an information module in SMIv2?"
+    },
+    "options": {
+      "ar": [
+        "OBJECT-TYPE",
+        "NOTIFICATION-TYPE",
+        "MODULE-IDENTITY",
+        "MODULE-COMPLIANCE"
+      ],
+      "en": [
+        "OBJECT-TYPE",
+        "NOTIFICATION-TYPE",
+        "MODULE-IDENTITY",
+        "MODULE-COMPLIANCE"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الماكرو MODULE-IDENTITY يُستخدم لتعريف دلالات وحدة المعلومات في الإصدار الثاني.",
+      "en": "The MODULE-IDENTITY macro is used to define the semantics of the information module in v2."
+    },
+    "hint": {
+      "ar": "يحتوي على كلمة 'Identity'.",
+      "en": "Contains the word 'Identity'."
+    },
+    "difficulty": "medium",
+    "conceptId": "snmpv2-enhancements-architecture"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لاستخدام 'المدير ثنائي اللغة' (Bilingual Manager) للتوافقية؟",
+      "en": "What is the main disadvantage of using a 'Bilingual Manager' for compatibility?"
+    },
+    "options": {
+      "ar": [
+        "لا يدعم رسائل Trap.",
+        "مكلف من حيث الموارد والتشغيل.",
+        "يتطلب تعديل وكلاء SNMPv1.",
+        "لا يمكنه معالجة GetBulkRequest."
+      ],
+      "en": [
+        "It does not support Trap messages.",
+        "It is expensive in resources and operation.",
+        "It requires modifying SNMPv1 agents.",
+        "It cannot process GetBulkRequest."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المدير ثنائي اللغة يجب أن يقوم بجميع التحويلات داخلياً، مما يجعله مكلفاً ويستهلك موارد النظام بشكل كبير.",
+      "en": "A Bilingual Manager must perform all conversions internally, making it expensive and resource-intensive."
+    },
+    "hint": {
+      "ar": "القيام بعملين في نفس الوقت يستهلك طاقة أكبر.",
+      "en": "Doing two jobs at once consumes more energy."
+    },
+    "difficulty": "easy",
+    "conceptId": "compatibility-snmpv1"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن رسالة GetBulkRequest لها علاقة واحد-لواحد (one-to-one) بين الطلب والاستجابة مثل GetRequest. هذا خطأ! الاستجابة في GetBulk تكون أكبر بكثير من الطلب لأنها تجلب صفوفاً متعددة.</template>
+    <template class="content-en">You might think GetBulkRequest has a one-to-one request/response relationship like GetRequest. False! The response in GetBulk is significantly larger than the request because it fetches multiple rows.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تم تعريف رسالة 'report' في SNMPv2، لكن لم يتم تحديد كيفية استخدامها في المعيار، وتُرك الأمر للموردين (Vendors) لتحديد استخدامها.</template>
+    <template class="content-en">The 'report' message was defined in SNMPv2, but its usage was not specified in the standard, leaving it up to individual vendors to implement.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الـ RowStatus هو الآلية الأساسية في SNMPv2 التي تسمح للمديرين بإنشاء وحذف الصفوف في الجداول بشكل ديناميكي، مما يحل مشكلة الجداول الثابتة في الإصدار الأول.</template>
+    <template class="content-en">RowStatus is the core mechanism in SNMPv2 that allows managers to dynamically create and delete rows in tables, solving the static table limitation of v1.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عندما يتلقى الخادم الوكيل (Proxy Server) خطأ 'tooBig' من وكيل v1، فإنه يقوم بمسح حقل المتغيرات (variable-bindings) قبل إرساله لمدير v2، لأن v2 لا يتوقع عودة البيانات مع هذا الخطأ.</template>
+    <template class="content-en">When a Proxy Server receives a 'tooBig' error from a v1 agent, it strips the variable-bindings field before sending it to the v2 manager, because v2 does not expect data to be returned with this error.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين Non-repeaters و Max-repetitions. تذكر: Non-repeaters للكائنات الفردية (Scalar) التي تُجلب مرة واحدة، بينما Max-repetitions للأعمدة التي تُجلب منها صفوف متعددة.</template>
+    <template class="content-en">Confusing Non-repeaters and Max-repetitions. Remember: Non-repeaters is for scalar objects fetched once, while Max-repetitions is for columns where multiple rows are fetched.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

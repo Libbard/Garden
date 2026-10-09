@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التعامل مع أجزاء أكبر من الكود (الدوال) · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#creating-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء الدوال (Functions)</template>
+        <template class="content-en">Creating a Function</template>
+        <span class="content-target">إنشاء الدوال (Functions)</span>
+      </a>
+      <a href="#commenting-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">التعليق على الدوال (Docstrings)</template>
+        <template class="content-en">Commenting a Function</template>
+        <span class="content-target">التعليق على الدوال (Docstrings)</span>
+      </a>
+      <a href="#passing-information-local-scope" class="toc-link" data-bilingual>
+        <template class="content-ar">تمرير المعلومات والنطاق المحلي</template>
+        <template class="content-en">Passing Information and Local Scope</template>
+        <span class="content-target">تمرير المعلومات والنطاق المحلي</span>
+      </a>
+      <a href="#optional-parameters-defaults" class="toc-link" data-bilingual>
+        <template class="content-ar">المعلمات الاختيارية والقيم الافتراضية</template>
+        <template class="content-en">Optional Parameters and Defaults</template>
+        <span class="content-target">المعلمات الاختيارية والقيم الافتراضية</span>
+      </a>
+      <a href="#keyword-arguments-kwargs" class="toc-link" data-bilingual>
+        <template class="content-ar">وسائط الكلمات الأساسية (kwargs)</template>
+        <template class="content-en">Keyword Arguments (kwargs)</template>
+        <span class="content-target">وسائط الكلمات الأساسية (kwargs)</span>
+      </a>
+      <a href="#passing-lists-copy" class="toc-link" data-bilingual>
+        <template class="content-ar">تمرير القوائم ونسخها</template>
+        <template class="content-en">Passing Lists and Copying</template>
+        <span class="content-target">تمرير القوائم ونسخها</span>
+      </a>
+      <a href="#arbitrary-arguments-args" class="toc-link" data-bilingual>
+        <template class="content-ar">تمرير عدد غير محدد من الوسائط (*args)</template>
+        <template class="content-en">Arbitrary Number of Arguments (*args)</template>
+        <span class="content-target">تمرير عدد غير محدد من الوسائط (*args)</span>
+      </a>
+      <a href="#returning-values" class="toc-link" data-bilingual>
+        <template class="content-ar">إرجاع القيم من الدوال</template>
+        <template class="content-en">Returning Values from Functions</template>
+        <span class="content-target">إرجاع القيم من الدوال</span>
+      </a>
+      <a href="#anonymous-lambda-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">الدوال المجهولة (Lambda)</template>
+        <template class="content-en">Unmasking Anonymous Functions</template>
+        <span class="content-target">الدوال المجهولة (Lambda)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التعامل مع أجزاء أكبر من الكود (الدوال)</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية إنشاء الدوال في بايثون، تمرير المعلومات إليها باستخدام المعلمات والوسائط، إرجاع القيم، وفهم الدوال المجهولة (Lambda).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Wrangling Bigger Chunks of Code (Functions)</h1>
+      <p class="hero-description">This module covers how to create functions in Python, pass information using parameters and arguments, return values, and understand anonymous (lambda) functions.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بايثون</span>
+      <span class="tag">الدوال</span>
+      <span class="tag">النطاق المحلي</span>
+      <span class="tag">الوسائط</span>
+      <span class="tag">الدوال المجهولة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Python</span>
+      <span class="tag">Functions</span>
+      <span class="tag">Local Scope</span>
+      <span class="tag">Arguments</span>
+      <span class="tag">Lambda Functions</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>إنشاء دالة خاصة بك وتضمين تعليق (Docstring) بداخلها.</span></li>
+      <li><span class="obj-icon">✦</span><span>معرفة كيفية تمرير المعلومات إلى الدالة.</span></li>
+      <li><span class="obj-icon">✦</span><span>إرجاع القيم من الدالة لاستخدامها في الكود.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم الدوال المجهولة (Lambda) وكيفية استخدامها.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Creating your own function and including a comment in a function.</span></li>
+      <li><span class="obj-icon">✦</span><span>Seeing how to pass information to a function.</span></li>
+      <li><span class="obj-icon">✦</span><span>Returning values from a function.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understanding anonymous functions.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="creating-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> إنشاء الدوال (Functions)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Creating a Function</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الدوال هي طريقة لتقسيم الكود إلى مهام صغيرة يمكن استدعاؤها من أماكن متعددة، تماماً مثل وصفة طعام جاهزة يمكنك استخدامها متى شئت.</p></template>
+    <template class="content-en"><p>Functions compartmentalize code into small, reusable tasks, much like a saved recipe you can pull out whenever you need to cook that dish.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لإنشاء دالة في بايثون، نبدأ السطر بكلمة <code>def</code> (اختصار لـ definition)، متبوعة بمسافة، ثم اسم الدالة الذي تختاره، يليه قوسان <code>()</code> ونقطتان رأسيتان <code>:</code>.</p><p>يجب أن تكون الأسطر التالية التي تحتوي على الكود الخاص بالدالة مزاحة (Indented) لضمان وجودها داخل الدالة.</p><p>الكود الموجود داخل الدالة لا يتم تنفيذه حتى يتم <b>استدعاء</b> الدالة (Calling the function) بكتابة اسمها متبوعاً بالأقواس.</p></template>
+    <template class="content-en"><p>To create a function, start a new line with <code>def</code> (short for <span class="smart-term" data-term-en="def" data-ar="كلمة def" data-en-def="The keyword used in Python to define a new function.">def<span class="smart-term-tooltip"></span></span>inition) followed by a space, a name of your choosing, a pair of parentheses, and a colon <code>:</code>.</p><p>To ensure the new code is inside the function, you must indent each of those lines.</p><p>The code inside a function isn't executed until the function is <b>called</b> by writing its name including the parentheses at the end.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهدف الأساسي من الدوال هو مبدأ (Don't Repeat Yourself - DRY). إذا كان لديك كود يتكرر، فإن وضعه في دالة يسهل صيانته؛ حيث ستحتاج إلى تعديله في مكان واحد فقط.</p><p>عدم استدعاء الدالة هو خطأ شائع للمبتدئين؛ حيث يتم تعريف الدالة ولكن لا يظهر أي مخرجات لأن الدالة لم تُستدعى في البرنامج الرئيسي.</p><p>تعتبر الدوال اللبنة الأساسية للبرمجة الإجرائية وتساعد في تنظيم التطبيقات الكبيرة.</p></template>
+    <template class="content-en"><p>The primary motivation for functions is the DRY (Don't Repeat Yourself) principle. If code is contained in a function, you only have to fix or change it in one location.</p><p>A common beginner mistake is defining a function but forgetting to call it, resulting in no output and confusion.</p><p>Functions are the building blocks of procedural programming, allowing complex problems to be broken down into manageable, testable pieces.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def hello():
+    print('Hello')
+
+hello()</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا قمت بتعريف دالة ولكنك لم تكتب كود استدعائها في نهاية البرنامج؟</template>
+      <template class="content-en">What happens if you define a function but never write the code to call it at the end of your program?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن يتم تنفيذ الكود الموجود داخل الدالة ولن يظهر أي خطأ، ببساطة سيتم تجاهله أثناء تشغيل البرنامج.</p></template>
+      <template class="content-en"><p>The code inside the function will never execute. The program will run without errors, but the function's task will not be performed.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="commenting-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> التعليق على الدوال (Docstrings)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Commenting a Function</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التعليقات وسلاسل التوثيق (Docstrings) هي ملاحظات للمبرمجين لا تؤثر على عمل الكود، وتستخدم لشرح وظيفة الدالة.</p></template>
+    <template class="content-en"><p>Comments and docstrings are notes for programmers that have no effect on what the code does, used to describe the function's purpose.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>من المعتاد في بايثون جعل السطر الأول تحت عبارة <code>def</code> عبارة عن سلسلة توثيق (Docstring)، وهي نص محاط بثلاث علامات تنصيص <code>"""</code> يصف ما تفعله الدالة.</p><p>يمكن أيضاً استخدام علامة <code>#</code> لكتابة تعليقات قصيرة بجانب الكود.</p><p>هذه التعليقات لا تغير من مخرجات البرنامج، بل تساعد أعضاء الفريق البرمجي على فهم الكود.</p></template>
+    <template class="content-en"><p>It is customary to make the first line under the <code>def</code> statement a <span class="smart-term" data-term-en="Docstring" data-ar="سلسلة التوثيق" data-en-def="Text enclosed in triple quotation marks used to document a Python module, class, function, or method.">docstring<span class="smart-term-tooltip"></span></span> (text enclosed in triple quotation marks <code>"""</code>) that describes what the function does.</p><p>It is also common to put a comment, preceded by a <code>#</code> sign, to the right of the parentheses or on specific lines.</p><p>Comments don't have any effect on what the code does; they are just notes to yourself or team members.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>سلاسل التوثيق (Docstrings) ليست مجرد تعليقات عادية؛ بل يمكن الوصول إليها برمجياً باستخدام خاصية <code>__doc__</code> الخاصة بالدالة، مما يسمح بإنشاء وثائق تلقائية للمكتبات.</p><p>تعتبر كتابة التعليقات الجيدة مهارة حاسمة في هندسة البرمجيات، حيث أن الكود يُقرأ مرات أكثر بكثير مما يُكتب.</p></template>
+    <template class="content-en"><p>Docstrings are not just ignored text; they are attached to the function object and can be accessed programmatically via the <code>__doc__</code> attribute, which is how automated documentation generators work.</p><p>Writing clear docstrings is a critical software engineering practice, as code is read far more often than it is written.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def hello(): # Practice function
+    """ A docstring describing the function """
+    print('Hello')</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم علامات التنصيص الثلاثية للـ Docstrings بدلاً من علامة المربع #؟</template>
+      <template class="content-en">Why do we use triple quotes for Docstrings instead of the hash # symbol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>علامات التنصيص الثلاثية تسمح بكتابة نصوص متعددة الأسطر بسهولة، والأهم أنها تُحفظ كجزء من الكائن (الدالة) ويمكن استدعاؤها برمجياً لإنشاء التوثيق، بينما يتم تجاهل علامة # تماماً بواسطة المترجم.</p></template>
+      <template class="content-en"><p>Triple quotes allow for multi-line strings easily, and more importantly, they are retained by Python as an attribute of the function (accessible via help()), whereas # comments are completely stripped out by the parser.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="passing-information-local-scope" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تمرير المعلومات والنطاق المحلي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Passing Information and Local Scope</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المعلمات (Parameters) هي بوابات لإدخال البيانات إلى الدالة، والمتغيرات داخل الدالة تعيش وتموت بداخلها (النطاق المحلي).</p></template>
+    <template class="content-en"><p>Parameters are gateways to pass data into a function, and variables inside a function live and die within it (Local Scope).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكنك تمرير المعلومات إلى الدالة عن طريق وضع أسماء معلمات (Parameters) داخل الأقواس في سطر <code>def</code>.</p><p>المصطلح التقني لطريقة عمل المتغيرات داخل الدوال هو <b><span class="smart-term" data-term-en="Local Scope" data-ar="النطاق المحلي" data-en-def="The region of a program where a variable is recognized and can be used, specifically inside a function.">النطاق المحلي<span class="smart-term-tooltip"></span></span> (Local Scope)</b>. هذا يعني أن المتغيرات التي يتم إنشاؤها أو تعديلها داخل الدالة تتوقف عن الوجود بمجرد انتهاء تشغيل الدالة.</p><p>أي متغيرات يتم تعريفها خارج الدالة لا تتأثر بما يحدث بداخلها، حتى لو كان لها نفس الاسم.</p></template>
+    <template class="content-en"><p>You can pass information to a function by entering a <span class="smart-term" data-term-en="Parameter" data-ar="المعلمة" data-en-def="A variable in a function definition that acts as a placeholder for the data passed in.">parameter<span class="smart-term-tooltip"></span></span> name in the <code>def</code> statement for each piece of information.</p><p>The technical term for how variables work inside functions is <b><span class="smart-term" data-term-en="Local Scope" data-ar="النطاق المحلي" data-en-def="The region of a program where a variable is recognized and can be used, specifically inside a function.">local scope<span class="smart-term-tooltip"></span></span></b>. The scope of the variables' existence and influence stays inside the function.</p><p>Variables created and modified inside a function literally cease to exist the moment the function stops running. Variables outside are unaffected.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>النطاق المحلي يحمي البرنامج من التداخل العرضي للمتغيرات. تخيل لو أن كل دالة تغير المتغيرات العامة؛ سيكون تتبع الأخطاء شبه مستحيل.</p><p>عند استدعاء الدالة، يجب تمرير قيمة (Argument) لكل معلمة (Parameter) مطلوبة، وإلا سيصدر بايثون خطأ <code>TypeError</code>.</p></template>
+    <template class="content-en"><p>Local scope is a protective mechanism. It prevents functions from accidentally overwriting global variables, which makes debugging large systems feasible.</p><p>If a function expects a parameter and you call it without passing an <span class="smart-term" data-term-en="Argument" data-ar="الوسيطة" data-en-def="The actual value passed to the function when it is called.">argument<span class="smart-term-tooltip"></span></span>, Python raises a <code>TypeError: missing 1 required positional argument</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def hello(user_name):
+    """ A docstring describing the function """
+    print('Hello ' + user_name)
+
+hello('Alan')</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a diagram showing a box representing the 'Global Scope' and a smaller box inside it representing the 'Local Scope' of a function. Show a variable 'x' outside the function and a separate variable 'x' inside the function. Use arrows to show that data passes into the local scope via parameters, but the local 'x' disappears when the function ends. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for Brand Color -->
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <polygon points="0,0 10,5 0,10" fill="var(--brand-500)" />
+    </marker>
+    <!-- Arrowhead for Muted Text Color -->
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <polygon points="0,0 10,5 0,10" fill="var(--text-muted)" />
+    </marker>
+    <!-- Arrowhead for Dashed Brand Color -->
+    <marker id="arrow-brand-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <polygon points="0,0 10,5 0,10" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Diagram Title -->
+  <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Global vs Local Scope</text>
+  <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">النطاق العام مقابل النطاق المحلي</text>
+
+  <!-- Global Scope Box -->
+  <rect x="20" y="70" width="760" height="410" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 4" />
+  <text x="40" y="105" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-secondary)">Global Scope</text>
+  <text x="40" y="105" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-secondary)">النطاق العام</text>
+
+  <!-- Local Scope Box (Function) -->
+  <rect x="360" y="110" width="380" height="240" rx="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="380" y="140" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">Local Scope (Function)</text>
+  <text x="380" y="140" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">النطاق المحلي (الدالة)</text>
+
+  <!-- TIME T1: Before / Passing Parameter -->
+  <!-- Global Variable (Initial) -->
+  <rect x="80" y="150" width="140" height="50" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="150" y="181" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="var(--text-primary)">x = 10</text>
+  <text x="150" y="220" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Global Variable</text>
+  <text x="150" y="220" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">متغير عام</text>
+
+  <!-- Parameter Passing Arrow -->
+  <path d="M 220 175 L 430 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  <text x="325" y="165" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Pass as parameter</text>
+  <text x="325" y="165" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">تمرير كمعامل</text>
+
+  <!-- Local Variable (Initial State) -->
+  <rect x="440" y="150" width="140" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 2" />
+  <text x="510" y="181" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="var(--text-primary)">x = 10</text>
+
+  <!-- TIME T2: Inside Function -->
+  <!-- Modification Arrow -->
+  <path d="M 510 200 L 510 245" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+  <text x="525" y="230" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Modified inside</text>
+  <text x="525" y="230" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">معدل بالداخل</text>
+
+  <!-- Local Variable (Modified State) -->
+  <rect x="440" y="255" width="140" height="50" rx="8" fill="var(--brand-500)" />
+  <text x="510" y="286" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="var(--on-brand-lo)">x = 99</text>
+
+  <!-- TIME T3: Function Ends -->
+  <!-- Function Return / Timeline Boundary -->
+  <line x1="40" y1="370" x2="760" y2="370" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 6" />
+  <text x="50" y="360" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-muted)">Function Returns</text>
+  <text x="50" y="360" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-muted)">عودة الدالة</text>
+
+  <!-- Destruction Arrow -->
+  <path d="M 510 305 L 510 385" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arrow-brand-dashed)" />
+  <text x="525" y="345" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">Function ends</text>
+  <text x="525" y="345" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">انتهاء الدالة</text>
+
+  <!-- Destroyed State -->
+  <rect x="440" y="395" width="140" height="50" rx="8" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 4" />
+  <text x="510" y="425" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-style="italic" fill="var(--text-muted)">Destroyed</text>
+  <text x="510" y="425" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-style="italic" fill="var(--text-muted)">تم التدمير</text>
+
+  <!-- Global Variable Unaffected Arrow -->
+  <path d="M 150 235 L 150 385" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+  <text x="165" y="315" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Unaffected by local changes</text>
+  <text x="165" y="315" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">غير متأثر بالتغييرات المحلية</text>
+
+  <!-- Global Variable (Final State) -->
+  <rect x="80" y="395" width="140" height="50" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="150" y="426" text-anchor="middle" font-family="monospace" font-size="18" font-weight="bold" fill="var(--text-primary)">x = 10</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا متغير باسم <code>x = 5</code> خارج الدالة، وقمنا بتعريف <code>x = 10</code> داخل الدالة، فما هي قيمة <code>x</code> بعد انتهاء الدالة؟</template>
+      <template class="content-en">If we have a variable <code>x = 5</code> outside a function, and we define <code>x = 10</code> inside the function, what is the value of <code>x</code> after the function finishes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستبقى قيمة <code>x</code> خارج الدالة 5. المتغير <code>x</code> الذي قيمته 10 هو متغير محلي تم تدميره بمجرد انتهاء الدالة.</p></template>
+      <template class="content-en"><p>The value of <code>x</code> outside will remain 5. The <code>x</code> inside the function is a local variable that is destroyed once the function execution completes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="optional-parameters-defaults" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> المعلمات الاختيارية والقيم الافتراضية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Optional Parameters and Defaults</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القيم الافتراضية تجعل المعلمات اختيارية، بحيث تستخدم الدالة القيمة الافتراضية إذا لم يقم المستخدم بتمرير قيمة.</p></template>
+    <template class="content-en"><p>Default values make parameters optional; the function uses the default if the caller doesn't provide a value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكنك كتابة دالة بحيث يكون تمرير المعلمة اختيارياً، ولكن يجب أن تخبر الدالة بما يجب استخدامه إذا لم يتم تمرير أي شيء.</p><p>يتم ذلك عن طريق تعيين قيمة افتراضية في تعريف الدالة باستخدام علامة اليساوي: <code>def function_name(parameter = default_value):</code>.</p><p>إذا تم تمرير قيمة أثناء الاستدعاء، فإنها تتجاوز القيمة الافتراضية.</p></template>
+    <template class="content-en"><p>You can write a function so that passing a parameter is optional, but you have to tell the function what to use if nothing gets passed.</p><p>The syntax is: <code>def functionname(parametername=defaultvalue):</code>.</p><p>If a value is passed during the function call, it overrides the default value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>قاعدة هامة: عند تعريف دالة تحتوي على معلمات إجبارية وأخرى اختيارية، يجب دائماً وضع المعلمات الاختيارية (ذات القيم الافتراضية) في نهاية القائمة.</p><p>إذا وضعت معلمة اختيارية قبل معلمة إجبارية، سيصدر بايثون خطأ <code>SyntaxError</code>.</p></template>
+    <template class="content-en"><p>Crucial rule: If you want to use some (but not all) optional parameters with multiple parameters, make sure the optional ones are the last ones entered in the definition.</p><p>Placing a <span class="smart-term" data-term-en="Default Parameter" data-ar="المعلمة الافتراضية" data-en-def="A parameter that assumes a default value if a value is not provided in the function call.">default parameter<span class="smart-term-tooltip"></span></span> before a non-default parameter results in a <code>SyntaxError: non-default argument follows default argument</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def hello(user_name = 'nobody'):
+    print('Hello ' + user_name)
+
+hello() # Prints: Hello nobody
+hello('Alice') # Prints: Hello Alice</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يفرض بايثون وضع المعلمات الافتراضية في نهاية قائمة المعلمات؟</template>
+      <template class="content-en">Why does Python enforce that default parameters must be placed at the end of the parameter list?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لتجنب الغموض أثناء استدعاء الدالة. إذا كانت المعلمات الافتراضية في البداية، فلن يعرف بايثون ما إذا كانت القيمة الممررة مخصصة للمعلمة الأولى (التي لها افتراضي) أم للمعلمة الثانية (الإجبارية).</p></template>
+      <template class="content-en"><p>To prevent ambiguity during function calls. If default parameters were first, Python wouldn't know if a passed positional argument was meant to override the default or fill the required parameter.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="keyword-arguments-kwargs" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> وسائط الكلمات الأساسية (kwargs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Keyword Arguments (kwargs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>وسائط الكلمات الأساسية تسمح لك بتمرير القيم للدالة عن طريق ذكر اسم المعلمة صراحة، مما يحررك من الالتزام بترتيب المعلمات.</p></template>
+    <template class="content-en"><p>Keyword arguments allow you to pass values by explicitly naming the parameter, freeing you from strict positional order.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المصطلح <b>Argument</b> هو القيمة التي تمررها لمعلمات الدالة. حتى الآن استخدمنا وسائط موضعية (Positional Arguments) تعتمد على الترتيب.</p><p>يمكنك استخدام <b>وسائط الكلمات الأساسية (Keyword Arguments - kwargs)</b> لتمرير البيانات. يتم ذلك بكتابة <code>parameter_name = value</code> عند استدعاء الدالة.</p><p>هذا يجعل الكود أكثر قابلية للقراءة ويسمح بتمرير القيم بأي ترتيب.</p></template>
+    <template class="content-en"><p>The term <b>argument</b> is the value you pass to a function's parameters. Normally, these are positional, meaning order matters.</p><p>You can use <b>keyword arguments (kwargs)</b> by explicitly identifying each parameter by name when calling the function: <code>parameter_name = value</code>.</p><p>This improves code readability and allows you to pass arguments in any order.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند دمج الوسائط الموضعية مع وسائط الكلمات الأساسية في استدعاء واحد، يجب أن تأتي الوسائط الموضعية أولاً.</p><p>استخدام kwargs يقلل من الأخطاء المنطقية، خاصة في الدوال التي تستقبل العديد من المعلمات من نفس النوع (مثل تمرير الطول والعرض).</p></template>
+    <template class="content-en"><p>When mixing positional and keyword arguments in a function call, positional arguments must always appear before keyword arguments.</p><p>Using kwargs heavily reduces logical bugs in functions with many parameters of the same data type, where swapping them accidentally would otherwise go unnoticed by the interpreter.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def hello(fname, lname, datestring=''):
+    print('Hello ' + fname + ' ' + lname)
+
+# Using kwargs
+hello(datestring='12/30/2019', lname='Janda', fname='Kylie')</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Positional Arguments</th><th>Keyword Arguments (kwargs)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الترتيب</template>
+          <template class="content-en">Order</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صارم (يجب أن يطابق التعريف)</template>
+          <template class="content-en">Strict (must match definition)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مرن (يمكن تمريرها بأي ترتيب)</template>
+          <template class="content-en">Flexible (can be passed in any order)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قابلية القراءة</template>
+          <template class="content-en">Readability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أقل وضوحاً عند كثرة المعلمات</template>
+          <template class="content-en">Less clear with many parameters</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">واضحة جداً (الاسم يشرح القيمة)</template>
+          <template class="content-en">Very clear (name explains value)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن استدعاء الدالة بالشكل التالي: <code>hello(lname='Smith', 'John')</code>؟ ولماذا؟</template>
+      <template class="content-en">Can you call the function like this: <code>hello(lname='Smith', 'John')</code>? Why or why not?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، سيصدر بايثون خطأ. يجب أن تأتي الوسائط الموضعية (مثل 'John') دائماً قبل وسائط الكلمات الأساسية (مثل lname='Smith').</p></template>
+      <template class="content-en"><p>No, Python will raise a SyntaxError. Positional arguments must always precede keyword arguments in a function call.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="passing-lists-copy" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تمرير القوائم ونسخها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Passing Lists and Copying</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عند تمرير قائمة لدالة، فإنك تمرر مؤشراً لموقعها؛ لتجنب تعديل القائمة الأصلية، يجب إنشاء نسخة منها داخل الدالة.</p></template>
+    <template class="content-en"><p>Passing a list passes a pointer to its location; to avoid altering the original list, make a copy inside the function.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكنك تمرير كائنات قابلة للتكرار (Iterables) مثل القوائم (Lists) إلى الدوال.</p><p><b>خدعة هامة:</b> القوائم قابلة للتغيير (Mutable). الدالة لا تتلقى القائمة الأصلية بتنسيق محمي، بل تتلقى مؤشراً (Pointer) لموقع القائمة في الذاكرة.</p><p>إذا قامت الدالة بتعديل القائمة (مثل فرزها باستخدام <code>.sort()</code>)، فإن القائمة الأصلية خارج الدالة ستتغير أيضاً. لمنع ذلك، استخدم <code>list.copy()</code> داخل الدالة واعمل على النسخة.</p></template>
+    <template class="content-en"><p>You can pass <span class="smart-term" data-term-en="Iterable" data-ar="قابل للتكرار" data-en-def="An object capable of returning its members one at a time, like a list or string.">iterable<span class="smart-term-tooltip"></span></span>s, like lists, to a function.</p><p><b>Trick to working with lists:</b> Lists are <span class="smart-term" data-term-en="Mutable" data-ar="قابل للتغيير" data-en-def="An object whose state or contents can be changed after it is created (e.g., lists).">mutable<span class="smart-term-tooltip"></span></span>. The function receives a pointer to the list, which indicates its location in memory.</p><p>If you alter the list contents (e.g., by sorting), the original list changes. To prevent this, make a copy of the list in the function using <code>original_list.copy()</code> and make changes to the copy. The original list remains unchanged.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا المفهوم يوضح الفرق بين التمرير بالقيمة (Pass by Value) والتمرير بالمرجع (Pass by Reference). في بايثون، يتم تمرير الكائنات بالمرجع (أو بشكل أدق Pass by Object Reference).</p><p>استخدام <code>.copy()</code> ينشئ نسخة سطحية (Shallow Copy). إذا كانت القائمة تحتوي على قوائم متداخلة، فقد تحتاج إلى <code>copy.deepcopy()</code>.</p></template>
+    <template class="content-en"><p>This illustrates Python's 'pass by object reference' model. Immutable objects (like strings/integers) act like pass-by-value because they can't be changed, but mutable objects (like lists/dicts) can be modified in-place.</p><p>Note that <code>.copy()</code> creates a shallow copy. For nested lists, modifications to inner lists would still affect the original unless <code>copy.deepcopy()</code> is used.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def alphabetize(original_list=[]):
+    # Make a working copy to avoid altering the original
+    sorted_list = original_list.copy()
+    sorted_list.sort()
+    return sorted_list</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show two scenarios. Scenario 1: A function modifying a passed list directly (show a pointer from the function's local variable to the global list in memory, modifying it). Scenario 2: A function using .copy() (show the local variable pointing to a NEW list in memory, leaving the global list untouched). Style: educational, dark background #0d1117, accent color #10b981, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Solid Arrow Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <!-- Dashed Arrow Marker -->
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Center Divider -->
+  <line x1="400" y1="20" x2="400" y2="460" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- ========================================== -->
+  <!-- SCENARIO 1: DIRECT MODIFICATION (LEFT)     -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="200" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Scenario 1: Direct Modification</text>
+  <text x="200" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">السيناريو 1: تعديل مباشر</text>
+
+  <!-- Code Snippet -->
+  <text x="200" y="65" font-family="monospace" font-size="15" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">lst.append(4)</text>
+  <text x="200" y="65" font-family="monospace" font-size="15" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">lst.append(4)</text>
+
+  <!-- Scope Labels -->
+  <text x="100" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Global Scope</text>
+  <text x="100" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">النطاق العام</text>
+  
+  <text x="300" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Function Scope</text>
+  <text x="300" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">نطاق الدالة</text>
+
+  <!-- Variable Boxes -->
+  <rect x="50" y="110" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="100" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">my_list</text>
+  <text x="100" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">my_list</text>
+
+  <rect x="250" y="110" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="300" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">lst</text>
+  <text x="300" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">lst</text>
+
+  <!-- Explanation Text -->
+  <text x="200" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Both variables point to the same list</text>
+  <text x="200" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">كلا المتغيرين يشيران لنفس القائمة</text>
+
+  <!-- Memory Area -->
+  <rect x="20" y="230" width="360" height="150" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="200" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">Memory (Heap)</text>
+  <text x="200" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">الذاكرة (Heap)</text>
+
+  <!-- List Object -->
+  <g transform="translate(120, 290)">
+    <rect x="0" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">1</text>
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">1</text>
+
+    <rect x="40" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">2</text>
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">2</text>
+
+    <rect x="80" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">3</text>
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">3</text>
+
+    <!-- Highlighted Modified Element -->
+    <rect x="120" y="0" width="40" height="40" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="140" y="26" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)" class="gsvg-en">4</text>
+    <text x="140" y="26" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)" class="gsvg-ar">4</text>
+  </g>
+
+  <!-- Pointers (Arrows) -->
+  <circle cx="100" cy="150" r="4" fill="var(--brand-500)" />
+  <path d="M 100 150 C 100 220, 180 230, 180 280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <circle cx="300" cy="150" r="4" fill="var(--brand-500)" />
+  <path d="M 300 150 C 300 220, 220 230, 220 280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Bottom Result Text -->
+  <text x="200" y="420" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink-strong)" class="gsvg-en">Original list is altered!</text>
+  <text x="200" y="420" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink-strong)" class="gsvg-ar">تم تعديل القائمة الأصلية!</text>
+
+
+  <!-- ========================================== -->
+  <!-- SCENARIO 2: USING .COPY() (RIGHT)          -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="600" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Scenario 2: Using .copy()</text>
+  <text x="600" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">السيناريو 2: استخدام .copy()</text>
+
+  <!-- Code Snippet -->
+  <text x="600" y="65" font-family="monospace" font-size="15" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">new_lst = lst.copy()</text>
+  <text x="600" y="65" font-family="monospace" font-size="15" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">new_lst = lst.copy()</text>
+
+  <!-- Scope Labels -->
+  <text x="500" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Global Scope</text>
+  <text x="500" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">النطاق العام</text>
+  
+  <text x="700" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Function Scope</text>
+  <text x="700" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">نطاق الدالة</text>
+
+  <!-- Variable Boxes -->
+  <rect x="450" y="110" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="500" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">my_list</text>
+  <text x="500" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">my_list</text>
+
+  <rect x="650" y="110" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="700" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">new_lst</text>
+  <text x="700" y="136" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">new_lst</text>
+
+  <!-- Explanation Text -->
+  <text x="600" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Function works on a separate copy</text>
+  <text x="600" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">الدالة تعمل على نسخة منفصلة</text>
+
+  <!-- Memory Area -->
+  <rect x="420" y="230" width="360" height="150" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4" />
+  <text x="600" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">Memory (Heap)</text>
+  <text x="600" y="255" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">الذاكرة (Heap)</text>
+
+  <!-- Original List Object -->
+  <g transform="translate(440, 290)">
+    <rect x="0" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">1</text>
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">1</text>
+
+    <rect x="40" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">2</text>
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">2</text>
+
+    <rect x="80" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">3</text>
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">3</text>
+  </g>
+
+  <!-- Copied List Object -->
+  <g transform="translate(620, 290)">
+    <rect x="0" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">1</text>
+    <text x="20" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">1</text>
+
+    <rect x="40" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">2</text>
+    <text x="60" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">2</text>
+
+    <rect x="80" y="0" width="40" height="40" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">3</text>
+    <text x="100" y="26" font-family="monospace" font-size="16" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">3</text>
+
+    <!-- Highlighted Modified Element -->
+    <rect x="120" y="0" width="40" height="40" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="140" y="26" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)" class="gsvg-en">4</text>
+    <text x="140" y="26" font-family="monospace" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)" class="gsvg-ar">4</text>
+  </g>
+
+  <!-- Pointers (Arrows) -->
+  <circle cx="500" cy="150" r="4" fill="var(--brand-500)" />
+  <path d="M 500 150 L 500 280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <circle cx="700" cy="150" r="4" fill="var(--brand-500)" />
+  <path d="M 700 150 L 700 280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Copy Action Arrow -->
+  <path d="M 565 310 L 610 310" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <text x="590" y="300" font-family="monospace" font-size="13" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">.copy()</text>
+  <text x="590" y="300" font-family="monospace" font-size="13" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">.copy()</text>
+
+  <!-- Bottom Result Text -->
+  <text x="600" y="420" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink-strong)" class="gsvg-en">Original list remains unchanged</text>
+  <text x="600" y="420" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink-strong)" class="gsvg-ar">القائمة الأصلية تبقى دون تغيير</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نحتاج إلى استخدام <code>.copy()</code> عند تمرير أرقام أو نصوص إلى الدالة؟</template>
+      <template class="content-en">Why don't we need to use <code>.copy()</code> when passing integers or strings to a function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الأرقام والنصوص في بايثون هي كائنات غير قابلة للتغيير (Immutable). أي محاولة لتعديلها داخل الدالة ستؤدي إلى إنشاء كائن جديد في الذاكرة، ولن تتأثر القيمة الأصلية.</p></template>
+      <template class="content-en"><p>Because integers and strings are immutable in Python. Any operation that seems to modify them actually creates a completely new object in memory, leaving the original untouched.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="arbitrary-arguments-args" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تمرير عدد غير محدد من الوسائط (*args)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Arbitrary Number of Arguments (*args)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تسمح لك <code>*args</code> بتمرير أي عدد من القيم إلى الدالة، حيث يتم تجميعها تلقائياً داخل صف (Tuple).</p></template>
+    <template class="content-en"><p><code>*args</code> allows you to pass any number of values to a function, automatically packing them into a tuple.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدلاً من تمرير قائمة، يمكنك تصميم الدالة لتقبل أي عدد من الوسائط المفصولة بفواصل.</p><p>للقيام بذلك، استخدم <code>*args</code> كاسم للمعلمة: <code>def sorter(*args):</code>.</p><p>كل ما تمرره يتحول إلى <b>صف (Tuple)</b> باسم <code>args</code> داخل الدالة.</p><p>تذكر أن <span class="smart-term" data-term-en="Tuple" data-ar="الصف" data-en-def="An immutable list in Python.">الصف<span class="smart-term-tooltip"></span></span>وف غير قابلة للتغيير (Immutable)، لذا إذا أردت تعديلها (مثل فرزها)، يجب تحويلها إلى قائمة أولاً باستخدام <code>list(args)</code>.</p></template>
+    <template class="content-en"><p>You can design a function so that it accepts any number of arguments separated by commas.</p><p>To pass in any number of arguments, use <code>*args</code> as the parameter name: <code>def sorter(*args):</code>.</p><p>Whatever you pass in becomes a <b><span class="smart-term" data-term-en="Tuple" data-ar="الصف" data-en-def="An immutable list in Python.">tuple<span class="smart-term-tooltip"></span></span></b> named <code>args</code> inside the function. Since tuples are immutable, if you want to change things (like sorting), you need to copy the tuple to a list using <code>newlist = list(args)</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>النجمة <code>*</code> هي المشغل الفعلي الذي يقوم بتجميع (Packing) الوسائط، بينما <code>args</code> هو مجرد اسم اصطلاحي متفق عليه بين المبرمجين.</p><p>تُستخدم هذه الميزة بكثرة في الدوال المدمجة مثل <code>print()</code> التي تقبل عدداً غير محدود من المدخلات.</p></template>
+    <template class="content-en"><p>The asterisk <code>*</code> is the actual unpacking/packing operator; <code>args</code> is just a strong community convention. You could technically write <code>*numbers</code>.</p><p>This is heavily used in wrapper functions and built-ins like <code>print()</code> to provide maximum flexibility in function signatures.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def sorter(*args):
+    # Create a list from the passed-in tuple
+    newlist = list(args)
+    newlist.sort()
+    print(newlist)
+
+sorter(1, 0.001, 100000, -900, 2)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا حاولت استخدام <code>.sort()</code> مباشرة على <code>args</code> داخل الدالة؟</template>
+      <template class="content-en">What happens if you try to call <code>.sort()</code> directly on <code>args</code> inside the function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيصدر بايثون خطأ (AttributeError) لأن <code>args</code> عبارة عن صف (Tuple)، والصفوف غير قابلة للتغيير ولا تمتلك دالة فرز مدمجة تعدلها في مكانها.</p></template>
+      <template class="content-en"><p>Python will raise an AttributeError because <code>args</code> is a tuple, and tuples are immutable and do not have an in-place <code>.sort()</code> method.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="returning-values" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> إرجاع القيم من الدوال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Returning Values from Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عبارة <code>return</code> ترسل النتيجة النهائية من الدالة إلى الكود الذي استدعاها، بدلاً من مجرد طباعتها على الشاشة.</p></template>
+    <template class="content-en"><p>The <code>return</code> statement sends the final result back to the calling code, rather than just printing it to the screen.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الطريقة الأكثر شيوعاً لاستخدام الدوال هي تخزين ما ترجعه في متغير. يتم ذلك باستخدام عبارة <code>return</code>.</p><p>السطر الذي يقوم بال<span class="smart-term" data-term-en="return" data-ar="إرجاع" data-en-def="A statement used to end the execution of the function call and &#x27;return&#x27; the result to the caller.">إرجاع<span class="smart-term-tooltip"></span></span> يكون عادةً السطر الأخير في الدالة، متبوعاً بمسافة واسم المتغير (أو التعبير) الذي يحتوي على القيمة المراد إرجاعها.</p><p>عند استدعاء الدالة، يمكنك تعيين النتيجة لمتغير: <code>result = my_function()</code>.</p></template>
+    <template class="content-en"><p>The most common way to use functions is to store whatever they <span class="smart-term" data-term-en="return" data-ar="إرجاع" data-en-def="A statement used to end the execution of the function call and &#x27;return&#x27; the result to the caller.">return<span class="smart-term-tooltip"></span></span> in some variable. This is done using the <code>return</code> statement.</p><p>The line that does the returning is typically the last line of the function followed by a space and the name of the variable (or expression) that contains the value to be returned.</p><p>When calling the code, you assign it to a variable: <code>alpha_list = alphabetize(random_list)</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بمجرد تنفيذ عبارة <code>return</code>، تتوقف الدالة فوراً عن العمل وتخرج، حتى لو كان هناك كود مكتوب بعدها.</p><p>الدوال التي لا تحتوي على عبارة <code>return</code> ترجع القيمة <code>None</code> افتراضياً في بايثون.</p></template>
+    <template class="content-en"><p>Executing a <code>return</code> statement immediately terminates the function's execution. Any code written below the executed return statement is unreachable.</p><p>If a function does not explicitly return a value, Python implicitly returns <code>None</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def alphabetize(original_list=[]):
+    sorted_list = original_list.copy()
+    sorted_list.sort()
+    return sorted_list # Returns the value instead of printing
+
+random_list = ['McMullen', 'Keaser', 'Maier']
+alpha_list = alphabetize(random_list)
+print(alpha_list)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق بين استخدام <code>print()</code> داخل الدالة واستخدام <code>return</code>؟</template>
+      <template class="content-en">What is the difference between using <code>print()</code> inside a function and using <code>return</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p><code>print()</code> يعرض القيمة على الشاشة فقط ولا يمكن للبرنامج استخدام هذه القيمة لاحقاً. <code>return</code> يرسل القيمة كبيانات فعلية يمكن تخزينها في متغير وإجراء عمليات حسابية عليها.</p></template>
+      <template class="content-en"><p><code>print()</code> only displays the value to the console for the user to see. <code>return</code> passes the actual data back to the program, allowing it to be stored in a variable and used in further calculations.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="anonymous-lambda-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الدوال المجهولة (Lambda)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Unmasking Anonymous Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دوال Lambda هي دوال صغيرة تُكتب في سطر واحد بدون اسم، وتُستخدم للمهام السريعة والمؤقتة.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Lambda Function" data-ar="الدالة المجهولة" data-en-def="A small anonymous function defined with the lambda keyword, containing only a single expression.">Lambda function<span class="smart-term-tooltip"></span></span>s are small, one-line functions without a name, used for quick, throwaway tasks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يدعم بايثون مفهوم الدوال المجهولة (Anonymous functions)، والتي تسمى أيضاً دوال <b>lambda</b>.</p><p>الجزء "المجهول" يعني أن الدالة لا تحتاج إلى اسم (على عكس استخدام <code>def</code>). يتم تعريفها باستخدام الكلمة الأساسية <code>lambda</code>.</p><p>الصيغة الأساسية هي: <code>lambda arguments : expression</code>. تقوم الدالة تلقائياً بإرجاع نتيجة التعبير (Expression) دون الحاجة لكتابة كلمة <code>return</code>.</p></template>
+    <template class="content-en"><p>Python supports the concept of anonymous functions, also called <b>lambda</b> functions.</p><p>The anonymous part means the function doesn't need to have a name. The lambda part is based on the use of the keyword <code>lambda</code> to define them.</p><p>The minimal syntax is: <code>lambda arguments : expression</code>. It automatically returns the result of the expression without needing a <code>return</code> statement.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُستخدم دوال Lambda غالباً كوسائط لدوال أخرى أعلى مستوى (Higher-order functions) مثل <code>map()</code> و <code>filter()</code>، أو كمفتاح فرز مخصص في دالة <code>sort()</code>.</p><p>يقتصر استخدامها على تعبير واحد فقط؛ لا يمكنك كتابة كود معقد أو حلقات تكرار داخل دالة Lambda.</p></template>
+    <template class="content-en"><p>Lambdas are most commonly used as arguments to higher-order functions (like <code>map()</code>, <code>filter()</code>, or the <code>key</code> parameter in <code>sort()</code>).</p><p>They are strictly limited to a single expression. You cannot include statements like loops or multiple lines of logic inside a lambda.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Example of lambda syntax (conceptual)
+# lambda arguments : expression
+
+# Using lambda to sort a list of names by length (implied usage)
+names = ['Adams', 'Ma', 'diMeola', 'Zandusky']
+names.sort(key=lambda x: len(x))
+print(names)</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Standard Function (def)</th><th>Lambda Function</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاسم</template>
+          <template class="content-en">Name</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مطلوب</template>
+          <template class="content-en">Required</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مجهولة (بدون اسم)</template>
+          <template class="content-en">Anonymous (No name)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الطول والتعقيد</template>
+          <template class="content-en">Length &amp; Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متعددة الأسطر، تدعم المنطق المعقد</template>
+          <template class="content-en">Multi-line, supports complex logic</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">سطر واحد، تعبير واحد فقط</template>
+          <template class="content-en">Single line, single expression only</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">كلمة الإرجاع (return)</template>
+          <template class="content-en">Return keyword</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب كتابتها صراحة</template>
+          <template class="content-en">Explicitly required</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ضمنية (تلقائية)</template>
+          <template class="content-en">Implicit (Automatic)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يجب أن تستخدم دالة <code>def</code> عادية بدلاً من دالة <code>lambda</code>؟</template>
+      <template class="content-en">When should you use a regular <code>def</code> function instead of a <code>lambda</code> function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب استخدام <code>def</code> عندما يكون الكود معقداً، يحتوي على أكثر من سطر واحد، يحتاج إلى تعليقات توضيحية (Docstrings)، أو سيتم استدعاؤه في أماكن متعددة في البرنامج.</p></template>
+      <template class="content-en"><p>You should use <code>def</code> when the logic is complex, requires multiple lines, needs documentation (docstrings), or will be reused in multiple places across your program.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة الحاسمة. تخيل أنك تبني منزلاً؛ لا يمكنك صب الخرسانة ووضع الطوب في كل مرة تحتاج فيها إلى جدار. بدلاً من ذلك، تصنع 'قوالب' جاهزة. الدوال (Functions) هي قوالب الكود الخاصة بك. لقد تعلمنا كيف نغلف الكود باستخدام <code>def</code>، وكيف نحميه بالنطاق المحلي (Local Scope) حتى لا تتداخل المتغيرات. ركزوا جيداً في الامتحان على خدعة تمرير القوائم؛ تذكروا أن القوائم تُمرر كـ 'مؤشر'، لذا إذا عدلتها داخل الدالة ستتغير في الخارج ما لم تستخدم <code>.copy()</code>. أيضاً، لا تنسوا أن <code>*args</code> تنشئ صفاً (Tuple) غير قابل للتغيير، وأن دوال <code>lambda</code> هي مجرد أدوات سريعة لسطر واحد لا تحتاج إلى <code>return</code>. فهم هذه الأساسيات سيجعل برمجتكم أنظف وأكثر احترافية.</template>
+    <template class="content-en">Welcome, friends, to a crucial module. Imagine building a house; you don't mix concrete and lay bricks from scratch every time you need a wall. Instead, you use prefabricated blocks. Functions are your code's prefabs. We've learned how to encapsulate code using <code>def</code>, and how to protect it with Local Scope so variables don't clash. For the exam, pay close attention to the list-passing trap: remember that lists are passed by reference (pointer), so modifying them inside a function alters the original unless you use <code>.copy()</code>. Also, don't forget that <code>*args</code> creates an immutable Tuple, and <code>lambda</code> functions are just quick, one-line tools that implicitly return values. Mastering these will make your code infinitely cleaner and more professional.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الدوال من الأساس؟ ألا يمكننا كتابة الكود بشكل متسلسل؟</template>
+          <template class="content-en">Why use functions at all? Can't we just write code sequentially?</template>
+          <span class="content-target">لماذا نستخدم الدوال من الأساس؟ ألا يمكننا كتابة الكود بشكل متسلسل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكنك ذلك في البرامج الصغيرة، ولكن في التطبيقات الكبيرة، الدوال تمنع تكرار الكود (DRY)، وتجعل اكتشاف الأخطاء أسهل (تصلح الخطأ في مكان واحد)، وتجعل الكود قابلاً للقراءة وإعادة الاستخدام.</template>
+          <template class="content-en">You can for tiny scripts, but in large apps, functions prevent code repetition (DRY), make debugging easier (fix a bug in one place), and make code readable and reusable.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين <code>print</code> و <code>return</code> داخل الدالة؟</template>
+          <template class="content-en">What is the difference between <code>print</code> and <code>return</code> inside a function?</template>
+          <span class="content-target">ما الفرق بين <code>print</code> و <code>return</code> داخل الدالة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><code>print</code> يعرض النص للمستخدم فقط، ولا يمكن للبرنامج استخدامه. <code>return</code> يرسل البيانات الفعلية كـ 'مخرجات' للدالة، مما يسمح بتخزينها في متغير واستخدامها لاحقاً.</template>
+          <template class="content-en"><code>print</code> only displays text to the user; the program can't use it. <code>return</code> sends actual data as the function's 'output', allowing it to be stored in a variable and used later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكنني الوصول إلى متغير تم تعريفه داخل دالة من خارجها؟</template>
+          <template class="content-en">Can I access a variable defined inside a function from outside of it?</template>
+          <span class="content-target">هل يمكنني الوصول إلى متغير تم تعريفه داخل دالة من خارجها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، المتغيرات المعرفة داخل الدالة لها 'نطاق محلي' (Local Scope) ويتم تدميرها بمجرد انتهاء تنفيذ الدالة.</template>
+          <template class="content-en">No, variables defined inside a function have 'local scope' and are destroyed as soon as the function finishes executing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا وضعت معلمة اختيارية قبل معلمة إجبارية؟</template>
+          <template class="content-en">What happens if I put an optional parameter before a required parameter?</template>
+          <span class="content-target">ماذا يحدث إذا وضعت معلمة اختيارية قبل معلمة إجبارية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سيصدر بايثون خطأ (SyntaxError). يجب دائماً وضع المعلمات ذات القيم الافتراضية في نهاية قائمة المعلمات.</template>
+          <template class="content-en">Python will throw a SyntaxError. Parameters with default values must always be placed at the end of the parameter list.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تتغير القائمة الأصلية عندما أقوم بفرزها داخل الدالة؟</template>
+          <template class="content-en">Why does my original list change when I sort it inside a function?</template>
+          <span class="content-target">لماذا تتغير القائمة الأصلية عندما أقوم بفرزها داخل الدالة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن القوائم قابلة للتغيير (Mutable)، وبايثون يمرر 'مؤشراً' لموقعها في الذاكرة. لتجنب ذلك، استخدم <code>list.copy()</code> داخل الدالة.</template>
+          <template class="content-en">Because lists are mutable, and Python passes a 'pointer' to its memory location. To avoid this, use <code>list.copy()</code> inside the function.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة من استخدام <code>*args</code>؟</template>
+          <template class="content-en">What is the benefit of using <code>*args</code>?</template>
+          <span class="content-target">ما هي الفائدة من استخدام <code>*args</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تسمح لك بإنشاء دوال مرنة يمكنها قبول أي عدد من الوسائط الموضعية دون الحاجة لتحديدها مسبقاً، مثل دالة <code>print()</code>.</template>
+          <template class="content-en">It allows you to create flexible functions that can accept any number of positional arguments without defining them all beforehand, much like the <code>print()</code> function.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل <code>args</code> في <code>*args</code> كلمة محجوزة في بايثون؟</template>
+          <template class="content-en">Is <code>args</code> in <code>*args</code> a reserved keyword in Python?</template>
+          <span class="content-target">هل <code>args</code> في <code>*args</code> كلمة محجوزة في بايثون؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، النجمة <code>*</code> هي المشغل الحقيقي. <code>args</code> هو مجرد اسم اصطلاحي يتفق عليه المبرمجون. يمكنك كتابة <code>*numbers</code> وسيعمل بنفس الطريقة.</template>
+          <template class="content-en">No, the asterisk <code>*</code> is the actual operator. <code>args</code> is just a strong community convention. You could write <code>*numbers</code> and it would work the same way.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم دالة Lambda؟</template>
+          <template class="content-en">When should I use a Lambda function?</template>
+          <span class="content-target">متى يجب أن أستخدم دالة Lambda؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدمها للمهام البسيطة جداً التي تتطلب سطراً واحداً فقط، خاصة عندما تحتاج إلى تمرير دالة كوسيطة لدالة أخرى (مثل الفرز المخصص).</template>
+          <template class="content-en">Use it for very simple, one-line tasks, especially when you need to pass a function as an argument to another function (like custom sorting).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن لدالة Lambda أن تحتوي على حلقات تكرار (Loops)؟</template>
+          <template class="content-en">Can a Lambda function contain loops?</template>
+          <span class="content-target">هل يمكن لدالة Lambda أن تحتوي على حلقات تكرار (Loops)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، دوال Lambda تقتصر على تعبير (Expression) واحد فقط. لا يمكنك استخدام عبارات معقدة مثل for أو while بداخلها.</template>
+          <template class="content-en">No, Lambda functions are restricted to a single expression. You cannot use complex statements like for or while loops inside them.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وسائط الكلمات الأساسية (kwargs) ولماذا هي مفيدة؟</template>
+          <template class="content-en">What are keyword arguments (kwargs) and why are they useful?</template>
+          <span class="content-target">ما هي وسائط الكلمات الأساسية (kwargs) ولماذا هي مفيدة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي تمرير القيم بكتابة اسم المعلمة (مثل <code>name='Ali'</code>). هي مفيدة لأنها تجعل الكود مقروءاً وتسمح لك بتمرير الوسائط بأي ترتيب، متجاهلاً الترتيب الموضعي.</template>
+          <template class="content-en">They are passing values by explicitly naming the parameter (e.g., <code>name='Ali'</code>). They are useful because they make code readable and allow you to pass arguments in any order, ignoring positional strictness.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الكلمة الأساسية المستخدمة لتعريف دالة في بايثون؟",
+      "en": "What keyword is used to define a function in Python?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كلمة <code>def</code>",
+        "en": "The <code>def</code> keyword."
+      },
+      "example": {
+        "ar": "def my_function():",
+        "en": "def my_function():"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو النطاق المحلي (Local Scope)؟",
+      "en": "What is Local Scope?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هو النطاق الذي تعيش فيه المتغيرات داخل الدالة فقط، وتتوقف عن الوجود بمجرد انتهاء الدالة.",
+        "en": "The scope where variables exist only inside the function and cease to exist once the function stops running."
+      },
+      "example": {
+        "ar": "متغير تم إنشاؤه داخل الدالة لا يمكن طباعته خارجها.",
+        "en": "A variable created inside a function cannot be printed outside of it."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي سلسلة التوثيق (Docstring)؟",
+      "en": "What is a Docstring?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نص محاط بثلاث علامات تنصيص يوضع تحت تعريف الدالة مباشرة لشرح وظيفتها.",
+        "en": "Text enclosed in triple quotation marks right under the def statement that describes what the function does."
+      },
+      "example": {
+        "ar": "\"\"\" هذه الدالة تقوم بجمع رقمين \"\"\"",
+        "en": "\"\"\" This function adds two numbers \"\"\""
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما الفرق بين المعلمة (Parameter) والوسيطة (Argument)؟",
+      "en": "What is the difference between a Parameter and an Argument?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المعلمة هي المتغير في تعريف الدالة، بينما الوسيطة هي القيمة الفعلية الممررة عند الاستدعاء.",
+        "en": "A parameter is the variable in the function definition; an argument is the actual value passed when calling it."
+      },
+      "example": {
+        "ar": "def func(x): -> x هي معلمة. func(5) -> 5 هي وسيطة.",
+        "en": "def func(x): -> x is parameter. func(5) -> 5 is argument."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف تجعل معلمة اختيارية في دالة؟",
+      "en": "How do you make a parameter optional in a function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق تعيين قيمة افتراضية لها في تعريف الدالة.",
+        "en": "By assigning it a default value in the function definition."
+      },
+      "example": {
+        "ar": "def hello(name='nobody'):",
+        "en": "def hello(name='nobody'):"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "أين يجب وضع المعلمات الاختيارية (ذات القيم الافتراضية) في تعريف الدالة؟",
+      "en": "Where must optional parameters (with default values) be placed in a function definition?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب وضعها في نهاية قائمة المعلمات، بعد جميع المعلمات الإجبارية.",
+        "en": "They must be placed at the end of the parameter list, after all required parameters."
+      },
+      "example": {
+        "ar": "def func(a, b, c=10):",
+        "en": "def func(a, b, c=10):"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي وسائط الكلمات الأساسية (kwargs)؟",
+      "en": "What are keyword arguments (kwargs)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي طريقة لتمرير القيم للدالة عن طريق تحديد اسم المعلمة صراحة، مما يلغي الحاجة للالتزام بالترتيب.",
+        "en": "A way to pass values to a function by explicitly identifying the parameter name, ignoring positional order."
+      },
+      "example": {
+        "ar": "hello(lname='Smith', fname='John')",
+        "en": "hello(lname='Smith', fname='John')"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "لماذا يجب استخدام <code>list.copy()</code> عند تمرير قائمة لدالة تريد تعديلها؟",
+      "en": "Why should you use <code>list.copy()</code> when passing a list to a function that modifies it?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن القوائم قابلة للتغيير (Mutable)، وتعديلها داخل الدالة سيغير القائمة الأصلية خارجها. النسخ يحمي الأصل.",
+        "en": "Because lists are mutable, modifying it inside the function alters the original list. Copying protects the original."
+      },
+      "example": {
+        "ar": "working_list = original_list.copy()",
+        "en": "working_list = original_list.copy()"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ماذا تفعل <code>*args</code> في تعريف الدالة؟",
+      "en": "What does <code>*args</code> do in a function definition?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسمح للدالة بقبول أي عدد من الوسائط الموضعية، وتجمعها في صف (Tuple).",
+        "en": "It allows the function to accept an arbitrary number of positional arguments, packing them into a tuple."
+      },
+      "example": {
+        "ar": "def sorter(*args):",
+        "en": "def sorter(*args):"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو نوع البيانات الذي يتم إنشاؤه بواسطة <code>*args</code> داخل الدالة؟",
+      "en": "What data type is created by <code>*args</code> inside the function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صف (Tuple)، وهو غير قابل للتغيير (Immutable).",
+        "en": "A Tuple, which is immutable."
+      },
+      "example": {
+        "ar": "type(args) == tuple",
+        "en": "type(args) == tuple"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي الكلمة الأساسية المستخدمة لإرسال قيمة من الدالة إلى الكود المستدعي؟",
+      "en": "What keyword is used to send a value from a function back to the calling code?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كلمة <code>return</code>.",
+        "en": "The <code>return</code> keyword."
+      },
+      "example": {
+        "ar": "return final_list",
+        "en": "return final_list"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي الدالة المجهولة (Lambda Function)؟",
+      "en": "What is an anonymous (lambda) function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة صغيرة تُكتب في سطر واحد بدون اسم، وتستخدم الكلمة الأساسية <code>lambda</code>.",
+        "en": "A small, one-line function without a name, defined using the <code>lambda</code> keyword."
+      },
+      "example": {
+        "ar": "lambda x, y: x + y",
+        "en": "lambda x, y: x + y"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "هل تحتاج دوال Lambda إلى كتابة كلمة <code>return</code>؟",
+      "en": "Do Lambda functions require the <code>return</code> keyword?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، فهي تقوم بإرجاع نتيجة التعبير الوحيد بداخلها تلقائياً (ضمنياً).",
+        "en": "No, they implicitly return the result of their single expression."
+      },
+      "example": {
+        "ar": "lambda x: x * 2 (ترجع القيمة تلقائياً)",
+        "en": "lambda x: x * 2 (automatically returns the value)"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ماذا يحدث إذا استدعيت دالة تتطلب معلمة دون تمرير أي وسيطة؟",
+      "en": "What happens if you call a function that requires a parameter without passing an argument?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سيصدر بايثون خطأ من نوع TypeError.",
+        "en": "Python will raise a TypeError (missing required positional argument)."
+      },
+      "example": {
+        "ar": "hello() missing 1 required positional argument",
+        "en": "hello() missing 1 required positional argument"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الكائن القابل للتكرار (Iterable)؟",
+      "en": "What is an Iterable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أي كائن يمكن لبايثون المرور عبر عناصره واحداً تلو الآخر (مثل القوائم والنصوص).",
+        "en": "Anything that Python can loop through to get values (like lists and strings)."
+      },
+      "example": {
+        "ar": "القائمة (List) هي الكائن القابل للتكرار الأكثر شيوعاً.",
+        "en": "A list is the most commonly used iterable."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الكلمات الأساسية التالية تُستخدم لتعريف دالة في بايثون؟",
+      "en": "Which of the following keywords is used to define a function in Python?"
+    },
+    "options": {
+      "ar": [
+        "function",
+        "def",
+        "define",
+        "lambda"
+      ],
+      "en": [
+        "function",
+        "def",
+        "define",
+        "lambda"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم الكلمة الأساسية <code>def</code> (اختصار لـ definition) لإنشاء دالة قياسية في بايثون.",
+      "en": "The <code>def</code> keyword (short for definition) is used to create a standard function in Python."
+    },
+    "hint": {
+      "ar": "إنها اختصار لكلمة definition.",
+      "en": "It is short for definition."
+    },
+    "difficulty": "easy",
+    "conceptId": "creating-functions"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ماذا يحدث للمتغيرات التي يتم إنشاؤها داخل الدالة بمجرد انتهاء تنفيذها؟",
+      "en": "What happens to variables created inside a function once the function finishes executing?"
+    },
+    "options": {
+      "ar": [
+        "تصبح متغيرات عامة (Global).",
+        "يتم حفظها في الذاكرة للاستدعاء القادم.",
+        "تتوقف عن الوجود (يتم تدميرها).",
+        "تتطلب الحذف اليدوي."
+      ],
+      "en": [
+        "They become global variables.",
+        "They are saved in memory for the next call.",
+        "They cease to exist (are destroyed).",
+        "They require manual deletion."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بسبب النطاق المحلي (Local Scope)، المتغيرات داخل الدالة تعيش فقط أثناء تشغيل الدالة وتُدمر بعدها.",
+      "en": "Due to local scope, variables inside a function only live while the function is running and are destroyed afterward."
+    },
+    "hint": {
+      "ar": "تذكر مفهوم 'النطاق المحلي'.",
+      "en": "Remember the concept of 'local scope'."
+    },
+    "difficulty": "medium",
+    "conceptId": "passing-information-local-scope"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أين يجب وضع المعلمات الاختيارية (التي لها قيم افتراضية) عند تعريف الدالة؟",
+      "en": "Where must optional parameters (with default values) be placed when defining a function?"
+    },
+    "options": {
+      "ar": [
+        "في بداية قائمة المعلمات.",
+        "في نهاية قائمة المعلمات.",
+        "في أي مكان.",
+        "يجب أن تكون في دالة منفصلة."
+      ],
+      "en": [
+        "At the beginning of the parameter list.",
+        "At the end of the parameter list.",
+        "Anywhere.",
+        "They must be in a separate function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب أن تأتي المعلمات الاختيارية دائماً بعد المعلمات الإجبارية لتجنب أخطاء بناء الجملة (SyntaxError).",
+      "en": "Optional parameters must always come after required parameters to avoid a SyntaxError."
+    },
+    "hint": {
+      "ar": "فكر في كيفية قراءة بايثون للوسائط بالترتيب.",
+      "en": "Think about how Python reads arguments in order."
+    },
+    "difficulty": "medium",
+    "conceptId": "optional-parameters-defaults"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الطريقة الصحيحة لتمرير وسائط الكلمات الأساسية (kwargs)؟",
+      "en": "What is the correct way to pass keyword arguments (kwargs)?"
+    },
+    "options": {
+      "ar": [
+        "hello('John', 'Smith')",
+        "hello(fname='John', lname='Smith')",
+        "hello({'fname': 'John', 'lname': 'Smith'})",
+        "hello(kwargs=['John', 'Smith'])"
+      ],
+      "en": [
+        "hello('John', 'Smith')",
+        "hello(fname='John', lname='Smith')",
+        "hello({'fname': 'John', 'lname': 'Smith'})",
+        "hello(kwargs=['John', 'Smith'])"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "وسائط الكلمات الأساسية تُمرر بكتابة اسم المعلمة متبوعاً بعلامة يساوي ثم القيمة.",
+      "en": "Keyword arguments are passed by writing the parameter name followed by an equals sign and the value."
+    },
+    "hint": {
+      "ar": "أنت تحدد الاسم والقيمة معاً باستخدام علامة =.",
+      "en": "You specify the name and value together using an = sign."
+    },
+    "difficulty": "easy",
+    "conceptId": "keyword-arguments-kwargs"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "لماذا نستخدم <code>list.copy()</code> داخل الدالة عند تمرير قائمة إليها؟",
+      "en": "Why do we use <code>list.copy()</code> inside a function when a list is passed to it?"
+    },
+    "options": {
+      "ar": [
+        "لأن القوائم لا يمكن تمريرها مباشرة.",
+        "لتسريع عملية تنفيذ الدالة.",
+        "لمنع الدالة من تعديل القائمة الأصلية الموجودة خارجها.",
+        "لتحويل القائمة إلى صف (Tuple)."
+      ],
+      "en": [
+        "Because lists cannot be passed directly.",
+        "To speed up the function execution.",
+        "To prevent the function from modifying the original list outside.",
+        "To convert the list into a tuple."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "القوائم قابلة للتغيير (Mutable). إذا قمت بتعديلها داخل الدالة، ستتغير القائمة الأصلية. النسخ يحمي الأصل.",
+      "en": "Lists are mutable. If you modify them inside the function, the original list changes. Copying protects the original."
+    },
+    "hint": {
+      "ar": "القوائم تمرر كمؤشر (Pointer) لموقعها في الذاكرة.",
+      "en": "Lists are passed as a pointer to their memory location."
+    },
+    "difficulty": "hard",
+    "conceptId": "passing-lists-copy"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو نوع البيانات الذي يتم إنشاؤه لـ <code>args</code> عند استخدام <code>*args</code> في الدالة؟",
+      "en": "What data type is created for <code>args</code> when using <code>*args</code> in a function?"
+    },
+    "options": {
+      "ar": [
+        "List (قائمة)",
+        "Dictionary (قاموس)",
+        "Tuple (صف)",
+        "String (نص)"
+      ],
+      "en": [
+        "List",
+        "Dictionary",
+        "Tuple",
+        "String"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يقوم بايثون بتجميع الوسائط المتعددة الممررة عبر <code>*args</code> في صف (Tuple) غير قابل للتغيير.",
+      "en": "Python packs the multiple arguments passed via <code>*args</code> into an immutable Tuple."
+    },
+    "hint": {
+      "ar": "إنه نوع بيانات يشبه القائمة ولكنه غير قابل للتغيير (Immutable).",
+      "en": "It is a list-like data type but immutable."
+    },
+    "difficulty": "medium",
+    "conceptId": "arbitrary-arguments-args"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي عبارة تُستخدم لإرسال النتيجة من الدالة لتخزينها في متغير؟",
+      "en": "Which statement is used to send a result from a function to be stored in a variable?"
+    },
+    "options": {
+      "ar": [
+        "print",
+        "output",
+        "send",
+        "return"
+      ],
+      "en": [
+        "print",
+        "output",
+        "send",
+        "return"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "عبارة <code>return</code> تُرجع القيمة إلى الكود المستدعي، مما يسمح بتخزينها في متغير.",
+      "en": "The <code>return</code> statement passes the value back to the caller, allowing it to be stored in a variable."
+    },
+    "hint": {
+      "ar": "إنها تعني 'إرجاع'.",
+      "en": "It means to 'give back'."
+    },
+    "difficulty": "easy",
+    "conceptId": "returning-values"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الصيغة الصحيحة لإنشاء دالة مجهولة (Lambda) تقوم بجمع رقمين؟",
+      "en": "What is the correct syntax to create an anonymous (lambda) function that adds two numbers?"
+    },
+    "options": {
+      "ar": [
+        "lambda x, y: x + y",
+        "def lambda(x, y): return x + y",
+        "lambda(x, y) = x + y",
+        "lambda x, y return x + y"
+      ],
+      "en": [
+        "lambda x, y: x + y",
+        "def lambda(x, y): return x + y",
+        "lambda(x, y) = x + y",
+        "lambda x, y return x + y"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الصيغة الصحيحة هي <code>lambda arguments : expression</code>. لا نستخدم أقواس حول المعلمات ولا نكتب كلمة return.",
+      "en": "The correct syntax is <code>lambda arguments : expression</code>. No parentheses around arguments and no return keyword."
+    },
+    "hint": {
+      "ar": "تذكر: الكلمة الأساسية، ثم المعلمات، ثم نقطتان رأسيتان، ثم التعبير.",
+      "en": "Remember: keyword, parameters, colon, expression."
+    },
+    "difficulty": "medium",
+    "conceptId": "anonymous-lambda-functions"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ماذا يحدث إذا حاولت فرز <code>args</code> مباشرة باستخدام <code>args.sort()</code> داخل الدالة؟",
+      "en": "What happens if you try to sort <code>args</code> directly using <code>args.sort()</code> inside the function?"
+    },
+    "options": {
+      "ar": [
+        "سيتم فرزها بنجاح.",
+        "سيصدر خطأ لأن <code>args</code> عبارة عن صف (Tuple) غير قابل للتغيير.",
+        "سيتم تحويلها تلقائياً إلى قائمة وفرزها.",
+        "سيتم تجاهل الأمر."
+      ],
+      "en": [
+        "It will sort successfully.",
+        "It will raise an error because <code>args</code> is an immutable tuple.",
+        "It will automatically convert to a list and sort.",
+        "The command will be ignored."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بما أن <code>args</code> عبارة عن صف (Tuple)، فهو غير قابل للتغيير ولا يمتلك دالة <code>.sort()</code>. يجب تحويله إلى قائمة أولاً <code>list(args)</code>.",
+      "en": "Since <code>args</code> is a tuple, it is immutable and lacks a <code>.sort()</code> method. You must convert it to a list first using <code>list(args)</code>."
+    },
+    "hint": {
+      "ar": "تذكر نوع البيانات الخاص بـ args.",
+      "en": "Remember the data type of args."
+    },
+    "difficulty": "hard",
+    "conceptId": "arbitrary-arguments-args"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الغرض من سلسلة التوثيق (Docstring)؟",
+      "en": "What is the purpose of a Docstring?"
+    },
+    "options": {
+      "ar": [
+        "تسريع تنفيذ الكود.",
+        "إخفاء الكود عن المستخدمين الآخرين.",
+        "وصف ما تفعله الدالة لمساعدة المبرمجين الآخرين.",
+        "تعريف المتغيرات المحلية."
+      ],
+      "en": [
+        "To speed up code execution.",
+        "To hide code from other users.",
+        "To describe what the function does to help other programmers.",
+        "To define local variables."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "سلاسل التوثيق تُستخدم كتعليقات متقدمة لشرح وظيفة الدالة، ولا تؤثر على تنفيذ الكود.",
+      "en": "Docstrings are used as advanced comments to explain the function's purpose and do not affect execution."
+    },
+    "hint": {
+      "ar": "إنها نوع من 'الوثائق' (Documentation).",
+      "en": "It is a form of 'Documentation'."
+    },
+    "difficulty": "easy",
+    "conceptId": "commenting-functions"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان الأقواس عند استدعاء الدالة. كتابة <code>hello</code> فقط لن ينفذ الدالة، بل سيشير إلى كائن الدالة في الذاكرة. يجب كتابة <code>hello()</code> لتنفيذها.</template>
+    <template class="content-en">Forgetting parentheses when calling a function. Writing just <code>hello</code> will not execute the function; it only references the function object in memory. You must write <code>hello()</code> to execute it.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تعديل قائمة ممررة مباشرة داخل الدالة. نظراً لأن القوائم قابلة للتغيير (Mutable)، فإن أي تعديل (مثل الفرز) سيؤثر على القائمة الأصلية. استخدم دائماً <code>list.copy()</code> إذا كنت تريد الحفاظ على الأصل.</template>
+    <template class="content-en">Modifying a passed list directly inside a function. Since lists are mutable, any modification (like sorting) affects the original list. Always use <code>list.copy()</code> if you want to preserve the original.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المعلمات المجمعة باستخدام <code>*args</code> تتحول دائماً إلى صف (Tuple). هذا يعني أنك لا تستطيع تعديلها مباشرة (لا يمكنك استخدام <code>.append()</code> أو <code>.sort()</code>). يجب تحويلها إلى قائمة أولاً عبر <code>list(args)</code>.</template>
+    <template class="content-en">Arguments packed using <code>*args</code> always become a Tuple. This means you cannot modify them directly (no <code>.append()</code> or <code>.sort()</code>). You must convert them to a list first via <code>list(args)</code>.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">النطاق المحلي (Local Scope) هو جدار حماية. المتغير <code>x</code> داخل الدالة منفصل تماماً عن المتغير <code>x</code> خارجها. بمجرد انتهاء الدالة، يتم مسح <code>x</code> الداخلي من الذاكرة.</template>
+    <template class="content-en">Local Scope is a firewall. A variable <code>x</code> inside a function is completely separate from a variable <code>x</code> outside. Once the function ends, the internal <code>x</code> is wiped from memory.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">وضع معلمات اختيارية (بقيم افتراضية) قبل المعلمات الإجبارية في تعريف الدالة. سيؤدي هذا دائماً إلى خطأ <code>SyntaxError</code>. المعلمات الاختيارية يجب أن تكون في النهاية.</template>
+    <template class="content-en">Placing optional parameters (with default values) before required parameters in a function definition. This will always cause a <code>SyntaxError</code>. Optional parameters must go at the end.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

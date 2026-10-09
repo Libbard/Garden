@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المدركات متعددة الطبقات - الجزء الثاني · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="M13.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#numerical-stability-gradients" class="toc-link" data-bilingual>
+        <template class="content-ar">الاستقرار العددي وتلاشي/انفجار التدرجات</template>
+        <template class="content-en">Numerical Stability and Vanishing/Exploding Gradients</template>
+        <span class="content-target">الاستقرار العددي وتلاشي/انفجار التدرجات</span>
+      </a>
+      <a href="#breaking-symmetry" class="toc-link" data-bilingual>
+        <template class="content-ar">كسر التماثل في الشبكات العصبية</template>
+        <template class="content-en">Breaking the Symmetry in Neural Networks</template>
+        <span class="content-target">كسر التماثل في الشبكات العصبية</span>
+      </a>
+      <a href="#parameter-initialization-xavier" class="toc-link" data-bilingual>
+        <template class="content-ar">تهيئة المعلمات وتهيئة خافيير (Xavier)</template>
+        <template class="content-en">Parameter Initialization and Xavier Initialization</template>
+        <span class="content-target">تهيئة المعلمات وتهيئة خافيير (Xavier)</span>
+      </a>
+      <a href="#distribution-shift-types" class="toc-link" data-bilingual>
+        <template class="content-ar">انزياح التوزيع وأنواعه</template>
+        <template class="content-en">Distribution Shift and Its Types</template>
+        <span class="content-target">انزياح التوزيع وأنواعه</span>
+      </a>
+      <a href="#taxonomy-learning-problems" class="toc-link" data-bilingual>
+        <template class="content-ar">تصنيف مشاكل التعلم</template>
+        <template class="content-en">A Taxonomy of Learning Problems</template>
+        <span class="content-target">تصنيف مشاكل التعلم</span>
+      </a>
+      <a href="#fairness-accountability-transparency" class="toc-link" data-bilingual>
+        <template class="content-ar">العدالة والمساءلة والشفافية في التعلم الآلي</template>
+        <template class="content-en">Fairness, Accountability, and Transparency in ML</template>
+        <span class="content-target">العدالة والمساءلة والشفافية في التعلم الآلي</span>
+      </a>
+      <a href="#kaggle-house-prices" class="toc-link" data-bilingual>
+        <template class="content-ar">تطبيق عملي: توقع أسعار المنازل على Kaggle</template>
+        <template class="content-en">Practical Application: Predicting House Prices on Kaggle</template>
+        <span class="content-target">تطبيق عملي: توقع أسعار المنازل على Kaggle</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المدركات متعددة الطبقات - الجزء الثاني</h1>
+      <p class="hero-description">تغطي هذه الوحدة الاستقرار العددي، تهيئة المعلمات، أنواع انزياح التوزيع (التباين، التسمية، المفهوم)، تصنيف مشاكل التعلم، والاعتبارات الأخلاقية، بالإضافة إلى تطبيق عملي لتوقع أسعار المنازل.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Multilayer Perceptrons-II</h1>
+      <p class="hero-description">This module covers numerical stability, parameter initialization, distribution shifts (covariate, label, concept), learning problem taxonomy, ethical considerations, and a practical Kaggle house price prediction application.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">الاستقرار العددي</span>
+      <span class="tag">تهيئة الأوزان</span>
+      <span class="tag">انزياح التوزيع</span>
+      <span class="tag">التعلم الآلي الأخلاقي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Numerical Stability</span>
+      <span class="tag">Weight Initialization</span>
+      <span class="tag">Distribution Shift</span>
+      <span class="tag">Ethical ML</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف الاستقرار العددي وطرق تهيئة المعلمات في الشبكات العصبية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح التعميم وانزياح التوزيع في التعلم العميق.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات التعلم العميق مثل الإسقاط (Dropout) لتوقع أسعار المنازل على منصة Kaggle.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe Numerical Stability and Initialization in neural networks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain Generalization and Distribution Shift in Deep Learning.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply deep learning techniques like Dropout to predict house prices on Kaggle.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="numerical-stability-gradients" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الاستقرار العددي وتلاشي/انفجار التدرجات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Numerical Stability and Vanishing/Exploding Gradients</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>سوء اختيار دوال التنشيط وتهيئة الأوزان يؤدي إلى تدرجات تتلاشى للصفر أو تنفجر للما لانهاية، مما يوقف عملية التعلم.</p><p>تخيل محاولة إيصال رسالة عبر طابور طويل من الأشخاص؛ إما أن تتلاشى الهمسة (تلاشي) أو يتحول الصوت إلى صراخ مزعج (انفجار).</p></template>
+    <template class="content-en"><p>Poor choice of activation functions and weight initialization leads to gradients that vanish to zero or explode to infinity, halting learning.</p><p>Imagine passing a message down a long line of people; the whisper either dies out (vanishing) or amplifies into deafening noise (exploding).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يلعب اختيار مخطط التهيئة ودالة التنشيط دورًا حاسمًا في الحفاظ على الاستقرار العددي أثناء تدريب الشبكات العصبية. الخيارات السيئة تسبب مشكلتين رئيسيتين:</p><ul><li><b><span class="smart-term" data-term-en="Exploding Gradient" data-ar="انفجار التدرج" data-en-def="A problem where gradients become excessively large, causing unstable and destructive parameter updates.">انفجار التدرج<span class="smart-term-tooltip"></span></span> (Exploding Gradient):</b> تحديثات معلمات كبيرة جدًا تدمر النموذج.</li><li><b><span class="smart-term" data-term-en="Vanishing Gradient" data-ar="تلاشي التدرج" data-en-def="A problem where gradients become excessively small, rendering learning impossible as parameters hardly move.">تلاشي التدرج<span class="smart-term-tooltip"></span></span> (Vanishing Gradient):</b> تحديثات صغيرة جدًا تجعل التعلم مستحيلاً لأن المعلمات بالكاد تتحرك.</li></ul><p>تاريخياً، كانت دالة (Sigmoid) شائعة، لكن تدرجها يتلاشى عندما تكون المدخلات كبيرة جدًا أو صغيرة جدًا. عند الانتشار العكسي عبر طبقات متعددة، قد يتلاشى التدرج الكلي تمامًا.</p></template>
+    <template class="content-en"><p>The choice of initialization scheme and activation function plays a crucial role in maintaining numerical stability during neural network training. Poor choices cause two main issues:</p><ul><li><b><span class="smart-term" data-term-en="Exploding Gradient" data-ar="انفجار التدرج" data-en-def="A problem where gradients become excessively large, causing unstable and destructive parameter updates.">Exploding Gradient<span class="smart-term-tooltip"></span></span>:</b> Excessively large parameter updates that destroy the model.</li><li><b><span class="smart-term" data-term-en="Vanishing Gradient" data-ar="تلاشي التدرج" data-en-def="A problem where gradients become excessively small, rendering learning impossible as parameters hardly move.">Vanishing Gradient<span class="smart-term-tooltip"></span></span>:</b> Excessively small updates rendering learning impossible as parameters hardly move.</li></ul><p>Historically, the Sigmoid function was popular, but its gradient vanishes when inputs are very large or very small. When backpropagating through many layers, the overall gradient product may vanish entirely.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يحدث التلاشي مع Sigmoid؟ مشتقة دالة Sigmoid تبلغ ذروتها عند 0.25. عند ضرب هذه المشتقات عبر طبقات متعددة (قاعدة السلسلة)، يقترب الناتج بسرعة من الصفر.</p><p>لحل هذه المشكلة، برزت دوال ReLU (Rectified Linear Units) كخيار افتراضي للممارسين. دالة ReLU أكثر استقرارًا لأن مشتقتها إما 1 (للقيم الموجبة) أو 0، مما يمنع التلاشي المستمر للتدرجات الموجبة.</p><p>يرتبط هذا المفهوم ارتباطًا وثيقًا بتهيئة الأوزان؛ فحتى مع ReLU، إذا كانت الأوزان الأولية صغيرة جدًا، فإن التنشيطات ستتقلص، وإذا كانت كبيرة جدًا، ستنفجر.</p></template>
+    <template class="content-en"><p>Why does vanishing happen with Sigmoid? The derivative of the Sigmoid function peaks at 0.25. When multiplying these derivatives across multiple layers (chain rule), the product rapidly approaches zero.</p><p>To solve this, ReLUs (Rectified Linear Units) have emerged as the default choice. ReLU is more stable because its derivative is either 1 (for positive values) or 0, preventing the continuous vanishing of positive gradients.</p><p>This concept is deeply tied to weight initialization; even with ReLU, if initial weights are too small, activations shrink, and if too large, they explode.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة التنشيط سيجمويد (Sigmoid)</strong></template>
+      <template class="content-en"><strong>Sigmoid activation function</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$1/(1+\exp(-x))$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A line chart showing the Sigmoid function (blue solid line) and its gradient (pink dashed line). X-axis from -7.5 to 7.5, Y-axis from 0.0 to 1.0. Show the gradient peaking at 0.25 at x=0 and approaching 0 at both tails. Style: educational, dark background #0d1117, accent colors #3b82f6 and #ec4899, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-secondary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+    
+    <!-- Chart Area Background -->
+    <rect x="80" y="60" width="640" height="280" fill="var(--bg-elevated)" rx="4" />
+
+    <!-- Vanishing Gradient Highlight Zones -->
+    <rect x="80" y="60" width="149.3" height="280" fill="var(--brand-500)" opacity="0.05" />
+    <rect x="570.7" y="60" width="149.3" height="280" fill="var(--brand-500)" opacity="0.05" />
+
+    <!-- Grid Lines -->
+    <g stroke="var(--border-color)" stroke-dasharray="4 4" stroke-width="1">
+        <!-- Horizontal -->
+        <line x1="80" y1="60" x2="720" y2="60" />
+        <line x1="80" y1="130" x2="720" y2="130" />
+        <line x1="80" y1="200" x2="720" y2="200" />
+        <line x1="80" y1="270" x2="720" y2="270" />
+        <!-- Vertical -->
+        <line x1="186.7" y1="60" x2="186.7" y2="340" />
+        <line x1="293.3" y1="60" x2="293.3" y2="340" />
+        <line x1="506.7" y1="60" x2="506.7" y2="340" />
+        <line x1="613.3" y1="60" x2="613.3" y2="340" />
+    </g>
+
+    <!-- Solid Axes -->
+    <g stroke="var(--text-muted)" stroke-width="2">
+        <line x1="80" y1="340" x2="720" y2="340" /> <!-- X axis -->
+        <line x1="400" y1="60" x2="400" y2="340" /> <!-- Center Y axis -->
+        <line x1="80" y1="60" x2="80" y2="340" /> <!-- Left Y axis -->
+    </g>
+
+    <!-- Y-axis Labels -->
+    <g fill="var(--text-secondary)" font-size="13" text-anchor="end">
+        <text x="70" y="65">1.0</text>
+        <text x="70" y="135">0.75</text>
+        <text x="70" y="205">0.5</text>
+        <text x="70" y="275">0.25</text>
+        <text x="70" y="345">0.0</text>
+    </g>
+
+    <!-- X-axis Labels -->
+    <g fill="var(--text-secondary)" font-size="13" text-anchor="middle">
+        <text x="80" y="365">-7.5</text>
+        <text x="186.7" y="365">-5.0</text>
+        <text x="293.3" y="365">-2.5</text>
+        <text x="400" y="365">0</text>
+        <text x="506.7" y="365">2.5</text>
+        <text x="613.3" y="365">5.0</text>
+        <text x="720" y="365">7.5</text>
+    </g>
+
+    <!-- Sigmoid Function Path -->
+    <path d="M 80 340 L 144 339.3 L 186.7 338.1 L 229.3 335.0 L 250.7 331.8 L 272 326.7 L 293.3 318.8 L 314.7 306.6 L 336 288.9 L 357.3 264.7 L 378.7 234.3 L 400 200 L 421.3 165.7 L 442.7 135.3 L 464 111.1 L 485.3 93.4 L 506.7 81.2 L 528 73.3 L 549.3 68.2 L 570.7 65.0 L 613.3 61.9 L 656 60.7 L 720 60" 
+          fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Gradient Function Path -->
+    <path d="M 80 340 L 144 339.3 L 186.7 338.2 L 229.3 335.0 L 250.7 332.0 L 272 327.3 L 293.3 320.4 L 314.7 310.6 L 336 298.2 L 357.3 284.9 L 378.7 274.2 L 400 270 L 421.3 274.2 L 442.7 284.9 L 464 298.2 L 485.3 310.6 L 506.7 320.4 L 528 327.3 L 549.3 332.0 L 570.7 335.0 L 613.3 338.2 L 656 339.3 L 720 340" 
+          fill="none" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8 6" stroke-linecap="round" stroke-linejoin="round" />
+
+    <!-- Legend -->
+    <rect x="95" y="75" width="240" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="6" />
+    <line x1="110" y1="95" x2="140" y2="95" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+    <text x="225" y="100" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Sigmoid Function σ(x)</text>
+    <text x="225" y="100" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">دالة سيجمويد σ(x)</text>
+
+    <line x1="110" y1="125" x2="140" y2="125" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="6 4" stroke-linecap="round" />
+    <text x="225" y="130" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Gradient σ'(x)</text>
+    <text x="225" y="130" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">المشتقة σ'(x)</text>
+
+    <!-- Left Vanishing Gradient Annotation -->
+    <rect x="100" y="220" width="160" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="6" />
+    <text x="180" y="245" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Vanishing Gradient</text>
+    <text x="180" y="245" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">تلاشي المشتقة</text>
+    <path d="M 180 260 L 180 325" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Right Vanishing Gradient Annotation -->
+    <rect x="540" y="220" width="160" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="6" />
+    <text x="620" y="245" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Vanishing Gradient</text>
+    <text x="620" y="245" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">تلاشي المشتقة</text>
+    <path d="M 620 260 L 620 325" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Peak Gradient Annotation -->
+    <rect x="420" y="255" width="160" height="30" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+    <text x="500" y="275" text-anchor="middle" font-size="13" fill="var(--text-primary)" class="gsvg-en">Max Gradient = 0.25</text>
+    <text x="500" y="275" text-anchor="middle" font-size="13" fill="var(--text-primary)" class="gsvg-ar">أقصى قيمة للمشتقة = 0.25</text>
+    <path d="M 420 270 L 405 270" fill="none" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sigmoid Activation &amp; Vanishing Gradients</text>
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">دالة التنشيط سيجمويد وتلاشي المشتقة</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت شبكتك العميقة لا تتعلم وتظل دالة الخسارة ثابتة منذ البداية، فأي مشكلة من مشاكل التدرج هي الأكثر احتمالاً، وكيف تتحقق من ذلك؟</template>
+      <template class="content-en">If your deep network is not learning and the loss remains flat from the start, which gradient problem is most likely, and how would you verify it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المشكلة الأكثر احتمالاً هي تلاشي التدرج. يمكن التحقق من ذلك عن طريق طباعة قيم التدرجات (gradients) للطبقات الأولى أثناء التدريب؛ إذا كانت قريبة جداً من الصفر، فهذا يؤكد المشكلة.</p></template>
+      <template class="content-en"><p>The most likely problem is the vanishing gradient. You can verify this by logging/printing the gradient values of the earlier layers during training; if they are extremely close to zero, it confirms the issue.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="breaking-symmetry" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> كسر التماثل في الشبكات العصبية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Breaking the Symmetry in Neural Networks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>إذا تمت تهيئة جميع الأوزان بنفس القيمة، فإن جميع الخلايا العصبية ستتعلم نفس الميزات بالضبط، مما يلغي فائدة وجود خلايا متعددة.</p><p>يشبه الأمر توظيف 10 محققين لحل جريمة، لكن إعطائهم جميعاً نفس الدليل ونفس طريقة التفكير؛ سيصلون جميعاً لنفس الاستنتاج.</p></template>
+    <template class="content-en"><p>If all weights are initialized to the same value, all neurons will learn the exact same features, negating the benefit of having multiple neurons.</p><p>It's like hiring 10 detectives to solve a crime but giving them all the exact same clue and thinking method; they will all reach the same conclusion.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>مشكلة التماثل تحدث عندما نقوم بتهيئة جميع معلمات الطبقة المخفية بنفس الثابت (مثلاً W = c). في هذه الحالة:</p><ol><li>أثناء الانتشار الأمامي (Forward Propagation)، تأخذ كل وحدة مخفية نفس المدخلات والمعلمات، وتنتج نفس التنشيط.</li><li>أثناء الانتشار العكسي (Backpropagation)، يعطي التفاضل تدرجاً تأخذ عناصره جميعاً نفس القيمة.</li><li>بعد تحديث الأوزان (مثلاً باستخدام SGD)، ستظل جميع الأوزان متساوية.</li></ol><p>هذا يعني أن الشبكة لن تكسر هذا التماثل أبداً، وستتصرف الطبقة المخفية وكأنها تحتوي على خلية عصبية واحدة فقط.</p></template>
+    <template class="content-en"><p>The symmetry problem occurs when we initialize all parameters of a hidden layer to the same constant (e.g., W = c). In this case:</p><ol><li>During forward propagation, every hidden unit takes the same inputs and parameters, producing the same activation.</li><li>During backpropagation, differentiation gives a gradient whose elements all take the same value.</li><li>After weight updates (e.g., using SGD), all weights will still be equal.</li></ol><p>This means the network will never break this symmetry, and the hidden layer will behave as if it had only a single unit.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التهيئة العشوائية هي الحل الأساسي لكسر هذا التماثل، حيث تسمح لكل خلية عصبية بالبدء من نقطة مختلفة وتعلم ميزات مستقلة.</p><p>من المثير للاهتمام أن خوارزمية النزول الاشتقاقي العشوائي (SGD) بحد ذاتها لا يمكنها كسر هذا التماثل إذا كانت الأوزان الأولية متطابقة. ومع ذلك، تقنيات التنظيم مثل الإسقاط (Dropout) يمكنها كسر التماثل لأنها تعطل خلايا عصبية مختلفة بشكل عشوائي في كل خطوة تدريب.</p></template>
+    <template class="content-en"><p>Random initialization is the primary solution to break this symmetry, allowing each neuron to start from a different point and learn independent features.</p><p>Interestingly, Stochastic Gradient Descent (SGD) itself cannot break this symmetry if the initial weights are identical. However, regularization techniques like Dropout *would* break the symmetry because they randomly deactivate different neurons at each training step.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تهيئة الأوزان بثابت (ممارسة خاطئة)</strong></template>
+      <template class="content-en"><strong>Initializing weights to a constant (bad practice)</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$W^{(1)} = c$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يمكن لتقنية Dropout كسر التماثل حتى لو تم تهيئة الأوزان بثابت؟</template>
+      <template class="content-en">Why can Dropout break symmetry even if weights are initialized to a constant?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن Dropout يقوم بإسقاط (تجاهل) خلايا عصبية مختلفة بشكل عشوائي في كل تمريرة. هذا يجعل المدخلات والتدرجات تختلف لكل خلية عصبية، مما يؤدي إلى تحديثات أوزان مختلفة وكسر التماثل.</p></template>
+      <template class="content-en"><p>Because Dropout randomly drops (ignores) different neurons in each pass. This causes the inputs and gradients to differ for each neuron, leading to different weight updates and breaking the symmetry.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="parameter-initialization-xavier" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تهيئة المعلمات وتهيئة خافيير (Xavier)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Parameter Initialization and Xavier Initialization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تهيئة خافيير تضمن أن تباين المخرجات والتدرجات يظل ثابتاً عبر جميع طبقات الشبكة، مما يمنع التلاشي والانفجار.</p><p>مثل ضبط مكبرات الصوت في سلسلة متصلة؛ يجب أن يكون كل مكبر مضبوطاً بحيث لا يضعف الصوت ولا يضخمه لدرجة التشويه.</p></template>
+    <template class="content-en"><p>Xavier initialization ensures that the variance of outputs and gradients remains constant across all layers, preventing vanishing and exploding.</p><p>Like tuning amplifiers in a daisy chain; each must be set so it neither weakens the signal nor amplifies it to distortion.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التهيئة الدقيقة ضرورية لتخفيف مشاكل الاستقرار العددي. هناك عدة طرق:</p><ul><li><b>التهيئة الافتراضية:</b> استخدام توزيع طبيعي عشوائي. يعمل جيداً للمشاكل متوسطة الحجم.</li><li><b><span class="smart-term" data-term-en="Xavier Initialization" data-ar="تهيئة خافيير" data-en-def="An initialization method that scales weights based on the number of input and output neurons to maintain variance.">تهيئة خافيير<span class="smart-term-tooltip"></span></span> (Xavier Initialization):</b> تقترح أنه لكل طبقة، يجب ألا يتأثر تباين أي مخرج بعدد المدخلات، ويجب ألا يتأثر تباين أي تدرج بعدد المخرجات.</li></ul><p>بالنسبة لطبقة متصلة بالكامل بدون دوال غير خطية، مع $n_{in}$ مدخلات $x_j$ وأوزان $w_{ij}$، المخرج هو: $o_i = \sum_{j=1}^{n_{in}} w_{ij} x_j$.</p></template>
+    <template class="content-en"><p>Careful initialization is essential to mitigate numerical stability issues. Methods include:</p><ul><li><b>Default Initialization:</b> Using a random normal distribution. Works well for moderate problem sizes.</li><li><b><span class="smart-term" data-term-en="Xavier Initialization" data-ar="تهيئة خافيير" data-en-def="An initialization method that scales weights based on the number of input and output neurons to maintain variance.">Xavier Initialization<span class="smart-term-tooltip"></span></span>:</b> Suggests that for each layer, the variance of any output should not be affected by the number of inputs, and the variance of any gradient should not be affected by the number of outputs.</li></ul><p>For a fully connected layer without nonlinearities, with $n_{in}$ inputs $x_j$ and weights $w_{ij}$, the output is: $o_i = \sum_{j=1}^{n_{in}} w_{ij} x_j$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تستمر أبحاث التعلم العميق في تطوير طرق تهيئة متقدمة. توفر أطر العمل الحديثة أكثر من اثنتي عشرة طريقة استدلالية مختلفة.</p><p>هناك طرق مخصصة للمعلمات المشتركة (tied parameters)، النماذج التسلسلية، والدقة الفائقة.</p><p>على سبيل المثال، أثبت الباحثون (Xiao et al.) إمكانية تدريب شبكات عصبية مكونة من 10000 طبقة بدون حيل معمارية معقدة، فقط باستخدام طريقة تهيئة مصممة بعناية فائقة.</p></template>
+    <template class="content-en"><p>Deep learning research continues to evolve advanced initialization methods. Modern frameworks implement over a dozen different heuristics.</p><p>There are specialized heuristics for tied (shared) parameters, sequence models, and super-resolution.</p><p>For instance, Xiao et al. demonstrated the possibility of training 10,000-layer neural networks without architectural tricks simply by using a carefully designed initialization method.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب المخرج لطبقة متصلة بالكامل</strong></template>
+      <template class="content-en"><strong>Output calculation for a fully connected layer</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$o_i = \sum_{j=1}^{n_{in}} w_{ij} x_j$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نأخذ في الاعتبار عدد المدخلات والمخرجات عند حساب تباين الأوزان في تهيئة خافيير؟</template>
+      <template class="content-en">Why do we consider the number of inputs and outputs when calculating weight variance in Xavier initialization?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كل خلية عصبية تجمع مدخلات متعددة. إذا كان عدد المدخلات كبيراً، سيزداد تباين المجموع. لضبط ذلك، يجب أن يكون تباين الأوزان الفردية أصغر كلما زاد عدد المدخلات.</p></template>
+      <template class="content-en"><p>Because each neuron sums multiple inputs. If the number of inputs is large, the variance of the sum increases. To counteract this, the variance of individual weights must be smaller when there are more inputs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distribution-shift-types" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> انزياح التوزيع وأنواعه</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Distribution Shift and Its Types</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحدث انزياح التوزيع عندما تختلف البيانات التي يواجهها النموذج في العالم الحقيقي عن البيانات التي تدرب عليها، مما يؤدي إلى فشله.</p><p>تخيل أنك تدربت على القيادة في طقس مشمس فقط، ثم طُلب منك القيادة في عاصفة ثلجية؛ ستفشل لأن بيئة الاختبار تغيرت.</p></template>
+    <template class="content-en"><p>Distribution shift occurs when the data a model encounters in the real world differs from its training data, causing it to fail.</p><p>Imagine learning to drive only in sunny weather, then being tested in a blizzard; you will fail because the test environment shifted.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قد تعمل النماذج بشكل ممتاز على بيانات الاختبار ولكنها تفشل بشكل كارثي عند النشر بسبب انزياح التوزيع. هناك ثلاثة أنواع رئيسية:</p><ol><li><b><span class="smart-term" data-term-en="Covariate Shift" data-ar="انزياح التباين" data-en-def="Input distribution changes, but the relationship between inputs and labels remains the same.">انزياح التباين<span class="smart-term-tooltip"></span></span> (Covariate Shift):</b> يتغير توزيع المدخلات $P(x)$، لكن دالة التسمية $P(y|x)$ تظل ثابتة. (مثال: التدريب على صور قطط حقيقية، والاختبار على رسومات كرتونية لقطط).</li><li><b><span class="smart-term" data-term-en="Label Shift" data-ar="انزياح التسمية" data-en-def="Label distribution changes, but the conditional distribution of inputs given labels remains fixed.">انزياح التسمية<span class="smart-term-tooltip"></span></span> (Label Shift):</b> يتغير التوزيع الهامشي للتسميات $P(y)$، لكن التوزيع الشرطي $P(x|y)$ يظل ثابتاً. (مثال: تغير معدل انتشار الأمراض بمرور الوقت، بينما تظل الأعراض لكل مرض ثابتة).</li><li><b><span class="smart-term" data-term-en="Concept Shift" data-ar="انزياح المفهوم" data-en-def="The actual definition or relationship mapping inputs to labels changes over time or space.">انزياح المفهوم<span class="smart-term-tooltip"></span></span> (Concept Shift):</b> يتغير تعريف التسميات نفسها $P(y|x)$. (مثال: تغير المسميات الوظيفية أو معايير تشخيص الأمراض بمرور الوقت أو الجغرافيا).</li></ol></template>
+    <template class="content-en"><p>Models may perform marvelously on test sets but fail catastrophically in deployment due to distribution shift. There are three main types:</p><ol><li><b><span class="smart-term" data-term-en="Covariate Shift" data-ar="انزياح التباين" data-en-def="Input distribution changes, but the relationship between inputs and labels remains the same.">Covariate Shift<span class="smart-term-tooltip"></span></span>:</b> The distribution of inputs $P(x)$ changes, but the labeling function $P(y|x)$ remains constant. (e.g., Training on real cat photos, testing on cartoon cats).</li><li><b><span class="smart-term" data-term-en="Label Shift" data-ar="انزياح التسمية" data-en-def="Label distribution changes, but the conditional distribution of inputs given labels remains fixed.">Label Shift<span class="smart-term-tooltip"></span></span>:</b> The label marginal $P(y)$ changes, but the class-conditional distribution $P(x|y)$ remains fixed. (e.g., Disease prevalence changes over time, but symptoms for a disease remain the same).</li><li><b><span class="smart-term" data-term-en="Concept Shift" data-ar="انزياح المفهوم" data-en-def="The actual definition or relationship mapping inputs to labels changes over time or space.">Concept Shift<span class="smart-term-tooltip"></span></span>:</b> The very definitions of labels $P(y|x)$ change. (e.g., Job titles or diagnostic criteria changing over time or geography).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في بعض الأحيان، نشر النموذج بحد ذاته يغير توزيع البيانات.</p><p>مثلاً، نموذج يمنح قروضاً بناءً على نوع الحذاء (أحذية أكسفورد = سداد، أحذية رياضية = تعثر). بمجرد نشر النموذج، سيقوم الجميع بارتداء أحذية أكسفورد للحصول على القرض، مما يكسر النموذج.</p><p>تصحيح انزياح المفهوم هو الأصعب. إذا تغيرت المشكلة جذرياً (من تمييز القطط/الكلاب إلى أبيض/أسود)، يجب إعادة التدريب من الصفر.</p><p>لكن عادةً ما تتغير المهام ببطء (مثل تدهور عدسات الكاميرا المرورية)، وهنا يمكننا استخدام الأوزان الحالية وإجراء خطوات تحديث بسيطة ببيانات جديدة.</p></template>
+    <template class="content-en"><p>Sometimes, deploying a model itself perturbs the data distribution. E.g., a model granting loans based on footwear (Oxfords = repay, sneakers = default). Once deployed, everyone wears Oxfords to get loans, breaking the model.</p><p>Concept shift correction is the hardest. If the problem changes drastically (cats/dogs to white/black animals), retraining from scratch is needed. However, tasks usually change slowly (e.g., traffic camera lenses degrading), where we can fine-tune existing weights with new data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A visual comparison of Covariate Shift. Left side: 'Training Data' showing realistic photos of cats and dogs. Right side: 'Test Data' showing cartoon illustrations of cats and dogs. An arrow points from left to right labeled 'Covariate Shift: P(x) changes, P(y|x) is constant'. Style: educational, dark background #0d1117, accent color #10b981, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Distribution Shift: Covariate Shift</text>
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تحول التوزيع: التحول في المتغيرات المشتركة</text>
+
+    <!-- ========================================== -->
+    <!-- LEFT PANEL: TRAINING DATA                  -->
+    <!-- ========================================== -->
+    <rect x="30" y="60" width="280" height="320" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="170" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Training Data</text>
+    <text x="170" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بيانات التدريب</text>
+    
+    <text x="170" y="115" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Realistic Photos</text>
+    <text x="170" y="115" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">صور واقعية</text>
+
+    <!-- Card 1: Real Cat -->
+    <rect x="50" y="135" width="100" height="100" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(100, 175)">
+        <path d="M -15 -10 L -20 -25 L -5 -15 Q 0 -18 5 -15 L 20 -25 L 15 -10 A 18 18 0 0 1 15 10 Q 10 20 0 20 Q -10 20 -15 10 A 18 18 0 0 1 -15 -10 Z" fill="var(--text-primary)" />
+    </g>
+    <text x="100" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Cat (y=1)</text>
+    <text x="100" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قط (y=1)</text>
+
+    <!-- Card 2: Real Dog -->
+    <rect x="190" y="135" width="100" height="100" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(240, 175)">
+        <circle cx="0" cy="0" r="14" fill="var(--text-primary)" />
+        <ellipse cx="-16" cy="2" rx="6" ry="12" fill="var(--text-primary)" transform="rotate(15 -16 2)" />
+        <ellipse cx="16" cy="2" rx="6" ry="12" fill="var(--text-primary)" transform="rotate(-15 16 2)" />
+        <ellipse cx="0" cy="8" rx="10" ry="8" fill="var(--text-primary)" />
+    </g>
+    <text x="240" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dog (y=0)</text>
+    <text x="240" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كلب (y=0)</text>
+
+    <!-- Left Panel Curves (P(x) Distribution) -->
+    <path d="M 50 330 L 290 330" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Baseline (Test) -->
+    <path d="M 160 330 C 180 330, 190 280, 220 280 C 250 280, 260 330, 280 330" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="220" y="270" text-anchor="middle" font-size="12" fill="var(--text-muted)" class="gsvg-en">Test</text>
+    <text x="220" y="270" text-anchor="middle" font-size="12" fill="var(--text-muted)" class="gsvg-ar">اختبار</text>
+
+    <!-- Active (Train) -->
+    <path d="M 60 330 C 80 330, 90 280, 120 280 C 150 280, 160 330, 180 330" fill="var(--brand-500)" opacity="0.2" />
+    <path d="M 60 330 C 80 330, 90 280, 120 280 C 150 280, 160 330, 180 330" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="120" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Train</text>
+    <text x="120" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تدريب</text>
+
+    <text x="170" y="360" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Input Distribution P(x)</text>
+    <text x="170" y="360" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">توزيع المدخلات P(x)</text>
+
+
+    <!-- ========================================== -->
+    <!-- CENTER ARROW & LABELS                      -->
+    <!-- ========================================== -->
+    <text x="400" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Covariate Shift</text>
+    <text x="400" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تحول المتغيرات المشتركة</text>
+
+    <text x="400" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">P(x) changes</text>
+    <text x="400" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">P(x) يتغير</text>
+
+    <path d="M 330 210 L 465 210" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow)" stroke-linecap="round" />
+
+    <text x="400" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">P(y|x) is constant</text>
+    <text x="400" y="240" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">P(y|x) ثابت</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT PANEL: TEST DATA                     -->
+    <!-- ========================================== -->
+    <rect x="490" y="60" width="280" height="320" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="630" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Test Data</text>
+    <text x="630" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بيانات الاختبار</text>
+    
+    <text x="630" y="115" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Cartoon Illustrations</text>
+    <text x="630" y="115" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">رسومات كرتونية</text>
+
+    <!-- Card 1: Cartoon Cat -->
+    <rect x="510" y="135" width="100" height="100" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(560, 175)">
+        <g stroke="var(--brand-500)" stroke-width="2" fill="var(--bg-surface)" stroke-linejoin="round">
+            <polygon points="-12,-10 -18,-25 -4,-15" />
+            <polygon points="12,-10 18,-25 4,-15" />
+            <circle cx="0" cy="0" r="16" />
+        </g>
+        <circle cx="-6" cy="-2" r="2" fill="var(--brand-500)" />
+        <circle cx="6" cy="-2" r="2" fill="var(--brand-500)" />
+        <path d="M -4 4 Q 0 8 4 4" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M -18 2 L -10 4 M -18 6 L -10 6 M 18 2 L 10 4 M 18 6 L 10 6" stroke="var(--brand-500)" stroke-width="1" />
+    </g>
+    <text x="560" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Cat (y=1)</text>
+    <text x="560" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قط (y=1)</text>
+
+    <!-- Card 2: Cartoon Dog -->
+    <rect x="650" y="135" width="100" height="100" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(700, 175)">
+        <g stroke="var(--brand-500)" stroke-width="2" fill="var(--bg-surface)" stroke-linejoin="round">
+            <ellipse cx="-14" cy="-2" rx="5" ry="12" transform="rotate(20 -14 -2)" />
+            <ellipse cx="14" cy="-2" rx="5" ry="12" transform="rotate(-20 14 -2)" />
+            <circle cx="0" cy="0" r="15" />
+            <ellipse cx="0" cy="6" rx="10" ry="7" />
+        </g>
+        <circle cx="-5" cy="-4" r="2" fill="var(--brand-500)" />
+        <circle cx="5" cy="-4" r="2" fill="var(--brand-500)" />
+        <circle cx="0" cy="4" r="2" fill="var(--brand-500)" />
+        <path d="M 0 6 L 0 9 Q 3 11 6 8" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+    <text x="700" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dog (y=0)</text>
+    <text x="700" y="255" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كلب (y=0)</text>
+
+    <!-- Right Panel Curves (P(x) Distribution) -->
+    <path d="M 510 330 L 750 330" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Baseline (Train) -->
+    <path d="M 520 330 C 540 330, 550 280, 580 280 C 610 280, 620 330, 640 330" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="580" y="270" text-anchor="middle" font-size="12" fill="var(--text-muted)" class="gsvg-en">Train</text>
+    <text x="580" y="270" text-anchor="middle" font-size="12" fill="var(--text-muted)" class="gsvg-ar">تدريب</text>
+
+    <!-- Active (Test) -->
+    <path d="M 620 330 C 640 330, 650 280, 680 280 C 710 280, 720 330, 740 330" fill="var(--brand-500)" opacity="0.2" />
+    <path d="M 620 330 C 640 330, 650 280, 680 280 C 710 280, 720 330, 740 330" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="680" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Test</text>
+    <text x="680" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">اختبار</text>
+
+    <text x="630" y="360" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Input Distribution P(x)</text>
+    <text x="630" y="360" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">توزيع المدخلات P(x)</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Covariate Shift</th><th>Label Shift</th><th>Concept Shift</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">ما الذي يتغير؟</template>
+          <template class="content-en">What changes?</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">توزيع المدخلات P(x)</template>
+          <template class="content-en">Input distribution P(x)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">توزيع التسميات P(y)</template>
+          <template class="content-en">Label distribution P(y)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">العلاقة P(y|x)</template>
+          <template class="content-en">Relationship P(y|x)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">ما الذي يظل ثابتاً؟</template>
+          <template class="content-en">What remains constant?</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">العلاقة P(y|x)</template>
+          <template class="content-en">Relationship P(y|x)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">التوزيع الشرطي P(x|y)</template>
+          <template class="content-en">Conditional dist P(x|y)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا شيء مضمون</template>
+          <template class="content-en">Nothing guaranteed</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">صعوبة التصحيح</template>
+          <template class="content-en">Correction Difficulty</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">متوسطة</template>
+          <template class="content-en">Moderate</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">متوسطة</template>
+          <template class="content-en">Moderate</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صعبة جداً (تتطلب إعادة تدريب)</template>
+          <template class="content-en">Very Hard (requires retraining)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بتدريب نموذج لتشخيص كوفيد-19 في عام 2020، واستخدمته في عام 2024 حيث ظهرت سلالات جديدة بأعراض مختلفة، فما نوع الانزياح الذي حدث؟</template>
+      <template class="content-en">If you trained a COVID-19 diagnostic model in 2020 and used it in 2024 when new variants with different symptoms appeared, what type of shift occurred?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>هذا انزياح في المفهوم (Concept Shift)، لأن العلاقة بين المدخلات (الأعراض) والمخرجات (التشخيص) قد تغيرت.</p></template>
+      <template class="content-en"><p>This is a Concept Shift, because the underlying relationship between inputs (symptoms) and outputs (diagnosis) has fundamentally changed.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="taxonomy-learning-problems" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تصنيف مشاكل التعلم</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> A Taxonomy of Learning Problems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تختلف طرق التعلم الآلي بناءً على كيفية تفاعل النموذج مع البيئة وتدفق البيانات، من التعلم الدفعي الثابت إلى التعلم المعزز الديناميكي.</p><p>التعلم الدفعي يشبه الدراسة لامتحان من كتاب مدرسي، بينما التعلم المعزز يشبه تعلم لعب الشطرنج من خلال اللعب الفعلي وتلقي التغذية الراجعة.</p></template>
+    <template class="content-en"><p>Machine learning methods differ based on how the model interacts with the environment and data flow, from static batch learning to dynamic reinforcement learning.</p><p>Batch learning is like studying for an exam from a textbook, while reinforcement learning is like learning chess by playing and getting feedback.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بناءً على طبيعة البيئة، نصنف مشاكل التعلم إلى:</p><ul><li><b><span class="smart-term" data-term-en="Batch Learning" data-ar="التعلم الدفعي" data-en-def="Training a model on a fixed dataset and deploying it without further updates.">التعلم الدفعي<span class="smart-term-tooltip"></span></span> (Batch Learning):</b> نتدرب على مجموعة بيانات ثابتة، ثم ننشر النموذج لتقييم بيانات جديدة من نفس التوزيع دون تحديثه لاحقاً (مثل نظام التعرف على القطط في باب ذكي).</li><li><b><span class="smart-term" data-term-en="Online Learning" data-ar="التعلم عبر الإنترنت" data-en-def="Continuously updating a model as data arrives sequentially one sample at a time.">التعلم عبر الإنترنت<span class="smart-term-tooltip"></span></span> (Online Learning):</b> تصل البيانات عينة تلو الأخرى. نتوقع، ثم نلاحظ النتيجة الحقيقية، ونتلقى مكافأة/خسارة، ونحدث النموذج باستمرار (مثل توقع أسعار الأسهم).</li><li><b>مشاكل قطاع الطرق (Bandits):</b> حالة خاصة من التعلم عبر الإنترنت حيث لدينا عدد محدود من الإجراءات (الأذرع) التي يمكننا اتخاذها.</li><li><b>التحكم (Control):</b> البيئة تتذكر أفعالنا السابقة وتستجيب بناءً عليها (مثل وحدة تحكم غلاية القهوة PID).</li><li><b>التعلم المعزز (Reinforcement Learning):</b> بيئة ذات ذاكرة قد تتعاون أو تتنافس معنا (مثل الشطرنج، أو السيارات ذاتية القيادة التي تتفاعل مع سيارات أخرى).</li></ul></template>
+    <template class="content-en"><p>Based on the environment's nature, we classify learning problems into:</p><ul><li><b><span class="smart-term" data-term-en="Batch Learning" data-ar="التعلم الدفعي" data-en-def="Training a model on a fixed dataset and deploying it without further updates.">Batch Learning<span class="smart-term-tooltip"></span></span>:</b> Train on a static dataset, deploy to score new data from the same distribution, never updated again (e.g., cat detector in a smart door).</li><li><b><span class="smart-term" data-term-en="Online Learning" data-ar="التعلم عبر الإنترنت" data-en-def="Continuously updating a model as data arrives sequentially one sample at a time.">Online Learning<span class="smart-term-tooltip"></span></span>:</b> Data arrives one sample at a time. We predict, observe the true label, incur loss/reward, and continuously update the model (e.g., stock price prediction).</li><li><b>Bandits:</b> A special case of online learning with a finite number of actions (arms) we can take.</li><li><b>Control:</b> The environment remembers our past actions and responds accordingly (e.g., PID coffee boiler controller).</li><li><b>Reinforcement Learning:</b> An environment with memory that may cooperate or compete with us (e.g., Chess, autonomous cars reacting to other drivers).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التمييز الرئيسي بين هذه الحالات هو ما إذا كانت البيئة ثابتة (Stationary) أم قادرة على التكيف (Adaptive).</p><p>الاستراتيجية التي تنجح في بيئة ثابتة قد تفشل تماماً إذا كانت البيئة تتكيف. على سبيل المثال، فرصة المراجحة (Arbitrage) التي يكتشفها متداول أسهم ستختفي بمجرد أن يبدأ في استغلالها لأن السوق سيتكيف.</p><p>سرعة وطريقة تغير البيئة تحدد نوع الخوارزميات المستخدمة. إذا كانت تتغير ببطء، نجبر النموذج على التكيف ببطء. فهم هذه الديناميكيات حاسم للتعامل مع انزياح المفهوم.</p></template>
+    <template class="content-en"><p>The key distinction is whether the environment is stationary or adaptive.</p><p>A strategy that works in a stationary environment might fail when the environment adapts. For instance, an arbitrage opportunity discovered by a trader disappears once exploited because the market adapts.</p><p>The speed and manner of environmental change dictate the algorithms used. If it changes slowly, we force estimates to change slowly. Understanding these dynamics is crucial for handling concept shift.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دورة التعلم عبر الإنترنت (Online Learning Cycle)</strong></template>
+      <template class="content-en"><strong>Online Learning Cycle</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$model\ f_t \rightarrow data\ x_t \rightarrow estimate\ f_t(x_t) \rightarrow observation\ y_t \rightarrow loss\ l(y_t, f_t(x_t)) \rightarrow model\ f_{t+1}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يعتبر نظام التوصيات في يوتيوب نظام 'تعلم دفعي'؟</template>
+      <template class="content-en">Why is YouTube's recommendation system not considered a 'batch learning' system?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تفضيلات المستخدمين تتغير باستمرار، والمحتوى الجديد يضاف كل ثانية. إذا كان تعلماً دفعياً، فلن يتكيف مع الفيديوهات الجديدة أو اهتمامات المستخدم المتغيرة. يتطلب الأمر تعلماً عبر الإنترنت أو تعلماً معززاً.</p></template>
+      <template class="content-en"><p>Because user preferences constantly change, and new content is added every second. If it were batch learning, it wouldn't adapt to new videos or shifting user interests. It requires online or reinforcement learning.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="fairness-accountability-transparency" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> العدالة والمساءلة والشفافية في التعلم الآلي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Fairness, Accountability, and Transparency in ML</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نماذج التعلم الآلي ليست مجرد أدوات تنبؤية، بل هي أنظمة تتخذ قرارات تؤثر على حياة البشر، مما يتطلب مراعاة الأخلاقيات والعدالة.</p><p>النموذج الذي يتنبأ بالجريمة قد يؤدي إلى إرسال المزيد من الشرطة لحي معين، مما يؤدي لاكتشاف جرائم أكثر هناك، وتغذية النموذج ببيانات تؤكد تحيزه (حلقة مفرغة).</p></template>
+    <template class="content-en"><p>ML models are not just predictive tools; they are decision-making systems that impact human lives, requiring ethical and fairness considerations.</p><p>A crime prediction model might send more police to a neighborhood, finding more crime there, feeding the model data that confirms its bias (a runaway feedback loop).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند نشر أنظمة التعلم الآلي، يجب أن ندرك أننا نؤتمت قرارات تؤثر على الأفراد. الدقة (Accuracy) نادراً ما تكون المقياس الصحيح الوحيد.</p><ul><li><b>حساسية التكلفة (Cost Sensitivity):</b> يجب مراعاة تكلفة الأخطاء المختلفة. التصنيف الخاطئ لصورة كإهانة عنصرية له تكلفة مجتمعية أعلى بكثير من تصنيفها كفئة غير ضارة.</li><li><b>حلقات التغذية الراجعة الجامحة (Runaway Feedback Loops):</b> تحدث عندما ترتبط تنبؤات النموذج ببيانات التدريب المستقبلية. مثال: أنظمة الشرطة التنبؤية توجه الدوريات لأحياء معينة $\rightarrow$ اكتشاف جرائم أكثر $\rightarrow$ تغذية النموذج $\rightarrow$ توجيه دوريات أكثر لنفس الحي.</li></ul></template>
+    <template class="content-en"><p>When deploying ML systems, we must realize we are automating decisions that impact individuals. Accuracy is seldom the only right measure.</p><ul><li><b>Cost Sensitivity:</b> We must account for the cost of different errors. Misclassifying an image as a racial slur has a much higher societal cost than a harmless misclassification.</li><li><b><span class="smart-term" data-term-en="Runaway Feedback Loop" data-ar="حلقة التغذية الراجعة الجامحة" data-en-def="A situation where a model&#x27;s predictions influence the environment in a way that generates future training data reinforcing the model&#x27;s initial biases.">Runaway Feedback Loop<span class="smart-term-tooltip"></span></span>s:</b> Occur when a model's predictions become coupled to its future training data. Example: Predictive policing sends patrols to a neighborhood $\rightarrow$ more crimes discovered $\rightarrow$ feeds model $\rightarrow$ sends even more patrols to the same neighborhood.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>القفزة من 'التنبؤات' إلى 'القرارات' تثير أسئلة أخلاقية عميقة. هل نعالج المشكلة الصحيحة في المقام الأول؟</p><p>تلعب الخوارزميات التنبؤية دوراً كبيراً في نشر المعلومات. هل يجب أن تتحدد الأخبار التي يراها الفرد فقط بناءً على الصفحات التي أعجب بها (Liked)؟ هذا يخلق غرف صدى (Echo Chambers) ويستدعي تدخلاً أخلاقياً في تصميم الخوارزمية.</p></template>
+    <template class="content-en"><p>The leap from 'predictions' to 'decisions' raises deep ethical questions. Are we addressing the right problem in the first place?</p><p>Predictive algorithms play an outsize role in mediating information dissemination.</p><p>Should the news an individual sees be determined solely by Facebook pages they 'Liked'? This creates echo chambers and demands ethical intervention in algorithm design.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن كسر 'حلقة التغذية الراجعة الجامحة' في نظام الشرطة التنبؤية؟</template>
+      <template class="content-en">How can a 'runaway feedback loop' in a predictive policing system be broken?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكن كسرها عن طريق فصل بيانات التدريب عن قرارات النموذج (مثلاً، استخدام بيانات استقصائية مستقلة لمعدلات الجريمة بدلاً من بيانات الاعتقالات التي تتأثر بتواجد الشرطة)، أو عن طريق إجبار النموذج على استكشاف مناطق جديدة عشوائياً.</p></template>
+      <template class="content-en"><p>It can be broken by decoupling training data from model decisions (e.g., using independent survey data for crime rates instead of arrest data which is biased by police presence), or by forcing the model to randomly explore new areas.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="kaggle-house-prices" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تطبيق عملي: توقع أسعار المنازل على Kaggle</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Practical Application: Predicting House Prices on Kaggle</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق مفاهيم التعلم العميق يتطلب معالجة مسبقة للبيانات (مثل التوحيد القياسي)، واختيار النموذج باستخدام التحقق المتقاطع (Cross-Validation).</p><p>البيانات الخام تشبه المكونات غير المطبوخة؛ يجب تنظيفها وتقطيعها (المعالجة المسبقة) قبل وضعها في الفرن (النموذج).</p></template>
+    <template class="content-en"><p>Applying deep learning concepts requires data preprocessing (like <span class="smart-term" data-term-en="Standardization" data-ar="التوحيد القياسي" data-en-def="Rescaling features to have a mean of zero and a standard deviation of one.">standardization<span class="smart-term-tooltip"></span></span>) and model selection using Cross-Validation.</p><p>Raw data is like uncooked ingredients; it must be cleaned and chopped (preprocessing) before going into the oven (the model).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في مسابقة Kaggle لتوقع أسعار المنازل، نتعامل مع بيانات متنوعة (أرقام، فئات، قيم مفقودة). الخطوات الأساسية:</p><ol><li><b>المعالجة المسبقة للبيانات (Preprocessing):</b> استبدال القيم المفقودة بالمتوسط. ثم توحيد البيانات الرقمية (Standardization) لتكون بمتوسط صفر وتباين واحد: $x \leftarrow \frac{x - \mu}{\sigma}$. هذا يسهل التحسين ويمنع تحيز النموذج لميزة ذات قيم كبيرة.</li><li><b>التدريب الأساسي:</b> نبدأ بنموذج خطي بسيط كاختبار سلامة (Sanity Check) لمعرفة ما إذا كانت البيانات تحتوي على معلومات مفيدة.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">التحقق المتقاطع K-Fold<span class="smart-term-tooltip"></span></span>:</b> لتقييم النموذج وضبط المعلمات الفائقة. نقسم البيانات إلى K أجزاء، نتدرب على K-1 ونختبر على الجزء المتبقي، ونكرر.</li></ol></template>
+    <template class="content-en"><p>In the Kaggle house price prediction competition, we handle diverse data (numbers, categories, missing values). Key steps:</p><ol><li><b>Data Preprocessing:</b> Replace missing values with the mean. Standardize numerical data to zero mean and unit variance: $x \leftarrow \frac{x - \mu}{\sigma}$. This aids optimization and prevents bias towards features with large scales.</li><li><b>Baseline Training:</b> Start with a simple linear model as a sanity check to ensure data contains meaningful information.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">K-Fold Cross-Validation<span class="smart-term-tooltip"></span></span>:</b> Used for model selection and hyperparameter tuning. Split data into K folds, train on K-1, validate on the remaining fold, and repeat.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم <span class="smart-term" data-term-en="Standardization" data-ar="التوحيد القياسي" data-en-def="Rescaling features to have a mean of zero and a standard deviation of one.">التوحيد القياسي<span class="smart-term-tooltip"></span></span> (Standardization)؟</p><ol><li><strong>أولاً</strong>، يسهل عملية التحسين (Optimization).</li><li><strong>ثانياً</strong>، لأننا لا نعرف مسبقاً أي الميزات أكثر أهمية، فلا نريد معاقبة المعاملات المخصصة لميزة معينة أكثر من غيرها لمجرد اختلاف مقياسها.</li></ol><p>أثناء التحقق المتقاطع، يجب مراقبة خطأ التدريب وخطأ التحقق.</p><p>إذا كان خطأ التدريب منخفضاً جداً بينما خطأ التحقق مرتفع، فهذا دليل قاطع على التخصيص الزائد (Overfitting)، مما يستدعي استخدام تقنيات التنظيم (Regularization) مثل Dropout أو Weight Decay.</p></template>
+    <template class="content-en"><p>Why standardize?</p><ol><li><strong>First</strong>, it proves convenient for optimization.</li><li><strong>Second</strong>, because we do not know a priori which features will be relevant, we do not want to penalize coefficients assigned to one feature more than any other just because of scale differences.</li></ol><p>During cross-validation, monitor both training and validation errors.</p><p>If training error is very low but validation error is high, it indicates massive overfitting, suggesting the need for regularization techniques like Dropout or Weight Decay.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التوحيد القياسي (Standardization)</strong></template>
+      <template class="content-en"><strong>Standardization formula</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$x \leftarrow \frac{x - \mu}{\sigma}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نبدأ بنموذج خطي بسيط قبل بناء شبكة عصبية عميقة معقدة في مسابقات Kaggle؟</template>
+      <template class="content-en">Why start with a simple linear model before building a complex deep neural network in Kaggle competitions?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعمل النموذج الخطي كـ 'اختبار سلامة' (Sanity Check). إذا كان أداؤه أسوأ من التخمين العشوائي، فهناك خطأ في معالجة البيانات. كما أنه يوفر خط أساس (Baseline) لمعرفة مقدار التحسن الذي تقدمه النماذج المعقدة.</p></template>
+      <template class="content-en"><p>A linear model acts as a 'sanity check'. If it performs worse than random guessing, there's a data processing bug. It also provides a baseline to measure how much improvement complex models actually provide.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. لقد تعلمنا كيف نبني الشبكات العصبية، لكن اليوم نتعلم كيف نجعلها 'تعمل فعلياً' في العالم الحقيقي. ليلة الامتحان، تذكروا هذه الركائز: أولاً، الاستقرار العددي. الشبكات العميقة هشة؛ دالة Sigmoid تقتل التدرجات (Vanishing)، والأوزان الكبيرة تفجرها (Exploding). الحل؟ استخدموا ReLU وتهيئة Xavier. ثانياً، التماثل. لا تبدأوا أبداً بأوزان متطابقة، وإلا ستصبح شبكتكم العميقة مجرد خلية عصبية واحدة غبية! العشوائية هنا هي صديقكم. ثالثاً، العالم الحقيقي يتغير. البيانات التي تدربون عليها اليوم قد تختلف غداً (Distribution Shift). ميزوا جيداً بين انزياح التباين (تغير شكل المدخلات) وانزياح التسمية (تغير نسبة المخرجات) وانزياح المفهوم (تغير القواعد تماماً). وأخيراً، تذكروا أن خوارزمياتكم تتخذ قرارات تؤثر على البشر. احذروا من حلقات التغذية الراجعة الجامحة التي تعزز التحيز. في مشروع Kaggle، التوحيد القياسي (Standardization) والتحقق المتقاطع (K-Fold) هما درعكم ضد التخصيص الزائد. ركزوا على هذه المفاهيم، وستكونون جاهزين ليس فقط للامتحان، بل لبناء أنظمة ذكاء اصطناعي مسؤولة وقوية.</template>
+    <template class="content-en">Welcome, future engineers, to this crucial module. We've learned how to build neural networks, but today we learn how to make them *actually work* in the real world. For the exam, remember these pillars: First, numerical stability. Deep networks are fragile; Sigmoid kills gradients (Vanishing), and large weights explode them. The solution? Use ReLU and Xavier initialization. Second, symmetry. Never start with identical weights, or your deep network becomes just one dumb neuron! Randomness is your friend here. Third, the real world changes. The data you train on today might differ tomorrow (Distribution Shift). Distinguish clearly between Covariate Shift (input appearance changes), Label Shift (output proportions change), and Concept Shift (the rules change entirely). Finally, remember your algorithms make decisions affecting humans. Beware of runaway feedback loops that reinforce bias. In your Kaggle project, Standardization and K-Fold cross-validation are your shields against overfitting. Master these, and you are ready not just for the exam, but to build responsible, robust AI systems.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نقوم بتهيئة جميع أوزان الشبكة العصبية بالصفر؟</template>
+          <template class="content-en">Why don't we initialize all neural network weights to zero?</template>
+          <span class="content-target">لماذا لا نقوم بتهيئة جميع أوزان الشبكة العصبية بالصفر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن ذلك يسبب 'تماثل التبديل' (Permutation Symmetry). ستتلقى جميع الخلايا العصبية نفس المدخلات، وتنتج نفس المخرجات، وتحصل على نفس التدرجات أثناء الانتشار العكسي. بالتالي، ستتعلم جميعها نفس الميزة، مما يلغي فائدة وجود خلايا متعددة.</template>
+          <template class="content-en">Because it causes 'Permutation Symmetry'. All neurons will receive the same inputs, produce the same outputs, and get the same gradients during backpropagation. Consequently, they will all learn the exact same feature, negating the purpose of having multiple neurons.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحل دالة ReLU مشكلة تلاشي التدرج مقارنة بدالة Sigmoid؟</template>
+          <template class="content-en">How does the ReLU function solve the vanishing gradient problem compared to Sigmoid?</template>
+          <span class="content-target">كيف تحل دالة ReLU مشكلة تلاشي التدرج مقارنة بدالة Sigmoid؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مشتقة Sigmoid أقصى قيمة لها هي 0.25، مما يجعل ضرب التدرجات عبر الطبقات يقترب من الصفر بسرعة. أما ReLU، فمشتقتها للقيم الموجبة هي 1، مما يسمح للتدرجات بالمرور عبر الطبقات العميقة دون أن تتلاشى.</template>
+          <template class="content-en">The maximum derivative of Sigmoid is 0.25, causing the product of gradients across layers to rapidly approach zero. ReLU's derivative for positive values is exactly 1, allowing gradients to flow through deep layers without vanishing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين انزياح التباين (Covariate Shift) وانزياح التسمية (Label Shift)؟</template>
+          <template class="content-en">What is the main difference between Covariate Shift and Label Shift?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين انزياح التباين (Covariate Shift) وانزياح التسمية (Label Shift)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في انزياح التباين، يتغير توزيع المدخلات P(x) (مثل تغير جودة الصور) لكن العلاقة P(y|x) ثابتة. في انزياح التسمية، يتغير توزيع المخرجات P(y) (مثل تغير نسبة انتشار مرض) لكن التوزيع الشرطي P(x|y) يظل ثابتاً.</template>
+          <template class="content-en">In Covariate Shift, the input distribution P(x) changes (e.g., image quality changes) but the relationship P(y|x) is constant. In Label Shift, the output distribution P(y) changes (e.g., disease prevalence changes) but the conditional distribution P(x|y) remains fixed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نتعامل مع انزياح المفهوم (Concept Shift) في الممارسة العملية؟</template>
+          <template class="content-en">How do we handle Concept Shift in practice?</template>
+          <span class="content-target">كيف نتعامل مع انزياح المفهوم (Concept Shift) في الممارسة العملية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا كان التغير جذرياً، يجب إعادة التدريب من الصفر ببيانات جديدة. لكن لحسن الحظ، التغيرات عادة ما تكون بطيئة. في هذه الحالة، نستخدم أوزان النموذج الحالي ونقوم بإجراء خطوات تحديث بسيطة (Fine-tuning) باستخدام البيانات الجديدة.</template>
+          <template class="content-en">If the change is drastic, we must retrain from scratch with new data. Fortunately, changes are usually slow. In such cases, we use the existing model weights and perform a few update steps (fine-tuning) with the new data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين التعلم الدفعي (Batch Learning) والتعلم عبر الإنترنت (Online Learning)؟</template>
+          <template class="content-en">What is the difference between Batch Learning and Online Learning?</template>
+          <span class="content-target">ما الفرق بين التعلم الدفعي (Batch Learning) والتعلم عبر الإنترنت (Online Learning)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التعلم الدفعي يدرب النموذج مرة واحدة على مجموعة بيانات ثابتة ثم ينشره دون تحديث. التعلم عبر الإنترنت يتلقى البيانات عينة تلو الأخرى، يتنبأ، يرى النتيجة، ويحدث النموذج باستمرار.</template>
+          <template class="content-en">Batch learning trains the model once on a fixed dataset and deploys it without updates. Online learning receives data one sample at a time, predicts, observes the result, and continuously updates the model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي 'حلقة التغذية الراجعة الجامحة' (Runaway Feedback Loop)؟ أعط مثالاً.</template>
+          <template class="content-en">What is a 'Runaway Feedback Loop'? Give an example.</template>
+          <span class="content-target">ما هي 'حلقة التغذية الراجعة الجامحة' (Runaway Feedback Loop)؟ أعط مثالاً.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحدث عندما تؤثر تنبؤات النموذج على البيئة لتوليد بيانات تؤكد تحيزه. مثال: نظام شرطة يرسل دوريات لحي معين بناءً على تنبؤ، فتكتشف الشرطة جرائم أكثر هناك، وتُدخل هذه البيانات للنموذج، الذي سيتنبأ بجرائم أكثر في نفس الحي مستقبلاً.</template>
+          <template class="content-en">It occurs when a model's predictions influence the environment to generate data that confirms its bias. Example: A policing system sends patrols to a neighborhood based on a prediction, police find more crimes there, this data feeds the model, which then predicts even more crime in that neighborhood.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم التوحيد القياسي (Standardization) للبيانات الرقمية قبل التدريب؟</template>
+          <template class="content-en">Why do we use Standardization for numerical data before training?</template>
+          <span class="content-target">لماذا نستخدم التوحيد القياسي (Standardization) للبيانات الرقمية قبل التدريب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لجعل متوسط الميزات صفراً وتباينها واحداً. هذا يسهل عملية التحسين (Optimization) ويمنع النموذج من إعطاء أهمية غير مبررة للميزات ذات القيم العددية الكبيرة (مثل الدخل بالآلاف مقارنة بالعمر بالعشرات).</template>
+          <template class="content-en">To give features a mean of zero and a variance of one. This facilitates optimization and prevents the model from giving unjustified importance to features with large numerical values (like income in thousands vs. age in tens).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الغرض من استخدام التحقق المتقاطع K-Fold؟</template>
+          <template class="content-en">What is the purpose of using K-Fold Cross-Validation?</template>
+          <span class="content-target">ما هو الغرض من استخدام التحقق المتقاطع K-Fold؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يُستخدم لتقييم أداء النموذج واختيار المعلمات الفائقة (Hyperparameters) بشكل موثوق، خاصة عندما تكون البيانات محدودة. يضمن أن كل عينة بيانات تُستخدم للتدريب والاختبار، مما يقلل من التحيز في التقييم.</template>
+          <template class="content-en">It is used to reliably evaluate model performance and select hyperparameters, especially when data is limited. It ensures every data sample is used for both training and testing, reducing evaluation bias.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني إذا كان خطأ التدريب منخفضاً جداً، بينما خطأ التحقق المتقاطع مرتفع جداً؟</template>
+          <template class="content-en">What does it mean if the training error is very low, while the cross-validation error is very high?</template>
+          <span class="content-target">ماذا يعني إذا كان خطأ التدريب منخفضاً جداً، بينما خطأ التحقق المتقاطع مرتفع جداً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هذا مؤشر واضح على التخصيص الزائد (Overfitting). النموذج قام بحفظ بيانات التدريب ولكنه يفشل في التعميم على بيانات جديدة. يتطلب ذلك استخدام تقنيات تنظيم مثل Dropout.</template>
+          <template class="content-en">This is a clear indicator of Overfitting. The model has memorized the training data but fails to generalize to new data. This requires using regularization techniques like Dropout.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن لتقنية Dropout كسر تماثل الأوزان؟</template>
+          <template class="content-en">How can the Dropout technique break weight symmetry?</template>
+          <span class="content-target">كيف يمكن لتقنية Dropout كسر تماثل الأوزان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">حتى لو بدأت الأوزان متطابقة، فإن Dropout يقوم بإسقاط (تعطيل) خلايا عصبية مختلفة بشكل عشوائي في كل خطوة تدريب. هذا يجعل المدخلات والتدرجات تختلف لكل خلية، مما يؤدي إلى تحديثات أوزان مختلفة وكسر التماثل.</template>
+          <template class="content-en">Even if weights start identical, Dropout randomly drops (deactivates) different neurons at each training step. This causes inputs and gradients to differ for each neuron, leading to different weight updates and breaking the symmetry.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي مشكلة تلاشي التدرج (Vanishing Gradient)؟",
+      "en": "What is the Vanishing Gradient problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مشكلة تصبح فيها التدرجات صغيرة جداً أثناء الانتشار العكسي، مما يجعل تحديث الأوزان شبه مستحيل ويوقف التعلم.",
+        "en": "A problem where gradients become excessively small during backpropagation, making weight updates nearly impossible and halting learning."
+      },
+      "example": {
+        "ar": "يحدث غالباً عند استخدام دالة Sigmoid في شبكات عميقة جداً.",
+        "en": "Often occurs when using the Sigmoid function in very deep networks."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي مشكلة انفجار التدرج (Exploding Gradient)؟",
+      "en": "What is the Exploding Gradient problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مشكلة تصبح فيها التدرجات كبيرة جداً، مما يؤدي إلى تحديثات ضخمة تدمر استقرار النموذج.",
+        "en": "A problem where gradients become excessively large, leading to massive updates that destroy model stability."
+      },
+      "example": {
+        "ar": "تؤدي إلى قيم NaN (Not a Number) أثناء التدريب.",
+        "en": "Leads to NaN (Not a Number) values during training."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "لماذا تعتبر دالة ReLU أفضل من Sigmoid للشبكات العميقة؟",
+      "en": "Why is ReLU preferred over Sigmoid for deep networks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن مشتقة ReLU لا تتلاشى للقيم الموجبة (تساوي 1)، مما يخفف من مشكلة تلاشي التدرج ويسرع التقارب.",
+        "en": "Because ReLU's derivative does not vanish for positive values (it equals 1), mitigating the vanishing gradient problem and accelerating convergence."
+      },
+      "example": {
+        "ar": "استبدال Sigmoid بـ ReLU في الطبقات المخفية.",
+        "en": "Replacing Sigmoid with ReLU in hidden layers."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو تماثل التبديل (Permutation Symmetry)؟",
+      "en": "What is Permutation Symmetry?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة تحدث عندما يتم تهيئة جميع أوزان الطبقة المخفية بنفس القيمة، مما يجعل جميع الخلايا العصبية تتعلم نفس الميزات.",
+        "en": "A state occurring when all hidden layer weights are initialized identically, causing all neurons to learn the exact same features."
+      },
+      "example": {
+        "ar": "تهيئة الأوزان بـ W=0.",
+        "en": "Initializing weights to W=0."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف نكسر التماثل في الشبكات العصبية؟",
+      "en": "How do we break symmetry in neural networks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق التهيئة العشوائية للأوزان، أو استخدام تقنيات التنظيم مثل الإسقاط (Dropout).",
+        "en": "By randomly initializing weights, or using regularization techniques like Dropout."
+      },
+      "example": {
+        "ar": "استخدام توزيع طبيعي عشوائي لتهيئة الأوزان.",
+        "en": "Using a random normal distribution for weight initialization."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الهدف من تهيئة خافيير (Xavier Initialization)؟",
+      "en": "What is the goal of Xavier Initialization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحفاظ على تباين المخرجات والتدرجات ثابتاً عبر جميع الطبقات لمنع التلاشي والانفجار.",
+        "en": "To keep the variance of outputs and gradients constant across all layers to prevent vanishing and exploding."
+      },
+      "example": {
+        "ar": "ضبط تباين الأوزان بناءً على عدد المدخلات والمخرجات للطبقة.",
+        "en": "Scaling weight variance based on the number of inputs and outputs of the layer."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو انزياح التوزيع (Distribution Shift)؟",
+      "en": "What is Distribution Shift?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ظاهرة تفشل فيها النماذج عند النشر لأن توزيع بيانات العالم الحقيقي يختلف عن بيانات التدريب.",
+        "en": "A phenomenon where models fail in deployment because the real-world data distribution differs from the training data."
+      },
+      "example": {
+        "ar": "نموذج مدرب على صور نهارية يفشل في الليل.",
+        "en": "A model trained on daytime photos fails at night."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو انزياح التباين (Covariate Shift)؟",
+      "en": "What is Covariate Shift?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغير في توزيع المدخلات P(x) مع بقاء دالة التسمية P(y|x) ثابتة.",
+        "en": "A change in the input distribution P(x) while the labeling function P(y|x) remains constant."
+      },
+      "example": {
+        "ar": "التدريب على صور قطط حقيقية والاختبار على رسومات كرتونية.",
+        "en": "Training on real cat photos and testing on cartoons."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو انزياح التسمية (Label Shift)؟",
+      "en": "What is Label Shift?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغير في التوزيع الهامشي للتسميات P(y) مع بقاء التوزيع الشرطي P(x|y) ثابتاً.",
+        "en": "A change in the label marginal distribution P(y) while the class-conditional distribution P(x|y) remains fixed."
+      },
+      "example": {
+        "ar": "تغير معدل انتشار مرض معين بمرور الوقت.",
+        "en": "The prevalence of a specific disease changing over time."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو انزياح المفهوم (Concept Shift)؟",
+      "en": "What is Concept Shift?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغير في تعريف التسميات نفسها، أي تغير العلاقة P(y|x).",
+        "en": "A change in the very definitions of labels, meaning the relationship P(y|x) changes."
+      },
+      "example": {
+        "ar": "تغير معايير تشخيص مرض نفسي بمرور الزمن.",
+        "en": "Diagnostic criteria for a mental illness changing over time."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو التعلم الدفعي (Batch Learning)؟",
+      "en": "What is Batch Learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تدريب نموذج على مجموعة بيانات ثابتة ونشره دون تحديثات لاحقة.",
+        "en": "Training a model on a fixed dataset and deploying it without subsequent updates."
+      },
+      "example": {
+        "ar": "نظام رؤية حاسوبية لباب ذكي للقطط.",
+        "en": "A computer vision system for a smart cat door."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو التعلم عبر الإنترنت (Online Learning)؟",
+      "en": "What is Online Learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديث النموذج باستمرار حيث تصل البيانات عينة تلو الأخرى.",
+        "en": "Continuously updating the model as data arrives one sample at a time."
+      },
+      "example": {
+        "ar": "توقع أسعار الأسهم اليومية.",
+        "en": "Predicting daily stock prices."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي حلقة التغذية الراجعة الجامحة (Runaway Feedback Loop)؟",
+      "en": "What is a Runaway Feedback Loop?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة تؤثر فيها تنبؤات النموذج على البيئة لتوليد بيانات تدريب مستقبلية تعزز تحيزات النموذج.",
+        "en": "A situation where a model's predictions influence the environment to generate future training data that reinforces the model's biases."
+      },
+      "example": {
+        "ar": "أنظمة الشرطة التنبؤية التي تركز على أحياء معينة.",
+        "en": "Predictive policing systems focusing on specific neighborhoods."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "لماذا نقوم بالتوحيد القياسي (Standardization) للبيانات؟",
+      "en": "Why do we perform Data Standardization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لجعل متوسط الميزات صفراً وتباينها واحداً، مما يسهل التحسين ويمنع تحيز النموذج للميزات ذات المقاييس الكبيرة.",
+        "en": "To give features zero mean and unit variance, facilitating optimization and preventing bias towards large-scale features."
+      },
+      "example": {
+        "ar": "تطبيق المعادلة: (x - mean) / std_dev",
+        "en": "Applying the formula: (x - mean) / std_dev"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الغرض من التحقق المتقاطع K-Fold؟",
+      "en": "What is the purpose of K-Fold Cross-Validation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقييم أداء النموذج واختيار المعلمات الفائقة بشكل موثوق عند توفر بيانات محدودة.",
+        "en": "To reliably evaluate model performance and select hyperparameters when data is limited."
+      },
+      "example": {
+        "ar": "تقسيم البيانات إلى 5 أجزاء، التدريب على 4 والاختبار على 1، وتكرار ذلك 5 مرات.",
+        "en": "Splitting data into 5 folds, training on 4, testing on 1, and repeating 5 times."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي دالة تنشيط تساهم بشكل كبير في مشكلة تلاشي التدرج في الشبكات العميقة؟",
+      "en": "Which activation function significantly contributes to the vanishing gradient problem in deep networks?"
+    },
+    "options": {
+      "ar": [
+        "ReLU",
+        "Sigmoid",
+        "Linear",
+        "Softmax"
+      ],
+      "en": [
+        "ReLU",
+        "Sigmoid",
+        "Linear",
+        "Softmax"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مشتقة دالة Sigmoid تبلغ ذروتها عند 0.25، وعند ضربها عبر طبقات متعددة، يقترب التدرج بسرعة من الصفر.",
+      "en": "The derivative of the Sigmoid function peaks at 0.25, and when multiplied across multiple layers, the gradient rapidly approaches zero."
+    },
+    "hint": {
+      "ar": "فكر في الدالة التي تشبه حرف S وتضغط القيم بين 0 و 1.",
+      "en": "Think of the S-shaped function that squashes values between 0 and 1."
+    },
+    "difficulty": "easy",
+    "conceptId": "numerical-stability-gradients"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما الذي يمنع خوارزمية النزول الاشتقاقي العشوائي (SGD) من كسر التماثل إذا تم تهيئة جميع الأوزان بنفس القيمة؟",
+      "en": "What prevents Stochastic Gradient Descent (SGD) from breaking symmetry if all weights are initialized to the same value?"
+    },
+    "options": {
+      "ar": [
+        "معدل التعلم المرتفع جداً.",
+        "التدرجات المتطابقة لجميع الخلايا العصبية.",
+        "استخدام دالة تنشيط ReLU.",
+        "حجم الدفعة (Batch size) الصغير."
+      ],
+      "en": [
+        "Too high learning rate.",
+        "Identical gradients for all neurons.",
+        "Using ReLU activation function.",
+        "Small batch size."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كانت الأوزان متطابقة، فإن الانتشار العكسي سينتج تدرجات متطابقة، مما يؤدي إلى تحديثات متطابقة، وبالتالي يظل التماثل قائماً.",
+      "en": "If weights are identical, backpropagation produces identical gradients, leading to identical updates, thus maintaining symmetry."
+    },
+    "hint": {
+      "ar": "كيف يتم تحديث الأوزان إذا كانت المشتقات متساوية؟",
+      "en": "How are weights updated if the derivatives are equal?"
+    },
+    "difficulty": "medium",
+    "conceptId": "breaking-symmetry"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو المبدأ الأساسي وراء تهيئة خافيير (Xavier Initialization)؟",
+      "en": "What is the core principle behind Xavier Initialization?"
+    },
+    "options": {
+      "ar": [
+        "تهيئة جميع الأوزان بالصفر.",
+        "جعل التدرجات تنفجر لتسريع التعلم.",
+        "الحفاظ على تباين المخرجات والتدرجات ثابتاً عبر الطبقات.",
+        "استخدام توزيع منتظم دائماً بغض النظر عن حجم الطبقة."
+      ],
+      "en": [
+        "Initializing all weights to zero.",
+        "Making gradients explode to speed up learning.",
+        "Maintaining constant variance of outputs and gradients across layers.",
+        "Always using a uniform distribution regardless of layer size."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تهدف تهيئة خافيير إلى التأكد من أن تباين الإشارات (سواء الأمامية أو العكسية) لا يزداد أو يقل أثناء مرورها عبر الشبكة.",
+      "en": "Xavier initialization aims to ensure that the variance of signals (both forward and backward) neither increases nor decreases as they pass through the network."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بالاستقرار الإحصائي للإشارات.",
+      "en": "It relates to the statistical stability of the signals."
+    },
+    "difficulty": "medium",
+    "conceptId": "parameter-initialization-xavier"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "إذا قمت بتدريب نموذج على صور طبية عالية الدقة، ثم استخدمته في مستشفى يمتلك كاميرات منخفضة الدقة، فما نوع الانزياح الذي تواجهه؟",
+      "en": "If you train a model on high-res medical images, then deploy it in a hospital with low-res cameras, what type of shift are you facing?"
+    },
+    "options": {
+      "ar": [
+        "انزياح التسمية (Label Shift)",
+        "انزياح التباين (Covariate Shift)",
+        "انزياح المفهوم (Concept Shift)",
+        "التعلم الدفعي (Batch Learning)"
+      ],
+      "en": [
+        "Label Shift",
+        "Covariate Shift",
+        "Concept Shift",
+        "Batch Learning"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذا انزياح تباين لأن توزيع المدخلات (جودة الصور) قد تغير، لكن العلاقة بين الصورة والتشخيص (التسمية) لم تتغير.",
+      "en": "This is covariate shift because the input distribution (image quality) changed, but the relationship between the image and the diagnosis (label) remains the same."
+    },
+    "hint": {
+      "ar": "تغير شكل المدخلات P(x) فقط.",
+      "en": "Only the appearance of inputs P(x) changed."
+    },
+    "difficulty": "medium",
+    "conceptId": "distribution-shift-types"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من السيناريوهات التالية يمثل 'انزياح المفهوم' (Concept Shift)؟",
+      "en": "Which of the following scenarios represents 'Concept Shift'?"
+    },
+    "options": {
+      "ar": [
+        "تغير نسبة المصابين بالزكام في الشتاء.",
+        "استخدام صور كرتونية بدلاً من صور حقيقية.",
+        "تغير معايير تشخيص مرض التوحد في الدليل الطبي الجديد.",
+        "تحديث أوزان النموذج يومياً."
+      ],
+      "en": [
+        "The proportion of people with colds changing in winter.",
+        "Using cartoon images instead of real photos.",
+        "Autism diagnostic criteria changing in a new medical manual.",
+        "Updating model weights daily."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "انزياح المفهوم يحدث عندما يتغير تعريف التسمية نفسه (العلاقة بين المدخلات والمخرجات)، مثل تغير معايير التشخيص.",
+      "en": "Concept shift occurs when the very definition of the label (the input-output relationship) changes, such as changing diagnostic criteria."
+    },
+    "hint": {
+      "ar": "ابحث عن الخيار الذي تتغير فيه القواعد الأساسية للتصنيف.",
+      "en": "Look for the option where the fundamental rules of classification change."
+    },
+    "difficulty": "hard",
+    "conceptId": "distribution-shift-types"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في أي نوع من مشاكل التعلم تتذكر البيئة أفعالك السابقة وتستجيب بناءً عليها؟",
+      "en": "In which type of learning problem does the environment remember your past actions and respond based on them?"
+    },
+    "options": {
+      "ar": [
+        "التعلم الدفعي (Batch Learning)",
+        "التحكم (Control)",
+        "مشاكل قطاع الطرق (Bandits)",
+        "التحقق المتقاطع (Cross-Validation)"
+      ],
+      "en": [
+        "Batch Learning",
+        "Control",
+        "Bandits",
+        "Cross-Validation"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في مشاكل التحكم (مثل وحدة تحكم PID)، تتذكر البيئة الأفعال السابقة (مثل تسخين الغلاية مسبقاً) وتستجيب وفقاً لذلك.",
+      "en": "In Control problems (like a PID controller), the environment remembers past actions (like previously heating the boiler) and responds accordingly."
+    },
+    "hint": {
+      "ar": "فكر في أنظمة التدفئة أو التبريد.",
+      "en": "Think of heating or cooling systems."
+    },
+    "difficulty": "medium",
+    "conceptId": "taxonomy-learning-problems"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الخطر الرئيسي لأنظمة الشرطة التنبؤية التي تعتمد على بيانات الاعتقالات السابقة؟",
+      "en": "What is the main risk of predictive policing systems relying on past arrest data?"
+    },
+    "options": {
+      "ar": [
+        "تلاشي التدرج.",
+        "حلقات التغذية الراجعة الجامحة (Runaway Feedback Loops).",
+        "انزياح التسمية (Label Shift).",
+        "التعلم الدفعي البطيء."
+      ],
+      "en": [
+        "Vanishing gradient.",
+        "Runaway Feedback Loops.",
+        "Label Shift.",
+        "Slow batch learning."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "توجيه الشرطة لمناطق معينة يؤدي لاكتشاف جرائم أكثر هناك، مما يغذي النموذج ببيانات تؤكد تحيزه الأولي، مكوناً حلقة مفرغة.",
+      "en": "Sending police to specific areas leads to discovering more crimes there, feeding the model data that confirms its initial bias, creating a runaway loop."
+    },
+    "hint": {
+      "ar": "النموذج يخلق واقعه الخاص.",
+      "en": "The model creates its own reality."
+    },
+    "difficulty": "medium",
+    "conceptId": "fairness-accountability-transparency"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "لماذا نقوم بتوحيد (Standardize) البيانات الرقمية قبل تدريب النموذج؟",
+      "en": "Why do we standardize numerical data before training a model?"
+    },
+    "options": {
+      "ar": [
+        "لتحويل جميع الأرقام إلى فئات.",
+        "لمنع النموذج من التحيز للميزات ذات القيم العددية الكبيرة.",
+        "لكسر التماثل في الشبكة العصبية.",
+        "لزيادة عدد الميزات في مجموعة البيانات."
+      ],
+      "en": [
+        "To convert all numbers into categories.",
+        "To prevent the model from biasing towards features with large numerical values.",
+        "To break symmetry in the neural network.",
+        "To increase the number of features in the dataset."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوحيد يضع جميع الميزات على نفس المقياس (متوسط 0، تباين 1)، مما يمنع الميزات ذات الأرقام الكبيرة من السيطرة على عملية التعلم.",
+      "en": "Standardization puts all features on the same scale (mean 0, variance 1), preventing features with large numbers from dominating the learning process."
+    },
+    "hint": {
+      "ar": "فكر في مقارنة العمر (بالعشرات) مع الدخل (بالآلاف).",
+      "en": "Think about comparing age (in tens) with income (in thousands)."
+    },
+    "difficulty": "easy",
+    "conceptId": "kaggle-house-prices"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ماذا يشير الانخفاض الكبير في خطأ التدريب مع ارتفاع خطأ التحقق (Validation Error)؟",
+      "en": "What does a very low training error combined with a high validation error indicate?"
+    },
+    "options": {
+      "ar": [
+        "النموذج يعاني من نقص التخصيص (Underfitting).",
+        "النموذج يعاني من التخصيص الزائد (Overfitting).",
+        "البيانات تحتوي على انزياح في المفهوم.",
+        "معدل التعلم منخفض جداً."
+      ],
+      "en": [
+        "The model is underfitting.",
+        "The model is overfitting.",
+        "The data has concept shift.",
+        "The learning rate is too low."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذا هو التعريف الكلاسيكي للتخصيص الزائد (Overfitting)، حيث يحفظ النموذج بيانات التدريب ولكنه يفشل في التعميم على بيانات جديدة.",
+      "en": "This is the classic definition of overfitting, where the model memorizes the training data but fails to generalize to new data."
+    },
+    "hint": {
+      "ar": "النموذج ممتاز في الحفظ، سيء في الفهم.",
+      "en": "The model is great at memorizing, bad at understanding."
+    },
+    "difficulty": "easy",
+    "conceptId": "kaggle-house-prices"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي تقنية يمكنها كسر التماثل (Symmetry) حتى لو تم تهيئة الأوزان بثابت؟",
+      "en": "Which technique can break symmetry even if weights are initialized to a constant?"
+    },
+    "options": {
+      "ar": [
+        "النزول الاشتقاقي العشوائي (SGD)",
+        "الإسقاط (Dropout)",
+        "دالة التنشيط Sigmoid",
+        "التحقق المتقاطع K-Fold"
+      ],
+      "en": [
+        "Stochastic Gradient Descent (SGD)",
+        "Dropout",
+        "Sigmoid activation function",
+        "K-Fold Cross-Validation"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "Dropout يعطل خلايا عصبية مختلفة عشوائياً في كل تمريرة، مما يغير المدخلات والتدرجات لكل خلية، ويكسر التماثل.",
+      "en": "Dropout randomly deactivates different neurons in each pass, altering inputs and gradients for each cell, thus breaking symmetry."
+    },
+    "hint": {
+      "ar": "تقنية تقوم بإيقاف تشغيل أجزاء من الشبكة عشوائياً.",
+      "en": "A technique that randomly turns off parts of the network."
+    },
+    "difficulty": "hard",
+    "conceptId": "breaking-symmetry"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يعتقد الكثيرون أن خوارزمية SGD قادرة على كسر تماثل الأوزان بمفردها بسبب طبيعتها العشوائية. هذا خطأ! إذا كانت الأوزان الأولية متطابقة، فإن التدرجات ستكون متطابقة، ولن يكسر SGD التماثل أبداً. يجب استخدام التهيئة العشوائية أو Dropout.</template>
+    <template class="content-en">Many believe SGD can break weight symmetry on its own due to its stochastic nature. This is a TRAP! If initial weights are identical, gradients will be identical, and SGD will never break the symmetry. You must use random initialization or Dropout.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين انزياح التباين (Covariate Shift) وانزياح التسمية (Label Shift) هو اتجاه السببية. نفترض انزياح التباين عندما نعتقد أن x يسبب y. ونفترض انزياح التسمية عندما نعتقد أن y يسبب x (مثل الأمراض تسبب الأعراض).</template>
+    <template class="content-en">The fundamental difference between Covariate Shift and Label Shift is the direction of causality. We assume covariate shift when we believe x causes y. We assume label shift when we believe y causes x (e.g., diseases cause symptoms).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في حالات انزياح التسمية (Label Shift)، من الأفضل غالباً العمل مع طرق تعالج التسميات (Labels) بدلاً من المدخلات (Inputs). السر هنا هو أن التسميات عادة ما تكون منخفضة الأبعاد (Low-dimensional)، بينما المدخلات في التعلم العميق تكون عالية الأبعاد جداً، مما يجعل معالجتها أصعب.</template>
+    <template class="content-en">In Label Shift scenarios, it is often advantageous to work with methods that manipulate labels rather than inputs. The secret is that labels are usually low-dimensional, whereas inputs in deep learning are highly dimensional, making them much harder to manipulate.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتماد على 'الدقة' (Accuracy) كمقياس وحيد عند نشر نماذج تؤثر على قرارات بشرية هو فخ خطير. يجب دائماً مراعاة 'حساسية التكلفة' (Cost Sensitivity) للأخطاء المختلفة، فبعض الأخطاء قد تكون غير ضارة، بينما البعض الآخر قد يحمل تحيزاً عنصرياً أو ضرراً بالغاً.</template>
+    <template class="content-en">Relying on 'Accuracy' as the sole metric when deploying models that affect human decisions is a dangerous trap. You must always consider the 'Cost Sensitivity' of different errors; some errors are harmless, while others carry racial bias or severe harm.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قاعدة تهيئة خافيير (Xavier): لكي يظل التباين مستقراً، يجب ألا يتأثر تباين المخرجات بعدد المدخلات، وألا يتأثر تباين التدرجات بعدد المخرجات. هذا هو السر وراء استقرار الشبكات العميقة قبل ظهور تقنيات مثل Batch Normalization.</template>
+    <template class="content-en">Xavier Initialization Rule: For variance to remain stable, the variance of outputs must not be affected by the number of inputs, and the variance of gradients must not be affected by the number of outputs. This is the secret behind stabilizing deep networks before techniques like Batch Normalization.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M13.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

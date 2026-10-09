@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="7" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الشبكات العصبية المتكررة والذاكرة طويلة قصيرة المدى (RNNs and LSTMs) · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#intro-to-rnns" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في الشبكات العصبية المتكررة (RNNs)</template>
+        <template class="content-en">Introduction to Recurrent Neural Networks (RNNs)</template>
+        <span class="content-target">مقدمة في الشبكات العصبية المتكررة (RNNs)</span>
+      </a>
+      <a href="#rnn-architectures" class="toc-link" data-bilingual>
+        <template class="content-ar">هياكل الإدخال والإخراج في RNN</template>
+        <template class="content-en">RNN Input-Output Architectures</template>
+        <span class="content-target">هياكل الإدخال والإخراج في RNN</span>
+      </a>
+      <a href="#rnn-inference-and-training" class="toc-link" data-bilingual>
+        <template class="content-ar">الاستدلال والتدريب في RNN</template>
+        <template class="content-en">RNN Inference and Training</template>
+        <span class="content-target">الاستدلال والتدريب في RNN</span>
+      </a>
+      <a href="#rnns-as-language-models" class="toc-link" data-bilingual>
+        <template class="content-ar">الشبكات العصبية المتكررة كنماذج لغوية</template>
+        <template class="content-en">RNNs as Language Models</template>
+        <span class="content-target">الشبكات العصبية المتكررة كنماذج لغوية</span>
+      </a>
+      <a href="#rnns-for-nlp-tasks" class="toc-link" data-bilingual>
+        <template class="content-ar">استخدام RNNs في مهام NLP الأخرى والتوليد</template>
+        <template class="content-en">RNNs for other NLP tasks and Generation</template>
+        <span class="content-target">استخدام RNNs في مهام NLP الأخرى والتوليد</span>
+      </a>
+      <a href="#stacked-and-bidirectional-rnns" class="toc-link" data-bilingual>
+        <template class="content-ar">هياكل RNN المكدسة وثنائية الاتجاه</template>
+        <template class="content-en">Stacked and Bidirectional RNN Architectures</template>
+        <span class="content-target">هياكل RNN المكدسة وثنائية الاتجاه</span>
+      </a>
+      <a href="#the-lstm" class="toc-link" data-bilingual>
+        <template class="content-ar">الذاكرة طويلة قصيرة المدى (LSTM)</template>
+        <template class="content-en">The Long Short-Term Memory (LSTM)</template>
+        <span class="content-target">الذاكرة طويلة قصيرة المدى (LSTM)</span>
+      </a>
+      <a href="#encoder-decoder-model" class="toc-link" data-bilingual>
+        <template class="content-ar">نموذج التشفير وفك التشفير (Encoder-Decoder)</template>
+        <template class="content-en">The Encoder-Decoder Model with RNNs</template>
+        <span class="content-target">نموذج التشفير وفك التشفير (Encoder-Decoder)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 7</template>
+      <template class="content-en">Module 7</template>
+      <span class="content-target">الوحدة 7</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الشبكات العصبية المتكررة والذاكرة طويلة قصيرة المدى (RNNs and LSTMs)</h1>
+      <p class="hero-description">تغطي هذه الوحدة الشبكات العصبية المتكررة (RNNs)، وتطبيقاتها كنماذج لغوية، وهياكلها المتقدمة مثل الشبكات المكدسة وثنائية الاتجاه، بالإضافة إلى شبكات الذاكرة طويلة قصيرة المدى (LSTMs) ونماذج التشفير وفك التشفير (Encoder-Decoder).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">RNNs and LSTMs</h1>
+      <p class="hero-description">This module covers Recurrent Neural Networks (RNNs), their applications as language models, advanced architectures like stacked and bidirectional RNNs, Long Short-Term Memory (LSTM) networks, and Encoder-Decoder models.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الشبكات العصبية المتكررة</span>
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">الذاكرة طويلة قصيرة المدى</span>
+      <span class="tag">التوليد التلقائي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">RNN</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">NLP</span>
+      <span class="tag">LSTM</span>
+      <span class="tag">Generative AI</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف الشبكات العصبية المتكررة (RNNs) وكيفية تعاملها مع البيانات المتسلسلة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية استخدام الشبكات العصبية المتكررة كنماذج لغوية وفي مهام معالجة اللغات الطبيعية الأخرى.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على هياكل الشبكات العصبية المتكررة المكدسة (Stacked) وثنائية الاتجاه (Bidirectional).</span></li>
+      <li><span class="obj-icon">✦</span><span>توضيح آلية عمل شبكات الذاكرة طويلة قصيرة المدى (LSTM) ونموذج التشفير وفك التشفير (Encoder-Decoder).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe Recurrent Neural Networks and how they handle sequential data.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe RNNs as Language Models &amp; RNNs for other NLP tasks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize Stacked and Bidirectional RNN architectures.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain LSTM &amp; The Encoder-Decoder Model with RNNs.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="intro-to-rnns" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في الشبكات العصبية المتكررة (RNNs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Recurrent Neural Networks (RNNs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الشبكات العصبية المتكررة هي بنية تعلم عميق تحتوي على دورات (Cycles) للتعامل مع البيانات المتسلسلة زمنياً. تخيلها كشخص يقرأ كتاباً ويتذكر الكلمات السابقة لفهم الكلمة الحالية.</p></template>
+    <template class="content-en"><p>RNNs are a deep learning architecture containing cycles to handle sequential data. Think of it like a person reading a book, remembering previous words to understand the current one.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>اللغة هي ظاهرة زمنية بطبيعتها؛ فنحن نفهم وننتج اللغة كتدفق إدخال متسلسل. توفر الشبكات العصبية المتكررة (RNNs)، وتحديداً فئة تُعرف باسم <span class="smart-term" data-term-en="Elman Networks" data-ar="شبكات إلمان" data-en-def="A class of simple recurrent networks that contain a cycle within their connections.">شبكات إلمان<span class="smart-term-tooltip"></span></span> (Elman Networks)، آلية تتعامل مباشرة مع هذه الطبيعة المتسلسلة دون الحاجة إلى نوافذ ذات حجم ثابت.</p><p>تطبق هذه الشبكات نفس المعالجة على كل عنصر في التسلسل، وتحتفظ بالمعلومات ذات الصلة وتمررها، مما يمكنها من تعلم التبعيات الزمنية التي لا تستطيع الشبكات العصبية التقليدية تعلمها. يوفر الاتصال المتكرر طريقة لتمثيل السياق السابق، مما يسمح لقرار النموذج بالاعتماد على معلومات من مئات الكلمات في الماضي.</p></template>
+    <template class="content-en"><p>Language is an inherently temporal phenomenon; we comprehend and produce it as a sequential input stream. RNNs, specifically a class known as <span class="smart-term" data-term-en="Elman Networks" data-ar="شبكات إلمان" data-en-def="A class of simple recurrent networks that contain a cycle within their connections.">Elman Networks<span class="smart-term-tooltip"></span></span>, provide a mechanism that deals directly with this sequential nature without using arbitrary fixed-sized windows.</p><p>RNNs apply the same network to each element in a sequence, preserving and passing on relevant information. This enables them to learn temporal dependencies that conventional neural networks cannot. The recurrent connections offer a new way to represent prior context, allowing decisions to depend on information from hundreds of words in the past.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم الدورات (Cycles)؟ في الشبكات العصبية التقليدية (Feedforward)، تُعتبر جميع المدخلات والمخرجات مستقلة عن بعضها البعض. لكن في مهام مثل ترجمة الجمل، من الضروري معرفة الكلمات السابقة. تحل الدورات هذه المشكلة عن طريق تمرير الحالة المخفية (Hidden State) من خطوة زمنية إلى الخطوة التي تليها.</p><p>تُعرف هذه الشبكات البسيطة بشبكات إلمان (Elman Networks). ورغم قوتها النظرية، إلا أنها تواجه تحديات عملية في تذكر التبعيات طويلة الأمد بسبب مشاكل تلاشي التدرج (Vanishing Gradient)، مما استدعى لاحقاً ابتكار هياكل أعقد مثل LSTMs.</p></template>
+    <template class="content-en"><p>Why use cycles? In traditional feedforward networks, all inputs and outputs are assumed to be independent. But for tasks like translating sentences, knowing previous words is crucial. Cycles solve this by passing the hidden state from one time step to the next.</p><p>These simple recurrent networks are known as Elman Networks. While theoretically powerful, they face practical challenges in remembering long-term dependencies due to vanishing gradient problems, which later necessitated more complex architectures like LSTMs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a folded RNN node with a loop arrow indicating recurrence, pointing to an 'Unfold' arrow. On the right, show the unrolled version: three sequential nodes (t-1, t, t+1). Each node takes an input X, produces an output L, and passes a hidden state 'h' horizontally to the next node. Use dark background #0d1117, accent colors green and purple. Labels in English. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Gradients -->
+        <linearGradient id="node-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)"/>
+            <stop offset="100%" stop-color="var(--brand-800)"/>
+        </linearGradient>
+
+        <!-- Markers -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L9,5 L0,9 z" fill="var(--brand-500)"/>
+        </marker>
+        <marker id="arrow-brand-large" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,1 L9,5 L0,9 z" fill="var(--brand-400)"/>
+        </marker>
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L9,5 L0,9 z" fill="var(--text-muted)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="35" text-anchor="middle" fill="var(--text-primary)" font-size="22" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Recurrent Neural Network (RNN): Folded vs. Unrolled</text>
+    <text x="400" y="35" text-anchor="middle" fill="var(--text-primary)" font-size="22" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">الشبكة العصبية المتكررة (RNN): مطوية مقابل مبسوطة</text>
+
+    <!-- ================= LEFT SECTION: FOLDED RNN ================= -->
+    <g id="folded-rnn">
+        <!-- Bounding Box -->
+        <rect x="50" y="60" width="180" height="300" rx="16" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6"/>
+        
+        <!-- Box Title -->
+        <text x="140" y="90" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Folded Representation</text>
+        <text x="140" y="90" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">التمثيل المطوي</text>
+
+        <!-- Input X -->
+        <text x="140" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">X</text>
+        <text x="140" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">X</text>
+        <line x1="140" y1="300" x2="140" y2="235" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+        <!-- Output L -->
+        <text x="140" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">L</text>
+        <text x="140" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">L</text>
+        <line x1="140" y1="165" x2="140" y2="130" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+        <!-- RNN Node -->
+        <rect x="100" y="170" width="80" height="60" rx="12" fill="url(#node-grad)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="140" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">RNN</text>
+        <text x="140" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">RNN</text>
+
+        <!-- Recurrent Loop -->
+        <path d="M 180 185 C 230 150, 230 250, 184 215" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)"/>
+        <text x="215" y="205" text-anchor="middle" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">h</text>
+        <text x="215" y="205" text-anchor="middle" fill="var(--brand-ink)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">h</text>
+    </g>
+
+    <!-- ================= MIDDLE SECTION: UNFOLD ARROW ================= -->
+    <g id="unfold-arrow">
+        <line x1="245" y1="200" x2="350" y2="200" stroke="var(--brand-400)" stroke-width="4" stroke-dasharray="8,5" marker-end="url(#arrow-brand-large)"/>
+        <text x="300" y="185" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Unfold</text>
+        <text x="300" y="185" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">بسط</text>
+    </g>
+
+    <!-- ================= RIGHT SECTION: UNROLLED RNN ================= -->
+    <g id="unrolled-rnn">
+        <!-- Bounding Box -->
+        <rect x="370" y="60" width="410" height="300" rx="16" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6"/>
+        
+        <!-- Box Title -->
+        <text x="575" y="90" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Unrolled Through Time</text>
+        <text x="575" y="90" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">مبسوطة عبر الزمن</text>
+
+        <!-- Node 1 (t-1) -->
+        <g id="node-t-minus-1">
+            <text x="450" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">X<tspan dy="4" font-size="13">t-1</tspan></text>
+            <text x="450" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">X<tspan dy="4" font-size="13">t-1</tspan></text>
+            <line x1="450" y1="300" x2="450" y2="235" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <text x="450" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">L<tspan dy="4" font-size="13">t-1</tspan></text>
+            <text x="450" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">L<tspan dy="4" font-size="13">t-1</tspan></text>
+            <line x1="450" y1="165" x2="450" y2="130" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <rect x="410" y="170" width="80" height="60" rx="12" fill="url(#node-grad)" stroke="var(--brand-500)" stroke-width="2"/>
+            <text x="450" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">RNN</text>
+            <text x="450" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">RNN</text>
+        </g>
+
+        <!-- Node 2 (t) -->
+        <g id="node-t">
+            <text x="575" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">X<tspan dy="4" font-size="13">t</tspan></text>
+            <text x="575" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">X<tspan dy="4" font-size="13">t</tspan></text>
+            <line x1="575" y1="300" x2="575" y2="235" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <text x="575" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">L<tspan dy="4" font-size="13">t</tspan></text>
+            <text x="575" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">L<tspan dy="4" font-size="13">t</tspan></text>
+            <line x1="575" y1="165" x2="575" y2="130" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <rect x="535" y="170" width="80" height="60" rx="12" fill="url(#node-grad)" stroke="var(--brand-500)" stroke-width="2"/>
+            <text x="575" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">RNN</text>
+            <text x="575" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">RNN</text>
+        </g>
+
+        <!-- Node 3 (t+1) -->
+        <g id="node-t-plus-1">
+            <text x="700" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">X<tspan dy="4" font-size="13">t+1</tspan></text>
+            <text x="700" y="325" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">X<tspan dy="4" font-size="13">t+1</tspan></text>
+            <line x1="700" y1="300" x2="700" y2="235" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <text x="700" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">L<tspan dy="4" font-size="13">t+1</tspan></text>
+            <text x="700" y="120" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">L<tspan dy="4" font-size="13">t+1</tspan></text>
+            <line x1="700" y1="165" x2="700" y2="130" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)"/>
+
+            <rect x="660" y="170" width="80" height="60" rx="12" fill="url(#node-grad)" stroke="var(--brand-500)" stroke-width="2"/>
+            <text x="700" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">RNN</text>
+            <text x="700" y="206" text-anchor="middle" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">RNN</text>
+        </g>
+
+        <!-- Hidden State Arrows (h) -->
+        <!-- Entering Node 1 -->
+        <line x1="375" y1="200" x2="402" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)"/>
+        
+        <!-- Node 1 to Node 2 -->
+        <line x1="490" y1="200" x2="527" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)"/>
+        <text x="512" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">h<tspan dy="3" font-size="11">t-1</tspan></text>
+        <text x="512" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">h<tspan dy="3" font-size="11">t-1</tspan></text>
+
+        <!-- Node 2 to Node 3 -->
+        <line x1="615" y1="200" x2="652" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)"/>
+        <text x="637" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">h<tspan dy="3" font-size="11">t</tspan></text>
+        <text x="637" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">h<tspan dy="3" font-size="11">t</tspan></text>
+
+        <!-- Leaving Node 3 -->
+        <line x1="740" y1="200" x2="772" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)"/>
+        <text x="758" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">h<tspan dy="3" font-size="11">t+1</tspan></text>
+        <text x="758" y="190" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">h<tspan dy="3" font-size="11">t+1</tspan></text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف تعامل RNN مع السياق مقارنة بنماذج N-gram التقليدية؟</template>
+      <template class="content-en">How does an RNN's handling of context differ from traditional N-gram models?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نماذج N-gram مقيدة بنافذة سياق ثابتة (مثلاً 3 كلمات سابقة)، بينما يمكن لـ RNN نظرياً الاحتفاظ بمعلومات من بداية التسلسل بأكمله عبر حالتها المخفية.</p></template>
+      <template class="content-en"><p>N-gram models are restricted by a fixed context window (e.g., previous 3 words), whereas an RNN can theoretically retain information from the very beginning of the sequence via its hidden state.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rnn-architectures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> هياكل الإدخال والإخراج في RNN</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> RNN Input-Output Architectures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن لـ RNN أن تأخذ مدخلاً واحداً لتوليد مخرجات متعددة (One-to-Many)، أو تأخذ مدخلات متعددة لتوليد مخرج واحد (Many-to-One).</p></template>
+    <template class="content-en"><p>RNNs can take a single input to generate multiple outputs (One-to-Many), or take multiple inputs to generate a single output (Many-to-One).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتميز الشبكات العصبية المتكررة بمرونتها في التعامل مع أطوال مختلفة من المدخلات والمخرجات. هناك نوعان رئيسيان تمت مناقشتهما:</p><ol><li><b>One-to-Many RNN (واحد إلى متعدد):</b> تعالج الشبكة مدخلاً واحداً لإنتاج مخرجات متعددة بمرور الوقت. هذا الإعداد مفيد عندما يجب أن يولد عنصر إدخال واحد تسلسلاً من التنبؤات. مثال: مهمة التعليق على الصور (Image Captioning)، حيث يكون الإدخال صورة واحدة، ويتنبأ النموذج بتسلسل من الكلمات كتعليق.</li><li><b>Many-to-One RNN (متعدد إلى واحد):</b> تتلقى الشبكة تسلسلاً من المدخلات وتولد مخرجاً واحداً. هذا النوع مفيد عندما تكون هناك حاجة إلى السياق العام لتسلسل الإدخال لإجراء تنبؤ واحد. مثال: تحليل المشاعر (Sentiment Analysis)، حيث يتلقى النموذج تسلسلاً من الكلمات (جملة) وينتج مخرجاً واحداً يمثل مشاعر الجملة (إيجابي، سلبي، أو محايد).</li></ol></template>
+    <template class="content-en"><p>RNNs are highly flexible in handling different lengths of inputs and outputs. Two main types discussed are:</p><ol><li><b><span class="smart-term" data-term-en="One-to-Many RNN" data-ar="شبكة متكررة من واحد إلى متعدد" data-en-def="An RNN architecture that processes a single input to produce a sequence of outputs.">One-to-Many RNN<span class="smart-term-tooltip"></span></span>:</b> The network processes a single input to produce multiple outputs over time. This setup is beneficial when a single input element should generate a sequence of predictions. Example: Image captioning, where a single image is the input, and the model predicts a sequence of words as a caption.</li><li><b><span class="smart-term" data-term-en="Many-to-One RNN" data-ar="شبكة متكررة من متعدد إلى واحد" data-en-def="An RNN architecture that processes a sequence of inputs to produce a single output.">Many-to-One RNN<span class="smart-term-tooltip"></span></span>:</b> The network receives a sequence of inputs and generates a single output. This type is useful when the overall context of the input sequence is needed to make one prediction. Example: Sentiment analysis, where the model receives a sequence of words (a sentence) and produces a single output representing the sentiment (positive, negative, or neutral).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في بنية One-to-Many، عادة ما يتم إدخال البيانات في الخطوة الزمنية الأولى فقط، وتعتمد الخطوات اللاحقة على الحالة المخفية السابقة والمخرجات السابقة لتوليد العنصر التالي.</p><p>في بنية Many-to-One، تقوم الشبكة بتحديث حالتها المخفية مع كل عنصر إدخال جديد، ولكنها لا تقوم بحساب أو إرجاع المخرج النهائي (مثل تصنيف المشاعر) إلا بعد معالجة العنصر الأخير في التسلسل، مما يضمن أن القرار مبني على السياق الكامل.</p></template>
+    <template class="content-en"><p>In a One-to-Many architecture, the input is typically provided only at the first time step, and subsequent steps rely on the previous hidden state and previous output to generate the next element.</p><p>In a Many-to-One architecture, the network updates its hidden state with each new input element, but it only computes and returns the final output (like a sentiment class) after processing the very last element in the sequence, ensuring the decision is based on the full context.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create two side-by-side diagrams. Left: 'One to Many' showing a single green input box at the bottom, connecting to a sequence of hidden state boxes, which output multiple green boxes at the top. Right: 'Many to One' showing multiple green input boxes at the bottom, connecting sequentially through hidden states, producing a single green output box at the top of the final state. Use dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Center Divider -->
+  <line x1="400" y1="60" x2="400" y2="440" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 8" />
+
+  <!-- ========================================== -->
+  <!-- LEFT DIAGRAM: ONE-TO-MANY                  -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="200" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">One-to-Many</text>
+  <text x="200" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">واحد إلى متعدد</text>
+
+  <!-- Sequence Labels -->
+  <text x="200" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Output Sequence</text>
+  <text x="200" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">سلسلة الإخراج</text>
+
+  <text x="100" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Input</text>
+  <text x="100" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الإدخال</text>
+
+  <!-- Time Steps -->
+  <text x="100" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 1</text>
+  <text x="200" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 2</text>
+  <text x="300" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 3</text>
+
+  <!-- Arrows -->
+  <!-- Input to Hidden -->
+  <line x1="100" y1="330" x2="100" y2="268" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Hidden to Hidden -->
+  <line x1="130" y1="240" x2="162" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="230" y1="240" x2="262" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Hidden to Output -->
+  <line x1="100" y1="220" x2="100" y2="158" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="200" y1="220" x2="200" y2="158" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="300" y1="220" x2="300" y2="158" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Nodes -->
+  <!-- Input -->
+  <rect x="70" y="330" width="60" height="40" rx="8" fill="var(--brand-700)" />
+  <text x="100" y="356" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">x<tspan dy="4" font-size="12">1</tspan></text>
+
+  <!-- Hidden States -->
+  <rect x="70" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="100" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">1</tspan></text>
+
+  <rect x="170" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">2</tspan></text>
+
+  <rect x="270" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="300" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Outputs -->
+  <rect x="70" y="110" width="60" height="40" rx="8" fill="var(--brand-500)" />
+  <text x="100" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)">y<tspan dy="4" font-size="12">1</tspan></text>
+
+  <rect x="170" y="110" width="60" height="40" rx="8" fill="var(--brand-500)" />
+  <text x="200" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)">y<tspan dy="4" font-size="12">2</tspan></text>
+
+  <rect x="270" y="110" width="60" height="40" rx="8" fill="var(--brand-500)" />
+  <text x="300" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)">y<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Example Text -->
+  <text x="200" y="460" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Example: Image Captioning</text>
+  <text x="200" y="460" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">مثال: توليد التسميات التوضيحية للصور</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT DIAGRAM: MANY-TO-ONE                 -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="600" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Many-to-One</text>
+  <text x="600" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">متعدد إلى واحد</text>
+
+  <!-- Sequence Labels -->
+  <text x="700" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Output</text>
+  <text x="700" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الإخراج</text>
+
+  <text x="600" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Input Sequence</text>
+  <text x="600" y="395" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">سلسلة الإدخال</text>
+
+  <!-- Time Steps -->
+  <text x="500" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 1</text>
+  <text x="600" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 2</text>
+  <text x="700" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">t = 3</text>
+
+  <!-- Arrows -->
+  <!-- Input to Hidden -->
+  <line x1="500" y1="330" x2="500" y2="268" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="600" y1="330" x2="600" y2="268" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="700" y1="330" x2="700" y2="268" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Hidden to Hidden -->
+  <line x1="530" y1="240" x2="562" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="630" y1="240" x2="662" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Hidden to Output -->
+  <line x1="700" y1="220" x2="700" y2="158" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Nodes -->
+  <!-- Inputs -->
+  <rect x="470" y="330" width="60" height="40" rx="8" fill="var(--brand-700)" />
+  <text x="500" y="356" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">x<tspan dy="4" font-size="12">1</tspan></text>
+
+  <rect x="570" y="330" width="60" height="40" rx="8" fill="var(--brand-700)" />
+  <text x="600" y="356" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">x<tspan dy="4" font-size="12">2</tspan></text>
+
+  <rect x="670" y="330" width="60" height="40" rx="8" fill="var(--brand-700)" />
+  <text x="700" y="356" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">x<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Hidden States -->
+  <rect x="470" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="500" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">1</tspan></text>
+
+  <rect x="570" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="600" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">2</tspan></text>
+
+  <rect x="670" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="700" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">h<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Output -->
+  <rect x="670" y="110" width="60" height="40" rx="8" fill="var(--brand-500)" />
+  <text x="700" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)">y<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Example Text -->
+  <text x="600" y="460" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Example: Sentiment Analysis</text>
+  <text x="600" y="460" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">مثال: تحليل المشاعر</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>One-to-Many RNN</th><th>Many-to-One RNN</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">شكل الإدخال</template>
+          <template class="content-en">Input Format</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عنصر واحد (مثل صورة)</template>
+          <template class="content-en">Single element (e.g., image)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تسلسل من العناصر (مثل جملة)</template>
+          <template class="content-en">Sequence of elements (e.g., sentence)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">شكل الإخراج</template>
+          <template class="content-en">Output Format</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تسلسل من العناصر (مثل تعليق)</template>
+          <template class="content-en">Sequence of elements (e.g., caption)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عنصر واحد (مثل تصنيف المشاعر)</template>
+          <template class="content-en">Single element (e.g., sentiment class)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مثال تطبيقي</template>
+          <template class="content-en">Application Example</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">التعليق على الصور (Image Captioning)</template>
+          <template class="content-en">Image Captioning</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تحليل المشاعر (Sentiment Analysis)</template>
+          <template class="content-en">Sentiment Analysis</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي بنية RNN ستستخدم لبناء نظام يقرأ مراجعة منتج ويقيمها من 1 إلى 5 نجوم؟</template>
+      <template class="content-en">Which RNN architecture would you use to build a system that reads a product review and rates it from 1 to 5 stars?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بنية Many-to-One، لأن الإدخال عبارة عن تسلسل من الكلمات (المراجعة) والمخرج عبارة عن قيمة واحدة (التقييم).</p></template>
+      <template class="content-en"><p>Many-to-One architecture, because the input is a sequence of words (the review) and the output is a single value (the star rating).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rnn-inference-and-training" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الاستدلال والتدريب في RNN</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> RNN Inference and Training</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتشارك RNN نفس الأوزان (U, V, W) عبر جميع الخطوات الزمنية. يتم تدريبها باستخدام خوارزمية تمرير ثنائية تُسمى الانتشار الخلفي عبر الزمن (BPTT).</p></template>
+    <template class="content-en"><p>RNNs share the same weights (U, V, W) across all time steps. They are trained using a two-pass algorithm called Backpropagation Through Time (BPTT).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الاستدلال الأمامي (Forward Inference):</b> في الشبكة المتكررة البسيطة، يتم مشاركة المصفوفات U و V و W عبر الزمن، بينما يتم حساب قيم جديدة للحالة المخفية (h) والمخرجات (y) مع كل خطوة زمنية. المعادلة الأساسية هي: <code>h_i = g(U*h_{i-1} + W*x_i)</code> و <code>y_i = f(V*h_i)</code>.</p><p><b>التدريب (Training):</b> كما هو الحال مع الشبكات الأمامية، نستخدم مجموعة تدريب، ودالة خسارة، والانتشار الخلفي للحصول على التدرجات اللازمة لتعديل الأوزان. يؤدي تكييف خوارزمية الانتشار الخلفي مع هذا الموقف إلى خوارزمية من مسارين تُعرف باسم <b><span class="smart-term" data-term-en="Backpropagation Through Time (BPTT)" data-ar="الانتشار الخلفي عبر الزمن" data-en-def="A two-pass training algorithm for RNNs that unrolls the network through time to compute gradients.">الانتشار الخلفي عبر الزمن<span class="smart-term-tooltip"></span></span> (Backpropagation Through Time - BPTT)</b>:</p><ol><li><b>المسار الأول (الأمامي):</b> نقوم بإجراء الاستدلال الأمامي، وحساب \(h_t\) و \(y_t\)، وتجميع الخسارة في كل خطوة زمنية، وحفظ قيمة الطبقة المخفية في كل خطوة لاستخدامها في الخطوة الزمنية التالية.</li><li><b>المسار الثاني (الخلفي):</b> نعالج التسلسل في الاتجاه المعاكس، ونحسب التدرجات المطلوبة، ونحفظ مصطلح الخطأ لاستخدامه في الطبقة المخفية لكل خطوة إلى الوراء في الزمن.</li></ol></template>
+    <template class="content-en"><p><b>Forward Inference:</b> In a simple recurrent network, the matrices U, V, and W are shared across time, while new values for the hidden state (h) and output (y) are calculated with each time step. The core equations are: <code>h_i = g(U*h_{i-1} + W*x_i)</code> and <code>y_i = f(V*h_i)</code>.</p><p><b>Training:</b> As with feedforward networks, we use a training set, a loss function, and backpropagation to obtain the gradients needed to adjust the weights. Tailoring the backpropagation algorithm to this situation leads to a two-pass algorithm referred to as <b><span class="smart-term" data-term-en="Backpropagation Through Time (BPTT)" data-ar="الانتشار الخلفي عبر الزمن" data-en-def="A two-pass training algorithm for RNNs that unrolls the network through time to compute gradients.">Backpropagation Through Time (BPTT)<span class="smart-term-tooltip"></span></span></b>:</p><ol><li><b>First Pass (Forward):</b> We perform forward inference, computing \(h_t\) and \(y_t\), accumulating the loss at each step in time, and saving the value of the hidden layer at each step for use at the next time step.</li><li><b>Second Pass (Backward):</b> We process the sequence in reverse, computing the required gradients as we go, computing and saving the error term for use in the hidden layer for each step backward in time.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Weight Sharing" data-ar="مشاركة الأوزان" data-en-def="The practice of using the same weight matrices (U, V, W) at every time step in an RNN.">مشاركة الأوزان<span class="smart-term-tooltip"></span></span> (Weight Sharing) هي السمة المميزة لـ RNNs. بدلاً من تعلم أوزان منفصلة لكل موضع في الجملة، تتعلم الشبكة مصفوفة انتقال واحدة (U) ومصفوفة إدخال واحدة (W). هذا يقلل بشكل كبير من عدد المعلمات ويسمح للنموذج بالتعميم على تسلسلات بأطوال لم يراها أثناء التدريب.</p><p>تكمن صعوبة BPTT في أن التدرجات يتم ضربها بشكل متكرر بالمصفوفة U أثناء المسار الخلفي. إذا كانت قيم U صغيرة، تتلاشى التدرجات (Vanishing Gradients)، وإذا كانت كبيرة، تنفجر التدرجات (Exploding Gradients). هذا يجعل من الصعب جداً على RNNs القياسية تعلم التبعيات طويلة الأمد.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Weight Sharing" data-ar="مشاركة الأوزان" data-en-def="The practice of using the same weight matrices (U, V, W) at every time step in an RNN.">Weight sharing<span class="smart-term-tooltip"></span></span> is the defining characteristic of RNNs. Instead of learning separate weights for every position in a sentence, the network learns a single transition matrix (U) and a single input matrix (W). This drastically reduces the number of parameters and allows the model to generalize to sequence lengths it hasn't seen during training.</p><p>The difficulty with BPTT is that gradients are repeatedly multiplied by the matrix U during the backward pass. If the values of U are small, gradients vanish; if they are large, gradients explode. This makes it notoriously difficult for standard RNNs to learn long-term dependencies.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات الاستدلال الأمامي في RNN، حيث h هي الحالة المخفية، x هو الإدخال، y هو المخرج، و U,V,W هي مصفوفات الأوزان المشتركة.</strong></template>
+      <template class="content-en"><strong>Forward inference equations in an RNN, where h is the hidden state, x is the input, y is the output, and U,V,W are shared weight matrices.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$h_i = g(Uh_{i-1} + Wx_i) \\ y_i = f(Vh_i)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى حفظ قيم الطبقة المخفية \((h_t)\) أثناء المسار الأمامي في BPTT؟</template>
+      <template class="content-en">Why do we need to save the hidden layer values \((h_t)\) during the forward pass in BPTT?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حساب التدرجات (المشتقات) في المسار الخلفي يتطلب معرفة القيم الدقيقة التي تم حسابها وتمريرها خلال المسار الأمامي لتطبيق قاعدة السلسلة (Chain Rule) بشكل صحيح.</p></template>
+      <template class="content-en"><p>Because calculating the gradients (derivatives) in the backward pass requires knowing the exact values that were computed and passed during the forward pass to correctly apply the chain rule.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rnns-as-language-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الشبكات العصبية المتكررة كنماذج لغوية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> RNNs as Language Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم RNNs كنماذج لغوية للتنبؤ بالكلمة التالية بناءً على الكلمة الحالية والسياق السابق بأكمله، متجاوزة قيود نماذج N-gram.</p></template>
+    <template class="content-en"><p>RNNs are used as language models to predict the next word based on the current word and the entire previous context, overcoming the limitations of N-gram models.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تمنح النماذج اللغوية القدرة على تعيين احتمال شرطي لكل كلمة تالية محتملة، مما يعطي توزيعاً على المفردات بأكملها.</p><p>نقوم بتعيين الاحتمالات لتسلسلات كاملة من خلال الجمع بين هذه الاحتمالات الشرطية باستخدام قاعدة السلسلة (Chain Rule).</p><p>تعالج نماذج لغة RNN تسلسل الإدخال كلمة بكلمة، محاولة التنبؤ بالكلمة التالية من الكلمة الحالية والحالة المخفية السابقة.</p><p>وبالتالي، لا تعاني RNNs من مشكلة السياق المحدود التي تعاني منها نماذج n-gram، أو السياق الثابت الذي تعاني منه النماذج اللغوية الأمامية (Feedforward).</p><p>يمكن للحالة المخفية من حيث المبدأ أن تمثل معلومات حول جميع الكلمات السابقة وصولاً إلى بداية التسلسل.</p><p><b>التدريب:</b> لتدريب RNN كنموذج لغوي، نستخدم خوارزمية <span class="smart-term" data-term-en="Self-supervision" data-ar="الإشراف الذاتي" data-en-def="A training method where the data itself provides the supervision signal (e.g., predicting the next word in a text).">الإشراف الذاتي<span class="smart-term-tooltip"></span></span> (Self-supervision).</p><p>يتم تعديل الأوزان في الشبكة لتقليل متوسط <span class="smart-term" data-term-en="Cross-Entropy Loss" data-ar="خسارة الإنتروبيا المتقاطعة" data-en-def="A standard loss function used in classification and language modeling to measure the difference between the predicted probability distribution and the actual distribution.">خسارة الإنتروبيا المتقاطعة<span class="smart-term-tooltip"></span></span> (Cross-Entropy Loss) عبر تسلسل التدريب باستخدام النزول الاشتقاقي (Gradient Descent).</p></template>
+    <template class="content-en"><p>Language models give the ability to assign a conditional probability to every possible next word, giving a distribution over the entire vocabulary. We assign probabilities to entire sequences by combining these conditional probabilities with the chain rule.</p><p>RNN language models process the input sequence one word at a time, attempting to predict the next word from the current word and the previous hidden state. Thus, RNNs don't have the limited context problem of n-gram models, or the fixed context of feedforward language models. The hidden state can in principle represent information about all preceding words back to the beginning of the sequence.</p><p><b>Training:</b> To train an RNN as a language model, we use a <span class="smart-term" data-term-en="Self-supervision" data-ar="الإشراف الذاتي" data-en-def="A training method where the data itself provides the supervision signal (e.g., predicting the next word in a text).">self-supervision<span class="smart-term-tooltip"></span></span> algorithm. The weights are adjusted to minimize the average Cross-Entropy (CE) loss over the training sequence via gradient descent.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الإشراف الذاتي (Self-supervision) يعني أننا لا نحتاج إلى بيانات مصنفة يدوياً لتدريب النموذج اللغوي.</p><p>النص نفسه يوفر التسميات (Labels)؛ فالكلمة التالية في النص هي الهدف (Target) الذي يجب على النموذج التنبؤ به.</p><p>على الرغم من أن RNNs يمكنها نظرياً تذكر السياق اللانهائي، إلا أن قدرتها العملية محدودة بسبب سعة متجه الحالة المخفية (Hidden State Vector) ومشاكل تلاشي التدرج.</p><p>لذلك، في الممارسة العملية، قد تنسى RNN القياسية الكلمات التي ظهرت قبل 10 أو 20 خطوة زمنية.</p></template>
+    <template class="content-en"><p>Self-supervision means we don't need manually labeled data to train the language model. The text itself provides the labels; the actual next word in the text is the target the model must predict.</p><p>Although RNNs can theoretically remember infinite context, their practical capacity is limited by the size of the hidden state vector and vanishing gradient problems. Therefore, in practice, a standard RNN might forget words that appeared 10 or 20 time steps ago.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تُعتبر نماذج RNN اللغوية أفضل من نماذج N-gram في التعامل مع الجمل الطويلة؟</template>
+      <template class="content-en">Why are RNN language models better than N-gram models at handling long sentences?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن نماذج N-gram تفقد أي معلومات خارج نافذة N الخاصة بها، بينما تقوم RNN بتحديث حالة مخفية مستمرة تحمل ملخصاً نظرياً لكل ما سبقها.</p></template>
+      <template class="content-en"><p>Because N-gram models lose any information outside their N-window, whereas an RNN updates a continuous hidden state that theoretically carries a summary of everything that preceded it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rnns-for-nlp-tasks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> استخدام RNNs في مهام NLP الأخرى والتوليد</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> RNNs for other NLP tasks and Generation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم RNNs لتصنيف التسلسلات، ووضع العلامات (Sequence Labeling)، وتوليد النصوص باستخدام التوليد الانحداري التلقائي (Autoregressive Generation).</p></template>
+    <template class="content-en"><p>RNNs are used for sequence classification, sequence labeling, and text generation using Autoregressive Generation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>إلى جانب النمذجة اللغوية، تُستخدم RNNs في مجموعة متنوعة من مهام معالجة اللغات الطبيعية (NLP):</p><ul><li><b>وضع العلامات على التسلسل (Sequence Labeling):</b> مهمة الشبكة هي تعيين تسمية (Label) مختارة من مجموعة ثابتة صغيرة لكل عنصر في التسلسل (مثل وضع علامات أجزاء الكلام POS tagging). المدخلات في كل خطوة زمنية هي تضمينات كلمات (Word Embeddings) مدربة مسبقاً.</li><li><b>تصنيف التسلسل (Sequence Classification):</b> استخدام آخر هو تصنيف تسلسلات بأكملها بدلاً من الرموز بداخلها (مثل تحليل المشاعر أو تصنيف الموضوع). يُشار إلى نظام التدريب الذي يستخدم الخسارة من تطبيق المصب (Downstream) لضبط الأوزان عبر الشبكة بأكملها باسم <b><span class="smart-term" data-term-en="End-to-End Training" data-ar="التدريب من البداية إلى النهاية" data-en-def="Training a complex model directly on the final task&#x27;s loss, adjusting all weights simultaneously without intermediate modules.">التدريب من البداية إلى النهاية<span class="smart-term-tooltip"></span></span> (End-to-End Training)</b>.</li><li><b>توليد النص (Text Generation):</b> يمكن استخدام النماذج اللغوية القائمة على RNN لتوليد النص. يُطلق على نهج استخدام نموذج لغوي لتوليد الكلمات بشكل تدريجي عن طريق أخذ عينات متكررة للكلمة التالية المشروطة باختياراتنا السابقة اسم <b><span class="smart-term" data-term-en="Autoregressive Generation" data-ar="التوليد الانحداري التلقائي" data-en-def="Generating a sequence incrementally by using the model&#x27;s own previous outputs as inputs for the next step.">التوليد الانحداري التلقائي<span class="smart-term-tooltip"></span></span> (Autoregressive Generation)</b> أو التوليد السببي (Causal LM generation).</li></ul></template>
+    <template class="content-en"><p>Beyond language modeling, RNNs are used in a variety of NLP tasks:</p><ul><li><b>Sequence Labeling:</b> The network's task is to assign a label chosen from a small fixed set to each element of a sequence (e.g., part-of-speech tagging). Inputs at each time step are pretrained word embeddings.</li><li><b>Sequence Classification:</b> Another use is classifying entire sequences rather than the tokens within them (e.g., sentiment analysis, topic classification). The training regimen that uses the loss from a downstream application to adjust weights all the way through the network is referred to as <b><span class="smart-term" data-term-en="End-to-End Training" data-ar="التدريب من البداية إلى النهاية" data-en-def="Training a complex model directly on the final task&#x27;s loss, adjusting all weights simultaneously without intermediate modules.">end-to-end training<span class="smart-term-tooltip"></span></span></b>.</li><li><b>Text Generation:</b> RNN-based language models can generate text. The approach of incrementally generating words by repeatedly sampling the next word conditioned on previous choices is called <b><span class="smart-term" data-term-en="Autoregressive Generation" data-ar="التوليد الانحداري التلقائي" data-en-def="Generating a sequence incrementally by using the model&#x27;s own previous outputs as inputs for the next step.">autoregressive generation<span class="smart-term-tooltip"></span></span></b> or causal LM generation.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في التوليد الانحداري التلقائي (Autoregressive)، يتم تغذية المخرج الذي تم توليده في الخطوة الزمنية (t) كمدخل للشبكة في الخطوة الزمنية (t+1). هذا يعني أن أي خطأ في التوليد المبكر يمكن أن يتراكم ويؤدي إلى نصوص غير منطقية لاحقاً.</p><p>يشكل توليد النصوص، إلى جانب توليد الصور والتعليمات البرمجية، مجالاً جديداً في الذكاء الاصطناعي يُعرف باسم <b><span class="smart-term" data-term-en="Generative AI" data-ar="الذكاء الاصطناعي التوليدي" data-en-def="A branch of AI focused on generating new content (text, images, code) rather than just analyzing existing data.">الذكاء الاصطناعي التوليدي<span class="smart-term-tooltip"></span></span> (Generative AI)</b>. من الناحية الفنية، النموذج الانحداري التلقائي هو نموذج يتنبأ بقيمة في الوقت t بناءً على دالة خطية للقيم السابقة في الأوقات t-1، t-2، وهكذا.</p></template>
+    <template class="content-en"><p>In autoregressive generation, the output generated at time step (t) is fed back as the input to the network at time step (t+1). This means any error in early generation can compound and lead to nonsensical text later on.</p><p>Text generation, along with image and code generation, constitutes a new area of AI often called <b><span class="smart-term" data-term-en="Generative AI" data-ar="الذكاء الاصطناعي التوليدي" data-en-def="A branch of AI focused on generating new content (text, images, code) rather than just analyzing existing data.">Generative AI<span class="smart-term-tooltip"></span></span></b>. Technically, an autoregressive model predicts a value at time t based on a linear function of previous values at times t-1, t-2, and so on.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Create a pie chart or circular diagram showing 'RNN Applications'. The center says 'RNN'. The slices are: 01 Sentiment Analysis, 02 Language Modelling, 03 Translation, 04 Conversational Agents, 05 Language Generation, 06 Image Captioning, 07 Text Summarization. Use shades of blue and dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)"/>
+      <stop offset="100%" stop-color="var(--brand-600)"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RNN Applications</text>
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيقات الشبكات العصبية المتكررة</text>
+
+  <!-- Connecting Background Circle -->
+  <circle cx="400" cy="280" r="190" fill="none" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="6 6" opacity="0.3"/>
+
+  <!-- Connecting Lines with Arrows -->
+  <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)">
+    <!-- 01 -->
+    <line x1="400" y1="225" x2="400" y2="145"/>
+    <!-- 02 -->
+    <line x1="443" y1="245.7" x2="504.5" y2="196.7"/>
+    <!-- 03 -->
+    <line x1="453.6" y1="292.2" x2="531.5" y2="310.2"/>
+    <!-- 04 -->
+    <line x1="423.9" y1="329.6" x2="457.7" y2="399.1"/>
+    <!-- 05 -->
+    <line x1="376.1" y1="329.6" x2="342.3" y2="399.1"/>
+    <!-- 06 -->
+    <line x1="346.4" y1="292.2" x2="268.5" y2="310.2"/>
+    <!-- 07 -->
+    <line x1="357" y1="245.7" x2="295.5" y2="196.7"/>
+  </g>
+
+  <!-- Outer Nodes -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600">
+    
+    <!-- 01 Sentiment Analysis -->
+    <g transform="translate(400, 90)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">01</tspan> Sentiment Analysis</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">01</tspan> تحليل المشاعر</text>
+    </g>
+
+    <!-- 02 Language Modelling -->
+    <g transform="translate(548.5, 161.5)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">02</tspan> Language Modelling</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">02</tspan> نمذجة اللغة</text>
+    </g>
+
+    <!-- 03 Translation -->
+    <g transform="translate(585.2, 322.3)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">03</tspan> Translation</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">03</tspan> الترجمة</text>
+    </g>
+
+    <!-- 04 Conversational Agents -->
+    <g transform="translate(482.4, 451.2)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">04</tspan> Conversational Agents</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">04</tspan> الوكلاء الحواريون</text>
+    </g>
+
+    <!-- 05 Language Generation -->
+    <g transform="translate(317.6, 451.2)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">05</tspan> Language Generation</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">05</tspan> توليد اللغة</text>
+    </g>
+
+    <!-- 06 Image Captioning -->
+    <g transform="translate(214.8, 322.3)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">06</tspan> Image Captioning</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">06</tspan> التعليق على الصور</text>
+    </g>
+
+    <!-- 07 Text Summarization -->
+    <g transform="translate(251.5, 161.5)">
+      <rect x="-90" y="-24" width="180" height="48" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en"><tspan fill="var(--brand-ink)">07</tspan> Text Summarization</text>
+      <text x="0" y="5" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar"><tspan fill="var(--brand-ink)">07</tspan> تلخيص النصوص</text>
+    </g>
+  </g>
+
+  <!-- Center Node -->
+  <g transform="translate(400, 280)">
+    <circle cx="0" cy="0" r="55" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="3"/>
+    <text x="0" y="6" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">RNN</text>
+    <text x="0" y="6" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">شبكات RNN</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُسمى توليد النص بـ 'الانحدار التلقائي' (Autoregressive)؟</template>
+      <template class="content-en">Why is text generation called 'Autoregressive'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه ينحدر (Regresses) أو يعتمد على مخرجاته السابقة (Auto) للتنبؤ بالقيمة التالية في التسلسل.</p></template>
+      <template class="content-en"><p>Because it regresses (depends) on its own (auto) previous outputs to predict the next value in the sequence.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="stacked-and-bidirectional-rnns" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> هياكل RNN المكدسة وثنائية الاتجاه</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Stacked and Bidirectional RNN Architectures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تزيد الشبكات المكدسة (Stacked) من عمق النموذج، بينما تعالج الشبكات ثنائية الاتجاه (Bidirectional) النص من البداية للنهاية ومن النهاية للبداية لفهم السياق المستقبلي.</p></template>
+    <template class="content-en"><p>Stacked RNNs increase model depth, while Bidirectional RNNs process text from start-to-end and end-to-start to understand future context.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحسين أداء الشبكات العصبية المتكررة، يتم استخدام هياكل متقدمة:</p><ol><li><b><span class="smart-term" data-term-en="Stacked RNNs" data-ar="الشبكات المتكررة المكدسة" data-en-def="RNNs with multiple hidden layers stacked on top of each other to learn deeper representations.">الشبكات المتكررة المكدسة<span class="smart-term-tooltip"></span></span> (Stacked RNNs):</b> تتكون من شبكات متعددة حيث يعمل مخرج طبقة واحدة كمدخل للطبقة اللاحقة. تتفوق الشبكات المكدسة عموماً على الشبكات ذات الطبقة الواحدة لأنها تسمح للنموذج بتعلم تمثيلات هرمية أكثر تعقيداً. العدد الأمثل للطبقات المكدسة يختلف حسب كل تطبيق ومجموعة تدريب.</li><li><b><span class="smart-term" data-term-en="Bidirectional RNNs (BRNN)" data-ar="الشبكات المتكررة ثنائية الاتجاه" data-en-def="An architecture that processes data in both forward and backward directions to capture full context.">الشبكات المتكررة ثنائية الاتجاه<span class="smart-term-tooltip"></span></span> (Bidirectional RNNs):</b> تجمع بين شبكتين مستقلتين؛ واحدة تعالج الإدخال من البداية إلى النهاية (Forward)، والأخرى تعالجه من النهاية إلى البداية (Backward). أثبتت هذه الشبكات فعاليتها الكبيرة في تصنيف التسلسلات لأنها تسمح للنموذج بالنظر إلى السياق السابق واللاحق للكلمة في نفس الوقت.</li></ol></template>
+    <template class="content-en"><p>To improve RNN performance, advanced architectures are used:</p><ol><li><b><span class="smart-term" data-term-en="Stacked RNNs" data-ar="الشبكات المتكررة المكدسة" data-en-def="RNNs with multiple hidden layers stacked on top of each other to learn deeper representations.">Stacked RNNs<span class="smart-term-tooltip"></span></span>:</b> Consist of multiple networks where the output of one layer serves as the input to a subsequent layer. Stacked RNNs generally outperform single-layer networks because they allow the model to learn more complex, hierarchical representations. The optimal number of stacked layers is specific to each application and training set.</li><li><b>Bidirectional RNNs:</b> Combine two independent RNNs; one processes the input from start to end (Forward), and the other from end to start (Backward). These have proven quite effective for sequence classification because they allow the model to look at both the preceding and succeeding context of a word simultaneously.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الشبكات ثنائية الاتجاه، يتم دمج الحالة المخفية للشبكة الأمامية والحالة المخفية للشبكة الخلفية في كل خطوة زمنية (عادةً عن طريق التسلسل Concatenation) لإنتاج المخرج النهائي لتلك الخطوة.</p><p>من المهم ملاحظة أن الشبكات ثنائية الاتجاه لا يمكن استخدامها في النماذج اللغوية القياسية (التوليد الانحداري التلقائي) لأن التنبؤ بالكلمة التالية يتطلب عدم رؤية الكلمات المستقبلية (التي ستوفرها الشبكة الخلفية).</p></template>
+    <template class="content-en"><p>In Bidirectional RNNs, the hidden state of the forward network and the hidden state of the backward network at each time step are combined (usually by concatenation) to produce the final output for that step.</p><p>It is important to note that Bidirectional RNNs cannot be used for standard language modeling (autoregressive generation) because predicting the next word requires not seeing the future words (which the backward network would provide).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Create two diagrams. Left: Stacked RNN showing vertical layers (LSTM1, LSTM2, LSTM3) where input goes up through the layers. Right: Bidirectional RNN (BRNN) showing an input layer feeding into two parallel hidden layers: one with arrows pointing right (Forward) and one with arrows pointing left (Backward). Both hidden layers feed up into a single Output Layer. Use dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Standard Arrowhead -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Dashed Arrowhead for sequence continuation -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Center Divider -->
+    <line x1="400" y1="80" x2="400" y2="460" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 6" />
+
+    <!-- Titles -->
+    <g>
+        <text x="200" y="50" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Stacked RNN</text>
+        <text x="200" y="50" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">شبكة عصبية متكررة مكدسة</text>
+
+        <text x="600" y="50" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bidirectional RNN</text>
+        <text x="600" y="50" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">شبكة عصبية متكررة ثنائية الاتجاه</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- LEFT DIAGRAM: STACKED RNN                  -->
+    <!-- ========================================== -->
+    <g id="stacked-rnn">
+        <!-- Layer Labels -->
+        <text x="50" y="355" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Layer 1</text>
+        <text x="50" y="355" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الطبقة 1</text>
+
+        <text x="50" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Layer 2</text>
+        <text x="50" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الطبقة 2</text>
+
+        <text x="50" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Layer 3</text>
+        <text x="50" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الطبقة 3</text>
+
+        <!-- Vertical Arrows (Drawn first to sit behind nodes if needed) -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+            <!-- X1 = 150 -->
+            <path d="M 150 412 L 150 375" />
+            <path d="M 150 330 L 150 295" />
+            <path d="M 150 250 L 150 215" />
+            <path d="M 150 170 L 150 133" />
+            <!-- X2 = 230 -->
+            <path d="M 230 412 L 230 375" />
+            <path d="M 230 330 L 230 295" />
+            <path d="M 230 250 L 230 215" />
+            <path d="M 230 170 L 230 133" />
+            <!-- X3 = 310 -->
+            <path d="M 310 412 L 310 375" />
+            <path d="M 310 330 L 310 295" />
+            <path d="M 310 250 L 310 215" />
+            <path d="M 310 170 L 310 133" />
+        </g>
+
+        <!-- Horizontal Arrows -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+            <!-- Layer 1 -->
+            <path d="M 180 350 L 195 350" />
+            <path d="M 260 350 L 275 350" />
+            <!-- Layer 2 -->
+            <path d="M 180 270 L 195 270" />
+            <path d="M 260 270 L 275 270" />
+            <!-- Layer 3 -->
+            <path d="M 180 190 L 195 190" />
+            <path d="M 260 190 L 275 190" />
+        </g>
+
+        <!-- Dashed Horizontal Arrows (Incoming/Outgoing) -->
+        <g stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-dashed)">
+            <path d="M 90 350 L 115 350" />
+            <path d="M 345 350 L 370 350" />
+            <path d="M 90 270 L 115 270" />
+            <path d="M 345 270 L 370 270" />
+            <path d="M 90 190 L 115 190" />
+            <path d="M 345 190 L 370 190" />
+        </g>
+
+        <!-- Nodes -->
+        <!-- Inputs -->
+        <circle cx="150" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="230" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="310" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <!-- Layer 1 -->
+        <rect x="120" y="330" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="200" y="330" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="280" y="330" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Layer 2 -->
+        <rect x="120" y="250" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="200" y="250" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="280" y="250" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Layer 3 -->
+        <rect x="120" y="170" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="200" y="170" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="280" y="170" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Outputs -->
+        <circle cx="150" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="230" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="310" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Node Text -->
+        <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">
+            <!-- Inputs -->
+            <text x="150" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t-1</tspan></text>
+            <text x="230" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t</tspan></text>
+            <text x="310" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t+1</tspan></text>
+            
+            <!-- Hidden Layers -->
+            <g fill="var(--text-primary)">
+                <text x="150" y="355">LSTM</text>
+                <text x="230" y="355">LSTM</text>
+                <text x="310" y="355">LSTM</text>
+                <text x="150" y="275">LSTM</text>
+                <text x="230" y="275">LSTM</text>
+                <text x="310" y="275">LSTM</text>
+                <text x="150" y="195">LSTM</text>
+                <text x="230" y="195">LSTM</text>
+                <text x="310" y="195">LSTM</text>
+            </g>
+
+            <!-- Outputs -->
+            <g fill="var(--on-brand-lo)">
+                <text x="150" y="114">y<tspan dy="3" font-size="11">t-1</tspan></text>
+                <text x="230" y="114">y<tspan dy="3" font-size="11">t</tspan></text>
+                <text x="310" y="114">y<tspan dy="3" font-size="11">t+1</tspan></text>
+            </g>
+        </g>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- RIGHT DIAGRAM: BIDIRECTIONAL RNN           -->
+    <!-- ========================================== -->
+    <g id="bidirectional-rnn">
+        <!-- Layer Labels -->
+        <text x="750" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Forward</text>
+        <text x="750" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">أمامية</text>
+
+        <text x="750" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Backward</text>
+        <text x="750" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">خلفية</text>
+
+        <!-- Vertical Bypass Arrows (Drawn first to sit behind nodes) -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+            <!-- X1 = 490 -->
+            <path d="M 490 412 L 490 355" />
+            <path d="M 475 415 C 450 380, 450 280, 475 255" />
+            <path d="M 505 305 C 530 280, 530 160, 505 133" />
+            <path d="M 490 210 L 490 133" />
+            
+            <!-- X2 = 570 -->
+            <path d="M 570 412 L 570 355" />
+            <path d="M 555 415 C 530 380, 530 280, 555 255" />
+            <path d="M 585 305 C 610 280, 610 160, 585 133" />
+            <path d="M 570 210 L 570 133" />
+            
+            <!-- X3 = 650 -->
+            <path d="M 650 412 L 650 355" />
+            <path d="M 635 415 C 610 380, 610 280, 635 255" />
+            <path d="M 665 305 C 690 280, 690 160, 665 133" />
+            <path d="M 650 210 L 650 133" />
+        </g>
+
+        <!-- Horizontal Arrows -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+            <!-- Forward (Left to Right) -->
+            <path d="M 520 330 L 535 330" />
+            <path d="M 600 330 L 615 330" />
+            <!-- Backward (Right to Left) -->
+            <path d="M 620 230 L 605 230" />
+            <path d="M 540 230 L 525 230" />
+        </g>
+
+        <!-- Dashed Horizontal Arrows (Incoming/Outgoing) -->
+        <g stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-dashed)">
+            <!-- Forward -->
+            <path d="M 430 330 L 455 330" />
+            <path d="M 685 330 L 710 330" />
+            <!-- Backward -->
+            <path d="M 710 230 L 685 230" />
+            <path d="M 455 230 L 430 230" />
+        </g>
+
+        <!-- Nodes -->
+        <!-- Inputs -->
+        <circle cx="490" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="570" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="650" cy="430" r="18" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <!-- Forward Layer -->
+        <rect x="460" y="310" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="540" y="310" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="620" y="310" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Backward Layer -->
+        <rect x="460" y="210" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="540" y="210" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="620" y="210" width="60" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Outputs -->
+        <circle cx="490" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="570" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="650" cy="110" r="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Node Text -->
+        <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle">
+            <!-- Inputs -->
+            <text x="490" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t-1</tspan></text>
+            <text x="570" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t</tspan></text>
+            <text x="650" y="434" fill="var(--text-primary)">x<tspan dy="3" font-size="11">t+1</tspan></text>
+            
+            <!-- Hidden Layers -->
+            <g fill="var(--text-primary)">
+                <text x="490" y="335">RNN</text>
+                <text x="570" y="335">RNN</text>
+                <text x="650" y="335">RNN</text>
+                <text x="490" y="235">RNN</text>
+                <text x="570" y="235">RNN</text>
+                <text x="650" y="235">RNN</text>
+            </g>
+
+            <!-- Outputs -->
+            <g fill="var(--on-brand-lo)">
+                <text x="490" y="114">y<tspan dy="3" font-size="11">t-1</tspan></text>
+                <text x="570" y="114">y<tspan dy="3" font-size="11">t</tspan></text>
+                <text x="650" y="114">y<tspan dy="3" font-size="11">t+1</tspan></text>
+            </g>
+        </g>
+    </g>
+
+    <!-- Time Axis -->
+    <g>
+        <path d="M 300 480 L 500 480" stroke="var(--text-muted)" stroke-width="2" fill="none" marker-end="url(#arrow-dashed)" />
+        <text x="400" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Time Step (t)</text>
+        <text x="400" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">الخطوة الزمنية (t)</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم الشبكات ثنائية الاتجاه (Bidirectional RNNs) في التوليد الفوري للنصوص (Real-time text generation)؟</template>
+      <template class="content-en">Why don't we use Bidirectional RNNs for real-time text generation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التوليد الفوري يتطلب التنبؤ بالكلمة التالية بناءً على الماضي فقط. الشبكة ثنائية الاتجاه تتطلب معرفة التسلسل المستقبلي بأكمله لتعمل، وهو غير متاح أثناء التوليد.</p></template>
+      <template class="content-en"><p>Because real-time generation requires predicting the next word based only on the past. A bidirectional network requires knowing the entire future sequence to operate, which isn't available during generation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="the-lstm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الذاكرة طويلة قصيرة المدى (LSTM)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> The Long Short-Term Memory (LSTM)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>شبكات LSTM هي امتداد لـ RNNs مصممة لحل مشكلة نسيان السياق الطويل. تستخدم بوابات (Gates) للتحكم في المعلومات التي يجب الاحتفاظ بها أو نسيانها.</p></template>
+    <template class="content-en"><p>LSTMs are an extension of RNNs designed to solve the long-context forgetting problem. They use gates to control what information should be kept or forgotten.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الامتداد الأكثر استخداماً للشبكات العصبية المتكررة هو شبكة <span class="smart-term" data-term-en="LSTM (Long Short-Term Memory)" data-ar="الذاكرة طويلة قصيرة المدى" data-en-def="A type of RNN architecture that uses gating mechanisms to learn long-term dependencies.">الذاكرة طويلة قصيرة المدى<span class="smart-term-tooltip"></span></span> (LSTM). تقسم LSTMs مشكلة إدارة السياق إلى مشكلتين فرعيتين: إزالة المعلومات التي لم تعد هناك حاجة إليها من السياق، وإضافة المعلومات التي يُحتمل أن تكون مطلوبة لاتخاذ القرارات لاحقاً.</p><p>تشترك البوابات (Gates) في LSTM في نمط تصميم مشترك؛ تتكون كل منها من طبقة أمامية (Feed-forward)، تليها دالة تنشيط سيجمويد (Sigmoid)، يليها ضرب نقطي (Pointwise Multiplication) مع الطبقة التي يتم التحكم بها.</p><ul><li><b><span class="smart-term" data-term-en="Forget Gate" data-ar="بوابة النسيان" data-en-def="An LSTM gate that decides what information from the previous cell state should be discarded.">بوابة النسيان<span class="smart-term-tooltip"></span></span> (Forget Gate):</b> الغرض منها هو حذف المعلومات من السياق التي لم تعد مطلوبة. تحسب مجموعاً مرجحاً للطبقة المخفية للحالة السابقة والمدخل الحالي وتمرره عبر دالة سيجمويد. يتم بعد ذلك ضرب هذا القناع (Mask) عنصراً بعنصر في متجه السياق لإزالة المعلومات.</li><li><b><span class="smart-term" data-term-en="Output Gate" data-ar="بوابة الإخراج" data-en-def="An LSTM gate that decides what information from the cell state should be output as the current hidden state.">بوابة الإخراج<span class="smart-term-tooltip"></span></span> (Output Gate):</b> تُستخدم لتحديد المعلومات المطلوبة للحالة المخفية الحالية (على عكس المعلومات التي يجب الحفاظ عليها للقرارات المستقبلية).</li></ul></template>
+    <template class="content-en"><p>The most commonly used extension to RNNs is the Long Short-Term Memory (LSTM) network. LSTMs divide the context management problem into two subproblems: removing information no longer needed from the context, and adding information likely to be needed for later decision making.</p><p>The gates in an LSTM share a common design pattern; each consists of a feed-forward layer, followed by a sigmoid activation function, followed by a pointwise multiplication with the layer being gated.</p><ul><li><b><span class="smart-term" data-term-en="Forget Gate" data-ar="بوابة النسيان" data-en-def="An LSTM gate that decides what information from the previous cell state should be discarded.">Forget Gate<span class="smart-term-tooltip"></span></span>:</b> Its purpose is to delete information from the context that is no longer needed. It computes a weighted sum of the previous state's hidden layer and the current input and passes that through a sigmoid. This mask is then multiplied element-wise by the context vector to remove unneeded info.</li><li><b><span class="smart-term" data-term-en="Output Gate" data-ar="بوابة الإخراج" data-en-def="An LSTM gate that decides what information from the cell state should be output as the current hidden state.">Output Gate<span class="smart-term-tooltip"></span></span>:</b> The final gate used to decide what information is required for the current hidden state (as opposed to what information needs to be preserved for future decisions).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الوحدات العصبية المستخدمة في LSTMs أكثر تعقيداً بكثير من تلك المستخدمة في الشبكات الأمامية الأساسية. يتم تغليف هذا التعقيد داخل وحدات المعالجة الأساسية (Cells)، مما يسمح لنا بالحفاظ على النمطية (Modularity) وتجربة هياكل مختلفة بسهولة.</p><p>دالة السيجمويد (Sigmoid) حاسمة هنا لأنها تخرج قيماً بين 0 و 1. القيمة 0 تعني 'انسَ هذا تماماً'، والقيمة 1 تعني 'احتفظ بهذا بالكامل'. هذا يعمل كصمام (Valve) يتحكم في تدفق التدرجات، مما يحل مشكلة تلاشي التدرج بشكل فعال.</p></template>
+    <template class="content-en"><p>The neural units used in LSTMs are obviously much more complex than those used in basic feedforward networks. This complexity is encapsulated within the basic processing units (cells), allowing us to maintain modularity and easily experiment with different architectures.</p><p>The Sigmoid function is crucial here because it outputs values between 0 and 1. A value of 0 means 'forget this completely', and 1 means 'keep this entirely'. This acts as a valve controlling the flow of gradients, effectively solving the vanishing gradient problem.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تُستخدم دالة Sigmoid في بوابات LSTM بدلاً من ReLU؟</template>
+      <template class="content-en">Why is the Sigmoid function used in LSTM gates instead of ReLU?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن Sigmoid تضغط القيم بين 0 و 1، مما يجعلها مثالية للعمل كـ 'نسبة مئوية' للاحتفاظ بالمعلومات (0 = نسيان، 1 = احتفاظ). ReLU تخرج قيماً من 0 إلى ما لا نهاية، ولا تصلح كبوابة تحكم.</p></template>
+      <template class="content-en"><p>Because Sigmoid squashes values between 0 and 1, making it perfect to act as a 'percentage' of information to keep (0 = forget, 1 = keep). ReLU outputs from 0 to infinity and doesn't work as a control gate.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="encoder-decoder-model" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> نموذج التشفير وفك التشفير (Encoder-Decoder)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> The Encoder-Decoder Model with RNNs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يُستخدم نموذج Encoder-Decoder (أو Seq2Seq) لتحويل تسلسل إدخال إلى تسلسل إخراج بطول مختلف، مثل الترجمة الآلية.</p></template>
+    <template class="content-en"><p>The Encoder-Decoder model (or Seq2Seq) is used to translate an input sequence into an output sequence of a different length, like machine translation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُستخدم نموذج <span class="smart-term" data-term-en="Encoder-Decoder" data-ar="التشفير وفك التشفير" data-en-def="An architecture consisting of two networks: one to compress the input into a context vector, and another to generate the output from that vector.">التشفير وفك التشفير<span class="smart-term-tooltip"></span></span> (Encoder-Decoder) عندما نأخذ تسلسل إدخال ونترجمه إلى تسلسل إخراج يختلف في الطول عن الإدخال، ولا يتوافق معه بطريقة كلمة بكلمة.</p><p>يُستخدم هذا النموذج بشكل خاص في مهام مثل الترجمة الآلية (Machine Translation)، حيث يمكن أن يكون لتسلسل الإدخال وتسلسل الإخراج أطوال مختلفة، ويمكن أن يكون التعيين بين رمز في الإدخال ورمز في الإخراج غير مباشر. تُسمى هذه الشبكات أحياناً <b>شبكات التسلسل إلى التسلسل (Sequence-to-Sequence أو Seq2Seq)</b>.</p><p>يتم تطبيقها على نطاق واسع جداً من التطبيقات بما في ذلك التلخيص (Summarization)، والإجابة على الأسئلة (Question Answering)، والحوار (Dialogue). يتم تدريب هياكل التشفير وفك التشفير من البداية إلى النهاية (End-to-End). كل مثال تدريبي عبارة عن مجموعة من السلاسل المزدوجة: مصدر (Source) وهدف (Target). يتم دمج أزواج المصدر والهدف هذه مع رمز فاصل (Separator Token) لتكون بمثابة بيانات تدريب.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Encoder-Decoder" data-ar="التشفير وفك التشفير" data-en-def="An architecture consisting of two networks: one to compress the input into a context vector, and another to generate the output from that vector.">encoder-decoder<span class="smart-term-tooltip"></span></span> model is used when we are taking an input sequence and translating it to an output sequence that is of a different length than the input, and doesn't align with it in a word-to-word way.</p><p>It is used especially for tasks like machine translation, where the input sequence and output sequence can have different lengths and the mapping between a token in the input and a token in the output can be indirect. These networks are sometimes called <b>sequence-to-sequence (Seq2Seq) networks</b>.</p><p>It is applied to a very wide range of applications including summarization, question answering, and dialogue. Encoder-decoder architectures are trained end-to-end. Each training example is a tuple of paired strings, a source and a target. Concatenated with a separator token, these source-target pairs can now serve as training data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كيف يعمل؟ يقوم الـ Encoder (المشفر) بقراءة تسلسل الإدخال بالكامل ويضغطه في متجه سياق واحد (Intermediate Vector أو Context Vector) يمثل المعنى العام للجملة. ثم يأخذ الـ Decoder (مفكك التشفير) هذا المتجه ويبدأ في توليد تسلسل الإخراج خطوة بخطوة.</p><p>عنق الزجاجة (Bottleneck) في هذا التصميم هو متجه السياق الوسيط؛ حيث يجب أن يحتوي هذا المتجه الفردي على كل المعلومات من جملة الإدخال، مما يجعله يواجه صعوبة مع الجمل الطويلة جداً (وهي المشكلة التي حلتها لاحقاً آلية الانتباه Attention).</p></template>
+    <template class="content-en"><p>How does it work? The Encoder reads the entire input sequence and compresses it into a single context vector (Intermediate vector) representing the overall meaning. The Decoder then takes this vector and generates the output sequence step-by-step.</p><p>The bottleneck in this design is the intermediate context vector; this single vector must hold all information from the input sentence, causing it to struggle with very long sentences (a problem later solved by the Attention mechanism).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Show an 'ENCODER' block (LSTM/GRU cell) taking 'Input' at the bottom. It produces an 'Intermediate vector' which points to a 'DECODER' block (LSTM/GRU cell). The Decoder produces 'Output' at the top. Below this high-level view, show the unrolled version: Encoder takes 'Input at time t' sequentially, passes 'Internal state' horizontally to a 'Final state'. This Final state becomes the 'Initial state' for the Decoder, which starts with a 'START_' token and generates 'Output at time t' sequentially until an '_END' token. Use dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Standard Arrow -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Dashed Arrow for Feedback -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+        <!-- Axis Arrow -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="450" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Encoder-Decoder (Seq2Seq) Architecture</text>
+    <text x="450" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">بنية المشفر-المفكك (Seq2Seq)</text>
+
+    <!-- ========================================== -->
+    <!-- HIGH-LEVEL VIEW                            -->
+    <!-- ========================================== -->
+    <g id="high-level-view">
+        <!-- Encoder Block -->
+        <rect x="180" y="100" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="250" y="128" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">ENCODER</text>
+        <text x="250" y="128" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المشفر</text>
+        <text x="250" y="148" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">(RNN / LSTM / GRU)</text>
+        <text x="250" y="148" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">(RNN / LSTM / GRU)</text>
+
+        <!-- Context Vector Block -->
+        <rect x="380" y="110" width="140" height="40" rx="20" fill="var(--brand-500)" />
+        <text x="450" y="136" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Intermediate Vector</text>
+        <text x="450" y="136" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">المتجه الوسيط</text>
+
+        <!-- Decoder Block -->
+        <rect x="580" y="100" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="650" y="128" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">DECODER</text>
+        <text x="650" y="128" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المفكك</text>
+        <text x="650" y="148" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">(RNN / LSTM / GRU)</text>
+        <text x="650" y="148" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">(RNN / LSTM / GRU)</text>
+
+        <!-- High-Level Arrows -->
+        <!-- Input to Encoder -->
+        <line x1="250" y1="210" x2="250" y2="165" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+        <text x="250" y="230" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Input</text>
+        <text x="250" y="230" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الإدخال</text>
+
+        <!-- Encoder to Context -->
+        <line x1="320" y1="130" x2="375" y2="130" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+        
+        <!-- Context to Decoder -->
+        <line x1="520" y1="130" x2="575" y2="130" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+        <!-- Decoder to Output -->
+        <line x1="650" y1="100" x2="650" y2="55" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+        <text x="650" y="40" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Output</text>
+        <text x="650" y="40" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الإخراج</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- DIVIDER                                    -->
+    <!-- ========================================== -->
+    <line x1="50" y1="270" x2="850" y2="270" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+    <rect x="350" y="255" width="200" height="30" fill="var(--bg-surface)" />
+    <text x="450" y="275" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Unrolled View over Time</text>
+    <text x="450" y="275" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">عرض مفصل عبر الزمن</text>
+
+    <!-- ========================================== -->
+    <!-- UNROLLED VIEW                              -->
+    <!-- ========================================== -->
+    <g id="unrolled-view">
+        
+        <!-- ENCODER SECTION -->
+        <g id="unrolled-encoder">
+            <!-- Encoder Cells -->
+            <rect x="90" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="120" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+            
+            <rect x="210" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="240" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+            
+            <rect x="330" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="360" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+
+            <!-- Encoder Inputs -->
+            <rect x="95" y="540" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="120" y="560" font-size="15" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="0.75em">1</tspan></text>
+            
+            <rect x="215" y="540" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="240" y="560" font-size="15" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="0.75em">2</tspan></text>
+            
+            <rect x="335" y="540" width="50" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="360" y="560" font-size="15" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="0.75em">3</tspan></text>
+
+            <!-- Input Arrows -->
+            <line x1="120" y1="540" x2="120" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="240" y1="540" x2="240" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="360" y1="540" x2="360" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+            <!-- Horizontal State Arrows -->
+            <line x1="150" y1="470" x2="205" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="270" y1="470" x2="325" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            
+            <!-- State Labels -->
+            <text x="180" y="460" font-size="13" fill="var(--text-secondary)" text-anchor="middle">h<tspan dy="3" font-size="0.75em">1</tspan></text>
+            <text x="300" y="460" font-size="13" fill="var(--text-secondary)" text-anchor="middle">h<tspan dy="3" font-size="0.75em">2</tspan></text>
+
+            <!-- Section Labels -->
+            <text x="240" y="415" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Internal State</text>
+            <text x="240" y="415" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الحالة الداخلية</text>
+            
+            <text x="240" y="595" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Input at time t</text>
+            <text x="240" y="595" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الإدخال في الزمن t</text>
+        </g>
+
+        <!-- CONTEXT VECTOR (FINAL STATE) -->
+        <g id="unrolled-context">
+            <line x1="390" y1="470" x2="425" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            
+            <rect x="430" y="440" width="80" height="60" rx="8" fill="var(--brand-500)" />
+            <text x="470" y="468" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Final State</text>
+            <text x="470" y="468" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">الحالة النهائية</text>
+            <text x="470" y="486" font-size="12" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">(Context)</text>
+            <text x="470" y="486" font-size="12" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">(السياق)</text>
+
+            <line x1="510" y1="470" x2="545" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+        </g>
+
+        <!-- DECODER SECTION -->
+        <g id="unrolled-decoder">
+            <!-- Decoder Cells -->
+            <rect x="550" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="580" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+            
+            <rect x="670" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="700" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+            
+            <rect x="790" y="440" width="60" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="820" y="475" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">RNN</text>
+
+            <!-- Decoder Inputs -->
+            <rect x="545" y="540" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="580" y="560" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">&lt;START&gt;</text>
+            <text x="580" y="560" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">&lt;بداية&gt;</text>
+            
+            <rect x="665" y="540" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="700" y="560" font-size="15" fill="var(--text-primary)" text-anchor="middle">y<tspan dy="4" font-size="0.75em">1</tspan></text>
+            
+            <rect x="785" y="540" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="820" y="560" font-size="15" fill="var(--text-primary)" text-anchor="middle">y<tspan dy="4" font-size="0.75em">2</tspan></text>
+
+            <!-- Decoder Outputs -->
+            <rect x="545" y="330" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="580" y="350" font-size="15" fill="var(--text-primary)" text-anchor="middle">y<tspan dy="4" font-size="0.75em">1</tspan></text>
+            
+            <rect x="665" y="330" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="700" y="350" font-size="15" fill="var(--text-primary)" text-anchor="middle">y<tspan dy="4" font-size="0.75em">2</tspan></text>
+            
+            <rect x="785" y="330" width="70" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+            <text x="820" y="350" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">&lt;END&gt;</text>
+            <text x="820" y="350" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">&lt;نهاية&gt;</text>
+
+            <!-- Vertical Arrows (Input to Cell, Cell to Output) -->
+            <line x1="580" y1="540" x2="580" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="700" y1="540" x2="700" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="820" y1="540" x2="820" y2="505" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+            <line x1="580" y1="440" x2="580" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="700" y1="440" x2="700" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="820" y1="440" x2="820" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+            <!-- Horizontal State Arrows -->
+            <line x1="610" y1="470" x2="665" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+            <line x1="730" y1="470" x2="785" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+            <!-- Autoregressive Feedback Paths (Dashed) -->
+            <path d="M 615 345 L 640 345 L 640 555 L 658 555" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+            <path d="M 735 345 L 760 345 L 760 555 L 778 555" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+
+            <!-- Section Labels -->
+            <text x="700" y="305" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Output at time t</text>
+            <text x="700" y="305" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الإخراج في الزمن t</text>
+        </g>
+
+        <!-- Time Axis -->
+        <line x1="100" y1="620" x2="800" y2="620" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-axis)" />
+        <text x="450" y="640" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Time (t)</text>
+        <text x="450" y="640" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">الزمن (t)</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم بنية Many-to-Many القياسية للترجمة الآلية بدلاً من Encoder-Decoder؟</template>
+      <template class="content-en">Why don't we use a standard Many-to-Many architecture for machine translation instead of Encoder-Decoder?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بنية Many-to-Many القياسية تفترض أن طول الإدخال يساوي طول الإخراج (توافق كلمة بكلمة). في الترجمة، تختلف أطوال الجمل ويختلف ترتيب الكلمات، لذا نحتاج إلى Encoder-Decoder لفصل قراءة الإدخال عن توليد الإخراج.</p></template>
+      <template class="content-en"><p>A standard Many-to-Many architecture assumes input length equals output length (word-to-word alignment). In translation, sentence lengths and word orders differ, so we need Encoder-Decoder to decouple reading the input from generating the output.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. إذا كانت الشبكات العصبية التقليدية تعاني من 'فقدان الذاكرة' بمجرد انتقالها للبيانات التالية، فإن الشبكات المتكررة (RNNs) هي الحل؛ فهي تمتلك 'ذاكرة' (الحالة المخفية) تسمح لها بقراءة النصوص كالبشر، كلمة تلو الأخرى. للامتحان، ركزوا جيداً على التفريق بين هياكل الإدخال والإخراج (متى نستخدم One-to-Many ومتى نستخدم Many-to-One). تذكروا أن مشكلة RNN الأساسية هي نسيان السياق البعيد، وهنا يأتي دور بطلنا: LSTM، الذي يستخدم 'بوابات' ذكية (بوابة النسيان وبوابة الإخراج) ليقرر ما يجب تذكره وما يجب التخلص منه. وأخيراً، لا تنسوا نموذج Encoder-Decoder؛ فهو الأساس الذي بنيت عليه أنظمة الترجمة الآلية الحديثة لأنه يحررنا من قيد تطابق طول الإدخال مع الإخراج. راجعوا هذه المفاهيم جيداً، فهي حجر الأساس لكل ما يتعلق بمعالجة اللغات الطبيعية المتقدمة!</template>
+    <template class="content-en">Welcome, my friends, to this pivotal module. If traditional neural networks suffer from 'amnesia' the moment they move to the next data point, Recurrent Neural Networks (RNNs) are the cure. They possess a 'memory' (the hidden state) that allows them to read text like humans, word by word. For the exam, focus heavily on distinguishing between input-output architectures (when to use One-to-Many vs. Many-to-One). Remember that the main flaw of standard RNNs is forgetting distant context, which is where our hero steps in: the LSTM. It uses smart 'gates' (Forget and Output gates) to decide what to remember and what to discard. Finally, don't overlook the Encoder-Decoder model; it's the foundation of modern machine translation because it frees us from the constraint of matching input and output lengths. Review these concepts thoroughly; they are the bedrock of advanced NLP!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم الشبكات العصبية الأمامية (Feedforward) العادية لمعالجة اللغة؟</template>
+          <template class="content-en">Why don't we use standard Feedforward Neural Networks for language processing?</template>
+          <span class="content-target">لماذا لا نستخدم الشبكات العصبية الأمامية (Feedforward) العادية لمعالجة اللغة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الشبكات الأمامية تفترض أن جميع المدخلات مستقلة وتتطلب حجماً ثابتاً للإدخال. اللغة متسلسلة زمنياً وأطوال الجمل متغيرة، وتعتمد الكلمات على ما يسبقها، وهو ما تتفوق فيه RNNs.</template>
+          <template class="content-en">Because feedforward networks assume all inputs are independent and require a fixed input size. Language is sequential, sentence lengths vary, and words depend on preceding ones, which is exactly where RNNs excel.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين One-to-Many و Many-to-One؟ أعط مثالاً لكل منهما.</template>
+          <template class="content-en">What is the difference between One-to-Many and Many-to-One? Give an example for each.</template>
+          <span class="content-target">ما هو الفرق بين One-to-Many و Many-to-One؟ أعط مثالاً لكل منهما.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">One-to-Many يأخذ مدخلاً واحداً ويولد تسلسلاً (مثل إدخال صورة لتوليد جملة تصفها). Many-to-One يأخذ تسلسلاً ويولد مخرجاً واحداً (مثل إدخال جملة لتصنيف مشاعرها كإيجابية أو سلبية).</template>
+          <template class="content-en">One-to-Many takes a single input and generates a sequence (e.g., inputting an image to generate a caption). Many-to-One takes a sequence and generates a single output (e.g., inputting a sentence to classify its sentiment as positive or negative).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا نعني بـ 'مشاركة الأوزان' (Weight Sharing) في RNN؟</template>
+          <template class="content-en">What do we mean by 'Weight Sharing' in an RNN?</template>
+          <span class="content-target">ماذا نعني بـ 'مشاركة الأوزان' (Weight Sharing) في RNN؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني أن الشبكة تستخدم نفس مصفوفات الأوزان (U, V, W) لمعالجة الكلمة الأولى، والكلمة الثانية، والكلمة المائة. هذا يقلل المعلمات ويسمح للنموذج بالتعامل مع جمل بأي طول.</template>
+          <template class="content-en">It means the network uses the exact same weight matrices (U, V, W) to process the first word, the second word, and the hundredth word. This reduces parameters and allows the model to handle sentences of any length.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تدريب RNNs؟</template>
+          <template class="content-en">How are RNNs trained?</template>
+          <span class="content-target">كيف يتم تدريب RNNs؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام خوارزمية الانتشار الخلفي عبر الزمن (BPTT). تتكون من مسار أمامي لحساب المخرجات وحفظ الحالات المخفية، ومسار خلفي لحساب التدرجات وتحديث الأوزان.</template>
+          <template class="content-en">Using the Backpropagation Through Time (BPTT) algorithm. It consists of a forward pass to compute outputs and save hidden states, and a backward pass to compute gradients and update weights.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تتفوق RNNs على نماذج N-gram في النمذجة اللغوية؟</template>
+          <template class="content-en">How do RNNs outperform N-gram models in language modeling?</template>
+          <span class="content-target">كيف تتفوق RNNs على نماذج N-gram في النمذجة اللغوية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نماذج N-gram مقيدة بنافذة سياق صغيرة (مثلاً 3 كلمات). RNNs تمتلك حالة مخفية يمكنها نظرياً الاحتفاظ بمعلومات من بداية الجملة بأكملها، مما يحل مشكلة السياق المحدود.</template>
+          <template class="content-en">N-gram models are restricted by a small context window (e.g., 3 words). RNNs have a hidden state that can theoretically retain information from the very beginning of the sentence, solving the limited context problem.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التوليد الانحداري التلقائي (Autoregressive Generation)؟</template>
+          <template class="content-en">What is Autoregressive Generation?</template>
+          <span class="content-target">ما هو التوليد الانحداري التلقائي (Autoregressive Generation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو عملية توليد النص كلمة بكلمة، حيث يتم استخدام الكلمة التي تم توليدها للتو كمدخل للشبكة في الخطوة التالية للتنبؤ بالكلمة التي تليها.</template>
+          <template class="content-en">It is the process of generating text word by word, where the word just generated is used as the input to the network in the next step to predict the following word.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقوم بتكديس (Stacking) الشبكات المتكررة؟</template>
+          <template class="content-en">Why do we stack RNNs?</template>
+          <span class="content-target">لماذا نقوم بتكديس (Stacking) الشبكات المتكررة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لزيادة عمق النموذج. مخرج الطبقة الأولى يصبح مدخلاً للطبقة الثانية، مما يسمح للشبكة بتعلم تمثيلات هرمية وميزات أكثر تعقيداً وتجريداً.</template>
+          <template class="content-en">To increase the depth of the model. The output of the first layer becomes the input to the second, allowing the network to learn hierarchical representations and more complex, abstract features.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم الشبكات ثنائية الاتجاه (Bidirectional RNNs) ومتى نتجنبها؟</template>
+          <template class="content-en">When do we use Bidirectional RNNs and when do we avoid them?</template>
+          <span class="content-target">متى نستخدم الشبكات ثنائية الاتجاه (Bidirectional RNNs) ومتى نتجنبها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمها في مهام مثل تصنيف المشاعر أو وضع العلامات حيث يكون النص بأكمله متاحاً ونحتاج لفهم السياق اللاحق. نتجنبها في توليد النص لأننا لا نملك المستقبل بعد.</template>
+          <template class="content-en">We use them in tasks like sentiment analysis or sequence labeling where the full text is available and we need to understand succeeding context. We avoid them in text generation because we don't have the future text yet.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة التي تحلها LSTM وكيف؟</template>
+          <template class="content-en">What problem does LSTM solve and how?</template>
+          <span class="content-target">ما هي المشكلة التي تحلها LSTM وكيف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحل مشكلة نسيان التبعيات طويلة الأمد (تلاشي التدرج). تفعل ذلك باستخدام 'البوابات' (مثل بوابة النسيان وبوابة الإخراج) التي تتحكم بدقة في المعلومات التي يجب الاحتفاظ بها أو التخلص منها.</template>
+          <template class="content-en">It solves the problem of forgetting long-term dependencies (vanishing gradients). It does this using 'gates' (like the forget and output gates) that precisely control what information to keep or discard.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى نموذج Encoder-Decoder للترجمة الآلية؟</template>
+          <template class="content-en">Why do we need an Encoder-Decoder model for machine translation?</template>
+          <span class="content-target">لماذا نحتاج إلى نموذج Encoder-Decoder للترجمة الآلية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الترجمة لا تتم كلمة بكلمة؛ أطوال الجمل تختلف وترتيب الكلمات يتغير بين اللغات. الـ Encoder يقرأ الجملة كاملة ويضغطها في متجه، ثم يقوم الـ Decoder بتوليد الترجمة من هذا المتجه بطول مختلف.</template>
+          <template class="content-en">Because translation is not word-for-word; sentence lengths differ and word order changes between languages. The Encoder reads the full sentence and compresses it into a vector, then the Decoder generates the translation from this vector at a different length.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الشبكة العصبية المتكررة (RNN)؟",
+      "en": "What is a Recurrent Neural Network (RNN)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة عصبية تحتوي على دورة (Cycle) في اتصالاتها للتعامل مع البيانات المتسلسلة.",
+        "en": "A neural network that contains a cycle within its network connections to handle sequential data."
+      },
+      "example": {
+        "ar": "شبكات إلمان (Elman Networks).",
+        "en": "Elman Networks."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي بنية One-to-Many RNN؟",
+      "en": "What is a One-to-Many RNN architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة تعالج مدخلاً واحداً لإنتاج مخرجات متعددة بمرور الوقت.",
+        "en": "A network that processes a single input to produce multiple outputs over time."
+      },
+      "example": {
+        "ar": "التعليق على الصور (Image Captioning).",
+        "en": "Image Captioning."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي بنية Many-to-One RNN؟",
+      "en": "What is a Many-to-One RNN architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة تتلقى تسلسلاً من المدخلات وتولد مخرجاً واحداً.",
+        "en": "A network that receives a sequence of inputs and generates a single output."
+      },
+      "example": {
+        "ar": "تحليل المشاعر (Sentiment Analysis).",
+        "en": "Sentiment Analysis."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "كيف يتم التعامل مع الأوزان في RNN؟",
+      "en": "How are weights handled in an RNN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتم مشاركة المصفوفات (U, V, W) عبر الزمن في جميع الخطوات الزمنية.",
+        "en": "The matrices (U, V, W) are shared across time at all time steps."
+      },
+      "example": {
+        "ar": "نفس المصفوفة U تُستخدم لضرب الحالة المخفية السابقة في الخطوة 1 والخطوة 100.",
+        "en": "The same matrix U is used to multiply the previous hidden state at step 1 and step 100."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الانتشار الخلفي عبر الزمن (BPTT)؟",
+      "en": "What is Backpropagation Through Time (BPTT)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية من مسارين لتدريب RNNs، تتضمن مساراً أمامياً لحفظ الحالات، ومساراً خلفياً لحساب التدرجات.",
+        "en": "A two-pass algorithm for training RNNs, involving a forward pass to save states and a backward pass to compute gradients."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف تتفوق RNNs على نماذج N-gram كنماذج لغوية؟",
+      "en": "How do RNNs outperform N-gram models as language models?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا تعاني RNNs من مشكلة السياق المحدود؛ يمكن للحالة المخفية تمثيل معلومات من بداية التسلسل.",
+        "en": "RNNs don't have the limited context problem; the hidden state can represent information from the beginning of the sequence."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو التوليد الانحداري التلقائي (Autoregressive Generation)؟",
+      "en": "What is Autoregressive Generation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توليد الكلمات تدريجياً عن طريق أخذ عينات للكلمة التالية بناءً على الاختيارات السابقة للنموذج.",
+        "en": "Incrementally generating words by sampling the next word conditioned on the model's previous choices."
+      },
+      "example": {
+        "ar": "توليد نص كلمة بكلمة في ChatGPT.",
+        "en": "Generating text word-by-word in ChatGPT."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو التدريب من البداية إلى النهاية (End-to-End Training)؟",
+      "en": "What is End-to-End Training?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام الخسارة من التطبيق النهائي لضبط الأوزان عبر الشبكة بأكملها مباشرة.",
+        "en": "Using the loss from a downstream application to adjust weights all the way through the network directly."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي الشبكات المتكررة المكدسة (Stacked RNNs)؟",
+      "en": "What are Stacked RNNs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكات متعددة حيث يعمل مخرج طبقة واحدة كمدخل للطبقة اللاحقة لتعلم تمثيلات أعمق.",
+        "en": "Multiple networks where the output of one layer serves as the input to a subsequent layer to learn deeper representations."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي الشبكات المتكررة ثنائية الاتجاه (Bidirectional RNNs)؟",
+      "en": "What are Bidirectional RNNs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بنية تجمع بين شبكتين مستقلتين لمعالجة الإدخال من البداية للنهاية ومن النهاية للبداية.",
+        "en": "An architecture combining two independent networks to process input from start to end and end to start."
+      },
+      "example": {
+        "ar": "مفيدة جداً في تصنيف التسلسلات حيث يتوفر النص بالكامل.",
+        "en": "Very useful in sequence classification where the full text is available."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي شبكة LSTM؟",
+      "en": "What is an LSTM network?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة ذاكرة طويلة قصيرة المدى، وهي امتداد لـ RNN يحل مشكلة إدارة السياق باستخدام البوابات.",
+        "en": "Long Short-Term Memory network, an extension to RNNs that solves context management using gates."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي وظيفة بوابة النسيان (Forget Gate) في LSTM؟",
+      "en": "What is the function of the Forget Gate in an LSTM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حذف المعلومات التي لم تعد مطلوبة من السياق باستخدام دالة سيجمويد.",
+        "en": "To delete information from the context that is no longer needed using a sigmoid function."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي وظيفة بوابة الإخراج (Output Gate) في LSTM؟",
+      "en": "What is the function of the Output Gate in an LSTM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد المعلومات المطلوبة للحالة المخفية الحالية.",
+        "en": "To decide what information is required for the current hidden state."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "متى نستخدم نموذج Encoder-Decoder؟",
+      "en": "When do we use an Encoder-Decoder model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عند تحويل تسلسل إدخال إلى تسلسل إخراج يختلف عنه في الطول ولا يتوافق معه كلمة بكلمة.",
+        "en": "When translating an input sequence to an output sequence of a different length that doesn't align word-to-word."
+      },
+      "example": {
+        "ar": "الترجمة الآلية (Machine Translation).",
+        "en": "Machine Translation."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الاسم الآخر لشبكات Encoder-Decoder؟",
+      "en": "What is another name for Encoder-Decoder networks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكات التسلسل إلى التسلسل (Sequence-to-Sequence أو Seq2Seq).",
+        "en": "Sequence-to-sequence (Seq2Seq) networks."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل السمة الأساسية للشبكات العصبية المتكررة (RNN)؟",
+      "en": "Which of the following represents the core feature of Recurrent Neural Networks (RNNs)?"
+    },
+    "options": {
+      "ar": [
+        "تستخدم نوافذ ذات حجم ثابت لمعالجة النص.",
+        "تحتوي على دورة (Cycle) ضمن اتصالات الشبكة.",
+        "لا يمكنها معالجة البيانات المتسلسلة.",
+        "تستخدم أوزاناً مختلفة لكل خطوة زمنية."
+      ],
+      "en": [
+        "They use fixed-sized windows to process text.",
+        "They contain a cycle within their network connections.",
+        "They cannot process sequential data.",
+        "They use different weights for each time step."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "السمة المميزة لـ RNN هي وجود دورات تسمح بتمرير المعلومات من خطوة زمنية إلى أخرى.",
+      "en": "The defining feature of an RNN is the presence of cycles that allow information to be passed from one time step to the next."
+    },
+    "hint": {
+      "ar": "تذكر كلمة 'متكررة' (Recurrent).",
+      "en": "Remember the word 'Recurrent'."
+    },
+    "difficulty": "easy",
+    "conceptId": "intro-to-rnns"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "مهمة التعليق على الصور (Image Captioning) هي مثال على أي بنية RNN؟",
+      "en": "Image captioning is an example of which RNN architecture?"
+    },
+    "options": {
+      "ar": [
+        "Many-to-Many",
+        "Many-to-One",
+        "One-to-Many",
+        "One-to-One"
+      ],
+      "en": [
+        "Many-to-Many",
+        "Many-to-One",
+        "One-to-Many",
+        "One-to-One"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في التعليق على الصور، الإدخال هو صورة واحدة (One) والإخراج هو تسلسل من الكلمات (Many).",
+      "en": "In image captioning, the input is a single image (One) and the output is a sequence of words (Many)."
+    },
+    "hint": {
+      "ar": "كم عدد المدخلات؟ كم عدد المخرجات؟",
+      "en": "How many inputs? How many outputs?"
+    },
+    "difficulty": "medium",
+    "conceptId": "rnn-architectures"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي الخوارزمية المستخدمة لتدريب الشبكات العصبية المتكررة؟",
+      "en": "What algorithm is used to train Recurrent Neural Networks?"
+    },
+    "options": {
+      "ar": [
+        "الانتشار الأمامي فقط",
+        "الانتشار الخلفي عبر الزمن (BPTT)",
+        "خوارزمية K-Means",
+        "التعلم المعزز"
+      ],
+      "en": [
+        "Forward Propagation only",
+        "Backpropagation Through Time (BPTT)",
+        "K-Means algorithm",
+        "Reinforcement Learning"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتم تدريب RNNs باستخدام الانتشار الخلفي عبر الزمن (BPTT)، وهي خوارزمية من مسارين.",
+      "en": "RNNs are trained using Backpropagation Through Time (BPTT), a two-pass algorithm."
+    },
+    "hint": {
+      "ar": "تتضمن الخوارزمية الزمن (Time).",
+      "en": "The algorithm involves Time."
+    },
+    "difficulty": "medium",
+    "conceptId": "rnn-inference-and-training"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كيف تتغلب نماذج لغة RNN على قيود نماذج N-gram؟",
+      "en": "How do RNN language models overcome the limitations of N-gram models?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام مفردات أصغر.",
+        "بالاعتماد على سياق ثابت الحجم.",
+        "من خلال عدم وجود مشكلة السياق المحدود بفضل الحالة المخفية.",
+        "عن طريق إزالة دالة الخسارة."
+      ],
+      "en": [
+        "By using a smaller vocabulary.",
+        "By relying on a fixed-size context.",
+        "By not having the limited context problem thanks to the hidden state.",
+        "By removing the loss function."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يمكن للحالة المخفية في RNN أن تمثل نظرياً معلومات حول جميع الكلمات السابقة، متجاوزة نافذة السياق المحدودة لـ N-grams.",
+      "en": "The hidden state in an RNN can theoretically represent information about all preceding words, overcoming the limited context window of N-grams."
+    },
+    "hint": {
+      "ar": "فكر في كيفية تذكر RNN للماضي.",
+      "en": "Think about how an RNN remembers the past."
+    },
+    "difficulty": "medium",
+    "conceptId": "rnns-as-language-models"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو التوليد الانحداري التلقائي (Autoregressive Generation)؟",
+      "en": "What is Autoregressive Generation?"
+    },
+    "options": {
+      "ar": [
+        "توليد جملة كاملة في خطوة واحدة.",
+        "توليد الكلمات تدريجياً بناءً على الاختيارات السابقة.",
+        "تصنيف النص إلى فئات.",
+        "ترجمة النص دون استخدام سياق."
+      ],
+      "en": [
+        "Generating an entire sentence in one step.",
+        "Incrementally generating words based on previous choices.",
+        "Classifying text into categories.",
+        "Translating text without using context."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوليد الانحداري التلقائي هو أخذ عينات متكررة للكلمة التالية المشروطة باختيارات النموذج السابقة.",
+      "en": "Autoregressive generation is repeatedly sampling the next word conditioned on the model's previous choices."
+    },
+    "hint": {
+      "ar": "الكلمة السابقة تصبح مدخلاً للكلمة التالية.",
+      "en": "The previous word becomes the input for the next word."
+    },
+    "difficulty": "medium",
+    "conceptId": "rnns-for-nlp-tasks"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "لماذا تتفوق الشبكات المتكررة المكدسة (Stacked RNNs) عادةً على الشبكات ذات الطبقة الواحدة؟",
+      "en": "Why do Stacked RNNs generally outperform single-layer networks?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تعالج النص من النهاية إلى البداية.",
+        "لأنها تستخدم بوابات النسيان.",
+        "لأنها تسمح بتعلم تمثيلات هرمية أكثر تعقيداً.",
+        "لأنها لا تتطلب تدريباً."
+      ],
+      "en": [
+        "Because they process text from end to start.",
+        "Because they use forget gates.",
+        "Because they allow learning more complex, hierarchical representations.",
+        "Because they do not require training."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الشبكات المكدسة تزيد من عمق النموذج، مما يسمح له بتعلم ميزات وتمثيلات أكثر تعقيداً.",
+      "en": "Stacked networks increase the depth of the model, allowing it to learn more complex features and representations."
+    },
+    "hint": {
+      "ar": "فكر في فائدة 'العمق' في التعلم العميق.",
+      "en": "Think about the benefit of 'depth' in deep learning."
+    },
+    "difficulty": "medium",
+    "conceptId": "stacked-and-bidirectional-rnns"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية للشبكات المتكررة ثنائية الاتجاه (Bidirectional RNNs)؟",
+      "en": "What is the main advantage of Bidirectional RNNs?"
+    },
+    "options": {
+      "ar": [
+        "تولد النص بشكل أسرع.",
+        "تسمح للنموذج بالنظر إلى السياق السابق واللاحق للكلمة في نفس الوقت.",
+        "تستخدم ذاكرة أقل من RNN القياسية.",
+        "لا تعاني من مشكلة تلاشي التدرج أبداً."
+      ],
+      "en": [
+        "They generate text faster.",
+        "They allow the model to look at both preceding and succeeding context simultaneously.",
+        "They use less memory than standard RNNs.",
+        "They never suffer from vanishing gradients."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "من خلال معالجة النص في كلا الاتجاهين، يمكن للنموذج فهم الكلمة بناءً على ما قبلها وما بعدها.",
+      "en": "By processing text in both directions, the model can understand a word based on what comes before and after it."
+    },
+    "hint": {
+      "ar": "ثنائية الاتجاه تعني الأمام والخلف.",
+      "en": "Bidirectional means forward and backward."
+    },
+    "difficulty": "easy",
+    "conceptId": "stacked-and-bidirectional-rnns"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو الغرض من بوابة النسيان (Forget Gate) في LSTM؟",
+      "en": "What is the purpose of the Forget Gate in an LSTM?"
+    },
+    "options": {
+      "ar": [
+        "تحديد المخرج النهائي للشبكة.",
+        "إضافة معلومات جديدة إلى السياق.",
+        "حذف المعلومات من السياق التي لم تعد مطلوبة.",
+        "تسريع عملية التدريب."
+      ],
+      "en": [
+        "To determine the final output of the network.",
+        "To add new information to the context.",
+        "To delete information from the context that is no longer needed.",
+        "To speed up the training process."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بوابة النسيان تتحكم في المعلومات التي يجب التخلص منها من حالة الخلية السابقة.",
+      "en": "The forget gate controls what information should be discarded from the previous cell state."
+    },
+    "hint": {
+      "ar": "الاسم 'نسيان' يوضح وظيفتها.",
+      "en": "The name 'forget' explains its function."
+    },
+    "difficulty": "easy",
+    "conceptId": "the-lstm"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي دالة تنشيط تُستخدم بشكل شائع داخل بوابات LSTM للتحكم في تدفق المعلومات؟",
+      "en": "Which activation function is commonly used inside LSTM gates to control information flow?"
+    },
+    "options": {
+      "ar": [
+        "ReLU",
+        "Tanh",
+        "Sigmoid",
+        "Softmax"
+      ],
+      "en": [
+        "ReLU",
+        "Tanh",
+        "Sigmoid",
+        "Softmax"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم دالة Sigmoid لأنها تخرج قيماً بين 0 و 1، مما يعمل كقناع (Mask) للتحكم في النسبة المئوية للمعلومات التي تمر.",
+      "en": "The Sigmoid function is used because it outputs values between 0 and 1, acting as a mask to control the percentage of information that passes."
+    },
+    "hint": {
+      "ar": "نحتاج إلى دالة تخرج قيماً بين 0 (إغلاق) و 1 (فتح).",
+      "en": "We need a function that outputs between 0 (closed) and 1 (open)."
+    },
+    "difficulty": "hard",
+    "conceptId": "the-lstm"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "متى يكون نموذج Encoder-Decoder هو الخيار الأنسب؟",
+      "en": "When is the Encoder-Decoder model the most appropriate choice?"
+    },
+    "options": {
+      "ar": [
+        "عندما يكون طول الإدخال والإخراج متطابقاً دائماً.",
+        "في مهام تصنيف الصور.",
+        "عندما يختلف طول تسلسل الإدخال عن طول تسلسل الإخراج (مثل الترجمة).",
+        "عند التنبؤ بقيمة عددية واحدة من بيانات جدولية."
+      ],
+      "en": [
+        "When input and output lengths are always identical.",
+        "In image classification tasks.",
+        "When the input sequence length differs from the output sequence length (e.g., translation).",
+        "When predicting a single numerical value from tabular data."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "صُمم نموذج Encoder-Decoder خصيصاً للمهام التي لا تتوافق فيها المدخلات والمخرجات كلمة بكلمة وتختلف في الطول.",
+      "en": "The Encoder-Decoder model is specifically designed for tasks where inputs and outputs don't align word-for-word and differ in length."
+    },
+    "hint": {
+      "ar": "فكر في الترجمة الآلية.",
+      "en": "Think about machine translation."
+    },
+    "difficulty": "medium",
+    "conceptId": "encoder-decoder-model"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يعتقد الكثيرون أن RNN تتعلم مصفوفة أوزان جديدة لكل كلمة في الجملة. هذا خطأ! السمة الأهم في RNN هي 'مشاركة الأوزان' (Weight Sharing)؛ حيث تُستخدم نفس المصفوفات (U, V, W) في كل خطوة زمنية.</template>
+    <template class="content-en">Many think an RNN learns a new weight matrix for every word in a sentence. This is false! The most important feature of an RNN is 'Weight Sharing'; the exact same matrices (U, V, W) are used at every time step.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين نماذج N-gram و RNNs في النمذجة اللغوية هو 'السياق'. N-gram يرى فقط نافذة ثابتة (مثلاً آخر 3 كلمات)، بينما RNN تمتلك 'حالة مخفية' (Hidden State) تتحدث باستمرار وتحمل نظرياً ملخصاً لكل الكلمات منذ بداية النص.</template>
+    <template class="content-en">The fundamental difference between N-gram models and RNNs in language modeling is 'Context'. N-grams only see a fixed window (e.g., last 3 words), while RNNs have a 'Hidden State' that continuously updates and theoretically carries a summary of all words since the beginning of the text.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لماذا تستخدم بوابات LSTM دالة Sigmoid تحديداً؟ لأن Sigmoid تضغط الأرقام لتصبح بين 0 و 1. إذا ضربت أي رقم في 0، فأنت 'تنساه'. وإذا ضربته في 1، فأنت 'تحتفظ به'. إنها تعمل كصمام ميكانيكي دقيق لتدفق المعلومات.</template>
+    <template class="content-en">Why do LSTM gates specifically use the Sigmoid function? Because Sigmoid squashes numbers to be between 0 and 1. If you multiply any number by 0, you 'forget' it. If you multiply by 1, you 'keep' it. It acts as a precise mechanical valve for information flow.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا يمكنك استخدام الشبكات ثنائية الاتجاه (Bidirectional RNNs) لتوليد النص (Autoregressive Generation). التوليد يتطلب التنبؤ بالمستقبل بناءً على الماضي فقط، بينما الشبكة ثنائية الاتجاه 'تغش' بالنظر إلى المستقبل (الشبكة الخلفية) وهو ما لا يكون متاحاً أثناء التوليد الفعلي.</template>
+    <template class="content-en">You cannot use Bidirectional RNNs for text generation (Autoregressive Generation). Generation requires predicting the future based only on the past, whereas a bidirectional network 'cheats' by looking at the future (the backward network), which isn't available during actual generation.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

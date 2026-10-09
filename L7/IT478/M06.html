@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT478" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن طبقة النقل (TLS و SSH) · IT478 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT478" data-page-title-en="IT478">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=IT478"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#web-security-considerations" class="toc-link" data-bilingual>
+        <template class="content-ar">اعتبارات وتهديدات أمن الويب</template>
+        <template class="content-en">Web Security Considerations and Threats</template>
+        <span class="content-target">اعتبارات وتهديدات أمن الويب</span>
+      </a>
+      <a href="#ssl-tls-overview" class="toc-link" data-bilingual>
+        <template class="content-ar">نظرة عامة على SSL و TLS</template>
+        <template class="content-en">SSL and TLS Overview</template>
+        <span class="content-target">نظرة عامة على SSL و TLS</span>
+      </a>
+      <a href="#ssl-sessions-connections" class="toc-link" data-bilingual>
+        <template class="content-ar">الجلسات والاتصالات في SSL/TLS</template>
+        <template class="content-en">SSL/TLS Sessions and Connections</template>
+        <span class="content-target">الجلسات والاتصالات في SSL/TLS</span>
+      </a>
+      <a href="#ssl-protocols" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكولات SSL الأربعة</template>
+        <template class="content-en">The Four SSL Protocols</template>
+        <span class="content-target">بروتوكولات SSL الأربعة</span>
+      </a>
+      <a href="#https-protocol" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول HTTPS</template>
+        <template class="content-en">HTTPS (HTTP over SSL/TLS)</template>
+        <span class="content-target">بروتوكول HTTPS</span>
+      </a>
+      <a href="#ssh-overview-stack" class="toc-link" data-bilingual>
+        <template class="content-ar">القشرة الآمنة (SSH) ومكدس البروتوكول</template>
+        <template class="content-en">Secure Shell (SSH) and Protocol Stack</template>
+        <span class="content-target">القشرة الآمنة (SSH) ومكدس البروتوكول</span>
+      </a>
+      <a href="#ssh-auth-connection" class="toc-link" data-bilingual>
+        <template class="content-ar">مصادقة SSH وبروتوكولات الاتصال</template>
+        <template class="content-en">SSH Authentication and Connection Protocols</template>
+        <span class="content-target">مصادقة SSH وبروتوكولات الاتصال</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · IT478
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن طبقة النقل (TLS و SSH)</h1>
+      <p class="hero-description">تغطي هذه الوحدة اعتبارات أمن الويب، وبروتوكولات طبقة النقل مثل SSL و TLS، وتطبيقها في HTTPS، بالإضافة إلى بروتوكول القشرة الآمنة (SSH) لتأمين الاتصالات عن بُعد.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Transport-Level Security (TLS &amp; SSH)</h1>
+      <p class="hero-description">This module covers Web security considerations, transport layer protocols like SSL and TLS, their application in HTTPS, and the Secure Shell (SSH) protocol for secure remote communications.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن الويب</span>
+      <span class="tag">SSL</span>
+      <span class="tag">TLS</span>
+      <span class="tag">HTTPS</span>
+      <span class="tag">SSH</span>
+      <span class="tag">التشفير</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Web Security</span>
+      <span class="tag">SSL</span>
+      <span class="tag">TLS</span>
+      <span class="tag">HTTPS</span>
+      <span class="tag">SSH</span>
+      <span class="tag">Cryptography</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تلخيص تهديدات أمن الويب ومناهج أمن حركة مرور الويب.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقديم نظرة عامة على أمن طبقة النقل (TLS).</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم الفروق بين طبقة المآخذ الآمنة (SSL) وأمن طبقة النقل (TLS).</span></li>
+      <li><span class="obj-icon">✦</span><span>تقديم نظرة عامة على بروتوكول HTTPS (HTTP عبر SSL).</span></li>
+      <li><span class="obj-icon">✦</span><span>تقديم نظرة عامة على القشرة الآمنة (SSH).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Summarize Web security threats and Web traffic security approaches.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present an overview of Transport Layer Security (TLS).</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the differences between Secure Sockets Layer and Transport Layer Security.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present an overview of HTTPS (HTTP over SSL).</span></li>
+      <li><span class="obj-icon">✦</span><span>Present an overview of Secure Shell (SSH).</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="web-security-considerations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> اعتبارات وتهديدات أمن الويب</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Web Security Considerations and Threats</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الويب بيئة خصبة للهجمات بسبب تعقيد برمجياتها وسهولة استخدامها من قبل مستخدمين غير مدربين.</p></template>
+    <template class="content-en"><p>The Web is a prime target for attacks due to its complex underlying software and widespread use by untrained users.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>شبكة الويب العالمية هي تطبيق عميل/خادم يعمل عبر الإنترنت. تتطلب خصائص الويب أدوات أمنية مخصصة للأسباب التالية:</p><ul><li>خوادم الويب سهلة التكوين والإدارة، ومحتوى الويب سهل التطوير.</li><li>البرمجيات الأساسية معقدة للغاية وقد تخفي عيوباً أمنية.</li><li>يمكن استغلال خادم الويب كنقطة انطلاق لاختراق شبكة المؤسسة بأكملها.</li><li>المستخدمون العاديون غير مدربين أمنياً ولا يدركون المخاطر.</li></ul><p>تشمل التهديدات الرئيسية: فقدان <span class="smart-term" data-term-en="Integrity" data-ar="النزاهة" data-en-def="Protection against modification of user data or memory.">النزاهة<span class="smart-term-tooltip"></span></span> (تعديل البيانات)، فقدان <span class="smart-term" data-term-en="Confidentiality" data-ar="السرية" data-en-def="Protection against eavesdropping and theft of information.">السرية<span class="smart-term-tooltip"></span></span> (التنصت)، رفض الخدمة (إغراق الخادم)، والتزوير (انتحال الشخصية).</p></template>
+    <template class="content-en"><p>The World Wide Web is fundamentally a client/server application running over the Internet. Web usage characteristics suggest the need for tailored security tools:</p><ul><li>Web servers are relatively easy to configure, and content is easy to develop.</li><li>The underlying software is extraordinarily complex and may hide security flaws.</li><li>A Web server can be exploited as a launching pad into a corporation's entire computer complex.</li><li>Casual and untrained users are common clients and lack security awareness.</li></ul><p>Key threats include <span class="smart-term" data-term-en="Integrity" data-ar="النزاهة" data-en-def="Protection against modification of user data or memory.">Integrity<span class="smart-term-tooltip"></span></span> (modification of data), <span class="smart-term" data-term-en="Confidentiality" data-ar="السرية" data-en-def="Protection against eavesdropping and theft of information.">Confidentiality<span class="smart-term-tooltip"></span></span> (eavesdropping), Denial of Service (flooding), and Authentication (impersonation).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تتطلب التهديدات المختلفة تدابير مضادة محددة. على سبيل المثال، يتم مواجهة تهديدات النزاهة باستخدام مجاميع الاختبار التشفيرية (Cryptographic checksums)، بينما تتطلب تهديدات السرية التشفير ووكلاء الويب.</p><p>تعتبر هجمات رفض الخدمة (DoS) الأصعب في المنع لأنها تستغل الموارد المشروعة للشبكة، مما يؤدي إلى تعطيل العمل وإزعاج المستخدمين.</p><p>يعد فهم هذه التهديدات الأساس المنطقي لتطوير بروتوكولات مثل SSL و TLS التي تعمل في طبقة النقل لتأمين حركة مرور الويب بالكامل.</p></template>
+    <template class="content-en"><p>Different threats require specific countermeasures. For instance, Integrity threats are countered with cryptographic checksums, while Confidentiality threats require encryption and Web proxies.</p><p>Denial of Service (DoS) attacks are notoriously difficult to prevent because they often exploit legitimate network resources, leading to disruptive and annoying outages.</p><p>Understanding these threats provides the rationale for developing transport-layer protocols like SSL and TLS, which aim to secure the entire pipeline of Web traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>SSL</th><th>TLS</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">سنة الإصدار والمطور</template>
+          <template class="content-en">Year &amp; Developer</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">1994 بواسطة Netscape</template>
+          <template class="content-en">1994 by Netscape</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">1999 بواسطة IETF</template>
+          <template class="content-en">1999 by IETF</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مستوى الأمان</template>
+          <template class="content-en">Security Level</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أقل أماناً</template>
+          <template class="content-en">Not as secure</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أكثر أماناً</template>
+          <template class="content-en">More secure</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعقيد</template>
+          <template class="content-en">Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أقل تعقيداً نسبياً</template>
+          <template class="content-en">Comparatively less complex</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بروتوكول معقد</template>
+          <template class="content-en">A complex protocol</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر هجمات رفض الخدمة (DoS) صعبة المنع مقارنة بهجمات فقدان السرية؟</template>
+      <template class="content-en">Why are Denial of Service (DoS) attacks more difficult to prevent compared to confidentiality attacks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن هجمات السرية يمكن منعها بالتشفير، بينما هجمات DoS تعتمد غالباً على إرسال طلبات تبدو مشروعة بكميات هائلة تستنزف الموارد، مما يجعل التمييز بين المستخدم الحقيقي والمهاجم أمراً صعباً.</p></template>
+      <template class="content-en"><p>Confidentiality attacks can be mitigated mathematically via encryption. DoS attacks, however, often use seemingly legitimate requests to overwhelm resources, making it hard to filter malicious traffic without blocking real users.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ssl-tls-overview" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> نظرة عامة على SSL و TLS</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> SSL and TLS Overview</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكولات SSL و TLS توفر الأمن في طبقة النقل من خلال المصادقة، السرية، وسلامة البيانات.</p></template>
+    <template class="content-en"><p>SSL and TLS are transport-layer protocols that provide server/client authentication, data confidentiality, and data integrity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكول طبقة المآخذ الآمنة (SSL) وأمن طبقة النقل (TLS) هما البروتوكولان السائدان لتوفير الأمن في طبقة النقل. يعتمد TLS على SSL وهو معيار إنترنت أكثر أماناً وتعقيداً.</p><p>يقدم SSL/TLS خدمات أساسية تشمل:</p><ol><li><b><span class="smart-term" data-term-en="Fragmentation" data-ar="التجزئة" data-en-def="Dividing data into smaller blocks for processing in SSL/TLS.">التجزئة<span class="smart-term-tooltip"></span></span> (Fragmentation):</b> تقسيم البيانات إلى كتل بحجم 214 بايت أو أقل.</li><li><b>الضغط (Compression):</b> ضغط البيانات (اختياري).</li><li><b>سلامة الرسالة (Message Integrity):</b> استخدام دالة تجزئة ذات مفتاح لإنشاء <span class="smart-term" data-term-en="MAC (Message Authentication Code)" data-ar="رمز مصادقة الرسالة" data-en-def="A cryptographic checksum used to preserve data integrity.">رمز مصادقة الرسالة<span class="smart-term-tooltip"></span></span> (MAC).</li><li><b>السرية (Confidentiality):</b> تشفير البيانات الأصلية و MAC باستخدام تشفير المفتاح المتماثل.</li><li><b>التأطير (Framing):</b> إضافة ترويسة للحمولة المشفرة.</li></ol></template>
+    <template class="content-en"><p>Secure Sockets Layer (SSL) and Transport Layer Security (TLS) are the dominant protocols for transport-layer security. TLS is an Internet standard that evolved from SSL, offering more security and complexity.</p><p>SSL/TLS provides essential services including:</p><ol><li><b><span class="smart-term" data-term-en="Fragmentation" data-ar="التجزئة" data-en-def="Dividing data into smaller blocks for processing in SSL/TLS.">Fragmentation<span class="smart-term-tooltip"></span></span>:</b> Divides data into blocks of 214 bytes or less.</li><li><b>Compression:</b> Lossless compression of data fragments (optional).</li><li><b>Message Integrity:</b> Uses a keyed-hash function to create a MAC.</li><li><b>Confidentiality:</b> Encrypts original data and MAC using symmetric key cryptography.</li><li><b>Framing:</b> Adds a header to the encrypted payload before passing it to a reliable transport protocol.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم تقديم SSL في عام 1994 بواسطة Netscape، بينما تم تقديم TLS في عام 1999 بواسطة IETF. يعتبر TLS أكثر أماناً وتعقيداً من SSL.</p><p>تعمل هذه البروتوكولات فوق بروتوكول TCP، مما يعني أنها تعتمد على موثوقية TCP في تسليم الحزم، وتضيف طبقة من التشفير والمصادقة قبل وصول البيانات إلى طبقة التطبيق (مثل HTTP).</p><p>استخدام MAC يضمن عدم العبث بالبيانات أثناء النقل، بينما يضمن التشفير المتماثل (الذي يتم التفاوض على مفاتيحه مسبقاً) عدم قدرة المتنصتين على قراءة المحتوى.</p></template>
+    <template class="content-en"><p>SSL was introduced in 1994 by Netscape, while TLS was introduced in 1999 by the IETF. TLS is a more secure and complex evolution of SSL.</p><p>These protocols operate directly above TCP. They rely on TCP's reliable delivery mechanism while injecting a layer of encryption and authentication before data reaches the application layer (e.g., HTTP).</p><p>The use of a MAC ensures data has not been tampered with in transit, while symmetric encryption (with keys negotiated during the handshake) ensures eavesdroppers cannot read the payload.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A layered architecture diagram showing Application Layer at the top, SSL or TLS layer in the middle (highlighted in blue), TCP layer below it, and IP layer at the bottom. Arrows indicate data flow downwards. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Highlight Gradient for SSL/TLS Layer -->
+        <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        
+        <!-- Drop Shadow for Elevated Elements -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.08"/>
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SSL/TLS Layered Architecture &amp; Services</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية وخدمات طبقة SSL/TLS</text>
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDE: PROTOCOL STACK                  -->
+    <!-- ========================================== -->
+
+    <!-- Stack Title -->
+    <text x="175" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Protocol Stack</text>
+    <text x="175" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مكدس البروتوكولات</text>
+
+    <!-- Application Layer -->
+    <rect x="50" y="120" width="250" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+    <text x="175" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Application Layer</text>
+    <text x="175" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">طبقة التطبيقات</text>
+
+    <!-- Arrow Down 1 -->
+    <line x1="175" y1="180" x2="175" y2="230" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="160" y="210" text-anchor="end" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Data Flow</text>
+    <text x="160" y="210" text-anchor="end" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تدفق البيانات</text>
+
+    <!-- SSL/TLS Layer (Highlighted) -->
+    <rect x="50" y="240" width="250" height="60" rx="8" fill="url(#brandGrad)" filter="url(#shadow)" />
+    <text x="175" y="275" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">SSL / TLS Layer</text>
+    <text x="175" y="275" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">طبقة SSL / TLS</text>
+
+    <!-- Arrow Down 2 -->
+    <line x1="175" y1="300" x2="175" y2="350" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- TCP Layer -->
+    <rect x="50" y="360" width="250" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+    <text x="175" y="395" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">TCP Layer</text>
+    <text x="175" y="395" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">طبقة TCP</text>
+
+    <!-- Arrow Down 3 -->
+    <line x1="175" y1="420" x2="175" y2="470" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- IP Layer -->
+    <rect x="50" y="480" width="250" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+    <text x="175" y="515" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">IP Layer</text>
+    <text x="175" y="515" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">طبقة IP</text>
+
+
+    <!-- ========================================== -->
+    <!-- PROJECTION LINES                           -->
+    <!-- ========================================== -->
+    <path d="M 300 240 C 350 240, 350 80, 400 80" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+    <path d="M 300 300 C 350 300, 350 560, 400 560" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT SIDE: SSL/TLS SERVICES PIPELINE      -->
+    <!-- ========================================== -->
+
+    <!-- Pipeline Container -->
+    <rect x="400" y="80" width="360" height="480" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,4" />
+    <text x="580" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">SSL/TLS Record Protocol Phases</text>
+    <text x="580" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مراحل بروتوكول سجل SSL/TLS</text>
+
+    <!-- Step 1: Fragmentation -->
+    <rect x="430" y="140" width="300" height="55" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <text x="580" y="162" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">1. Fragmentation</text>
+    <text x="580" y="162" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">1. التجزئة (Fragmentation)</text>
+    <text x="580" y="182" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Divides data into blocks ≤ 2¹⁴ bytes</text>
+    <text x="580" y="182" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">تقسيم البيانات إلى كتل ≤ 2¹⁴ بايت</text>
+
+    <!-- Arrow -->
+    <line x1="580" y1="195" x2="580" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 2: Compression -->
+    <rect x="430" y="230" width="300" height="55" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <text x="580" y="252" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">2. Compression</text>
+    <text x="580" y="252" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">2. الضغط (Compression)</text>
+    <text x="580" y="272" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Lossless compression (Optional)</text>
+    <text x="580" y="272" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">ضغط بيانات غير مفقود (اختياري)</text>
+
+    <!-- Arrow -->
+    <line x1="580" y1="285" x2="580" y2="310" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 3: Message Integrity -->
+    <rect x="430" y="320" width="300" height="55" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <text x="580" y="342" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">3. Message Integrity</text>
+    <text x="580" y="342" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">3. سلامة الرسالة (MAC)</text>
+    <text x="580" y="362" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Keyed-hash function creates a MAC</text>
+    <text x="580" y="362" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">إنشاء رمز مصادقة (MAC) باستخدام دالة تجزئة</text>
+
+    <!-- Arrow -->
+    <line x1="580" y1="375" x2="580" y2="400" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 4: Confidentiality -->
+    <rect x="430" y="410" width="300" height="55" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <text x="580" y="432" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">4. Confidentiality</text>
+    <text x="580" y="432" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">4. السرية (التشفير)</text>
+    <text x="580" y="452" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Encrypts data &amp; MAC (Symmetric Key)</text>
+    <text x="580" y="452" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">تشفير البيانات ورمز MAC (مفتاح متماثل)</text>
+
+    <!-- Arrow -->
+    <line x1="580" y1="465" x2="580" y2="490" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Step 5: Framing -->
+    <rect x="430" y="500" width="300" height="55" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <text x="580" y="522" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">5. Framing</text>
+    <text x="580" y="522" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">5. التأطير (Framing)</text>
+    <text x="580" y="542" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Adds header for reliable transport</text>
+    <text x="580" y="542" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">إضافة ترويسة للنقل الموثوق</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم ضغط البيانات قبل تشفيرها في بروتوكول SSL؟</template>
+      <template class="content-en">Why is data compressed before it is encrypted in the SSL protocol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التشفير يحول البيانات إلى نصوص عشوائية لا تحتوي على أنماط متكررة، مما يجعل ضغطها بعد التشفير مستحيلاً أو غير فعال.</p></template>
+      <template class="content-en"><p>Encryption turns data into pseudo-random ciphertext with high entropy, which removes the patterns compression algorithms rely on. Therefore, compression must occur before encryption to be effective.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ssl-sessions-connections" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الجلسات والاتصالات في SSL/TLS</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> SSL/TLS Sessions and Connections</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الجلسة (Session) هي علاقة طويلة الأمد تخزن معلمات الأمان، بينما الاتصال (Connection) هو رابط مؤقت لنقل البيانات ينتمي لجلسة معينة.</p></template>
+    <template class="content-en"><p>A Session is a long-lasting relationship storing security parameters, while a Connection is a transient link for data transfer associated with a session.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يميز بروتوكول SSL/TLS بين مفهومين أساسيين:</p><ol><li><b>الجلسة (Session):</b> ارتباط بين عميل وخادم يتم إنشاؤه بواسطة بروتوكول المصافحة (Handshake). تحدد الجلسة مجموعة من معلمات الأمان التشفيرية التي يمكن مشاركتها بين اتصالات متعددة لتجنب التفاوض المكلف في كل مرة. في الجلسة، يكون لأحد الأطراف دور العميل والآخر دور الخادم.</li><li><b>الاتصال (Connection):</b> نقل يوفر نوعاً مناسباً من الخدمة (من نظير إلى نظير). الاتصالات مؤقتة، وكل اتصال يرتبط بجلسة واحدة. في الاتصال، يكون للطرفين أدوار متساوية (نظراء).</li></ol></template>
+    <template class="content-en"><p>SSL/TLS distinguishes between two core concepts:</p><ol><li><b>Session:</b> An association between a client and a server created by the Handshake Protocol. It defines a set of cryptographic security parameters shared among multiple connections to avoid expensive renegotiation. In a session, one party is the client and the other is the server.</li><li><b>Connection:</b> A transport providing a suitable type of service (peer-to-peer). Connections are transient, and every connection is associated with exactly one session. In a connection, both parties have equal roles as peers.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حالة الجلسة (Session State) تتضمن معلمات مثل: معرف الجلسة، شهادة النظير، طريقة الضغط، مواصفات التشفير، و<span class="smart-term" data-term-en="Master Secret" data-ar="السر الرئيسي" data-en-def="A 48-byte secret shared between the client and server, defining the session state.">السر الرئيسي<span class="smart-term-tooltip"></span></span> (Master secret) المكون من 48 بايت.</p><p>حالة الاتصال (Connection State) تتضمن معلمات تتغير لكل اتصال مثل: الأرقام العشوائية للعميل والخادم، مفاتيح MAC، مفاتيح التشفير، متجهات التهيئة (IVs)، و<span class="smart-term" data-term-en="Sequence Numbers" data-ar="أرقام التسلسل" data-en-def="Maintained separately by each party for transmitted and received messages in a connection to prevent replay attacks.">أرقام التسلسل<span class="smart-term-tooltip"></span></span>.</p><p>هذا الفصل المعماري يحسن الأداء بشكل كبير، حيث أن عملية المصافحة غير المتماثلة (RSA/ECC) ثقيلة حسابياً، لذا يتم إجراؤها مرة واحدة لإنشاء الجلسة، ثم تُشتق مفاتيح الاتصال السريعة منها.</p></template>
+    <template class="content-en"><p>A Session State includes parameters like:</p><ul><li><strong>Session identifier</strong>,</li><li><strong>Peer certificate</strong>,</li><li><strong>Compression method</strong>,</li><li><strong>Cipher spec</strong>,</li><li>and a <strong>48-byte <span class="smart-term" data-term-en="Master Secret" data-ar="السر الرئيسي" data-en-def="A 48-byte secret shared between the client and server, defining the session state.">Master secret<span class="smart-term-tooltip"></span></span></strong>.</li></ul><p>A Connection State includes per-connection parameters like:</p><ul><li><strong>Server/client randoms</strong>,</li><li><strong>MAC secrets</strong>,</li><li><strong>Write keys</strong>,</li><li><strong>Initialization Vectors (IVs)</strong>,</li><li>and <strong><span class="smart-term" data-term-en="Sequence Numbers" data-ar="أرقام التسلسل" data-en-def="Maintained separately by each party for transmitted and received messages in a connection to prevent replay attacks.">Sequence numbers<span class="smart-term-tooltip"></span></span></strong>.</li></ul><p>This architectural separation drastically improves performance.</p><p>Asymmetric handshakes (RSA/ECC) are computationally heavy, so they are done once to establish a session. Fast symmetric keys for individual connections are then derived from the session's master secret.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: A diagram showing a single 'Session state' box encompassing multiple 'Connection state' boxes. It illustrates that one session can contain many transient connections between a Client and a Server. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Gradient for Shared Parameters Box -->
+    <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="var(--brand-800)"/>
+      <stop offset="100%" stop-color="var(--brand-600)"/>
+    </linearGradient>
+    
+    <!-- Bidirectional Arrow Markers -->
+    <marker id="arrow-right" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
+    </marker>
+    <marker id="arrow-left" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 10 1 L 0 5 L 10 9 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <style>
+    text { font-family: system-ui, 'Cairo', 'Inter', sans-serif; }
+  </style>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Main Diagram Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SSL/TLS: 1 Session Contains Multiple Connections</text>
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">SSL/TLS: جلسة واحدة تحتوي على عدة اتصالات</text>
+
+  <!-- Client Entity -->
+  <rect x="40" y="80" width="100" height="430" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <!-- Client Icon (Laptop) -->
+  <rect x="70" y="240" width="40" height="25" rx="2" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+  <path d="M 60 270 L 120 270 L 115 275 L 65 275 Z" fill="var(--brand-500)"/>
+  <text x="90" y="305" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Client</text>
+  <text x="90" y="305" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">العميل</text>
+
+  <!-- Server Entity -->
+  <rect x="660" y="80" width="100" height="430" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <!-- Server Icon (Rack) -->
+  <rect x="695" y="235" width="30" height="40" rx="2" fill="none" stroke="var(--brand-500)" stroke-width="2"/>
+  <line x1="700" y1="245" x2="720" y2="245" stroke="var(--brand-500)" stroke-width="2"/>
+  <line x1="700" y1="255" x2="720" y2="255" stroke="var(--brand-500)" stroke-width="2"/>
+  <line x1="700" y1="265" x2="720" y2="265" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="710" y="305" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Server</text>
+  <text x="710" y="305" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الخادم</text>
+
+  <!-- Session State Container -->
+  <rect x="170" y="80" width="460" height="430" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="400" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Session State (Created by Handshake)</text>
+  <text x="400" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حالة الجلسة (تُنشأ عبر المصافحة)</text>
+
+  <!-- Shared Cryptographic Parameters -->
+  <rect x="190" y="135" width="420" height="50" rx="6" fill="url(#brandGradient)"/>
+  <!-- Lock Icon -->
+  <rect x="210" y="152" width="14" height="12" rx="2" fill="var(--on-brand-hi)"/>
+  <path d="M 213 152 V 146 A 4 4 0 0 1 221 146 V 152" fill="none" stroke="var(--on-brand-hi)" stroke-width="2"/>
+  <text x="400" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Shared Cryptographic Parameters (Master Secret)</text>
+  <text x="400" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">معلمات التشفير المشتركة (السر الرئيسي)</text>
+
+  <!-- Connection 1 -->
+  <rect x="190" y="205" width="420" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="400" y="230" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Connection 1</text>
+  <text x="400" y="230" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الاتصال 1</text>
+  <text x="400" y="250" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Transient, Peer-to-Peer Transport)</text>
+  <text x="400" y="250" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(نقل مؤقت، ند لند)</text>
+  <line x1="144" y1="270" x2="656" y2="270" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-left)" marker-end="url(#arrow-right)"/>
+
+  <!-- Connection 2 -->
+  <rect x="190" y="305" width="420" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="400" y="330" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Connection 2</text>
+  <text x="400" y="330" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الاتصال 2</text>
+  <text x="400" y="350" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Transient, Peer-to-Peer Transport)</text>
+  <text x="400" y="350" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(نقل مؤقت، ند لند)</text>
+  <line x1="144" y1="370" x2="656" y2="370" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-left)" marker-end="url(#arrow-right)"/>
+
+  <!-- Ellipsis indicating multiple connections -->
+  <circle cx="400" cy="391" r="2" fill="var(--brand-400)"/>
+  <circle cx="400" cy="395" r="2" fill="var(--brand-400)"/>
+  <circle cx="400" cy="399" r="2" fill="var(--brand-400)"/>
+
+  <!-- Connection N -->
+  <rect x="190" y="405" width="420" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 4"/>
+  <text x="400" y="430" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Connection N</text>
+  <text x="400" y="430" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الاتصال N</text>
+  <text x="400" y="450" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Associated with exactly 1 Session)</text>
+  <text x="400" y="450" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(مرتبط بجلسة واحدة فقط)</text>
+  <line x1="144" y1="470" x2="656" y2="470" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4" marker-start="url(#arrow-left)" marker-end="url(#arrow-right)"/>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Session</th><th>Connection</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المدة الزمنية</template>
+          <template class="content-en">Lifespan</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">طويلة الأمد (تتضمن اتصالات متعددة)</template>
+          <template class="content-en">Long-lasting (spans multiple connections)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مؤقتة (عابرة)</template>
+          <template class="content-en">Transient</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الأدوار</template>
+          <template class="content-en">Roles</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عميل وخادم</template>
+          <template class="content-en">Client and Server</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نظراء (Peers)</template>
+          <template class="content-en">Peers</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المعلمات التشفيرية</template>
+          <template class="content-en">Cryptographic Parameters</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">السر الرئيسي (Master Secret)، مواصفات التشفير</template>
+          <template class="content-en">Master Secret, Cipher Spec</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مفاتيح الكتابة، متجهات التهيئة (IVs)</template>
+          <template class="content-en">Write keys, IVs, Sequence numbers</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يساهم فصل الجلسة عن الاتصال في تحسين أداء خوادم الويب؟</template>
+      <template class="content-en">How does separating the session from the connection improve the performance of Web servers?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يسمح للخادم بتخطي عملية المصافحة التشفيرية المعقدة (تبادل المفاتيح غير المتماثلة) للطلبات المتتالية من نفس العميل، واستئناف الجلسة باستخدام مفاتيح متماثلة سريعة.</p></template>
+      <template class="content-en"><p>It allows the server to skip the computationally expensive asymmetric cryptographic handshake for subsequent requests from the same client, resuming the session using fast, derived symmetric keys.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ssl-protocols" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> بروتوكولات SSL الأربعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> The Four SSL Protocols</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتكون SSL من 4 بروتوكولات: المصافحة (Handshake)، تغيير مواصفات التشفير (ChangeCipherSpec)، التنبيه (Alert)، والسجل (Record).</p></template>
+    <template class="content-en"><p>SSL consists of 4 protocols: Handshake, ChangeCipherSpec, Alert, and Record.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرّف SSL أربعة بروتوكولات تعمل في طبقتين:</p><ol><li><b><span class="smart-term" data-term-en="Handshake Protocol" data-ar="بروتوكول المصافحة" data-en-def="Negotiates security parameters and authenticates parties before data transfer.">بروتوكول المصافحة<span class="smart-term-tooltip"></span></span> (Handshake Protocol):</b> يتفاوض على حزمة التشفير، يصادق الخادم والعميل، ويتبادل المعلومات لبناء الأسرار التشفيرية. يمر بـ 4 مراحل (تأسيس القدرات، مصادقة الخادم، مصادقة العميل، والإنهاء).</li><li><b>بروتوكول <span class="smart-term" data-term-en="ChangeCipherSpec" data-ar="تغيير مواصفات التشفير" data-en-def="A protocol used to signal the transition to the newly negotiated symmetric encryption keys.">تغيير مواصفات التشفير<span class="smart-term-tooltip"></span></span> (ChangeCipherSpec Protocol):</b> رسالة واحدة تخبر النظير بالانتقال إلى استخدام المفاتيح المتماثلة الجديدة التي تم التفاوض عليها.</li><li><b>بروتوكول التنبيه (Alert Protocol):</b> يُستخدم للإبلاغ عن الأخطاء والحالات غير الطبيعية (تحذير أو خطأ فادح).</li><li><b>بروتوكول السجل (Record Protocol):</b> يحمل رسائل البروتوكولات العليا أو بيانات التطبيق. يوفر السرية (بالتشفير) والنزاهة (باستخدام MAC).</li></ol></template>
+    <template class="content-en"><p>SSL defines four protocols operating in two layers:</p><ol><li><b><span class="smart-term" data-term-en="Handshake Protocol" data-ar="بروتوكول المصافحة" data-en-def="Negotiates security parameters and authenticates parties before data transfer.">Handshake Protocol<span class="smart-term-tooltip"></span></span>:</b> Negotiates the cipher suite, authenticates server/client, and exchanges cryptographic secrets. It has 4 phases (Establish capabilities, Server auth, Client auth, Finalize).</li><li><b><span class="smart-term" data-term-en="ChangeCipherSpec" data-ar="تغيير مواصفات التشفير" data-en-def="A protocol used to signal the transition to the newly negotiated symmetric encryption keys.">ChangeCipherSpec<span class="smart-term-tooltip"></span></span> Protocol:</b> A single message telling the peer to switch to the newly negotiated symmetric keys.</li><li><b>Alert Protocol:</b> Used for reporting errors and abnormal conditions (warning or fatal levels).</li><li><b>Record Protocol:</b> Carries messages from upper layers (Handshake, Alert, Application). It provides Confidentiality (encryption) and Message Integrity (MAC).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعمل بروتوكول السجل (Record Protocol) كطبقة أساسية للبروتوكولات الثلاثة الأخرى ولبيانات التطبيق. يأخذ البيانات، يجزئها، يضغطها، يضيف MAC، يشفرها، ثم يضيف ترويسة (Header).</p><p>بروتوكول التنبيه يحتوي على رموز محددة مثل <code>BadRecordMAC</code> (خطأ في MAC) أو <code>HandshakeFailure</code> (فشل المصافحة). الأخطاء الفادحة تؤدي إلى إنهاء الاتصال فوراً.</p><p>مراحل المصافحة الأربعة تضمن تبادلاً آمناً قبل إرسال أي بيانات تطبيقية. المرحلة الأولى (ClientHello/ServerHello) تحدد الخوارزميات، والمرحلة الثانية ترسل شهادة الخادم، والمرحلة الثالثة (اختيارية) ترسل شهادة العميل، والمرحلة الرابعة تؤكد التبديل إلى التشفير الآمن.</p></template>
+    <template class="content-en"><p>The Record Protocol acts as the foundational layer for the other three protocols and application data. It fragments data, compresses it, appends a MAC, encrypts it, and adds a header.</p><p>The Alert Protocol uses specific codes like <code>BadRecordMAC</code> or <code>HandshakeFailure</code>. Fatal alerts immediately terminate the connection.</p><p>The 4 Handshake phases ensure secure exchange before application data flows. Phase 1 (ClientHello/ServerHello) sets algorithms, Phase 2 sends the server certificate, Phase 3 (optional) sends the client certificate, and Phase 4 confirms the switch to secure encryption.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: A block diagram showing the SSL protocol stack. Top layer has three boxes: Handshake Protocol, ChangeCipherSpec Protocol, Alert Protocol. Below them is a wide box for Record Protocol. Below that is the Transport layer (TCP). -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <linearGradient id="recordGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SSL Protocol Stack</text>
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مكدس بروتوكول SSL</text>
+
+    <!-- Upper Layer Grouping Box -->
+    <rect x="30" y="70" width="740" height="195" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 6" />
+    <text x="50" y="95" text-anchor="start" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">SSL Upper Layer Protocols</text>
+    <text x="750" y="95" text-anchor="end" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بروتوكولات الطبقة العليا لـ SSL</text>
+
+    <!-- Top Layer: Handshake Protocol -->
+    <rect x="50" y="115" width="220" height="130" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="160" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Handshake Protocol</text>
+    <text x="160" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بروتوكول المصافحة</text>
+    
+    <text x="160" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Negotiates cipher suite</text>
+    <text x="160" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يتفاوض على مجموعة التشفير</text>
+    
+    <text x="160" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Authenticates peers</text>
+    <text x="160" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يصادق على الأطراف</text>
+    
+    <text x="160" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Exchanges secrets</text>
+    <text x="160" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يتبادل الأسرار</text>
+
+    <!-- Top Layer: ChangeCipherSpec Protocol -->
+    <rect x="290" y="115" width="220" height="130" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">ChangeCipherSpec</text>
+    <text x="400" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بروتوكول ChangeCipherSpec</text>
+    
+    <text x="400" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Single message protocol</text>
+    <text x="400" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">بروتوكول رسالة واحدة</text>
+    
+    <text x="400" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Switches to newly</text>
+    <text x="400" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يبدل إلى المفاتيح</text>
+    
+    <text x="400" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">negotiated keys</text>
+    <text x="400" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الجديدة المتفق عليها</text>
+
+    <!-- Top Layer: Alert Protocol -->
+    <rect x="530" y="115" width="220" height="130" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="640" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Alert Protocol</text>
+    <text x="640" y="145" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بروتوكول التنبيه</text>
+    
+    <text x="640" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Reports errors and</text>
+    <text x="640" y="175" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يبلغ عن الأخطاء</text>
+    
+    <text x="640" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">abnormal conditions</text>
+    <text x="640" y="195" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">والحالات غير الطبيعية</text>
+    
+    <text x="640" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">(Warning or Fatal)</text>
+    <text x="640" y="215" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">(تحذير أو قاتل)</text>
+
+    <!-- Arrows from Upper Layer to Record Protocol -->
+    <line x1="160" y1="265" x2="160" y2="308" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="400" y1="265" x2="400" y2="308" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <line x1="640" y1="265" x2="640" y2="308" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- Middle Layer: Record Protocol -->
+    <rect x="50" y="320" width="700" height="110" rx="8" fill="url(#recordGrad)" stroke="var(--brand-800)" stroke-width="2" />
+    <text x="400" y="355" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">SSL Record Protocol</text>
+    <text x="400" y="355" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">بروتوكول سجل SSL</text>
+    
+    <text x="400" y="385" text-anchor="middle" font-size="15" fill="var(--on-brand-hi)" class="gsvg-en">Carries messages from upper layers</text>
+    <text x="400" y="385" text-anchor="middle" font-size="15" fill="var(--on-brand-hi)" class="gsvg-ar">يحمل الرسائل من الطبقات العليا</text>
+    
+    <text x="400" y="410" text-anchor="middle" font-size="15" fill="var(--on-brand-hi)" class="gsvg-en">Provides Confidentiality (Encryption) &amp; Message Integrity (MAC)</text>
+    <text x="400" y="410" text-anchor="middle" font-size="15" fill="var(--on-brand-hi)" class="gsvg-ar">يوفر السرية (التشفير) وسلامة الرسائل (MAC)</text>
+
+    <!-- Arrow from Record Protocol to Transport Layer -->
+    <line x1="400" y1="430" x2="400" y2="488" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- Bottom Layer: Transport Layer -->
+    <rect x="50" y="500" width="700" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="535" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transport Layer (TCP)</text>
+    <text x="400" y="535" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">طبقة النقل (TCP)</text>
+    
+    <text x="400" y="565" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Reliable, end-to-end data transmission</text>
+    <text x="400" y="565" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">نقل بيانات موثوق من طرف إلى طرف</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر بروتوكول ChangeCipherSpec منفصلاً عن بروتوكول المصافحة رغم أنه جزء من عملية الإعداد؟</template>
+      <template class="content-en">Why is the ChangeCipherSpec protocol separate from the Handshake protocol even though it's part of the setup process?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يمثل إشارة صريحة لطبقة السجل (Record Layer) لتغيير حالة التشفير من النص الواضح إلى النص المشفر لجميع الرسائل اللاحقة.</p></template>
+      <template class="content-en"><p>It acts as an explicit signal to the Record Layer state machine to immediately switch from cleartext to ciphertext for all subsequent messages, requiring a distinct protocol type in the record header.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="https-protocol" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> بروتوكول HTTPS</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> HTTPS (HTTP over SSL/TLS)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>HTTPS هو دمج لبروتوكول HTTP مع SSL/TLS لتأمين الاتصال بين المتصفح والخادم عبر المنفذ 443.</p></template>
+    <template class="content-en"><p>HTTPS combines HTTP with SSL/TLS to secure communication between a browser and a server over port 443.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يشير HTTPS إلى استخدام HTTP فوق طبقة SSL أو TLS. لا يوجد تغيير جوهري في بروتوكول HTTP نفسه، بل يتم تغليف بياناته وتشفيرها.</p><p>عند استخدام HTTPS، يتم تشفير العناصر التالية:</p><ul><li>عنوان URL للمستند المطلوب.</li><li>محتويات المستند.</li><li>محتويات نماذج المتصفح (Browser forms).</li><li>ملفات تعريف الارتباط (Cookies) المرسلة في الاتجاهين.</li><li>محتويات ترويسة HTTP.</li></ul><p>يبدأ الاتصال بإنشاء اتصال TCP، ثم مصافحة TLS، وبعدها يتم إرسال طلب HTTP الأول كبيانات تطبيق TLS.</p></template>
+    <template class="content-en"><p>HTTPS refers to the combination of HTTP and SSL/TLS. There is no fundamental change to the HTTP protocol itself; its data is simply encapsulated and encrypted.</p><p>When HTTPS is used, the following elements are encrypted:</p><ul><li>URL of the requested document.</li><li>Contents of the document.</li><li>Contents of browser forms.</li><li>Cookies sent between browser and server.</li><li>Contents of the HTTP header.</li></ul><p>Connection initiation begins with a TCP connection, followed by the TLS handshake. Only then is the first HTTP request sent as TLS application data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>إغلاق اتصال HTTPS يتطلب إغلاق اتصال TLS أولاً قبل إغلاق TCP.</p><p>يجب على تطبيقات TLS تبادل تنبيهات الإغلاق (Closure alerts).</p><p>إذا تم إغلاق اتصال TCP دون إرسال تنبيه إغلاق TLS (ما يسمى <span class="smart-term" data-term-en="Incomplete Close" data-ar="الإغلاق غير المكتمل" data-en-def="When a TCP connection is closed without a proper TLS closure alert exchange, potentially indicating an attack.">الإغلاق غير المكتمل<span class="smart-term-tooltip"></span></span> - Incomplete close)، فقد يكون ذلك دليلاً على هجوم (مثل هجوم الاقتطاع Truncation attack)، ويجب على المتصفح إصدار تحذير أمني.</p><p>يعمل HTTPS على المنفذ 443 افتراضياً، مما يسمح لجدران الحماية بالتمييز بين حركة مرور الويب المشفرة وغير المشفرة (المنفذ 80).</p></template>
+    <template class="content-en"><p>Closing an HTTPS connection requires closing the TLS connection before the underlying TCP connection. TLS implementations must exchange closure alerts.</p><p>If a TCP connection is closed without a TLS closure alert (an '<span class="smart-term" data-term-en="Incomplete Close" data-ar="الإغلاق غير المكتمل" data-en-def="When a TCP connection is closed without a proper TLS closure alert exchange, potentially indicating an attack.">incomplete close<span class="smart-term-tooltip"></span></span>'), it could indicate a truncation attack. The HTTPS client should issue a security warning when this occurs.</p><p>HTTPS operates on port 443 by default, allowing firewalls to easily distinguish between encrypted and unencrypted (port 80) web traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يخفي HTTPS حقيقة أنك تزور موقعاً معيناً (مثل عنوان IP الخاص بالخادم)؟</template>
+      <template class="content-en">Does HTTPS hide the fact that you are visiting a specific website (e.g., the server's IP address)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، HTTPS يشفر محتوى الاتصال (بما في ذلك مسار URL الدقيق)، لكن عنوان IP الوجهة يظل مرئياً في طبقة الشبكة (IP layer) لتوجيه الحزم.</p></template>
+      <template class="content-en"><p>No, HTTPS encrypts the content and the specific URL path, but the destination IP address remains visible at the Network layer (IP) so routers can deliver the packets.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ssh-overview-stack" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> القشرة الآمنة (SSH) ومكدس البروتوكول</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Secure Shell (SSH) and Protocol Stack</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول SSH يوفر اتصالات شبكية آمنة لتسجيل الدخول عن بُعد ونقل الملفات، كبديل آمن لبروتوكول TELNET.</p></template>
+    <template class="content-en"><p>SSH provides secure network communications for remote logon and file transfer, serving as a secure replacement for TELNET.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>القشرة الآمنة (SSH) هي بروتوكول للاتصالات الشبكية الآمنة، مصمم ليكون بسيطاً وغير مكلف. الإصدار الأولي (SSH1) ركز على تسجيل الدخول عن بُعد، بينما أصلح SSH2 العيوب الأمنية وأصبح معياراً (RFC 4250-4256).</p><p>يتكون مكدس بروتوكول SSH من ثلاث طبقات فوق TCP/IP:</p><ol><li><b>بروتوكول طبقة النقل (Transport Layer Protocol):</b> يوفر مصادقة الخادم، السرية، والنزاهة. (قد يوفر الضغط أيضاً).</li><li><b>بروتوكول مصادقة المستخدم (User Authentication Protocol):</b> يصادق العميل (المستخدم) لدى الخادم.</li><li><b>بروتوكول الاتصال (Connection Protocol):</b> يضاعف (Multiplexes) النفق المشفر إلى عدة قنوات منطقية.</li></ol></template>
+    <template class="content-en"><p>Secure Shell (SSH) is a protocol for secure network communications, designed to be relatively simple and inexpensive. SSH1 focused on remote logon, while SSH2 fixed security flaws and became an IETF standard (RFC 4250-4256).</p><p>The SSH protocol stack consists of three layers running over TCP/IP:</p><ol><li><b>Transport Layer Protocol:</b> Provides server authentication, confidentiality, and integrity. (May optionally provide compression).</li><li><b>User Authentication Protocol:</b> Authenticates the client-side user to the server.</li><li><b>Connection Protocol:</b> Multiplexes the encrypted tunnel into several logical channels.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في طبقة النقل لـ SSH، تتم مصادقة الخادم بناءً على امتلاكه لزوج مفاتيح (عام/خاص). يمكن أن يمتلك الخادم مفاتيح مضيف متعددة. يعتمد العميل إما على قاعدة بيانات محلية تربط أسماء المضيفين بمفاتيحهم، أو على مرجع مصدق (CA).</p><p>تكوين حزمة SSH (Packet Formation) يتضمن أخذ الحمولة، ضغطها، إضافة حشوة (Padding)، تشفيرها، ثم إضافة MAC للنزاهة.</p><p>فصل المصادقة (الخادم في طبقة النقل، والمستخدم في طبقة المصادقة) يوفر مرونة عالية ويمنع هجمات الوسيط (Man-in-the-Middle) قبل إرسال بيانات اعتماد المستخدم.</p></template>
+    <template class="content-en"><p>In the SSH Transport Layer, server authentication is based on the server possessing a public/private key pair. Trust models include a local client database mapping hostnames to keys, or using a trusted Certificate Authority (CA).</p><p>SSH Packet Formation involves taking the payload, compressing it, adding padding, encrypting the result, and appending a MAC for integrity.</p><p>Separating authentication (server auth in the transport layer, user auth in the user authentication layer) provides flexibility and prevents Man-in-the-Middle attacks before user credentials are transmitted.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: SSH Protocol Stack diagram. Top layer split into two: 'SSH User Authentication Protocol' and 'SSH Connection Protocol'. Middle layer: 'SSH Transport Layer Protocol'. Bottom layers: TCP, then IP. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Gradient for SSH Layers -->
+    <linearGradient id="ssh-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-600)"/>
+      <stop offset="100%" stop-color="var(--brand-800)"/>
+    </linearGradient>
+
+    <!-- Markers for Data Flow Arrow -->
+    <marker id="arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--brand-400)"/>
+    </marker>
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">SSH Protocol Stack</text>
+  <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">حزمة بروتوكولات SSH</text>
+
+  <!-- Data Flow Indicator (Left Side) -->
+  <line x1="90" y1="120" x2="90" y2="375" stroke="var(--brand-400)" stroke-width="3" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <text x="70" y="247" transform="rotate(-90, 70, 247)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Data Flow</text>
+  <text x="70" y="247" transform="rotate(-90, 70, 247)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">تدفق البيانات</text>
+
+  <!-- SSH Protocol Suite Bounding Box -->
+  <rect x="130" y="60" width="540" height="220" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" rx="8" />
+  <text x="400" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">SSH Protocol Suite</text>
+  <text x="400" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">حزمة بروتوكولات SSH</text>
+
+  <!-- Connecting Lines Between Layers -->
+  <line x1="270" y1="180" x2="270" y2="195" stroke="var(--brand-400)" stroke-width="2" />
+  <line x1="530" y1="180" x2="530" y2="195" stroke="var(--brand-400)" stroke-width="2" />
+  <line x1="400" y1="265" x2="400" y2="285" stroke="var(--brand-400)" stroke-width="2" />
+  <line x1="400" y1="330" x2="400" y2="345" stroke="var(--brand-400)" stroke-width="2" />
+
+  <!-- Layer 1: User Authentication Protocol -->
+  <rect x="150" y="105" width="240" height="75" rx="6" fill="url(#ssh-grad)" stroke="var(--brand-500)" stroke-width="1" />
+  <text x="270" y="134" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">SSH User Authentication</text>
+  <text x="270" y="134" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">مصادقة مستخدم SSH</text>
+  <text x="270" y="158" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Authenticates client to server</text>
+  <text x="270" y="158" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">يصادق العميل لدى الخادم</text>
+
+  <!-- Layer 1: Connection Protocol -->
+  <rect x="410" y="105" width="240" height="75" rx="6" fill="url(#ssh-grad)" stroke="var(--brand-500)" stroke-width="1" />
+  <text x="530" y="134" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">SSH Connection Protocol</text>
+  <text x="530" y="134" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">بروتوكول اتصال SSH</text>
+  <text x="530" y="158" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Multiplexes logical channels</text>
+  <text x="530" y="158" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">يضاعف القنوات المنطقية</text>
+
+  <!-- Layer 2: Transport Layer Protocol -->
+  <rect x="150" y="195" width="500" height="70" rx="6" fill="url(#ssh-grad)" stroke="var(--brand-500)" stroke-width="1" />
+  <text x="400" y="224" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">SSH Transport Layer Protocol</text>
+  <text x="400" y="224" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">بروتوكول طبقة نقل SSH</text>
+  <text x="400" y="248" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Server auth, confidentiality, and integrity</text>
+  <text x="400" y="248" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">مصادقة الخادم، السرية، والسلامة</text>
+
+  <!-- Layer 3: TCP -->
+  <rect x="150" y="285" width="500" height="45" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="400" y="313" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Transmission Control Protocol (TCP)</text>
+  <text x="400" y="313" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">بروتوكول التحكم في الإرسال (TCP)</text>
+
+  <!-- Layer 4: IP -->
+  <rect x="150" y="345" width="500" height="45" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="400" y="373" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Internet Protocol (IP)</text>
+  <text x="400" y="373" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">بروتوكول الإنترنت (IP)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يقوم SSH بمصادقة الخادم أولاً قبل مصادقة المستخدم؟</template>
+      <template class="content-en">Why does SSH authenticate the server first before authenticating the user?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لمنع هجمات الوسيط (MitM). إذا أرسل المستخدم كلمة المرور الخاصة به قبل التأكد من هوية الخادم، فقد يرسلها إلى خادم وهمي يسرق بيانات الاعتماد.</p></template>
+      <template class="content-en"><p>To prevent Man-in-the-Middle (MitM) attacks. If the user sends credentials before verifying the server's identity, they might send their password to a malicious server.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="ssh-auth-connection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> مصادقة SSH وبروتوكولات الاتصال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> SSH Authentication and Connection Protocols</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يدعم SSH طرق مصادقة متعددة (مفتاح عام، كلمة مرور، مستندة إلى المضيف) ويستخدم بروتوكول الاتصال لإنشاء قنوات منطقية متعددة داخل نفق آمن واحد.</p></template>
+    <template class="content-en"><p>SSH supports multiple authentication methods (Publickey, Password, Hostbased) and uses the Connection Protocol to multiplex multiple logical channels inside one secure tunnel.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر SSH ثلاث طرق رئيسية لمصادقة العميل:</p><ul><li><b>المفتاح العام (Publickey):</b> يرسل العميل رسالة موقعة بمفتاحه الخاص. يتحقق الخادم من التوقيع باستخدام المفتاح العام للعميل.</li><li><b>كلمة المرور (Password):</b> يرسل العميل كلمة مرور نصية، والتي تكون محمية لأنها تُرسل عبر طبقة النقل المشفرة.</li><li><b>مستندة إلى المضيف (Hostbased):</b> تتم المصادقة بناءً على مضيف العميل بدلاً من العميل نفسه، باستخدام المفتاح الخاص للمضيف.</li></ul><p><b>بروتوكول الاتصال (Connection Protocol):</b> يعمل فوق طبقة النقل ويفترض وجود اتصال مصادق عليه (نفق). يقوم بإنشاء قنوات (Channels) للاتصال. أنواع القنوات تشمل:</p><ul><li><b>Session:</b> لتنفيذ البرامج عن بُعد (مثل الصدفة Shell).</li><li><b>X11:</b> لتطبيقات الواجهة الرسومية.</li><li><b>Forwarded-tcpip:</b> إعادة توجيه المنفذ عن بُعد.</li><li><b>Direct-tcpip:</b> إعادة توجيه المنفذ المحلي.</li></ul></template>
+    <template class="content-en"><p>SSH provides three main client authentication methods:</p><ul><li><b>Publickey:</b> The client sends a message signed with its private key. The server verifies the signature using the client's public key.</li><li><b>Password:</b> The client sends a plaintext password, which is protected because it is sent over the encrypted Transport Layer.</li><li><b>Hostbased:</b> Authentication is performed on the client's host rather than the user, using the host's private key.</li></ul><p><b>Connection Protocol:</b> Runs on top of the Transport Layer and assumes a secure tunnel exists. It multiplexes logical channels. Channel types include:</p><ul><li><b>Session:</b> For remote program execution (e.g., a shell).</li><li><b>X11:</b> For graphical user interfaces.</li><li><b>Forwarded-tcpip:</b> Remote <span class="smart-term" data-term-en="Port Forwarding" data-ar="إعادة توجيه المنافذ" data-en-def="Converting an insecure TCP connection into a secure SSH connection (SSH Tunneling).">port forwarding<span class="smart-term-tooltip"></span></span>.</li><li><b>Direct-tcpip:</b> Local port forwarding.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Port Forwarding" data-ar="إعادة توجيه المنافذ" data-en-def="Converting an insecure TCP connection into a secure SSH connection (SSH Tunneling).">إعادة توجيه المنافذ<span class="smart-term-tooltip"></span></span> (Port Forwarding / SSH Tunneling):</b> هي واحدة من أقوى ميزات SSH. تتيح تحويل أي اتصال TCP غير آمن إلى اتصال آمن عبر نفق SSH.</p><p>يتم تسليم حركة مرور TCP الواردة إلى التطبيق المناسب بناءً على رقم المنفذ. يمكن لتطبيق واحد استخدام أرقام منافذ متعددة.</p><p>تتم إدارة تدفق البيانات في القنوات باستخدام آلية النافذة (Window mechanism)، حيث لا يمكن إرسال بيانات إلى قناة حتى يتم استلام رسالة تشير إلى توفر مساحة في النافذة، مما يمنع إغراق المستقبل.</p></template>
+    <template class="content-en"><p><b>Port Forwarding (SSH Tunneling):</b> One of SSH's most powerful features. It provides the ability to convert any insecure TCP connection into a secure SSH connection.</p><p>Incoming TCP traffic is delivered to the appropriate application based on the port number. This allows legacy insecure protocols to be securely routed through the SSH tunnel.</p><p>Channels are flow-controlled using a window mechanism. No data may be sent to a channel until a message is received indicating that window space is available, preventing the receiver from being overwhelmed.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Diagram showing Port Forwarding (SSH Tunnel). Top part shows an insecure TCP connection between Client App and Server App. Bottom part shows the same connection routed through a 'Secure SSH Tunnel' between an SSH entity on the client and an SSH entity on the server. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for insecure connection -->
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+        <!-- Arrowhead for secure tunnel -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for local/remote port connections -->
+        <marker id="arrow-text" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Main Title -->
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Port Forwarding (SSH Tunnel)</text>
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">توجيه المنافذ (نفق SSH)</text>
+
+        <!-- Client Machine Container -->
+        <rect x="40" y="80" width="240" height="390" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="160" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Client Machine</text>
+        <text x="160" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جهاز العميل</text>
+
+        <!-- Server Machine Container -->
+        <rect x="520" y="80" width="240" height="390" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="640" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Server Machine</text>
+        <text x="640" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جهاز الخادم</text>
+
+        <!-- ================= TOP SECTION: INSECURE ================= -->
+        
+        <!-- Subtitle -->
+        <text x="400" y="140" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">1. Direct Connection (Insecure)</text>
+        <text x="400" y="140" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">1. اتصال مباشر (غير آمن)</text>
+
+        <!-- Client App 1 -->
+        <rect x="80" y="160" width="160" height="40" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="160" y="185" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Client App</text>
+        <text x="160" y="185" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق العميل</text>
+
+        <!-- Server App 1 -->
+        <rect x="560" y="160" width="160" height="40" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="640" y="185" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Server App</text>
+        <text x="640" y="185" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق الخادم</text>
+
+        <!-- Insecure Connection Line -->
+        <line x1="245" y1="180" x2="555" y2="180" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-muted)" />
+        <text x="400" y="170" text-anchor="middle" font-size="14" fill="var(--text-muted)" class="gsvg-en">Unencrypted TCP</text>
+        <text x="400" y="170" text-anchor="middle" font-size="14" fill="var(--text-muted)" class="gsvg-ar">TCP غير مشفر</text>
+        <text x="400" y="200" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">(Vulnerable to Eavesdropping)</text>
+        <text x="400" y="200" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">(عرضة للتنصت)</text>
+
+        <!-- Divider -->
+        <line x1="20" y1="230" x2="780" y2="230" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="8,8" opacity="0.5" />
+
+        <!-- ================= BOTTOM SECTION: SECURE ================= -->
+
+        <!-- Subtitle -->
+        <text x="400" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">2. SSH Port Forwarding (Secure Tunnel)</text>
+        <text x="400" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">2. توجيه منافذ SSH (نفق آمن)</text>
+
+        <!-- Client App 2 -->
+        <rect x="80" y="280" width="160" height="40" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="160" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Client App</text>
+        <text x="160" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق العميل</text>
+
+        <!-- Server App 2 -->
+        <rect x="560" y="280" width="160" height="40" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="640" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Server App</text>
+        <text x="640" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق الخادم</text>
+
+        <!-- SSH Client -->
+        <rect x="80" y="400" width="160" height="40" rx="4" fill="var(--brand-500)" />
+        <text x="160" y="425" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">SSH Client</text>
+        <text x="160" y="425" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">عميل SSH</text>
+
+        <!-- SSH Server -->
+        <rect x="560" y="400" width="160" height="40" rx="4" fill="var(--brand-500)" />
+        <text x="640" y="425" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">SSH Server</text>
+        <text x="640" y="425" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">خادم SSH</text>
+
+        <!-- Local Port Connection -->
+        <line x1="160" y1="320" x2="160" y2="390" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-text)" />
+        <text x="100" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Local Port</text>
+        <text x="100" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">منفذ محلي</text>
+        <text x="100" y="375" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(e.g., :8080)</text>
+        <text x="100" y="375" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(مثل :8080)</text>
+
+        <!-- Remote Port Connection -->
+        <line x1="640" y1="400" x2="640" y2="330" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-text)" />
+        <text x="700" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Target Port</text>
+        <text x="700" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">المنفذ الهدف</text>
+        <text x="700" y="375" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(e.g., :80)</text>
+        <text x="700" y="375" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(مثل :80)</text>
+
+        <!-- Secure SSH Tunnel -->
+        <!-- Tunnel Background -->
+        <rect x="220" y="380" width="360" height="80" rx="40" fill="var(--brand-500)" opacity="0.1" />
+        
+        <!-- Tunnel Line -->
+        <line x1="245" y1="420" x2="550" y2="420" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-brand)" />
+        
+        <!-- Tunnel Labels -->
+        <text x="400" y="405" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Encrypted SSH Tunnel</text>
+        <text x="400" y="405" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نفق SSH مشفر</text>
+        
+        <text x="400" y="445" text-anchor="middle" font-size="13" fill="var(--brand-ink)" class="gsvg-en">(Multiplexed Connection Protocol)</text>
+        <text x="400" y="445" text-anchor="middle" font-size="13" fill="var(--brand-ink)" class="gsvg-ar">(بروتوكول اتصال متعدد القنوات)</text>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يحمي SSH كلمات المرور المرسلة بنص واضح (Plaintext) في طريقة مصادقة كلمة المرور؟</template>
+      <template class="content-en">How does SSH protect plaintext passwords sent during the Password authentication method?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن بروتوكول مصادقة المستخدم يعمل فوق بروتوكول طبقة النقل، والذي يكون قد أنشأ بالفعل نفقاً مشفراً بالكامل قبل إرسال كلمة المرور.</p></template>
+      <template class="content-en"><p>Because the User Authentication Protocol runs on top of the Transport Layer Protocol, which has already established a fully encrypted tunnel before the password is ever transmitted.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الحاسمة. لقد رأينا كيف أن الويب بيئة مليئة بالثغرات، وكيف يمكن للمهاجمين التنصت على بياناتنا أو تعديلها. لحل هذه المشكلة، لا نغير تطبيقات الويب نفسها، بل نؤمن 'الأنبوب' الذي تمر عبره البيانات. هنا يأتي دور SSL ووريثه الأقوى TLS. ركزوا جيداً على الفرق بين 'الجلسة' (التي نؤسس فيها الثقة والمفاتيح الرئيسية بصعوبة) و'الاتصال' (الذي نستخدمه لنقل البيانات بسرعة). تذكروا بروتوكولات SSL الأربعة، خاصة 'المصافحة' و'السجل'. عندما نطبق TLS على الويب، نحصل على HTTPS، الذي يشفر كل شيء ما عدا عنوان IP. أخيراً، انتقلنا إلى SSH، وهو ليس للويب بل للتحكم عن بُعد بالخوادم. افهموا كيف يبني SSH نفقاً آمناً أولاً (طبقة النقل)، ثم يتحقق من هويتك، ثم يفتح قنوات متعددة، وكيف يمكننا استخدام هذا النفق لحماية تطبيقات أخرى عبر 'إعادة توجيه المنافذ'. هذه المفاهيم هي أساس أمن الإنترنت الحديث، ومؤكد أنها ستكون محوراً رئيسياً في الامتحان!</template>
+    <template class="content-en">Welcome everyone to this crucial module. We've seen how the Web is fraught with vulnerabilities. To fix this, we don't rewrite web apps; we secure the 'pipe' the data travels through. Enter SSL and its stronger successor, TLS. Pay close attention to the difference between a 'Session' (where we establish trust and master keys) and a 'Connection' (where we quickly transfer data). Remember the 4 SSL protocols, especially Handshake and Record. When we apply TLS to the Web, we get HTTPS, encrypting everything except the IP address. Finally, we covered SSH, used for secure remote server management. Understand how SSH builds a secure tunnel first (Transport layer), then authenticates you, and then opens multiple channels. Grasp the power of 'Port Forwarding' to protect legacy apps. These concepts are the bedrock of modern internet security and will definitely be heavily tested!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى أمن مخصص للويب؟</template>
+          <template class="content-en">Why do we need tailored security for the Web?</template>
+          <span class="content-target">لماذا نحتاج إلى أمن مخصص للويب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن خوادم الويب سهلة الإعداد، والبرمجيات معقدة وتخفي عيوباً، والمستخدمين غير مدربين أمنياً، مما يجعل الويب نقطة انطلاق مثالية لاختراق الشبكات.</template>
+          <template class="content-en">Because Web servers are easy to set up, the software is complex and hides flaws, and users are untrained, making the Web an ideal launching pad for network compromises.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين SSL و TLS؟</template>
+          <template class="content-en">What is the fundamental difference between SSL and TLS?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين SSL و TLS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">TLS هو تطور قياسي (IETF) لبروتوكول SSL التجاري. TLS أكثر أماناً وتعقيداً، وهما غير متوافقين بشكل مباشر رغم تشابههما المعماري.</template>
+          <template class="content-en">TLS is an IETF standard evolution of the commercial SSL protocol. TLS is more secure and complex, and they are not directly interoperable despite architectural similarities.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يفصل TLS بين الجلسة والاتصال؟</template>
+          <template class="content-en">Why does TLS separate the Session from the Connection?</template>
+          <span class="content-target">لماذا يفصل TLS بين الجلسة والاتصال؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لتحسين الأداء. إنشاء الجلسة يتطلب عمليات تشفير غير متماثلة ثقيلة. بفصلها، يمكن للعميل فتح اتصالات متعددة سريعة تعيد استخدام الأسرار المستنتجة من الجلسة.</template>
+          <template class="content-en">For performance. Establishing a session requires heavy asymmetric cryptography. By separating them, a client can open multiple fast connections reusing the secrets derived from the session.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة بروتوكول ChangeCipherSpec؟</template>
+          <template class="content-en">What is the function of the ChangeCipherSpec protocol?</template>
+          <span class="content-target">ما هي وظيفة بروتوكول ChangeCipherSpec؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو رسالة واحدة تعمل كمفتاح تبديل، تخبر الطرف الآخر بأن جميع الرسائل القادمة ستكون مشفرة باستخدام المفاتيح المتماثلة التي تم التفاوض عليها للتو.</template>
+          <template class="content-en">It is a single message acting as a toggle switch, telling the other party that all subsequent messages will be encrypted using the newly negotiated symmetric keys.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث في بروتوكول السجل (Record Protocol)؟</template>
+          <template class="content-en">What happens in the Record Protocol?</template>
+          <span class="content-target">ماذا يحدث في بروتوكول السجل (Record Protocol)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يأخذ البيانات، يجزئها، يضغطها (اختيارياً)، يضيف رمز مصادقة (MAC) للنزاهة، يشفرها للسرية، ثم يضيف ترويسة قبل إرسالها عبر TCP.</template>
+          <template class="content-en">It takes data, fragments it, compresses it (optionally), appends a MAC for integrity, encrypts it for confidentiality, and adds a header before sending it over TCP.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يقوم HTTPS بتشفير عنوان URL بالكامل؟</template>
+          <template class="content-en">Does HTTPS encrypt the entire URL?</template>
+          <span class="content-target">هل يقوم HTTPS بتشفير عنوان URL بالكامل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يتم تشفير مسار URL بالكامل، بالإضافة إلى محتوى الصفحة، الكوكيز، والترويسات. فقط عنوان IP الوجهة يظل مرئياً للموجهات.</template>
+          <template class="content-en">Yes, the entire URL path is encrypted, along with page content, cookies, and headers. Only the destination IP address remains visible to routers.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو خطر 'الإغلاق غير المكتمل' في HTTPS؟</template>
+          <template class="content-en">What is the danger of an 'incomplete close' in HTTPS?</template>
+          <span class="content-target">ما هو خطر 'الإغلاق غير المكتمل' في HTTPS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا أُغلق اتصال TCP دون تنبيه إغلاق TLS، فقد يكون المهاجم قد قطع الاتصال عمداً (هجوم اقتطاع) لمنع وصول بيانات هامة، لذا يجب أن يحذر المتصفح المستخدم.</template>
+          <template class="content-en">If a TCP connection closes without a TLS closure alert, an attacker might have intentionally dropped the connection (truncation attack) to prevent important data from arriving, so the browser must warn the user.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في SSH، لماذا تتم مصادقة الخادم قبل العميل؟</template>
+          <template class="content-en">In SSH, why is the server authenticated before the client?</template>
+          <span class="content-target">في SSH، لماذا تتم مصادقة الخادم قبل العميل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لمنع هجمات الوسيط. يجب أن يتأكد العميل من أنه يتحدث إلى الخادم الحقيقي (عبر طبقة النقل) قبل أن يرسل كلمة المرور الخاصة به (عبر طبقة مصادقة المستخدم).</template>
+          <template class="content-en">To prevent Man-in-the-Middle attacks. The client must ensure it is talking to the real server (via the Transport Layer) before sending its password (via the User Authentication Layer).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي آلية النافذة (Window mechanism) في قنوات SSH؟</template>
+          <template class="content-en">What is the Window mechanism in SSH channels?</template>
+          <span class="content-target">ما هي آلية النافذة (Window mechanism) في قنوات SSH؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي آلية للتحكم في تدفق البيانات، تمنع المرسل من إرسال البيانات حتى يؤكد المستقبل أن لديه مساحة (نافذة) كافية لاستقبالها، مما يمنع إغراق الشبكة.</template>
+          <template class="content-en">It is a flow control mechanism that prevents the sender from transmitting data until the receiver confirms it has enough buffer space (window) to receive it, preventing network overwhelming.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل إعادة توجيه المنافذ (Port Forwarding) في SSH؟</template>
+          <template class="content-en">How does Port Forwarding work in SSH?</template>
+          <span class="content-target">كيف تعمل إعادة توجيه المنافذ (Port Forwarding) في SSH؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تأخذ حركة مرور TCP غير الآمنة من تطبيق معين، وتغلفها داخل نفق SSH المشفر، ثم ترسلها إلى الخادم الآمن الذي يفك تغليفها ويوجهها للتطبيق الوجهة.</template>
+          <template class="content-en">It takes insecure TCP traffic from a specific application, encapsulates it inside the encrypted SSH tunnel, and sends it to the secure server which unwraps and routes it to the destination app.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الهدف الأساسي لبروتوكولات SSL و TLS؟",
+      "en": "What is the primary goal of SSL and TLS protocols?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توفير مصادقة الخادم والعميل، سرية البيانات، وسلامة البيانات في طبقة النقل.",
+        "en": "To provide server and client authentication, data confidentiality, and data integrity at the transport layer."
+      },
+      "example": {
+        "ar": "تأمين بيانات بطاقة الائتمان المرسلة من المتصفح إلى خادم المتجر.",
+        "en": "Securing credit card data sent from a browser to a store's server."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما الفرق بين الجلسة (Session) والاتصال (Connection) في TLS؟",
+      "en": "What is the difference between a Session and a Connection in TLS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الجلسة هي علاقة طويلة الأمد تخزن معلمات الأمان، بينما الاتصال هو رابط مؤقت لنقل البيانات يرتبط بجلسة واحدة.",
+        "en": "A Session is a long-lasting relationship storing security parameters, while a Connection is a transient link for data transfer associated with one session."
+      },
+      "example": {
+        "ar": "تسجيل الدخول لموقع (جلسة) وتحميل عدة صور (اتصالات متعددة).",
+        "en": "Logging into a site (Session) and downloading multiple images (multiple Connections)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي وظيفة بروتوكول المصافحة (Handshake Protocol) في SSL؟",
+      "en": "What is the function of the SSL Handshake Protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التفاوض على حزمة التشفير، مصادقة الأطراف، وتبادل المعلومات لبناء الأسرار التشفيرية.",
+        "en": "Negotiates the cipher suite, authenticates parties, and exchanges information for building cryptographic secrets."
+      },
+      "example": {
+        "ar": "المرحلة الأولى حيث يرسل العميل ClientHello.",
+        "en": "Phase 1 where the client sends a ClientHello."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو بروتوكول ChangeCipherSpec؟",
+      "en": "What is the ChangeCipherSpec Protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رسالة مفردة تخبر النظير بالانتقال إلى استخدام مفاتيح التشفير المتماثلة الجديدة.",
+        "en": "A single message telling the peer to switch to the newly negotiated symmetric encryption keys."
+      },
+      "example": {
+        "ar": "يُرسل في نهاية المصافحة لبدء التشفير الفعلي.",
+        "en": "Sent at the end of the handshake to begin actual encryption."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي وظيفة بروتوكول السجل (Record Protocol) في TLS؟",
+      "en": "What is the function of the TLS Record Protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحمل الرسائل من الطبقات العليا، ويوفر السرية (بالتشفير) والنزاهة (بواسطة MAC).",
+        "en": "Carries messages from upper layers, providing Confidentiality (encryption) and Message Integrity (MAC)."
+      },
+      "example": {
+        "ar": "تجزئة وضغط وتشفير بيانات HTTP.",
+        "en": "Fragmenting, compressing, and encrypting HTTP data."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو السر الرئيسي (Master Secret) في TLS؟",
+      "en": "What is the Master Secret in TLS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سر بحجم 48 بايت مشترك بين العميل والخادم، يُستخدم لاشتقاق مفاتيح التشفير للاتصالات.",
+        "en": "A 48-byte secret shared between the client and server, used to derive encryption keys for connections."
+      },
+      "example": {
+        "ar": "جزء من حالة الجلسة (Session State).",
+        "en": "Part of the Session State."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو المنفذ الافتراضي لبروتوكول HTTPS؟",
+      "en": "What is the default port for HTTPS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المنفذ 443.",
+        "en": "Port 443."
+      },
+      "example": {
+        "ar": "https://example.com يتصل تلقائياً بالمنفذ 443.",
+        "en": "https://example.com automatically connects to port 443."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي العناصر التي يشفرها HTTPS؟",
+      "en": "What elements are encrypted by HTTPS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عنوان URL، محتوى المستند، بيانات النماذج، ملفات تعريف الارتباط (Cookies)، وترويسات HTTP.",
+        "en": "URL, document contents, form data, cookies, and HTTP headers."
+      },
+      "example": {
+        "ar": "تشفير مسار الصفحة المطلوبة لمنع مزود الخدمة من معرفتها.",
+        "en": "Encrypting the specific page path to hide it from the ISP."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو الإغلاق غير المكتمل (Incomplete Close) في HTTPS؟",
+      "en": "What is an Incomplete Close in HTTPS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إغلاق اتصال TCP دون إرسال تنبيه إغلاق TLS، مما قد يشير إلى هجوم اقتطاع.",
+        "en": "Closing a TCP connection without sending a TLS closure alert, potentially indicating a truncation attack."
+      },
+      "example": {
+        "ar": "المتصفح يعرض تحذيراً أمنياً عند حدوث ذلك.",
+        "en": "The browser displays a security warning when this occurs."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو بروتوكول SSH؟",
+      "en": "What is the SSH protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول للاتصالات الشبكية الآمنة، يُستخدم أساساً لتسجيل الدخول عن بُعد ونقل الملفات.",
+        "en": "A protocol for secure network communications, primarily used for remote logon and file transfer."
+      },
+      "example": {
+        "ar": "استخدام SSH للوصول إلى سطر أوامر خادم لينكس.",
+        "en": "Using SSH to access a Linux server's command line."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي الطبقات الثلاث لمكدس بروتوكول SSH؟",
+      "en": "What are the three layers of the SSH Protocol Stack?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول طبقة النقل، بروتوكول مصادقة المستخدم، وبروتوكول الاتصال.",
+        "en": "Transport Layer Protocol, User Authentication Protocol, and Connection Protocol."
+      },
+      "example": {
+        "ar": "تعمل جميعها فوق بروتوكول TCP.",
+        "en": "They all run on top of TCP."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي طرق المصادقة المدعومة في SSH؟",
+      "en": "What authentication methods are supported in SSH?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المفتاح العام (Publickey)، كلمة المرور (Password)، والمستندة إلى المضيف (Hostbased).",
+        "en": "Publickey, Password, and Hostbased."
+      },
+      "example": {
+        "ar": "إرسال كلمة مرور نصية عبر نفق SSH المشفر.",
+        "en": "Sending a plaintext password over the encrypted SSH tunnel."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو إعادة توجيه المنافذ (Port Forwarding) في SSH؟",
+      "en": "What is Port Forwarding in SSH?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل اتصال TCP غير آمن إلى اتصال آمن عبر نفق SSH.",
+        "en": "Converting an insecure TCP connection into a secure SSH connection (SSH Tunneling)."
+      },
+      "example": {
+        "ar": "تأمين اتصال قاعدة بيانات قديم عبر شبكة عامة.",
+        "en": "Securing a legacy database connection over a public network."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي أنواع القنوات (Channels) في بروتوكول اتصال SSH؟",
+      "en": "What are the channel types in the SSH Connection Protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "Session، X11، Forwarded-tcpip، و Direct-tcpip.",
+        "en": "Session, X11, Forwarded-tcpip, and Direct-tcpip."
+      },
+      "example": {
+        "ar": "استخدام قناة Session لتشغيل أوامر النظام.",
+        "en": "Using a Session channel to run system commands."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يتم التحكم في تدفق البيانات في قنوات SSH؟",
+      "en": "How is data flow controlled in SSH channels?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام آلية النافذة (Window mechanism)، حيث لا تُرسل البيانات إلا إذا توفرت مساحة.",
+        "en": "Using a window mechanism, where no data is sent until window space is available."
+      },
+      "example": {
+        "ar": "يمنع إغراق المستقبل بالبيانات السريعة.",
+        "en": "Prevents overwhelming the receiver with fast data."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو بروتوكول التنبيه (Alert Protocol) في SSL؟",
+      "en": "What is the Alert Protocol in SSL?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يُستخدم للإبلاغ عن الأخطاء والحالات غير الطبيعية بمستويين: تحذير أو خطأ فادح.",
+        "en": "Used for reporting errors and abnormal conditions at two levels: warning or fatal."
+      },
+      "example": {
+        "ar": "إرسال تنبيه BadRecordMAC عند فشل التحقق من النزاهة.",
+        "en": "Sending a BadRecordMAC alert when integrity check fails."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من بروتوكولات SSL التالية يُستخدم لتغيير مفاتيح التشفير المستخدمة؟",
+      "en": "Which of the following SSL protocols is used to change the encryption keys being used?"
+    },
+    "options": {
+      "ar": [
+        "بروتوكول المصافحة (Handshake)",
+        "بروتوكول السجل (Record)",
+        "بروتوكول تغيير مواصفات التشفير (ChangeCipherSpec)",
+        "بروتوكول التنبيه (Alert)"
+      ],
+      "en": [
+        "Handshake Protocol",
+        "Record Protocol",
+        "ChangeCipherSpec Protocol",
+        "Alert Protocol"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بروتوكول ChangeCipherSpec هو رسالة مفردة تخبر النظير بالانتقال إلى استخدام مجموعة المفاتيح الجديدة التي تم التفاوض عليها.",
+      "en": "The ChangeCipherSpec protocol is a single message that tells the peer to switch to the newly negotiated set of keys."
+    },
+    "hint": {
+      "ar": "اسمه يدل على وظيفته في 'تغيير مواصفات التشفير'.",
+      "en": "Its name literally means changing the cipher specifications."
+    },
+    "difficulty": "easy",
+    "conceptId": "ssl-protocols"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في بنية TLS، ما هو الفرق الرئيسي بين الجلسة (Session) والاتصال (Connection)؟",
+      "en": "In TLS architecture, what is the main difference between a Session and a Connection?"
+    },
+    "options": {
+      "ar": [
+        "الجلسة مؤقتة، بينما الاتصال طويل الأمد.",
+        "الجلسة يمكن أن تحتوي على اتصالات متعددة، والاتصال مؤقت.",
+        "الاتصال يُستخدم للمصادقة، والجلسة لنقل البيانات.",
+        "لا يوجد فرق، هما مصطلحان لنفس المفهوم."
+      ],
+      "en": [
+        "A session is transient, while a connection is long-lasting.",
+        "A session can contain multiple connections, and a connection is transient.",
+        "A connection is used for authentication, and a session for data transfer.",
+        "There is no difference; they are terms for the same concept."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الجلسة هي ارتباط طويل الأمد يخزن معلمات الأمان، ويمكن أن ترتبط بها اتصالات متعددة ومؤقتة لتجنب إعادة التفاوض.",
+      "en": "A session is a long-lasting association storing security parameters, which can have multiple transient connections associated with it to avoid renegotiation."
+    },
+    "hint": {
+      "ar": "فكر في الجلسة كحساب مستخدم، والاتصال كتحميل صفحة واحدة.",
+      "en": "Think of a session as a user account login, and a connection as loading a single page."
+    },
+    "difficulty": "medium",
+    "conceptId": "ssl-sessions-connections"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي مما يلي يُعد جزءاً من حالة الجلسة (Session State) وليس حالة الاتصال (Connection State) في TLS؟",
+      "en": "Which of the following is part of the TLS Session State rather than the Connection State?"
+    },
+    "options": {
+      "ar": [
+        "أرقام التسلسل (Sequence numbers)",
+        "السر الرئيسي (Master secret)",
+        "مفاتيح الكتابة (Write keys)",
+        "متجهات التهيئة (Initialization vectors)"
+      ],
+      "en": [
+        "Sequence numbers",
+        "Master secret",
+        "Write keys",
+        "Initialization vectors"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "السر الرئيسي (Master secret) المكون من 48 بايت هو جزء من حالة الجلسة ويُستخدم لاشتقاق مفاتيح الاتصال.",
+      "en": "The 48-byte Master secret is part of the Session State and is used to derive the per-connection keys."
+    },
+    "hint": {
+      "ar": "هذا العنصر هو السر الأساسي الذي تُشتق منه باقي المفاتيح.",
+      "en": "This element is the core secret from which other keys are derived."
+    },
+    "difficulty": "hard",
+    "conceptId": "ssl-sessions-connections"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الخدمة التي لا يوفرها بروتوكول السجل (Record Protocol) في SSL؟",
+      "en": "Which service is NOT provided by the SSL Record Protocol?"
+    },
+    "options": {
+      "ar": [
+        "السرية (Confidentiality)",
+        "سلامة الرسالة (Message Integrity)",
+        "التجزئة (Fragmentation)",
+        "التفاوض على حزمة التشفير (Cipher suite negotiation)"
+      ],
+      "en": [
+        "Confidentiality",
+        "Message Integrity",
+        "Fragmentation",
+        "Cipher suite negotiation"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "التفاوض على حزمة التشفير يتم بواسطة بروتوكول المصافحة (Handshake Protocol)، وليس بروتوكول السجل.",
+      "en": "Cipher suite negotiation is handled by the Handshake Protocol, not the Record Protocol."
+    },
+    "hint": {
+      "ar": "بروتوكول السجل يتعامل مع البيانات بعد تحديد كيفية تشفيرها.",
+      "en": "The Record Protocol handles data after deciding how to encrypt it."
+    },
+    "difficulty": "medium",
+    "conceptId": "ssl-protocols"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "عند استخدام HTTPS، أي من العناصر التالية لا يتم تشفيره؟",
+      "en": "When HTTPS is used, which of the following elements is NOT encrypted?"
+    },
+    "options": {
+      "ar": [
+        "عنوان URL للمستند",
+        "محتويات ترويسة HTTP",
+        "عنوان IP الوجهة",
+        "ملفات تعريف الارتباط (Cookies)"
+      ],
+      "en": [
+        "URL of the document",
+        "Contents of the HTTP header",
+        "Destination IP address",
+        "Cookies"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "عنوان IP الوجهة يعمل في طبقة الشبكة ويجب أن يظل غير مشفر لتوجيه الحزم، بينما يقوم HTTPS بتشفير بيانات طبقة التطبيق (HTTP).",
+      "en": "The destination IP address operates at the Network layer and must remain unencrypted for routing, whereas HTTPS encrypts Application layer (HTTP) data."
+    },
+    "hint": {
+      "ar": "الموجهات (Routers) تحتاج إلى معرفة إلى أين ترسل الحزمة.",
+      "en": "Routers need to know where to send the packet."
+    },
+    "difficulty": "medium",
+    "conceptId": "https-protocol"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الإغلاق غير المكتمل (Incomplete close) في سياق HTTPS؟",
+      "en": "What is an 'incomplete close' in the context of HTTPS?"
+    },
+    "options": {
+      "ar": [
+        "إغلاق المتصفح قبل تحميل الصفحة بالكامل.",
+        "إغلاق اتصال TCP دون إرسال تنبيه إغلاق TLS.",
+        "فشل بروتوكول المصافحة في المرحلة الرابعة.",
+        "انتهاء صلاحية شهادة الخادم أثناء الاتصال."
+      ],
+      "en": [
+        "Closing the browser before the page fully loads.",
+        "Closing the TCP connection without sending a TLS closure alert.",
+        "Failure of the Handshake protocol in Phase 4.",
+        "Expiration of the server certificate during the connection."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يحدث الإغلاق غير المكتمل عندما يتم إغلاق اتصال TCP الأساسي دون تبادل تنبيهات إغلاق TLS، مما قد يشير إلى هجوم.",
+      "en": "An incomplete close occurs when the underlying TCP connection is closed without exchanging TLS closure alerts, potentially indicating an attack."
+    },
+    "hint": {
+      "ar": "يتعلق بكيفية إنهاء الطبقات المختلفة لاتصالاتها.",
+      "en": "It relates to how different layers terminate their connections."
+    },
+    "difficulty": "hard",
+    "conceptId": "https-protocol"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في مكدس بروتوكول SSH، أي طبقة مسؤولة عن مصادقة الخادم؟",
+      "en": "In the SSH protocol stack, which layer is responsible for server authentication?"
+    },
+    "options": {
+      "ar": [
+        "بروتوكول الاتصال (Connection Protocol)",
+        "بروتوكول مصادقة المستخدم (User Authentication Protocol)",
+        "بروتوكول طبقة النقل (Transport Layer Protocol)",
+        "بروتوكول TCP"
+      ],
+      "en": [
+        "Connection Protocol",
+        "User Authentication Protocol",
+        "Transport Layer Protocol",
+        "TCP Protocol"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تحدث مصادقة الخادم في طبقة النقل (Transport Layer) بناءً على امتلاك الخادم لزوج مفاتيح عام/خاص.",
+      "en": "Server authentication occurs at the Transport Layer based on the server possessing a public/private key pair."
+    },
+    "hint": {
+      "ar": "يتم التحقق من الخادم قبل التحقق من المستخدم.",
+      "en": "The server is verified before the user is verified."
+    },
+    "difficulty": "medium",
+    "conceptId": "ssh-overview-stack"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من طرق مصادقة SSH التالية تعتمد على التحقق من هوية جهاز العميل بدلاً من المستخدم نفسه؟",
+      "en": "Which of the following SSH authentication methods relies on verifying the client's machine rather than the user itself?"
+    },
+    "options": {
+      "ar": [
+        "المفتاح العام (Publickey)",
+        "كلمة المرور (Password)",
+        "المستندة إلى المضيف (Hostbased)",
+        "الشهادات (Certificates)"
+      ],
+      "en": [
+        "Publickey",
+        "Password",
+        "Hostbased",
+        "Certificates"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طريقة Hostbased تقوم بالمصادقة بناءً على مضيف العميل باستخدام المفتاح الخاص للمضيف.",
+      "en": "The Hostbased method performs authentication on the client's host rather than the client itself, using the host's private key."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة 'مضيف'.",
+      "en": "The name contains the word 'host'."
+    },
+    "difficulty": "easy",
+    "conceptId": "ssh-auth-connection"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الميزة في SSH التي تسمح بتحويل اتصال TCP غير آمن إلى اتصال آمن؟",
+      "en": "What feature in SSH allows converting an insecure TCP connection into a secure connection?"
+    },
+    "options": {
+      "ar": [
+        "تعدد الإرسال (Multiplexing)",
+        "إعادة توجيه المنافذ (Port Forwarding)",
+        "مصادقة المضيف (Hostbased Authentication)",
+        "تغيير مواصفات التشفير (ChangeCipherSpec)"
+      ],
+      "en": [
+        "Multiplexing",
+        "Port Forwarding",
+        "Hostbased Authentication",
+        "ChangeCipherSpec"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إعادة توجيه المنافذ (أو نفق SSH) توفر القدرة على توجيه حركة مرور TCP غير الآمنة عبر نفق SSH المشفر.",
+      "en": "Port Forwarding (or SSH Tunneling) provides the ability to route insecure TCP traffic through the encrypted SSH tunnel."
+    },
+    "hint": {
+      "ar": "تُعرف أيضاً باسم 'نفق SSH' (SSH Tunneling).",
+      "en": "Also known as 'SSH Tunneling'."
+    },
+    "difficulty": "easy",
+    "conceptId": "ssh-auth-connection"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف يتم التحكم في تدفق البيانات داخل قنوات SSH؟",
+      "en": "How is data flow controlled within SSH channels?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام أرقام التسلسل (Sequence numbers)",
+        "عن طريق بروتوكول التنبيه (Alert Protocol)",
+        "باستخدام آلية النافذة (Window mechanism)",
+        "عن طريق إغلاق القناة وإعادة فتحها"
+      ],
+      "en": [
+        "Using Sequence numbers",
+        "Via the Alert Protocol",
+        "Using a Window mechanism",
+        "By closing and reopening the channel"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم التحكم في تدفق القنوات باستخدام آلية النافذة، حيث لا يمكن إرسال البيانات حتى يتم استلام رسالة تشير إلى توفر مساحة.",
+      "en": "Channels are flow-controlled using a window mechanism, where no data may be sent until a message indicates window space is available."
+    },
+    "hint": {
+      "ar": "آلية مشابهة لتلك المستخدمة في بروتوكول TCP للتحكم في الازدحام.",
+      "en": "A mechanism similar to the one used in TCP for congestion control."
+    },
+    "difficulty": "medium",
+    "conceptId": "ssh-auth-connection"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الجلسة (Session) والاتصال (Connection) في TLS. تذكر: الجلسة تُنشأ مرة واحدة وتكون ثقيلة حسابياً (تشفير غير متماثل)، بينما الاتصالات متعددة، سريعة، وتُشتق مفاتيحها من الجلسة.</template>
+    <template class="content-en">Confusing Session and Connection in TLS. Remember: A Session is created once and is computationally heavy (asymmetric), while Connections are multiple, fast, and derive their keys from the Session.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في HTTPS، لا يتم تشفير عنوان IP الوجهة. التشفير يحدث في طبقة النقل/التطبيق، لذا مزود الخدمة (ISP) يعرف 'إلى أين' تذهب، لكنه لا يعرف 'ماذا' تفعل هناك (المسار الدقيق أو المحتوى).</template>
+    <template class="content-en">In HTTPS, the destination IP address is NOT encrypted. Encryption happens at the Transport/Application layer, so your ISP knows 'where' you are going, but not 'what' you are doing there (exact path or content).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">بروتوكول السجل (Record Protocol) هو العمود الفقري لـ SSL/TLS. كل شيء (المصافحة، التنبيهات، بيانات التطبيق) يجب أن يمر عبره ليتم تجزئته، ضغطه، حمايته بـ MAC، وتشفيره.</template>
+    <template class="content-en">The Record Protocol is the backbone of SSL/TLS. Everything (Handshakes, Alerts, Application data) must pass through it to be fragmented, compressed, MAC-protected, and encrypted.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن إرسال كلمة المرور في SSH غير آمن. الحقيقة أن بروتوكول مصادقة المستخدم يعمل *فوق* بروتوكول طبقة النقل، مما يعني أن النفق المشفر يكون قد أُنشئ بالفعل قبل إرسال كلمة المرور.</template>
+    <template class="content-en">Believing that sending a password in SSH is insecure. The truth is the User Authentication Protocol runs *on top of* the Transport Layer Protocol, meaning the encrypted tunnel is already established before the password is sent.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">إعادة توجيه المنافذ (SSH Tunneling) هي أداة قوية تسمح بتغليف بروتوكولات غير آمنة (مثل FTP أو Telnet القديم) داخل نفق SSH آمن، مما يوفر السرية والنزاهة دون تعديل التطبيق الأصلي.</template>
+    <template class="content-en">Port Forwarding (SSH Tunneling) is a powerful tool that allows encapsulating insecure protocols inside a secure SSH tunnel, providing confidentiality and integrity without modifying the original application.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

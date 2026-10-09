@@ -188,11 +188,25 @@
     } catch (e) {}
   }
 
+  /*@3.FISJ.252*/
+  let vkPair = null;
+  async function ensureVk() {
+    const s = currentVaultSecret();
+    if (!s) { vkPair = null; return null; }
+    if (vkPair && vkPair.s === s) return vkPair;
+    const id = await vaultDocId(s);
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('garden-vault-key:' + s));
+    vkPair = { s: s, id: id, vk: [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('') };
+    return vkPair;
+  }
+
   /*@3.FISJ.206*/
   function guardHeaders(id, extra) {
     const h = Object.assign({}, extra || {});
     const t = vaultTok(id);
     if (t) h['x-garden-vault'] = t;
+    /*@3.FISJ.253*/
+    if (vkPair && vkPair.id === String(id || getKey() || '')) h['x-garden-vk'] = vkPair.vk;
     return h;
   }
 
@@ -229,6 +243,8 @@
   async function storeGet(docId) {
     if (usingOracle()) {
       const id = await oracleDocId(docId);
+      /*@3.FISJ.254*/
+      try { await ensureVk(); } catch (e) {}
       const r = await fetch(vaultUrl(id), { cache: 'no-store', headers: guardHeaders(id) });
       if (r.status === 401) await guardThrow(r);
       if (!r.ok) throw new Error('oracle-get-' + r.status);
@@ -247,6 +263,7 @@
   async function storeMerge(docId, payload, extra) {
     if (usingOracle()) {
       const id = await oracleDocId(docId);
+      try { await ensureVk(); } catch (e) {}
       const r = await fetch(vaultUrl(id), {
         method: 'POST',
         headers: guardHeaders(id, { 'Content-Type': 'application/json' }),
@@ -941,6 +958,7 @@
     const id = await vaultDocId(s);
     localStorage.setItem(VAULT_SECRET_LS, s);
     saveKey(id);
+    try { await ensureVk(); } catch (e) {}
     /*@3.FISJ.215*/
     lock = { armed: false, pw: false, google: false, locked: false };
     lockAnnounced = false;
@@ -2270,6 +2288,7 @@
 
     userKey = getKey();
     if (!userKey) return; /*@3.FISJ.179*/
+    try { await ensureVk(); } catch (e) {}
 
     /*@3.FISJ.180*/
     hlcSeedFromLocal();

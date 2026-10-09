@@ -168,7 +168,7 @@
     d.addEventListener('cancel', function (e) { e.preventDefault(); self.close(); });
     document.body.appendChild(d);
     this._onLang = function () { self.paintChrome(); self.paintCats(); self.render(); };
-    document.addEventListener('garden:lang', this._onLang);
+    document.addEventListener('garden:languageChanged', this._onLang);
     this.paintChrome();
   };
 
@@ -307,6 +307,7 @@
     if (this.kind === 'sticker') { this.sel = item; this.pick('sticker'); return; }
     this.sel = item;
     preload([item.line, item.color]);
+    if (this.opts.onSelect) { try { this.opts.onSelect(item); } catch (e) {} }
     this.$('.glib-grid').querySelectorAll('.glib-t').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('aria-label') === (en() ? item.en : item.ar) && +b.dataset.i >= 0 && this.list[+b.dataset.i] === item)); }, this);
     this.paintSel();
   };
@@ -337,7 +338,7 @@
     if (this.gone) return; this.gone = true;
     if (live === this) live = null;
     if (this.io) { this.io.disconnect(); this.io = null; }
-    document.removeEventListener('garden:lang', this._onLang);
+    document.removeEventListener('garden:languageChanged', this._onLang);
     this.$('.glib-grid').textContent = '';
     this.d.remove();
     if (this.opts.release !== false) release();

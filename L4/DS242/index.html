@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242">
+<head>
+
+  <!-- ========================================== -->
+  <!-- Google Analytics                           -->
+  <!-- ========================================== -->
+  <!-- Google tag (gtag.js) -->
+
+  <!-- ========================================== -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>برمجة علوم البيانات المتقدّمة · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+  <style>
+    /* ═══ SUBJECT HUB SCOPED STYLES ═══ */
+    .subject-hub { max-width: 1100px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+    /* ── Hub Hero ── */
+    .hub-hero {
+      position: relative;
+      padding: 4rem 2.5rem 3rem;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 3rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+    .hub-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+    .hub-hero-content { position: relative; z-index: 1; }
+    .hub-hero-badge {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 0.5rem 1.5rem;
+      background: var(--brand-glow);
+      border: 1px solid var(--brand-500);
+      border-radius: var(--radius-pill);
+      font-family: var(--display-font);
+      font-weight: 800; font-size: 1rem;
+      color: var(--brand-500);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+    .hub-hero-badge i { font-size: 1.1rem; }
+    .hub-hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 900;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+    }
+    .hub-hero-metaphor {
+      font-size: 1.15rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      max-width: 600px;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .hub-stats {
+      display: flex; flex-wrap: wrap; gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .hub-stat {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-weight: 700; font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    .hub-stat strong {
+      color: var(--brand-500);
+      font-family: var(--display-font);
+      font-size: 1.25rem;
+    }
+
+    /* ── Progress Ring ── */
+    .hub-progress {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      margin-bottom: 2.5rem;
+    }
+    .progress-ring-container {
+      width: 80px; height: 80px; flex-shrink: 0;
+      position: relative;
+    }
+    .progress-ring-container svg { transform: rotate(-90deg); }
+    .progress-ring-bg { fill: none; stroke: var(--bg-elevated); stroke-width: 6; }
+    .progress-ring-fill { fill: none; stroke: var(--brand-500); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+    .progress-ring-text {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display-font); font-weight: 900; font-size: 1.1rem;
+      color: var(--brand-500);
+    }
+    .progress-info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+    .progress-info p { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
+
+    /* ── Section Wrapper (divider + header + divider) ── */
+    .hub-section-wrapper {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin: 3rem 0 2rem;
+    }
+
+    /* ── Section Headers ── */
+    .hub-section-header {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      padding: 0 1rem;
+      flex-shrink: 0;
+    }
+    .hub-section-header h2 {
+      font-size: 1.45rem; font-weight: 800; margin: 0;
+    }
+    .hub-section-header .section-count {
+      font-size: 0.85rem; font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--radius-pill);
+    }
+
+    /* ── Module Grid — always 2 columns (1 on mobile) ── */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Module Card ── */
+    .module-card {
+      display: flex; flex-direction: column;
+      padding: 1.75rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .module-card:hover {
+      border-color: var(--brand-500);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px -8px var(--brand-glow), 0 4px 10px -4px var(--shadow-base);
+    }
+    .module-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .module-card-number {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display-font);
+      font-weight: 900; font-size: 1rem;
+    }
+    .module-card-flavor {
+      font-size: 0.75rem; font-weight: 700;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 0.2rem 0.65rem;
+      border-radius: var(--radius-pill);
+      font-family: var(--display-font);
+      letter-spacing: 0.03em;
+    }
+    .module-card h3 {
+      font-size: 1.1rem; font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+    .module-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      flex: 1;
+      margin-bottom: 1rem;
+    }
+    .module-card-meta {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--text-muted);
+    }
+    .module-card-meta span {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .module-card[data-completed="true"]::after {
+      content: '✓';
+      position: absolute; top: 1rem; inset-inline-end: 1rem;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #10b981;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 900;
+    }
+
+    /* ── Exam Hub Section ── */
+    .exam-hub {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .exam-card {
+      padding: 2rem;
+      border-radius: var(--radius-xl);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    .exam-card:hover {
+      border-color: var(--brand-500);
+      box-shadow: 0 8px 20px -6px var(--brand-glow);
+    }
+    .exam-card-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .exam-card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-md);
+      background: var(--brand-glow);
+      color: var(--brand-500);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .exam-card h3 { font-size: 1.15rem; font-weight: 800; }
+    .exam-card p {
+      font-size: 0.9rem; color: var(--text-secondary);
+      line-height: 1.7; margin-bottom: 1.25rem;
+    }
+    .exam-card-scope {
+      font-size: 0.8rem; font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .exam-card-links {
+      display: flex; gap: 0.75rem;
+    }
+    .exam-link {
+      flex: 1;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem; font-weight: 700;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .exam-link--review {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    .exam-link--review:hover {
+      border-color: var(--brand-500);
+      color: var(--brand-500);
+      background: var(--brand-glow);
+    }
+    .exam-link--quiz {
+      background: var(--brand-500);
+      border: 1px solid var(--brand-500);
+      color: #fff;
+    }
+    .exam-link--quiz:hover {
+      background: var(--brand-600);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--brand-glow);
+    }
+
+    /* ── Motivational Footer Quote ── */
+    .hub-quote {
+      text-align: center;
+      padding: 1rem 1.5rem;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    /* ── Subject-specific hero patterns ── */
+    [data-subject="DS242"] {
+      --brand-600: #8d76d4;
+      --brand-500: #a78bfa;
+      --brand-400: #c1adfb;
+      --brand-glow: rgba(167, 139, 250, 0.12);
+    }
+    [data-subject="DS242"] .hub-hero::before {
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 L50 50 M50 10 L10 50' stroke='%23a78bfa' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='10' cy='10' r='2' fill='%23a78bfa'/%3E%3Ccircle cx='50' cy='50' r='2' fill='%23a78bfa'/%3E%3C/svg%3E");
+    }
+
+    /* ── Thematic divider ── */
+    .hub-divider {
+      height: 2px;
+      background: var(--border-color);
+      border-radius: var(--radius-pill);
+      position: relative;
+      overflow: hidden;
+      flex: 1;
+      margin: 0;
+    }
+    .hub-divider::after {
+      content: '';
+      position: absolute; top: 0;
+      width: 40px; height: 100%;
+      background: var(--brand-500);
+      border-radius: var(--radius-pill);
+    }
+
+    [data-subject="DS242"] .hub-divider.dir-rtl::after { animation: raceLineRTL 3s ease-in-out infinite; }
+    [data-subject="DS242"] .hub-divider.dir-ltr::after { animation: raceLineLTR 3s ease-in-out infinite; }
+
+    @keyframes raceLineRTL {
+      0%   { left: -40px; }
+      100% { left: 100%; }
+    }
+    @keyframes raceLineLTR {
+      0%   { right: -40px; }
+      100% { right: 100%; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .subject-hub { padding: 1rem 1rem 3rem; }
+      .hub-hero { padding: 2.5rem 1.5rem 2rem; }
+      .hub-hero h1 { font-size: 1.75rem; }
+      .module-grid { grid-template-columns: 1fr; }
+      .exam-hub { grid-template-columns: 1fr; }
+      .hub-progress { flex-direction: column; text-align: center; }
+      .exam-card-links { flex-direction: column; }
+      .hub-section-wrapper { gap: 0.75rem; }
+    }
+  </style>
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+  <header data-gh data-gh-variant="course" data-gh-up="../index.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+  <main class="subject-hub">
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hub-hero fade-up">
+      <div class="hub-hero-content">
+        <div class="hub-hero-badge">
+          <i class="fa-solid fa-file-code"></i>
+          <span>DS242</span>
+        </div>
+        <h1 data-bilingual>
+          <template class="content-ar"><span class="text-gradient">برمجة علوم البيانات المتقدّمة</span></template>
+          <template class="content-en"><span class="text-gradient">Advanced Data Science Programming</span></template>
+          <span class="content-target"><span class="text-gradient">برمجة علوم البيانات المتقدّمة</span></span>
+        </h1>
+        <div class="hub-hero-metaphor" data-bilingual>
+          <template class="content-ar">من القائمة إلى الإطار: بايثون حين تكبر البيانات</template>
+          <template class="content-en">From list to DataFrame: Python when data grows</template>
+          <span class="content-target">من القائمة إلى الإطار: بايثون حين تكبر البيانات</span>
+        </div>
+        <div class="hub-stats">
+          <div class="hub-stat">
+            <strong>13</strong>
+            <span data-bilingual>
+              <template class="content-ar">وحدة تعليمية</template>
+              <template class="content-en">Modules</template>
+              <span class="content-target">وحدة تعليمية</span>
+            </span>
+          </div>
+          <div class="hub-stat">
+            <strong>73</strong>
+            <span data-bilingual>
+              <template class="content-ar">مفهوم</template>
+              <template class="content-en">Concepts</template>
+              <span class="content-target">مفهوم</span>
+            </span>
+          </div>
+          <div class="hub-stat">
+            <strong>208</strong>
+            <span data-bilingual>
+              <template class="content-ar">بطاقة تعليمية</template>
+              <template class="content-en">Flashcards</template>
+              <span class="content-target">بطاقة تعليمية</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PROGRESS RING ═══ -->
+    <div class="hub-progress fade-up" id="progress-section">
+      <div class="progress-ring-container">
+        <svg viewBox="0 0 80 80">
+          <circle class="progress-ring-bg" cx="40" cy="40" r="34"/>
+          <circle class="progress-ring-fill" cx="40" cy="40" r="34"
+                  stroke-dasharray="213.6"
+                  stroke-dashoffset="213.6"
+                  id="progress-ring"/>
+        </svg>
+        <div class="progress-ring-text" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-info">
+        <h3 data-bilingual>
+          <template class="content-ar">تقدمك في المادة</template>
+          <template class="content-en">Your Progress</template>
+          <span class="content-target">تقدمك في المادة</span>
+        </h3>
+        <p data-bilingual id="progress-detail">
+          <template class="content-ar">اكمل دراسة الوحدة واجراء الاختبار لاحتساب تقدمك</template>
+          <template class="content-en">Complete module study and take the quiz to track progress</template>
+          <span class="content-target">اكمل دراسة الوحدة واجراء الاختبار لاحتساب تقدمك</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ═══ MODULE GRID — Modules 1–6 (Midterm Scope) ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-section-header">
+        <h2 data-bilingual>
+          <template class="content-ar"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 1–6 · نطاق الميدتيرم</template>
+          <template class="content-en"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Modules 1–6 · Midterm Scope</template>
+          <span class="content-target"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 1–6 · نطاق الميدتيرم</span>
+        </h2>
+        <span class="section-count">6 / 13</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+    <div class="module-grid">
+      <a href="M01.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">1</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · علوم البيانات</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 concepts · Data Science</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · علوم البيانات</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">فهم المجالات الخمسة لعلوم البيانات</template>
+          <template class="content-en">Understanding the Five Areas of Data Science</template>
+          <span class="content-target">فهم المجالات الخمسة لعلوم البيانات</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة في علوم البيانات، التعامل مع البيانات الضخمة (الحجم، التنوع، السرعة)، والخطوات الخمس لعملية علوم البيانات.</template>
+          <template class="content-en">Introduction to data science, working with Big Data (Volume, Variety, Velocity), and the five-step process of data science.</template>
+          <span class="content-target">مقدمة في علوم البيانات، التعامل مع البيانات الضخمة (الحجم، التنوع، السرعة)، والخطوات الخمس لعملية علوم البيانات.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 17</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M02.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">2</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الانطلاق بسرعة مع القوائم والصفوف (الجزء الأول)</template>
+          <template class="content-en">Speeding Along with Lists and Tuples (Part 1)</template>
+          <span class="content-target">الانطلاق بسرعة مع القوائم والصفوف (الجزء الأول)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة للعمل مع القوائم في بايثون، بما في ذلك تعريفها، الوصول إلى عناصرها، وتعديلها باستخدام دوال مثل append و insert و remove و sort.</template>
+          <template class="content-en">A comprehensive introduction to working with lists in Python, including defining, accessing, and modifying them using methods like append, insert, remove, and sort.</template>
+          <span class="content-target">مقدمة شاملة للعمل مع القوائم في بايثون، بما في ذلك تعريفها، الوصول إلى عناصرها، وتعديلها باستخدام دوال مثل append و insert و remove و sort.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M03.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">3</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 2 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 2 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 2 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">الانطلاق بسرعة مع القوائم والصفوف (الجزء الثاني)</template>
+          <template class="content-en">Speeding Along with Lists and Tuples (Part 2)</template>
+          <span class="content-target">الانطلاق بسرعة مع القوائم والصفوف (الجزء الثاني)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">فهم هياكل البيانات المتقدمة في بايثون، مع التركيز على الصفوف (Tuples) والمجموعات (Sets)، وخصائصها، والطرق المدمجة للتعامل معها.</template>
+          <template class="content-en">Understanding advanced data structures in Python, focusing on Tuples and Sets, their properties, and built-in methods.</template>
+          <span class="content-target">فهم هياكل البيانات المتقدمة في بايثون، مع التركيز على الصفوف (Tuples) والمجموعات (Sets)، وخصائصها، والطرق المدمجة للتعامل معها.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 2</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M04.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">4</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الأول)</template>
+          <template class="content-en">Cruising Massive Data with Dictionaries (Part 1)</template>
+          <span class="content-target">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الأول)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة لقواميس البيانات في بايثون، تشمل إنشائها، الوصول إلى بياناتها، تعديلها، والتكرار عبر عناصرها.</template>
+          <template class="content-en">A comprehensive introduction to Python data dictionaries, covering creation, data access, modification, and iteration.</template>
+          <span class="content-target">مقدمة شاملة لقواميس البيانات في بايثون، تشمل إنشائها، الوصول إلى بياناتها، تعديلها، والتكرار عبر عناصرها.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 18</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M05.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">5</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الثاني)</template>
+          <template class="content-en">Cruising Massive Data with Dictionaries (Part 2)</template>
+          <span class="content-target">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الثاني)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">يغطي هذا الوحدة طرق حذف العناصر من القواميس، استخدام القواميس متعددة المفاتيح، إنشاء القواميس باستخدام fromkeys، وتداخل القواميس (قواميس داخل قواميس).</template>
+          <template class="content-en">This module covers deleting dictionary items, using multi-key dictionaries, creating dictionaries with fromkeys, and nesting dictionaries.</template>
+          <span class="content-target">يغطي هذا الوحدة طرق حذف العناصر من القواميس، استخدام القواميس متعددة المفاتيح، إنشاء القواميس باستخدام fromkeys، وتداخل القواميس (قواميس داخل قواميس).</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M06.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">6</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 9 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 9 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 9 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التعامل مع أجزاء أكبر من الكود (الدوال)</template>
+          <template class="content-en">Wrangling Bigger Chunks of Code (Functions)</template>
+          <span class="content-target">التعامل مع أجزاء أكبر من الكود (الدوال)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة كيفية إنشاء الدوال في بايثون، تمرير المعلومات إليها باستخدام المعلمات والوسائط، إرجاع القيم، وفهم الدوال المجهولة (Lambda).</template>
+          <template class="content-en">This module covers how to create functions in Python, pass information using parameters and arguments, return values, and understand anonymous (lambda) functions.</template>
+          <span class="content-target">تغطي هذه الوحدة كيفية إنشاء الدوال في بايثون، تمرير المعلومات إليها باستخدام المعلمات والوسائط، إرجاع القيم، وفهم الدوال المجهولة (Lambda).</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 9</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ═══ MIDTERM EXAM HUB ═══ -->
+    <div class="exam-hub">
+      <div class="exam-card fade-up">
+        <div class="exam-card-header">
+          <div class="exam-card-icon"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i></div>
+          <h3 data-bilingual>
+            <template class="content-ar">المراجعة الشاملة · ميدتيرم</template>
+            <template class="content-en">Comprehensive Review · Midterm</template>
+            <span class="content-target">المراجعة الشاملة · ميدتيرم</span>
+          </h3>
+        </div>
+        <p data-bilingual>
+          <template class="content-ar">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</template>
+          <template class="content-en">Complete review of all concepts, formulas, and algorithms from Modules 7–13</template>
+          <span class="content-target">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</span>
+        </p>
+        <div class="exam-card-links">
+          <a href="midterm-review.html" class="exam-link exam-link--review">
+            <i class="fa-solid fa-book-open"></i>
+            <span data-bilingual>
+              <template class="content-ar">مراجعة</template>
+              <template class="content-en">Review</template>
+              <span class="content-target">مراجعة</span>
+            </span>
+          </a>
+          <a href="midterm-quiz.html" class="exam-link exam-link--quiz">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-bilingual>
+              <template class="content-ar">اختبار</template>
+              <template class="content-en">Quiz</template>
+              <span class="content-target">اختبار</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODULE GRID — Modules 7–13 (Final Scope) ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-section-header">
+        <h2 data-bilingual>
+          <template class="content-ar"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 7–13 · نطاق الفاينل</template>
+          <template class="content-en"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> Modules 7–13 · Final Scope</template>
+          <span class="content-target"><i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> الوحدات 7–13 · نطاق الفاينل</span>
+        </h2>
+        <span class="section-count">7 / 13</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+    <div class="module-grid">
+      <a href="M07.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">7</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · البرمجة كائنية التوجه</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 concepts · OOP</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · البرمجة كائنية التوجه</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">البرمجة باستخدام الفئات (Classes)</template>
+          <template class="content-en">Doing Python with Class</template>
+          <span class="content-target">البرمجة باستخدام الفئات (Classes)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة للبرمجة كائنية التوجه (OOP) في بايثون، تغطي الفئات، الكائنات، السمات، الطرق، والمتغيرات على مستوى الفئة والكائن.</template>
+          <template class="content-en">A comprehensive introduction to Object-Oriented Programming (OOP) in Python, covering classes, objects, attributes, methods, and class/instance level variables.</template>
+          <span class="content-target">مقدمة شاملة للبرمجة كائنية التوجه (OOP) في بايثون، تغطي الفئات، الكائنات، السمات، الطرق، والمتغيرات على مستوى الفئة والكائن.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M08.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">8</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">البرمجة باستخدام الفئات وتجنب الأخطاء</template>
+          <template class="content-en">Doing Python with Class and Sidestepping Errors</template>
+          <span class="content-target">البرمجة باستخدام الفئات وتجنب الأخطاء</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة مفاهيم الوراثة في الفئات (Class Inheritance) في بايثون، بالإضافة إلى كيفية التعامل مع الاستثناءات (Exceptions) ومعالجة الأخطاء برمجياً لتجنب توقف التطبيقات عن العمل.</template>
+          <template class="content-en">This module covers Class Inheritance in Python, along with understanding Exceptions and handling errors gracefully to prevent application crashes.</template>
+          <span class="content-target">تغطي هذه الوحدة مفاهيم الوراثة في الفئات (Class Inheritance) في بايثون، بالإضافة إلى كيفية التعامل مع الاستثناءات (Exceptions) ومعالجة الأخطاء برمجياً لتجنب توقف التطبيقات عن العمل.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 7</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M09.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">9</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 8 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 8 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 8 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التعامل مع الملفات الخارجية</template>
+          <template class="content-en">Working With External Files</template>
+          <span class="content-target">التعامل مع الملفات الخارجية</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة كيفية قراءة وكتابة الملفات النصية والثنائية في بايثون، وإدارة سياق الملفات، والتعامل مع ملفات CSV، وتحويل البيانات إلى كائنات وقواميس.</template>
+          <template class="content-en">This module covers how to read and write text and binary files in Python, manage file contexts, handle CSV files, and convert data into objects and dictionaries.</template>
+          <span class="content-target">تغطي هذه الوحدة كيفية قراءة وكتابة الملفات النصية والثنائية في بايثون، وإدارة سياق الملفات، والتعامل مع ملفات CSV، وتحويل البيانات إلى كائنات وقواميس.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 8</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M10.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">10</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">المكتبات، الحزم، والوحدات في بايثون</template>
+          <template class="content-en">Libraries, Packages, And Modules in Python</template>
+          <span class="content-target">المكتبات، الحزم، والوحدات في بايثون</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">استكشاف مكتبة بايثون القياسية، إدارة الحزم باستخدام pip، استيراد الوحدات، وإنشاء وحدات مخصصة لدعم البرمجة المعيارية.</template>
+          <template class="content-en">Exploring the Python Standard Library, managing packages with pip, importing modules, and creating custom modules to support modular programming.</template>
+          <span class="content-target">استكشاف مكتبة بايثون القياسية، إدارة الحزم باستخدام pip، استيراد الوحدات، وإنشاء وحدات مخصصة لدعم البرمجة المعيارية.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 15</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M11.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">11</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · جيسون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 concepts · JSON</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 6 مفهوم · جيسون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التعامل مع بيانات جيسون (JSON)</template>
+          <template class="content-en">Juggling JSON Data</template>
+          <span class="content-target">التعامل مع بيانات جيسون (JSON)</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة كيفية تنظيم بيانات JSON، فهم عمليات التسلسل وإلغاء التسلسل، تحميل البيانات من ملفات ونصوص JSON، وتصدير بيانات بايثون إلى تنسيق JSON.</template>
+          <template class="content-en">This module covers organizing JSON data, understanding serialization and deserialization, loading data from JSON files and strings, and dumping Python data to JSON format.</template>
+          <span class="content-target">تغطي هذه الوحدة كيفية تنظيم بيانات JSON، فهم عمليات التسلسل وإلغاء التسلسل، تحميل البيانات من ملفات ونصوص JSON، وتصدير بيانات بايثون إلى تنسيق JSON.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 6</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 18</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M12.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">12</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 مفهوم · الويب</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 concepts · Web</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 7 مفهوم · الويب</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">التفاعل مع الإنترنت وبرمجة الويب</template>
+          <template class="content-en">Interacting With The Internet</template>
+          <span class="content-target">التفاعل مع الإنترنت وبرمجة الويب</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">تغطي هذه الوحدة كيفية عمل الويب، وفهم عناوين URL، واستخدام بايثون للتفاعل مع الإنترنت، بالإضافة إلى تقنيات استخراج البيانات (Web Scraping) وحفظها في ملفات JSON و CSV.</template>
+          <template class="content-en">This module covers how the web works, understanding URLs, using Python to interact with the internet, and web scraping techniques to extract and save data into JSON and CSV files.</template>
+          <span class="content-target">تغطي هذه الوحدة كيفية عمل الويب، وفهم عناوين URL، واستخدام بايثون للتفاعل مع الإنترنت، بالإضافة إلى تقنيات استخراج البيانات (Web Scraping) وحفظها في ملفات JSON و CSV.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 7</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 17</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+
+      <a href="M13.html" class="module-card fade-up">
+        <div class="module-card-header">
+          <div class="module-card-number">13</div>
+          <span class="module-card-flavor" data-bilingual>
+            <template class="content-ar"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</template>
+            <template class="content-en"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 concepts · Python</template>
+            <span class="content-target"><i class="fa-solid fa-file-code" aria-hidden="true"></i> 4 مفهوم · بايثون</span>
+          </span>
+        </div>
+        <h3 data-bilingual>
+          <template class="content-ar">استكشاف البيانات الضخمة: NumPy و Pandas و MatPlotLib</template>
+          <template class="content-en">Exploring Big Data: NumPy, Pandas, and MatPlotLib</template>
+          <span class="content-target">استكشاف البيانات الضخمة: NumPy و Pandas و MatPlotLib</span>
+        </h3>
+        <div class="module-card-desc" data-bilingual>
+          <template class="content-ar">مقدمة شاملة لمكتبات علوم البيانات الأساسية في بايثون، وتطبيق مشروع عملي لتحليل مجموعة بيانات الألماس.</template>
+          <template class="content-en">A comprehensive introduction to core Python data science libraries, and a practical project analyzing the Diamonds dataset.</template>
+          <span class="content-target">مقدمة شاملة لمكتبات علوم البيانات الأساسية في بايثون، وتطبيق مشروع عملي لتحليل مجموعة بيانات الألماس.</span>
+        </div>
+        <div class="module-card-meta">
+          <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> 4</span>
+          <span><i class="fa-solid fa-clone" aria-hidden="true"></i> 16</span>
+          <span><i class="fa-solid fa-circle-question" aria-hidden="true"></i> 10</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ═══ FINAL EXAM HUB ═══ -->
+    <div class="exam-hub">
+      <div class="exam-card fade-up">
+        <div class="exam-card-header">
+          <div class="exam-card-icon"><i class="fa-solid fa-bullseye" aria-hidden="true"></i></div>
+          <h3 data-bilingual>
+            <template class="content-ar">المراجعة الشاملة · فاينل</template>
+            <template class="content-en">Comprehensive Review · Final</template>
+            <span class="content-target">المراجعة الشاملة · فاينل</span>
+          </h3>
+        </div>
+        <p data-bilingual>
+          <template class="content-ar">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</template>
+          <template class="content-en">Complete review of all concepts, formulas, and algorithms from Modules 7–13</template>
+          <span class="content-target">مراجعة كاملة لجميع المفاهيم والمعادلات والخوارزميات من الوحدات 7–13</span>
+        </p>
+        <div class="exam-card-links">
+          <a href="final-review.html" class="exam-link exam-link--review">
+            <i class="fa-solid fa-book-open"></i>
+            <span data-bilingual>
+              <template class="content-ar">مراجعة</template>
+              <template class="content-en">Review</template>
+              <span class="content-target">مراجعة</span>
+            </span>
+          </a>
+          <a href="final-quiz.html" class="exam-link exam-link--quiz">
+            <i class="fa-solid fa-bolt"></i>
+            <span data-bilingual>
+              <template class="content-ar">اختبار</template>
+              <template class="content-en">Quiz</template>
+              <span class="content-target">اختبار</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MOTIVATIONAL QUOTE ═══ -->
+    <div class="hub-section-wrapper">
+      <div class="hub-divider dir-ltr"></div>
+      <div class="hub-quote fade-up" data-bilingual>
+        <template class="content-ar">البنيةُ الصحيحة تجعل الكبيرَ صغيراً</template>
+        <template class="content-en">The right structure makes the big small</template>
+        <span class="content-target">البنيةُ الصحيحة تجعل الكبيرَ صغيراً</span>
+      </div>
+      <div class="hub-divider dir-rtl"></div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+
+<!-- Progress Ring: reads quiz scores from localStorage -->
+<script>
+(function(){
+  const code = document.documentElement.getAttribute('data-subject') || '';
+  const total = 13;
+  let done = 0;
+  for (let i = 1; i <= total; i++) {
+    const key = 'garden_' + code + '_m' + i + '_quiz';
+    try { if (parseInt(localStorage.getItem(key)) > 0) done++; } catch(e) {}
+  }
+  const pct = Math.round((done / total) * 100);
+  const ring = document.getElementById('progress-ring');
+  const text = document.getElementById('progress-pct');
+  if (ring) {
+    const circum = 213.6;
+    ring.style.strokeDashoffset = circum - (circum * pct / 100);
+  }
+  if (text) text.textContent = pct + '%';
+
+  // Mark completed modules
+  document.querySelectorAll('.module-card').forEach(card => {
+    const num = card.querySelector('.module-card-number')?.textContent?.trim();
+    if (num) {
+      const key = 'garden_' + code + '_m' + num + '_quiz';
+      try { if (parseInt(localStorage.getItem(key)) >= 7) card.setAttribute('data-completed', 'true'); } catch(e) {}
+    }
+  });
+})();
+</script>
+</body>
+</html>

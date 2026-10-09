@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT484" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>بروتوكولات طبقة النقل لشبكات الاستشعار اللاسلكية · IT484 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT484" data-page-title-en="IT484">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=IT484"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#transport-protocol-requirements" class="toc-link" data-bilingual>
+        <template class="content-ar">متطلبات وتحديات بروتوكول النقل في شبكات الاستشعار</template>
+        <template class="content-en">Transport Protocol Requirements and Challenges in WSNs</template>
+        <span class="content-target">متطلبات وتحديات بروتوكول النقل في شبكات الاستشعار</span>
+      </a>
+      <a href="#performance-metrics" class="toc-link" data-bilingual>
+        <template class="content-ar">مقاييس الأداء في طبقة النقل</template>
+        <template class="content-en">Performance Metrics in Transport Layer</template>
+        <span class="content-target">مقاييس الأداء في طبقة النقل</span>
+      </a>
+      <a href="#tcp-unsuitability" class="toc-link" data-bilingual>
+        <template class="content-ar">عدم ملاءمة بروتوكولات الإنترنت (TCP) لشبكات الاستشعار</template>
+        <template class="content-en">Unsuitability of Internet Transport Protocols (TCP) for WSNs</template>
+        <span class="content-target">عدم ملاءمة بروتوكولات الإنترنت (TCP) لشبكات الاستشعار</span>
+      </a>
+      <a href="#congestion-control-protocols" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكولات التحكم في الازدحام وتدفق البيانات</template>
+        <template class="content-en">Congestion and Flow Control-Centric Protocols</template>
+        <span class="content-target">بروتوكولات التحكم في الازدحام وتدفق البيانات</span>
+      </a>
+      <a href="#reliability-centric-protocols" class="toc-link" data-bilingual>
+        <template class="content-ar">البروتوكولات التي تركز على الموثوقية</template>
+        <template class="content-en">Reliability-Centric Protocols</template>
+        <span class="content-target">البروتوكولات التي تركز على الموثوقية</span>
+      </a>
+      <a href="#hybrid-protocols-stcp" class="toc-link" data-bilingual>
+        <template class="content-ar">البروتوكولات الهجينة: Sensor TCP (STCP)</template>
+        <template class="content-en">Hybrid Protocols: Sensor TCP (STCP)</template>
+        <span class="content-target">البروتوكولات الهجينة: Sensor TCP (STCP)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · IT484
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">بروتوكولات طبقة النقل لشبكات الاستشعار اللاسلكية</h1>
+      <p class="hero-description">تغطي هذه الوحدة متطلبات بروتوكولات طبقة النقل في شبكات الاستشعار اللاسلكية، وتناقش عدم ملاءمة بروتوكولات الإنترنت التقليدية مثل TCP، وتستعرض البروتوكولات الحالية المصممة خصيصاً للتحكم في الازدحام وضمان الموثوقية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Transport Protocols for Wireless Sensor Networks</h1>
+      <p class="hero-description">This module covers the requirements of transport protocols in WSNs, discusses the unsuitability of traditional Internet protocols like TCP, and reviews existing protocols designed specifically for congestion control and reliability.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">طبقة النقل</span>
+      <span class="tag">التحكم في الازدحام</span>
+      <span class="tag">الموثوقية</span>
+      <span class="tag">شبكات الاستشعار اللاسلكية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Transport Layer</span>
+      <span class="tag">Congestion Control</span>
+      <span class="tag">Reliability</span>
+      <span class="tag">WSN</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم المتطلبات الأساسية لبروتوكولات النقل في شبكات الاستشعار اللاسلكية.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة مدى ملاءمة بروتوكولات النقل الخاصة بالإنترنت للاستخدام في شبكات الاستشعار اللاسلكية.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة بروتوكولات النقل الحالية المصممة خصيصاً لشبكات الاستشعار اللاسلكية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the basic requirements of transport protocols for WSNs.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss the suitability of Internet transport protocols for WSNs.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss existing transport protocols for WSN.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="transport-protocol-requirements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> متطلبات وتحديات بروتوكول النقل في شبكات الاستشعار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Transport Protocol Requirements and Challenges in WSNs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تدعم بروتوكولات طبقة النقل وظيفتين رئيسيتين: التحكم في الازدحام وضمان موثوقية تسليم البيانات، ولكنها تواجه تحديات بيئية وموارد قاسية في شبكات الاستشعار.</p></template>
+    <template class="content-en"><p>Transport layer protocols support two main functions: congestion control and reliable data delivery, but face severe resource and environmental challenges in WSNs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في شبكات الاستشعار اللاسلكية (WSN)، تمر البيانات المتبادلة بين عقد المصدر وعقدة التجميع (Sink) عبر قفزات متعددة، مما يخلق بنية مرور تشبه القمع (Funnel-like structure). تدعم بروتوكولات طبقة النقل وظيفتين رئيسيتين:</p><ol><li>التحكم في الازدحام (Congestion control).</li><li>تسليم البيانات الموثوق أو الاسترداد من فقدان الحزم (Reliable data delivery).</li></ol><p>يعد النقل الموثوق للبيانات مهمة صعبة للأسباب التالية:</p><ul><li>تمتلك المستشعرات طاقة حوسبة واتصال محدودة.</li><li>المستشعرات تعمل بالبطاريات، لذا فإن الحفاظ على الطاقة يمثل مشكلة مهمة.</li><li>يتم نشر المستشعرات بالقرب من الأرض مما يزيد من عدم موثوقية قناة الاتصال بسبب توهين الإشارة أو التلاشي.</li><li>النشر الكثيف للمستشعرات يزيد من التنافس على القناة والازدحام.</li></ul></template>
+    <template class="content-en"><p>In WSNs, data exchanged between source nodes and the sink node passes through multiple hops, creating a funnel-like traffic structure. Transport layer protocols support two main functions:</p><ol><li>Congestion control.</li><li>Reliable data delivery or recovery from packet loss.</li></ol><p>Reliable data transmission is a challenging task due to the following reasons:</p><ul><li>Sensors have limited computation and communication power.</li><li>Sensors are battery-powered, making energy conservation critical.</li><li>Sensors are deployed close to the ground, increasing channel unreliability due to signal attenuation, fading, or shadowing.</li><li>Dense deployment increases channel contention and congestion.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على عكس الشبكات التقليدية حيث يكون الازدحام ناتجاً غالباً عن تجاوز سعة الروابط الأساسية، فإن الازدحام في شبكات الاستشعار اللاسلكية ينتج عن الطبيعة المتقاربة لحركة المرور (تأثير القمع نحو الـ Sink) وتداخل الإشارات اللاسلكية (Interference).</p><p>بالإضافة إلى ذلك، فإن فقدان الحزم في شبكات الاستشعار لا يعني دائماً وجود ازدحام؛ فقد يكون ناتجاً عن سوء جودة القناة اللاسلكية. هذا التمييز حاسم لأن تطبيق آليات تقليل معدل الإرسال (كما يفعل TCP) عند فقدان الحزم بسبب جودة القناة سيؤدي إلى انخفاض غير مبرر في الأداء.</p><p>لذلك، يجب أن تكون بروتوكولات النقل في WSN قادرة على التمييز بين فقدان الحزم الناتج عن الازدحام وفقدان الحزم الناتج عن أخطاء القناة اللاسلكية.</p></template>
+    <template class="content-en"><p>Unlike traditional networks where congestion is often due to exceeding core link capacities, congestion in WSNs is caused by the convergent nature of traffic (the funnel effect towards the sink) and wireless signal interference.</p><p>Furthermore, packet loss in WSNs does not always indicate congestion; it is frequently caused by poor wireless channel quality. This distinction is critical because applying rate-reduction mechanisms (like TCP does) when packets are lost due to channel errors leads to an unjustified drop in throughput.</p><p>Therefore, WSN transport protocols must be able to distinguish between packet loss caused by congestion and packet loss caused by wireless channel errors.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A diagram showing a funnel-like structure in WSN. Multiple sensor nodes at the bottom (source nodes) sending data upwards through intermediate nodes, converging into a single Sink node at the top. Arrows indicate data flow. The density of arrows increases near the sink, illustrating the 'funnel' effect and potential congestion. Dark background #0d1117, accent color #00a8ff. Labels in English and Arabic. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrow marker for standard data flow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+    <!-- Arrow marker for vertical axis -->
+    <marker id="arrow-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+    </marker>
+    <!-- Gradient for Sink Node -->
+    <linearGradient id="sinkGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-600)"/>
+      <stop offset="100%" stop-color="var(--brand-800)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Main Title -->
+  <text x="425" y="35" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">WSN Funnel Effect &amp; Transport Challenges</text>
+  <text x="425" y="35" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">تأثير القمع وتحديات طبقة النقل في شبكات الاستشعار</text>
+
+  <!-- Divider Line -->
+  <line x1="505" y1="80" x2="505" y2="470" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="2"/>
+
+  <!-- ========================================== -->
+  <!-- LEFT SECTION: FUNNEL DIAGRAM               -->
+  <!-- ========================================== -->
+
+  <!-- Funnel Outline -->
+  <path d="M 180 60 L 340 60 L 480 470 L 40 470 Z" fill="none" stroke="var(--brand-400)" stroke-dasharray="6,6" stroke-width="2"/>
+  
+  <!-- Funnel Label -->
+  <text x="100" y="140" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Funnel-like Traffic</text>
+  <text x="100" y="140" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">حركة مرور قمعية</text>
+  <line x1="100" y1="148" x2="140" y2="180" stroke="var(--brand-400)" stroke-dasharray="2,2" stroke-width="1.5"/>
+
+  <!-- Vertical Data Flow Axis -->
+  <path d="M 20 420 L 20 120" stroke="var(--brand-400)" stroke-width="3" fill="none" marker-end="url(#arrow-axis)"/>
+  <text x="12" y="270" text-anchor="middle" transform="rotate(-90, 12, 270)" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Data Flow</text>
+  <text x="12" y="270" text-anchor="middle" transform="rotate(-90, 12, 270)" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">تدفق البيانات</text>
+
+  <!-- ARROWS: Source to Relay (Lower Density) -->
+  <g stroke="var(--brand-500)" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 80 425 L 145 280"/>
+    <path d="M 140 425 L 155 280"/>
+    <path d="M 200 425 L 245 280"/>
+    <path d="M 260 425 L 260 280"/>
+    <path d="M 320 425 L 275 280"/>
+    <path d="M 380 425 L 355 280"/>
+    <path d="M 440 425 L 365 280"/>
+  </g>
+
+  <!-- ARROWS: Relay to Sink (Higher Density / Congestion) -->
+  <g stroke="var(--brand-500)" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 160 238 Q 180 180 220 125"/>
+    <path d="M 170 238 Q 190 180 230 125"/>
+    <path d="M 250 238 L 250 125"/>
+    <path d="M 260 238 L 260 125"/>
+    <path d="M 270 238 L 270 125"/>
+    <path d="M 350 238 Q 330 180 290 125"/>
+    <path d="M 360 238 Q 340 180 300 125"/>
+  </g>
+
+  <!-- CONGESTION ZONE LABEL (Placed over the dense arrows) -->
+  <rect x="200" y="173" width="120" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="260" y="191" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Congestion</text>
+  <text x="260" y="191" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">ازدحام</text>
+
+  <!-- NODES: Source Layer -->
+  <g fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2">
+    <circle cx="80" cy="440" r="15"/>
+    <circle cx="140" cy="440" r="15"/>
+    <circle cx="200" cy="440" r="15"/>
+    <circle cx="260" cy="440" r="15"/>
+    <circle cx="320" cy="440" r="15"/>
+    <circle cx="380" cy="440" r="15"/>
+    <circle cx="440" cy="440" r="15"/>
+  </g>
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">
+    <text x="80" y="445">S1</text>
+    <text x="140" y="445">S2</text>
+    <text x="200" y="445">S3</text>
+    <text x="260" y="445">S4</text>
+    <text x="320" y="445">S5</text>
+    <text x="380" y="445">S6</text>
+    <text x="440" y="445">S7</text>
+  </g>
+  <text x="260" y="485" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Source Nodes</text>
+  <text x="260" y="485" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">عقد المصدر</text>
+
+  <!-- NODES: Relay Layer -->
+  <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+    <circle cx="160" cy="260" r="22"/>
+    <circle cx="260" cy="260" r="22"/>
+    <circle cx="360" cy="260" r="22"/>
+  </g>
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+    <text x="160" y="265">R1</text>
+    <text x="260" y="265">R2</text>
+    <text x="360" y="265">R3</text>
+  </g>
+  <text x="260" y="310" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Intermediate Nodes</text>
+  <text x="260" y="310" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">عقد وسيطة</text>
+
+  <!-- NODE: Sink -->
+  <rect x="200" y="70" width="120" height="50" rx="8" fill="url(#sinkGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="260" y="100" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Sink Node</text>
+  <text x="260" y="100" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">العقدة الوجهة</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SECTION: CHALLENGES CARDS            -->
+  <!-- ========================================== -->
+
+  <text x="660" y="90" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">Transport Layer Challenges</text>
+  <text x="660" y="90" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">تحديات طبقة النقل</text>
+
+  <!-- Card 1: Limited Resources -->
+  <rect x="530" y="120" width="260" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="660" y="145" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">1. Limited Resources</text>
+  <text x="660" y="145" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">1. موارد محدودة</text>
+  <text x="660" y="165" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Sensors lack computation</text>
+  <text x="660" y="165" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تفتقر المستشعرات لطاقة الحوسبة</text>
+  <text x="660" y="180" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">and battery power.</text>
+  <text x="660" y="180" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">وطاقة البطارية.</text>
+
+  <!-- Card 2: Channel Unreliability -->
+  <rect x="530" y="205" width="260" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="660" y="230" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">2. Channel Unreliability</text>
+  <text x="660" y="230" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">2. عدم موثوقية القناة</text>
+  <text x="660" y="250" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Signal attenuation, fading,</text>
+  <text x="660" y="250" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">توهين الإشارة، التلاشي،</text>
+  <text x="660" y="265" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">and shadowing near ground.</text>
+  <text x="660" y="265" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">والتظليل بالقرب من الأرض.</text>
+
+  <!-- Card 3: Dense Deployment -->
+  <rect x="530" y="290" width="260" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="660" y="315" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">3. Dense Deployment</text>
+  <text x="660" y="315" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">3. النشر الكثيف</text>
+  <text x="660" y="335" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">High channel contention</text>
+  <text x="660" y="335" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تنافس عالٍ على القناة</text>
+  <text x="660" y="350" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">and frequent collisions.</text>
+  <text x="660" y="350" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">وتصادمات متكررة للحزم.</text>
+
+  <!-- Card 4: Reliability vs. Congestion -->
+  <rect x="530" y="375" width="260" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="660" y="400" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">4. Reliability vs. Congestion</text>
+  <text x="660" y="400" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">4. الموثوقية مقابل الازدحام</text>
+  <text x="660" y="420" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Ensuring data delivery</text>
+  <text x="660" y="420" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">ضمان تسليم البيانات</text>
+  <text x="660" y="435" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">without overloading the network.</text>
+  <text x="660" y="435" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">دون التسبب بعبء زائد للشبكة.</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>TCP (Internet)</th><th>WSN Transport Protocols</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نمط الاتصال</template>
+          <template class="content-en">Connection Paradigm</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">من طرف إلى طرف (End-to-end)</template>
+          <template class="content-en">End-to-end</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">غالباً قفزة بقفزة (Hop-by-hop)</template>
+          <template class="content-en">Often Hop-by-hop</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تفسير فقدان الحزم</template>
+          <template class="content-en">Packet Loss Interpretation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يفترض دائماً أنه ازدحام</template>
+          <template class="content-en">Always assumes congestion</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يميز بين الازدحام وأخطاء القناة</template>
+          <template class="content-en">Distinguishes congestion from channel errors</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع الموثوقية</template>
+          <template class="content-en">Reliability Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">موثوقية الحزمة (100%)</template>
+          <template class="content-en">Packet reliability (100%)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">موثوقية الحدث (Event reliability)</template>
+          <template class="content-en">Event reliability</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يؤثر النشر الكثيف للمستشعرات بشكل مزدوج (إيجاباً وسلباً) على موثوقية الشبكة؟</template>
+      <template class="content-en">How does dense deployment of sensors have a dual effect (positive and negative) on network reliability?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إيجاباً: يوفر مسارات بديلة وتكراراً للبيانات مما يعزز موثوقية الحدث. سلباً: يزيد من التنافس على القناة اللاسلكية ويسبب تداخل الإشارات والازدحام، مما يقلل من موثوقية الحزم الفردية.</p></template>
+      <template class="content-en"><p>Positively: It provides alternative paths and data redundancy, enhancing event reliability. Negatively: It increases wireless channel contention, signal interference, and congestion, which reduces individual packet reliability.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="performance-metrics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مقاييس الأداء في طبقة النقل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Performance Metrics in Transport Layer</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم مقاييس رياضية محددة لتقييم أداء بروتوكولات النقل، مثل موثوقية الحدث، درجة الازدحام، كفاءة الشبكة، والعدالة.</p></template>
+    <template class="content-en"><p>Specific mathematical metrics are used to evaluate transport protocol performance, such as event reliability, congestion degree, network efficiency, and fairness.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتقييم بروتوكولات النقل في WSN، يتم استخدام عدة مقاييس:</p><ul><li><b><span class="smart-term" data-term-en="Event Reliability" data-ar="موثوقية الحدث" data-en-def="Achieved when a detected event is reported to the sink with a certain degree of accuracy, regardless of individual packet loss.">موثوقية الحدث<span class="smart-term-tooltip"></span></span> (Event Reliability):</b> نسبة الرسائل التي تم تسليمها بنجاح والتي تبلغ عن حدث معين خلال فترة زمنية.</li><li><b>موثوقية العقدة (Node Reliability):</b> نسبة الحزم التي تم إنشاؤها بواسطة عقدة معينة واستقبلها الـ Sink بنجاح.</li><li><b>اكتشاف الازدحام (Congestion Detection):</b> يحدد مستوى الازدحام الحالي، ويُحسب كنسبة بين متوسط وقت خدمة الحزمة ومتوسط وقت وصول الحزم.</li><li><b>كفاءة الشبكة (Network Efficiency):</b> نسبة إجمالي عدد القفزات التي قطعتها الحزم المفيدة إلى إجمالي عدد عمليات إرسال الحزم في الشبكة (بما في ذلك إعادة الإرسال والحزم المفقودة).</li><li><b>كفاءة العقدة أو عدم التوازن (Node Imbalance):</b> نسبة الحزم التي تستقبلها العقدة من أبنائها إلى الحزم التي يستقبلها والدها منها.</li><li><b>عدالة الشبكة (Network Fairness):</b> مدى عدالة حصول كل عقدة على فرصة لاستخدام موارد الشبكة وإرسال بياناتها.</li></ul></template>
+    <template class="content-en"><p>To evaluate transport protocols in WSNs, several metrics are used:</p><ul><li><b><span class="smart-term" data-term-en="Event Reliability" data-ar="موثوقية الحدث" data-en-def="Achieved when a detected event is reported to the sink with a certain degree of accuracy, regardless of individual packet loss.">Event Reliability<span class="smart-term-tooltip"></span></span>:</b> The ratio of successfully delivered messages reporting an event within an update interval.</li><li><b>Node Reliability:</b> The ratio of packets generated by a specific node that are successfully received by the sink.</li><li><b>Congestion Detection (Degree):</b> Specifies the current congestion level, calculated as the ratio of average packet service time to average packet interarrival time.</li><li><b>Network Efficiency:</b> The ratio of the total number of hops traveled by useful packets to the total number of packet transmissions in the network (including retransmissions and dropped packets).</li><li><b>Node Imbalance:</b> The ratio of packets received at a node from its children to the packets received at its parent from it.</li><li><b>Network Fairness:</b> Implies how fairly or equally each node gets the chance to use network resources and transmit data.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مفهوم 'موثوقية الحدث' هو نقلة نوعية مقارنة بالشبكات التقليدية. في الإنترنت، نهتم بوصول كل حزمة (Packet Reliability). في WSN، إذا اكتشفت 10 مستشعرات حريقاً، يكفي أن تصل رسالة واحدة أو اثنتان إلى الـ Sink للإبلاغ عن الحدث بنجاح، حتى لو فُقدت باقي الحزم.</p><p>مقياس 'كفاءة الشبكة' يعاقب البروتوكولات التي تفرط في إعادة الإرسال. إذا تم تسليم حزمة مفيدة ولكن بعد 5 عمليات إعادة إرسال فاشلة، فإن المقام في معادلة الكفاءة سيزداد، مما يقلل الكفاءة الكلية، وهو أمر بالغ الأهمية للحفاظ على الطاقة.</p></template>
+    <template class="content-en"><p>The concept of 'Event Reliability' is a paradigm shift compared to traditional networks. In the Internet, we care about every packet arriving (Packet Reliability). In WSNs, if 10 sensors detect a fire, it is sufficient for one or two messages to reach the sink to successfully report the event, even if the other packets are lost.</p><p>The 'Network Efficiency' metric penalizes protocols that over-retransmit. If a useful packet is delivered but only after 5 failed retransmissions, the denominator in the efficiency equation increases, lowering overall efficiency, which is critical for energy conservation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>درجة الازدحام تساوي متوسط وقت خدمة الحزمة مقسوماً على متوسط وقت وصول الحزم.</strong></template>
+      <template class="content-en"><strong>Congestion degree equals average packet service time divided by average packet interarrival time.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{Congestion Degree } d(i) = \frac{t_s^i}{t_a^i}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت درجة الازدحام d(i) أكبر من 1، ماذا يعني ذلك بالنسبة للعقدة؟</template>
+      <template class="content-en">If the congestion degree d(i) is greater than 1, what does this mean for the node?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن متوسط وقت خدمة الحزمة أطول من متوسط وقت وصول الحزم، مما يؤدي إلى تراكم الحزم في طابور الانتظار (Queue) وحدوث ازدحام حتمي وفقدان للحزم.</p></template>
+      <template class="content-en"><p>It means the average packet service time is longer than the average packet interarrival time, leading to packet accumulation in the queue, inevitable congestion, and packet loss.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tcp-unsuitability" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> عدم ملاءمة بروتوكولات الإنترنت (TCP) لشبكات الاستشعار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Unsuitability of Internet Transport Protocols (TCP) for WSNs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول TCP غير مناسب لشبكات الاستشعار لأنه مصمم لاتصالات من طرف إلى طرف، ويفترض أن فقدان الحزم سببه الازدحام فقط، ويتطلب موارد تفوق قدرات المستشعرات.</p></template>
+    <template class="content-en"><p>TCP is unsuitable for WSNs because it is designed for end-to-end connections, assumes packet loss is solely due to congestion, and requires resources beyond sensor capabilities.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الإنترنت، تعمل العقد الوسيطة كأجهزة طبقة ثالثة (مُوجّهات)، بينما في شبكات الاستشعار، تمتلك جميع العقد طبقة نقل. بروتوكول TCP هو الأكثر استخداماً في الإنترنت، لكنه غير مناسب لـ WSN للأسباب التالية:</p><ol><li><b>غياب ال<span class="smart-term" data-term-en="End-to-end connectivity" data-ar="اتصال من طرف إلى طرف" data-en-def="A network design principle where protocol features are implemented at the endpoints of the network, typical of TCP, but often impractical in WSNs.">اتصال من طرف إلى طرف<span class="smart-term-tooltip"></span></span>:</b> عادة لا يتم إنشاء اتصال مباشر بين المصدر والـ Sink أثناء جلسة الاتصال في WSN.</li><li><b>جودة القناة الضعيفة:</b> تتميز WSN بمعدلات خطأ عالية بسبب ضعف جودة القناة، وانخفاض النطاق الترددي، والفشل المتكرر للعقد. TCP يفسر أي فقدان للحزم على أنه ازدحام ويقلل سرعة الإرسال بشكل غير ضروري.</li><li><b>التخزين المؤقت في العقد الوسيطة:</b> يمكن لكل عقدة وسيطة تخزين الحزم لفترة أطول ثم إرسالها للقفزة التالية عند توفر القناة، وهو ما يتعارض مع نموذج TCP.</li><li><b>قيود الموارد:</b> يتطلب TCP ذاكرة وطاقة معالجة لا تتوفر في عقد الاستشعار المحدودة.</li></ol></template>
+    <template class="content-en"><p>In the Internet, intermediate nodes act as layer-3 devices (routers), whereas in sensor networks, all nodes possess a transport layer. TCP is the most common Internet protocol, but it is unsuitable for WSNs due to:</p><ol><li><b>Lack of <span class="smart-term" data-term-en="End-to-end connectivity" data-ar="اتصال من طرف إلى طرف" data-en-def="A network design principle where protocol features are implemented at the endpoints of the network, typical of TCP, but often impractical in WSNs.">end-to-end connectivity<span class="smart-term-tooltip"></span></span>:</b> Typically, an end-to-end connection between source and sink is not established during a WSN session.</li><li><b>Poor channel quality:</b> WSNs have high error rates due to poor channel quality, low bandwidth, and frequent node failures. TCP misinterprets packet loss as congestion and unnecessarily reduces transmission rates.</li><li><b>Intermediate caching:</b> Each intermediate node can store packets for a longer period and send them to the next hop when the channel is available, conflicting with TCP's model.</li><li><b>Resource limitations:</b> TCP requires memory and processing power that constrained sensor nodes lack.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق المعماري الأساسي هو أن بروتوكولات النقل في WSN غالباً ما تعمل بنمط 'قفزة بقفزة' (Hop-by-hop) بدلاً من 'طرف إلى طرف' (End-to-end). هذا يسمح للعقد الوسيطة بالمشاركة الفعالة في التحكم في الازدحام والموثوقية (مثل تجميع البيانات أو طلب إعادة الإرسال محلياً)، مما يوفر الطاقة التي كانت ستُهدر في إعادة الإرسال من المصدر الأصلي.</p></template>
+    <template class="content-en"><p>The fundamental architectural difference is that WSN transport protocols often operate on a 'hop-by-hop' basis rather than 'end-to-end'. This allows intermediate nodes to actively participate in congestion control and reliability (e.g., data aggregation or local retransmission requests), saving energy that would otherwise be wasted retransmitting from the original source.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: A side-by-side comparison diagram. Left side: Internet architecture showing End Hosts with full protocol stacks (up to Application) and intermediate Routers only going up to Network Layer (Layer 3). Right side: WSN architecture showing all nodes (source, intermediate, sink) possessing the full protocol stack including the Transport Layer. Use distinct colors to highlight the Transport Layer presence. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowheads for Logical Links -->
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M10,0 L0,5 L10,10 Z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Arrowheads for Physical Links -->
+    <marker id="phys-arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--text-muted)" />
+    </marker>
+    <marker id="phys-arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M10,0 L0,5 L10,10 Z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Center Divider -->
+  <line x1="475" y1="20" x2="475" y2="280" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+
+  <!-- ========================================== -->
+  <!-- LEFT PANE: INTERNET ARCHITECTURE           -->
+  <!-- ========================================== -->
+  
+  <!-- Section Title -->
+  <text x="237" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Internet Architecture</text>
+  <text x="237" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">بنية الإنترنت</text>
+
+  <!-- Node Titles -->
+  <text x="67" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">End Host A</text>
+  <text x="67" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المضيف أ</text>
+
+  <text x="237" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Router (Layer 3)</text>
+  <text x="237" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">موجه (الطبقة 3)</text>
+
+  <text x="407" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">End Host B</text>
+  <text x="407" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المضيف ب</text>
+
+  <!-- Host A Stack -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="22" y="100" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="67" y="113" fill="var(--text-primary)" class="gsvg-en">Application</text>
+    <text x="67" y="113" fill="var(--text-primary)" class="gsvg-ar">التطبيق</text>
+
+    <rect x="22" y="124" width="90" height="24" fill="var(--brand-500)" stroke="var(--brand-700)" stroke-width="1.5" />
+    <text x="67" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-en">Transport</text>
+    <text x="67" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-ar">النقل</text>
+
+    <rect x="22" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="67" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="67" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="22" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="67" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="67" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="22" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="67" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="67" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- Router Stack (Only up to Layer 3) -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="192" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="237" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="237" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="192" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="237" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="237" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="192" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="237" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="237" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- Host B Stack -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="362" y="100" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="407" y="113" fill="var(--text-primary)" class="gsvg-en">Application</text>
+    <text x="407" y="113" fill="var(--text-primary)" class="gsvg-ar">التطبيق</text>
+
+    <rect x="362" y="124" width="90" height="24" fill="var(--brand-500)" stroke="var(--brand-700)" stroke-width="1.5" />
+    <text x="407" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-en">Transport</text>
+    <text x="407" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-ar">النقل</text>
+
+    <rect x="362" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="407" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="407" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="362" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="407" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="407" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="362" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="407" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="407" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- Internet Links -->
+  <!-- Physical Links -->
+  <line x1="118" y1="208" x2="186" y2="208" stroke="var(--text-muted)" stroke-width="2" marker-start="url(#phys-arrow-start)" marker-end="url(#phys-arrow-end)" />
+  <line x1="288" y1="208" x2="356" y2="208" stroke="var(--text-muted)" stroke-width="2" marker-start="url(#phys-arrow-start)" marker-end="url(#phys-arrow-end)" />
+  
+  <!-- Logical Transport Link (End-to-End) -->
+  <line x1="118" y1="136" x2="356" y2="136" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <text x="237" y="124" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">End-to-End TCP Connection</text>
+  <text x="237" y="124" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">اتصال TCP من النهاية للنهاية</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT PANE: WSN ARCHITECTURE               -->
+  <!-- ========================================== -->
+
+  <!-- Section Title -->
+  <text x="712" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">WSN Architecture</text>
+  <text x="712" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">بنية شبكات الاستشعار (WSN)</text>
+
+  <!-- Node Titles -->
+  <text x="543" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Source Node</text>
+  <text x="543" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">عقدة المصدر</text>
+
+  <text x="713" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Intermediate Node</text>
+  <text x="713" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">عقدة وسيطة</text>
+
+  <text x="883" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Sink Node</text>
+  <text x="883" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">عقدة المصب</text>
+
+  <!-- Source Node Stack -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="498" y="100" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="543" y="113" fill="var(--text-primary)" class="gsvg-en">Application</text>
+    <text x="543" y="113" fill="var(--text-primary)" class="gsvg-ar">التطبيق</text>
+
+    <rect x="498" y="124" width="90" height="24" fill="var(--brand-500)" stroke="var(--brand-700)" stroke-width="1.5" />
+    <text x="543" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-en">Transport</text>
+    <text x="543" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-ar">النقل</text>
+
+    <rect x="498" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="543" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="543" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="498" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="543" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="543" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="498" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="543" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="543" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- Intermediate Node Stack (Full Stack) -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="668" y="100" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="713" y="113" fill="var(--text-primary)" class="gsvg-en">Application</text>
+    <text x="713" y="113" fill="var(--text-primary)" class="gsvg-ar">التطبيق</text>
+
+    <rect x="668" y="124" width="90" height="24" fill="var(--brand-500)" stroke="var(--brand-700)" stroke-width="1.5" />
+    <text x="713" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-en">Transport</text>
+    <text x="713" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-ar">النقل</text>
+
+    <rect x="668" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="713" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="713" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="668" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="713" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="713" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="668" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="713" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="713" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- Sink Node Stack -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" dominant-baseline="middle">
+    <rect x="838" y="100" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="883" y="113" fill="var(--text-primary)" class="gsvg-en">Application</text>
+    <text x="883" y="113" fill="var(--text-primary)" class="gsvg-ar">التطبيق</text>
+
+    <rect x="838" y="124" width="90" height="24" fill="var(--brand-500)" stroke="var(--brand-700)" stroke-width="1.5" />
+    <text x="883" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-en">Transport</text>
+    <text x="883" y="137" fill="var(--on-brand-lo)" font-weight="bold" class="gsvg-ar">النقل</text>
+
+    <rect x="838" y="148" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="883" y="161" fill="var(--text-primary)" class="gsvg-en">Network</text>
+    <text x="883" y="161" fill="var(--text-primary)" class="gsvg-ar">الشبكة</text>
+
+    <rect x="838" y="172" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="883" y="185" fill="var(--text-primary)" class="gsvg-en">Data Link</text>
+    <text x="883" y="185" fill="var(--text-primary)" class="gsvg-ar">ربط البيانات</text>
+
+    <rect x="838" y="196" width="90" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="883" y="209" fill="var(--text-primary)" class="gsvg-en">Physical</text>
+    <text x="883" y="209" fill="var(--text-primary)" class="gsvg-ar">المادية</text>
+  </g>
+
+  <!-- WSN Links -->
+  <!-- Physical Links -->
+  <line x1="594" y1="208" x2="662" y2="208" stroke="var(--text-muted)" stroke-width="2" marker-start="url(#phys-arrow-start)" marker-end="url(#phys-arrow-end)" />
+  <line x1="764" y1="208" x2="832" y2="208" stroke="var(--text-muted)" stroke-width="2" marker-start="url(#phys-arrow-start)" marker-end="url(#phys-arrow-end)" />
+  
+  <!-- Logical Transport Links (Hop-by-Hop) -->
+  <line x1="594" y1="136" x2="662" y2="136" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  <line x1="764" y1="136" x2="832" y2="136" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+  
+  <text x="713" y="124" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Hop-by-Hop / Caching</text>
+  <text x="713" y="124" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">عقدة لعقدة / تخزين مؤقت</text>
+
+
+  <!-- ========================================== -->
+  <!-- BOTTOM PANE: WHY TCP FAILS IN WSN          -->
+  <!-- ========================================== -->
+
+  <!-- Section Title -->
+  <text x="475" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Why TCP is Unsuitable for WSNs</text>
+  <text x="475" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">لماذا بروتوكول TCP غير مناسب لشبكات الاستشعار</text>
+
+  <!-- Box 1: No End-to-End -->
+  <g transform="translate(26, 350)">
+    <rect x="0" y="0" width="210" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <circle cx="105" cy="0" r="16" fill="var(--brand-500)" />
+    <text x="105" y="2" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">1</text>
+    
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">No End-to-End</text>
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">غياب الاتصال الطرفي</text>
+    
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">No direct connection</text>
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">لا يوجد اتصال مباشر</text>
+    
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">between source &amp; sink</text>
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">بين المصدر والمصب</text>
+  </g>
+
+  <!-- Box 2: Poor Channel Quality -->
+  <g transform="translate(258, 350)">
+    <rect x="0" y="0" width="210" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <circle cx="105" cy="0" r="16" fill="var(--brand-500)" />
+    <text x="105" y="2" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">2</text>
+    
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Poor Channel Quality</text>
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">سوء جودة القناة</text>
+    
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Loss misinterpreted</text>
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">يُفسر الفقد خطأً</text>
+    
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">as congestion</text>
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">على أنه ازدحام</text>
+  </g>
+
+  <!-- Box 3: Intermediate Caching -->
+  <g transform="translate(490, 350)">
+    <rect x="0" y="0" width="210" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <circle cx="105" cy="0" r="16" fill="var(--brand-500)" />
+    <text x="105" y="2" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">3</text>
+    
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Intermediate Caching</text>
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">التخزين المؤقت الوسيط</text>
+    
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Nodes store packets</text>
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">تقوم العقد بتخزين الحزم</text>
+    
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">breaking TCP model</text>
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">مما يكسر نموذج TCP</text>
+  </g>
+
+  <!-- Box 4: Resource Limits -->
+  <g transform="translate(722, 350)">
+    <rect x="0" y="0" width="210" height="120" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <circle cx="105" cy="0" r="16" fill="var(--brand-500)" />
+    <text x="105" y="2" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" dominant-baseline="middle">4</text>
+    
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Resource Limits</text>
+    <text x="105" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">محدودية الموارد</text>
+    
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">TCP requires memory</text>
+    <text x="105" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">يتطلب TCP ذاكرة</text>
+    
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">&amp; processing power</text>
+    <text x="105" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">وقوة معالجة عالية</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تفسير TCP لفقدان الحزم مشكلة قاتلة لأداء شبكات الاستشعار؟</template>
+      <template class="content-en">Why is TCP's interpretation of packet loss a fatal flaw for WSN performance?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن TCP يفترض دائماً أن فقدان الحزم سببه الازدحام، فيقوم بخفض معدل الإرسال (نافذة الازدحام). في WSN، الفقدان غالباً بسبب التشويش اللاسلكي، وخفض معدل الإرسال يقلل الإنتاجية دون حل مشكلة التشويش.</p></template>
+      <template class="content-en"><p>Because TCP always assumes packet loss is due to congestion, so it reduces the transmission rate (congestion window). In WSNs, loss is often due to wireless interference, and reducing the rate lowers throughput without solving the interference issue.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="congestion-control-protocols" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> بروتوكولات التحكم في الازدحام وتدفق البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Congestion and Flow Control-Centric Protocols</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تركز هذه البروتوكولات على اكتشاف الازدحام مبكراً وتخفيفه باستخدام تقنيات مثل الضغط العكسي، الجدولة القائمة على الأولوية، والمصارف الافتراضية.</p></template>
+    <template class="content-en"><p>These protocols focus on early congestion detection and mitigation using techniques like backpressure, priority-based scheduling, and virtual sinks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُصنف بروتوكولات النقل في WSN إلى بروتوكولات تحكم في الازدحام وبروتوكولات موثوقية. من أبرز بروتوكولات التحكم في الازدحام:</p><ol><li><b>CODA:</b> يكتشف الازدحام بناءً على طول طابور الانتظار. يستخدم <span class="smart-term" data-term-en="Backpressure" data-ar="الضغط العكسي" data-en-def="A hop-by-hop mechanism where a congested node signals its immediate upstream neighbor to reduce its sending rate.">الضغط العكسي<span class="smart-term-tooltip"></span></span> (Backpressure) قفزة بقفزة، وتنظيم متعدد المصادر باستخدام خوارزمية AIMD.</li><li><b>CCF:</b> يتحكم في الازدحام بناءً على وقت خدمة الحزمة ويضمن العدالة (Fairness) بين العقد.</li><li><b>PCCP:</b> بروتوكول قائم على الأولوية. يستخدم طابورين (للمرور المصدري والمرور العابر) ويطبق خوارزميات جدولة عادلة (WFQ أو WRR).</li><li><b>Trickle:</b> يحد من عدد الحزم لضبط معدل الإرسال، ويُستخدم أساساً لنشر تحديثات الأكواد البرمجية.</li><li><b>Fusion:</b> يدمج التحكم في التدفق قفزة بقفزة، الحد من معدل المصدر، وطبقة MAC ذات أولوية.</li><li><b>Siphon:</b> يعالج الازدحام باستخدام '<span class="smart-term" data-term-en="Virtual Sinks" data-ar="المصارف الافتراضية" data-en-def="Special nodes used in the Siphon protocol to tunnel traffic out of congested regions to alleviate network load.">المصارف الافتراضية<span class="smart-term-tooltip"></span></span>' (Virtual Sinks) لسحب حركة المرور الزائدة من مناطق الازدحام.</li><li><b>LACAS:</b> يستخدم 'الآلات التعليمية' (Learning Automata) في العقد الوسيطة لاتخاذ قرارات مستقلة لتجنب الازدحام.</li><li><b>ARCC:</b> يستخدم تحسين مستعمرة النمل (ACO) لإيجاد مسارات مثالية وتجنب الازدحام ديناميكياً.</li></ol></template>
+    <template class="content-en"><p>WSN transport protocols are classified into congestion control and reliability protocols. Key congestion control protocols include:</p><ol><li><b>CODA:</b> Detects congestion based on queue length. Uses hop-by-hop <span class="smart-term" data-term-en="Backpressure" data-ar="الضغط العكسي" data-en-def="A hop-by-hop mechanism where a congested node signals its immediate upstream neighbor to reduce its sending rate.">backpressure<span class="smart-term-tooltip"></span></span> and closed-loop multi-source regulation (AIMD).</li><li><b>CCF:</b> Controls congestion based on packet service time and ensures fairness among nodes.</li><li><b>PCCP:</b> Priority-based. Uses two queues (source traffic and transit traffic) and applies fair scheduling algorithms (WFQ or WRR).</li><li><b>Trickle:</b> Limits packet numbers to adjust transmission rates, primarily used for propagating code updates.</li><li><b>Fusion:</b> Integrates hop-by-hop flow control, source rate limiting, and a prioritized MAC layer.</li><li><b>Siphon:</b> Addresses overload using '<span class="smart-term" data-term-en="Virtual Sinks" data-ar="المصارف الافتراضية" data-en-def="Special nodes used in the Siphon protocol to tunnel traffic out of congested regions to alleviate network load.">Virtual Sinks<span class="smart-term-tooltip"></span></span>' (VSs) to tunnel out traffic from congested regions.</li><li><b>LACAS:</b> Uses 'Learning Automata' at intermediate nodes to make independent congestion avoidance decisions.</li><li><b>ARCC:</b> Uses Ant Colony Optimization (ACO) to find optimal paths and dynamically avoid congestion.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>آلية 'الضغط العكسي' (Backpressure) في CODA تعمل كالتالي:</p><ul><li>عندما تكتشف عقدة وسيطة ازدحاماً، ترسل إشارة تحذير إلى العقدة التي تسبقها مباشرة (القفزة السابقة) لتخفيف الإرسال،</li><li>وتنتشر هذه الإشارة تدريجياً حتى تصل للمصدر.</li></ul><p>هذا أسرع بكثير من انتظار إشعار من الـ Sink.</p><p>في بروتوكول Siphon، فكرة 'المصارف الافتراضية' تشبه فتح مسارات طوارئ جانبية في طريق سريع مزدحم.</p><p>العقد التي تمتلك أجهزة راديو متعددة (Multi-radio) تعمل كمصارف افتراضية تسحب البيانات من المنطقة المزدحمة وترسلها عبر شبكة خلفية (Backbone) إلى الـ Sink.</p></template>
+    <template class="content-en"><p>The 'Backpressure' mechanism in CODA works as follows: when an intermediate node detects congestion, it sends a warning signal to its immediate upstream neighbor to slow down. This signal propagates backward to the source. This is much faster than waiting for an end-to-end notification from the sink.</p><p>In the Siphon protocol, the concept of 'Virtual Sinks' is like opening emergency side lanes on a congested highway. Nodes equipped with multi-radios act as virtual sinks, siphoning data from the congested event region and tunneling it via a secondary backbone network to the physical sink.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Diagram illustrating the Siphon protocol. A dense field of sensor nodes. A specific 'Event region' is highlighted where active sensors are generating heavy traffic. Arrows point from these sensors to a 'Virtual Sink' node (distinctly colored). The Virtual Sink then has a direct, separate path (tunnel) to the main physical Sink at the top, bypassing the normal multi-hop congested paths. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 620" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Marker for normal multi-hop paths ending at node centers -->
+        <marker id="arr-muted-node" viewBox="0 0 10 10" refX="13" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,2 L8,5 L0,8 z" fill="var(--text-muted)" />
+        </marker>
+        
+        <!-- Marker for normal multi-hop paths ending at flat edges (Sink) -->
+        <marker id="arr-muted-edge" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,2 L8,5 L0,8 z" fill="var(--text-muted)" />
+        </marker>
+        
+        <!-- Marker for heavy traffic paths ending at node centers -->
+        <marker id="arr-brand-node" viewBox="0 0 10 10" refX="12" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,2 L8,5 L0,8 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Marker for heavy traffic paths ending at flat edges (Virtual Sink) -->
+        <marker id="arr-brand-edge" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M0,2 L8,5 L0,8 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Marker for the high-speed tunnel ending at Sink -->
+        <marker id="arr-tunnel" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+            <path d="M0,2 L8,5 L0,8 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Reusable Node Templates -->
+        <g id="node-normal">
+            <circle r="7" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="2" />
+        </g>
+        <g id="node-active">
+            <circle r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        </g>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Title -->
+        <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Siphon Protocol: Congestion Bypass via Virtual Sinks</text>
+        <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بروتوكول Siphon: تجاوز الازدحام عبر الأحواض الافتراضية</text>
+
+        <!-- Event Region Background -->
+        <circle cx="600" cy="460" r="120" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+        <circle cx="600" cy="460" r="80" fill="none" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4" />
+
+        <!-- ================= LINES & PATHS ================= -->
+        
+        <!-- Normal Multi-hop Paths (Background Network) -->
+        <g stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4,4">
+            <!-- To Physical Sink -->
+            <line x1="150" y1="250" x2="340" y2="150" marker-end="url(#arr-muted-edge)" />
+            <line x1="320" y1="280" x2="380" y2="150" marker-end="url(#arr-muted-edge)" />
+            <line x1="380" y1="200" x2="380" y2="150" marker-end="url(#arr-muted-edge)" />
+            <line x1="460" y1="240" x2="460" y2="150" marker-end="url(#arr-muted-edge)" />
+            <line x1="550" y1="180" x2="460" y2="150" marker-end="url(#arr-muted-edge)" />
+            <line x1="250" y1="180" x2="340" y2="150" marker-end="url(#arr-muted-edge)" />
+            
+            <!-- Node to Node -->
+            <line x1="220" y1="320" x2="150" y2="250" marker-end="url(#arr-muted-node)" />
+            <line x1="120" y1="420" x2="220" y2="320" marker-end="url(#arr-muted-node)" />
+            <line x1="280" y1="450" x2="320" y2="280" marker-end="url(#arr-muted-node)" />
+            <line x1="420" y1="360" x2="460" y2="240" marker-end="url(#arr-muted-node)" />
+            <line x1="350" y1="480" x2="420" y2="360" marker-end="url(#arr-muted-node)" />
+            <line x1="480" y1="440" x2="420" y2="360" marker-end="url(#arr-muted-node)" />
+            <line x1="680" y1="260" x2="460" y2="240" marker-end="url(#arr-muted-node)" />
+            <line x1="720" y1="360" x2="680" y2="260" marker-end="url(#arr-muted-node)" />
+            
+            <!-- Background density connections -->
+            <line x1="80" y1="300" x2="150" y2="250" marker-end="url(#arr-muted-node)" />
+            <line x1="100" y1="520" x2="120" y2="420" marker-end="url(#arr-muted-node)" />
+            <line x1="200" y1="550" x2="280" y2="450" marker-end="url(#arr-muted-node)" />
+            <line x1="700" y1="450" x2="720" y2="360" marker-end="url(#arr-muted-node)" />
+            <line x1="750" y1="300" x2="680" y2="260" marker-end="url(#arr-muted-node)" />
+        </g>
+
+        <!-- Congested / Diverted Path (Old Route) -->
+        <line x1="550" y1="420" x2="480" y2="440" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,4" />
+        <g transform="translate(515, 430)">
+            <line x1="-6" y1="-6" x2="6" y2="6" stroke="var(--text-primary)" stroke-width="2.5" />
+            <line x1="-6" y1="6" x2="6" y2="-6" stroke="var(--text-primary)" stroke-width="2.5" />
+        </g>
+        <text x="515" y="410" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Traffic Diverted</text>
+        <text x="515" y="410" text-anchor="middle" font-size="12" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تم تحويل حركة المرور</text>
+
+        <!-- Heavy Traffic Paths (Event Region to Virtual Sink) -->
+        <g stroke="var(--brand-500)" stroke-width="2">
+            <!-- To Virtual Sink Edges -->
+            <line x1="550" y1="420" x2="550" y2="330" marker-end="url(#arr-brand-edge)" />
+            <line x1="630" y1="410" x2="565" y2="315" marker-end="url(#arr-brand-edge)" />
+            <line x1="590" y1="470" x2="555" y2="325" marker-end="url(#arr-brand-edge)" />
+            
+            <!-- Active Node to Active Node -->
+            <line x1="660" y1="480" x2="630" y2="410" marker-end="url(#arr-brand-node)" />
+            <line x1="540" y1="490" x2="550" y2="420" marker-end="url(#arr-brand-node)" />
+            <line x1="620" y1="520" x2="590" y2="470" marker-end="url(#arr-brand-node)" />
+        </g>
+
+        <!-- High-Speed Virtual Tunnel -->
+        <path d="M 550,270 Q 520,190 440,150" fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="8,6" marker-end="url(#arr-tunnel)" />
+
+        <!-- ================= NODES ================= -->
+        
+        <!-- Normal Nodes -->
+        <use href="#node-normal" x="150" y="250" />
+        <use href="#node-normal" x="220" y="320" />
+        <use href="#node-normal" x="120" y="420" />
+        <use href="#node-normal" x="280" y="450" />
+        <use href="#node-normal" x="320" y="280" />
+        <use href="#node-normal" x="380" y="200" />
+        <use href="#node-normal" x="460" y="240" />
+        <use href="#node-normal" x="420" y="360" />
+        <use href="#node-normal" x="350" y="480" />
+        <use href="#node-normal" x="480" y="440" />
+        <use href="#node-normal" x="680" y="260" />
+        <use href="#node-normal" x="720" y="360" />
+        
+        <!-- Background Density Nodes -->
+        <use href="#node-normal" x="80" y="300" />
+        <use href="#node-normal" x="100" y="520" />
+        <use href="#node-normal" x="200" y="550" />
+        <use href="#node-normal" x="300" y="550" />
+        <use href="#node-normal" x="700" y="450" />
+        <use href="#node-normal" x="750" y="300" />
+        <use href="#node-normal" x="760" y="500" />
+        <use href="#node-normal" x="650" y="180" />
+        <use href="#node-normal" x="550" y="180" />
+        <use href="#node-normal" x="250" y="180" />
+
+        <!-- Active Nodes (Event Region) -->
+        <use href="#node-active" x="550" y="420" />
+        <use href="#node-active" x="630" y="410" />
+        <use href="#node-active" x="590" y="470" />
+        <use href="#node-active" x="660" y="480" />
+        <use href="#node-active" x="540" y="490" />
+        <use href="#node-active" x="620" y="520" />
+
+        <!-- Virtual Sink -->
+        <polygon points="550,270 580,300 550,330 520,300" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <text x="550" y="305" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">VS</text>
+        <text x="550" y="305" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">VS</text>
+
+        <!-- Physical Sink (Base Station) -->
+        <line x1="400" y1="90" x2="400" y2="60" stroke="var(--brand-500)" stroke-width="3" />
+        <circle cx="400" cy="60" r="4" fill="var(--brand-500)" />
+        <path d="M 390,50 Q 400,40 410,50" fill="none" stroke="var(--brand-400)" stroke-width="2" />
+        <path d="M 385,40 Q 400,25 415,40" fill="none" stroke="var(--brand-400)" stroke-width="2" />
+        
+        <rect x="320" y="90" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+        <text x="400" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Physical Sink</text>
+        <text x="400" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الحوض المادي</text>
+        <text x="400" y="140" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Base Station)</text>
+        <text x="400" y="140" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(المحطة الأساسية)</text>
+
+        <!-- ================= LABELS & POINTERS ================= -->
+        
+        <!-- Virtual Sink Label -->
+        <line x1="605" y1="290" x2="585" y2="290" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="2,2" />
+        <text x="610" y="295" text-anchor="start" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Virtual Sink</text>
+        <text x="610" y="295" text-anchor="start" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حوض افتراضي</text>
+        <text x="610" y="315" text-anchor="start" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Tunnels traffic out</text>
+        <text x="610" y="315" text-anchor="start" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">ينقل حركة المرور للخارج</text>
+
+        <!-- Event Region Label -->
+        <text x="600" y="570" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Event Region</text>
+        <text x="600" y="570" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">منطقة الحدث</text>
+        <text x="600" y="590" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Heavy Traffic Source)</text>
+        <text x="600" y="590" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(مصدر حركة مرور كثيفة)</text>
+
+        <!-- Tunnel Label -->
+        <line x1="465" y1="205" x2="495" y2="205" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="2,2" />
+        <text x="460" y="210" text-anchor="end" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Virtual Tunnel</text>
+        <text x="460" y="210" text-anchor="end" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نفق افتراضي</text>
+        <text x="460" y="230" text-anchor="end" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Direct bypass to Sink</text>
+        <text x="460" y="230" text-anchor="end" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تجاوز مباشر إلى الحوض</text>
+
+        <!-- Congested Path Label -->
+        <line x1="385" y1="325" x2="445" y2="395" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />
+        <circle cx="450" cy="400" r="3" fill="var(--text-muted)" />
+        <text x="380" y="330" text-anchor="end" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Congested Multi-hop</text>
+        <text x="380" y="330" text-anchor="end" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مسار متعدد القفزات مزدحم</text>
+        <text x="380" y="350" text-anchor="end" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Standard routing</text>
+        <text x="380" y="350" text-anchor="end" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">توجيه قياسي</text>
+
+        <!-- ================= LEGEND ================= -->
+        <rect x="20" y="430" width="210" height="150" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="125" y="455" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Legend</text>
+        <text x="125" y="455" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مفتاح الرموز</text>
+
+        <!-- Normal Node -->
+        <circle cx="45" cy="480" r="7" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="2" />
+        <text x="65" y="485" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Sensor Node</text>
+        <text x="65" y="485" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">عقدة استشعار</text>
+
+        <!-- Active Node -->
+        <circle cx="45" cy="510" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <text x="65" y="515" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Active Node (Event)</text>
+        <text x="65" y="515" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">عقدة نشطة (حدث)</text>
+
+        <!-- Virtual Sink -->
+        <polygon points="45,532 53,540 45,548 37,540" fill="var(--brand-500)" />
+        <text x="65" y="545" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Virtual Sink (VS)</text>
+        <text x="65" y="545" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">حوض افتراضي (VS)</text>
+
+        <!-- Tunnel -->
+        <line x1="35" y1="570" x2="55" y2="570" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="6,4" />
+        <text x="65" y="575" font-size="13" fill="var(--text-secondary)" class="gsvg-en">High-speed Tunnel</text>
+        <text x="65" y="575" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">نفق عالي السرعة</text>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يفصل بروتوكول PCCP بين 'المرور المصدري' و 'المرور العابر' في طوابير مختلفة؟</template>
+      <template class="content-en">Why does the PCCP protocol separate 'source traffic' and 'transit traffic' into different queues?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان العدالة. المرور العابر (البيانات القادمة من عقد أخرى) قد يطغى على المرور المصدري (البيانات التي تولدها العقدة نفسها). فصلهما يسمح للمجدول بإعطاء فرص عادلة لكليهما.</p></template>
+      <template class="content-en"><p>To ensure fairness. Transit traffic (data forwarded from other nodes) might overwhelm source traffic (data generated by the node itself). Separating them allows the scheduler to allocate fair transmission opportunities to both.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="reliability-centric-protocols" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> البروتوكولات التي تركز على الموثوقية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Reliability-Centric Protocols</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تركز هذه البروتوكولات على ضمان وصول البيانات الهامة، وتتبنى مفاهيم مثل 'موثوقية الحدث' بدلاً من موثوقية كل حزمة على حدة لتوفير الطاقة.</p></template>
+    <template class="content-en"><p>These protocols focus on ensuring critical data delivery, adopting concepts like 'event reliability' instead of per-packet reliability to save energy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن أن تعني الموثوقية في WSN موثوقية الحزمة، موثوقية الحدث، موثوقية من طرف لطرف، أو قفزة بقفزة. من أبرز البروتوكولات:</p><ol><li><b>ESRT:</b> يركز على موثوقية الحدث بأقل طاقة. يعتمد الـ Sink على البيانات المجمعة لتقييم الحدث كل فترة زمنية (t).</li><li><b>RMST:</b> بروتوكول يعتمد على إشعارات الرفض الانتقائية (Selective NACK) ويدعم التجزئة وإعادة التجميع.</li><li><b>RBC:</b> مصمم للبيانات المتدفقة فجأة (Bursty). يستخدم إشعارات كتلية بدون نوافذ (Window-less block ACK) للتعامل مع الازدحام المفاجئ.</li><li><b>PSFQ (ضخ ببطء، جلب بسرعة):</b> تُرسل الحزم ببطء، وإذا فقدت عقدة حزمة، تطلبها بسرعة من جيرانها.</li><li><b>GARUDA:</b> يركز على الموثوقية في الاتجاه التنازلي (من الـ Sink إلى المستشعرات). يستخدم عقداً أساسية (Core nodes) لتخزين الحزم مؤقتاً.</li><li><b>ART:</b> يوفر موثوقية الحدث ويصنف العقد إلى أساسية (E) وغير أساسية (N) لتخفيف الازدحام.</li><li><b>CTCP:</b> بروتوكول تعاوني يجمع بين الموثوقية من طرف لطرف والتحكم في الازدحام.</li></ol></template>
+    <template class="content-en"><p>Reliability in WSNs can mean packet, event, end-to-end, or hop-by-hop reliability. Key protocols include:</p><ol><li><b>ESRT:</b> Focuses on event reliability using minimum energy. The sink evaluates event features every decision interval (t).</li><li><b>RMST:</b> A <span class="smart-term" data-term-en="Selective NACK" data-ar="إشعار الرفض الانتقائي" data-en-def="A mechanism where a receiver explicitly requests the retransmission of only the specific packets it failed to receive.">selective NACK<span class="smart-term-tooltip"></span></span>-based protocol supporting guaranteed delivery, fragmentation, and reassembly.</li><li><b>RBC:</b> Designed for <span class="smart-term" data-term-en="Bursty convergecast" data-ar="البث المتقارب المفاجئ" data-en-def="A sudden, high-volume surge of packets generated by multiple nodes simultaneously towards the sink, typical in event-driven WSNs.">bursty convergecast<span class="smart-term-tooltip"></span></span>. Uses window-less block ACK and differentiated contention control.</li><li><b>PSFQ (Pump slowly, fetch quickly):</b> Packets are pumped slowly; if a node misses a packet, it fetches it quickly from immediate neighbors.</li><li><b>GARUDA:</b> Addresses downstream (sink-to-sensors) reliability. Uses core nodes to cache packets for loss recovery.</li><li><b>ART:</b> Provides event reliability and classifies nodes into Essential (E) and Nonessential (N) to mitigate congestion.</li><li><b>CTCP:</b> A collaborative protocol providing end-to-end reliability and congestion control.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فلسفة PSFQ (Pump slowly, fetch quickly) عبقرية لبيئة WSN. الضخ البطيء يمنع الازدحام من الحدوث أصلاً. والجلب السريع (طلب إعادة إرسال الحزمة المفقودة من الجار المباشر فوراً) يمنع انتشار الخطأ ويقلل من زمن الوصول (Latency) مقارنة بطلبها من المصدر الأصلي.</p><p>بروتوكول GARUDA يحل مشكلة صعبة وهي إرسال تحديثات أو أوامر من الـ Sink إلى شبكة واسعة (Downstream). بدلاً من إغراق الشبكة، يعين GARUDA عقداً معينة كـ 'خوادم استرداد' (Core nodes) تحتفظ بنسخ من البيانات، لتتمكن العقد الأخرى من استرجاع ما فاتها منها محلياً.</p></template>
+    <template class="content-en"><p>The philosophy of PSFQ (Pump slowly, fetch quickly) is ingenious for WSNs.</p><ul><li><strong>Pumping slowly</strong> prevents congestion from occurring in the first place.</li><li><strong>Fetching quickly</strong> (requesting a lost packet immediately from a direct neighbor) prevents error propagation and reduces latency compared to requesting it from the original source.</li></ul><p>GARUDA solves the difficult problem of downstream reliability (sending updates/queries from the sink to the network).</p><p>Instead of flooding, GARUDA designates specific nodes as 'loss-recovery servers' (Core nodes) that cache packets, allowing other nodes to recover missing data locally.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يستخدم بروتوكول RMST إشعارات الرفض (NACK) بدلاً من إشعارات القبول (ACK) لضمان الموثوقية؟</template>
+      <template class="content-en">Why does the RMST protocol use Negative Acknowledgements (NACK) instead of Acknowledgements (ACK) to ensure reliability?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>استخدام ACK لكل حزمة يولد حركة مرور هائلة تستهلك الطاقة وتسبب ازدحاماً. استخدام NACK يعني أن العقدة ترسل إشعاراً فقط عند حدوث خطأ (فقدان حزمة)، مما يقلل بشكل كبير من النفقات العامة (Overhead).</p></template>
+      <template class="content-en"><p>Using ACK for every packet generates massive traffic, consuming energy and causing congestion. Using NACK means a node only sends a notification when an error occurs (packet loss), significantly reducing overhead.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hybrid-protocols-stcp" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> البروتوكولات الهجينة: Sensor TCP (STCP)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Hybrid Protocols: Sensor TCP (STCP)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول STCP هو بروتوكول نقل عام يوفر كلاً من الموثوقية والتحكم في الازدحام بشكل مخصص حسب احتياجات التطبيق.</p></template>
+    <template class="content-en"><p>STCP is a generic transport protocol that provides both application-specific reliability and congestion control.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بينما تركز معظم البروتوكولات إما على الازدحام أو الموثوقية، فإن القليل منها يوفر الاثنين معاً (Hybrid). من أمثلة ذلك بروتوكول STCP (Sensor TCP):</p><ul><li>هو بروتوكول عام مصمم للاستخدام في طبقة النقل لشبكات الاستشعار اللاسلكية.</li><li>قادر على دعم العديد من التطبيقات المتزامنة في نفس الشبكة.</li><li>يوفر موثوقية مخصصة حسب التطبيق (Application-specific reliability).</li><li>يوفر آليات لاكتشاف الازدحام وتجنبه.</li></ul></template>
+    <template class="content-en"><p>While most protocols focus on either congestion or reliability, a few provide both (Hybrid). An example is STCP (Sensor TCP):</p><ul><li>It is a generic protocol designed for the transport layer of WSNs.</li><li>Capable of supporting many simultaneous applications in the same network.</li><li>Provides <span class="smart-term" data-term-en="Application-specific reliability" data-ar="موثوقية مخصصة للتطبيق" data-en-def="The ability of a transport protocol to adjust its reliability guarantees based on the specific needs of the application generating the data.">application-specific reliability<span class="smart-term-tooltip"></span></span>.</li><li>Provides congestion detection and avoidance mechanisms.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>أهمية STCP تكمن في مرونته. في شبكات الاستشعار الحديثة، قد تقوم نفس الشبكة بتشغيل تطبيقين: أحدهما يراقب درجة الحرارة (يتطلب موثوقية منخفضة) والآخر يكتشف الحرائق (يتطلب موثوقية عالية جداً). STCP يسمح بتخصيص مستوى الموثوقية والتحكم في الازدحام بناءً على نوع التطبيق الذي يولد البيانات.</p></template>
+    <template class="content-en"><p>The significance of STCP lies in its flexibility. In modern WSNs, the same network might run two applications: one monitoring temperature (requires low reliability) and another detecting fires (requires very high reliability). STCP allows customizing the level of reliability and congestion control based on the specific application generating the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف STCP عن TCP التقليدي رغم تشابه الأسماء؟</template>
+      <template class="content-en">How does STCP differ from traditional TCP despite the similar names?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>TCP التقليدي يوفر موثوقية صارمة بنسبة 100% لكل الحزم وهو ثقيل جداً. STCP مصمم خصيصاً للمستشعرات، ويوفر موثوقية مرنة (حسب التطبيق) ويدير الازدحام بطرق تناسب القيود اللاسلكية.</p></template>
+      <template class="content-en"><p>Traditional TCP provides strict 100% per-packet reliability and is very heavy. STCP is tailored for sensors, offering flexible (application-specific) reliability and managing congestion in ways suited for wireless constraints.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة الخامسة. لقد صعدنا في مكدس الشبكة ووصلنا إلى طبقة النقل. في الشبكات التقليدية، هذه الطبقة هي مملكة بروتوكول TCP، ولكن هنا في شبكات الاستشعار، TCP هو عدونا! لماذا؟ لأنه يستهلك طاقتنا المحدودة ويسيء فهم طبيعة قنواتنا اللاسلكية المليئة بالتشويش. لذلك، كان علينا ابتكار بروتوكولات جديدة تماماً. تنقسم هذه البروتوكولات إلى عائلتين رئيسيتين: عائلة 'التحكم في الازدحام' (مثل CODA الذي يستخدم الضغط العكسي، و Siphon الذي يبتكر مسارات طوارئ تسمى المصارف الافتراضية)، وعائلة 'الموثوقية' (مثل PSFQ الذي يضخ البيانات ببطء ويجلبها بسرعة، و GARUDA المتخصص في الاتجاه التنازلي). تذكروا دائماً المفهوم الذهبي هنا: 'موثوقية الحدث'. نحن لا نهتم بوصول كل حزمة، بل نهتم بوصول المعلومة عن الحدث. ركزوا في الامتحان على التمييز بين آليات عمل كل بروتوكول، ولماذا فشل TCP في هذه البيئة.</template>
+    <template class="content-en">Welcome to Module 5. We've moved up the network stack to the Transport Layer. In traditional networks, this is TCP's kingdom, but in WSNs, TCP is our enemy! Why? Because it drains our limited energy and misunderstands our noisy wireless channels. Therefore, we had to invent entirely new protocols. These protocols fall into two main families: 'Congestion Control' (like CODA using backpressure, and Siphon creating emergency lanes called Virtual Sinks), and 'Reliability' (like PSFQ which pumps slowly and fetches quickly, and GARUDA which specializes in downstream traffic). Always remember the golden concept here: 'Event Reliability'. We don't care about every packet arriving; we care about the event being reported. For the exam, focus on distinguishing the mechanisms of each protocol and exactly why TCP fails in this environment.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم بروتوكول TCP ببساطة في شبكات الاستشعار؟</template>
+          <template class="content-en">Why don't we simply use TCP in sensor networks?</template>
+          <span class="content-target">لماذا لا نستخدم بروتوكول TCP ببساطة في شبكات الاستشعار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن TCP مصمم للشبكات السلكية الموثوقة. في WSN، فقدان الحزم غالباً ما يكون بسبب ضعف الإشارة اللاسلكية، لكن TCP سيفترض أنه ازدحام ويقلل سرعة الإرسال، مما يقتل أداء الشبكة. كما أنه يتطلب ذاكرة وطاقة لا تملكها المستشعرات.</template>
+          <template class="content-en">Because TCP is designed for reliable wired networks. In WSNs, packet loss is often due to weak wireless signals, but TCP assumes it's congestion and reduces the sending rate, killing network performance. It also requires memory and power that sensors lack.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين موثوقية الحزمة وموثوقية الحدث؟</template>
+          <template class="content-en">What is the difference between packet reliability and event reliability?</template>
+          <span class="content-target">ما الفرق بين موثوقية الحزمة وموثوقية الحدث؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">موثوقية الحزمة تعني ضمان وصول كل حزمة بيانات مفردة (كما في الإنترنت). موثوقية الحدث تعني ضمان وصول تقرير عن الحدث (مثل حريق) إلى المحطة الأساسية، حتى لو فُقدت بعض حزم المستشعرات الفردية في الطريق.</template>
+          <template class="content-en">Packet reliability ensures every single data packet arrives (like on the Internet). Event reliability ensures a report about an event (like a fire) reaches the base station, even if some individual sensor packets are lost along the way.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل الضغط العكسي (Backpressure) في بروتوكول CODA؟</template>
+          <template class="content-en">How does Backpressure work in the CODA protocol?</template>
+          <span class="content-target">كيف يعمل الضغط العكسي (Backpressure) في بروتوكول CODA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما يمتلئ طابور الانتظار في عقدة وسيطة (ازدحام)، ترسل هذه العقدة إشارة إلى العقدة التي تسبقها مباشرة لتخفيف معدل الإرسال. تنتقل هذه الإشارة عكسياً خطوة بخطوة حتى تصل للمصدر.</template>
+          <template class="content-en">When an intermediate node's queue fills up (congestion), it sends a signal to its immediate upstream neighbor to reduce its sending rate. This signal propagates backward step-by-step until it reaches the source.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي فكرة 'المصارف الافتراضية' في بروتوكول Siphon؟</template>
+          <template class="content-en">What is the idea of 'Virtual Sinks' in the Siphon protocol?</template>
+          <span class="content-target">ما هي فكرة 'المصارف الافتراضية' في بروتوكول Siphon؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي عقد خاصة تمتلك أجهزة راديو متعددة. عند حدوث ازدحام شديد في منطقة معينة، تتدخل هذه العقد لسحب البيانات من المنطقة المزدحمة وإرسالها عبر مسار بديل (نفق) مباشرة إلى الـ Sink الرئيسي.</template>
+          <template class="content-en">They are special nodes with multi-radios. When severe congestion occurs in a specific area, these nodes step in to siphon data from the congested area and send it via an alternative path (tunnel) directly to the main Sink.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح فلسفة بروتوكول PSFQ.</template>
+          <template class="content-en">Explain the philosophy of the PSFQ protocol.</template>
+          <span class="content-target">اشرح فلسفة بروتوكول PSFQ.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ضخ ببطء (Pump slowly) لمنع حدوث الازدحام من الأساس. وإذا فُقدت حزمة، يتم جلبها بسرعة (Fetch quickly) من الجار المباشر بدلاً من طلبها من المصدر الأصلي، مما يقلل التأخير.</template>
+          <template class="content-en">Pump slowly to prevent congestion from happening in the first place. If a packet is lost, fetch it quickly from the immediate neighbor instead of requesting it from the original source, reducing delay.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الذي يميز بروتوكول GARUDA عن باقي بروتوكولات الموثوقية؟</template>
+          <template class="content-en">What distinguishes the GARUDA protocol from other reliability protocols?</template>
+          <span class="content-target">ما الذي يميز بروتوكول GARUDA عن باقي بروتوكولات الموثوقية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">معظم البروتوكولات تركز على نقل البيانات من المستشعرات للـ Sink. GARUDA مصمم خصيصاً للاتجاه المعاكس (Downstream)، لضمان وصول الأوامر والتحديثات من الـ Sink إلى جميع المستشعرات بشكل موثوق.</template>
+          <template class="content-en">Most protocols focus on moving data from sensors to the sink. GARUDA is specifically designed for the opposite direction (Downstream), ensuring commands and updates from the sink reliably reach all sensors.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يضمن بروتوكول PCCP العدالة في الشبكة؟</template>
+          <template class="content-en">How does the PCCP protocol ensure fairness in the network?</template>
+          <span class="content-target">كيف يضمن بروتوكول PCCP العدالة في الشبكة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يفصل البيانات التي تولدها العقدة نفسها (المرور المصدري) عن البيانات التي تمررها نيابة عن عقد أخرى (المرور العابر) في طابورين مختلفين، ويستخدم خوارزميات جدولة لضمان حصول كليهما على فرصة عادلة للإرسال.</template>
+          <template class="content-en">It separates data generated by the node itself (source traffic) from data it forwards for others (transit traffic) into two different queues, and uses scheduling algorithms to ensure both get a fair chance to transmit.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور العقد الأساسية (E) في بروتوكول ART؟</template>
+          <template class="content-en">What is the role of Essential (E) nodes in the ART protocol?</template>
+          <span class="content-target">ما هو دور العقد الأساسية (E) في بروتوكول ART؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعمل كمديرين محليين للازدحام. تراقب وصول إشعارات القبول (ACK)، وإذا تأخرت (مما يدل على ازدحام)، ترسل أوامر للعقد غير الأساسية (N) المجاورة لإبطاء إرسالها أو إيقافه مؤقتاً.</template>
+          <template class="content-en">They act as local congestion managers. They monitor ACK arrivals, and if delayed (indicating congestion), they send commands to neighboring Nonessential (N) nodes to slow down or temporarily stop sending.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم إشعارات الرفض (NACK) بدلاً من إشعارات القبول (ACK) في بروتوكولات مثل RMST؟</template>
+          <template class="content-en">Why do we use Negative Acknowledgements (NACK) instead of Acknowledgements (ACK) in protocols like RMST?</template>
+          <span class="content-target">لماذا نستخدم إشعارات الرفض (NACK) بدلاً من إشعارات القبول (ACK) في بروتوكولات مثل RMST؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إرسال ACK لكل حزمة ناجحة يولد حركة مرور هائلة تستهلك طاقة المستشعرات. استخدام NACK يعني أن العقدة تتحدث فقط عندما تفقد حزمة، مما يقلل بشكل كبير من استهلاك النطاق الترددي والطاقة.</template>
+          <template class="content-en">Sending an ACK for every successful packet generates massive traffic that drains sensor energy. Using NACK means a node only speaks up when it misses a packet, drastically reducing bandwidth and energy consumption.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو بروتوكول STCP وما ميزته الرئيسية؟</template>
+          <template class="content-en">What is the STCP protocol and what is its main feature?</template>
+          <span class="content-target">ما هو بروتوكول STCP وما ميزته الرئيسية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو بروتوكول نقل هجين (Sensor TCP). ميزته الرئيسية أنه يوفر 'موثوقية مخصصة حسب التطبيق'، مما يعني أنه يمكنه تعديل مستوى الموثوقية والتحكم في الازدحام بناءً على نوع التطبيق الذي يرسل البيانات في تلك اللحظة.</template>
+          <template class="content-en">It is a hybrid transport protocol (Sensor TCP). Its main feature is providing 'application-specific reliability', meaning it can adjust the level of reliability and congestion control based on the type of application sending data at that moment.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هما الوظيفتان الرئيسيتان لبروتوكولات طبقة النقل؟",
+      "en": "What are the two main functions of transport layer protocols?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التحكم في الازدحام، وتسليم البيانات الموثوق (أو الاسترداد من فقدان الحزم).",
+        "en": "Congestion control and reliable data delivery (or recovery from packet loss)."
+      },
+      "example": {
+        "ar": "مثل تنظيم سرعة إرسال المستشعرات لضمان عدم اختناق الشبكة.",
+        "en": "Like regulating sensor sending rates to ensure the network doesn't choke."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو مفهوم 'موثوقية الحدث' (Event Reliability)؟",
+      "en": "What is the concept of 'Event Reliability'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتحقق عندما يتم الإبلاغ عن حدث مكتشف إلى الـ Sink بدرجة معينة من الدقة، بغض النظر عن وصول كل حزمة فردية.",
+        "en": "Achieved when a detected event is reported to the sink with a certain degree of accuracy, regardless of individual packet delivery."
+      },
+      "example": {
+        "ar": "وصول تنبيه واحد عن حريق من أصل 10 مستشعرات يعتبر نجاحاً لموثوقية الحدث.",
+        "en": "Receiving one fire alert out of 10 sensors is considered successful event reliability."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "كيف يتم حساب 'درجة الازدحام' (Congestion Degree)؟",
+      "en": "How is 'Congestion Degree' calculated?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي النسبة بين متوسط وقت خدمة الحزمة ومتوسط وقت وصول الحزم.",
+        "en": "It is the ratio of average packet service time to average packet interarrival time."
+      },
+      "example": {
+        "ar": "إذا كان وقت الخدمة أطول من وقت الوصول، فإن الدرجة > 1، مما يعني وجود ازدحام.",
+        "en": "If service time is longer than interarrival time, degree > 1, meaning congestion exists."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "لماذا يعتبر بروتوكول TCP غير مناسب لشبكات الاستشعار؟",
+      "en": "Why is TCP unsuitable for WSNs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنه يتطلب اتصالاً من طرف لطرف، ويفترض أن فقدان الحزم سببه الازدحام فقط، ويستهلك موارد عالية.",
+        "en": "Because it requires end-to-end connection, assumes packet loss is only due to congestion, and consumes high resources."
+      },
+      "example": {
+        "ar": "TCP سيخفض سرعة الإرسال إذا تداخلت إشارة لاسلكية، مما يضر بالأداء.",
+        "en": "TCP will reduce sending speed if wireless interference occurs, harming performance."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي آلية عمل بروتوكول CODA؟",
+      "en": "What is the mechanism of the CODA protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يكتشف الازدحام عبر طول طابور الانتظار، ويستخدم الضغط العكسي (Backpressure) قفزة بقفزة لتخفيفه.",
+        "en": "Detects congestion via queue length and uses hop-by-hop backpressure to mitigate it."
+      },
+      "example": {
+        "ar": "عقدة مزدحمة تخبر العقدة التي قبلها بإبطاء الإرسال فوراً.",
+        "en": "A congested node tells its immediate upstream neighbor to slow down immediately."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الهدف الرئيسي لبروتوكول CCF؟",
+      "en": "What is the main goal of the CCF protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التحكم في الازدحام مع ضمان العدالة (Fairness) في تسليم الحزم من جميع العقد إلى المحطة الأساسية.",
+        "en": "Congestion control while ensuring fairness in packet delivery from all nodes to the base station."
+      },
+      "example": {
+        "ar": "يضمن ألا تستحوذ عقدة قريبة على كل النطاق الترددي وتمنع العقد البعيدة.",
+        "en": "Ensures a nearby node doesn't hog all bandwidth and block distant nodes."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "كيف يدير بروتوكول PCCP الازدحام؟",
+      "en": "How does the PCCP protocol manage congestion?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم مؤشر أولوية لكل عقدة، ويفصل حركة المرور المصدرية عن العابرة في طوابير مختلفة لضمان العدالة.",
+        "en": "Uses a priority index for each node and separates source and transit traffic into different queues to ensure fairness."
+      },
+      "example": {
+        "ar": "يعطي أولوية للبيانات المهمة ويجدول الإرسال بإنصاف.",
+        "en": "Prioritizes important data and schedules transmission fairly."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي الوظيفة الأساسية لبروتوكول Trickle؟",
+      "en": "What is the primary function of the Trickle protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحد من عدد الحزم لضبط معدل الإرسال، ويُستخدم بشكل أساسي لنشر تحديثات الأكواد البرمجية في الشبكة.",
+        "en": "Limits packet numbers to adjust transmission rates, primarily used for propagating code updates in the network."
+      },
+      "example": {
+        "ar": "يمنع العقد من إرسال نفس التحديث لبعضها البعض بشكل متكرر ومزعج.",
+        "en": "Prevents nodes from repeatedly and annoyingly sending the same update to each other."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو المفهوم الفريد الذي يستخدمه بروتوكول Siphon؟",
+      "en": "What unique concept does the Siphon protocol use?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم 'المصارف الافتراضية' (Virtual Sinks) لسحب حركة المرور الزائدة من مناطق الازدحام.",
+        "en": "Uses 'Virtual Sinks' to tunnel out excess traffic from congested regions."
+      },
+      "example": {
+        "ar": "مثل فتح مسار جانبي للطوارئ لتجاوز زحام مروري خانق.",
+        "en": "Like opening an emergency side lane to bypass a severe traffic jam."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "على ماذا يعتمد بروتوكول LACAS لتجنب الازدحام؟",
+      "en": "What does the LACAS protocol rely on to avoid congestion?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعتمد على مفهوم 'الآلات التعليمية' (Learning Automata) في العقد الوسيطة لاتخاذ قرارات مستقلة.",
+        "en": "Relies on the concept of 'Learning Automata' at intermediate nodes to make independent decisions."
+      },
+      "example": {
+        "ar": "تتعلم العقدة من تجارب فقدان الحزم السابقة لتعديل معدل إرسالها مستقبلاً.",
+        "en": "The node learns from past packet loss experiences to adjust its future sending rate."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي التقنية التي يستخدمها بروتوكول ARCC؟",
+      "en": "What technique does the ARCC protocol use?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم تحسين مستعمرة النمل (ACO) لإيجاد مسارات مثالية وتجنب الازدحام.",
+        "en": "Uses Ant Colony Optimization (ACO) to find optimal paths and avoid congestion."
+      },
+      "example": {
+        "ar": "تترك الحزم 'فرمونات' رقمية لتدل الحزم اللاحقة على المسارات الأقل ازدحاماً.",
+        "en": "Packets leave digital 'pheromones' to guide subsequent packets to less congested paths."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الهدف الرئيسي لبروتوكول ESRT؟",
+      "en": "What is the main goal of the ESRT protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحقيق موثوقية الحدث (Event-to-sink reliability) باستخدام الحد الأدنى من الطاقة.",
+        "en": "Achieving event-to-sink reliability using minimum energy."
+      },
+      "example": {
+        "ar": "يقيم الـ Sink الحدث كل فترة زمنية بناءً على عدد الحزم المستلمة بدلاً من تتبع كل حزمة.",
+        "en": "The sink evaluates the event every interval based on received packets rather than tracking each one."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يضمن بروتوكول RMST الموثوقية؟",
+      "en": "How does the RMST protocol ensure reliability?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم إشعارات الرفض الانتقائية (Selective NACK) ويدعم تجزئة وإعادة تجميع الرسائل.",
+        "en": "Uses selective NACKs and supports message fragmentation and reassembly."
+      },
+      "example": {
+        "ar": "تطلب العقدة فقط الأجزاء المفقودة من الرسالة بدلاً من تأكيد كل جزء يصل.",
+        "en": "A node only requests missing message fragments instead of acknowledging every arriving fragment."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي المشكلة التي يعالجها بروتوكول RBC؟",
+      "en": "What problem does the RBC protocol address?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعالج الازدحام الناتج عن البث المتقارب المفاجئ (Bursty convergecast) باستخدام إشعارات كتلية بدون نوافذ.",
+        "en": "Addresses congestion from bursty convergecast using window-less block acknowledgements."
+      },
+      "example": {
+        "ar": "يتعامل مع تدفق هائل للبيانات فجأة عند اكتشاف زلزال.",
+        "en": "Handles a massive sudden influx of data when an earthquake is detected."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "اشرح مبدأ عمل بروتوكول PSFQ.",
+      "en": "Explain the working principle of the PSFQ protocol."
+    },
+    "back": {
+      "definition": {
+        "ar": "ضخ ببطء وجلب بسرعة (Pump slowly, fetch quickly). تُرسل الحزم ببطء، وتُسترد الحزم المفقودة بسرعة من الجيران.",
+        "en": "Pump slowly, fetch quickly. Packets are sent slowly, and lost packets are recovered quickly from neighbors."
+      },
+      "example": {
+        "ar": "الضخ البطيء يمنع الازدحام، والجلب السريع يصحح الأخطاء محلياً دون إزعاج المصدر.",
+        "en": "Slow pumping prevents congestion, and quick fetching corrects errors locally without bothering the source."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو الاتجاه الذي يركز عليه بروتوكول GARUDA؟",
+      "en": "Which direction does the GARUDA protocol focus on?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يركز على الموثوقية في الاتجاه التنازلي (Downstream)، أي من الـ Sink إلى عقد الاستشعار.",
+        "en": "Focuses on downstream reliability, i.e., from the sink to the sensor nodes."
+      },
+      "example": {
+        "ar": "يستخدم عقداً أساسية (Core nodes) لتخزين البيانات وضمان وصول الأوامر لجميع المستشعرات.",
+        "en": "Uses core nodes to cache data and ensure commands reach all sensors."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "كيف يصنف بروتوكول ART العقد في الشبكة؟",
+      "en": "How does the ART protocol classify nodes in the network?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يصنفها إلى عقد أساسية (Essential - E) وعقد غير أساسية (Nonessential - N).",
+        "en": "Classifies them into Essential (E) nodes and Nonessential (N) nodes."
+      },
+      "example": {
+        "ar": "العقد الأساسية تراقب الازدحام وتأمر العقد غير الأساسية بإبطاء الإرسال عند الضرورة.",
+        "en": "Essential nodes monitor congestion and order nonessential nodes to slow down when necessary."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هي ميزة بروتوكول STCP؟",
+      "en": "What is the advantage of the STCP protocol?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هو بروتوكول هجين يوفر موثوقية مخصصة حسب التطبيق (Application-specific) بالإضافة للتحكم في الازدحام.",
+        "en": "It is a hybrid protocol providing application-specific reliability in addition to congestion control."
+      },
+      "example": {
+        "ar": "يمكنه توفير موثوقية عالية لتطبيق إنذار الحريق، وموثوقية منخفضة لتطبيق قياس الحرارة الدوري في نفس الشبكة.",
+        "en": "Can provide high reliability for a fire alarm app, and low reliability for periodic temp sensing in the same network."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من البروتوكولات التالية يستخدم مفهوم 'المصارف الافتراضية' (Virtual Sinks) لتخفيف الازدحام؟",
+      "en": "Which of the following protocols uses the concept of 'Virtual Sinks' to mitigate congestion?"
+    },
+    "options": {
+      "ar": [
+        "CODA",
+        "Siphon",
+        "Trickle",
+        "Fusion"
+      ],
+      "en": [
+        "CODA",
+        "Siphon",
+        "Trickle",
+        "Fusion"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يستخدم Siphon المصارف الافتراضية لسحب حركة المرور الزائدة من المناطق المزدحمة وتوجيهها عبر مسارات بديلة.",
+      "en": "Siphon uses Virtual Sinks to tunnel out excess traffic from congested regions via alternative paths."
+    },
+    "hint": {
+      "ar": "تذكر الكلمة التي تعني 'سحب السوائل' بالإنجليزية.",
+      "en": "Think of the word that means drawing off liquid."
+    },
+    "difficulty": "easy",
+    "conceptId": "congestion-control-protocols"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "لماذا يعتبر بروتوكول TCP غير مناسب لشبكات الاستشعار اللاسلكية؟",
+      "en": "Why is the TCP protocol unsuitable for Wireless Sensor Networks?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يستهلك طاقة وذاكرة كبيرة",
+        "لأنه يفترض أن فقدان الحزم سببه الازدحام فقط",
+        "لأنه يتطلب اتصالاً من طرف إلى طرف",
+        "جميع ما سبق"
+      ],
+      "en": [
+        "Because it consumes high energy and memory",
+        "Because it assumes packet loss is only due to congestion",
+        "Because it requires end-to-end connectivity",
+        "All of the above"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "TCP غير مناسب لجميع هذه الأسباب، فهو ثقيل جداً ولا يتناسب مع طبيعة القنوات اللاسلكية المعرضة للخطأ.",
+      "en": "TCP is unsuitable for all these reasons; it is too heavy and not adapted to error-prone wireless channels."
+    },
+    "hint": {
+      "ar": "TCP صُمم للإنترنت السلكي المستقر، وليس للمستشعرات الضعيفة.",
+      "en": "TCP was designed for stable wired internet, not constrained sensors."
+    },
+    "difficulty": "medium",
+    "conceptId": "tcp-unsuitability"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو المبدأ الأساسي لبروتوكول PSFQ؟",
+      "en": "What is the core principle of the PSFQ protocol?"
+    },
+    "options": {
+      "ar": [
+        "الضخ بسرعة، الجلب ببطء",
+        "الضخ ببطء، الجلب بسرعة",
+        "إرسال إشعارات قبول (ACK) لكل حزمة",
+        "استخدام المصارف الافتراضية"
+      ],
+      "en": [
+        "Pump quickly, fetch slowly",
+        "Pump slowly, fetch quickly",
+        "Send ACK for every packet",
+        "Use virtual sinks"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "PSFQ يرمز إلى Pump Slowly, Fetch Quickly. يرسل البيانات ببطء لتجنب الازدحام، ويسترد المفقود بسرعة من الجيران.",
+      "en": "PSFQ stands for Pump Slowly, Fetch Quickly. It sends data slowly to avoid congestion and recovers lost packets quickly from neighbors."
+    },
+    "hint": {
+      "ar": "الاسم نفسه هو اختصار للمبدأ.",
+      "en": "The name itself is an acronym for the principle."
+    },
+    "difficulty": "easy",
+    "conceptId": "reliability-centric-protocols"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي بروتوكول يركز على الموثوقية في الاتجاه التنازلي (Downstream) من الـ Sink إلى المستشعرات؟",
+      "en": "Which protocol focuses on downstream reliability from the sink to the sensors?"
+    },
+    "options": {
+      "ar": [
+        "ESRT",
+        "GARUDA",
+        "CODA",
+        "RBC"
+      ],
+      "en": [
+        "ESRT",
+        "GARUDA",
+        "CODA",
+        "RBC"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "GARUDA مصمم خصيصاً لتسليم البيانات الموثوق من نقطة إلى عدة نقاط (Point-to-multipoint) في الاتجاه التنازلي.",
+      "en": "GARUDA is specifically designed for reliable point-to-multipoint downstream data delivery."
+    },
+    "hint": {
+      "ar": "يبدأ بحرف G ويستخدم العقد الأساسية (Core nodes).",
+      "en": "Starts with G and uses Core nodes."
+    },
+    "difficulty": "medium",
+    "conceptId": "reliability-centric-protocols"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف يكتشف بروتوكول CODA الازدحام؟",
+      "en": "How does the CODA protocol detect congestion?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق قياس قوة الإشارة",
+        "عن طريق طول طابور الانتظار (Queue length)",
+        "عن طريق حساب عدد القفزات",
+        "عن طريق استهلاك البطارية"
+      ],
+      "en": [
+        "By measuring signal strength",
+        "By queue length",
+        "By counting hop numbers",
+        "By battery consumption"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في CODA، يتم اكتشاف الازدحام بناءً على طول طابور الحزم في العقد الوسيطة.",
+      "en": "In CODA, congestion is detected based on the queue length of packets at intermediate nodes."
+    },
+    "hint": {
+      "ar": "أين تتراكم الحزم عندما يكون هناك ازدحام؟",
+      "en": "Where do packets accumulate when there is congestion?"
+    },
+    "difficulty": "medium",
+    "conceptId": "congestion-control-protocols"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي بروتوكول يستخدم خوارزمية تحسين مستعمرة النمل (ACO)؟",
+      "en": "Which protocol uses the Ant Colony Optimization (ACO) algorithm?"
+    },
+    "options": {
+      "ar": [
+        "LACAS",
+        "ARCC",
+        "PCCP",
+        "CCF"
+      ],
+      "en": [
+        "LACAS",
+        "ARCC",
+        "PCCP",
+        "CCF"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ARCC (Ant-based routing with congestion control) يستخدم مفاهيم مستعمرة النمل للتعامل مع الازدحام.",
+      "en": "ARCC uses ant colony optimization concepts to deal with congestion in a WSN."
+    },
+    "hint": {
+      "ar": "حرف A في اسم البروتوكول يرمز إلى Ant.",
+      "en": "The A in the protocol name stands for Ant."
+    },
+    "difficulty": "easy",
+    "conceptId": "congestion-control-protocols"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو مقياس 'كفاءة الشبكة' (Network Efficiency)؟",
+      "en": "What is the 'Network Efficiency' metric?"
+    },
+    "options": {
+      "ar": [
+        "نسبة الحزم المستلمة إلى الحزم المرسلة",
+        "نسبة القفزات للحزم المفيدة إلى إجمالي عمليات الإرسال",
+        "متوسط وقت وصول الحزم",
+        "نسبة العقد النشطة إلى العقد النائمة"
+      ],
+      "en": [
+        "Ratio of received to sent packets",
+        "Ratio of useful packet hops to total transmissions",
+        "Average packet interarrival time",
+        "Ratio of active to sleeping nodes"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "كفاءة الشبكة تُعرّف بأنها نسبة إجمالي القفزات التي قطعتها الحزم المفيدة إلى إجمالي عدد عمليات إرسال الحزم (بما في ذلك إعادة الإرسال).",
+      "en": "Network efficiency is defined as the ratio of total hops traveled by useful packets to the total number of packet transmissions (including retransmissions)."
+    },
+    "hint": {
+      "ar": "الكفاءة تعاقب البروتوكولات التي تقوم بإعادة الإرسال كثيراً.",
+      "en": "Efficiency penalizes protocols that retransmit too much."
+    },
+    "difficulty": "hard",
+    "conceptId": "performance-metrics"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في بروتوكول ART، ما هي وظيفة العقد الأساسية (Essential nodes)؟",
+      "en": "In the ART protocol, what is the function of Essential (E) nodes?"
+    },
+    "options": {
+      "ar": [
+        "تخزين البيانات بشكل دائم",
+        "مراقبة الازدحام وإرسال رسائل إنذار للعقد غير الأساسية",
+        "العمل كمصارف افتراضية",
+        "تجزئة الرسائل الكبيرة"
+      ],
+      "en": [
+        "Store data permanently",
+        "Monitor congestion and send alarm messages to nonessential nodes",
+        "Act as virtual sinks",
+        "Fragment large messages"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "العقد الأساسية في ART تراقب الازدحام عبر تتبع وصول إشعارات ACK، وتأمر العقد غير الأساسية بإبطاء الإرسال عند حدوث ازدحام.",
+      "en": "Essential nodes in ART monitor congestion via ACK arrivals and order nonessential nodes to slow down when congestion occurs."
+    },
+    "hint": {
+      "ar": "هي العقد 'المديرة' التي تتحكم في تدفق العقد الأقل أهمية.",
+      "en": "They are the 'manager' nodes controlling the flow of less important nodes."
+    },
+    "difficulty": "medium",
+    "conceptId": "reliability-centric-protocols"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي بروتوكول يفصل حركة المرور إلى 'مصدري' (Source) و 'عابر' (Transit) لضمان العدالة؟",
+      "en": "Which protocol separates traffic into 'Source' and 'Transit' to ensure fairness?"
+    },
+    "options": {
+      "ar": [
+        "CODA",
+        "Trickle",
+        "PCCP",
+        "LACAS"
+      ],
+      "en": [
+        "CODA",
+        "Trickle",
+        "PCCP",
+        "LACAS"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يستخدم PCCP طابورين منفصلين للمرور المصدري والعابر ويطبق خوارزميات جدولة عادلة بينهما.",
+      "en": "PCCP uses two separate queues for source and transit traffic and applies fair scheduling algorithms between them."
+    },
+    "hint": {
+      "ar": "البروتوكول القائم على الأولوية (Priority-based).",
+      "en": "The Priority-based protocol."
+    },
+    "difficulty": "hard",
+    "conceptId": "congestion-control-protocols"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لبروتوكول STCP؟",
+      "en": "What is the main feature of the STCP protocol?"
+    },
+    "options": {
+      "ar": [
+        "يوفر موثوقية مخصصة حسب التطبيق (Application-specific)",
+        "يستخدم النمل الرقمي للبحث عن المسارات",
+        "يعمل فقط في الاتجاه التنازلي",
+        "لا يدعم التحكم في الازدحام"
+      ],
+      "en": [
+        "Provides application-specific reliability",
+        "Uses digital ants for pathfinding",
+        "Only works downstream",
+        "Does not support congestion control"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "STCP هو بروتوكول هجين يوفر موثوقية مخصصة حسب احتياجات التطبيق، بالإضافة إلى التحكم في الازدحام.",
+      "en": "STCP is a hybrid protocol that provides application-specific reliability, in addition to congestion control."
+    },
+    "hint": {
+      "ar": "إنه بروتوكول عام (Generic) يدعم تطبيقات متعددة في نفس الوقت.",
+      "en": "It's a generic protocol supporting multiple applications simultaneously."
+    },
+    "difficulty": "medium",
+    "conceptId": "hybrid-protocols-stcp"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن بروتوكول TCP هو الخيار الأفضل لشبكات الاستشعار لأنه المعيار الذهبي في الإنترنت. هذا فخ! TCP ثقيل جداً، ويفترض أن أي فقدان للحزم سببه الازدحام، مما يؤدي إلى خفض سرعة الشبكة بشكل غير مبرر عند حدوث تشويش لاسلكي.</template>
+    <template class="content-en">You might think TCP is the best choice for WSNs because it's the gold standard on the Internet. This is a trap! TCP is too heavy and assumes all packet loss is due to congestion, leading to unjustified rate reductions when wireless interference occurs.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">موثوقية الحدث (Event Reliability) مقابل موثوقية الحزمة (Packet Reliability): في WSN، نحن لا نهتم بوصول قراءة كل مستشعر على حدة (موثوقية الحزمة). نحن نهتم فقط بمعرفة ما إذا كان الحدث (مثل الحريق) قد وقع أم لا (موثوقية الحدث). هذا المفهوم يوفر طاقة هائلة.</template>
+    <template class="content-en">Event Reliability vs. Packet Reliability: In WSNs, we don't care if every single sensor's reading arrives (packet reliability). We only care about knowing if the event (e.g., a fire) occurred (event reliability). This concept saves massive amounts of energy.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في الإنترنت التقليدي، تعمل العقد الوسيطة (الموجهات) حتى الطبقة الثالثة (الشبكة) فقط. السر في WSN هو أن كل عقدة وسيطة تمتلك طبقة نقل كاملة، مما يسمح لها بالمشاركة في التحكم في الازدحام (مثل الضغط العكسي) وطلب إعادة الإرسال محلياً.</template>
+    <template class="content-en">In the traditional Internet, intermediate nodes (routers) only operate up to Layer 3 (Network). The secret in WSNs is that every intermediate node possesses a full transport layer, allowing them to participate in congestion control (like backpressure) and local retransmission requests.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين بروتوكولات الاتجاه التصاعدي (Upstream) والتنازلي (Downstream). معظم البروتوكولات تركز على نقل البيانات من المستشعرات إلى الـ Sink (تصاعدي). بروتوكول GARUDA هو استثناء بارز يركز على الاتجاه التنازلي (من الـ Sink للمستشعرات).</template>
+    <template class="content-en">Don't confuse Upstream and Downstream protocols. Most protocols focus on moving data from sensors to the sink (upstream). GARUDA is a notable exception that focuses on the downstream direction (from sink to sensors).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

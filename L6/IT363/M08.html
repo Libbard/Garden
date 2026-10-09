@@ -1,0 +1,2380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT363" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة SNMP: المراقبة عن بُعد (RMON) · IT363 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT363" data-page-title-en="IT363">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=IT363"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#rmon-components" class="toc-link" data-bilingual>
+        <template class="content-ar">مكونات RMON (المسبار والمحلل)</template>
+        <template class="content-en">RMON Components (Probe and Analyzer)</template>
+        <span class="content-target">مكونات RMON (المسبار والمحلل)</span>
+      </a>
+      <a href="#protocol-analyzer" class="toc-link" data-bilingual>
+        <template class="content-ar">محلل البروتوكولات (Protocol Analyzer)</template>
+        <template class="content-en">Protocol Analyzer</template>
+        <span class="content-target">محلل البروتوكولات (Protocol Analyzer)</span>
+      </a>
+      <a href="#rmon-benefits" class="toc-link" data-bilingual>
+        <template class="content-ar">فوائد RMON</template>
+        <template class="content-en">RMON Benefits</template>
+        <span class="content-target">فوائد RMON</span>
+      </a>
+      <a href="#rmon-mib-structure" class="toc-link" data-bilingual>
+        <template class="content-ar">هيكلية RMON MIB (RMON1 مقابل RMON2)</template>
+        <template class="content-en">RMON MIB Structure (RMON1 vs RMON2)</template>
+        <span class="content-target">هيكلية RMON MIB (RMON1 مقابل RMON2)</span>
+      </a>
+      <a href="#row-creation-deletion" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء وحذف الصفوف (Row Creation &amp; Deletion)</template>
+        <template class="content-en">Row Creation &amp; Deletion</template>
+        <span class="content-target">إنشاء وحذف الصفوف (Row Creation &amp; Deletion)</span>
+      </a>
+      <a href="#rmon1-groups" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعات RMON1 ووظائفها</template>
+        <template class="content-en">RMON1 Groups and Functions</template>
+        <span class="content-target">مجموعات RMON1 ووظائفها</span>
+      </a>
+      <a href="#control-and-data-tables" class="toc-link" data-bilingual>
+        <template class="content-ar">جداول التحكم والبيانات (Control and Data Tables)</template>
+        <template class="content-en">Control and Data Tables</template>
+        <span class="content-target">جداول التحكم والبيانات (Control and Data Tables)</span>
+      </a>
+      <a href="#matrix-group" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعة المصفوفة (Matrix Control and SD Tables)</template>
+        <template class="content-en">Matrix Control and SD Tables</template>
+        <span class="content-target">مجموعة المصفوفة (Matrix Control and SD Tables)</span>
+      </a>
+      <a href="#host-group" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعة المضيفين (Host Group)</template>
+        <template class="content-en">Host Group</template>
+        <span class="content-target">مجموعة المضيفين (Host Group)</span>
+      </a>
+      <a href="#filter-and-packet-capture" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعات الفلترة والتقاط الحزم (Filter &amp; Packet Capture)</template>
+        <template class="content-en">Filter &amp; Packet Capture Groups</template>
+        <span class="content-target">مجموعات الفلترة والتقاط الحزم (Filter &amp; Packet Capture)</span>
+      </a>
+      <a href="#rmon2-enhancements" class="toc-link" data-bilingual>
+        <template class="content-ar">تحسينات RMON2 وإحصائيات الأخطاء</template>
+        <template class="content-en">RMON2 Enhancements and Error Statistics</template>
+        <span class="content-target">تحسينات RMON2 وإحصائيات الأخطاء</span>
+      </a>
+      <a href="#rmon2-mib-groups" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعات RMON2 MIB</template>
+        <template class="content-en">RMON2 MIB Groups</template>
+        <span class="content-target">مجموعات RMON2 MIB</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · IT363
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">إدارة SNMP: المراقبة عن بُعد (RMON)</h1>
+      <p class="hero-description">تغطي هذه الوحدة مفاهيم المراقبة عن بعد للشبكات (RMON)، بما في ذلك مكونات RMON، والفرق بين RMON1 و RMON2، ومجموعات MIB المختلفة، وكيفية إدارة الجداول والبيانات محلياً لتقليل العبء على الشبكة.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">SNMP Management: RMON</h1>
+      <p class="hero-description">This module covers Remote Network Monitoring (RMON) concepts, including RMON components, the difference between RMON1 and RMON2, various MIB groups, and how to manage tables and data locally to reduce network load.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">إدارة الشبكات</span>
+      <span class="tag">RMON</span>
+      <span class="tag">SNMP</span>
+      <span class="tag">مراقبة الأداء</span>
+      <span class="tag">تحليل البروتوكولات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Management</span>
+      <span class="tag">RMON</span>
+      <span class="tag">SNMP</span>
+      <span class="tag">Performance Monitoring</span>
+      <span class="tag">Protocol Analysis</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم بنية ومكونات المراقبة عن بعد للشبكات (RMON).</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين RMON1 (مراقبة الطبقة الثانية) و RMON2 (مراقبة الطبقات العليا).</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية توليد وإرسال الإحصائيات من الشبكات الفرعية إلى نظام إدارة الشبكة المركزي (NMS).</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل مجموعات RMON MIB ووظائفها المختلفة مثل الفلترة والتقاط الحزم.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم آلية إنشاء وحذف الصفوف في جداول RMON باستخدام EntryStatus.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the architecture and components of Remote Network Monitoring (RMON).</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between RMON1 (Layer 2 monitoring) and RMON2 (Upper layers monitoring).</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain how statistics are generated and sent from subnetworks to the central NMS.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze RMON MIB groups and their various functions such as filtering and packet capture.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the mechanism of row creation and deletion in RMON tables using EntryStatus.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="rmon-components" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مكونات RMON (المسبار والمحلل)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> RMON Components (Probe and Analyzer)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتكون RMON من مسبار (Probe) يجمع البيانات محلياً، ومحلل (Analyzer) يعالجها، تماماً كحارس أمن محلي يجمع المعلومات ويرسل تقريراً للمركز الرئيسي.</p></template>
+    <template class="content-en"><p>RMON consists of a Probe that gathers data locally and an Analyzer that processes it, much like a local security guard gathering intel for a central headquarters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد المراقبة عن بعد للشبكات (RMON) على مكونين رئيسيين:</p><ul><li><b><span class="smart-term" data-term-en="RMON Probe" data-ar="مسبار RMON" data-en-def="A physical device or software that gathers data by sniffing packets on a LAN.">مسبار RMON<span class="smart-term-tooltip"></span></span> (RMON Probe):</b> هو جهاز مادي أو أداة برمجية تعمل كجامع للبيانات (Data gatherer). يقوم بـ "شم" (sniffing) كل حزمة تمر عبر الشبكة المحلية (LAN).</li><li><b><span class="smart-term" data-term-en="Data Analyzer" data-ar="محلل البيانات" data-en-def="The processor that analyzes the data collected by the RMON probe.">محلل البيانات<span class="smart-term-tooltip"></span></span> (Data Analyzer):</b> هو المعالج الذي يقوم بتحليل البيانات التي جمعها المسبار.</li></ul><p>إذا كان المسبار والمحلل في نفس المكان الجغرافي، يُعرف بـ <b>المسبار المحلي (Local Probe)</b>. أما إذا تم استخدام المسبار لمراقبة الشبكة عن بعد والتواصل مع نظام إدارة مركزي (NMS)، فيُعرف ذلك بـ <b>المراقبة عن بعد (RMON)</b>.</p></template>
+    <template class="content-en"><p>Remote Network Monitoring (RMON) relies on two main components:</p><ul><li><b><span class="smart-term" data-term-en="RMON Probe" data-ar="مسبار RMON" data-en-def="A physical device or software that gathers data by sniffing packets on a LAN.">RMON Probe<span class="smart-term-tooltip"></span></span>:</b> A physical device or software tool that acts as a data gatherer. It "sniffs" every packet going across a Local Area Network (LAN).</li><li><b><span class="smart-term" data-term-en="Data Analyzer" data-ar="محلل البيانات" data-en-def="The processor that analyzes the data collected by the RMON probe.">Data Analyzer<span class="smart-term-tooltip"></span></span>:</b> The processor that analyzes the data collected by the probe.</li></ul><p>If both are at the same place geographically, it is a <b>local probe</b>. Remotely monitoring the network using a probe is referred to as <b>Remote Network Monitoring (RMON)</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تم فصل المسبار عن المحلل؟ هذا التصميم يقلل بشكل كبير من حركة المرور على الشبكة الأساسية (Backbone). بدلاً من إرسال كل حزمة بيانات إلى المركز لتحليلها، يقوم المسبار بالعمل الشاق محلياً ويرسل فقط الإحصائيات أو التنبيهات.</p><p>من حالات الحافة المهمة: إذا انقطع الاتصال بين المسبار ونظام الإدارة (NMS)، يستمر المسبار في جمع البيانات وتخزينها محلياً حتى يعود الاتصال، مما يمنع فقدان البيانات الحيوية أثناء أعطال الشبكة.</p><p>تتطلب بيئات الشبكات المعقدة معايير RMON لأن المسابير قد تكون من موردين مختلفين (Vendors)، ويجب أن تتواصل جميعها بلغة موحدة مع نظام الإدارة المركزي.</p></template>
+    <template class="content-en"><p>Why separate the probe from the analyzer? This architecture drastically reduces traffic on the backbone network. Instead of sending every raw packet to the central NMS for analysis, the probe does the heavy lifting locally and only sends statistics or alerts.</p><p>An important edge case: If the connection between the probe and the NMS drops, the probe continues to gather and store data locally until the connection is restored, preventing the loss of vital diagnostic data during network outages.</p><p>Complex network environments require RMON standards because probes can come from different vendors, and they all must communicate using a unified language with the central NMS.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a network diagram with a 'Data Analyzer' on the left, connected via 'SNMP Traffic' to a 'Router', which connects to a cloud labeled 'BACKBONE NETWORK'. On the right side of the cloud, another 'Router' connects via 'SNMP Traffic' to an 'RMON Probe'. The RMON Probe is connected downwards to an oval labeled 'LAN'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Standard Arrow Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Reverse Arrow Marker for Bidirectional Lines -->
+        <marker id="arrow-reverse" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Gradient for Highlighted Nodes (Analyzer & Probe) -->
+        <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-600)" />
+            <stop offset="100%" stop-color="var(--brand-800)" />
+        </linearGradient>
+
+        <!-- Subtle Drop Shadow -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.1" flood-color="#000000" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RMON Architecture: Probe and Analyzer</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية RMON: المسبار والمحلل</text>
+
+    <!-- ========================================== -->
+    <!-- CONNECTIONS (Drawn first to be behind nodes) -->
+    <!-- ========================================== -->
+
+    <!-- Analyzer to Router 1 -->
+    <line x1="150" y1="200" x2="215" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow-reverse)" />
+    <text x="182.5" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">SNMP Traffic</text>
+    <text x="182.5" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">حركة مرور SNMP</text>
+
+    <!-- Router 1 to Backbone -->
+    <line x1="285" y1="200" x2="330" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow-reverse)" />
+
+    <!-- Backbone to Router 2 -->
+    <line x1="470" y1="200" x2="515" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow-reverse)" />
+
+    <!-- Router 2 to Probe -->
+    <line x1="585" y1="200" x2="650" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow-reverse)" />
+    <text x="617.5" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">SNMP Traffic</text>
+    <text x="617.5" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">حركة مرور SNMP</text>
+
+    <!-- Probe to LAN (Sniffing) -->
+    <line x1="710" y1="240" x2="710" y2="295" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)" />
+    <text x="720" y="270" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Monitors / Sniffs</text>
+    <text x="720" y="270" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">يراقب / يتنصت</text>
+
+    <!-- ========================================== -->
+    <!-- NODES -->
+    <!-- ========================================== -->
+
+    <!-- Data Analyzer (Left) -->
+    <g filter="url(#shadow)">
+        <rect x="30" y="160" width="120" height="80" rx="8" fill="url(#nodeGrad)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="90" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Data</text>
+        <text x="90" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Analyzer</text>
+        <text x="90" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">محلل البيانات</text>
+    </g>
+
+    <!-- Router 1 -->
+    <g filter="url(#shadow)">
+        <circle cx="250" cy="200" r="35" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <!-- Router Icon -->
+        <g stroke="var(--text-primary)" stroke-width="2" fill="none">
+            <line x1="230" y1="200" x2="270" y2="200" />
+            <line x1="250" y1="180" x2="250" y2="220" />
+            <polyline points="265,195 270,200 265,205" />
+            <polyline points="235,195 230,200 235,205" />
+            <polyline points="245,185 250,180 255,185" />
+            <polyline points="245,215 250,220 255,215" />
+        </g>
+    </g>
+    <text x="250" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Router</text>
+    <text x="250" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مُوجّه</text>
+
+    <!-- Backbone Network Cloud -->
+    <g filter="url(#shadow)">
+        <path d="M 330 200 C 330 175, 355 160, 370 170 C 380 145, 420 145, 430 170 C 445 160, 470 175, 470 200 C 470 225, 445 240, 430 230 C 420 255, 380 255, 370 230 C 355 240, 330 225, 330 200 Z" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+        <text x="400" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">BACKBONE</text>
+        <text x="400" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">NETWORK</text>
+        <text x="400" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الشبكة الأساسية</text>
+    </g>
+
+    <!-- Router 2 -->
+    <g filter="url(#shadow)">
+        <circle cx="550" cy="200" r="35" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <!-- Router Icon -->
+        <g stroke="var(--text-primary)" stroke-width="2" fill="none">
+            <line x1="530" y1="200" x2="570" y2="200" />
+            <line x1="550" y1="180" x2="550" y2="220" />
+            <polyline points="565,195 570,200 565,205" />
+            <polyline points="535,195 530,200 535,205" />
+            <polyline points="545,185 550,180 555,185" />
+            <polyline points="545,215 550,220 555,215" />
+        </g>
+    </g>
+    <text x="550" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Router</text>
+    <text x="550" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مُوجّه</text>
+
+    <!-- RMON Probe (Right) -->
+    <g filter="url(#shadow)">
+        <rect x="650" y="160" width="120" height="80" rx="8" fill="url(#nodeGrad)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="710" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">RMON</text>
+        <text x="710" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Probe</text>
+        <text x="710" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مسبار RMON</text>
+    </g>
+
+    <!-- LAN Oval (Bottom Right) -->
+    <g filter="url(#shadow)">
+        <ellipse cx="710" cy="330" rx="70" ry="35" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="710" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">LAN</text>
+        <text x="710" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شبكة محلية (LAN)</text>
+    </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>RMON1</th><th>RMON2</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبقة OSI المدعومة</template>
+          <template class="content-en">Supported OSI Layer</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">الطبقة 2 (Data Link / MAC)</template>
+          <template class="content-en">Layer 2 (Data Link / MAC)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الطبقات 3 إلى 7 (Network to Application)</template>
+          <template class="content-en">Layers 3 to 7 (Network to Application)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مجموعات MIB</template>
+          <template class="content-en">MIB Groups</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">من 1 إلى 10</template>
+          <template class="content-en">1 to 10</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">من 11 إلى 20</template>
+          <template class="content-en">11 to 20</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حساب إحصائيات الأخطاء</template>
+          <template class="content-en">Error Statistics Calculation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">أخطاء الطبقة الثانية (التصادمات، CRC)</template>
+          <template class="content-en">Layer 2 errors (Collisions, CRC)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">تتضمن الطبقات السفلية وصولاً لطبقة الشبكة فقط (تستثني الطبقة 2)</template>
+          <template class="content-en">Includes lower layers down to Network layer only (excludes Layer 2)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث لبيانات الشبكة إذا تعطل نظام إدارة الشبكة (NMS) المركزي ولكن مسبار RMON لا يزال يعمل؟</template>
+      <template class="content-en">What happens to network data if the central NMS goes down but the RMON probe is still functioning?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يستمر مسبار RMON في جمع الإحصائيات وتخزينها محلياً. بمجرد عودة NMS للعمل، يمكنه استرداد البيانات التاريخية من المسبار، مما يضمن عدم فقدان معلومات الأداء أثناء فترة التعطل.</p></template>
+      <template class="content-en"><p>The RMON probe continues to gather and store statistics locally. Once the NMS is back online, it can retrieve the historical data from the probe, ensuring no performance information is lost during the downtime.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="protocol-analyzer" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> محلل البروتوكولات (Protocol Analyzer)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Protocol Analyzer</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>محلل البروتوكولات يحلل حزم البيانات على أي مستوى بروتوكول، ولكنه يعتمد على جهاز التقاط لا يخزن البيانات بل ينقلها مباشرة.</p></template>
+    <template class="content-en"><p>A protocol analyzer analyzes data packets at all protocol levels, relying on a capture device that transfers raw data without storing it.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>محلل البروتوكولات هو أداة تقوم بتحليل حزم البيانات على أي خط نقل، بما في ذلك الشبكات المحلية (LAN). يتميز بالخصائص التالية:</p><ul><li>يمكن إجراء القياسات محلياً أو عن بعد.</li><li>يستخدم <b>مسباراً (جهاز التقاط البيانات)</b> لالتقاط البيانات ونقلها مباشرة إلى محلل البروتوكولات <b>(بدون تخزين)</b>.</li><li>رابط البيانات بين المسبار ومحلل البروتوكولات يمكن أن يكون اتصالاً هاتفياً (dial-up)، أو رابطاً مخصصاً، أو عبر الشبكة المحلية.</li><li>يقوم بتحليل البيانات على <b>جميع مستويات البروتوكول</b>.</li></ul></template>
+    <template class="content-en"><p>A Protocol Analyzer is a tool that analyzes data packets on any transmission line, including LANs. It has the following characteristics:</p><ul><li>Measurements can be made locally or remotely.</li><li>It uses a <b>probe (data capture device)</b> that captures data and transfers it to the protocol analyzer <b>(no storage)</b>.</li><li>The data link between the probe and the protocol analyzer can be dial-up, a dedicated link, or a LAN.</li><li>It analyzes data at <b>all protocol levels</b>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين محلل البروتوكولات ومسبار RMON يكمن في "التخزين والمعالجة المحلية". جهاز التقاط البيانات في محلل البروتوكولات هو مجرد قناة تمرير (Passthrough) ترسل البيانات الخام (Raw data) عبر الشبكة ليتم تحليلها، مما قد يستهلك عرض نطاق ترددي كبير.</p><p>بالمقابل، مسبار RMON يجمع الإحصائيات ويخزنها لفترة ممتدة ليتم تحليلها لاحقاً، ويرسل فقط الإحصائيات بدلاً من البيانات الخام، مما يجعله مثالياً لضبط الأداء (Performance tuning) وإدارة التكوين.</p></template>
+    <template class="content-en"><p>The fundamental difference between a Protocol Analyzer and an RMON probe lies in "local storage and processing". The capture device in a protocol analyzer is merely a passthrough that sends raw data across the network to be analyzed, which can consume significant bandwidth.</p><p>In contrast, an RMON probe gathers and stores statistics for an extended period to be analyzed later. It sends statistics instead of raw data, making it ideal for configuration management and performance tuning without overloading the network.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Protocol Analyzer</th><th>RMON Probe</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تخزين البيانات</template>
+          <template class="content-en">Data Storage</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يوجد تخزين (ينقل البيانات الخام مباشرة)</template>
+          <template class="content-en">No storage (transfers raw data directly)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجمع ويخزن البيانات لفترة ممتدة</template>
+          <template class="content-en">Gathers and stores data for an extended period</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك عرض النطاق الترددي (Bandwidth)</template>
+          <template class="content-en">Bandwidth Consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع (ينقل كل حزمة)</template>
+          <template class="content-en">High (transfers every packet)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (ينقل الإحصائيات والتنبيهات فقط)</template>
+          <template class="content-en">Low (transfers only statistics and alerts)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قد نفضل استخدام RMON على محلل البروتوكولات التقليدي عند مراقبة فرع بعيد للشركة؟</template>
+      <template class="content-en">Why might we prefer using RMON over a traditional protocol analyzer when monitoring a remote company branch?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن محلل البروتوكولات سيرسل البيانات الخام عبر شبكة WAN، مما قد يسبب اختناقاً في الشبكة. بينما RMON سيحلل البيانات محلياً في الفرع ويرسل فقط الإحصائيات والتنبيهات، مما يوفر عرض النطاق الترددي.</p></template>
+      <template class="content-en"><p>Because a protocol analyzer would send raw data across the WAN, potentially causing network congestion. RMON analyzes data locally at the branch and only sends statistics and alerts, saving bandwidth.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rmon-benefits" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> فوائد RMON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> RMON Benefits</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يوفر RMON معلومات أكثر موثوقية ويقلل العبء على الشبكة من خلال المراقبة المحلية، مما يمنع الإنذارات الكاذبة الناتجة عن مشاكل الاتصال عن بعد.</p></template>
+    <template class="content-en"><p>RMON provides more reliable information and reduces network load through local monitoring, preventing false alarms caused by remote connection issues.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يقدم استخدام RMON فوائد عديدة لإدارة الشبكات:</p><ol><li><b>تقليل العبء على الشبكة:</b> يراقب ويحلل البيانات محلياً ثم ينقل النتائج فقط.</li><li><b>لا يحتاج إلى رؤية مباشرة من NMS:</b> على سبيل المثال، قد يُظهر الموزع (Hub) فشلاً متكرراً ولكنه يتعافى ذاتياً. إذا كان NMS يراقبه مباشرة، فقد يغرق الشبكة بالاستعلامات. الحل مع RMON هو إرسال تنبيه فقط عند فشل 3 استجابات ICMP متتالية.</li><li><b>معلومات أكثر موثوقية:</b> لأن الاستعلام (Polling) يتم محلياً، يتم تجنب التفسير الخاطئ من قبل NMS (مثل ضياع حزم ICMP ping بسبب المسافات الطويلة).</li><li><b>تشخيص أسرع للأعطال:</b> يسمح بالمراقبة بشكل متكرر ومكثف محلياً.</li><li><b>زيادة إنتاجية مديري الشبكات:</b> من خلال أتمتة المراقبة وتقليل الإنذارات الكاذبة.</li></ol></template>
+    <template class="content-en"><p>Using RMON offers several benefits for network management:</p><ol><li><b>Less load on the network:</b> Monitors and analyzes locally and relays only the data/statistics.</li><li><b>Needs no direct visibility by NMS:</b> For example, a hub frequently shows failure but recovers itself. Direct NMS monitoring might overload the network. The RMON solution: report failure only when 3 successive ICMP responses are not received.</li><li><b>More reliable information:</b> Because polling is local, it avoids wrong interpretation by the NMS (e.g., ICMP pings getting lost in long-distance communication).</li><li><b>Faster fault diagnosis:</b> Permits monitoring on a more frequent basis locally.</li><li><b>Increases productivity:</b> For administrators by automating monitoring and reducing false alarms.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تخيل سيناريو حيث يقوم NMS في نيويورك بمراقبة موجه (Router) في طوكيو عبر بروتوكول ICMP (Ping). إذا كان هناك ازدحام في كابل بحري، قد تضيع حزم Ping، فيستنتج NMS خطأً أن الموجه في طوكيو قد تعطل (False Positive).</p><p>بوجود مسبار RMON في طوكيو، يقوم المسبار بعمل Ping للموجه محلياً (حيث لا يوجد ازدحام). إذا كان الموجه يعمل، فلن يرسل المسبار أي إنذار لنيويورك. هذا التصميم يحل مشكلة "العمى الإداري" الناتج عن مشاكل الروابط الوسيطة.</p></template>
+    <template class="content-en"><p>Imagine a scenario where an NMS in New York monitors a router in Tokyo via ICMP (Ping). If there is congestion on an undersea cable, Ping packets might drop, causing the NMS to falsely conclude the Tokyo router is dead (False Positive).</p><p>With an RMON probe in Tokyo, the probe pings the router locally (where there is no congestion). If the router is fine, the probe sends no alarm to New York. This architecture solves the "management blindness" caused by intermediate link issues.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمنع RMON مشكلة 'الإنذارات الكاذبة' (False Alarms) في الشبكات الواسعة (WAN)؟</template>
+      <template class="content-en">How does RMON prevent the issue of 'False Alarms' in Wide Area Networks (WAN)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال إجراء الاستعلامات (Polling) محلياً داخل نفس الشبكة الفرعية. هذا يضمن أن ضياع الحزم بسبب مشاكل في روابط WAN لا يُفسر خطأً على أنه تعطل في الجهاز النهائي.</p></template>
+      <template class="content-en"><p>By performing polling locally within the same subnetwork. This ensures that packet loss due to WAN link issues is not falsely interpreted as an end-device failure.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rmon-mib-structure" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> هيكلية RMON MIB (RMON1 مقابل RMON2)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> RMON MIB Structure (RMON1 vs RMON2)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتعامل RMON1 مع إحصائيات الطبقة الثانية (MAC/Ethernet)، بينما يمتد RMON2 لمراقبة الطبقات العليا (من 3 إلى 7) مثل IP والتطبيقات.</p></template>
+    <template class="content-en"><p>RMON1 deals with Layer 2 statistics (MAC/Ethernet), while RMON2 extends monitoring to upper layers (3 to 7) like IP and applications.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تنقسم قاعدة معلومات الإدارة (MIB) الخاصة بـ RMON إلى فئتين رئيسيتين بناءً على طبقات نموذج OSI:</p><ul><li><b>RMON1:</b> يغطي المجموعات من (rmon 1) إلى (rmon 9) لشبكات Ethernet، والمجموعة (rmon 10) كملحق لشبكات Token Ring. يعالج RMON1 المعلمات في <b>الطبقة الثانية (Layer 2) فقط</b> من نموذج OSI.</li><li><b>RMON2:</b> يغطي المجموعات من (rmon 11) إلى (rmon 20). وهو مصمم لمراقبة <b>الطبقات العليا (من 3 إلى 7)</b>، مما يسمح برؤية حركة المرور بناءً على بروتوكولات الشبكة (مثل IP) والتطبيقات.</li></ul></template>
+    <template class="content-en"><p>The RMON Management Information Base (MIB) is divided into two main categories based on OSI model layers:</p><ul><li><b><span class="smart-term" data-term-en="RMON1" data-ar="الإصدار الأول من RMON" data-en-def="RMON standard that operates at OSI Layer 2, focusing on MAC-level statistics.">RMON1<span class="smart-term-tooltip"></span></span>:</b> Covers Ethernet RMON groups (rmon 1 - rmon 9) and a Token ring extension (rmon 10). RMON1 addresses parameters at the <b>OSI layer 2 only</b>.</li><li><b><span class="smart-term" data-term-en="RMON2" data-ar="الإصدار الثاني من RMON" data-en-def="RMON standard that operates at OSI Layers 3-7, focusing on network and application protocols.">RMON2<span class="smart-term-tooltip"></span></span>:</b> Covers Higher layers (3-7) groups (rmon 11 - rmon 20). It is designed to monitor upper-layer protocols, allowing visibility into network traffic based on protocols (like IP) and applications.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>القيود في RMON1 كانت واضحة:</p><ul><li>يمكنه إخبارك أن المضيف A يتحدث مع المضيف B بكثافة (عبر عناوين MAC)،</li><li>لكنه لا يستطيع إخبارك <i>بماذا</i> يتحدثان (هل هو تصفح ويب HTTP أم نقل ملفات FTP؟).</li></ul><p>هنا جاء دور RMON2.</p><p>RMON2 يتيح لمديري الشبكات تتبع حركة المرور عبر الموجهات (Routers) لأن عناوين IP (الطبقة 3) لا تتغير عند عبور الموجه، بخلاف عناوين MAC (الطبقة 2) التي تتغير في كل قفزة (Hop).</p></template>
+    <template class="content-en"><p>The limitations of RMON1 were clear:</p><ul><li>it could tell you that Host A is talking heavily to Host B (via MAC addresses),</li><li>but it couldn't tell you <i>what</i> they were talking about (is it HTTP web traffic or FTP file transfer?).</li></ul><p>This is where RMON2 comes in.</p><p>RMON2 allows network managers to track traffic across routers because IP addresses (Layer 3) remain end-to-end, unlike MAC addresses (Layer 2) which change at every router hop.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A tree diagram showing 'rmon (mib-2 16)' at the root. Branches go down to two main boxes: 'RMON1' (containing statistics(1), history(2), alarm(3), host(4), hostTopN(5), matrix(6), filter(7), capture(8), event(9)) and 'RMON1 Extension' (tokenRing(10)), and 'RMON2' (containing protocolDir(11), protocolDist(12), addressMap(13), n1Host(14), n1Matrix(15), a1Host(16), a1Matrix(17), usrHistory(18), probeConfig(19), rmonConformance(20)). Style: educational, dark background #0d1117, accent colors for RMON1 and RMON2 boxes, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 580" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Root Node -->
+  <rect x="310" y="20" width="180" height="44" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="400" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">rmon (mib-2 16)</text>
+  <text x="400" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">rmon (mib-2 16)</text>
+
+  <!-- Connection Lines -->
+  <path d="M 400 64 L 400 85 L 210 85 L 210 97" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 64 L 400 85 L 590 85 L 590 97" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- RMON1 Main Box -->
+  <rect x="50" y="100" width="320" height="440" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+  <line x1="50" y1="140" x2="370" y2="140" stroke="var(--brand-400)" stroke-width="2" opacity="0.5" />
+  
+  <text x="210" y="126" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">RMON1 (OSI Layer 2)</text>
+  <text x="210" y="126" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">RMON1 (الطبقة 2 من OSI)</text>
+
+  <!-- RMON1 Items -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">
+    <!-- 1 -->
+    <rect x="70" y="150" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="169" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">statistics(1)</text>
+    <text x="210" y="169" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الإحصائيات (1)</text>
+    <!-- 2 -->
+    <rect x="70" y="184" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="203" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">history(2)</text>
+    <text x="210" y="203" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">السجل (2)</text>
+    <!-- 3 -->
+    <rect x="70" y="218" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="237" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">alarm(3)</text>
+    <text x="210" y="237" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الإنذار (3)</text>
+    <!-- 4 -->
+    <rect x="70" y="252" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="271" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">host(4)</text>
+    <text x="210" y="271" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">المضيف (4)</text>
+    <!-- 5 -->
+    <rect x="70" y="286" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="305" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">hostTopN(5)</text>
+    <text x="210" y="305" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">أعلى N مضيفين (5)</text>
+    <!-- 6 -->
+    <rect x="70" y="320" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="339" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">matrix(6)</text>
+    <text x="210" y="339" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">المصفوفة (6)</text>
+    <!-- 7 -->
+    <rect x="70" y="354" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="373" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">filter(7)</text>
+    <text x="210" y="373" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الفلتر (7)</text>
+    <!-- 8 -->
+    <rect x="70" y="388" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="407" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">capture(8)</text>
+    <text x="210" y="407" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الالتقاط (8)</text>
+    <!-- 9 -->
+    <rect x="70" y="422" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="441" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">event(9)</text>
+    <text x="210" y="441" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الحدث (9)</text>
+  </g>
+
+  <!-- RMON1 Extension Divider -->
+  <line x1="70" y1="464" x2="350" y2="464" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  
+  <text x="210" y="484" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">RMON1 Extension</text>
+  <text x="210" y="484" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">امتداد RMON1</text>
+
+  <!-- RMON1 Extension Item -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">
+    <rect x="70" y="496" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="210" y="515" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">tokenRing(10)</text>
+    <text x="210" y="515" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">حلقة الرمز (10)</text>
+  </g>
+
+  <!-- RMON2 Main Box -->
+  <rect x="430" y="100" width="320" height="440" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <line x1="430" y1="140" x2="750" y2="140" stroke="var(--brand-500)" stroke-width="2" opacity="0.5" />
+  
+  <text x="590" y="126" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">RMON2 (OSI Layers 3-7)</text>
+  <text x="590" y="126" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">RMON2 (الطبقات 3-7 من OSI)</text>
+
+  <!-- RMON2 Items -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">
+    <!-- 11 -->
+    <rect x="450" y="150" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="169" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">protocolDir(11)</text>
+    <text x="590" y="169" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">دليل البروتوكول (11)</text>
+    <!-- 12 -->
+    <rect x="450" y="184" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="203" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">protocolDist(12)</text>
+    <text x="590" y="203" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">توزيع البروتوكول (12)</text>
+    <!-- 13 -->
+    <rect x="450" y="218" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="237" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">addressMap(13)</text>
+    <text x="590" y="237" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">خريطة العناوين (13)</text>
+    <!-- 14 -->
+    <rect x="450" y="252" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="271" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">n1Host(14)</text>
+    <text x="590" y="271" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مضيف n1 (14)</text>
+    <!-- 15 -->
+    <rect x="450" y="286" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="305" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">n1Matrix(15)</text>
+    <text x="590" y="305" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مصفوفة n1 (15)</text>
+    <!-- 16 -->
+    <rect x="450" y="320" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="339" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">a1Host(16)</text>
+    <text x="590" y="339" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مضيف a1 (16)</text>
+    <!-- 17 -->
+    <rect x="450" y="354" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="373" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">a1Matrix(17)</text>
+    <text x="590" y="373" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مصفوفة a1 (17)</text>
+    <!-- 18 -->
+    <rect x="450" y="388" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="407" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">usrHistory(18)</text>
+    <text x="590" y="407" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">سجل المستخدم (18)</text>
+    <!-- 19 -->
+    <rect x="450" y="422" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="441" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">probeConfig(19)</text>
+    <text x="590" y="441" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">تكوين المسبار (19)</text>
+    <!-- 20 -->
+    <rect x="450" y="456" width="280" height="28" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="590" y="475" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">rmonConformance(20)</text>
+    <text x="590" y="475" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مطابقة RMON (20)</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت معرفة كمية البيانات المستهلكة بواسطة تطبيق معين (مثل يوتيوب) على الشبكة، هل ستستخدم RMON1 أم RMON2؟ ولماذا؟</template>
+      <template class="content-en">If you want to know the amount of data consumed by a specific application (like YouTube) on the network, would you use RMON1 or RMON2? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم RMON2، لأنه يعمل في الطبقات العليا (3 إلى 7) ويمكنه التمييز بين بروتوكولات التطبيقات المختلفة، بينما RMON1 يرى فقط إطارات الطبقة الثانية (MAC) ولا يفهم محتوى التطبيق.</p></template>
+      <template class="content-en"><p>I would use RMON2, because it operates at higher layers (3 to 7) and can distinguish between different application protocols, whereas RMON1 only sees Layer 2 (MAC) frames and does not understand application content.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="row-creation-deletion" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> إنشاء وحذف الصفوف (Row Creation &amp; Deletion)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Row Creation &amp; Deletion</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم RMON نوعين جديدين من البيانات: OwnerString لتحديد مالك الصف، و EntryStatus (بـ 4 حالات فقط) لإنشاء وحذف الصفوف في الجداول.</p></template>
+    <template class="content-en"><p>RMON uses two new data types: OwnerString to identify the row's owner, and EntryStatus (with only 4 states) to create and delete rows in tables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تعريف نوعين جديدين من البيانات في اصطلاحات RMON النصية للتحكم في الجداول:</p><ol><li><b>OwnerString:</b> يحتوي على معلومات حول المالك (الذي أنشأ الإدخال)، مثل عنوان IP، اسم محطة الإدارة، اسم مدير الشبكة، الموقع، أو رقم الهاتف.</li><li><b>EntryStatus:</b> مشابه لـ RowStatus في SNMPv2، ويُستخدم لإنشاء وحذف الصفوف المفاهيمية. يحتوي على 4 حالات فقط (مقارنة بـ 6 في SNMPv2):<ul><li><b>valid (1):</b> الصف موجود ونشط. تم تكوينه بالكامل وهو قيد التشغيل.</li><li><b>createRequest (2):</b> طلب إنشاء صف جديد.</li><li><b>underCreation (3):</b> الصف قيد الإنشاء ولم يكتمل تنشيطه بعد.</li><li><b>invalid (4):</b> يُستخدم لحذف الصف عن طريق فك ارتباط هذا الإدخال.</li></ul></li></ol></template>
+    <template class="content-en"><p>Two new data types are defined in RMON textual conventions for table management:</p><ol><li><b><span class="smart-term" data-term-en="OwnerString" data-ar="سلسلة المالك" data-en-def="A data type in RMON that identifies the creator of a row entry to prevent management conflicts.">OwnerString<span class="smart-term-tooltip"></span></span>:</b> Contains information about the owner (who created the entry): IP address, management station name, network manager's name, location, or telephone number.</li><li><b><span class="smart-term" data-term-en="EntryStatus" data-ar="حالة الإدخال" data-en-def="A 4-state variable used in RMON to manage the creation and deletion of conceptual rows.">EntryStatus<span class="smart-term-tooltip"></span></span>:</b> Similar to RowStatus in SNMPv2, used to create and delete conceptual rows. It has only 4 states (compared to 6 in SNMPv2):<ul><li><b>valid (1):</b> Row exists and is active. It is fully configured and operational.</li><li><b>createRequest (2):</b> Create a new row by creating this object.</li><li><b>underCreation (3):</b> Row is not fully active.</li><li><b>invalid (4):</b> Delete the row by disassociating the mapping of this entry.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى <code>OwnerString</code>؟ في الشبكات الكبيرة، قد يكون هناك عدة أنظمة إدارة (NMS) أو عدة مدراء يحاولون تكوين نفس مسبار RMON. يمنع <code>OwnerString</code> التعارضات بحيث يعرف كل مدير من قام بإنشاء فلتر معين أو جدول التقاط، ولا يقوم بحذفه عن طريق الخطأ.</p><p>تبسيط <code>EntryStatus</code> إلى 4 حالات بدلاً من 6 في SNMPv2 جعل تنفيذ RMON أسهل على الأجهزة ذات الموارد المحدودة (المسابير)، مع الحفاظ على دورة الحياة الأساسية: الطلب -> قيد الإنشاء -> صالح -> غير صالح (حذف).</p></template>
+    <template class="content-en"><p>Why do we need <code>OwnerString</code>? In large networks, multiple NMS or managers might try to configure the same RMON probe. <code>OwnerString</code> prevents conflicts so each manager knows who created a specific filter or capture table, preventing accidental deletions.</p><p>Simplifying <code>EntryStatus</code> to 4 states instead of 6 in SNMPv2 made RMON implementation easier on resource-constrained devices (probes), while maintaining the essential lifecycle: Request -> Under Creation -> Valid -> Invalid (Delete).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت إيقاف عملية جمع بيانات معينة في جدول RMON وحذف الإعدادات، ما هي الحالة التي يجب تعيين EntryStatus إليها؟</template>
+      <template class="content-en">If you want to stop a specific data collection process in an RMON table and delete the settings, what state should EntryStatus be set to?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب تعيين الحالة إلى invalid (4)، مما يؤدي إلى حذف الصف وإيقاف العملية المرتبطة به.</p></template>
+      <template class="content-en"><p>The state should be set to invalid (4), which deletes the row and stops the associated process.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rmon1-groups" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مجموعات RMON1 ووظائفها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> RMON1 Groups and Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحتوي RMON1 على 10 مجموعات مقسمة إلى ثلاث فئات: الإحصائيات، الإبلاغ عن الأحداث، والفلترة/التقاط الحزم.</p></template>
+    <template class="content-en"><p>RMON1 contains 10 groups divided into three categories: Statistics, Event reporting, and Filter/Packet capture.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون RMON1 من عشر مجموعات مقسمة إلى ثلاث فئات رئيسية:</p><ol><li><b>مجموعات الإحصائيات (Statistics groups):</b> (1, 2, 4, 5, 6, 10)<ul><li><b>Statistics (1):</b> إحصائيات مستوى الرابط (Link level).</li><li><b>History (2):</b> جمع بيانات إحصائية دورية وتخزينها لاسترجاعها لاحقاً.</li><li><b>Host (4):</b> يجمع بيانات إحصائية عن المضيفين.</li><li><b>HostTopN (5):</b> يحسب <span class="smart-term" data-term-en="HostTopN" data-ar="أعلى N مضيفين" data-en-def="An RMON group that calculates and ranks the top &#x27;N&#x27; hosts based on specific traffic statistics.">أعلى N مضيفين<span class="smart-term-tooltip"></span></span> في فئات الإحصائيات.</li><li><b>Matrix (6):</b> إحصائيات حركة المرور بين أزواج من المضيفين.</li><li><b>Token Ring (10):</b> ملحق لشبكات Token Ring.</li></ul></li><li><b>مجموعات الإبلاغ عن الأحداث (Event reporting groups):</b> (3, 9)<ul><li><b>Alarm (3):</b> يولد أحداثاً عندما تتجاوز العينة عتبات محددة مسبقاً.</li><li><b>Event (9):</b> يتحكم في توليد الأحداث والإشعارات.</li></ul></li><li><b>مجموعات الفلترة والتقاط الحزم (Filter and packet capture groups):</b> (7, 8)<ul><li><b>Filter (7):</b> دالة فلترة تتيح التقاط معلمات محددة.</li><li><b>Packet Capture (8):</b> قدرة التقاط الحزم بعد مرورها عبر قناة.</li></ul></li></ol></template>
+    <template class="content-en"><p>RMON1 consists of ten groups divided into three categories:</p><ol><li><b>Statistics groups (rmon 1, 2, 4, 5, 6, and 10):</b><ul><li><b>Statistics (1):</b> Link level statistics.</li><li><b>History (2):</b> Periodic statistical data collection and storage for later retrieval.</li><li><b>Host (4):</b> Gathers statistical data on hosts.</li><li><b><span class="smart-term" data-term-en="HostTopN" data-ar="أعلى N مضيفين" data-en-def="An RMON group that calculates and ranks the top &#x27;N&#x27; hosts based on specific traffic statistics.">HostTopN<span class="smart-term-tooltip"></span></span> (5):</b> Computes the top N hosts on the respective categories of statistics gathered.</li><li><b>Matrix (6):</b> Statistics on traffic between pairs of hosts.</li><li><b>Token Ring (10):</b> Token ring extension.</li></ul></li><li><b>Event reporting groups (rmon 3 and 9):</b><ul><li><b>Alarm (3):</b> Generates events when the data sample gathered crosses pre-established thresholds.</li><li><b>Event (9):</b> Controls the generation of events and notifications.</li></ul></li><li><b>Filter and packet capture groups (rmon 7 and 8):</b><ul><li><b>Filter (7):</b> Filter function that enables capture of desired parameters.</li><li><b>Packet Capture (8):</b> Packet capture capability to gather packets after they flow through a channel.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المجموعات التي تحتوي على الرقم "2" في أسمائها (مثل <code>etherStats2Table</code> أو <code>historyControl2Table</code>) هي تحسينات تمت إضافتها لاحقاً مع معيار RMON2 لدعم ميزات إضافية دون كسر التوافق مع RMON1.</p><p>التفاعل بين المجموعات مهم جداً: مجموعة <b>Alarm</b> تعتمد على البيانات التي تجمعها مجموعة <b>Statistics</b>. ومجموعة <b>Event</b> تحدد ما سيحدث (مثل إرسال Trap أو تسجيل في السجل) عندما يتم تشغيل إنذار من مجموعة Alarm.</p></template>
+    <template class="content-en"><p>Groups with "2" in their table names (like <code>etherStats2Table</code> or <code>historyControl2Table</code>) are enhancements introduced with RMON2 to support additional features without breaking RMON1 compatibility.</p><p>The interaction between groups is crucial: The <b>Alarm</b> group relies on data gathered by the <b>Statistics</b> group. The <b>Event</b> group determines what action to take (e.g., send a Trap or log an entry) when an alarm is triggered by the Alarm group.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت إرسال تنبيه لمدير الشبكة عندما يتجاوز استخدام الباندويث 80%، ما هي المجموعتان اللتان ستعملان معاً لتحقيق ذلك؟</template>
+      <template class="content-en">If you want to send an alert to the network manager when bandwidth usage exceeds 80%, which two RMON groups will work together to achieve this?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مجموعة Alarm (لمراقبة العتبة وتجاوز الـ 80%) ومجموعة Event (لتوليد وإرسال الإشعار/Trap لمدير الشبكة).</p></template>
+      <template class="content-en"><p>The Alarm group (to monitor the threshold and detect the 80% breach) and the Event group (to generate and send the notification/Trap to the manager).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="control-and-data-tables" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> جداول التحكم والبيانات (Control and Data Tables)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Control and Data Tables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في RMON، يحدد جدول التحكم (Control Table) <i>كيف وماذا</i> يتم جمعه، بينما يخزن جدول البيانات (Data Table) الإحصائيات الفعلية التي تم جمعها.</p></template>
+    <template class="content-en"><p>In RMON, the Control Table defines <i>how and what</i> is collected, while the Data Table stores the actual gathered statistics.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد بنية RMON بشكل كبير على فصل التكوين عن البيانات الفعلية:</p><ul><li><b><span class="smart-term" data-term-en="Data Table" data-ar="جدول البيانات" data-en-def="A table in RMON that stores the actual statistics and data collected based on the control table&#x27;s configuration.">جدول البيانات<span class="smart-term-tooltip"></span></span> (Data Table):</b> يحتوي على صفوف (Instances) من البيانات الفعلية التي تم جمعها (مثل عدد الحزم، الأخطاء، إلخ).</li><li><b><span class="smart-term" data-term-en="Control Table" data-ar="جدول التحكم" data-en-def="A table in RMON used to configure and define what data should be collected.">جدول التحكم<span class="smart-term-tooltip"></span></span> (Control Table):</b> يحدد مثيلات صفوف البيانات في جدول البيانات. وهو قابل للضبط (Settable) لجمع وتخزين مثيلات مختلفة من البيانات.</li></ul><p>يُستخدم جدول التحكم لضبط إعدادات صفوف البيانات. ومن القواعد الهامة أن <b>قيم مؤشر البيانات (data index) ومؤشر التحكم (control index) تكون متطابقة</b> لربط الإعدادات بالبيانات الخاصة بها.</p></template>
+    <template class="content-en"><p>RMON architecture heavily relies on separating configuration from actual data:</p><ul><li><b><span class="smart-term" data-term-en="Data Table" data-ar="جدول البيانات" data-en-def="A table in RMON that stores the actual statistics and data collected based on the control table&#x27;s configuration.">Data Table<span class="smart-term-tooltip"></span></span>:</b> Contains rows (instances) of actual gathered data (e.g., packet counts, errors).</li><li><b><span class="smart-term" data-term-en="Control Table" data-ar="جدول التحكم" data-en-def="A table in RMON used to configure and define what data should be collected.">Control Table<span class="smart-term-tooltip"></span></span>:</b> Defines the instances of the data rows in the data table. It is settable to gather and store different instances of data.</li></ul><p>The control table is used to set the instances of data rows in the data table. An important rule is that the <b>values of the data index and control index are the same</b> to link the configuration to its respective data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا الفصل (Separation of Concerns) هو تصميم ذكي جداً. بدلاً من وجود جدول واحد ضخم يحتوي على إعدادات التكوين والبيانات المتغيرة باستمرار، يسمح هذا التصميم لمدير الشبكة (NMS) بتعديل جدول التحكم مرة واحدة، بينما يقوم المسبار بتحديث جدول البيانات آلاف المرات في الثانية دون التأثير على بنية التكوين.</p><p>التطابق في الفهارس (Indices) يعني أنه إذا كان الصف رقم 5 في جدول التحكم يحدد مراقبة المنفذ رقم 2، فإن الصف رقم 5 في جدول البيانات سيحتوي حتماً على إحصائيات المنفذ رقم 2.</p></template>
+    <template class="content-en"><p>This Separation of Concerns is a very smart design.</p><p>Instead of having one massive table containing both configuration settings and rapidly changing data, this design allows the NMS to modify the control table once, while the probe updates the data table thousands of times per second without affecting the configuration structure.</p><p>The matching indices mean that if row index 5 in the control table configures monitoring for interface 2, then row index 5 in the data table will inherently contain the statistics for interface 2.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A diagram showing the relationship between 'controlTable' and 'dataTable'. On the left, a hierarchical tree for 'controlTable' -> 'controlEntry' -> fields like 'control Index', 'control DataSource', 'control TableSize', 'control Owner', 'control Status'. On the right, 'dataTable' -> 'dataEntry' -> fields like 'data Index', 'data AddlIndex', 'data Other'. Arrows point from the 'control Index' fields on the left to the corresponding 'data Index' fields on the right, illustrating that their values are the same. Style: educational, dark background #0d1117, accent color #10b981. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 900 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Highlight Gradient for Index Fields -->
+        <linearGradient id="highlightGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">RMON: Control Table vs Data Table</text>
+    <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">RMON: جدول التحكم مقابل جدول البيانات</text>
+
+    <!-- Subtitles -->
+    <text x="250" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Configuration (Control Table)</text>
+    <text x="250" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">الإعدادات (جدول التحكم)</text>
+
+    <text x="650" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Gathered Data (Data Table)</text>
+    <text x="650" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">البيانات المجمعة (جدول البيانات)</text>
+
+    <!-- ================= LEFT TREE (CONTROL) ================= -->
+    
+    <!-- controlTable -->
+    <rect x="160" y="130" width="180" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="250" y="150" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">controlTable</text>
+    <text x="250" y="150" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جدول التحكم (controlTable)</text>
+
+    <!-- Line to controlEntry -->
+    <line x1="250" y1="170" x2="250" y2="200" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- controlEntry -->
+    <rect x="160" y="200" width="180" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="250" y="220" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">controlEntry</text>
+    <text x="250" y="220" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">إدخال التحكم (controlEntry)</text>
+
+    <!-- Left Spine -->
+    <path d="M 250 240 L 250 270 L 120 270 L 120 600" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-linejoin="round" />
+    
+    <!-- Left Branches -->
+    <path d="M 120 320 L 160 320 M 120 390 L 160 390 M 120 460 L 160 460 M 120 530 L 160 530 M 120 600 L 160 600" fill="none" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- Control Fields -->
+    <!-- 1. control Index (Highlighted) -->
+    <rect x="160" y="300" width="180" height="40" rx="4" fill="url(#highlightGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="250" y="320" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">control Index</text>
+    <text x="250" y="320" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مؤشر التحكم (Index)</text>
+
+    <!-- 2. control DataSource -->
+    <rect x="160" y="370" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="250" y="390" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">control DataSource</text>
+    <text x="250" y="390" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">مصدر البيانات (DataSource)</text>
+
+    <!-- 3. control TableSize -->
+    <rect x="160" y="440" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="250" y="460" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">control TableSize</text>
+    <text x="250" y="460" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">حجم الجدول (TableSize)</text>
+
+    <!-- 4. control Owner -->
+    <rect x="160" y="510" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="250" y="530" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">control Owner</text>
+    <text x="250" y="530" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">المالك (Owner)</text>
+
+    <!-- 5. control Status -->
+    <rect x="160" y="580" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="250" y="600" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">control Status</text>
+    <text x="250" y="600" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">الحالة (Status)</text>
+
+
+    <!-- ================= RIGHT TREE (DATA) ================= -->
+    
+    <!-- dataTable -->
+    <rect x="560" y="130" width="180" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="650" y="150" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">dataTable</text>
+    <text x="650" y="150" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جدول البيانات (dataTable)</text>
+
+    <!-- Line to dataEntry -->
+    <line x1="650" y1="170" x2="650" y2="200" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- dataEntry -->
+    <rect x="560" y="200" width="180" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="650" y="220" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">dataEntry</text>
+    <text x="650" y="220" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">إدخال البيانات (dataEntry)</text>
+
+    <!-- Right Spine -->
+    <path d="M 650 240 L 650 270 L 520 270 L 520 460" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-linejoin="round" />
+    
+    <!-- Right Branches -->
+    <path d="M 520 320 L 560 320 M 520 390 L 560 390 M 520 460 L 560 460" fill="none" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- Data Fields -->
+    <!-- 1. data Index (Highlighted) -->
+    <rect x="560" y="300" width="180" height="40" rx="4" fill="url(#highlightGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="650" y="320" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">data Index</text>
+    <text x="650" y="320" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مؤشر البيانات (Index)</text>
+
+    <!-- 2. data AddlIndex -->
+    <rect x="560" y="370" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="650" y="390" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">data AddlIndex</text>
+    <text x="650" y="390" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">مؤشر إضافي (AddlIndex)</text>
+
+    <!-- 3. data Other -->
+    <rect x="560" y="440" width="180" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="650" y="460" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">data Other</text>
+    <text x="650" y="460" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بيانات أخرى (Other)</text>
+
+
+    <!-- ================= CONNECTION & ANNOTATION ================= -->
+    
+    <!-- Arrow linking the indices -->
+    <line x1="340" y1="320" x2="545" y2="320" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    
+    <!-- Arrow Label -->
+    <text x="450" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Same Value (Links Config to Data)</text>
+    <text x="450" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نفس القيمة (يربط الإعدادات بالبيانات)</text>
+
+    <!-- Info Box -->
+    <rect x="520" y="510" width="320" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+    
+    <text x="680" y="540" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Key Rule:</text>
+    <text x="680" y="540" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">قاعدة هامة:</text>
+    
+    <text x="680" y="570" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Control Index and Data Index must match</text>
+    <text x="680" y="570" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يجب أن يتطابق مؤشر التحكم مع مؤشر البيانات</text>
+    
+    <text x="680" y="595" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">to link configuration to gathered data.</text>
+    <text x="680" y="595" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">لربط الإعدادات بالبيانات المجمعة.</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Control Table</th><th>Data Table</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الوظيفة الأساسية</template>
+          <template class="content-en">Primary Function</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">يحدد ويضبط مثيلات البيانات التي سيتم جمعها</template>
+          <template class="content-en">Defines and sets the instances of data to be gathered</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">يحتوي على صفوف البيانات والإحصائيات الفعلية</template>
+          <template class="content-en">Contains the actual data rows and statistics</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">العلاقة (الفهرسة)</template>
+          <template class="content-en">Relationship (Indexing)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">قيمة مؤشر التحكم (Control Index)</template>
+          <template class="content-en">Control Index value</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">تتطابق مع قيمة مؤشر التحكم</template>
+          <template class="content-en">Matches the Control Index value</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تتطابق قيمة مؤشر التحكم (Control Index) مع قيمة مؤشر البيانات (Data Index)؟</template>
+      <template class="content-en">Why does the value of the Control Index match the value of the Data Index?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لإنشاء رابط مباشر ومنطقي بين إعدادات التكوين (في جدول التحكم) والبيانات الفعلية التي تم جمعها بناءً على تلك الإعدادات (في جدول البيانات).</p></template>
+      <template class="content-en"><p>To create a direct and logical link between the configuration settings (in the control table) and the actual data collected based on those settings (in the data table).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="matrix-group" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> مجموعة المصفوفة (Matrix Control and SD Tables)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Matrix Control and SD Tables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتتبع مجموعة المصفوفة حركة المرور بين أزواج من الأجهزة (المصدر والوجهة) لمعرفة من يتحدث مع من وبأي حجم.</p></template>
+    <template class="content-en"><p>The Matrix group tracks traffic between pairs of devices (Source and Destination) to see who is talking to whom and how much.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم مجموعة المصفوفة (Matrix) لجمع إحصائيات حول حركة المرور بين أزواج من المضيفين. تتكون من جداول تحكم وبيانات:</p><ul><li><b>matrixSDTable:</b> هو جدول المصدر-الوجهة (Source-Destination table). يسجل الإحصائيات بناءً على عنوان المصدر وعنوان الوجهة.</li><li><b>controlDataSource:</b> يحدد مصدر البيانات. على سبيل المثال، إذا كانت الواجهة رقم 1 تنتمي إلى مجموعة الواجهات، فإن controlDataSource سيكون <code>ifIndex.1</code>.</li><li><b>controlTableSize:</b> يحدد عدد الإدخالات المرتبطة بمصدر البيانات.</li><li><b>controlOwner:</b> هو منشئ الإدخال (الوكيل Agent، نظام الإدارة NMS، أو شخص الإدارة).</li></ul></template>
+    <template class="content-en"><p>The Matrix group is used to gather statistics on traffic between pairs of hosts. It consists of control and data tables:</p><ul><li><b><span class="smart-term" data-term-en="matrixSDTable" data-ar="جدول المصدر-الوجهة للمصفوفة" data-en-def="An RMON table that stores traffic statistics between specific source and destination MAC addresses.">matrixSDTable<span class="smart-term-tooltip"></span></span>:</b> is the source-destination table. It logs statistics based on the source address and destination address.</li><li><b>controlDataSource:</b> identifies the source of the data. In our example, if interface #1 belongs to the interfaces group, then controlDataSource is <code>ifIndex.1</code>.</li><li><b>controlTableSize:</b> identifies entries associated with the data source.</li><li><b>controlOwner:</b> is the creator of the entry (Agent, NMS, or management person).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر مجموعة المصفوفة أداة قوية جداً لاكتشاف "أكبر المستهلكين" (Top Talkers) في الشبكة. إذا كانت الشبكة بطيئة، فإن جدول <code>matrixSDTable</code> سيكشف فوراً عن عنواني MAC اللذين يتبادلان أكبر قدر من الحزم.</p><p>يوجد أيضاً جدول عكسي يسمى <code>matrixDSTable</code> (الوجهة-المصدر)، وهو مفيد للبحث السريع عندما تريد معرفة جميع الأجهزة التي تتصل بخادم معين (الوجهة).</p></template>
+    <template class="content-en"><p>The Matrix group is a very powerful tool for discovering "Top Talkers" on a network. If the network is slow, the <code>matrixSDTable</code> will immediately reveal which two MAC addresses are exchanging the most packets.</p><p>There is also a reverse table called <code>matrixDSTable</code> (Destination-Source), which is useful for quick lookups when you want to know all the devices connecting to a specific server (the destination).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يساعد جدول matrixSDTable في اكتشاف هجمات حجب الخدمة (DDoS) داخل الشبكة المحلية؟</template>
+      <template class="content-en">How does the matrixSDTable help in detecting DDoS attacks within a LAN?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيُظهر الجدول عدداً هائلاً من الحزم (Pkts) المتجهة من مصادر متعددة (أو مصدر واحد مزيف) إلى عنوان وجهة واحد (الضحية)، مما يبرز النمط غير الطبيعي لحركة المرور.</p></template>
+      <template class="content-en"><p>The table will show a massive number of packets (Pkts) going from multiple sources (or a spoofed source) to a single destination address (the victim), highlighting the abnormal traffic pattern.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="host-group" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> مجموعة المضيفين (Host Group)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Host Group</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تجمع مجموعة المضيفين إحصائيات عن كل جهاز على الشبكة، وتستخدم جدولاً زمنياً (hostTimeTable) لاكتشاف الأجهزة الجديدة بسرعة بمجرد ظهورها.</p></template>
+    <template class="content-en"><p>The Host group gathers statistics about every device on the network, using a time table (hostTimeTable) to quickly discover new devices as they appear.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحتوي مجموعة المضيفين (Host group) على معلومات حول المضيفين على الشبكة. تقوم بتجميع قائمة المضيفين من خلال فحص الحزم الصالحة التي تعبر الشبكة واستخراج عناوين MAC للمصدر والوجهة. وتحتفظ بإحصائيات عن هؤلاء المضيفين.</p><p>هناك ثلاثة جداول في هذه المجموعة:</p><ol><li><b>hostControlTable:</b> يتحكم في الواجهات التي يتم جمع البيانات منها.</li><li><b>hostTable:</b> يحتوي على الإحصائيات الخاصة بكل مضيف.</li><li><b>hostTimeTable:</b> يحتوي على نفس بيانات جدول المضيف، ولكنه <b>مخزن بالترتيب الزمني</b> الذي تم فيه اكتشاف إدخال المضيف.</li></ol><p>يساعد <code>hostTimeTable</code> في الاكتشاف السريع للمضيفين الجدد في النظام. تتم مزامنة الإدخالات في جدولي البيانات (hostTable و hostTimeTable) فيما يتعلق بالمضيف في جدول التحكم.</p></template>
+    <template class="content-en"><p>The host group contains information about the hosts on the network. It compiles the list of hosts by looking at the good packets traversing the network and extracting the source and destination MAC addresses. It maintains statistics on these hosts.</p><p>There are three tables in the group:</p><ol><li><b>hostControlTable:</b> controls the interfaces on which data gathering is done.</li><li><b>hostTable:</b> contains statistics about the host.</li><li><b><span class="smart-term" data-term-en="hostTimeTable" data-ar="الجدول الزمني للمضيفين" data-en-def="An RMON table that stores host statistics ordered by the time they were discovered, enabling fast detection of new devices.">hostTimeTable<span class="smart-term-tooltip"></span></span>:</b> contains the same data as the host table, but is <b>stored in the time order</b> in which the host entry was discovered.</li></ol><p>This <code>hostTimeTable</code> helps in the fast discovery of new hosts in the system. The entries in the two data tables (hostTable and hostTimeTable) are synchronized with respect to the host in the hostControlTable.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى جدولين يحملان نفس البيانات (hostTable و hostTimeTable)؟ الفهرسة (Indexing) هي السبب. يتم فهرسة <code>hostTable</code> بواسطة عنوان MAC، مما يجعله سريعاً للبحث عن مضيف معين. بينما يتم فهرسة <code>hostTimeTable</code> بواسطة وقت الاكتشاف.</p><p>إذا أراد NMS معرفة "من انضم إلى الشبكة في الدقائق الخمس الماضية؟"، فإن البحث في <code>hostTable</code> سيتطلب فحص الجدول بأكمله. بينما باستخدام <code>hostTimeTable</code>، يمكن لـ NMS ببساطة قراءة الإدخالات الأخيرة فقط، مما يوفر الكثير من وقت المعالجة وعرض النطاق الترددي.</p></template>
+    <template class="content-en"><p>Why do we need two tables holding the same data (hostTable and hostTimeTable)? Indexing is the reason. The <code>hostTable</code> is indexed by MAC address, making it fast to look up a specific host. The <code>hostTimeTable</code> is indexed by discovery time.</p><p>If the NMS wants to know "who joined the network in the last 5 minutes?", searching the <code>hostTable</code> would require polling the entire table. Using the <code>hostTimeTable</code>, the NMS can simply read only the most recent entries, saving significant processing time and bandwidth.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يكتشف مسبار RMON وجود مضيف جديد على الشبكة دون إرسال استعلامات (Ping) إليه؟</template>
+      <template class="content-en">How does an RMON probe discover a new host on the network without sending pings to it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال المراقبة السلبية (Passive monitoring). المسبار يقرأ عناوين MAC للمصدر والوجهة في كل حزمة تمر عبر الشبكة. إذا رأى عنوان MAC لم يسبق له تسجيله، يضيفه كمضيف جديد.</p></template>
+      <template class="content-en"><p>Through passive monitoring. The probe reads the source and destination MAC addresses of every packet traversing the network. If it sees a MAC address it hasn't recorded before, it adds it as a new host.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="filter-and-packet-capture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> مجموعات الفلترة والتقاط الحزم (Filter &amp; Packet Capture)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Filter &amp; Packet Capture Groups</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تسمح مجموعة الفلترة بتحديد الحزم المهمة فقط (باستخدام تعبيرات منطقية)، بينما تقوم مجموعة التقاط الحزم بتخزين هذه الحزم المفلترة لتحليلها لاحقاً.</p></template>
+    <template class="content-en"><p>The Filter group allows selecting only packets of interest (using logical expressions), while the Packet Capture group stores these filtered packets for later analysis.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل مجموعتا الفلترة والتقاط الحزم معاً بشكل وثيق:</p><ul><li><b><span class="smart-term" data-term-en="Filter Group" data-ar="مجموعة الفلترة" data-en-def="An RMON group that uses logical expressions and masks to select specific packets of interest.">مجموعة الفلترة<span class="smart-term-tooltip"></span></span> (Filter Group):</b> تُستخدم لالتقاط الحزم المحددة بواسطة تعبيرات منطقية (Logical expressions).<ul><li>يتم تعريف كل فلتر بواسطة صف في جدول الفلتر (filter table).</li><li>يسمح جدول الفلتر بفلترة الحزم باستخدام تعبير فلترة عشوائي (بإجراء عمليات Boolean و/أو XOR مع قناع محدد).</li><li><b>القناة (Channel):</b> هي تدفق من البيانات التي تم التقاطها بناءً على تعبير منطقي. يرتبط صف في جدول القنوات (channel table) بصفوف متعددة في جدول الفلتر.</li></ul></li><li><b><span class="smart-term" data-term-en="Packet Capture Group" data-ar="مجموعة التقاط الحزم" data-en-def="A post-filter RMON group that stores the raw data of packets that passed the filter criteria.">مجموعة التقاط الحزم<span class="smart-term-tooltip"></span></span> (Packet Capture Group):</b> هي مجموعة <b>ما بعد الفلترة (post-filter group)</b>.<ul><li>تلتقط الحزم من كل قناة بناءً على معايير الفلترة.</li><li>يُستخدم جدول تحكم المخزن المؤقت (Buffer control table) لتحديد القنوات.</li><li>يتم تخزين البيانات الملتقطة في جدول التخزين المؤقت للالتقاط (capture buffer table).</li></ul></li></ul></template>
+    <template class="content-en"><p>The Filter and <span class="smart-term" data-term-en="Packet Capture Group" data-ar="مجموعة التقاط الحزم" data-en-def="A post-filter RMON group that stores the raw data of packets that passed the filter criteria.">Packet Capture group<span class="smart-term-tooltip"></span></span>s work closely together:</p><ul><li><b><span class="smart-term" data-term-en="Filter Group" data-ar="مجموعة الفلترة" data-en-def="An RMON group that uses logical expressions and masks to select specific packets of interest.">Filter Group<span class="smart-term-tooltip"></span></span>:</b> Used to capture packets defined by logical expressions.<ul><li>Each filter is defined by a row in the filter table.</li><li>The filter table allows packets to be filtered with an arbitrary filter expression (performing Boolean and/or XOR with a specified mask).</li><li><b>Channel:</b> is a stream of data captured based on a logical expression. A row in the channel table is associated with multiple rows in the filter table.</li></ul></li><li><b>Packet Capture Group:</b> is a <b>post-filter group</b>.<ul><li>It captures packets from each channel based on the filter criteria of packet and channel filters in the filter group.</li><li>Buffer control table is used to select channels.</li><li>Captured data is stored in the capture buffer table.</li></ul></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا نلتقط كل شيء؟ التقاط الحزم الخام يستهلك الذاكرة بسرعة هائلة. باستخدام الفلاتر (مثل: التقاط الحزم التي تحتوي فقط على أخطاء CRC، أو الحزم القادمة من عنوان MAC محدد)، نضمن أن الذاكرة المحدودة للمسبار تُستخدم فقط لتخزين البيانات ذات الصلة بالمشكلة التي نحاول حلها.</p><p>مفهوم "القناة" (Channel) يتيح دمج عدة فلاتر معاً. على سبيل المثال، القناة 1 قد تكون (الفلتر أ OR الفلتر ب)، مما يوفر مرونة عالية في تحديد ما يتم تمريره إلى مجموعة التقاط الحزم.</p></template>
+    <template class="content-en"><p>Why not capture everything? Raw packet capture consumes memory extremely fast. By using filters (e.g., capture only packets with CRC errors, or packets from a specific MAC address), we ensure the probe's limited memory is used only to store data relevant to the problem we are troubleshooting.</p><p>The concept of a "Channel" allows combining multiple filters. For example, Channel 1 could be (Filter A OR Filter B), providing high flexibility in defining what gets passed to the Packet Capture group.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A block flow diagram showing three vertical blocks. Left block: 'Channel Table' (green). Middle block: 'Filter Table (many for each channel)' (green). Right block: 'Capture Buffer Table (One entry per channel)' (green). Thick black arrows point from Channel Table -> Filter Table -> Capture Buffer Table, illustrating the flow of data from channels, through filters, into the capture buffer. Style: educational, dark background #0d1117, accent color #10b981. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg viewBox="0 0 960 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Clip Paths for Card Headers -->
+        <clipPath id="clip-col1">
+            <rect x="60" y="100" width="220" height="220" rx="8" />
+        </clipPath>
+        <clipPath id="clip-col2-back">
+            <rect x="390" y="80" width="220" height="220" rx="8" />
+        </clipPath>
+        <clipPath id="clip-col2-mid">
+            <rect x="380" y="90" width="220" height="220" rx="8" />
+        </clipPath>
+        <clipPath id="clip-col2-front">
+            <rect x="370" y="100" width="220" height="220" rx="8" />
+        </clipPath>
+        <clipPath id="clip-col3">
+            <rect x="680" y="100" width="220" height="220" rx="8" />
+        </clipPath>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="480" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Filter &amp; Packet Capture Groups</text>
+    <text x="480" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مجموعات التصفية والتقاط الحزم</text>
+
+    <text x="480" y="65" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Data flow from channels through filters to the capture buffer</text>
+    <text x="480" y="65" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">تدفق البيانات من القنوات عبر الفلاتر إلى التخزين المؤقت</text>
+
+    <!-- ========================================== -->
+    <!-- COLUMN 1: CHANNEL TABLE                    -->
+    <!-- ========================================== -->
+    <g id="channel-table">
+        <!-- Card Base -->
+        <rect x="60" y="100" width="220" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <!-- Header -->
+        <rect x="60" y="100" width="220" height="70" fill="var(--brand-700)" clip-path="url(#clip-col1)" />
+        
+        <!-- Header Icon (Stream/List) -->
+        <g stroke="var(--on-brand-hi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M158 116 h24 M158 124 h24 M158 132 h24" />
+        </g>
+        
+        <!-- Header Text -->
+        <text x="170" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Channel Table</text>
+        <text x="170" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">جدول القنوات</text>
+
+        <!-- Row Lines -->
+        <line x1="60" y1="170" x2="280" y2="170" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="60" y1="220" x2="280" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="60" y1="270" x2="280" y2="270" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Row 1 -->
+        <text x="170" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Defines data streams</text>
+        <text x="170" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">يحدد تدفقات البيانات</text>
+
+        <!-- Row 2 -->
+        <text x="170" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">1 Row = 1 Channel</text>
+        <text x="170" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">صف واحد = قناة واحدة</text>
+
+        <!-- Row 3 -->
+        <text x="170" y="300" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Selected by Buffer Control</text>
+        <text x="170" y="300" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">محددة بتحكم التخزين</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- COLUMN 2: FILTER TABLE (STACKED)           -->
+    <!-- ========================================== -->
+    <g id="filter-table-group">
+        <!-- Back Card -->
+        <rect x="390" y="80" width="220" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="390" y="80" width="220" height="70" fill="var(--brand-700)" clip-path="url(#clip-col2-back)" />
+        <line x1="390" y1="150" x2="610" y2="150" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Middle Card -->
+        <rect x="380" y="90" width="220" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="380" y="90" width="220" height="70" fill="var(--brand-700)" clip-path="url(#clip-col2-mid)" />
+        <line x1="380" y1="160" x2="600" y2="160" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Front Card -->
+        <rect x="370" y="100" width="220" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="370" y="100" width="220" height="70" fill="var(--brand-700)" clip-path="url(#clip-col2-front)" />
+        
+        <!-- Header Icon (Funnel) -->
+        <g stroke="var(--on-brand-hi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <path d="M468 114 l8 10 v8 l8 -4 v-4 l8 -10 z" />
+        </g>
+
+        <!-- Header Text -->
+        <text x="480" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Filter Table</text>
+        <text x="480" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">جدول الفلاتر</text>
+
+        <!-- Row Lines -->
+        <line x1="370" y1="170" x2="590" y2="170" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="370" y1="220" x2="590" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="370" y1="270" x2="590" y2="270" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Row 1 -->
+        <text x="480" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Logical expressions</text>
+        <text x="480" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تعبيرات منطقية</text>
+
+        <!-- Row 2 -->
+        <text x="480" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Many rows per channel</text>
+        <text x="480" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">عدة صفوف لكل قناة</text>
+
+        <!-- Row 3 -->
+        <text x="480" y="300" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en" font-family="monospace">(Data &amp; Mask) == Expr</text>
+        <text x="480" y="300" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar" font-family="monospace">(البيانات &amp; القناع) == التعبير</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- COLUMN 3: CAPTURE BUFFER TABLE             -->
+    <!-- ========================================== -->
+    <g id="buffer-table">
+        <!-- Card Base -->
+        <rect x="680" y="100" width="220" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <!-- Header -->
+        <rect x="680" y="100" width="220" height="70" fill="var(--brand-700)" clip-path="url(#clip-col3)" />
+        
+        <!-- Header Icon (Database/Buffer) -->
+        <g stroke="var(--on-brand-hi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+            <ellipse cx="790" cy="116" rx="10" ry="4" />
+            <path d="M780 116 v12 c0 2.2 4.5 4 10 4 s10 -1.8 10 -4 v-12" />
+            <path d="M780 122 c0 2.2 4.5 4 10 4 s10 -1.8 10 -4" />
+        </g>
+
+        <!-- Header Text -->
+        <text x="790" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Capture Buffer Table</text>
+        <text x="790" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">جدول التخزين المؤقت</text>
+
+        <!-- Row Lines -->
+        <line x1="680" y1="170" x2="900" y2="170" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="680" y1="220" x2="900" y2="220" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="680" y1="270" x2="900" y2="270" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Row 1 -->
+        <text x="790" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Stores captured packets</text>
+        <text x="790" y="200" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">يخزن الحزم الملتقطة</text>
+
+        <!-- Row 2 -->
+        <text x="790" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">1 entry per channel</text>
+        <text x="790" y="250" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">إدخال واحد لكل قناة</text>
+
+        <!-- Row 3 -->
+        <text x="790" y="300" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Post-filter storage</text>
+        <text x="790" y="300" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تخزين ما بعد التصفية</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- ARROWS & FLOW LABELS                       -->
+    <!-- ========================================== -->
+    
+    <!-- Arrow 1: Channel to Filter -->
+    <line x1="280" y1="210" x2="358" y2="210" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="325" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">1 : N</text>
+    <text x="325" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">1 : متعدد</text>
+
+    <!-- Arrow 2: Filter to Buffer -->
+    <line x1="610" y1="210" x2="668" y2="210" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="645" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Filtered</text>
+    <text x="645" y="195" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">مصفاة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن لمجموعة التقاط الحزم (Packet Capture) العمل بشكل مستقل دون مجموعة الفلترة (Filter)؟</template>
+      <template class="content-en">Can the Packet Capture group operate independently without the Filter group?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، مجموعة التقاط الحزم هي مجموعة 'ما بعد الفلترة' (post-filter). تعتمد على القنوات والفلاتر المحددة في مجموعة الفلترة لتحديد الحزم التي يجب التقاطها وتخزينها.</p></template>
+      <template class="content-en"><p>No, the Packet Capture group is a 'post-filter' group. It relies on the channels and filters defined in the Filter group to determine which packets to capture and store.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rmon2-enhancements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> تحسينات RMON2 وإحصائيات الأخطاء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> RMON2 Enhancements and Error Statistics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ينقل RMON2 المراقبة إلى الطبقات العليا (3 وما فوق)، مع قاعدة هامة: إحصائيات الأخطاء في أي طبقة تتضمن أخطاء الطبقات التي تحتها، وصولاً إلى طبقة الشبكة فقط.</p></template>
+    <template class="content-en"><p>RMON2 moves monitoring to upper layers (3 and above), with a key rule: error statistics in any layer include errors from layers below it, down to the network layer only.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعد RMON2 تحسيناً لـ RMON1، حيث يوسع قدرات المراقبة لتشمل الطبقات 3 وما فوق (Network to Application). وظائفه مشابهة لـ RMON1 ولكنه يحدد التوافقية والامتثال (conformance and compliance) بشكل أوضح.</p><p><b>قاعدة إحصائيات الأخطاء في RMON2:</b></p><ul><li>تتضمن إحصائيات الأخطاء في أي طبقة جميع الأخطاء الموجودة أسفل تلك الطبقة، <b>نزولاً إلى طبقة الشبكة (Network layer) فقط</b>.</li><li>أخطاء طبقة النقل (Transport layer) <b>تتضمن</b> أخطاء طبقة الشبكة.</li><li>أخطاء طبقة الشبكة <b>لا تتضمن</b> أخطاء طبقة ارتباط البيانات (Data link layer errors).</li></ul></template>
+    <template class="content-en"><p>RMON2 is an enhancement to RMON1, extending monitoring capabilities to Layers 3 and above. Its functions are similar to RMON1, but it clearly defines conformance and compliance.</p><p><b>Error Statistics Rule in RMON2:</b></p><ul><li>The error statistics in any layer include all errors below the layer, <b>down to the network layer only</b>.</li><li>The transport layer errors <b>include</b> the network layer errors.</li><li>The network layer errors <b>do not include</b> data link layer errors.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا هذا الفصل الصارم عند طبقة الشبكة؟ RMON1 مسؤول بالفعل عن الطبقة الثانية (Data Link). إذا قام RMON2 بتضمين أخطاء الطبقة الثانية في إحصائياته، فسيحدث تكرار في حساب الأخطاء (Double counting).</p><p>علاوة على ذلك، أخطاء الطبقة الثانية غالباً ما تكون مشاكل مادية (مثل تداخل الكابلات، تصادمات Ethernet)، بينما أخطاء الطبقة الثالثة وما فوق هي مشاكل منطقية (مثل توجيه خاطئ، منافذ مغلقة). فصل هذه الأخطاء يساعد مدير الشبكة على تحديد ما إذا كانت المشكلة في الكابل (RMON1) أو في إعدادات التوجيه/التطبيق (RMON2).</p></template>
+    <template class="content-en"><p>Why this strict cutoff at the network layer? RMON1 is already responsible for Layer 2 (Data Link). If RMON2 included Layer 2 errors in its statistics, there would be double counting of errors.</p><p>Furthermore, Layer 2 errors are often physical issues (e.g., cable interference, Ethernet collisions), while Layer 3+ errors are logical issues (e.g., bad routing, closed ports). Separating these helps the network manager quickly identify if the issue is a cable problem (RMON1) or a routing/application configuration problem (RMON2).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان هناك خطأ في طبقة التطبيق (Application Layer)، هل سيتم احتساب أخطاء طبقة النقل (Transport Layer) ضمن إحصائيات هذا الخطأ في RMON2؟</template>
+      <template class="content-en">If there is an error at the Application Layer, will Transport Layer errors be included in its statistics in RMON2?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، إحصائيات الأخطاء في أي طبقة تتضمن جميع الأخطاء في الطبقات التي تحتها، وصولاً إلى طبقة الشبكة.</p></template>
+      <template class="content-en"><p>Yes, error statistics in any layer include all errors in the layers below it, down to the network layer.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rmon2-mib-groups" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">12</span> مجموعات RMON2 MIB</h2></template>
+    <template class="content-en"><h2><span class="concept-number">12</span> RMON2 MIB Groups</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يضيف RMON2 مجموعات جديدة (من 11 إلى 20) تركز على البروتوكولات، عناوين الشبكة، وتاريخ المستخدم، مما يوفر رؤية أعمق لحركة مرور التطبيقات.</p></template>
+    <template class="content-en"><p>RMON2 adds new groups (11 to 20) focusing on protocols, network addresses, and user history, providing deeper visibility into application traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يقدم RMON2 المجموعات التالية (من 11 إلى 20):</p><ul><li><b>Protocol Directory (11):</b> جرد للبروتوكولات المدعومة.</li><li><b>Protocol Distribution (12):</b> إحصائيات نسبية حول البايتات والحزم لكل بروتوكول.</li><li><b>Address Map (13):</b> يربط عنوان MAC بعنوان الشبكة (IP) على الواجهات.</li><li><b>Network-Layer Host (14) & Matrix (15):</b> بيانات حركة المرور من وإلى كل مضيف، وبين أزواج المضيفين (على مستوى طبقة الشبكة).</li><li><b>Application-Layer Host (16) & Matrix (17):</b> بيانات حركة المرور حسب البروتوكول من وإلى كل مضيف، وبين أزواج المضيفين (على مستوى التطبيق).</li><li><b>User History Collection (18):</b> بيانات تاريخية محددة من قبل المستخدم حول الإنذارات والإحصائيات.</li><li><b>Probe Configuration (19):</b> معلمات تكوين المسبار (مثل إعدادات الشبكة والاتصال التسلسلي).</li><li><b>RMON Conformance (20):</b> توافق RMON2 ومجموعات الامتثال.</li></ul></template>
+    <template class="content-en"><p>RMON2 introduces the following groups (11 to 20):</p><ul><li><b>Protocol Directory (11):</b> Inventory of protocols.</li><li><b>Protocol Distribution (12):</b> Relative statistics on octets and packets per protocol.</li><li><b>Address Map (13):</b> Maps MAC address to network address on the interfaces.</li><li><b>Network-Layer Host (14) & Matrix (15):</b> Traffic data from and to each host, and between pairs of hosts (at the network layer).</li><li><b>Application-Layer Host (16) & Matrix (17):</b> Traffic data by protocol from and to each host, and between pairs of hosts (at the application layer).</li><li><b>User History Collection (18):</b> User-specified historical data on alarms and statistics.</li><li><b>Probe Configuration (19):</b> Configuration of probe parameters (e.g., serial and net config).</li><li><b>RMON Conformance (20):</b> RMON2 MIB Compliances and Compliance Groups.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مجموعة <b>Address Map (13)</b> حيوية جداً في RMON2. بما أن RMON1 يعرف فقط عناوين MAC، و RMON2 يتعامل مع عناوين IP، فإن هذه المجموعة تعمل كجسر (مثل بروتوكول ARP) لربط هوية الطبقة الثانية بهوية الطبقة الثالثة، مما يسمح لمدير الشبكة بتتبع جهاز معين عبر الشبكات الفرعية المختلفة.</p><p>مجموعة <b>User History (18)</b> تعطي مرونة هائلة، حيث لم يعد المدير مقيداً بالجداول التاريخية الافتراضية، بل يمكنه تحديد متغيرات معينة (مثل أخطاء بروتوكول معين) لتتبعها تاريخياً.</p></template>
+    <template class="content-en"><p>The <b>Address Map (13)</b> group is vital in RMON2. Since RMON1 only knows MAC addresses and RMON2 deals with IP addresses, this group acts as a bridge (similar to ARP) linking the Layer 2 identity to the Layer 3 identity, allowing the manager to track a specific device across different subnets.</p><p>The <b>User History (18)</b> group provides immense flexibility. The manager is no longer restricted to default history tables but can specify custom variables (like errors on a specific protocol) to track historically.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي مجموعة في RMON2 ستستخدمها لمعرفة نسبة حركة مرور الويب (HTTP) مقارنة بحركة مرور البريد الإلكتروني (SMTP) على شبكتك؟</template>
+      <template class="content-en">Which RMON2 group would you use to find out the percentage of Web traffic (HTTP) compared to Email traffic (SMTP) on your network?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم مجموعة Protocol Distribution (12)، لأنها توفر إحصائيات نسبية حول البايتات والحزم لكل بروتوكول.</p></template>
+      <template class="content-en"><p>I would use the Protocol Distribution (12) group, as it provides relative statistics on octets and packets per protocol.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبنائي في هذه الوحدة الحيوية. تخيلوا أنكم تديرون شبكة ضخمة تمتد عبر مدن متعددة. إذا حاولتم مراقبة كل جهاز من المركز الرئيسي عبر إرسال استعلامات (Ping) مستمرة، ستغرقون الشبكة بحركة مرور إدارية لا داعي لها، وقد تفسرون انقطاع كابل بسيط على أنه تعطل في الخادم! هنا يأتي دور RMON (المراقبة عن بعد). فكروا في مسبار RMON كحارس أمن ذكي تضعونه في كل فرع؛ هو يراقب، يحلل، ويسجل كل شيء محلياً، ولا يتصل بكم إلا إذا حدث شيء مهم (عبر مجموعات Alarm و Event). للامتحان، ركزوا جيداً على الفرق بين RMON1 (الذي يرى فقط عناوين MAC في الطبقة الثانية) و RMON2 (الذي يفهم عناوين IP والتطبيقات في الطبقات العليا). تذكروا أيضاً كيف نفصل التكوين عن البيانات باستخدام جداول التحكم وجداول البيانات، وكيف نستخدم EntryStatus بحالاته الأربع لإنشاء هذه الجداول. فهمكم لهذه الهيكلية سيجعلكم مدراء شبكات محترفين قادرين على تشخيص المشاكل دون التسبب في اختناق الشبكة.</template>
+    <template class="content-en">Welcome to this vital module. Imagine managing a massive network across multiple cities. If you try to monitor every device from the central HQ by constantly sending pings, you'll flood the network with management traffic, and you might misinterpret a simple cable drop as a server crash! This is where RMON comes in. Think of the RMON probe as a smart security guard placed in every branch; it monitors, analyzes, and logs everything locally, and only calls you if something important happens (via Alarm and Event groups). For the exam, focus heavily on the difference between RMON1 (which only sees MAC addresses at Layer 2) and RMON2 (which understands IP addresses and applications at higher layers). Also, remember how we separate configuration from data using Control and Data tables, and how we use the 4-state EntryStatus to manage them. Mastering this architecture will make you professional network managers capable of diagnosing issues without causing network congestion.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر معلومات RMON أكثر موثوقية من الاستعلام المباشر (Direct Polling) من NMS؟</template>
+          <template class="content-en">Why do we consider RMON information more reliable than direct polling from the NMS?</template>
+          <span class="content-target">لماذا نعتبر معلومات RMON أكثر موثوقية من الاستعلام المباشر (Direct Polling) من NMS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الاستعلام يتم محلياً داخل نفس الشبكة الفرعية. هذا يمنع التفسير الخاطئ للأعطال؛ فمثلاً، ضياع حزمة Ping بسبب ازدحام في رابط WAN لن يُفسر خطأً على أنه تعطل في الجهاز النهائي.</template>
+          <template class="content-en">Because polling is done locally within the same subnetwork. This prevents misinterpretation of faults; for example, a lost Ping packet due to WAN link congestion won't be falsely interpreted as an end-device failure.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الجوهري بين محلل البروتوكولات ومسبار RMON؟</template>
+          <template class="content-en">What is the fundamental difference between a Protocol Analyzer and an RMON probe?</template>
+          <span class="content-target">ما هو الفرق الجوهري بين محلل البروتوكولات ومسبار RMON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">محلل البروتوكولات ينقل البيانات الخام مباشرة عبر الشبكة ليتم تحليلها (مما يستهلك الباندويث)، بينما مسبار RMON يجمع ويحلل ويخزن الإحصائيات محلياً، ويرسل النتائج فقط.</template>
+          <template class="content-en">A protocol analyzer transfers raw data directly across the network to be analyzed (consuming bandwidth), whereas an RMON probe gathers, analyzes, and stores statistics locally, sending only the results.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمنع RMON التعارضات إذا حاول مديران تكوين نفس المسبار في نفس الوقت؟</template>
+          <template class="content-en">How does RMON prevent conflicts if two managers try to configure the same probe at the same time?</template>
+          <span class="content-target">كيف يمنع RMON التعارضات إذا حاول مديران تكوين نفس المسبار في نفس الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام حقل <code>OwnerString</code> عند إنشاء الصفوف. هذا الحقل يسجل هوية من أنشأ الإعداد (مثل عنوان IP الخاص به)، مما يمنع مديراً آخر من تعديل أو حذف إعدادات لا يملكها.</template>
+          <template class="content-en">By using the <code>OwnerString</code> field when creating rows. This field records the identity of who created the configuration (like their IP address), preventing another manager from modifying or deleting settings they don't own.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الحالات الأربع لـ EntryStatus في RMON؟</template>
+          <template class="content-en">What are the four states of EntryStatus in RMON?</template>
+          <span class="content-target">ما هي الحالات الأربع لـ EntryStatus في RMON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي: valid (صالح ونشط)، createRequest (طلب إنشاء)، underCreation (قيد الإنشاء)، و invalid (غير صالح / للحذف).</template>
+          <template class="content-en">They are: valid (active), createRequest (request to create), underCreation (not fully active yet), and invalid (used to delete).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف ترتبط جداول التحكم (Control Tables) بجداول البيانات (Data Tables)؟</template>
+          <template class="content-en">How are Control Tables linked to Data Tables?</template>
+          <span class="content-target">كيف ترتبط جداول التحكم (Control Tables) بجداول البيانات (Data Tables)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ترتبط من خلال تطابق الفهارس (Indices). قيمة مؤشر التحكم في جدول التحكم تكون مطابقة تماماً لقيمة مؤشر البيانات في جدول البيانات المرتبط به.</template>
+          <template class="content-en">They are linked through matching Indices. The value of the control index in the control table is exactly the same as the value of the data index in its associated data table.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة من وجود جدول <code>hostTimeTable</code> رغم أنه يحتوي على نفس بيانات <code>hostTable</code>؟</template>
+          <template class="content-en">What is the benefit of having the <code>hostTimeTable</code> even though it contains the same data as the <code>hostTable</code>?</template>
+          <span class="content-target">ما هي الفائدة من وجود جدول <code>hostTimeTable</code> رغم أنه يحتوي على نفس بيانات <code>hostTable</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">جدول <code>hostTimeTable</code> مرتب زمنياً حسب وقت اكتشاف المضيف. هذا يسمح لنظام الإدارة باكتشاف الأجهزة الجديدة التي انضمت للشبكة مؤخراً بسرعة كبيرة دون الحاجة لفحص الجدول بأكمله.</template>
+          <template class="content-en">The <code>hostTimeTable</code> is ordered chronologically by discovery time. This allows the NMS to very quickly discover new devices that recently joined the network without having to poll the entire table.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل مجموعة التقاط الحزم (Packet Capture) مع مجموعة الفلترة (Filter)؟</template>
+          <template class="content-en">How does the Packet Capture group work with the Filter group?</template>
+          <span class="content-target">كيف تعمل مجموعة التقاط الحزم (Packet Capture) مع مجموعة الفلترة (Filter)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مجموعة التقاط الحزم هي مجموعة 'ما بعد الفلترة'. مجموعة الفلترة تحدد الشروط (عبر القنوات)، ومجموعة الالتقاط تقوم بتخزين الحزم التي نجحت في المرور عبر تلك القنوات فقط.</template>
+          <template class="content-en">The Packet Capture group is a 'post-filter' group. The Filter group defines the conditions (via channels), and the Capture group stores only the packets that successfully passed through those channels.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي في نطاق المراقبة بين RMON1 و RMON2؟</template>
+          <template class="content-en">What is the primary difference in monitoring scope between RMON1 and RMON2?</template>
+          <span class="content-target">ما هو الفرق الأساسي في نطاق المراقبة بين RMON1 و RMON2؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">RMON1 يقتصر على الطبقة الثانية (Data Link) ويتعامل مع عناوين MAC وإحصائيات الإيثرنت. بينما RMON2 يمتد للطبقات من 3 إلى 7، مما يسمح بمراقبة بروتوكولات الشبكة (IP) والتطبيقات.</template>
+          <template class="content-en">RMON1 is limited to Layer 2 (Data Link) dealing with MAC addresses and Ethernet stats. RMON2 extends to Layers 3-7, allowing monitoring of network protocols (IP) and applications.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح قاعدة حساب إحصائيات الأخطاء في RMON2.</template>
+          <template class="content-en">Explain the error statistics calculation rule in RMON2.</template>
+          <span class="content-target">اشرح قاعدة حساب إحصائيات الأخطاء في RMON2.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في RMON2، إحصائيات الأخطاء في أي طبقة عليا تتضمن أخطاء الطبقات التي تحتها، ولكن هذا التضمين يتوقف عند طبقة الشبكة (Network Layer). أي أن أخطاء طبقة الشبكة لا تتضمن أخطاء الطبقة الثانية.</template>
+          <template class="content-en">In RMON2, error statistics in any upper layer include errors from the layers below it, but this inclusion stops at the Network Layer. Meaning, network layer errors do not include Layer 2 errors.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة مجموعة المصفوفة (Matrix Group) ولماذا هي مهمة؟</template>
+          <template class="content-en">What is the function of the Matrix Group and why is it important?</template>
+          <span class="content-target">ما هي وظيفة مجموعة المصفوفة (Matrix Group) ولماذا هي مهمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم بتتبع حركة المرور بين أزواج من الأجهزة (المصدر والوجهة). هي مهمة جداً لاكتشاف 'أكبر المستهلكين' (Top Talkers) في الشبكة وتحديد الأجهزة التي تتبادل أكبر قدر من البيانات.</template>
+          <template class="content-en">It tracks traffic between pairs of devices (Source and Destination). It is crucial for discovering 'Top Talkers' on the network and identifying which devices are exchanging the most data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو مسبار RMON (RMON Probe)؟",
+      "en": "What is an RMON Probe?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جهاز مادي أو برمجي يجمع البيانات عن طريق فحص الحزم على الشبكة المحلية.",
+        "en": "A physical device or software that gathers data by sniffing packets on a LAN."
+      },
+      "example": {
+        "ar": "مثل كاميرا المراقبة التي تسجل الحركة في ممر معين.",
+        "en": "Like a security camera recording traffic in a specific hallway."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الفرق الرئيسي بين المسبار المحلي والمراقبة عن بعد؟",
+      "en": "What is the main difference between a local probe and remote monitoring?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المسبار المحلي يكون في نفس المكان الجغرافي مع محلل البيانات، بينما المراقبة عن بعد تعني أن المسبار يتواصل مع نظام إدارة (NMS) بعيد.",
+        "en": "A local probe is geographically in the same place as the data analyzer, while remote monitoring means the probe communicates with a distant NMS."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "كيف يختلف محلل البروتوكولات عن مسبار RMON من حيث التخزين؟",
+      "en": "How does a Protocol Analyzer differ from an RMON probe regarding storage?"
+    },
+    "back": {
+      "definition": {
+        "ar": "محلل البروتوكولات لا يخزن البيانات بل ينقلها مباشرة، بينما مسبار RMON يجمع ويخزن البيانات لفترة ممتدة لتحليلها لاحقاً.",
+        "en": "A protocol analyzer does not store data but transfers it directly, whereas an RMON probe gathers and stores data for an extended period for later analysis."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "اذكر فائدتين رئيسيتين لاستخدام RMON.",
+      "en": "Name two main benefits of using RMON."
+    },
+    "back": {
+      "definition": {
+        "ar": "1. تقليل العبء على الشبكة (التحليل محلي). 2. معلومات أكثر موثوقية (تجنب الإنذارات الكاذبة بسبب مشاكل الاتصال).",
+        "en": "1. Less load on the network (local analysis). 2. More reliable information (avoids false alarms due to connection issues)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي طبقة OSI التي يعمل عليها RMON1؟",
+      "en": "Which OSI layer does RMON1 operate on?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الطبقة الثانية (Layer 2) فقط.",
+        "en": "OSI Layer 2 only."
+      },
+      "example": {
+        "ar": "يتعامل مع إحصائيات Ethernet و Token Ring (عناوين MAC).",
+        "en": "Deals with Ethernet and Token Ring statistics (MAC addresses)."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي الطبقات التي يغطيها RMON2؟",
+      "en": "Which layers does RMON2 cover?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الطبقات العليا (من 3 إلى 7).",
+        "en": "Higher layers (3 to 7)."
+      },
+      "example": {
+        "ar": "يمكنه مراقبة حركة مرور IP وبروتوكولات التطبيقات.",
+        "en": "Can monitor IP traffic and application protocols."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الغرض من OwnerString في RMON؟",
+      "en": "What is the purpose of OwnerString in RMON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحتوي على معلومات حول مالك الإدخال (مثل عنوان IP أو الاسم) لمنع التعارضات بين مديري الشبكة.",
+        "en": "Contains information about the owner of the entry (like IP or name) to prevent conflicts between network managers."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "كم عدد الحالات (States) الموجودة في EntryStatus في RMON؟",
+      "en": "How many states are in EntryStatus in RMON?"
+    },
+    "back": {
+      "definition": {
+        "ar": "4 حالات فقط (مقارنة بـ 6 في SNMPv2).",
+        "en": "Only 4 states (compared to 6 in SNMPv2)."
+      },
+      "example": {
+        "ar": "valid, createRequest, underCreation, invalid.",
+        "en": "valid, createRequest, underCreation, invalid."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ماذا تعني حالة 'createRequest' في EntryStatus؟",
+      "en": "What does the 'createRequest' state mean in EntryStatus?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لطلب إنشاء صف جديد في الجدول.",
+        "en": "Used to request the creation of a new row in the table."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ماذا تعني حالة 'invalid' في EntryStatus؟",
+      "en": "What does the 'invalid' state mean in EntryStatus?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لحذف الصف عن طريق فك ارتباط هذا الإدخال.",
+        "en": "Used to delete the row by disassociating the mapping of this entry."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي العلاقة بين جدول التحكم (Control Table) وجدول البيانات (Data Table)؟",
+      "en": "What is the relationship between the Control Table and the Data Table?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول التحكم يحدد ويضبط مثيلات البيانات، بينما جدول البيانات يخزن الإحصائيات الفعلية. قيم المؤشرات (Indices) متطابقة في كليهما.",
+        "en": "The control table defines and sets data instances, while the data table stores the actual statistics. Their index values are the same."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي وظيفة مجموعة المصفوفة (Matrix Group)؟",
+      "en": "What is the function of the Matrix Group?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجمع إحصائيات حول حركة المرور بين أزواج من المضيفين (المصدر والوجهة).",
+        "en": "Gathers statistics on traffic between pairs of hosts (source and destination)."
+      },
+      "example": {
+        "ar": "معرفة كمية البيانات المتبادلة بين الخادم A والجهاز B.",
+        "en": "Knowing the amount of data exchanged between Server A and Device B."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو الفرق بين hostTable و hostTimeTable؟",
+      "en": "What is the difference between hostTable and hostTimeTable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحتويان على نفس البيانات، لكن hostTimeTable يخزن الإدخالات بالترتيب الزمني لاكتشافها، مما يسهل العثور على المضيفين الجدد.",
+        "en": "They contain the same data, but hostTimeTable stores entries in the time order they were discovered, making it easier to find new hosts."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف تعمل مجموعة الفلترة (Filter Group)؟",
+      "en": "How does the Filter Group work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم تعبيرات منطقية (Boolean/XOR) مع أقنعة لفلترة الحزم الواردة وتوجيهها عبر قنوات (Channels).",
+        "en": "It uses logical expressions (Boolean/XOR) with masks to filter incoming packets and route them through channels."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي مجموعة التقاط الحزم (Packet Capture Group)؟",
+      "en": "What is the Packet Capture Group?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي مجموعة ما بعد الفلترة (post-filter) تقوم بتخزين الحزم التي مرت بنجاح عبر قنوات الفلترة.",
+        "en": "It is a post-filter group that stores the packets that successfully passed through the filter channels."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "كيف يتم حساب إحصائيات الأخطاء في RMON2؟",
+      "en": "How are error statistics calculated in RMON2?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتضمن أخطاء أي طبقة جميع أخطاء الطبقات التي تحتها، نزولاً إلى طبقة الشبكة فقط (لا تتضمن أخطاء الطبقة الثانية).",
+        "en": "Errors in any layer include all errors in layers below it, down to the network layer only (does not include Layer 2 errors)."
+      },
+      "example": {
+        "ar": "أخطاء طبقة النقل تتضمن أخطاء طبقة الشبكة.",
+        "en": "Transport layer errors include network layer errors."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هي وظيفة مجموعة Address Map في RMON2؟",
+      "en": "What is the function of the Address Map group in RMON2?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تربط عنوان MAC بعنوان الشبكة (IP) على الواجهات.",
+        "en": "Maps the MAC address to the network address (IP) on the interfaces."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هي وظيفة مجموعة HostTopN؟",
+      "en": "What is the function of the HostTopN group?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحسب أعلى N مضيفين في فئات الإحصائيات التي تم جمعها (مثل أعلى 10 أجهزة استهلاكاً للبيانات).",
+        "en": "Computes the top N hosts on the respective categories of statistics gathered (e.g., top 10 data consumers)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من المكونات التالية يقوم بـ 'شم' (sniffing) الحزم على الشبكة المحلية في بنية RMON؟",
+      "en": "Which of the following components 'sniffs' packets on the LAN in the RMON architecture?"
+    },
+    "options": {
+      "ar": [
+        "محلل البيانات (Data Analyzer)",
+        "مسبار RMON (RMON Probe)",
+        "نظام إدارة الشبكة (NMS)",
+        "الموجه (Router)"
+      ],
+      "en": [
+        "Data Analyzer",
+        "RMON Probe",
+        "Network Management System (NMS)",
+        "Router"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المسبار (Probe) هو الجهاز المادي أو البرمجي الذي يجمع البيانات عن طريق فحص الحزم التي تمر عبر الشبكة.",
+      "en": "The Probe is the physical or software device that gathers data by sniffing packets traversing the network."
+    },
+    "hint": {
+      "ar": "إنه جامع البيانات (Data gatherer).",
+      "en": "It is the data gatherer."
+    },
+    "difficulty": "easy",
+    "conceptId": "rmon-components"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين محلل البروتوكولات ومسبار RMON؟",
+      "en": "What is the main difference between a Protocol Analyzer and an RMON Probe?"
+    },
+    "options": {
+      "ar": [
+        "محلل البروتوكولات يخزن البيانات لفترة طويلة، بينما المسبار لا يفعل ذلك.",
+        "المسبار ينقل البيانات الخام مباشرة، بينما محلل البروتوكولات يرسل الإحصائيات فقط.",
+        "محلل البروتوكولات لا يخزن البيانات بل ينقلها مباشرة، بينما المسبار يجمع ويخزن الإحصائيات.",
+        "لا يوجد فرق، كلاهما يقومان بنفس الوظيفة تماماً."
+      ],
+      "en": [
+        "Protocol analyzer stores data for a long time, while the probe does not.",
+        "The probe transfers raw data directly, while the protocol analyzer sends only statistics.",
+        "Protocol analyzer does not store data but transfers it directly, while the probe gathers and stores statistics.",
+        "There is no difference, both perform exactly the same function."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "محلل البروتوكولات يعتمد على جهاز التقاط ينقل البيانات الخام دون تخزين، بينما مسبار RMON يخزن الإحصائيات محلياً لتحليلها لاحقاً.",
+      "en": "A protocol analyzer relies on a capture device that transfers raw data without storage, whereas an RMON probe stores statistics locally for later analysis."
+    },
+    "hint": {
+      "ar": "تذكر من الذي يقلل العبء على الشبكة عن طريق التخزين المحلي.",
+      "en": "Remember which one reduces network load by storing locally."
+    },
+    "difficulty": "medium",
+    "conceptId": "protocol-analyzer"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي طبقات نموذج OSI يغطيها معيار RMON1؟",
+      "en": "Which OSI model layers does the RMON1 standard cover?"
+    },
+    "options": {
+      "ar": [
+        "الطبقات من 3 إلى 7",
+        "الطبقة 2 فقط",
+        "الطبقة 1 والطبقة 2",
+        "جميع الطبقات من 1 إلى 7"
+      ],
+      "en": [
+        "Layers 3 to 7",
+        "Layer 2 only",
+        "Layer 1 and Layer 2",
+        "All layers from 1 to 7"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتعامل RMON1 مع معلمات الطبقة الثانية (Layer 2) فقط، مثل إحصائيات Ethernet و Token Ring.",
+      "en": "RMON1 addresses parameters at the OSI layer 2 only, such as Ethernet and Token Ring statistics."
+    },
+    "hint": {
+      "ar": "يتعامل مع عناوين MAC وليس عناوين IP.",
+      "en": "It deals with MAC addresses, not IP addresses."
+    },
+    "difficulty": "easy",
+    "conceptId": "rmon-mib-structure"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كم عدد الحالات (States) المتاحة في EntryStatus لإنشاء وحذف الصفوف في RMON؟",
+      "en": "How many states are available in EntryStatus for row creation and deletion in RMON?"
+    },
+    "options": {
+      "ar": [
+        "2",
+        "4",
+        "6",
+        "8"
+      ],
+      "en": [
+        "2",
+        "4",
+        "6",
+        "8"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يحتوي EntryStatus في RMON على 4 حالات فقط (valid, createRequest, underCreation, invalid)، مقارنة بـ 6 حالات في SNMPv2.",
+      "en": "EntryStatus in RMON has only 4 states (valid, createRequest, underCreation, invalid), compared to 6 in SNMPv2."
+    },
+    "hint": {
+      "ar": "أقل من SNMPv2 بحالتين.",
+      "en": "Two less than SNMPv2."
+    },
+    "difficulty": "medium",
+    "conceptId": "row-creation-deletion"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي العلاقة بين مؤشر جدول التحكم (Control Index) ومؤشر جدول البيانات (Data Index) في RMON؟",
+      "en": "What is the relationship between the Control Index and the Data Index in RMON?"
+    },
+    "options": {
+      "ar": [
+        "مؤشر البيانات يكون دائماً ضعف مؤشر التحكم.",
+        "لا توجد علاقة بينهما.",
+        "قيم مؤشر البيانات ومؤشر التحكم تكون متطابقة.",
+        "مؤشر التحكم يُستخدم فقط في RMON2."
+      ],
+      "en": [
+        "Data index is always double the control index.",
+        "There is no relationship between them.",
+        "Values of data index and control index are the same.",
+        "Control index is only used in RMON2."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "لربط إعدادات التكوين بالبيانات الفعلية، يجب أن تكون قيمة مؤشر البيانات مطابقة لقيمة مؤشر التحكم.",
+      "en": "To link configuration settings to actual data, the value of the data index must be the same as the value of the control index."
+    },
+    "hint": {
+      "ar": "كيف يعرف النظام أي بيانات تنتمي لأي إعداد؟",
+      "en": "How does the system know which data belongs to which setting?"
+    },
+    "difficulty": "medium",
+    "conceptId": "control-and-data-tables"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي جدول في مجموعة المضيفين (Host Group) يساعد في الاكتشاف السريع للمضيفين الجدد على الشبكة؟",
+      "en": "Which table in the Host Group helps in the fast discovery of new hosts on the network?"
+    },
+    "options": {
+      "ar": [
+        "hostControlTable",
+        "hostTable",
+        "hostTimeTable",
+        "hostTopNTable"
+      ],
+      "en": [
+        "hostControlTable",
+        "hostTable",
+        "hostTimeTable",
+        "hostTopNTable"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يحتوي hostTimeTable على نفس بيانات hostTable ولكنه مخزن بالترتيب الزمني لاكتشاف المضيف، مما يسهل العثور على الأجهزة الجديدة.",
+      "en": "The hostTimeTable contains the same data as the hostTable but is stored in the time order of discovery, making it easy to find new devices."
+    },
+    "hint": {
+      "ar": "ابحث عن الجدول المرتبط بالوقت (Time).",
+      "en": "Look for the table associated with Time."
+    },
+    "difficulty": "medium",
+    "conceptId": "host-group"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي وظيفة مجموعة التقاط الحزم (Packet Capture Group)؟",
+      "en": "What is the function of the Packet Capture Group?"
+    },
+    "options": {
+      "ar": [
+        "توليد إنذارات عند تجاوز العتبات.",
+        "التقاط جميع الحزم المارة في الشبكة دون استثناء.",
+        "التقاط الحزم بعد مرورها عبر قناة الفلترة (post-filter).",
+        "حساب أعلى N مضيفين في الشبكة."
+      ],
+      "en": [
+        "Generating alarms when thresholds are crossed.",
+        "Capturing all packets passing through the network without exception.",
+        "Capturing packets after they flow through a filter channel (post-filter).",
+        "Computing the top N hosts in the network."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مجموعة التقاط الحزم هي مجموعة ما بعد الفلترة، حيث تلتقط وتخزن فقط الحزم التي اجتازت معايير الفلترة المحددة في مجموعة الفلتر.",
+      "en": "The Packet Capture group is a post-filter group, capturing and storing only the packets that passed the filter criteria defined in the Filter group."
+    },
+    "hint": {
+      "ar": "إنها تعمل بعد مجموعة أخرى.",
+      "en": "It operates after another group."
+    },
+    "difficulty": "medium",
+    "conceptId": "filter-and-packet-capture"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "وفقاً لقواعد RMON2، هل تتضمن إحصائيات أخطاء طبقة الشبكة (Network layer) أخطاء طبقة ارتباط البيانات (Data link layer)؟",
+      "en": "According to RMON2 rules, do network layer error statistics include data link layer errors?"
+    },
+    "options": {
+      "ar": [
+        "نعم، دائماً.",
+        "لا، أخطاء طبقة الشبكة لا تتضمن أخطاء طبقة ارتباط البيانات.",
+        "نعم، ولكن فقط في شبكات Token Ring.",
+        "لا، RMON2 لا يراقب الأخطاء على الإطلاق."
+      ],
+      "en": [
+        "Yes, always.",
+        "No, network layer errors do not include data link layer errors.",
+        "Yes, but only in Token Ring networks.",
+        "No, RMON2 does not monitor errors at all."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في RMON2، تتضمن إحصائيات الأخطاء في أي طبقة الأخطاء التي تحتها نزولاً إلى طبقة الشبكة فقط. لذلك، أخطاء طبقة الشبكة لا تتضمن أخطاء الطبقة الثانية.",
+      "en": "In RMON2, error statistics in any layer include errors below it down to the network layer only. Therefore, network layer errors do not include Layer 2 errors."
+    },
+    "hint": {
+      "ar": "تذكر أن RMON1 مسؤول عن الطبقة الثانية.",
+      "en": "Remember that RMON1 is responsible for Layer 2."
+    },
+    "difficulty": "hard",
+    "conceptId": "rmon2-enhancements"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي مجموعة في RMON2 تُستخدم لربط عنوان MAC بعنوان IP على الواجهات؟",
+      "en": "Which RMON2 group is used to map a MAC address to an IP address on the interfaces?"
+    },
+    "options": {
+      "ar": [
+        "Protocol Directory (11)",
+        "Address Map (13)",
+        "Network-Layer Host (14)",
+        "User History Collection (18)"
+      ],
+      "en": [
+        "Protocol Directory (11)",
+        "Address Map (13)",
+        "Network-Layer Host (14)",
+        "User History Collection (18)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مجموعة Address Map (13) هي المسؤولة عن ربط عناوين MAC بعناوين الشبكة (IP).",
+      "en": "The Address Map (13) group is responsible for mapping MAC addresses to network addresses (IP)."
+    },
+    "hint": {
+      "ar": "الاسم يدل على 'خريطة العناوين'.",
+      "en": "The name implies 'mapping addresses'."
+    },
+    "difficulty": "easy",
+    "conceptId": "rmon2-mib-groups"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الغرض من حقل 'OwnerString' في جداول RMON؟",
+      "en": "What is the purpose of the 'OwnerString' field in RMON tables?"
+    },
+    "options": {
+      "ar": [
+        "تحديد نوع البروتوكول المستخدم.",
+        "تحديد حجم جدول البيانات.",
+        "تحديد من قام بإنشاء الإدخال (مثل عنوان IP أو اسم المدير).",
+        "تحديد حالة الصف (نشط أو غير نشط)."
+      ],
+      "en": [
+        "To identify the type of protocol used.",
+        "To define the size of the data table.",
+        "To identify who created the entry (e.g., IP address or manager's name).",
+        "To determine the state of the row (active or inactive)."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يحتوي OwnerString على معلومات حول المالك الذي أنشأ الإدخال لمنع التعارضات بين مديري الشبكة المختلفين.",
+      "en": "OwnerString contains information about the owner who created the entry to prevent conflicts between different network managers."
+    },
+    "hint": {
+      "ar": "كلمة Owner تعني المالك.",
+      "en": "The word Owner means the person who possesses or created it."
+    },
+    "difficulty": "medium",
+    "conceptId": "row-creation-deletion"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن RMON2 هو بديل كامل يلغي الحاجة لـ RMON1. هذا فخ! RMON2 هو امتداد (Enhancement) يغطي الطبقات من 3 إلى 7، بينما يظل RMON1 ضرورياً لمراقبة الطبقة الثانية (MAC/Ethernet).</template>
+    <template class="content-en">You might think RMON2 is a complete replacement that eliminates the need for RMON1. This is a trap! RMON2 is an enhancement covering layers 3-7, while RMON1 remains essential for Layer 2 (MAC/Ethernet) monitoring.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">السر وراء الاكتشاف السريع للأجهزة في RMON هو جدول <code>hostTimeTable</code>. بدلاً من البحث في جدول المضيفين بأكمله، يقرأ النظام فقط الإدخالات الأخيرة في هذا الجدول الزمني لمعرفة من انضم للشبكة حديثاً.</template>
+    <template class="content-en">The secret behind fast device discovery in RMON is the <code>hostTimeTable</code>. Instead of searching the entire host table, the system only reads the latest entries in this time-ordered table to see who recently joined the network.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفصل بين جدول التحكم (Control Table) وجدول البيانات (Data Table) هو المفهوم المعماري الأهم في RMON. جدول التحكم يحدد 'ماذا وكيف' نراقب، وجدول البيانات يخزن 'النتائج'. ويتم ربطهما بتطابق الفهارس (Indices).</template>
+    <template class="content-en">The separation between the Control Table and the Data Table is the most important architectural concept in RMON. The control table defines 'what and how' to monitor, and the data table stores the 'results'. They are linked by matching Indices.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في إحصائيات الأخطاء لـ RMON2، احذر من افتراض أن أخطاء طبقة الشبكة تتضمن أخطاء الطبقة الثانية (Data Link). القاعدة تنص بوضوح على أن التضمين يتوقف عند طبقة الشبكة نزولاً.</template>
+    <template class="content-en">In RMON2 error statistics, beware of assuming that network layer errors include Layer 2 (Data Link) errors. The rule explicitly states that the downward inclusion stops at the network layer.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الهدف الأساسي من RMON هو تقليل العبء على الشبكة (Less load). بدلاً من إرسال كل حزمة للمركز لتحليلها، يقوم المسبار بالتحليل محلياً ويرسل فقط الإحصائيات أو التنبيهات عند الضرورة.</template>
+    <template class="content-en">The primary goal of RMON is to reduce network load. Instead of sending every packet to the center for analysis, the probe analyzes locally and only sends statistics or alerts when necessary.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

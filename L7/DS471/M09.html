@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="9" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>البيرسيبترون والشبكات العصبية الاصطناعية · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#introduction-to-perceptrons" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة عن البيرسيبترون والإلهام البيولوجي</template>
+        <template class="content-en">Introduction to Perceptrons &amp; Biological Inspiration</template>
+        <span class="content-target">مقدمة عن البيرسيبترون والإلهام البيولوجي</span>
+      </a>
+      <a href="#perceptron-structure-and-preactivation" class="toc-link" data-bilingual>
+        <template class="content-ar">هيكل البيرسيبترون والتنشيط المسبق</template>
+        <template class="content-en">Perceptron Structure and Preactivation</template>
+        <span class="content-target">هيكل البيرسيبترون والتنشيط المسبق</span>
+      </a>
+      <a href="#activation-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">دوال التنشيط (Activation Functions)</template>
+        <template class="content-en">Activation Functions</template>
+        <span class="content-target">دوال التنشيط (Activation Functions)</span>
+      </a>
+      <a href="#perceptron-learning-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزمية تعلم البيرسيبترون والمعلمات الفائقة</template>
+        <template class="content-en">Perceptron Learning Algorithm &amp; Hyperparameters</template>
+        <span class="content-target">خوارزمية تعلم البيرسيبترون والمعلمات الفائقة</span>
+      </a>
+      <a href="#limitations-of-perceptron" class="toc-link" data-bilingual>
+        <template class="content-ar">حدود البيرسيبترون وتطبيقاته</template>
+        <template class="content-en">Limitations and Applications of the Perceptron</template>
+        <span class="content-target">حدود البيرسيبترون وتطبيقاته</span>
+      </a>
+      <a href="#toy-classification-problem" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال تطبيقي: تصنيف القطط (Toy Classification Problem)</template>
+        <template class="content-en">Toy Classification Problem: Kittens vs Adult Cats</template>
+        <span class="content-target">مثال تطبيقي: تصنيف القطط (Toy Classification Problem)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">البيرسيبترون والشبكات العصبية الاصطناعية</h1>
+      <p class="hero-description">مقدمة شاملة عن البيرسيبترون، هيكلته، خوارزمية التعلم الخاصة به، دوال التنشيط، وحدوده، مع مثال تطبيقي لتصنيف البيانات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">The Perceptron and Artificial Neural Networks</h1>
+      <p class="hero-description">A comprehensive introduction to the perceptron, its structure, learning algorithm, activation functions, limitations, and a toy classification example.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">البيرسيبترون</span>
+      <span class="tag">الشبكات العصبية</span>
+      <span class="tag">التصنيف الثنائي</span>
+      <span class="tag">التعلم المباشر</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Perceptron</span>
+      <span class="tag">Neural Networks</span>
+      <span class="tag">Binary Classification</span>
+      <span class="tag">Online Learning</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 35 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف هيكل ووظيفة البيرسيبترون.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح حدود البيرسيبترون وكيفية معالجتها بواسطة البيرسيبترون متعدد الطبقات (MLPs).</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف عملية الانتشار الأمامي والخلفي في الشبكات العصبية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe the structure and function of a perceptron.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the limitations of the perceptron and how they are addressed by multilayer perceptrons (MLPs).</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the process of forward and backward propagation in neural networks.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="introduction-to-perceptrons" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة عن البيرسيبترون والإلهام البيولوجي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Perceptrons &amp; Biological Inspiration</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>البيرسيبترون هو مصنف ثنائي يتعلم من أمثلة التدريب الفردية، وهو مستوحى من طريقة عمل الخلايا العصبية في الدماغ البشري.</p></template>
+    <template class="content-en"><p>The perceptron is a binary classifier that learns from individual training instances, inspired by the function of human neurons.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم اختراع <span class="smart-term" data-term-en="Perceptron" data-ar="البيرسيبترون" data-en-def="A binary classifier that learns from individual training instances.">البيرسيبترون<span class="smart-term-tooltip"></span></span> بواسطة فرانك روزنبلات (Frank Rosenblatt) في أواخر الخمسينيات. يُعد نموذجاً أساسياً مفيداً للتدريب على مجموعات البيانات الضخمة ويعمل كأساس للنماذج الأكثر تعقيداً.</p><p>هيكله مستوحى من الخلايا العصبية البشرية التي تعالج المعلومات وتنقلها عبر المشابك العصبية (synapses). يتكون العصبون البيولوجي من الزوائد الشجرية (dendrites)، وجسم الخلية (body)، والمحور العصبي (axon). وبالمثل، يستقبل البيرسيبترون المدخلات، ويعالجها، ثم ينتج مخرجات.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Perceptron" data-ar="البيرسيبترون" data-en-def="A binary classifier that learns from individual training instances.">perceptron<span class="smart-term-tooltip"></span></span> was invented by Frank Rosenblatt in the late 1950s. It is a foundational model useful for training from large datasets and serves as a basis for more complex models.</p><p>Its structure is inspired by human <span class="smart-term" data-term-en="Neuron" data-ar="الخلية العصبية" data-en-def="A biological cell that processes and transmits information, serving as the inspiration for the perceptron.">neuron<span class="smart-term-tooltip"></span></span>s, which process information and transmit it through synapses. A biological neuron consists of dendrites, a cell body, and an axon. Analogously, perceptrons accept inputs, process them, and produce an output.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُعد البيرسيبترون من أوائل النماذج التي مهدت الطريق لمجال الشبكات العصبية الاصطناعية. على الرغم من بساطته، إلا أن قدرته على التعلم المباشر (Online Learning) جعلته ثورياً في وقته.</p><p>التشبيه البيولوجي ليس دقيقاً بنسبة 100% من الناحية الفسيولوجية، ولكنه يوفر إطاراً مفاهيمياً ممتازاً لفهم كيفية تجميع الإشارات (المدخلات) وتجاوزها لعتبة معينة (دالة التنشيط) لإطلاق إشارة جديدة (المخرجات).</p></template>
+    <template class="content-en"><p>The perceptron is one of the earliest models that paved the way for the field of Artificial Neural Networks. Despite its simplicity, its capacity for online learning made it revolutionary at the time.</p><p>The biological analogy is not 100% physiologically accurate, but it provides an excellent conceptual framework for understanding how signals (inputs) are aggregated and passed through a threshold (activation function) to fire a new signal (output).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A side-by-side comparison diagram. On the left, a biological neuron showing dendrites, cell body, and axon. On the right, a mathematical perceptron model showing input nodes (x1, x2, x3) with arrows pointing to a central computational node (circle), and a single output arrow. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for Perceptron Connections -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for Inspiration Arrow -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Grouping Boxes -->
+    <rect x="30" y="60" width="340" height="280" rx="12" fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <rect x="430" y="60" width="340" height="280" rx="12" fill="none" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Titles -->
+    <text x="200" y="40" text-anchor="middle" class="gsvg-en" font-size="20" font-weight="bold" fill="var(--text-primary)">Biological Neuron</text>
+    <text x="200" y="40" text-anchor="middle" class="gsvg-ar" font-size="20" font-weight="bold" fill="var(--text-primary)">عصبون حيوي</text>
+
+    <text x="600" y="40" text-anchor="middle" class="gsvg-en" font-size="20" font-weight="bold" fill="var(--text-primary)">Artificial Perceptron</text>
+    <text x="600" y="40" text-anchor="middle" class="gsvg-ar" font-size="20" font-weight="bold" fill="var(--text-primary)">بيرسبترون اصطناعي</text>
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDE: BIOLOGICAL NEURON               -->
+    <!-- ========================================== -->
+
+    <!-- Dendrites -->
+    <g stroke="var(--brand-400)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 175 180 Q 140 140 110 120 M 130 148 Q 110 160 90 150 M 115 128 Q 100 110 80 115" />
+        <path d="M 165 200 Q 110 200 80 210 M 110 200 Q 90 180 70 190 M 95 205 Q 80 230 60 225" />
+        <path d="M 175 220 Q 140 260 110 280 M 130 252 Q 110 240 90 250 M 115 272 Q 100 290 80 285" />
+        <path d="M 190 170 Q 180 120 160 90 M 172 105 Q 150 90 130 95" />
+        <path d="M 210 170 Q 230 120 250 90 M 238 105 Q 260 90 280 95" />
+        <path d="M 190 230 Q 180 280 160 310 M 172 295 Q 150 310 130 305" />
+        <path d="M 210 230 Q 230 280 250 310 M 238 295 Q 260 310 280 305" />
+    </g>
+
+    <!-- Axon Core -->
+    <line x1="235" y1="200" x2="320" y2="200" stroke="var(--brand-400)" stroke-width="4" />
+
+    <!-- Axon Terminals -->
+    <g stroke="var(--brand-400)" stroke-width="3" fill="none" stroke-linecap="round">
+        <path d="M 320 200 Q 340 170 360 160 M 340 185 Q 360 190 370 180" />
+        <path d="M 320 200 Q 340 230 360 240 M 340 215 Q 360 210 370 220" />
+        <path d="M 320 200 L 370 200" />
+    </g>
+    
+    <!-- Synapses (Terminal Buttons) -->
+    <g fill="var(--brand-500)">
+        <circle cx="360" cy="160" r="3" />
+        <circle cx="370" cy="180" r="3" />
+        <circle cx="370" cy="200" r="3" />
+        <circle cx="370" cy="220" r="3" />
+        <circle cx="360" cy="240" r="3" />
+    </g>
+
+    <!-- Myelin Sheaths -->
+    <rect x="245" y="192" width="20" height="16" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <rect x="270" y="192" width="20" height="16" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <rect x="295" y="192" width="20" height="16" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- Cell Body (Soma) -->
+    <circle cx="200" cy="200" r="35" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- Nucleus -->
+    <circle cx="200" cy="200" r="10" fill="var(--brand-500)" />
+
+    <!-- Labels for Biological Neuron -->
+    <text x="110" y="90" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Dendrites (Inputs)</text>
+    <text x="110" y="90" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">الزوائد الشجرية (المدخلات)</text>
+
+    <text x="200" y="315" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Cell Body (Processing)</text>
+    <text x="200" y="315" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">جسم الخلية (المعالجة)</text>
+
+    <text x="300" y="255" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Axon (Output)</text>
+    <text x="300" y="255" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">المحور العصبي (المخرجات)</text>
+
+
+    <!-- ========================================== -->
+    <!-- MIDDLE: INSPIRATION ARROW                  -->
+    <!-- ========================================== -->
+    <line x1="375" y1="200" x2="420" y2="200" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <text x="400" y="185" text-anchor="middle" class="gsvg-en" font-size="14" font-style="italic" fill="var(--brand-ink)">Inspired by</text>
+    <text x="400" y="185" text-anchor="middle" class="gsvg-ar" font-size="14" font-style="italic" fill="var(--brand-ink)">مستوحى من</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT SIDE: ARTIFICIAL PERCEPTRON          -->
+    <!-- ========================================== -->
+
+    <!-- Input Connections (Weights) -->
+    <line x1="495" y1="120" x2="545" y2="165" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="495" y1="200" x2="535" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="495" y1="280" x2="545" y2="235" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Weight Labels -->
+    <text x="520" y="135" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-secondary)">w₁</text>
+    <text x="520" y="192" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-secondary)">w₂</text>
+    <text x="520" y="275" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-secondary)">w₃</text>
+
+    <!-- Input Nodes -->
+    <circle cx="475" cy="120" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="475" y="125" text-anchor="middle" font-size="16" fill="var(--text-primary)">x₁</text>
+
+    <circle cx="475" cy="200" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="475" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)">x₂</text>
+
+    <circle cx="475" cy="280" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="475" y="285" text-anchor="middle" font-size="16" fill="var(--text-primary)">x₃</text>
+
+    <!-- Central Processing Node -->
+    <circle cx="600" cy="200" r="55" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <line x1="600" y1="145" x2="600" y2="255" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Summation Symbol -->
+    <text x="572" y="210" text-anchor="middle" font-size="28" fill="var(--text-primary)">∑</text>
+    
+    <!-- Step Function Icon -->
+    <g transform="translate(610, 185)">
+        <!-- Axes -->
+        <line x1="0" y1="25" x2="35" y2="25" stroke="var(--text-muted)" stroke-width="1" />
+        <line x1="17" y1="40" x2="17" y2="5" stroke="var(--text-muted)" stroke-width="1" />
+        <!-- Step Path -->
+        <path d="M 0 25 L 17 25 L 17 10 L 35 10" stroke="var(--brand-500)" stroke-width="2" fill="none" />
+    </g>
+
+    <!-- Output Connection -->
+    <line x1="655" y1="200" x2="720" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="690" y="190" text-anchor="middle" font-size="16" font-style="italic" fill="var(--text-primary)">y</text>
+
+    <!-- Labels for Artificial Perceptron -->
+    <text x="475" y="90" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Inputs</text>
+    <text x="475" y="90" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">المدخلات</text>
+
+    <text x="600" y="315" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Sum &amp; Activation</text>
+    <text x="600" y="315" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">الجمع والتنشيط</text>
+
+    <text x="710" y="230" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="500" fill="var(--text-secondary)">Output</text>
+    <text x="710" y="230" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="500" fill="var(--text-secondary)">المخرجات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف البيرسيبترون عن الخلية العصبية البيولوجية الحقيقية من حيث التعقيد؟</template>
+      <template class="content-en">How does a perceptron differ from a real biological neuron in terms of complexity?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>البيرسيبترون هو تبسيط رياضي شديد؛ فالخلايا العصبية الحقيقية تمتلك ديناميكيات زمنية معقدة، وأنواع مختلفة من النواقل العصبية، ولا تعمل كبوابات منطقية ثنائية بسيطة فقط.</p></template>
+      <template class="content-en"><p>The perceptron is a severe mathematical simplification; real neurons have complex temporal dynamics, various types of neurotransmitters, and do not function merely as simple binary logic gates.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="perceptron-structure-and-preactivation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> هيكل البيرسيبترون والتنشيط المسبق</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Perceptron Structure and Preactivation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتكون البيرسيبترون من وحدات إدخال (الميزات)، ووحدة حسابية (لمعالجة المدخلات)، ومخرجات (تصنيف ثنائي)، بالإضافة إلى مصطلح التحيز (Bias).</p></template>
+    <template class="content-en"><p>A perceptron consists of input units (features), a computational unit (processes inputs), an output (binary classification), and a bias term.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعمل البيرسيبترون كنموذج خطي، حيث يربط المجموعات الخطية من المتغيرات التفسيرية بمتغيرات الاستجابة باستخدام دالة ربط. يتكون من المكونات التالية:</p><ol><li><b>وحدات الإدخال (Input Units):</b> تمثل الميزات ($x_i$).</li><li><b>الوحدة الحسابية (Computational Unit):</b> تعالج المدخلات.</li><li><b>المخرجات (Output):</b> تنتج تصنيفاً ثنائياً.</li><li><b>التحيز (Bias Term):</b> يُدرج غالباً في الحسابات ولكنه قد يُحذف من الرسوم البيانية للتبسيط.</li></ol><p><b><span class="smart-term" data-term-en="Preactivation" data-ar="التنشيط المسبق" data-en-def="The linear combination of explanatory variables and model parameters before applying the activation function.">التنشيط المسبق<span class="smart-term-tooltip"></span></span> (Preactivation):</b> هو التركيبة الخطية للمتغيرات التفسيرية ومعلمات النموذج. يُحسب بالمعادلة: $\text{preactivation} = \sum w_i x_i + b$، حيث $w_i$ هي معلمات النموذج (الأوزان)، $x_i$ هي المتغيرات التفسيرية، و $b$ هو التحيز.</p></template>
+    <template class="content-en"><p>The perceptron acts as a linear model, relating linear combinations of explanatory variables to response variables using a link function. It consists of:</p><ol><li><b>Input Units:</b> Represent features ($x_i$).</li><li><b>Computational Unit:</b> Processes inputs.</li><li><b>Output:</b> Produces a binary classification.</li><li><b><span class="smart-term" data-term-en="Bias Term" data-ar="مصطلح التحيز" data-en-def="An additional parameter in the perceptron that shifts the decision boundary away from the origin.">Bias Term<span class="smart-term-tooltip"></span></span>:</b> Often included in calculations but omitted from diagrams for simplicity.</li></ol><p><b><span class="smart-term" data-term-en="Preactivation" data-ar="التنشيط المسبق" data-en-def="The linear combination of explanatory variables and model parameters before applying the activation function.">Preactivation<span class="smart-term-tooltip"></span></span>:</b> The linear combination of explanatory variables and model parameters. It is calculated as: $\text{preactivation} = \sum w_i x_i + b$, where $w_i$ are model parameters (weights), $x_i$ are explanatory variables, and $b$ is the bias term.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Bias Term" data-ar="مصطلح التحيز" data-en-def="An additional parameter in the perceptron that shifts the decision boundary away from the origin.">مصطلح التحيز<span class="smart-term-tooltip"></span></span> ($b$) بالغ الأهمية لأنه يسمح لدالة التنشيط بالانزياح يميناً أو يساراً، مما يعني أن حدود القرار لا يُشترط أن تمر عبر نقطة الأصل (0,0). بدونه، سيكون النموذج مقيداً جداً.</p><p>يمكن مقارنة البيرسيبترون بالنماذج الخطية المعممة (GLMs)، حيث يستخدم كلاهما تركيبة خطية للمدخلات، لكن البيرسيبترون يتميز بكونه مصنفاً ثنائياً يتعلم من الحالات الفردية (التعلم المباشر).</p></template>
+    <template class="content-en"><p>The bias term ($b$) is crucial because it allows the activation function to shift left or right, meaning the decision boundary is not forced to pass through the origin (0,0). Without it, the model would be severely restricted.</p><p>The perceptron can be compared to Generalized Linear Models (GLMs), as both use a linear combination of inputs, but the perceptron is distinct as a binary classifier that learns from individual instances (online learning).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التنشيط المسبق التي تحسب المجموع الموزون للمدخلات مضافاً إليه التحيز.</strong></template>
+      <template class="content-en"><strong>The preactivation formula calculating the weighted sum of inputs plus the bias.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{preactivation} = \sum w_i x_i + b$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram of a perceptron structure. Three input circles labeled x1, x2, x3 on the left. Arrows labeled 'input wires' point from these circles to a larger central circle (computational unit). An arrow points out from the central circle to the right, labeled 'output' and 'h_theta(x)'. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for the Computational Unit -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">Perceptron Structure</text>
+  <text x="400" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">هيكل البيرسيبترون</text>
+
+  <!-- ==================== INPUT SECTION ==================== -->
+  <!-- Input Labels -->
+  <text x="150" y="65" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Input Features</text>
+  <text x="150" y="65" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">ميزات الإدخال</text>
+
+  <!-- Input Node x1 -->
+  <circle cx="150" cy="110" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="150" y="115" text-anchor="middle" fill="var(--text-primary)" font-size="16">x<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+
+  <!-- Input Node x2 -->
+  <circle cx="150" cy="200" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="150" y="205" text-anchor="middle" fill="var(--text-primary)" font-size="16">x<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+
+  <!-- Input Node x3 -->
+  <circle cx="150" cy="290" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="150" y="295" text-anchor="middle" fill="var(--text-primary)" font-size="16">x<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+
+  <!-- ==================== WEIGHTS / CONNECTIONS ==================== -->
+  <!-- Weights Label -->
+  <text x="260" y="75" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Input Wires (Weights)</text>
+  <text x="260" y="75" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">أسلاك الإدخال (الأوزان)</text>
+
+  <!-- Arrows from Inputs to Center -->
+  <path d="M 175 110 L 325 167" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 175 200 L 315 200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 175 290 L 325 233" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Weight Values -->
+  <text x="250" y="130" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold">w<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+  <text x="250" y="192" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold">w<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+  <text x="250" y="275" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold">w<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+
+  <!-- ==================== COMPUTATIONAL UNIT ==================== -->
+  <!-- Central Unit Label -->
+  <text x="400" y="105" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Computational Unit</text>
+  <text x="400" y="105" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">وحدة الحساب</text>
+
+  <!-- Central Circle -->
+  <circle cx="400" cy="200" r="75" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="3" />
+  
+  <!-- Split Line inside Circle -->
+  <line x1="400" y1="125" x2="400" y2="275" stroke="var(--on-brand-hi)" stroke-width="2" opacity="0.4" />
+  
+  <!-- Summation Symbol (Left Half) -->
+  <text x="360" y="212" text-anchor="middle" fill="var(--on-brand-hi)" font-size="36" font-family="serif">∑</text>
+  
+  <!-- Activation Function Graph (Right Half) -->
+  <g opacity="0.9">
+    <!-- Axes -->
+    <path d="M 415 200 L 465 200 M 440 175 L 440 225" stroke="var(--on-brand-hi)" stroke-width="1" opacity="0.5" />
+    <!-- Step Function -->
+    <path d="M 415 215 L 440 215 L 440 185 L 465 185" stroke="var(--on-brand-hi)" stroke-width="2" fill="none" />
+  </g>
+
+  <!-- ==================== OUTPUT SECTION ==================== -->
+  <!-- Output Arrow -->
+  <path d="M 475 200 L 635 200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Output Label -->
+  <text x="555" y="188" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15">Output</text>
+  <text x="555" y="188" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15">المخرجات</text>
+
+  <!-- Output Node -->
+  <rect x="650" y="180" width="100" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="700" y="205" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">h<tspan baseline-shift="sub" font-size="0.7em">θ</tspan>(x)</text>
+
+  <!-- ==================== PREACTIVATION FORMULA ==================== -->
+  <!-- Formula Box -->
+  <rect x="250" y="330" width="300" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Formula Text -->
+  <text x="400" y="358" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15">Preactivation: z = ∑ w<tspan baseline-shift="sub" font-size="0.7em">i</tspan>x<tspan baseline-shift="sub" font-size="0.7em">i</tspan> + b</text>
+  <text x="400" y="358" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15">التفعيل المسبق: z = ∑ w<tspan baseline-shift="sub" font-size="0.7em">i</tspan>x<tspan baseline-shift="sub" font-size="0.7em">i</tspan> + b</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث لحدود القرار إذا قمنا بإزالة مصطلح التحيز (b) من معادلة البيرسيبترون؟</template>
+      <template class="content-en">What would happen to the decision boundary if we removed the bias term (b) from the perceptron equation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستُجبر حدود القرار على المرور دائماً عبر نقطة الأصل (0,0)، مما يقلل بشكل كبير من قدرة النموذج على فصل البيانات التي لا تتمركز حول نقطة الأصل.</p></template>
+      <template class="content-en"><p>The decision boundary would be forced to always pass through the origin (0,0), significantly reducing the model's ability to separate data that is not centered around the origin.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="activation-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> دوال التنشيط (Activation Functions)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Activation Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دوال التنشيط تعالج التركيبة الخطية للمدخلات وتُدخل اللاخطية (non-linearity) إلى النموذج، مما يمكنه من تعلم أنماط معقدة.</p></template>
+    <template class="content-en"><p>Activation functions process the linear combination of inputs and introduce non-linearity into the model, enabling it to learn complex patterns.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم دوال التنشيط لمعالجة التنشيط المسبق. من أهم الدوال المذكورة:</p><ol><li><b><span class="smart-term" data-term-en="Heaviside Step Function" data-ar="دالة الخطوة لهيفيسايد" data-en-def="A binary activation function that outputs 1 if the input is greater than 0, and 0 otherwise.">دالة الخطوة لهيفيسايد<span class="smart-term-tooltip"></span></span> (Heaviside Step Function):</b> هي دالة خطوة ثنائية استُخدمت في بيرسيبترون روزنبلات الأصلي. تُرجع 1 إذا كان المجموع الموزون أكبر من الصفر، وإلا تُرجع 0. معادلتها: $\phi(z) = 1 \text{ if } z > 0, \text{ else } 0$.</li><li><b><span class="smart-term" data-term-en="Logistic Sigmoid" data-ar="دالة سيجمويد اللوجستية" data-en-def="A smooth, differentiable activation function that maps any real value to a value between 0 and 1.">دالة سيجمويد اللوجستية<span class="smart-term-tooltip"></span></span> (Logistic Sigmoid):</b> دالة سلسة تُرجع قيمة بين 0 و 1. معادلتها: $\sigma(z) = \frac{1}{1 + e^{-z}}$. أهميتها تكمن في كفاءة حساب التدرج (gradient)، مما يجعلها مفيدة للشبكات العصبية.</li></ol></template>
+    <template class="content-en"><p>Activation functions are used to process the preactivation. Key functions include:</p><ol><li><b><span class="smart-term" data-term-en="Heaviside Step Function" data-ar="دالة الخطوة لهيفيسايد" data-en-def="A binary activation function that outputs 1 if the input is greater than 0, and 0 otherwise.">Heaviside Step Function<span class="smart-term-tooltip"></span></span>:</b> A binary step function used in Rosenblatt's original perceptron. It returns 1 if the weighted sum is greater than zero, otherwise returns 0. Equation: $\phi(z) = 1 \text{ if } z > 0, \text{ else } 0$.</li><li><b><span class="smart-term" data-term-en="Logistic Sigmoid" data-ar="دالة سيجمويد اللوجستية" data-en-def="A smooth, differentiable activation function that maps any real value to a value between 0 and 1.">Logistic Sigmoid<span class="smart-term-tooltip"></span></span> Activation Function:</b> A smooth function that returns a value between 0 and 1. Equation: $\sigma(z) = \frac{1}{1 + e^{-z}}$. Its importance lies in efficient gradient calculation, making it useful for neural networks.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين دالة الخطوة والسيجمويد هو قابلية الاشتقاق. دالة هيفيسايد غير قابلة للاشتقاق عند الصفر ومشتقتها صفر في كل مكان آخر، مما يجعل استخدام خوارزميات النزول الاشتقاقي (Gradient Descent) مستحيلاً معها. لذلك يستخدم البيرسيبترون الأصلي التعلم القائم على الخطأ.</p><p>بينما دالة السيجمويد قابلة للاشتقاق في كل مكان، مما يسمح باستخدام النزول الاشتقاقي، وهو ما يربطها بالانحدار اللوجستي (Logistic Regression).</p></template>
+    <template class="content-en"><p>The fundamental difference between the step function and sigmoid is differentiability. The Heaviside function is non-differentiable at zero and its derivative is zero everywhere else, making Gradient Descent impossible. Hence, the original perceptron uses error-driven learning.</p><p>The Sigmoid function, however, is differentiable everywhere, allowing the use of gradient descent, which connects it to Logistic Regression.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة دالة التنشيط سيجمويد اللوجستية.</strong></template>
+      <template class="content-en"><strong>The equation for the Logistic Sigmoid activation function.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\sigma(z) = \frac{1}{1 + e^{-z}}$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Perceptron</th><th>Logistic Regression</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دالة التنشيط / الربط</template>
+          <template class="content-en">Activation / Link Function</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">دالة الخطوة (Heaviside)</template>
+          <template class="content-en">Step Function (Heaviside)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">دالة سيجمويد (Sigmoid)</template>
+          <template class="content-en">Sigmoid Function</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">خوارزمية التعلم</template>
+          <template class="content-en">Learning Algorithm</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">التعلم القائم على الخطأ (Error-driven)</template>
+          <template class="content-en">Error-driven learning</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">النزول الاشتقاقي (Gradient Descent)</template>
+          <template class="content-en">Gradient Descent</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Perceptron Learning</th><th>Gradient Descent</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تكرار تحديث الأوزان</template>
+          <template class="content-en">Weight Update Frequency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لكل عينة فردية (Online)</template>
+          <template class="content-en">For individual instances (Online)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لكامل مجموعة البيانات (Batch)</template>
+          <template class="content-en">For entire dataset (Batch)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف</template>
+          <template class="content-en">Objective</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقليل أخطاء التصنيف</template>
+          <template class="content-en">Minimize classification error</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقليل دالة التكلفة (Cost Function)</template>
+          <template class="content-en">Minimize cost function</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكننا استخدام خوارزمية النزول الاشتقاقي (Gradient Descent) لتدريب بيرسيبترون يستخدم دالة هيفيسايد؟</template>
+      <template class="content-en">Why can't we use Gradient Descent to train a perceptron that uses the Heaviside step function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن دالة هيفيسايد غير قابلة للاشتقاق عند الصفر، ومشتقتها تساوي صفراً في جميع النقاط الأخرى، مما يعني أن التدرج (gradient) لن يوفر أي معلومات حول الاتجاه الذي يجب تحديث الأوزان إليه.</p></template>
+      <template class="content-en"><p>Because the Heaviside function is non-differentiable at zero and its derivative is zero everywhere else, meaning the gradient provides no information on which direction to update the weights.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="perceptron-learning-algorithm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> خوارزمية تعلم البيرسيبترون والمعلمات الفائقة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Perceptron Learning Algorithm &amp; Hyperparameters</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتعلم البيرسيبترون من خلال تحديث أوزانه بناءً على أخطاء التصنيف لكل عينة تدريب بشكل فردي (التعلم المباشر).</p></template>
+    <template class="content-en"><p>The perceptron learns by updating its weights based on classification errors for each individual training instance (error-driven learning).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>خطوات خوارزمية التعلم:</p><ol><li><b>التهيئة (Initialization):</b> تُعين الأوزان إلى الصفر أو قيم عشوائية صغيرة.</li><li><b>التنبؤ (Prediction):</b> يتم التنبؤ بالفئة لكل عينة تدريب: $\text{output} = \text{sign}(\sum w_i x_i)$.</li><li><b>التعلم القائم على الخطأ (Error-driven Learning):</b> تُحدث الأوزان فقط إذا كان التنبؤ غير صحيح.</li></ol><p><b>معادلة تحديث الأوزان:</b> $w_i = w_i + \Delta w$, حيث $\Delta w = \eta(y - \hat{y})x_i$. ($y$: الفئة الحقيقية، $\hat{y}$: الفئة المتوقعة، $x_i$: المتغير التفسيري، $\eta$: <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A hyperparameter that controls the size of the weight updates during training.">معدل التعلم<span class="smart-term-tooltip"></span></span>).</p><p><b>المعلمات الفائقة (Hyperparameters):</b></p><ul><li><b>معدل التعلم ($\eta$):</b> يتحكم في حجم تحديثات الأوزان.</li><li><b>الحد الأقصى للعصور (Maximum Epochs):</b> يحدد الحد الأقصى لعدد العصور (epochs) قبل الإنهاء لمنع حلقات التدريب اللانهائية.</li></ul></template>
+    <template class="content-en"><p>Steps of the learning algorithm:</p><ol><li><b>Initialization:</b> Weights are set to zero or small random values.</li><li><b>Prediction:</b> Class for a training instance is predicted: $\text{output} = \text{sign}(\sum w_i x_i)$.</li><li><b>Error-driven Learning:</b> Weights are updated if the prediction is incorrect.</li></ol><p><b>Weight update formula:</b> $w_i = w_i + \Delta w$, where $\Delta w = \eta(y - \hat{y})x_i$. ($y$: True class, $\hat{y}$: Predicted class, $x_i$: Explanatory variable, $\eta$: <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A hyperparameter that controls the size of the weight updates during training.">Learning rate<span class="smart-term-tooltip"></span></span>).</p><p><b>Hyperparameters:</b></p><ul><li><b>Learning Rate ($\eta$):</b> Controls the size of weight updates.</li><li><b>Maximum <span class="smart-term" data-term-en="Epoch" data-ar="العصر (حقبة التدريب)" data-en-def="One complete pass through all the training instances in the dataset.">Epoch<span class="smart-term-tooltip"></span></span>s:</b> Specifies the maximum number of epochs before termination to prevent endless training loops.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تضمن الخوارزمية تعديل الأوزان في اتجاه التصنيف الصحيح. إذا كان التنبؤ صحيحاً ($y = \hat{y}$)، فإن التحديث يكون صفراً. إذا كان التنبؤ خاطئاً، فإن الإشارة الناتجة عن $(y - \hat{y})$ تضمن زيادة أو تقليل الوزن بناءً على قيمة المدخل $x_i$.</p><p>يُعرف العصر (Epoch) بأنه تمريرة واحدة كاملة عبر جميع عينات التدريب. تتوقف الخوارزمية (تتقارب - Convergence) عندما يكتمل عصر كامل دون تصنيف أي عينة بشكل خاطئ.</p></template>
+    <template class="content-en"><p>The algorithm ensures weights are adjusted towards correct classification. If the prediction is correct ($y = \hat{y}$), the update is zero. If incorrect, the sign of $(y - \hat{y})$ ensures the weight is increased or decreased based on the input $x_i$.</p><p>An Epoch is one complete pass through the training instances. The algorithm stops (Convergence) when an epoch completes without misclassifying any instance.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تحديث أوزان البيرسيبترون بناءً على الخطأ ومعدل التعلم.</strong></template>
+      <template class="content-en"><strong>The perceptron weight update formula based on the error and learning rate.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$w_i = w_i + \eta(y - \hat{y})x_i$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا تم تعيين معدل التعلم (Learning Rate) بقيمة كبيرة جداً؟</template>
+      <template class="content-en">What happens if the learning rate is set to a very large value?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قد تتجاوز الأوزان القيم المثلى بشكل متكرر، مما يؤدي إلى تذبذب النموذج وعدم استقراره، وقد يفشل في التقارب (Convergence) حتى لو كانت البيانات قابلة للفصل خطياً.</p></template>
+      <template class="content-en"><p>The weights might repeatedly overshoot the optimal values, causing the model to oscillate and become unstable, potentially failing to converge even if the data is linearly separable.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="limitations-of-perceptron" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> حدود البيرسيبترون وتطبيقاته</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Limitations and Applications of the Perceptron</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>العيب الرئيسي للبيرسيبترون هو عدم قدرته على حل المشكلات غير القابلة للفصل خطياً (مثل مشكلة XOR).</p></template>
+    <template class="content-en"><p>The main limitation of the perceptron is its inability to solve non-linearly separable problems (like the XOR problem).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الحدود (Limitations):</b></p><ul><li><b>عدم القدرة على تقريب بعض الدوال:</b> لا يمكن للبيرسيبترون حل المشكلات غير القابلة للفصل خطياً (Non-linearly separable problems)، والمثال الأشهر على ذلك هو <span class="smart-term" data-term-en="XOR Problem" data-ar="مشكلة XOR" data-en-def="A classic non-linearly separable problem that a single-layer perceptron cannot solve.">مشكلة XOR<span class="smart-term-tooltip"></span></span>.</li><li><b>عدم التقارب (Non-Convergence):</b> إذا كانت البيانات غير قابلة للفصل خطياً، فإن خوارزمية التعلم لن تتقارب أبداً وستستمر في تحديث الأوزان إلى ما لا نهاية (ما لم يتم استخدام الحد الأقصى للعصور).</li></ul><p><b>التطبيقات والأهمية:</b></p><ul><li>استُخدم في الأبحاث الأولية للشبكات العصبية ومهام التصنيف الثنائي البسيطة.</li><li>أدى هذا القصور إلى تطوير نماذج أكثر قوة مثل آلات المتجهات الداعمة (SVMs) والشبكات العصبية الاصطناعية (البيرسيبترون متعدد الطبقات - MLPs).</li><li>يُعد فهمه أمراً حاسماً لدراسة نماذج تعلم الآلة المتقدمة.</li></ul></template>
+    <template class="content-en"><p><b>Limitations:</b></p><ul><li><b>Inability to Approximate Some Functions:</b> Cannot solve non-<span class="smart-term" data-term-en="Linearly Separable" data-ar="قابل للفصل خطياً" data-en-def="A dataset where classes can be completely separated by a single straight line (or hyperplane).">linearly separable<span class="smart-term-tooltip"></span></span> problems, most notably the <span class="smart-term" data-term-en="XOR Problem" data-ar="مشكلة XOR" data-en-def="A classic non-linearly separable problem that a single-layer perceptron cannot solve.">XOR problem<span class="smart-term-tooltip"></span></span>.</li><li><b>Non-Convergence:</b> If the dataset is linearly inseparable, the learning algorithm will never converge and will loop endlessly (unless a maximum epochs limit is set).</li></ul><p><b>Applications and Significance:</b></p><ul><li>Used in initial research for neural networks and simple binary classification tasks.</li><li>This limitation led to the development of more powerful models like Support Vector Machines (SVMs) and Artificial Neural Networks (Multilayer Perceptrons - MLPs).</li><li>Understanding perceptrons is crucial for studying advanced machine learning models.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مشكلة XOR (Exclusive OR) هي مشكلة كلاسيكية حيث لا يمكن رسم خط مستقيم واحد يفصل بين الفئات (0,0 و 1,1 في فئة، و 0,1 و 1,0 في فئة أخرى). أثبت مارفن مينسكي وسيمور بابيرت هذا القصور رياضياً في عام 1969، مما أدى إلى تراجع الاهتمام بالشبكات العصبية لفترة عُرفت بـ 'شتاء الذكاء الاصطناعي'.</p><p>الحل لهذه المشكلة كان إضافة طبقات مخفية (Hidden Layers) واستخدام دوال تنشيط غير خطية، وهو ما يُعرف اليوم بالبيرسيبترون متعدد الطبقات (MLP).</p></template>
+    <template class="content-en"><p>The XOR (Exclusive OR) problem is a classic issue where a single straight line cannot separate the classes (0,0 and 1,1 in one class; 0,1 and 1,0 in another). Marvin Minsky and Seymour Papert proved this limitation mathematically in 1969, leading to a decline in neural network research known as the 'AI Winter'.</p><p>The solution to this problem was adding hidden layers and using non-linear activation functions, creating what is now known as the Multilayer Perceptron (MLP).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يحل البيرسيبترون متعدد الطبقات (MLP) مشكلة XOR التي يفشل فيها البيرسيبترون البسيط؟</template>
+      <template class="content-en">How does a Multilayer Perceptron (MLP) solve the XOR problem that a simple perceptron fails at?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال استخدام طبقات مخفية، يمكن لـ MLP دمج خطوط قرار متعددة لإنشاء حدود قرار غير خطية معقدة قادرة على عزل الفئات في مشكلة XOR.</p></template>
+      <template class="content-en"><p>By using hidden layers, an MLP can combine multiple decision boundaries to create complex, non-linear decision boundaries capable of isolating the classes in the XOR problem.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="toy-classification-problem" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مثال تطبيقي: تصنيف القطط (Toy Classification Problem)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Toy Classification Problem: Kittens vs Adult Cats</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مثال عملي يوضح كيف يقوم البيرسيبترون بتحديث أوزانه عبر عدة عصور (Epochs) لفصل القطط الصغيرة عن القطط البالغة بناءً على ميزتين.</p></template>
+    <template class="content-en"><p>A practical example showing how a perceptron updates its weights over multiple epochs to separate kittens from adult cats based on two features.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>السياق:</b> فصل القطط البالغة عن القطط الصغيرة (Kittens) باستخدام ميزتين: نسبة اليوم في النوم ($x_1$) ونسبة اليوم في المزاج السيئ ($x_2$).</p><p><b>إعداد النموذج:</b> 3 وحدات إدخال ($x_0$ للتحيز، $x_1$، $x_2$). دالة التنشيط: هيفيسايد. معدل التعلم = 1. الأوزان الأولية = 0.</p><p><b>تطور التدريب (Epoch 1):</b></p><ul><li>العينة 1 (Kitten): المجموع الموزون = 0. التنبؤ = 0. الهدف = 1. خطأ! تحديث الأوزان إلى: 1.0, 0.2, 0.1.</li><li>العينة 4 (Adult): المجموع الموزون = 1.23. التنبؤ = 1. الهدف = 0. خطأ! تحديث الأوزان إلى: 0, -0.5, -0.8.</li></ul><p>يستمر التدريب عبر العصر الثاني والثالث، حيث يتم تعديل الأوزان في كل مرة يتم فيها تصنيف عينة بشكل خاطئ.</p><p><b><span class="smart-term" data-term-en="Decision Boundary" data-ar="حدود القرار" data-en-def="A hypersurface that partitions the underlying vector space into two sets, one for each class.">حدود القرار<span class="smart-term-tooltip"></span></span> النهائية:</b> بعد التقارب، تفصل حدود القرار بين الفئتين بناءً على الأوزان النهائية. معادلة الحدود المستمدة هي: $0.6x_1 + 0.9x_2 = 1.0$.</p></template>
+    <template class="content-en"><p><b>Context:</b> Separating adult cats from kittens using two features: proportion of day spent sleeping ($x_1$) and proportion of day spent being grumpy ($x_2$).</p><p><b>Model Setup:</b> 3 input units ($x_0$ for bias, $x_1$, $x_2$). Activation function: Heaviside. Learning rate = 1. Initial weights = 0.</p><p><b>Training Progression (Epoch 1):</b></p><ul><li>Instance 1 (Kitten): Weighted sum = 0. Prediction = 0. Target = 1. Error! Weights updated to: 1.0, 0.2, 0.1.</li><li>Instance 4 (Adult): Weighted sum = 1.23. Prediction = 1. Target = 0. Error! Weights updated to: 0, -0.5, -0.8.</li></ul><p>Training continues through Epoch 2 and 3, adjusting weights whenever an instance is misclassified.</p><p><b>Final <span class="smart-term" data-term-en="Decision Boundary" data-ar="حدود القرار" data-en-def="A hypersurface that partitions the underlying vector space into two sets, one for each class.">Decision Boundary<span class="smart-term-tooltip"></span></span>:</b> After convergence, the decision boundary separates the classes based on final weights. The derived boundary equation is: $0.6x_1 + 0.9x_2 = 1.0$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يوضح هذا المثال الطبيعة المتذبذبة للتعلم المباشر (Online Learning). تتغير الأوزان بشكل جذري بعد كل خطأ، مما قد يؤدي إلى 'نسيان' ما تم تعلمه من العينات السابقة مؤقتاً، ولهذا السبب يتطلب الأمر عدة عصور (Epochs) للوصول إلى الاستقرار.</p><p>معادلة حدود القرار $0.6x_1 + 0.9x_2 = 1.0$ تمثل خطاً مستقيماً في فضاء ثنائي الأبعاد. أي نقطة تقع فوق هذا الخط تُصنف كفئة، وأي نقطة تحته تُصنف كالفئة الأخرى.</p></template>
+    <template class="content-en"><p>This example illustrates the oscillatory nature of online learning. Weights change drastically after each error, potentially temporarily 'forgetting' what was learned from previous instances, which is why multiple epochs are required to reach stability.</p><p>The decision boundary equation $0.6x_1 + 0.9x_2 = 1.0$ represents a straight line in a 2D space. Any point above this line is classified as one class, and any point below as the other.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة حدود القرار النهائية المستخرجة من الأوزان بعد تدريب البيرسيبترون.</strong></template>
+      <template class="content-en"><strong>The final decision boundary equation derived from the weights after perceptron training.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$0.6x_1 + 0.9x_2 = 1.0$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A 2D scatter plot showing the toy classification problem. X-axis labeled 'Proportion Sleeping (x1)', Y-axis labeled 'Proportion Grumpy (x2)'. Plot 3 points for Kittens (e.g., green circles) at (0.2, 0.1), (0.4, 0.6), (0.5, 0.2). Plot 1 point for Adult Cat (e.g., red square) at (0.7, 0.9). Draw a straight line representing the decision boundary: 0.6*x1 + 0.9*x2 = 1.0. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Main Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="25" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold" class="gsvg-en">Toy Classification: Kittens vs Adult Cats</text>
+    <text x="400" y="25" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold" class="gsvg-ar">تصنيف مبسط: القطط الصغيرة مقابل القطط البالغة</text>
+
+    <!-- Plot Area Background -->
+    <rect x="100" y="60" width="450" height="280" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+
+    <!-- Shaded Regions -->
+    <!-- Kitten Region (Below Boundary) -->
+    <polygon points="100,340 550,340 550,215.56 175,60 100,60" fill="var(--brand-500)" opacity="0.1" />
+    <!-- Adult Cat Region (Above Boundary) -->
+    <polygon points="550,60 550,215.56 175,60" fill="var(--text-primary)" opacity="0.05" />
+
+    <!-- Grid Lines -->
+    <!-- X Grid -->
+    <line x1="190" y1="340" x2="190" y2="60" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="280" y1="340" x2="280" y2="60" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="370" y1="340" x2="370" y2="60" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="460" y1="340" x2="460" y2="60" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <!-- Y Grid -->
+    <line x1="100" y1="284" x2="550" y2="284" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="100" y1="228" x2="550" y2="228" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="100" y1="172" x2="550" y2="172" stroke="var(--border-color)" stroke-dasharray="4,4" />
+    <line x1="100" y1="116" x2="550" y2="116" stroke="var(--border-color)" stroke-dasharray="4,4" />
+
+    <!-- Axes -->
+    <line x1="100" y1="340" x2="570" y2="340" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="100" y1="340" x2="100" y2="40" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Ticks & Labels -->
+    <!-- X Ticks -->
+    <text x="100" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">0.0</text>
+    <text x="190" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">0.2</text>
+    <text x="280" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">0.4</text>
+    <text x="370" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">0.6</text>
+    <text x="460" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">0.8</text>
+    <text x="550" y="360" text-anchor="middle" fill="var(--text-secondary)" font-size="13">1.0</text>
+
+    <!-- Y Ticks -->
+    <text x="85" y="344" text-anchor="end" fill="var(--text-secondary)" font-size="13">0.0</text>
+    <text x="85" y="288" text-anchor="end" fill="var(--text-secondary)" font-size="13">0.2</text>
+    <text x="85" y="232" text-anchor="end" fill="var(--text-secondary)" font-size="13">0.4</text>
+    <text x="85" y="176" text-anchor="end" fill="var(--text-secondary)" font-size="13">0.6</text>
+    <text x="85" y="120" text-anchor="end" fill="var(--text-secondary)" font-size="13">0.8</text>
+    <text x="85" y="64" text-anchor="end" fill="var(--text-secondary)" font-size="13">1.0</text>
+
+    <!-- Axis Titles -->
+    <text x="325" y="390" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-en">Proportion Sleeping (x₁)</text>
+    <text x="325" y="390" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-ar">نسبة النوم (x₁)</text>
+
+    <g transform="translate(40, 200) rotate(-90)">
+        <text x="0" y="0" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-en">Proportion Grumpy (x₂)</text>
+        <text x="0" y="0" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-ar">نسبة الغضب (x₂)</text>
+    </g>
+
+    <!-- Region Labels -->
+    <text x="250" y="260" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" class="gsvg-en">KITTENS REGION</text>
+    <text x="250" y="260" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" class="gsvg-ar">منطقة القطط الصغيرة</text>
+
+    <text x="450" y="130" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" class="gsvg-en">ADULT CATS REGION</text>
+    <text x="450" y="130" text-anchor="middle" fill="var(--text-primary)" font-size="18" font-weight="bold" class="gsvg-ar">منطقة القطط البالغة</text>
+
+    <!-- Decision Boundary Line -->
+    <line x1="175" y1="60" x2="550" y2="215.56" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="8,4" />
+    
+    <!-- Decision Boundary Label -->
+    <g transform="translate(362.5, 137.78) rotate(22.5)">
+        <text x="0" y="-10" text-anchor="middle" fill="var(--brand-ink)" font-size="14" font-weight="bold" class="gsvg-en">Decision Boundary</text>
+        <text x="0" y="-10" text-anchor="middle" fill="var(--brand-ink)" font-size="14" font-weight="bold" class="gsvg-ar">حدود القرار</text>
+    </g>
+
+    <!-- Data Points -->
+    <!-- Kittens (Class 1) -->
+    <circle cx="190" cy="312" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+    <circle cx="280" cy="172" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+    <circle cx="325" cy="284" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+    <!-- Adult Cat (Class 0) -->
+    <rect x="407" y="80" width="16" height="16" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="3" />
+
+    <!-- Legend -->
+    <rect x="580" y="60" width="200" height="200" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="680" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-en">Legend</text>
+    <text x="680" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold" class="gsvg-ar">مفتاح الرسم</text>
+
+    <!-- Legend: Kitten -->
+    <circle cx="680" cy="110" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+    <text x="680" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-en">Kitten (Target = 1)</text>
+    <text x="680" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-ar">قطة صغيرة (الهدف = 1)</text>
+
+    <!-- Legend: Adult Cat -->
+    <rect x="672" y="145" width="16" height="16" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="3" />
+    <text x="680" y="178" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-en">Adult Cat (Target = 0)</text>
+    <text x="680" y="178" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-ar">قطة بالغة (الهدف = 0)</text>
+
+    <!-- Legend: Boundary -->
+    <line x1="650" y1="200" x2="710" y2="200" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" />
+    <text x="680" y="220" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-en">Decision Boundary</text>
+    <text x="680" y="220" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-ar">حدود القرار</text>
+    
+    <text x="680" y="240" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-en">0.6x₁ + 0.9x₂ = 1.0</text>
+    <text x="680" y="240" text-anchor="middle" fill="var(--text-secondary)" font-size="14" class="gsvg-ar">0.6x₁ + 0.9x₂ = 1.0</text>
+
+    <!-- Bottom Note -->
+    <text x="400" y="390" text-anchor="middle" fill="var(--text-muted)" font-size="13" class="gsvg-en">Activation: Heaviside Step Function</text>
+    <text x="400" y="390" text-anchor="middle" fill="var(--text-muted)" font-size="13" class="gsvg-ar">التنشيط: دالة هيفيسايد الدرجية</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في المثال التطبيقي، لماذا تم تحديث الأوزان للعينة 4 (Adult) في العصر الأول رغم أن المجموع الموزون كان موجباً (1.23)؟</template>
+      <template class="content-en">In the toy example, why were the weights updated for Instance 4 (Adult) in Epoch 1 even though the weighted sum was positive (1.23)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التنبؤ الناتج عن دالة هيفيسايد كان 1 (بما أن 1.23 > 0)، لكن الهدف (Target) للفئة Adult كان 0. نظراً لوجود اختلاف بين التنبؤ والهدف، حدث خطأ استوجب تحديث الأوزان.</p></template>
+      <template class="content-en"><p>Because the prediction from the Heaviside function was 1 (since 1.23 > 0), but the Target for the Adult class was 0. Since there was a mismatch between prediction and target, an error occurred, requiring a weight update.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. إذا كنتم تستعدون للامتحان، ركزوا جيداً على البيرسيبترون، فهو الجد الأكبر للذكاء الاصطناعي الحديث. تذكروا دائماً أن البيرسيبترون هو مصنف خطي ثنائي. في الامتحان، غالباً ما أسأل عن الفرق بين دالة هيفيسايد (التي لا يمكن اشتقاقها) ودالة سيجمويد (التي نستخدمها لاحقاً مع النزول الاشتقاقي). احفظوا معادلة تحديث الأوزان عن ظهر قلب: نحن نحدث الوزن فقط عندما نخطئ! ولا تنسوا 'مشكلة XOR'؛ فهي نقطة الضعف القاتلة للبيرسيبترون والتي أجبرت العلماء على ابتكار الشبكات العصبية متعددة الطبقات (MLPs). راجعوا مثال تصنيف القطط خطوة بخطوة، فقد يطلب منكم تتبع تحديث الأوزان لعينة واحدة في الاختبار. بالتوفيق!</template>
+    <template class="content-en">Welcome friends to this pivotal module. If you're prepping for the exam, focus heavily on the Perceptron—it's the granddaddy of modern AI. Always remember it's a linear binary classifier. In exams, I frequently ask about the difference between the Heaviside function (non-differentiable) and the Sigmoid function (used later with gradient descent). Memorize the weight update formula: we only update when we make a mistake! And never forget the 'XOR problem'; it's the fatal flaw of the perceptron that forced scientists to invent Multilayer Perceptrons (MLPs). Review the kitten classification toy example step-by-step, as you might be asked to trace a weight update for a single instance on the test. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر البيرسيبترون نموذجاً للتعلم المباشر (Online Learning)؟</template>
+          <template class="content-en">Why do we consider the perceptron an Online Learning model?</template>
+          <span class="content-target">لماذا نعتبر البيرسيبترون نموذجاً للتعلم المباشر (Online Learning)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يقوم بتحديث أوزانه بناءً على كل عينة تدريب فردية فور معالجتها، بدلاً من حساب الخطأ الإجمالي لكامل مجموعة البيانات قبل التحديث (كما في Batch Learning).</template>
+          <template class="content-en">Because it updates its weights based on each individual training instance immediately after processing it, rather than calculating the total error for the entire dataset before updating (as in Batch Learning).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الدور الدقيق لمعدل التعلم (Learning Rate) في معادلة تحديث الأوزان؟</template>
+          <template class="content-en">What is the exact role of the Learning Rate in the weight update formula?</template>
+          <span class="content-target">ما هو الدور الدقيق لمعدل التعلم (Learning Rate) في معادلة تحديث الأوزان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">معدل التعلم ($\eta$) يعمل كعامل تحجيم (Scaling factor). يحدد مقدار التغيير الذي نطبقه على الوزن عند حدوث خطأ. قيمة كبيرة تعني خطوات كبيرة (قد تتجاوز الحل)، وقيمة صغيرة تعني تعلماً بطيئاً.</template>
+          <template class="content-en">The learning rate ($\eta$) acts as a scaling factor. It determines the magnitude of the change applied to the weight when an error occurs. A large value means large steps (might overshoot), and a small value means slow learning.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساهم مصطلح التحيز (Bias) في مرونة البيرسيبترون؟</template>
+          <template class="content-en">How does the bias term contribute to the perceptron's flexibility?</template>
+          <span class="content-target">كيف يساهم مصطلح التحيز (Bias) في مرونة البيرسيبترون؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدون التحيز، ستكون حدود القرار (الخط الفاصل) مجبرة دائماً على المرور بنقطة الأصل (0,0). التحيز يسمح بإزاحة هذا الخط في أي اتجاه، مما يمكن النموذج من فصل البيانات التي لا تتمركز حول نقطة الأصل.</template>
+          <template class="content-en">Without bias, the decision boundary (the separating line) would always be forced to pass through the origin (0,0). The bias allows this line to shift in any direction, enabling the model to separate data not centered around the origin.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح لماذا تعتبر مشكلة XOR دليلاً على قصور البيرسيبترون.</template>
+          <template class="content-en">Explain why the XOR problem is proof of the perceptron's limitation.</template>
+          <span class="content-target">اشرح لماذا تعتبر مشكلة XOR دليلاً على قصور البيرسيبترون.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">البيرسيبترون هو مصنف خطي، مما يعني أنه يمكنه فقط رسم خط مستقيم واحد لفصل البيانات. في مشكلة XOR، البيانات مرتبة قطرياً بحيث يستحيل رسم خط مستقيم واحد يفصل الفئة 0 عن الفئة 1. هذا يثبت أن البيرسيبترون لا يمكنه حل المشكلات غير القابلة للفصل خطياً.</template>
+          <template class="content-en">The perceptron is a linear classifier, meaning it can only draw a single straight line to separate data. In the XOR problem, data is arranged diagonally such that it's impossible to draw one straight line separating class 0 from class 1. This proves the perceptron cannot solve non-linearly separable problems.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا قمنا بتدريب بيرسيبترون على بيانات غير قابلة للفصل خطياً دون تعيين حد أقصى للعصور؟</template>
+          <template class="content-en">What happens if we train a perceptron on linearly inseparable data without setting a maximum number of epochs?</template>
+          <span class="content-target">ماذا يحدث إذا قمنا بتدريب بيرسيبترون على بيانات غير قابلة للفصل خطياً دون تعيين حد أقصى للعصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ستدخل الخوارزمية في حلقة لا نهائية. ستستمر في تحديث الأوزان جيئة وذهاباً محاولةً تصحيح الأخطاء، ولن تصل أبداً إلى حالة التقارب (صفر أخطاء).</template>
+          <template class="content-en">The algorithm will enter an infinite loop. It will continuously update weights back and forth trying to correct errors, and will never reach a state of convergence (zero errors).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في معادلة التحديث $w_i = w_i + \eta(y - \hat{y})x_i$، ماذا يمثل الجزء $(y - \hat{y})$؟</template>
+          <template class="content-en">In the update formula $w_i = w_i + \eta(y - \hat{y})x_i$, what does the part $(y - \hat{y})$ represent?</template>
+          <span class="content-target">في معادلة التحديث $w_i = w_i + \eta(y - \hat{y})x_i$، ماذا يمثل الجزء $(y - \hat{y})$؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمثل اتجاه الخطأ. إذا كان التنبؤ صحيحاً، يكون الناتج 0 (لا تحديث). إذا كان الهدف 1 والتنبؤ 0، يكون الناتج +1 (زيادة الوزن). إذا كان الهدف 0 والتنبؤ 1، يكون الناتج -1 (تقليل الوزن).</template>
+          <template class="content-en">It represents the direction of the error. If prediction is correct, it's 0 (no update). If target is 1 and prediction 0, it's +1 (increase weight). If target is 0 and prediction 1, it's -1 (decrease weight).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل دالة سيجمويد على دالة هيفيسايد في الشبكات العصبية الحديثة؟</template>
+          <template class="content-en">Why do we prefer the Sigmoid function over the Heaviside function in modern neural networks?</template>
+          <span class="content-target">لماذا نفضل دالة سيجمويد على دالة هيفيسايد في الشبكات العصبية الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن دالة سيجمويد سلسة وقابلة للاشتقاق في كل مكان، مما يسمح لنا باستخدام خوارزميات التحسين القائمة على التدرج (مثل النزول الاشتقاقي والانتشار الخلفي). دالة هيفيسايد غير قابلة للاشتقاق عند الصفر.</template>
+          <template class="content-en">Because the Sigmoid function is smooth and differentiable everywhere, allowing us to use gradient-based optimization algorithms (like Gradient Descent and Backpropagation). The Heaviside function is non-differentiable at zero.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو 'العصر' (Epoch) ومتى نقول أن البيرسيبترون قد 'تقارب' (Converged)؟</template>
+          <template class="content-en">What is an 'Epoch' and when do we say the perceptron has 'Converged'?</template>
+          <span class="content-target">ما هو 'العصر' (Epoch) ومتى نقول أن البيرسيبترون قد 'تقارب' (Converged)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العصر هو تمريرة واحدة كاملة عبر جميع عينات التدريب. يتقارب البيرسيبترون عندما يكمل عصراً كاملاً دون إجراء أي تحديث للأوزان (أي تم تصنيف جميع العينات بشكل صحيح).</template>
+          <template class="content-en">An Epoch is one complete pass through all training instances. The perceptron converges when it completes a full epoch without making any weight updates (i.e., all instances are classified correctly).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في المثال التطبيقي، لماذا تغيرت الأوزان بشكل جذري من العينة 1 إلى العينة 4 في العصر الأول؟</template>
+          <template class="content-en">In the toy example, why did the weights change drastically from Instance 1 to Instance 4 in Epoch 1?</template>
+          <span class="content-target">في المثال التطبيقي، لماذا تغيرت الأوزان بشكل جذري من العينة 1 إلى العينة 4 في العصر الأول؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب طبيعة التعلم المباشر (Online). كل خطأ يؤدي إلى تحديث فوري للأوزان بناءً على العينة الحالية فقط، مما قد يؤدي إلى تذبذب الأوزان بشكل كبير قبل أن تستقر في العصور اللاحقة.</template>
+          <template class="content-en">Due to the nature of Online learning. Every error triggers an immediate weight update based only on the current instance, which can cause weights to oscillate wildly before settling down in later epochs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي العلاقة بين البيرسيبترون والانحدار اللوجستي؟</template>
+          <template class="content-en">What is the relationship between the Perceptron and Logistic Regression?</template>
+          <span class="content-target">ما هي العلاقة بين البيرسيبترون والانحدار اللوجستي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كلاهما نماذج خطية تحسب التنشيط المسبق (مجموع موزون). الفرق الرئيسي هو أن البيرسيبترون يستخدم دالة خطوة (Heaviside) وتعلم قائم على الخطأ، بينما الانحدار اللوجستي يستخدم دالة سيجمويد وخوارزمية النزول الاشتقاقي.</template>
+          <template class="content-en">Both are linear models that calculate a preactivation (weighted sum). The main difference is the Perceptron uses a step function (Heaviside) and error-driven learning, while Logistic Regression uses a Sigmoid function and Gradient Descent.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو البيرسيبترون (Perceptron)؟",
+      "en": "What is a Perceptron?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصنف ثنائي يتعلم من أمثلة التدريب الفردية، مستوحى من الخلايا العصبية البشرية.",
+        "en": "A binary classifier that learns from individual training instances, inspired by human neurons."
+      },
+      "example": {
+        "ar": "استخدامه لتصنيف رسائل البريد الإلكتروني إلى (بريد مزعج) أو (غير مزعج).",
+        "en": "Using it to classify emails as spam or not spam."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "من اخترع البيرسيبترون وفي أي عقد؟",
+      "en": "Who invented the perceptron and in which decade?"
+    },
+    "back": {
+      "definition": {
+        "ar": "اخترعه فرانك روزنبلات (Frank Rosenblatt) في أواخر الخمسينيات.",
+        "en": "Invented by Frank Rosenblatt in the late 1950s."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي المكونات الرئيسية للبيرسيبترون؟",
+      "en": "What are the main components of a perceptron?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وحدات الإدخال، الوحدة الحسابية، المخرجات، ومصطلح التحيز (Bias).",
+        "en": "Input units, computational unit, output, and bias term."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو التنشيط المسبق (Preactivation)؟",
+      "en": "What is Preactivation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التركيبة الخطية للمتغيرات التفسيرية ومعلمات النموذج (الأوزان + التحيز).",
+        "en": "The linear combination of explanatory variables and model parameters (weights + bias)."
+      },
+      "example": {
+        "ar": "المعادلة: $\\sum w_i x_i + b$",
+        "en": "Formula: $\\sum w_i x_i + b$"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي وظيفة مصطلح التحيز (Bias Term)؟",
+      "en": "What is the function of the Bias Term?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسمح بإزاحة حدود القرار بعيداً عن نقطة الأصل، مما يزيد من مرونة النموذج.",
+        "en": "Allows shifting the decision boundary away from the origin, increasing model flexibility."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الغرض من دوال التنشيط (Activation Functions)؟",
+      "en": "What is the purpose of Activation Functions?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إدخال اللاخطية (non-linearity) إلى النموذج لتمكينه من تعلم أنماط معقدة.",
+        "en": "To introduce non-linearity into the model, enabling it to learn complex patterns."
+      },
+      "example": {
+        "ar": "دالة هيفيسايد ودالة سيجمويد.",
+        "en": "Heaviside step function and Sigmoid function."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "كيف تعمل دالة الخطوة لهيفيسايد (Heaviside Step Function)؟",
+      "en": "How does the Heaviside Step Function work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُرجع 1 إذا كان المجموع الموزون أكبر من الصفر، وإلا تُرجع 0.",
+        "en": "Returns 1 if the weighted sum is greater than zero, otherwise returns 0."
+      },
+      "example": {
+        "ar": "إذا كان $z = -0.5$، فإن المخرجات = 0.",
+        "en": "If $z = -0.5$, output = 0."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي ميزة دالة سيجمويد اللوجستية (Logistic Sigmoid)؟",
+      "en": "What is the advantage of the Logistic Sigmoid function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي دالة سلسة قابلة للاشتقاق، مما يسمح بحساب التدرج (gradient) بكفاءة.",
+        "en": "It is a smooth, differentiable function, allowing for efficient gradient calculation."
+      },
+      "example": {
+        "ar": "تُرجع قيماً بين 0 و 1، مما يمثل احتمالات.",
+        "en": "Returns values between 0 and 1, representing probabilities."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "متى يقوم البيرسيبترون بتحديث أوزانه أثناء التدريب؟",
+      "en": "When does the perceptron update its weights during training?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فقط عندما يكون التنبؤ للعينة الحالية غير صحيح (التعلم القائم على الخطأ).",
+        "en": "Only when the prediction for the current instance is incorrect (error-driven learning)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي معادلة تحديث الأوزان في البيرسيبترون؟",
+      "en": "What is the weight update formula in the perceptron?"
+    },
+    "back": {
+      "definition": {
+        "ar": "$w_i = w_i + \\eta(y - \\hat{y})x_i$",
+        "en": "$w_i = w_i + \\eta(y - \\hat{y})x_i$"
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو العصر (Epoch) في سياق تدريب النماذج؟",
+      "en": "What is an Epoch in the context of model training?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمريرة واحدة كاملة عبر جميع عينات التدريب في مجموعة البيانات.",
+        "en": "One complete pass through all the training instances in the dataset."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "متى تصل خوارزمية البيرسيبترون إلى التقارب (Convergence)؟",
+      "en": "When does the perceptron algorithm reach Convergence?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما يكتمل عصر (Epoch) كامل دون تصنيف أي عينة بشكل خاطئ.",
+        "en": "When an epoch completes without misclassifying any instance."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو دور معدل التعلم (Learning Rate - $\\eta$)؟",
+      "en": "What is the role of the Learning Rate ($\\eta$)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتحكم في حجم تحديثات الأوزان في كل خطوة.",
+        "en": "Controls the size of the weight updates at each step."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو العيب الرئيسي للبيرسيبترون؟",
+      "en": "What is the main limitation of the perceptron?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عدم قدرته على حل المشكلات غير القابلة للفصل خطياً.",
+        "en": "Its inability to solve non-linearly separable problems."
+      },
+      "example": {
+        "ar": "مشكلة XOR.",
+        "en": "The XOR problem."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ماذا يحدث إذا حاولنا تدريب بيرسيبترون على بيانات غير قابلة للفصل خطياً؟",
+      "en": "What happens if we try to train a perceptron on linearly inseparable data?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لن تتقارب الخوارزمية أبداً وستستمر في تحديث الأوزان إلى ما لا نهاية (عدم التقارب).",
+        "en": "The algorithm will never converge and will loop endlessly updating weights (Non-Convergence)."
+      },
+      "example": {
+        "ar": "لذلك نستخدم معلمة 'الحد الأقصى للعصور' لإيقافها.",
+        "en": "This is why we use the 'Maximum Epochs' hyperparameter to stop it."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "كيف يختلف تحديث الأوزان في البيرسيبترون عن النزول الاشتقاقي (Gradient Descent)؟",
+      "en": "How does weight updating in the perceptron differ from Gradient Descent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "البيرسيبترون يُحدث الأوزان لكل عينة فردية (Online)، بينما النزول الاشتقاقي يُحدثها لكامل مجموعة البيانات (Batch).",
+        "en": "Perceptron updates weights for individual instances (Online), while gradient descent updates for the entire dataset (Batch)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "من هو مخترع نموذج البيرسيبترون؟",
+      "en": "Who invented the perceptron model?"
+    },
+    "options": {
+      "ar": [
+        "آلان تورينج",
+        "فرانك روزنبلات",
+        "جيفري هينتون",
+        "مارفن مينسكي"
+      ],
+      "en": [
+        "Alan Turing",
+        "Frank Rosenblatt",
+        "Geoffrey Hinton",
+        "Marvin Minsky"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تم اختراع البيرسيبترون بواسطة فرانك روزنبلات في أواخر الخمسينيات.",
+      "en": "The perceptron was invented by Frank Rosenblatt in the late 1950s."
+    },
+    "hint": {
+      "ar": "اسمه الأول فرانك.",
+      "en": "His first name is Frank."
+    },
+    "difficulty": "easy",
+    "conceptId": "introduction-to-perceptrons"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي وظيفة مصطلح التحيز (Bias Term) في البيرسيبترون؟",
+      "en": "What is the function of the bias term in a perceptron?"
+    },
+    "options": {
+      "ar": [
+        "تحديد معدل التعلم",
+        "إدخال اللاخطية للنموذج",
+        "السماح لحدود القرار بعدم المرور بنقطة الأصل",
+        "منع النموذج من التجاوز (Overfitting)"
+      ],
+      "en": [
+        "Determine the learning rate",
+        "Introduce non-linearity to the model",
+        "Allow the decision boundary to not pass through the origin",
+        "Prevent the model from overfitting"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التحيز يسمح بإزاحة حدود القرار، مما يعني أنها غير مجبرة على المرور عبر نقطة الأصل (0,0).",
+      "en": "The bias allows the decision boundary to shift, meaning it is not forced to pass through the origin (0,0)."
+    },
+    "hint": {
+      "ar": "فكر في التقاطع مع المحور الصادي في المعادلات الخطية.",
+      "en": "Think about the y-intercept in linear equations."
+    },
+    "difficulty": "medium",
+    "conceptId": "perceptron-structure-and-preactivation"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي المخرجات التي تعطيها دالة هيفيسايد (Heaviside) إذا كان المجموع الموزون يساوي -0.5؟",
+      "en": "What output does the Heaviside step function give if the weighted sum is -0.5?"
+    },
+    "options": {
+      "ar": [
+        "1",
+        "-1",
+        "0",
+        "-0.5"
+      ],
+      "en": [
+        "1",
+        "-1",
+        "0",
+        "-0.5"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة هيفيسايد تُرجع 1 فقط إذا كان المدخل أكبر من 0، وإلا تُرجع 0.",
+      "en": "The Heaviside function returns 1 only if the input is greater than 0, otherwise it returns 0."
+    },
+    "hint": {
+      "ar": "هي دالة ثنائية قيمتها إما 0 أو 1.",
+      "en": "It is a binary function with values of either 0 or 1."
+    },
+    "difficulty": "easy",
+    "conceptId": "activation-functions"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "متى يتم تحديث الأوزان في خوارزمية تعلم البيرسيبترون؟",
+      "en": "When are the weights updated in the perceptron learning algorithm?"
+    },
+    "options": {
+      "ar": [
+        "بعد كل عصر (Epoch) بغض النظر عن الأخطاء",
+        "فقط عندما يكون التنبؤ للعينة الحالية غير صحيح",
+        "فقط عندما يكون التنبؤ للعينة الحالية صحيحاً",
+        "بشكل عشوائي أثناء التدريب"
+      ],
+      "en": [
+        "After every epoch regardless of errors",
+        "Only when the prediction for the current instance is incorrect",
+        "Only when the prediction for the current instance is correct",
+        "Randomly during training"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البيرسيبترون يستخدم التعلم القائم على الخطأ؛ يتم تحديث الأوزان فقط عند حدوث خطأ في التصنيف.",
+      "en": "The perceptron uses error-driven learning; weights are updated only when a classification error occurs."
+    },
+    "hint": {
+      "ar": "التعلم مدفوع بالأخطاء.",
+      "en": "Learning is driven by mistakes."
+    },
+    "difficulty": "medium",
+    "conceptId": "perceptron-learning-algorithm"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من المعادلات التالية تمثل تحديث الأوزان الصحيح في البيرسيبترون؟",
+      "en": "Which of the following equations represents the correct weight update in a perceptron?"
+    },
+    "options": {
+      "ar": [
+        "\\(w_i = w_i - \\eta(y - \\hat{y})x_i\\)",
+        "\\(w_i = w_i + \\eta(y + \\hat{y})x_i\\)",
+        "\\(w_i = w_i + \\eta(y - \\hat{y})x_i\\)",
+        "\\(w_i = \\eta(y - \\hat{y})x_i\\)"
+      ],
+      "en": [
+        "\\(w_i = w_i - \\eta(y - \\hat{y})x_i\\)",
+        "\\(w_i = w_i + \\eta(y + \\hat{y})x_i\\)",
+        "\\(w_i = w_i + \\eta(y - \\hat{y})x_i\\)",
+        "\\(w_i = \\eta(y - \\hat{y})x_i\\)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعادلة الصحيحة تضيف التغير الموزون بمعدل التعلم والخطأ إلى الوزن الحالي.",
+      "en": "The correct formula adds the change scaled by learning rate and error to the current weight."
+    },
+    "hint": {
+      "ar": "تذكر أننا نجمع (الوزن القديم + التغير).",
+      "en": "Remember we add (old weight + change)."
+    },
+    "difficulty": "hard",
+    "conceptId": "perceptron-learning-algorithm"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو العيب الرئيسي للبيرسيبترون الذي أدى إلى تطوير الشبكات العصبية متعددة الطبقات؟",
+      "en": "What is the main limitation of the perceptron that led to the development of multilayer neural networks?"
+    },
+    "options": {
+      "ar": [
+        "بطء التدريب على البيانات الخطية",
+        "عدم القدرة على حل المشكلات غير القابلة للفصل خطياً",
+        "استهلاك عالي للذاكرة",
+        "عدم القدرة على استخدام دالة هيفيسايد"
+      ],
+      "en": [
+        "Slow training on linear data",
+        "Inability to solve non-linearly separable problems",
+        "High memory consumption",
+        "Inability to use the Heaviside function"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البيرسيبترون لا يمكنه تقريب الدوال غير القابلة للفصل خطياً، مثل مشكلة XOR.",
+      "en": "The perceptron cannot approximate non-linearly separable functions, such as the XOR problem."
+    },
+    "hint": {
+      "ar": "تذكر مشكلة XOR.",
+      "en": "Remember the XOR problem."
+    },
+    "difficulty": "medium",
+    "conceptId": "limitations-of-perceptron"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يختلف تحديث الأوزان في البيرسيبترون عن النزول الاشتقاقي (Gradient Descent)؟",
+      "en": "How does weight updating in the perceptron differ from Gradient Descent?"
+    },
+    "options": {
+      "ar": [
+        "البيرسيبترون يُحدث الأوزان لكامل البيانات، بينما النزول الاشتقاقي لكل عينة.",
+        "البيرسيبترون يُحدث الأوزان لكل عينة فردية، بينما النزول الاشتقاقي لكامل البيانات.",
+        "لا يوجد فرق، كلاهما يستخدم نفس الطريقة.",
+        "البيرسيبترون لا يُحدث الأوزان أبداً."
+      ],
+      "en": [
+        "Perceptron updates weights for the entire dataset, while GD for each instance.",
+        "Perceptron updates weights for individual instances, while GD for the entire dataset.",
+        "There is no difference, both use the same method.",
+        "Perceptron never updates weights."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البيرسيبترون يستخدم التعلم المباشر (Online) بتحديث الأوزان بعد كل عينة، بينما النزول الاشتقاقي التقليدي يحسب التدرج لكامل مجموعة البيانات (Batch).",
+      "en": "Perceptron uses online learning updating weights after each instance, while traditional GD calculates the gradient for the entire dataset (Batch)."
+    },
+    "hint": {
+      "ar": "Online vs Batch.",
+      "en": "Online vs Batch."
+    },
+    "difficulty": "medium",
+    "conceptId": "perceptron-learning-algorithm"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو الغرض من المعلمة الفائقة 'الحد الأقصى للعصور' (Maximum Epochs)؟",
+      "en": "What is the purpose of the 'Maximum Epochs' hyperparameter?"
+    },
+    "options": {
+      "ar": [
+        "زيادة دقة النموذج إلى 100%",
+        "منع حلقات التدريب اللانهائية إذا كانت البيانات غير قابلة للفصل خطياً",
+        "تحديد حجم خطوة تحديث الأوزان",
+        "تغيير دالة التنشيط تلقائياً"
+      ],
+      "en": [
+        "Increase model accuracy to 100%",
+        "Prevent endless training loops if data is linearly inseparable",
+        "Determine the step size of weight updates",
+        "Automatically change the activation function"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كانت البيانات غير قابلة للفصل خطياً، فلن يتقارب البيرسيبترون أبداً. الحد الأقصى للعصور يضمن توقف الخوارزمية.",
+      "en": "If data is linearly inseparable, the perceptron will never converge. Max epochs ensures the algorithm stops."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا لم تتقارب الخوارزمية أبداً؟",
+      "en": "What happens if the algorithm never converges?"
+    },
+    "difficulty": "easy",
+    "conceptId": "perceptron-learning-algorithm"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في المثال التطبيقي لتصنيف القطط، ماذا تمثل المعادلة 0.6x1 + 0.9x2 = 1.0؟",
+      "en": "In the toy classification example, what does the equation 0.6x1 + 0.9x2 = 1.0 represent?"
+    },
+    "options": {
+      "ar": [
+        "دالة التنشيط",
+        "معدل التعلم",
+        "حدود القرار النهائية",
+        "الخطأ الإجمالي للنموذج"
+      ],
+      "en": [
+        "The activation function",
+        "The learning rate",
+        "The final decision boundary",
+        "The total error of the model"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هذه المعادلة تمثل الخط المستقيم (حدود القرار) الذي يفصل بين فئة القطط الصغيرة والقطط البالغة بناءً على الأوزان النهائية.",
+      "en": "This equation represents the straight line (decision boundary) that separates the kittens and adult cats based on the final weights."
+    },
+    "hint": {
+      "ar": "إنها تفصل بين الفئتين في الفضاء ثنائي الأبعاد.",
+      "en": "It separates the two classes in the 2D space."
+    },
+    "difficulty": "medium",
+    "conceptId": "toy-classification-problem"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية تسمح بحساب التدرج (Gradient) بكفاءة وتُستخدم غالباً في الشبكات العصبية؟",
+      "en": "Which of the following activation functions allows for efficient gradient calculation and is often used in neural networks?"
+    },
+    "options": {
+      "ar": [
+        "دالة الخطوة لهيفيسايد",
+        "دالة سيجمويد اللوجستية",
+        "دالة الإشارة (Sign)",
+        "لا شيء مما سبق"
+      ],
+      "en": [
+        "Heaviside step function",
+        "Logistic Sigmoid function",
+        "Sign function",
+        "None of the above"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة سيجمويد هي دالة سلسة وقابلة للاشتقاق، مما يجعلها مناسبة لخوارزميات تعتمد على التدرج مثل النزول الاشتقاقي.",
+      "en": "The Sigmoid function is smooth and differentiable, making it suitable for gradient-based algorithms like gradient descent."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة 'السلسة' (Smooth).",
+      "en": "Look for the 'smooth' function."
+    },
+    "difficulty": "easy",
+    "conceptId": "activation-functions"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن البيرسيبترون الأصلي يستخدم خوارزمية النزول الاشتقاقي (Gradient Descent). هذا خطأ! البيرسيبترون يستخدم التعلم القائم على الخطأ (Error-driven learning) لأن دالة هيفيسايد غير قابلة للاشتقاق.</template>
+    <template class="content-en">Thinking the original perceptron uses Gradient Descent. This is false! The perceptron uses error-driven learning because the Heaviside step function is non-differentiable.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">غالباً ما يتم حذف مصطلح التحيز (Bias) من الرسوم البيانية للشبكات العصبية لتبسيط الشكل، ولكنه موجود دائماً في الحسابات الرياضية (Preactivation) لضمان مرونة حدود القرار.</template>
+    <template class="content-en">The bias term is often omitted from neural network diagrams to simplify the visual, but it is always present in the mathematical calculations (Preactivation) to ensure decision boundary flexibility.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">شرط التقارب (Convergence): خوارزمية البيرسيبترون مضمونة التقارب فقط إذا وفقط إذا كانت البيانات قابلة للفصل خطياً (Linearly Separable).</template>
+    <template class="content-en">Convergence Condition: The perceptron algorithm is guaranteed to converge if and only if the dataset is linearly separable.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين تحديث الأوزان (Online) و (Batch). البيرسيبترون يُحدث الأوزان فوراً بعد كل عينة تدريب (Online)، وليس بعد المرور على كامل البيانات.</template>
+    <template class="content-en">Confusing Online and Batch weight updates. The perceptron updates weights immediately after each training instance (Online), not after passing through the entire dataset.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

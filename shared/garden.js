@@ -1023,6 +1023,27 @@
   }
   window.GardenMath = { typeset: typesetMath, text: mathText, enhance: enhanceMath };
 
+  /*@3.GARJ.672*/
+  (function quizMath() {
+    const boxes = ['mcq-question-text', 'mcq-options', 'mcq-hint-text', 'mcq-feedback', 'essay-questions-container']
+      .map((id) => document.getElementById(id)).filter(Boolean);
+    if (!boxes.length) return;
+    const due = new Set(); let timer = 0;
+    const own = (n) => n && n.nodeType === 1 && (n.nodeName.indexOf('MJX') === 0 || !!(n.closest && n.closest('mjx-container')));
+    const flush = () => { timer = 0; due.forEach(typesetMath); due.clear(); };
+    const mo = new MutationObserver((list) => {
+      for (const m of list) {
+        const el = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        if (own(el) || (m.addedNodes.length && [...m.addedNodes].every(own))) continue;
+        const box = boxes.find((b) => b.contains(el));
+        if (box) due.add(box);
+      }
+      if (due.size && !timer) timer = setTimeout(flush, 30);
+    });
+    boxes.forEach((b) => { mo.observe(b, { childList: true, subtree: true, characterData: true }); due.add(b); });
+    timer = setTimeout(flush, 30);
+  })();
+
   /*@3.GARJ.51*/
   const TAP_SEEN = 'garden_fc_tap_seen';
   function tapSeen() { try { return localStorage.getItem(TAP_SEEN) === '1'; } catch (e) { return false; } }
@@ -3219,10 +3240,10 @@
     CS353: 13, CS360: 12, CS361: 13, CS362: 13, CS363: 13, CS364: 10, CS470: 12, CS471: 13, CS475: 13, CS476: 13,
     CS477: 13, CS478: 13, CS479: 12, CS480: 12, CS481: 13, DS230: 13, DS231: 12, DS240: 13, DS242: 13, DS243: 13,
     DS350: 13, DS351: 13, DS352: 13, DS353: 12, DS360: 12, DS361: 13, DS362: 13, DS363: 13, DS364: 13, DS470: 13,
-    DS471: 13, DS472: 13, DS479: 12, DS480: 13, DS481: 13, DS482: 13, DS483: 13, ENG103: 10, ISLAM101: 12,
+    DS471: 13, DS472: 13, DS473: 13, DS479: 12, DS480: 13, DS481: 13, DS482: 13, DS483: 13, ENG103: 10, ISLAM101: 12,
     ISLAM102: 12, ISLAM103: 10, ISLAM104: 14, IT231: 15, IT232: 13, IT233: 13, IT241: 13, IT244: 13, IT245: 13,
     IT351: 12, IT352: 12, IT353: 13, IT354: 12, IT361: 13, IT362: 12, IT363: 13, IT364: 10, IT365: 12, IT474: 13,
-    IT475: 13, IT476: 11, IT478: 12, IT479: 12, IT484: 13, IT485: 13, IT487: 14, IT488: 12, MATH150: 12, MATH241: 13,
+    IT475: 13, IT476: 12, IT478: 12, IT479: 12, IT484: 13, IT485: 13, IT487: 14, IT488: 12, MATH150: 12, MATH241: 13,
     MATH251: 12, SCI101: 10, SCI201: 11, STAT101: 12, STAT202: 11 };
   function slidesLink() {
     const html = document.documentElement;

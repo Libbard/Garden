@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>البرمجة باستخدام الفئات وتجنب الأخطاء · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#class-inheritance" class="toc-link" data-bilingual>
+        <template class="content-ar">وراثة الفئات (Class Inheritance)</template>
+        <template class="content-en">Class Inheritance</template>
+        <span class="content-target">وراثة الفئات (Class Inheritance)</span>
+      </a>
+      <a href="#overriding-and-extending" class="toc-link" data-bilingual>
+        <template class="content-ar">تجاوز القيم وتوسيع الفئات الفرعية</template>
+        <template class="content-en">Overriding and Extending Subclasses</template>
+        <span class="content-target">تجاوز القيم وتوسيع الفئات الفرعية</span>
+      </a>
+      <a href="#method-resolution" class="toc-link" data-bilingual>
+        <template class="content-ar">تجاوز الطرق (Method Overriding)</template>
+        <template class="content-en">Method Overriding and Resolution</template>
+        <span class="content-target">تجاوز الطرق (Method Overriding)</span>
+      </a>
+      <a href="#understanding-exceptions" class="toc-link" data-bilingual>
+        <template class="content-ar">فهم الاستثناءات (Exceptions)</template>
+        <template class="content-en">Understanding Exceptions</template>
+        <span class="content-target">فهم الاستثناءات (Exceptions)</span>
+      </a>
+      <a href="#handling-errors-gracefully" class="toc-link" data-bilingual>
+        <template class="content-ar">معالجة الأخطاء بسلاسة (try...except)</template>
+        <template class="content-en">Handling Errors Gracefully</template>
+        <span class="content-target">معالجة الأخطاء بسلاسة (try...except)</span>
+      </a>
+      <a href="#else-and-finally" class="toc-link" data-bilingual>
+        <template class="content-ar">استخدام else و finally</template>
+        <template class="content-en">Using try ... except ... else ... finally</template>
+        <span class="content-target">استخدام else و finally</span>
+      </a>
+      <a href="#custom-exceptions" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء استثناءات مخصصة (Custom Exceptions)</template>
+        <template class="content-en">Raising Your Own Exceptions</template>
+        <span class="content-target">إنشاء استثناءات مخصصة (Custom Exceptions)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">البرمجة باستخدام الفئات وتجنب الأخطاء</h1>
+      <p class="hero-description">تغطي هذه الوحدة مفاهيم الوراثة في الفئات (Class Inheritance) في بايثون، بالإضافة إلى كيفية التعامل مع الاستثناءات (Exceptions) ومعالجة الأخطاء برمجياً لتجنب توقف التطبيقات عن العمل.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Doing Python with Class and Sidestepping Errors</h1>
+      <p class="hero-description">This module covers Class Inheritance in Python, along with understanding Exceptions and handling errors gracefully to prevent application crashes.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بايثون</span>
+      <span class="tag">البرمجة كائنية التوجه</span>
+      <span class="tag">الوراثة</span>
+      <span class="tag">الاستثناءات</span>
+      <span class="tag">معالجة الأخطاء</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Python</span>
+      <span class="tag">OOP</span>
+      <span class="tag">Inheritance</span>
+      <span class="tag">Exceptions</span>
+      <span class="tag">Error Handling</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم مبدأ الوراثة في الفئات (Class Inheritance).</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم الاستثناءات وكيفية معالجة الأخطاء بسلاسة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد استثناءات معينة لمنع التطبيق من الانهيار.</span></li>
+      <li><span class="obj-icon">✦</span><span>إنشاء استثناءات مخصصة (Custom Exceptions).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understanding Class Inheritance.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understanding Exceptions and Handling Errors Gracefully.</span></li>
+      <li><span class="obj-icon">✦</span><span>Being Specific about Exceptions and Keeping Your App from Crashing.</span></li>
+      <li><span class="obj-icon">✦</span><span>Creating Your Own Exceptions.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="class-inheritance" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> وراثة الفئات (Class Inheritance)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Class Inheritance</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الوراثة هي آلية تسمح لفئة فرعية (Subclass) باكتساب خصائص وطرق فئة أساسية (Base Class)، تماماً كما يرث الأبناء الصفات من الآباء.</p></template>
+    <template class="content-en"><p>Inheritance allows a subclass to acquire the attributes and methods of a base class, much like children inherit traits from their parents.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في البرمجة كائنية التوجه، ترث الفئات الفرعية (Subclasses) جميع السمات (Attributes) والطرق (Methods) من فئة رئيسية ذات مستوى أعلى تُعرف ب<span class="smart-term" data-term-en="Base Class" data-ar="الفئة الأساسية" data-en-def="The parent class from which other classes inherit attributes and methods.">الفئة الأساسية<span class="smart-term-tooltip"></span></span> (Base Class) أو الفئة الأم (Parent Class).</p><p>لتعريف فئة فرعية، نستخدم الصيغة التالية: <code>class Subclass(BaseClass):</code>.</p><p>إذا أردنا إنشاء فئة فرعية فارغة مؤقتاً لتجنب أخطاء بناء الجملة، نستخدم الكلمة المفتاحية <code>pass</code>.</p><p>مثال: إذا كان لدينا فئة أساسية <code>Member</code>، يمكننا إنشاء فئة فرعية <code>Admin</code> ترث منها كالتالي:</p></template>
+    <template class="content-en"><p>In object-oriented programming, <span class="smart-term" data-term-en="Subclass" data-ar="الفئة الفرعية" data-en-def="A class that inherits from a base class.">subclass<span class="smart-term-tooltip"></span></span>es inherit all the attributes and methods of a higher-level main class, or parent class, which is usually referred to as the <span class="smart-term" data-term-en="Base Class" data-ar="الفئة الأساسية" data-en-def="The parent class from which other classes inherit attributes and methods.">base class<span class="smart-term-tooltip"></span></span>.</p><p>To define a subclass, use the syntax: <code>class Subclass(BaseClass):</code>. If you want to leave the class empty temporarily without causing a syntax error, use the <code>pass</code> keyword.</p><p>Example: If we have a base class <code>Member</code>, we can create a subclass <code>Admin</code> that inherits from it like this:</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>صُممت الوراثة لتعزيز إعادة استخدام الكود (Code Reusability) وتأسيس تسلسل هرمي منطقي للكائنات. بدلاً من تكرار الكود المشترك، يتم تعريفه مرة واحدة في الفئة الأساسية.</p><p>من حالات الحافة أنه يمكن للفئة الفرعية أن ترث من فئات متعددة (Multiple Inheritance) في بايثون، مما قد يؤدي إلى تعقيدات تُعرف بمشكلة الماسة (Diamond Problem).</p><p>ترتبط الوراثة ارتباطاً وثيقاً بمفهوم تعدد الأشكال (Polymorphism)، حيث يمكن التعامل مع كائنات <span class="smart-term" data-term-en="Subclass" data-ar="الفئة الفرعية" data-en-def="A class that inherits from a base class.">الفئة الفرعية<span class="smart-term-tooltip"></span></span> على أنها كائنات من الفئة الأساسية.</p></template>
+    <template class="content-en"><p>Inheritance is designed to promote code reusability and establish a logical hierarchy of objects. Instead of duplicating common code, it is defined once in the base class.</p><p>An edge case in Python is multiple inheritance, where a subclass inherits from multiple base classes, which can lead to complexities known as the Diamond Problem.</p><p>Inheritance is closely tied to Polymorphism, where subclass objects can be treated as instances of their base class.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Admin(Member):
+    pass</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A hierarchical tree diagram showing a base class 'Dogs' at the top, with arrows pointing down to three specific instances or subclasses labeled 'Bowser', 'Fido', and 'Wingnut'. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, clear text labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Class Inheritance</text>
+  <text x="400" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وراثة الفئات</text>
+
+  <!-- Connection Lines -->
+  <!-- Center Line (Fido) -->
+  <path d="M 400 160 L 400 248" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+  <!-- Left Branch (Bowser) -->
+  <path d="M 400 210 L 190 210 Q 180 210 180 220 L 180 248" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+  <!-- Right Branch (Wingnut) -->
+  <path d="M 400 210 L 610 210 Q 620 210 620 220 L 620 248" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+
+  <!-- Inherits Label (Masks the vertical line behind it) -->
+  <rect x="280" y="173" width="240" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+  <text x="400" y="190" font-size="13" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Inherits attributes &amp; methods</text>
+  <text x="400" y="190" font-size="13" font-weight="600" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">ترث الخصائص والطرق</text>
+
+  <!-- Base Class Node -->
+  <g>
+    <!-- Header Background -->
+    <path d="M 310 88 A 8 8 0 0 1 318 80 L 482 80 A 8 8 0 0 1 490 88 L 490 115 L 310 115 Z" fill="var(--brand-500)" />
+    <!-- Body Background -->
+    <path d="M 310 115 L 490 115 L 490 152 A 8 8 0 0 1 482 160 L 318 160 A 8 8 0 0 1 310 152 Z" fill="var(--bg-elevated)" />
+    <!-- Border -->
+    <rect x="310" y="80" width="180" height="80" rx="8" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+
+    <text x="400" y="103" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Dogs</text>
+    <text x="400" y="103" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">الكلاب</text>
+
+    <text x="400" y="133" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Base Class</text>
+    <text x="400" y="133" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الفئة الأساسية</text>
+
+    <text x="400" y="150" font-family="monospace" font-size="12" fill="var(--text-muted)" text-anchor="middle">class Dogs:</text>
+  </g>
+
+  <!-- Subclass Bowser -->
+  <g>
+    <rect x="90" y="250" width="180" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <line x1="90" y1="285" x2="270" y2="285" stroke="var(--brand-400)" stroke-width="2" />
+
+    <text x="180" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Bowser</text>
+    <text x="180" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">باوزر</text>
+
+    <text x="180" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Subclass</text>
+    <text x="180" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">فئة فرعية</text>
+
+    <text x="180" y="322" font-family="monospace" font-size="12" fill="var(--text-muted)" text-anchor="middle">class Bowser(Dogs):</text>
+  </g>
+
+  <!-- Subclass Fido -->
+  <g>
+    <rect x="310" y="250" width="180" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <line x1="310" y1="285" x2="490" y2="285" stroke="var(--brand-400)" stroke-width="2" />
+
+    <text x="400" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Fido</text>
+    <text x="400" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">فايدو</text>
+
+    <text x="400" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Subclass</text>
+    <text x="400" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">فئة فرعية</text>
+
+    <text x="400" y="322" font-family="monospace" font-size="12" fill="var(--text-muted)" text-anchor="middle">class Fido(Dogs):</text>
+  </g>
+
+  <!-- Subclass Wingnut -->
+  <g>
+    <rect x="530" y="250" width="180" height="80" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <line x1="530" y1="285" x2="710" y2="285" stroke="var(--brand-400)" stroke-width="2" />
+
+    <text x="620" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Wingnut</text>
+    <text x="620" y="273" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">وينغنات</text>
+
+    <text x="620" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Subclass</text>
+    <text x="620" y="305" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">فئة فرعية</text>
+
+    <text x="620" y="322" font-family="monospace" font-size="12" fill="var(--text-muted)" text-anchor="middle">class Wingnut(Dogs):</text>
+  </g>
+
+  <!-- Syntax Example Box -->
+  <g>
+    <rect x="200" y="350" width="400" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-dasharray="4 4" />
+    <text x="400" y="373" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Example: <tspan font-family="monospace" fill="var(--brand-ink)">class Bowser(Dogs): pass</tspan></text>
+    <text x="400" y="373" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مثال: <tspan font-family="monospace" fill="var(--brand-ink)">class Bowser(Dogs): pass</tspan></text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم الكلمة المفتاحية <code>pass</code> عند إنشاء فئة فرعية جديدة؟</template>
+      <template class="content-en">Why do we use the <code>pass</code> keyword when creating a new subclass?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نستخدمها لإخبار بايثون أن الفئة فارغة حالياً، وذلك لتجنب ظهور رسالة خطأ (Syntax Error) أثناء اختبار الكود قبل إضافة الخصائص والطرق الخاصة بالفئة.</p></template>
+      <template class="content-en"><p>We use it to tell Python that the class is currently empty, avoiding a syntax error during testing before adding specific attributes and methods.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="overriding-and-extending" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تجاوز القيم وتوسيع الفئات الفرعية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Overriding and Extending Subclasses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن للفئة الفرعية تغيير (تجاوز) القيم الافتراضية للفئة الأساسية، أو إضافة معلمات جديدة خاصة بها باستخدام دالة <code>super()</code>.</p></template>
+    <template class="content-en"><p>A subclass can change (override) the default values of the base class, or add its own new parameters using the <code>super()</code> function.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>من أبسط الأشياء التي يمكن القيام بها باستخدام الفئة الفرعية هو إعطاء سمة (Attribute) لها قيمة افتراضية في الفئة الأساسية قيمة أخرى جديدة (Overriding).</p><p>إذا كان لأعضاء الفئة الفرعية قيمة معلمة (Parameter) لا يمتلكها الأعضاء الآخرون، فستحتاج الفئة الفرعية إلى دالة <code>__init__</code> خاصة بها.</p><p>يجب أن تحتوي هذه الدالة على كل ما هو موجود في <code>__init__</code> الخاصة بالفئة الأساسية، بالإضافة إلى أي معلمات إضافية. لتمرير المعلمات الأساسية إلى الفئة الأم، نستخدم <code>super().__init__()</code>.</p></template>
+    <template class="content-en"><p>One of the simplest things you can do with a subclass is to give an attribute that has a default value in the base class some other value (<span class="smart-term" data-term-en="Overriding" data-ar="التجاوز / التخطي" data-en-def="Providing a new implementation or value in a subclass for an attribute or method defined in the base class.">Overriding<span class="smart-term-tooltip"></span></span>).</p><p>If members of a subclass have a parameter value that other members don't, your subclass will need its own <code>__init__</code> method.</p><p>This method must contain everything that's in the base class's <code>__init__</code>, plus any extra stuff you want to pass. To pass the base parameters up to the parent class, we use <code>super().__init__()</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>super()</code> يضمن التهيئة الصحيحة للفئة الأساسية دون الحاجة إلى كتابة اسم الفئة الأساسية صراحةً، مما يجعل الكود أكثر مرونة وقابلية للصيانة، خاصة في حالات الوراثة المتعددة.</p><p>إذا نسيت استدعاء <code>super().__init__()</code> في الفئة الفرعية، فلن يتم تهيئة السمات المعرفة في الفئة الأساسية، مما سيؤدي إلى أخطاء <code>AttributeError</code> عند محاولة الوصول إليها.</p></template>
+    <template class="content-en"><p>Using <code>super()</code> ensures proper initialization of the base class without explicitly naming it, making the code more maintainable and robust, especially in multiple inheritance scenarios.</p><p>If you forget to call <code>super().__init__()</code> in the subclass, the attributes defined in the base class will not be initialized, leading to <code>AttributeError</code> when trying to access them.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا قمنا بتعريف <code>__init__</code> في الفئة الفرعية ولم نستدعِ <code>super().__init__()</code>؟</template>
+      <template class="content-en">What happens if we define <code>__init__</code> in a subclass but do not call <code>super().__init__()</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن يتم تنفيذ كود التهيئة الخاص بالفئة الأساسية، وبالتالي لن يتم إنشاء المتغيرات (Attributes) الخاصة بالفئة الأساسية للكائن الجديد.</p></template>
+      <template class="content-en"><p>The initialization code of the base class will not execute, meaning the base class attributes will not be created for the new object.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="method-resolution" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تجاوز الطرق (Method Overriding)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Method Overriding and Resolution</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عند وجود طريقة (Method) بنفس الاسم في الفئة الأساسية والفئة الفرعية، تختار بايثون دائماً الطريقة الأكثر تحديداً (الموجودة في الفئة الفرعية).</p></template>
+    <template class="content-en"><p>When a method with the same name exists in both the base and subclass, Python always opts for the most specific one (the one in the subclass).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل الطرق (Methods) المعرفة في الفئة الأساسية بنفس الطريقة بالنسبة للفئات الفرعية. يمكن للفئة الفرعية استدعاء أي طريقة موجودة في الفئة الأساسية.</p><p>ومع ذلك، إذا قمت بتعريف طريقة في الفئة الفرعية تحمل نفس اسم طريقة في الفئة الأساسية، فإن بايثون ستستخدم الطريقة الأكثر تحديداً (الخاصة بالفئة الفرعية).</p><p>لن تستخدم بايثون الطريقة العامة من الفئة الأساسية إلا إذا لم يكن هناك طريقة بنفس الاسم في الفئة الفرعية.</p></template>
+    <template class="content-en"><p>Methods in the base class work the same for subclasses as they do for the base class. A subclass can call any method defined in its parent.</p><p>However, if you define a method in the subclass with the exact same name as one in the base class, Python will always opt for the most specific one, the one tied to the subclass.</p><p>It will use the more generic method from the base class only if nothing in the subclass has that method name.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُعرف هذه الآلية باسم (Method Resolution Order - MRO).</p><p>تبحث بايثون عن الطريقة في الفئة الحالية أولاً، ثم تنتقل إلى الفئة الأساسية، وهكذا صعوداً في شجرة الوراثة.</p><p>هذا يسمح بتطبيق مبدأ تعدد الأشكال (Polymorphism)، حيث يمكن لكل فئة فرعية تقديم تنفيذ مخصص لطريقة عامة (مثل دالة <code>get_status()</code> التي ترجع رسالة مختلفة لكل نوع مستخدم).</p></template>
+    <template class="content-en"><p>This mechanism is governed by the Method Resolution Order (MRO).</p><p>Python looks for the method in the current class first, then moves up to the base class, and so on up the inheritance tree.</p><p>This enables Polymorphism, where each subclass can provide a customized implementation of a generic method (e.g., a <code>get_status()</code> method returning a different message for each user type).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Specific Exception (e.g., FileNotFoundError)</th><th>Generic Exception (Exception)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دقة اكتشاف الأخطاء</template>
+          <template class="content-en">Debugging Accuracy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية جداً، تحدد المشكلة بدقة</template>
+          <template class="content-en">Very high, pinpoints the exact issue</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفضة، تخفي السبب الحقيقي</template>
+          <template class="content-en">Low, hides the true cause</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الترتيب في كتل except</template>
+          <template class="content-en">Order in except blocks</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب وضعها في الأعلى</template>
+          <template class="content-en">Must be placed at the top</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب وضعها في الأسفل كشبكة أمان</template>
+          <template class="content-en">Must be placed at the bottom as a safety net</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن للفئة الفرعية استخدام تنفيذ الطريقة من الفئة الأساسية مع إضافة تعديلات عليها؟</template>
+      <template class="content-en">How can a subclass use the base class's method implementation while adding modifications to it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكنها استدعاء طريقة الفئة الأساسية داخل طريقتها الخاصة باستخدام <code>super().method_name()</code> ثم إضافة الكود الإضافي.</p></template>
+      <template class="content-en"><p>It can call the base class's method inside its own method using <code>super().method_name()</code> and then add the additional code.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="understanding-exceptions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> فهم الاستثناءات (Exceptions)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Understanding Exceptions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاستثناء هو خطأ يحدث في العالم الحقيقي (مثل عدم وجود ملف) يمنع البرنامج من العمل بشكل صحيح، وليس خطأ في كتابة الكود (Syntax Error).</p></template>
+    <template class="content-en"><p>An exception is a real-world error (like a missing file) that prevents the program from running properly, not a programming syntax error.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في بايثون (وجميع لغات البرمجة الأخرى)، يشير مصطلح <span class="smart-term" data-term-en="Exception" data-ar="الاستثناء" data-en-def="An event that occurs during the execution of a program that disrupts the normal flow of instructions.">الاستثناء<span class="smart-term-tooltip"></span></span> (Exception) إلى خطأ لا يرجع إلى خطأ في البرمجة (مثل نسيان قوس)، بل هو خطأ في العالم الحقيقي يمنع البرنامج من العمل.</p><p>مثال بسيط: محاولة فتح ملف غير موجود باستخدام <code>open(filename)</code> ستؤدي إلى استثناء من نوع <code>FileNotFoundError</code>.</p><p>عند حدوث استثناء، تعرض بايثون <b>Traceback</b> (<span class="smart-term" data-term-en="Traceback" data-ar="تتبع الأثر" data-en-def="A report containing the function calls made in your code at a specific point, usually when an error occurs.">تتبع الأثر<span class="smart-term-tooltip"></span></span>)، وهو قائمة بالاستثناءات التي حدثت، مع إدراج أحدثها أولاً.</p><p>يُطلق على عملية إحداث الاستثناء مصطلح <i>throw an exception</i> أو <i>raise an exception</i>، وكلاهما يحمل نفس المعنى.</p></template>
+    <template class="content-en"><p>In Python (and all other programming languages), the term <span class="smart-term" data-term-en="Exception" data-ar="الاستثناء" data-en-def="An event that occurs during the execution of a program that disrupts the normal flow of instructions.">exception<span class="smart-term-tooltip"></span></span> refers to an error that isn't due to a programming error (like a missing parenthesis).</p><p>Rather, it's an error in the real world that prevents the program from running properly.</p><p>A simple example: trying to open a non-existent file using <code>open(filename)</code> will result in a <code>FileNotFoundError</code>.</p><p>When an exception occurs, Python displays a <b><span class="smart-term" data-term-en="Traceback" data-ar="تتبع الأثر" data-en-def="A report containing the function calls made in your code at a specific point, usually when an error occurs.">Traceback<span class="smart-term-tooltip"></span></span></b>, which is a reference to the fact that if there were multiple exceptions, they'd all be listed, with the most recent listed first.</p><p>Triggering an error is called <i>throwing</i> or <i>raising</i> an exception.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التمييز بين أخطاء بناء الجملة (Syntax Errors) والاستثناءات (Exceptions) أمر بالغ الأهمية. أخطاء بناء الجملة تمنع الكود من الترجمة/التشغيل من الأساس، بينما الاستثناءات تحدث أثناء وقت التشغيل (Runtime).</p><p>يوفر الـ Traceback معلومات حيوية لتصحيح الأخطاء (Debugging)، حيث يوضح بالضبط السطر الذي تسبب في المشكلة وسلسلة استدعاءات الدوال التي أدت إليه.</p></template>
+    <template class="content-en"><p>Distinguishing between Syntax Errors and Exceptions is crucial. Syntax errors prevent the code from even compiling/running, whereas exceptions occur during runtime.</p><p>The Traceback provides vital debugging information, showing exactly which line caused the issue and the chain of function calls that led to it.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن لبرنامج خالٍ تماماً من أخطاء البرمجة (Syntax Errors) أن ينهار؟ ولماذا؟</template>
+      <template class="content-en">Can a program completely free of syntax errors still crash? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، بسبب الاستثناءات (Exceptions) التي تحدث أثناء وقت التشغيل نتيجة عوامل خارجية، مثل انقطاع الاتصال بالإنترنت أو محاولة قراءة ملف محذوف.</p></template>
+      <template class="content-en"><p>Yes, due to runtime Exceptions caused by external factors, such as a dropped internet connection or attempting to read a deleted file.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="handling-errors-gracefully" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> معالجة الأخطاء بسلاسة (try...except)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Handling Errors Gracefully</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نستخدم كتل <code>try...except</code> لالتقاط الأخطاء المحتملة وعرض رسائل مفهومة للمستخدم بدلاً من انهيار التطبيق.</p></template>
+    <template class="content-en"><p>We use <code>try...except</code> blocks to catch potential errors and display user-friendly messages instead of crashing the application.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أفضل طريقة للتعامل مع خطأ (مثل عدم العثور على ملف) هي استبدال رسالة الخطأ الافتراضية المعقدة لبايثون بشيء يسهل على المستخدم فهمه.</p><p>للقيام بذلك، نستخدم كتلة <code>try ... except</code> بالصيغة التالية:</p><p>يمكنك تكديس (Stack) عدة عبارات <code>except</code> للتعامل مع أخطاء مختلفة بشكل منفصل.</p><p>عند حدوث استثناء، تتحقق بايثون من كل عبارة <code>except</code> بدءاً من الأعلى، وتنفذ أول عبارة تتطابق مع نوع الخطأ.</p></template>
+    <template class="content-en"><p>The best way to handle an error (like file not found) is to replace what Python normally displays with something the person using the app is more likely to understand.</p><p>To do that, you can code a <code>try ... except</code> block using this basic syntax:</p><p>You can stack up <code>except:</code> statements in a try block to handle different errors. When the exception occurs, it looks at each one starting at the top. If it finds a handler that matches the exception, it raises that one.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ترتيب كتل <code>except</code> مهم جداً. يجب دائماً وضع الاستثناءات الأكثر تحديداً (مثل <code>FileNotFoundError</code>) في الأعلى، والاستثناءات العامة (مثل <code>Exception</code>) في الأسفل كشبكة أمان (Catch-all).</p><p>إذا وضعت <code>except Exception:</code> في الأعلى، فستلتقط جميع الأخطاء ولن يتم تنفيذ كتل <code>except</code> المحددة التي تليها أبداً.</p></template>
+    <template class="content-en"><p>The order of <code>except</code> blocks is critical.</p><p>You must always place the most specific exceptions (like <code>FileNotFoundError</code>) at the top, and the generic ones (like <code>Exception</code>) at the bottom as a catch-all safety net.</p><p>If you place <code>except Exception:</code> at the top, it will catch everything, and the specific handlers below it will never be reached (unreachable code).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>try:
+    # The things you want the code to do
+except Exception:
+    # What to do if it can't do what you want it to do</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر الاعتماد فقط على <code>except Exception:</code> ممارسة برمجية سيئة؟</template>
+      <template class="content-en">Why is relying solely on <code>except Exception:</code> considered a bad programming practice?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يخفي السبب الحقيقي للخطأ ويجعل عملية اكتشاف الأخطاء (Debugging) صعبة للغاية، حيث يتم التعامل مع جميع الأخطاء بنفس الطريقة.</p></template>
+      <template class="content-en"><p>Because it hides the true cause of the error and makes debugging very difficult, as all errors are treated the exact same way.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="else-and-finally" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> استخدام else و finally</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Using try ... except ... else ... finally</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُنفذ كتلة <code>else</code> فقط إذا لم تحدث أي أخطاء، بينما تُنفذ كتلة <code>finally</code> دائماً بغض النظر عما حدث.</p></template>
+    <template class="content-en"><p>The <code>else</code> block runs only if no exceptions occurred, while the <code>finally</code> block runs no matter what happened.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الحياة الواقعية، قد ترغب في استمرار تنفيذ الكود بشكل طبيعي فقط إذا لم تحدث أخطاء. يمكنك استخدام كتلة <code>else</code> لهذا الغرض. يتم وضعها بعد كتل <code>except</code>.</p><p>من خلال قصر كتلة <code>try</code> على السطر الذي يُحتمل أن يسبب الخطأ فقط، ووضع باقي الكود في <code>else</code>، نمنع الكود من الاستمرار إذا حدث خطأ.</p><p>الصيغة الكاملة لمعالجة الاستثناءات تتضمن أيضاً <code>finally</code> في النهاية. الكود الموجود داخل <code>finally</code> يتم تنفيذه دائماً عند انتهاء كتلة <code>try</code>، سواء حدث خطأ أم لا.</p></template>
+    <template class="content-en"><p>In real life, if there's no error, you want execution to continue normally.</p><p>You can use the <code>else</code> block for this condition, placed after the <code>except</code> blocks.</p><p>By limiting <code>try:</code> to the one thing that's most likely to raise an exception, and putting the rest in <code>else</code>, we can stop the code dead in its tracks before it tries to go any further.</p><p>The complete syntax also includes <code>finally:</code> at the end.</p><p>The <code>finally</code> code is executed when the try block ends no matter what happened above.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُستخدم كتلة <code>finally</code> بشكل أساسي لعمليات التنظيف (Cleanup actions)، مثل إغلاق الملفات المفتوحة (<code>file.close()</code>) أو إنهاء اتصالات قواعد البيانات، لضمان تحرير الموارد حتى لو انهار البرنامج بسبب خطأ غير متوقع.</p><p>فصل الكود الناجح في كتلة <code>else</code> يجعل كتلة <code>try</code> أصغر وأكثر تركيزاً، مما يقلل من خطر التقاط استثناءات غير مقصودة من أسطر كود أخرى.</p></template>
+    <template class="content-en"><p>The <code>finally</code> block is primarily used for cleanup actions, such as closing open files (<code>file.close()</code>) or terminating database connections, ensuring resources are freed even if the program crashes due to an unexpected error.</p><p>Separating the successful execution code into the <code>else</code> block keeps the <code>try</code> block small and focused, reducing the risk of accidentally catching exceptions from unrelated lines of code.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A flowchart showing the execution path of try-except-else-finally. Start -> 'try' block. Decision node: 'Exception occurred?'. If Yes -> 'except' block -> 'finally' block. If No -> 'else' block -> 'finally' block. Style: educational, dark background #0d1117, accent colors (green for else, red for except, blue for finally), viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)"/>
+      <stop offset="100%" stop-color="var(--brand-600)"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Arrows / Paths -->
+  <!-- Start to Try -->
+  <line x1="400" y1="60" x2="400" y2="100" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Try to Decision -->
+  <line x1="400" y1="160" x2="400" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Decision to Except (Yes) -->
+  <path d="M 320 240 L 200 240 L 200 320" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Decision to Else (No) -->
+  <path d="M 480 240 L 600 240 L 600 320" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Except to Finally -->
+  <path d="M 200 380 L 200 470 L 320 470" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Else to Finally -->
+  <path d="M 600 380 L 600 470 L 480 470" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- Finally to End -->
+  <line x1="400" y1="500" x2="400" y2="540" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Global Text Group for Font Family -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    
+    <!-- Start Node -->
+    <rect x="340" y="20" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="400" y="45" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Start</text>
+    <text x="400" y="45" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">البداية</text>
+
+    <!-- Try Block -->
+    <rect x="320" y="100" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="400" y="122" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">try block</text>
+    <text x="400" y="122" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">كتلة try</text>
+    <text x="400" y="142" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Execute risky code</text>
+    <text x="400" y="142" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">تنفيذ الكود المعرض للخطأ</text>
+
+    <!-- Decision Node -->
+    <polygon points="400,190 480,240 400,290 320,240" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="400" y="232" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">Exception</text>
+    <text x="400" y="232" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">هل حدث</text>
+    <text x="400" y="252" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">occurred?</text>
+    <text x="400" y="252" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">استثناء؟</text>
+
+    <!-- Except Block -->
+    <rect x="120" y="320" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="200" y="342" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">except block</text>
+    <text x="200" y="342" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">كتلة except</text>
+    <text x="200" y="362" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Handle the error</text>
+    <text x="200" y="362" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">معالجة الخطأ</text>
+
+    <!-- Else Block -->
+    <rect x="520" y="320" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="600" y="342" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">else block</text>
+    <text x="600" y="342" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">كتلة else</text>
+    <text x="600" y="362" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Run if no errors</text>
+    <text x="600" y="362" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">تُنفذ إذا لم يحدث خطأ</text>
+
+    <!-- Finally Block -->
+    <rect x="320" y="440" width="160" height="60" rx="8" fill="url(#brandGradient)" stroke="none" filter="url(#shadow)"/>
+    <text x="400" y="462" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">finally block</text>
+    <text x="400" y="462" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="16" font-weight="bold">كتلة finally</text>
+    <text x="400" y="482" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="13" opacity="0.9">Always executes</text>
+    <text x="400" y="482" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="13" opacity="0.9">تُنفذ دائماً</text>
+
+    <!-- End Node -->
+    <rect x="340" y="540" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)"/>
+    <text x="400" y="565" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Continue</text>
+    <text x="400" y="565" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">متابعة</text>
+
+    <!-- Path Labels (Yes / No) -->
+    <text x="260" y="232" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">Yes</text>
+    <text x="260" y="232" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">نعم</text>
+
+    <text x="540" y="232" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">No</text>
+    <text x="540" y="232" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="14" font-weight="bold">لا</text>
+    
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا أمر <code>return</code> داخل كتلة <code>try</code>، هل سيتم تنفيذ كتلة <code>finally</code>؟</template>
+      <template class="content-en">If we have a <code>return</code> statement inside the <code>try</code> block, will the <code>finally</code> block still execute?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، كتلة <code>finally</code> مضمونة التنفيذ دائماً، حتى لو تم استدعاء <code>return</code> أو <code>break</code> أو <code>continue</code> داخل كتل <code>try</code> أو <code>except</code>.</p></template>
+      <template class="content-en"><p>Yes, the <code>finally</code> block is guaranteed to execute, even if a <code>return</code>, <code>break</code>, or <code>continue</code> statement is encountered in the <code>try</code> or <code>except</code> blocks.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-exceptions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> إنشاء استثناءات مخصصة (Custom Exceptions)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Raising Your Own Exceptions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك إنشاء أخطاء خاصة بتطبيقك (مثل <code>EmptyFileError</code>) باستخدام الكلمة المفتاحية <code>raise</code> ووراثة فئة <code>Exception</code>.</p></template>
+    <template class="content-en"><p>You can create application-specific errors (like <code>EmptyFileError</code>) using the <code>raise</code> keyword and inheriting from the <code>Exception</code> class.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحتوي بايثون على العديد من الاستثناءات المدمجة (Built-in)، ولكنك لست مقيداً بها. إذا كان تطبيقك يحتوي على حالة خطأ غير مغطاة، يمكنك اختراع استثناء خاص بك.</p><p>الصيغة العامة لإحداث خطأ هي: <code>raise error</code> (مثل <code>raise FileNotFoundError</code>). أو يمكنك ببساطة استخدام <code>raise Exception</code>.</p><p>لإنشاء استثناء مخصص بالكامل، نقوم بتعريف فئة جديدة ترث من الفئة الأساسية <code>Exception</code>:</p><p>بعد ذلك، يمكننا استخدام <code>raise EmptyFileError</code> في الكود الخاص بنا والتقاطه باستخدام <code>except EmptyFileError:</code>.</p></template>
+    <template class="content-en"><p>Python has lots of built-in exceptions, but you aren't limited to them. If your app has a vulnerability that isn't covered by the built-in exceptions, you can invent your own.</p><p>The general syntax for raising your own error is: <code>raise error</code> (e.g., <code>raise FileNotFoundError</code>). Or you can just use <code>raise Exception</code>.</p><p>To create a fully custom exception, we define a new class that inherits from the base <code>Exception</code> class:</p><p>Then, we can use <code>raise EmptyFileError</code> in our code and catch it using <code>except EmptyFileError:</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُعد الاستثناءات المخصصة ضرورية لبناء واجهات برمجة تطبيقات (APIs) ومكتبات قوية، حيث تسمح للمطورين الآخرين الذين يستخدمون الكود الخاص بك بالتقاط أخطاء محددة جداً تتعلق بمنطق العمل (Business Logic) بدلاً من الاعتماد على أخطاء بايثون العامة.</p><p>عندما تكون الموارد الخارجية مفقودة أو غير كافية، لا يجب أن تترك البرنامج ينهار ويعرض رسالة خطأ معقدة للمستخدمين، بل التقط الاستثناء واعرض رسالة توضح المشكلة بدقة.</p></template>
+    <template class="content-en"><p>Custom exceptions are essential for building robust APIs and libraries. They allow other developers using your code to catch very specific business-logic errors rather than relying on generic Python errors.</p><p>When outside resources are missing or insufficient, you don't have to let the program just crash and display a nerd-o-rama error message. Catch the exception and show users text that tells them exactly what's wrong.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class EmptyFileError(Exception):
+    pass</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نرث من فئة <code>Exception</code> عند إنشاء خطأ مخصص بدلاً من إنشاء فئة عادية؟</template>
+      <template class="content-en">Why do we inherit from the <code>Exception</code> class when creating a custom error instead of creating a regular class?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن بايثون تتطلب أن تكون جميع الكائنات التي يتم إحداثها باستخدام <code>raise</code> مشتقة من الفئة الأساسية <code>BaseException</code> (والتي تعتبر <code>Exception</code> جزءاً منها).</p></template>
+      <template class="content-en"><p>Because Python requires that all objects raised using the <code>raise</code> keyword must be derived from the <code>BaseException</code> class (of which <code>Exception</code> is a subclass).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه المراجعة السريعة. اليوم ركزنا على مفهومين ينقلان كود بايثون الخاص بك من مستوى 'مبتدئ' إلى 'محترف': الوراثة (Inheritance) ومعالجة الاستثناءات (Exception Handling). تخيل الوراثة كشجرة عائلة؛ الفئة الأساسية هي الجد، والفئات الفرعية هي الأحفاد الذين يرثون الصفات ولكن يمكنهم أيضاً إضافة لمساتهم الخاصة (عبر Overriding و super). أما بالنسبة للاستثناءات، ففي العالم الحقيقي، الأشياء تتعطل (ملفات مفقودة، انقطاع إنترنت). بدلاً من ترك برنامجك ينهار بشكل قبيح، نستخدم <code>try...except</code> لالتقاط هذه الأخطاء بأناقة. تذكر دائماً الفخ الكلاسيكي في الامتحانات: ترتيب كتل <code>except</code>! ضع الاستثناءات المحددة أولاً، واترك <code>Exception</code> العام في النهاية كشبكة أمان. ولا تنسَ أن <code>finally</code> هو صديقك الوفي الذي ينظف الفوضى (مثل إغلاق الملفات) بغض النظر عما يحدث. ركزوا على هذه النقاط، وستكونون مستعدين تماماً!</template>
+    <template class="content-en">Welcome everyone to this quick review. Today we focused on two concepts that elevate your Python code from 'beginner' to 'pro': Inheritance and Exception Handling. Think of inheritance like a family tree; the base class is the parent, and subclasses inherit traits but can also add their own flavor (via overriding and super). As for exceptions, in the real world, things break (missing files, dropped connections). Instead of letting your program crash ugly, we use <code>try...except</code> to catch these gracefully. Always remember the classic exam trap: the order of <code>except</code> blocks! Put specific exceptions first, and leave the generic <code>Exception</code> at the bottom as a safety net. And don't forget that <code>finally</code> is your loyal friend that cleans up the mess (like closing files) no matter what happens. Focus on these points, and you'll be perfectly prepared!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الوراثة (Inheritance) في البرمجة كائنية التوجه؟</template>
+          <template class="content-en">Why do we use Inheritance in Object-Oriented Programming?</template>
+          <span class="content-target">لماذا نستخدم الوراثة (Inheritance) في البرمجة كائنية التوجه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لإعادة استخدام الكود وتجنب التكرار. نضع الخصائص المشتركة في فئة أساسية، ونجعل الفئات الفرعية ترثها وتضيف خصائصها المحددة.</template>
+          <template class="content-en">To reuse code and avoid duplication. We put common attributes in a base class, and have subclasses inherit them and add their specific features.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة الكلمة المفتاحية <code>pass</code>؟</template>
+          <template class="content-en">What is the function of the <code>pass</code> keyword?</template>
+          <span class="content-target">ما هي وظيفة الكلمة المفتاحية <code>pass</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم كعنصر نائب (Placeholder) لإخبار بايثون بتجاهل الكتلة الفارغة، مما يمنع حدوث أخطاء بناء الجملة (Syntax Errors) أثناء بناء هيكل الكود.</template>
+          <template class="content-en">It is used as a placeholder to tell Python to ignore the empty block, preventing Syntax Errors while building the code structure.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نمرر المعلمات من الفئة الفرعية إلى الفئة الأساسية؟</template>
+          <template class="content-en">How do we pass parameters from a subclass to a base class?</template>
+          <span class="content-target">كيف نمرر المعلمات من الفئة الفرعية إلى الفئة الأساسية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام الدالة <code>super().__init__()</code> داخل دالة التهيئة الخاصة بالفئة الفرعية.</template>
+          <template class="content-en">By using the <code>super().__init__()</code> function inside the subclass's initialization method.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين خطأ بناء الجملة (Syntax Error) والاستثناء (Exception)؟</template>
+          <template class="content-en">What is the difference between a Syntax Error and an Exception?</template>
+          <span class="content-target">ما الفرق بين خطأ بناء الجملة (Syntax Error) والاستثناء (Exception)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">خطأ بناء الجملة هو خطأ في كتابة الكود يمنع تشغيله. الاستثناء هو خطأ يحدث أثناء التشغيل بسبب مشكلة خارجية (مثل ملف مفقود).</template>
+          <template class="content-en">A syntax error is a typo in the code that prevents it from running. An exception is a runtime error caused by an external issue (like a missing file).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو تتبع الأثر (Traceback)؟</template>
+          <template class="content-en">What is a Traceback?</template>
+          <span class="content-target">ما هو تتبع الأثر (Traceback)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تقرير تعرضه بايثون عند حدوث استثناء، يوضح تسلسل استدعاءات الدوال والسطر الدقيق الذي تسبب في الخطأ.</template>
+          <template class="content-en">It is a report Python displays when an exception occurs, showing the sequence of function calls and the exact line that caused the error.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يجب وضع الاستثناءات المحددة قبل الاستثناء العام <code>Exception</code>؟</template>
+          <template class="content-en">Why must specific exceptions be placed before the generic <code>Exception</code>?</template>
+          <span class="content-target">لماذا يجب وضع الاستثناءات المحددة قبل الاستثناء العام <code>Exception</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن بايثون تقيم كتل <code>except</code> من الأعلى للأسفل. إذا كان الاستثناء العام في الأعلى، فسيلتقط كل شيء ولن يتم تنفيذ الكتل المحددة أبداً.</template>
+          <template class="content-en">Because Python evaluates <code>except</code> blocks from top to bottom. If the generic exception is at the top, it catches everything and specific blocks will never run.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يتم تنفيذ الكود الموجود داخل كتلة <code>else</code>؟</template>
+          <template class="content-en">When is the code inside the <code>else</code> block executed?</template>
+          <span class="content-target">متى يتم تنفيذ الكود الموجود داخل كتلة <code>else</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم تنفيذه فقط إذا اكتملت كتلة <code>try</code> بنجاح تام دون إحداث أي استثناءات.</template>
+          <template class="content-en">It is executed only if the <code>try</code> block completes entirely successfully without raising any exceptions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة الرئيسية لكتلة <code>finally</code>؟</template>
+          <template class="content-en">What is the main benefit of the <code>finally</code> block?</template>
+          <span class="content-target">ما هي الفائدة الرئيسية لكتلة <code>finally</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تضمن تنفيذ كود معين (مثل إغلاق الملفات أو تحرير الموارد) بغض النظر عما إذا حدث خطأ أم لا.</template>
+          <template class="content-en">It guarantees the execution of specific code (like closing files or freeing resources) regardless of whether an error occurred or not.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف ننشئ استثناءً مخصصاً (Custom Exception)؟</template>
+          <template class="content-en">How do we create a Custom Exception?</template>
+          <span class="content-target">كيف ننشئ استثناءً مخصصاً (Custom Exception)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نقوم بإنشاء فئة جديدة ترث من الفئة الأساسية <code>Exception</code> (مثال: <code>class MyError(Exception): pass</code>).</template>
+          <template class="content-en">We create a new class that inherits from the base <code>Exception</code> class (e.g., <code>class MyError(Exception): pass</code>).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تفعل الكلمة المفتاحية <code>raise</code>؟</template>
+          <template class="content-en">What does the <code>raise</code> keyword do?</template>
+          <span class="content-target">ماذا تفعل الكلمة المفتاحية <code>raise</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم لإحداث (رمي) استثناء بشكل متعمد في الكود، سواء كان استثناءً مدمجاً أو مخصصاً.</template>
+          <template class="content-en">It is used to intentionally trigger (throw) an exception in the code, whether built-in or custom.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الفئة الأساسية (Base Class)؟",
+      "en": "What is a Base Class?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي الفئة الأم التي ترث منها الفئات الفرعية السمات والطرق.",
+        "en": "The parent class from which subclasses inherit attributes and methods."
+      },
+      "example": {
+        "ar": "فئة <code>Member</code> التي ترث منها فئة <code>Admin</code>.",
+        "en": "The <code>Member</code> class from which the <code>Admin</code> class inherits."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي الفئة الفرعية (Subclass)؟",
+      "en": "What is a Subclass?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فئة تكتسب (ترث) الخصائص والطرق من فئة أساسية.",
+        "en": "A class that acquires (inherits) attributes and methods from a base class."
+      },
+      "example": {
+        "ar": "<code>class Admin(Member):</code>",
+        "en": "<code>class Admin(Member):</code>"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما فائدة الكلمة المفتاحية <code>pass</code> في تعريف الفئات؟",
+      "en": "What is the purpose of the <code>pass</code> keyword in class definitions?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم كعنصر نائب لتجنب أخطاء بناء الجملة عندما تكون الفئة فارغة مؤقتاً.",
+        "en": "Used as a placeholder to avoid syntax errors when a class is temporarily empty."
+      },
+      "example": {
+        "ar": "<code>class User(Member): pass</code>",
+        "en": "<code>class User(Member): pass</code>"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي وظيفة الدالة <code>super()</code>؟",
+      "en": "What is the function of <code>super()</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لاستدعاء طرق الفئة الأساسية (مثل <code>__init__</code>) من داخل الفئة الفرعية.",
+        "en": "Used to call base class methods (like <code>__init__</code>) from within a subclass."
+      },
+      "example": {
+        "ar": "<code>super().__init__(firstname, lastname)</code>",
+        "en": "<code>super().__init__(firstname, lastname)</code>"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ماذا يحدث عند تعريف طريقة في الفئة الفرعية بنفس اسم طريقة في الفئة الأساسية؟",
+      "en": "What happens when a method in a subclass has the same name as one in the base class?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتجاوز (Override) طريقة الفئة الفرعية طريقة الفئة الأساسية؛ تختار بايثون الطريقة الأكثر تحديداً.",
+        "en": "The subclass method overrides the base class method; Python opts for the most specific one."
+      },
+      "example": {
+        "ar": "تعريف <code>get_status()</code> مخصص في فئة <code>Admin</code>.",
+        "en": "Defining a custom <code>get_status()</code> in the <code>Admin</code> class."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الاستثناء (Exception)؟",
+      "en": "What is an Exception?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خطأ يحدث أثناء وقت التشغيل بسبب مشكلة في العالم الحقيقي (مثل ملف مفقود) يمنع البرنامج من العمل.",
+        "en": "A runtime error caused by a real-world issue (like a missing file) that prevents the program from running."
+      },
+      "example": {
+        "ar": "<code>FileNotFoundError</code>",
+        "en": "<code>FileNotFoundError</code>"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو تتبع الأثر (Traceback)؟",
+      "en": "What is a Traceback?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقرير يعرض تسلسل استدعاءات الدوال التي أدت إلى حدوث الاستثناء، مع إدراج أحدثها أولاً.",
+        "en": "A report showing the sequence of function calls that led to the exception, listing the most recent first."
+      },
+      "example": {
+        "ar": "رسالة الخطأ الحمراء الطويلة في وحدة تحكم بايثون.",
+        "en": "The long red error message in the Python console."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي وظيفة كتلة <code>try</code>؟",
+      "en": "What is the purpose of the <code>try</code> block?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحتوي على الكود الذي يُحتمل أن يتسبب في حدوث استثناء (خطأ).",
+        "en": "Contains the code that might potentially raise an exception (error)."
+      },
+      "example": {
+        "ar": "<code>try: open('missing.txt')</code>",
+        "en": "<code>try: open('missing.txt')</code>"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي وظيفة كتلة <code>except</code>؟",
+      "en": "What is the purpose of the <code>except</code> block?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تلتقط الاستثناء وتحدد ما يجب فعله عند حدوث الخطأ لمنع انهيار البرنامج.",
+        "en": "Catches the exception and defines what to do when the error occurs to prevent crashing."
+      },
+      "example": {
+        "ar": "<code>except FileNotFoundError: print('File missing')</code>",
+        "en": "<code>except FileNotFoundError: print('File missing')</code>"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف تعمل عبارة <code>except Exception:</code>؟",
+      "en": "How does the <code>except Exception:</code> statement work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعمل كشبكة أمان شاملة (Catch-all) تلتقط أي استثناء لم يتم التعامل معه بواسطة كتل <code>except</code> السابقة.",
+        "en": "Acts as a catch-all safety net that handles any exception not caught by preceding specific except blocks."
+      },
+      "example": {
+        "ar": "وضعها في نهاية سلسلة كتل <code>except</code>.",
+        "en": "Placing it at the very end of a chain of <code>except</code> blocks."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "متى يتم تنفيذ كتلة <code>else</code> في معالجة الاستثناءات؟",
+      "en": "When is the <code>else</code> block executed in exception handling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تنفيذها فقط إذا اكتملت كتلة <code>try</code> بنجاح دون إحداث أي استثناءات.",
+        "en": "It is executed only if the <code>try</code> block completes successfully without raising any exceptions."
+      },
+      "example": {
+        "ar": "طباعة محتويات الملف بعد التأكد من فتحه بنجاح.",
+        "en": "Printing file contents after successfully opening it."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "متى يتم تنفيذ كتلة <code>finally</code>؟",
+      "en": "When is the <code>finally</code> block executed?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تنفيذها دائماً في النهاية، بغض النظر عما إذا حدث خطأ أم لا.",
+        "en": "It is always executed at the end, regardless of whether an error occurred or not."
+      },
+      "example": {
+        "ar": "إغلاق الملفات المفتوحة <code>file.close()</code>.",
+        "en": "Closing open files <code>file.close()</code>."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي وظيفة الكلمة المفتاحية <code>raise</code>؟",
+      "en": "What is the function of the <code>raise</code> keyword?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لإحداث (Trigger) استثناء بشكل متعمد في الكود.",
+        "en": "Used to intentionally trigger an exception in the code."
+      },
+      "example": {
+        "ar": "<code>raise ValueError('Invalid input')</code>",
+        "en": "<code>raise ValueError('Invalid input')</code>"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف تنشئ استثناءً مخصصاً (Custom Exception)؟",
+      "en": "How do you create a Custom Exception?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق إنشاء فئة جديدة ترث من الفئة الأساسية <code>Exception</code>.",
+        "en": "By creating a new class that inherits from the base <code>Exception</code> class."
+      },
+      "example": {
+        "ar": "<code>class MyError(Exception): pass</code>",
+        "en": "<code>class MyError(Exception): pass</code>"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الترتيب الصحيح لكتل معالجة الأخطاء المتعددة؟",
+      "en": "What is the correct order for multiple error handling blocks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب وضع الاستثناءات الأكثر تحديداً في الأعلى، والاستثناء العام <code>Exception</code> في الأسفل.",
+        "en": "Most specific exceptions must be at the top, and the generic <code>Exception</code> at the bottom."
+      },
+      "example": {
+        "ar": "<code>except FileNotFoundError:</code> ثم <code>except Exception:</code>",
+        "en": "<code>except FileNotFoundError:</code> then <code>except Exception:</code>"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي هو الصيغة الصحيحة لتعريف فئة فرعية (Subclass) ترث من فئة أساسية (BaseClass)؟",
+      "en": "Which of the following is the correct syntax to define a subclass inheriting from a base class?"
+    },
+    "options": {
+      "ar": [
+        "class Subclass inherits BaseClass:",
+        "class Subclass(BaseClass):",
+        "class BaseClass(Subclass):",
+        "def Subclass(BaseClass):"
+      ],
+      "en": [
+        "class Subclass inherits BaseClass:",
+        "class Subclass(BaseClass):",
+        "class BaseClass(Subclass):",
+        "def Subclass(BaseClass):"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في بايثون، يتم تمرير الفئة الأساسية كمعلمة بين قوسين بعد اسم الفئة الفرعية.",
+      "en": "In Python, the base class is passed as a parameter in parentheses after the subclass name."
+    },
+    "hint": {
+      "ar": "تذكر استخدام الأقواس.",
+      "en": "Remember to use parentheses."
+    },
+    "difficulty": "easy",
+    "conceptId": "class-inheritance"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي الكلمة المفتاحية المستخدمة لإنشاء فئة فارغة مؤقتاً دون التسبب في خطأ؟",
+      "en": "What keyword is used to temporarily create an empty class without causing an error?"
+    },
+    "options": {
+      "ar": [
+        "empty",
+        "null",
+        "pass",
+        "continue"
+      ],
+      "en": [
+        "empty",
+        "null",
+        "pass",
+        "continue"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الكلمة المفتاحية pass تخبر بايثون بتجاهل الكتلة الفارغة وتجنب أخطاء بناء الجملة.",
+      "en": "The pass keyword tells Python to ignore the empty block and avoid syntax errors."
+    },
+    "hint": {
+      "ar": "تعني 'تجاوز' أو 'مرر'.",
+      "en": "It means to 'skip' or 'move on'."
+    },
+    "difficulty": "easy",
+    "conceptId": "class-inheritance"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "كيف يمكن للفئة الفرعية استدعاء دالة التهيئة (__init__) الخاصة بالفئة الأساسية؟",
+      "en": "How can a subclass call the initialization method (__init__) of its base class?"
+    },
+    "options": {
+      "ar": [
+        "BaseClass.__init__()",
+        "parent.__init__()",
+        "super().__init__()",
+        "self.__init__()"
+      ],
+      "en": [
+        "BaseClass.__init__()",
+        "parent.__init__()",
+        "super().__init__()",
+        "self.__init__()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الدالة super() تُرجع كائناً يمثل الفئة الأم، مما يسمح باستدعاء طرقها.",
+      "en": "The super() function returns a proxy object that delegates method calls to a parent or sibling class."
+    },
+    "hint": {
+      "ar": "تبدأ بـ s.",
+      "en": "Starts with 's'."
+    },
+    "difficulty": "medium",
+    "conceptId": "overriding-and-extending"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "إذا كان للفئة الفرعية والفئة الأساسية طريقة (method) بنفس الاسم، أيهما سيتم تنفيذه عند استدعائه من كائن الفئة الفرعية؟",
+      "en": "If a subclass and a base class have a method with the same name, which one will be executed when called from a subclass object?"
+    },
+    "options": {
+      "ar": [
+        "طريقة الفئة الأساسية",
+        "طريقة الفئة الفرعية",
+        "كلاهما",
+        "سيحدث خطأ"
+      ],
+      "en": [
+        "The base class method",
+        "The subclass method",
+        "Both",
+        "An error will occur"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بايثون تختار دائماً الطريقة الأكثر تحديداً، وهي الطريقة الموجودة في الفئة الفرعية (Method Overriding).",
+      "en": "Python always opts for the most specific method, which is the one in the subclass (Method Overriding)."
+    },
+    "hint": {
+      "ar": "الأولوية للأكثر تحديداً.",
+      "en": "Priority goes to the most specific."
+    },
+    "difficulty": "medium",
+    "conceptId": "method-resolution"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو المصطلح الذي يصف خطأ في العالم الحقيقي يمنع البرنامج من العمل بشكل صحيح (مثل عدم وجود ملف)؟",
+      "en": "What term describes a real-world error that prevents the program from running properly (like a missing file)?"
+    },
+    "options": {
+      "ar": [
+        "Syntax Error",
+        "Logic Error",
+        "Exception",
+        "Bug"
+      ],
+      "en": [
+        "Syntax Error",
+        "Logic Error",
+        "Exception",
+        "Bug"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الاستثناء (Exception) هو حدث يقع أثناء تنفيذ البرنامج ويعطل التدفق الطبيعي للتعليمات.",
+      "en": "An Exception is an event that occurs during the execution of a program that disrupts the normal flow of instructions."
+    },
+    "hint": {
+      "ar": "ليس خطأ في كتابة الكود.",
+      "en": "Not a typing error in the code."
+    },
+    "difficulty": "easy",
+    "conceptId": "understanding-exceptions"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في كتلة try...except، أين يجب وضع <code>except Exception:</code> (الاستثناء الشامل) إذا كان لديك عدة كتل except؟",
+      "en": "In a try...except block, where should <code>except Exception:</code> (the catch-all) be placed if you have multiple except blocks?"
+    },
+    "options": {
+      "ar": [
+        "في الأعلى دائماً",
+        "في الأسفل دائماً",
+        "في المنتصف",
+        "لا يهم الترتيب"
+      ],
+      "en": [
+        "Always at the top",
+        "Always at the bottom",
+        "In the middle",
+        "Order doesn't matter"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب وضعه في الأسفل لأنه يلتقط أي شيء. إذا وضع في الأعلى، فلن يتم تنفيذ الاستثناءات المحددة التي تليه أبداً.",
+      "en": "It must be at the bottom because it catches everything. If placed at the top, specific exceptions below it will never run."
+    },
+    "hint": {
+      "ar": "يعمل كشبكة أمان أخيرة.",
+      "en": "It acts as a final safety net."
+    },
+    "difficulty": "hard",
+    "conceptId": "handling-errors-gracefully"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "متى يتم تنفيذ الكود الموجود داخل كتلة <code>else</code> في هيكل معالجة الاستثناءات؟",
+      "en": "When is the code inside the <code>else</code> block executed in an exception handling structure?"
+    },
+    "options": {
+      "ar": [
+        "دائماً",
+        "فقط إذا حدث استثناء",
+        "فقط إذا لم يحدث أي استثناء في كتلة try",
+        "فقط إذا فشلت كتلة finally"
+      ],
+      "en": [
+        "Always",
+        "Only if an exception occurred",
+        "Only if NO exception occurred in the try block",
+        "Only if the finally block fails"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "كتلة else مخصصة للكود الذي يجب أن يعمل فقط إذا نجحت كتلة try بالكامل دون أخطاء.",
+      "en": "The else block is for code that should only run if the try block succeeds completely without errors."
+    },
+    "hint": {
+      "ar": "عكس except.",
+      "en": "The opposite of except."
+    },
+    "difficulty": "medium",
+    "conceptId": "else-and-finally"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي كتلة يتم تنفيذها دائماً بغض النظر عما إذا حدث خطأ أم لا؟",
+      "en": "Which block is ALWAYS executed regardless of whether an error occurred or not?"
+    },
+    "options": {
+      "ar": [
+        "try",
+        "except",
+        "else",
+        "finally"
+      ],
+      "en": [
+        "try",
+        "except",
+        "else",
+        "finally"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "كتلة finally مضمونة التنفيذ، وتستخدم عادة لعمليات التنظيف مثل إغلاق الملفات.",
+      "en": "The finally block is guaranteed to execute, typically used for cleanup operations like closing files."
+    },
+    "hint": {
+      "ar": "الكلمة تعني 'في النهاية'.",
+      "en": "The word means 'in the end'."
+    },
+    "difficulty": "easy",
+    "conceptId": "else-and-finally"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الكلمة المفتاحية المستخدمة لإحداث استثناء بشكل يدوي في بايثون؟",
+      "en": "What keyword is used to manually trigger an exception in Python?"
+    },
+    "options": {
+      "ar": [
+        "throw",
+        "catch",
+        "raise",
+        "trigger"
+      ],
+      "en": [
+        "throw",
+        "catch",
+        "raise",
+        "trigger"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في بايثون، نستخدم <code>raise</code> لإحداث استثناء (على عكس لغات أخرى تستخدم throw).",
+      "en": "In Python, we use <code>raise</code> to trigger an exception (unlike other languages that use throw)."
+    },
+    "hint": {
+      "ar": "تبدأ بـ r.",
+      "en": "Starts with 'r'."
+    },
+    "difficulty": "medium",
+    "conceptId": "custom-exceptions"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف تقوم بإنشاء استثناء مخصص (Custom Exception) خاص بتطبيقك؟",
+      "en": "How do you create a custom exception specific to your application?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام دالة def CustomError():",
+        "بإنشاء فئة ترث من الفئة Exception",
+        "باستخدام الكلمة المفتاحية create_error",
+        "لا يمكن إنشاء استثناءات مخصصة في بايثون"
+      ],
+      "en": [
+        "Using def CustomError():",
+        "By creating a class that inherits from the Exception class",
+        "Using the create_error keyword",
+        "Custom exceptions cannot be created in Python"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الاستثناءات المخصصة هي ببساطة فئات (Classes) ترث من الفئة الأساسية <code>Exception</code>.",
+      "en": "Custom exceptions are simply classes that inherit from the base <code>Exception</code> class."
+    },
+    "hint": {
+      "ar": "الاستثناءات هي كائنات (Objects).",
+      "en": "Exceptions are objects."
+    },
+    "difficulty": "hard",
+    "conceptId": "custom-exceptions"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">وضع <code>except Exception:</code> قبل الاستثناءات المحددة مثل <code>except FileNotFoundError:</code>. هذا سيجعل الاستثناءات المحددة غير قابلة للوصول (Unreachable Code) لأن الاستثناء العام سيلتقط كل شيء أولاً.</template>
+    <template class="content-en">Placing <code>except Exception:</code> before specific exceptions like <code>except FileNotFoundError:</code>. This makes the specific exceptions unreachable because the generic catch-all will intercept everything first.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">ترتيب دقة الطرق (Method Resolution Order): إذا كان للفئة الفرعية والفئة الأساسية طريقة بنفس الاسم، فإن بايثون تختار دائماً الطريقة الأكثر تحديداً (الموجودة في الفئة الفرعية).</template>
+    <template class="content-en">Method Resolution Order: If a subclass and base class share a method name, Python always opts for the most specific one (the subclass method).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">على الرغم من أن المبرمجين يستخدمون مصطلحي 'throw' و 'raise' بالتبادل للإشارة إلى إحداث خطأ، إلا أن الكلمة المفتاحية الفعلية في بايثون هي <code>raise</code> فقط.</template>
+    <template class="content-en">Although programmers use 'throw' and 'raise' interchangeably to mean triggering an error, the actual keyword in Python is strictly <code>raise</code>.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">كتلة <code>finally</code> هي المكان المثالي لعمليات التنظيف (مثل <code>file.close()</code>) لأنها مضمونة التنفيذ سواء نجح الكود، أو فشل، أو حتى إذا تم استخدام <code>return</code> داخل كتلة <code>try</code>.</template>
+    <template class="content-en">The <code>finally</code> block is the perfect place for cleanup operations (like <code>file.close()</code>) because it is guaranteed to execute whether the code succeeds, fails, or even if a <code>return</code> is called inside the <code>try</code> block.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان استدعاء <code>super().__init__()</code> عند تجاوز دالة التهيئة في الفئة الفرعية. هذا سيؤدي إلى عدم تهيئة المتغيرات الخاصة بالفئة الأساسية، مما يسبب أخطاء لاحقاً.</template>
+    <template class="content-en">Forgetting to call <code>super().__init__()</code> when overriding the initialization method in a subclass. This leaves base class attributes uninitialized, causing errors later.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

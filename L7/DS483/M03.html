@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="3" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>نماذج اللغة القائمة على N-gram · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#language-modeling-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات نمذجة اللغة وتوقع الكلمات</template>
+        <template class="content-en">Language Modeling Basics &amp; Word Prediction</template>
+        <span class="content-target">أساسيات نمذجة اللغة وتوقع الكلمات</span>
+      </a>
+      <a href="#chain-rule-and-markov" class="toc-link" data-bilingual>
+        <template class="content-ar">قاعدة السلسلة وافتراض ماركوف</template>
+        <template class="content-en">Chain Rule and Markov Assumption</template>
+        <span class="content-target">قاعدة السلسلة وافتراض ماركوف</span>
+      </a>
+      <a href="#maximum-likelihood-estimation" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير الاحتمالية القصوى (MLE) لـ N-grams</template>
+        <template class="content-en">Maximum Likelihood Estimation (MLE) for N-grams</template>
+        <span class="content-target">تقدير الاحتمالية القصوى (MLE) لـ N-grams</span>
+      </a>
+      <a href="#evaluation-and-data-splits" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم النماذج وتقسيم البيانات</template>
+        <template class="content-en">Model Evaluation and Data Splits</template>
+        <span class="content-target">تقييم النماذج وتقسيم البيانات</span>
+      </a>
+      <a href="#perplexity" class="toc-link" data-bilingual>
+        <template class="content-ar">الحيرة (Perplexity)</template>
+        <template class="content-en">Perplexity</template>
+        <span class="content-target">الحيرة (Perplexity)</span>
+      </a>
+      <a href="#sampling-and-shannon-game" class="toc-link" data-bilingual>
+        <template class="content-ar">أخذ العينات ولعبة شانون</template>
+        <template class="content-en">Sampling and The Shannon Game</template>
+        <span class="content-target">أخذ العينات ولعبة شانون</span>
+      </a>
+      <a href="#generalization-and-smoothing" class="toc-link" data-bilingual>
+        <template class="content-ar">التعميم والتنعيم (Laplace Smoothing)</template>
+        <template class="content-en">Generalization and Laplace Smoothing</template>
+        <span class="content-target">التعميم والتنعيم (Laplace Smoothing)</span>
+      </a>
+      <a href="#interpolation-and-backoff" class="toc-link" data-bilingual>
+        <template class="content-ar">الاستيفاء (Interpolation) والتراجع (Backoff)</template>
+        <template class="content-en">Interpolation and Backoff</template>
+        <span class="content-target">الاستيفاء (Interpolation) والتراجع (Backoff)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">نماذج اللغة القائمة على N-gram</h1>
+      <p class="hero-description">دراسة النماذج اللغوية التأسيسية، وكيفية حساب احتمالات تسلسل الكلمات باستخدام قاعدة السلسلة وافتراض ماركوف، بالإضافة إلى طرق التقييم مثل الحيرة (Perplexity) وتقنيات التنعيم (Smoothing).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">N-gram Language Models</h1>
+      <p class="hero-description">Study of foundational language models, calculating word sequence probabilities using the Chain Rule and Markov assumption, alongside evaluation methods like Perplexity and smoothing techniques.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">نماذج اللغة</span>
+      <span class="tag">الاحتمالات</span>
+      <span class="tag">التقييم</span>
+      <span class="tag">التنعيم</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">Language Models</span>
+      <span class="tag">Probability</span>
+      <span class="tag">Evaluation</span>
+      <span class="tag">Smoothing</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح النماذج اللغوية التأسيسية ومقاييس التقييم مثل N-Grams والحيرة (Perplexity).</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق طرق التقييم مثل الحيرة وأخذ العينات لتقييم أداء نموذج اللغة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل تعميم النموذج مقابل فرط التخصيص (Overfitting) لفهم متى يتم تطبيق منهجيات التعلم الآلي المختلفة.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام تقنيات التنعيم (Smoothing) والتراجع (Backoff) لتحسين دقة نموذج اللغة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain foundational language models and evaluation metrics like N-Grams and perplexity.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply evaluation methods such as perplexity and sampling to assess language model performance.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze model generalization vs. overfitting to understand when to apply different machine learning methodologies.</span></li>
+      <li><span class="obj-icon">✦</span><span>Use smoothing and backoff techniques to improve language model accuracy for practical NLP tasks.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="language-modeling-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات نمذجة اللغة وتوقع الكلمات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Language Modeling Basics &amp; Word Prediction</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نمذجة اللغة هي مهمة التنبؤ بالكلمة التالية في تسلسل، تماماً مثل ميزة الإكمال التلقائي في هاتفك الذكي.</p></template>
+    <template class="content-en"><p>Language modeling is the task of predicting the next word in a sequence, just like autocomplete on your smartphone.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الهدف الأساسي لنموذج اللغة (LM) هو حساب احتمال جملة أو تسلسل من الكلمات $P(W) = P(w_1, w_2, ..., w_n)$، أو حساب احتمال الكلمة القادمة بناءً على الكلمات السابقة $P(w_n | w_1, w_2, ..., w_{n-1})$.</p><p>تُدرب النماذج اللغوية الكبيرة (LLMs) للتنبؤ بالكلمات من اليسار إلى اليمين (Autoregressive). وتُستخدم هذه النماذج في تطبيقات عديدة مثل التدقيق النحوي والإملائي، والتعرف على الكلام، والترجمة الآلية.</p></template>
+    <template class="content-en"><p>The core goal of a Language Model (LM) is to compute the probability of a sentence or sequence of words $P(W) = P(w_1, w_2, ..., w_n)$, or the probability of an upcoming word given the previous words $P(w_n | w_1, w_2, ..., w_{n-1})$.</p><p>Large Language Models (LLMs) are trained to predict words left-to-right (<span class="smart-term" data-term-en="Autoregressive" data-ar="الانحدار الذاتي" data-en-def="A model that predicts future values based on past values, typically generating text left-to-right.">autoregressive<span class="smart-term-tooltip"></span></span>). These models are essential for tasks like grammar/spell checking, speech recognition, and machine translation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نركز على التنبؤ بالكلمات؟ لأن إجبار النموذج على التنبؤ بالكلمة التالية يجعله يتعلم ضمنياً القواعد النحوية، والدلالات، وحتى المعرفة العامة عن العالم.</p><p>لا يمكننا ببساطة حساب الاحتمالات عن طريق عد الجمل الكاملة في مجموعة البيانات (Corpus) وتقسيمها، لأن عدد الجمل الممكنة لا نهائي، ولن نرى أبداً بيانات كافية لتقدير هذه الاحتمالات بدقة (مشكلة تناثر البيانات).</p></template>
+    <template class="content-en"><p>Why focus on word prediction? Because forcing a model to predict the next word implicitly requires it to learn syntax, semantics, and world knowledge.</p><p>We cannot simply compute probabilities by counting full sentences in a corpus and dividing, because the number of possible sentences is infinite. We will never see enough data to estimate these directly (the data sparsity problem).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الاحتمال المشترك لتسلسل من الكلمات.</strong></template>
+      <template class="content-en"><strong>Joint probability of a sequence of words.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P(W) = P(w_1, w_2, ..., w_n)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفشل طريقة 'العد والقسمة' البسيطة عند محاولة حساب احتمال جملة كاملة مكونة من 20 كلمة؟</template>
+      <template class="content-en">Why does the simple 'count and divide' method fail when trying to calculate the probability of a full 20-word sentence?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بسبب مشكلة تناثر البيانات (Data Sparsity). احتمال ظهور جملة معينة مكونة من 20 كلمة بالضبط في أي مجموعة بيانات تدريبية هو شبه معدوم، مما سيجعل الاحتمال المحسوب صفراً لمعظم الجمل.</p></template>
+      <template class="content-en"><p>Due to data sparsity. The exact sequence of a specific 20-word sentence is highly unlikely to appear in any training corpus, resulting in a calculated probability of zero for most valid sentences.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="chain-rule-and-markov" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> قاعدة السلسلة وافتراض ماركوف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Chain Rule and Markov Assumption</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قاعدة السلسلة تفكك احتمال الجملة إلى احتمالات شرطية متتالية، وافتراض ماركوف يبسطها بالنظر فقط إلى الكلمات القليلة السابقة.</p></template>
+    <template class="content-en"><p>The Chain Rule breaks sentence probability into sequential conditional probabilities, and the Markov Assumption simplifies it by only looking at the last few words.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحساب الاحتمال المشترك $P(W)$، نستخدم <b>قاعدة السلسلة للاحتمالات (Chain Rule)</b>:</p><p>$P(w_1...w_n) = \prod_{k=1}^{n} P(w_k | w_1...w_{k-1})$</p><p>نظراً لأن حساب الاحتمال الشرطي بناءً على تاريخ طويل جداً أمر مستحيل عملياً، نستخدم <b><span class="smart-term" data-term-en="Markov Assumption" data-ar="افتراض ماركوف" data-en-def="The assumption that the probability of a future state depends only on the current state (or a fixed number of previous states), not on the entire sequence of events that preceded it.">افتراض ماركوف<span class="smart-term-tooltip"></span></span> (Markov Assumption)</b>. هذا الافتراض ينص على أن احتمال الكلمة يعتمد فقط على عدد محدود من الكلمات السابقة.</p><p>في نموذج <b>Bigram</b> (<span class="smart-term" data-term-en="Bigram" data-ar="ثنائي الكلمات" data-en-def="An N-gram model where N=2, meaning the probability of a word is conditioned only on the single preceding word.">ثنائي الكلمات<span class="smart-term-tooltip"></span></span>)، نفترض أن الكلمة تعتمد فقط على الكلمة التي تسبقها مباشرة: $P(w_n | w_1...w_{n-1}) \approx P(w_n | w_{n-1})$.</p></template>
+    <template class="content-en"><p>To compute the joint probability $P(W)$, we rely on the <b>Chain Rule of Probability</b>:</p><p>$P(w_1...w_n) = \prod_{k=1}^{n} P(w_k | w_1...w_{k-1})$</p><p>Since computing conditional probabilities based on a very long history is practically impossible, we use the <b><span class="smart-term" data-term-en="Markov Assumption" data-ar="افتراض ماركوف" data-en-def="The assumption that the probability of a future state depends only on the current state (or a fixed number of previous states), not on the entire sequence of events that preceded it.">Markov Assumption<span class="smart-term-tooltip"></span></span></b>. This assumption states that the probability of a word depends only on a limited number of previous words.</p><p>In a <b><span class="smart-term" data-term-en="Bigram" data-ar="ثنائي الكلمات" data-en-def="An N-gram model where N=2, meaning the probability of a word is conditioned only on the single preceding word.">Bigram<span class="smart-term-tooltip"></span></span></b> model, we approximate the history by looking only at the immediately preceding word: $P(w_n | w_1...w_{n-1}) \approx P(w_n | w_{n-1})$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشكلة الرئيسية في نماذج N-gram (التي تعتمد على افتراض ماركوف) هي عدم قدرتها على التعامل مع <b>التبعيات طويلة المدى (Long-distance dependencies)</b>. على سبيل المثال، في جملة 'الحساء الذي صنعته من كتاب الطبخ الجديد كان لذيذاً'، الكلمة 'كان' تعتمد على 'الحساء' التي ظهرت قبل عدة كلمات.</p><p>النماذج اللغوية الكبيرة الحديثة (LLMs) تحل هذه المشكلة باستخدام آليات الانتباه (Attention) التي يمكنها التعامل مع سياقات أطول بكثير دون التقيد الصارم بافتراض ماركوف القصير.</p></template>
+    <template class="content-en"><p>The main problem with N-gram models (which rely on the Markov assumption) is their inability to handle <b>long-distance dependencies</b>. For example, in 'The soups that I made from that new cookbook were delicious', the word 'were' depends on 'soups', which appeared many words ago.</p><p>Modern Large Language Models (LLMs) solve this by using attention mechanisms that can handle much longer contexts without the strict limitations of a short Markov window.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تقريب الاحتمال المشترك باستخدام نموذج Bigram (افتراض ماركوف).</strong></template>
+      <template class="content-en"><strong>Approximating joint probability using a Bigram model (Markov assumption).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P(w_1...w_n) \approx \prod_{k=1}^{n} P(w_k | w_{k-1})$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Unigram</th><th>Bigram</th><th>Trigram</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحيرة (Perplexity) على مجموعة اختبار WSJ</template>
+          <template class="content-en">Perplexity on WSJ test set</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">962 (عالية جداً)</template>
+          <template class="content-en">962 (Very High)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">170 (متوسطة)</template>
+          <template class="content-en">170 (Medium)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">109 (منخفضة - الأفضل)</template>
+          <template class="content-en">109 (Low - Best)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاعتماد على السياق</template>
+          <template class="content-en">Context Dependency</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يوجد سياق</template>
+          <template class="content-en">No context</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلمة واحدة سابقة</template>
+          <template class="content-en">One previous word</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلمتان سابقتان</template>
+          <template class="content-en">Two previous words</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف نموذج Unigram عن نموذج Bigram من حيث افتراض ماركوف؟</template>
+      <template class="content-en">How does a Unigram model differ from a Bigram model in terms of the Markov assumption?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في نموذج Unigram، نفترض أن الكلمات مستقلة تماماً عن بعضها البعض، أي أن احتمال الكلمة لا يعتمد على أي كلمات سابقة $P(w_n)$. بينما في Bigram، يعتمد الاحتمال على الكلمة السابقة مباشرة $P(w_n | w_{n-1})$.</p></template>
+      <template class="content-en"><p>In a Unigram model, words are assumed to be completely independent; the probability of a word does not depend on any previous words $P(w_n)$. In a Bigram model, it depends on the immediately preceding word $P(w_n | w_{n-1})$.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="maximum-likelihood-estimation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تقدير الاحتمالية القصوى (MLE) لـ N-grams</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Maximum Likelihood Estimation (MLE) for N-grams</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقدير الاحتمالية القصوى (MLE) هو طريقة لحساب احتمالات N-gram ببساطة عن طريق عد مرات الظهور في بيانات التدريب والقسمة على الإجمالي.</p></template>
+    <template class="content-en"><p>Maximum Likelihood Estimation (MLE) computes N-gram probabilities simply by counting occurrences in the training data and dividing by the total.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتقدير احتمالات Bigram، نستخدم <b><span class="smart-term" data-term-en="Maximum Likelihood Estimate (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a statistical model by maximizing the likelihood function, often done by simple frequency counting in N-grams.">تقدير الاحتمالية القصوى<span class="smart-term-tooltip"></span></span> (MLE)</b>. يتم ذلك عن طريق حساب عدد مرات ظهور الكلمتين معاً $C(w_{n-1} w_n)$ وتقسيمه على عدد مرات ظهور الكلمة الأولى وحدها $C(w_{n-1})$.</p><p>المعادلة: $P(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n)}{C(w_{n-1})}$</p><p><b>مثال تطبيقي:</b> إذا أردنا حساب احتمال جملة <code>&lt;s&gt; I want english food &lt;/s&gt;</code> باستخدام Bigrams، نقوم بضرب الاحتمالات التالية:<br> $P(I|&lt;s&gt;) \times P(want|I) \times P(english|want) \times P(food|english) \times P(&lt;/s&gt;|food)$.</p></template>
+    <template class="content-en"><p>To estimate bigram probabilities, we use the <b><span class="smart-term" data-term-en="Maximum Likelihood Estimate (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a statistical model by maximizing the likelihood function, often done by simple frequency counting in N-grams.">Maximum Likelihood Estimate (MLE)<span class="smart-term-tooltip"></span></span></b>. This is done by taking the count of the bigram $C(w_{n-1} w_n)$ and dividing it by the count of the unigram prefix $C(w_{n-1})$.</p><p>Formula: $P(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n)}{C(w_{n-1})}$</p><p><b>Worked Example:</b> To compute the probability of the sentence <code>&lt;s&gt; I want english food &lt;/s&gt;</code> using bigrams, we multiply:<br> $P(I|&lt;s&gt;) \times P(want|I) \times P(english|want) \times P(food|english) \times P(&lt;/s&gt;|food)$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند التعامل مع نماذج N-gram الكبيرة، تصبح الاحتمالات أرقاماً صغيرة جداً. ضرب العديد من الأرقام الصغيرة يؤدي إلى مشكلة <b>Underflow</b> في الحواسيب (حيث يصبح الرقم صغيراً جداً لدرجة أن الحاسوب يعتبره صفراً).</p><p>لحل هذه المشكلة، يتم تخزين وحساب الاحتمالات باستخدام <b>اللوغاريتمات (Log probabilities)</b>. بدلاً من ضرب الاحتمالات، نقوم بجمع اللوغاريتمات الخاصة بها: $\log(p_1 \times p_2) = \log(p_1) + \log(p_2)$. إذا احتجنا للاحتمال الفعلي في النهاية، نستخدم الدالة الأسية (exp).</p></template>
+    <template class="content-en"><p>When dealing with large N-grams, probabilities become extremely small numbers. Multiplying many small numbers leads to numerical <b><span class="smart-term" data-term-en="Underflow" data-ar="التدفق السفلي" data-en-def="A condition in computer programming where a calculation produces a result smaller than the computer can represent, often rounding to zero.">underflow<span class="smart-term-tooltip"></span></span></b> in computers (the number becomes too small to represent and rounds to zero).</p><p>To avoid this, LM probabilities are stored and computed in <b>log format (log probabilities)</b>. Instead of multiplying probabilities, we add their logs: $\log(p_1 \times p_2) = \log(p_1) + \log(p_2)$. If we need the actual probability at the end, we apply the exponential function (exp).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة MLE لحساب احتمال Bigram.</strong></template>
+      <template class="content-en"><strong>MLE formula for calculating a Bigram probability.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n)}{C(w_{n-1})}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان $C(want) = 927$ و $C(want\ to) = 608$، فما هو احتمال $P(to | want)$ باستخدام MLE؟</template>
+      <template class="content-en">If $C(want) = 927$ and $C(want\ to) = 608$, what is the probability $P(to | want)$ using MLE?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>$P(to | want) = 608 / 927 \approx 0.656$</p></template>
+      <template class="content-en"><p>$P(to | want) = 608 / 927 \approx 0.656$</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluation-and-data-splits" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تقييم النماذج وتقسيم البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Model Evaluation and Data Splits</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تقييم النماذج إما داخلياً (Intrinsic) باستخدام مقاييس مثل الحيرة، أو خارجياً (Extrinsic) بتجربتها في تطبيق حقيقي. ويجب دائماً اختبار النموذج على بيانات لم يراها من قبل.</p></template>
+    <template class="content-en"><p>Models are evaluated either intrinsically using metrics like perplexity, or extrinsically by testing them in a real application. Models must always be tested on unseen data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Extrinsic Evaluation" data-ar="التقييم الخارجي" data-en-def="Evaluating a model by embedding it in an end-to-end application and measuring the improvement in the application&#x27;s overall performance.">التقييم الخارجي<span class="smart-term-tooltip"></span></span> (Extrinsic / in-vivo):</b> وضع النموذج في مهمة حقيقية (مثل الترجمة الآلية) ومقارنة الأداء. هذا التقييم دقيق ولكنه مكلف ويستغرق وقتاً طويلاً.</p><p><b><span class="smart-term" data-term-en="Intrinsic Evaluation" data-ar="التقييم الداخلي" data-en-def="Evaluating a model independently of any specific application, usually by measuring its performance on a specific metric like perplexity on a test set.">التقييم الداخلي<span class="smart-term-tooltip"></span></span> (Intrinsic / in-vitro):</b> قياس أداء النموذج مباشرة في التنبؤ بالكلمات باستخدام مقياس مثل <b>الحيرة (Perplexity)</b>. هو أسرع ومفيد لمقارنة النماذج، لكنه قد لا يعكس الأداء الحقيقي في التطبيقات دائماً.</p><p>لضمان التعميم، نقسم البيانات إلى:</p><ol><li><b>مجموعة التدريب (Training set):</b> لتدريب معلمات النموذج.</li><li><b>مجموعة التطوير (Dev set):</b> لضبط النموذج واختباره أثناء التطوير دون المساس ببيانات الاختبار النهائية.</li><li><b>مجموعة الاختبار (Test set):</b> بيانات غير مرئية تماماً تُستخدم مرة واحدة فقط في النهاية لقياس الأداء الحقيقي.</li></ol></template>
+    <template class="content-en"><p><b>Extrinsic (in-vivo) Evaluation:</b> Putting the model into a real task (like Machine Translation) and comparing performance. It is accurate but expensive and time-consuming.</p><p><b>Intrinsic (in-vitro) Evaluation:</b> Directly measuring the model's performance at predicting words using a metric like <b>Perplexity</b>. It is fast and useful for comparing models, though it doesn't always perfectly correlate with real application performance.</p><p>To ensure generalization, we split data into:</p><ol><li><b>Training set:</b> To train the model's parameters.</li><li><b>Development (Dev) set:</b> To tune the model and test changes during development without touching the final test data.</li><li><b>Test set:</b> Completely unseen data used only once at the very end to measure true performance.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>التدريب على مجموعة الاختبار (Training on the test set)</b> هو خطأ علمي فادح. إذا رأى النموذج بيانات الاختبار أثناء التدريب، فسيقوم بتعيين احتمالية عالية مصطنعة لها، مما يجعله يبدو أفضل مما هو عليه في الواقع (Overfitting).</p><p>يجب أن تعكس مجموعة التدريب نفس نوع (Genre) ولهجة البيانات التي سيتم استخدام النموذج عليها (مثلاً، نصوص طبية إذا كان التطبيق طبياً).</p></template>
+    <template class="content-en"><p><b>Training on the test set</b> is a severe scientific error. If the model sees test sentences during training, it will assign them an artificially high probability, making the model look better than it really is (Overfitting).</p><p>The training corpus should reflect the same genre and dialect as the task the model will be used for (e.g., medical texts for a medical application).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Extrinsic (in-vivo)</th><th>Intrinsic (in-vitro)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التكلفة والوقت</template>
+          <template class="content-en">Cost and Time</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مكلف ويستغرق وقتاً طويلاً</template>
+          <template class="content-en">Expensive and time-consuming</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع وسهل الحساب</template>
+          <template class="content-en">Fast and easy to compute</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دقة قياس الأداء الحقيقي</template>
+          <template class="content-en">Accuracy of Real-world Performance</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">دقيق جداً (يقيس الأداء في التطبيق الفعلي)</template>
+          <template class="content-en">Very accurate (measures actual application performance)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يتوافق دائماً مع أداء التطبيق الحقيقي</template>
+          <template class="content-en">Doesn't necessarily correspond with real application performance</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى مجموعة تطوير (Dev set) إذا كان لدينا بالفعل مجموعة تدريب ومجموعة اختبار؟</template>
+      <template class="content-en">Why do we need a Dev set if we already have a Training set and a Test set?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا قمنا باختبار النموذج وتعديله مراراً وتكراراً بناءً على نتائج مجموعة الاختبار، فإننا نقوم بضبط النموذج (Tuning) ليتناسب مع مجموعة الاختبار بشكل غير مباشر. مجموعة التطوير تسمح لنا بالتجربة والضبط، مع الحفاظ على مجموعة الاختبار نقية للتقييم النهائي العادل.</p></template>
+      <template class="content-en"><p>If we repeatedly test and tweak the model based on Test set results, we implicitly tune the model to the Test set's characteristics. The Dev set allows us to experiment and tune, keeping the Test set pure for a fair final evaluation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="perplexity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الحيرة (Perplexity)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Perplexity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الحيرة هي مقياس لمدى 'مفاجأة' النموذج من بيانات الاختبار؛ كلما انخفضت قيمة الحيرة، كان النموذج أفضل في التنبؤ.</p></template>
+    <template class="content-en"><p>Perplexity is a measure of how 'surprised' the model is by the test data; a lower perplexity means a better language model.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Perplexity" data-ar="الحيرة" data-en-def="A measurement of how well a probability distribution or probability model predicts a sample. Lower perplexity indicates better prediction.">الحيرة<span class="smart-term-tooltip"></span></span> (Perplexity - PP)</b> هي الاحتمال العكسي لمجموعة الاختبار، مطبعاً (Normalized) بعدد الكلمات. </p><p>المعادلة: $PP(W) = P(w_1w_2...w_N)^{-\frac{1}{N}} = \sqrt[N]{\frac{1}{P(w_1w_2...w_N)}}$</p><p>نظراً لأن الاحتمال يعتمد على طول النص (يصغر كلما طال النص)، فإن الحيرة توفر مقياساً لكل كلمة (Per-word metric). <b>تقليل الحيرة هو نفس تعظيم الاحتمال.</b></p><p>يمكن أيضاً فهم الحيرة على أنها <b>متوسط <span class="smart-term" data-term-en="Branching Factor" data-ar="عامل التفرع" data-en-def="The number of possible next words that can follow any word in a language model.">عامل التفرع<span class="smart-term-tooltip"></span></span> المرجح (Weighted average branching factor)</b> للغة، أي عدد الكلمات المحتملة التي يمكن أن تتبع أي كلمة.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Perplexity" data-ar="الحيرة" data-en-def="A measurement of how well a probability distribution or probability model predicts a sample. Lower perplexity indicates better prediction.">Perplexity<span class="smart-term-tooltip"></span></span> (PP)</b> is the inverse probability of the test set, normalized by the number of words.</p><p>Formula: $PP(W) = P(w_1w_2...w_N)^{-\frac{1}{N}} = \sqrt[N]{\frac{1}{P(w_1w_2...w_N)}}$</p><p>Because raw probability gets smaller the longer the text, perplexity provides a per-word, normalized metric. <b>Minimizing perplexity is the same as maximizing probability.</b></p><p>Perplexity can also be interpreted as the <b>weighted average <span class="smart-term" data-term-en="Branching Factor" data-ar="عامل التفرع" data-en-def="The number of possible next words that can follow any word in a language model.">branching factor<span class="smart-term-tooltip"></span></span></b> of a language—the number of possible next words that can follow any given word.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند مقارنة النماذج، يجب أن تظل مجموعة الاختبار ثابتة. نموذج Trigram سيعطي حيرة أقل من Bigram، والذي بدوره سيعطي حيرة أقل من Unigram، لأن السياق الأطول يوفر تنبؤات أفضل.</p><p>نطاق الاحتمال هو [0,1]، بينما نطاق الحيرة هو [1, $\infty$]. الحيرة مستمدة في الأصل من معدل الإنتروبيا المتقاطعة (Cross-entropy rate) في نظرية المعلومات.</p></template>
+    <template class="content-en"><p>When comparing models, the test set must be held constant. A Trigram model will yield a lower perplexity than a Bigram, which is lower than a Unigram, because longer context provides better predictions.</p><p>The probability range is [0,1], while the perplexity range is [1, $\infty$]. The inverse comes from the original definition of perplexity from cross-entropy rate in information theory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الحيرة (Perplexity) لتسلسل من الكلمات.</strong></template>
+      <template class="content-en"><strong>Perplexity formula for a sequence of words.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$PP(W) = \sqrt[N]{\frac{1}{P(w_1w_2...w_N)}}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا لغة حتمية (Deterministic) حيث كل كلمة تتبعها كلمة واحدة محددة دائماً، فما هي قيمة الحيرة لهذه اللغة؟</template>
+      <template class="content-en">If we have a deterministic language where every word is always followed by exactly one specific word, what is the perplexity of this language?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الحيرة ستكون 1. لأن الاحتمال دائماً 1، والجذر النوني لـ (1/1) هو 1. عامل التفرع هنا هو 1.</p></template>
+      <template class="content-en"><p>The perplexity would be 1. Because the probability is always 1, and the N-th root of (1/1) is 1. The branching factor is 1.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="sampling-and-shannon-game" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> أخذ العينات ولعبة شانون</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Sampling and The Shannon Game</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لعبة شانون تختبر مدى قدرتنا على التنبؤ بالكلمة التالية، وأخذ العينات هو عملية توليد نص عشوائي بناءً على احتمالات النموذج لتصور ما تعلمه.</p></template>
+    <template class="content-en"><p>The Shannon Game tests how well we can predict the next word, and sampling is the process of generating random text based on the model's probabilities to visualize what it learned.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Shannon Game" data-ar="لعبة شانون" data-en-def="A thought experiment by Claude Shannon involving guessing the next letter or word in a text, used to measure the information content of language.">لعبة شانون<span class="smart-term-tooltip"></span></span> (The Shannon Game):</b> اقترحها كلود شانون، وتطرح سؤال: ما مدى قدرتنا على التنبؤ بالكلمة التالية؟ (مثال: Once upon a ___). النموذج الجيد يعين احتمالية أعلى للكلمة التي تحدث بالفعل.</p><p><b><span class="smart-term" data-term-en="Sampling" data-ar="أخذ العينات" data-en-def="The process of randomly selecting an item from a probability distribution, used in LMs to generate text.">أخذ العينات<span class="smart-term-tooltip"></span></span> (Sampling):</b> لتصور ما تعلمه نموذج N-gram، يمكننا توليد جمل عشوائية. نختار كلمة البداية <code>&lt;s&gt;</code>، ثم نختار الكلمة التالية عشوائياً بناءً على توزيع الاحتمالات الخاص بها $P(w|&lt;s&gt;)$، ونستمر هكذا حتى نصل إلى رمز النهاية <code>&lt;/s&gt;</code>.</p><p>عند تطبيق ذلك على نصوص شكسبير، نجد أن نماذج Unigram تنتج كلمات غير مترابطة، بينما نماذج Bigram و Trigram تبدأ في إنتاج جمل تبدو وكأنها لشكسبير.</p></template>
+    <template class="content-en"><p><b>The <span class="smart-term" data-term-en="Shannon Game" data-ar="لعبة شانون" data-en-def="A thought experiment by Claude Shannon involving guessing the next letter or word in a text, used to measure the information content of language.">Shannon Game<span class="smart-term-tooltip"></span></span>:</b> Proposed by Claude Shannon, it asks: How well can we predict the next word? (e.g., Once upon a ___). A good LM assigns a higher probability to the actual next word.</p><p><b><span class="smart-term" data-term-en="Sampling" data-ar="أخذ العينات" data-en-def="The process of randomly selecting an item from a probability distribution, used in LMs to generate text.">Sampling<span class="smart-term-tooltip"></span></span>:</b> To visualize what an N-gram model knows, we can generate random sentences. We start with <code>&lt;s&gt;</code>, randomly pick the next word according to its probability distribution $P(w|&lt;s&gt;)$, and continue until we pick <code>&lt;/s&gt;</code>.</p><p>When applied to Shakespeare's corpus, Unigram models produce gibberish, while Bigram and Trigram models start producing sentences that sound remarkably like Shakespeare.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تبدو نصوص 4-gram المولدة مطابقة تقريباً لنصوص شكسبير الأصلية؟ بسبب <b>تناثر البيانات (Data Sparsity)</b>.</p><p>في مجموعة بيانات شكسبير، 99.96% من الـ Bigrams الممكنة لم تظهر أبداً.</p><p>بالنسبة لـ 4-grams، التناثر أسوأ بكثير، مما يعني أن النموذج غالباً ما يمتلك خياراً واحداً فقط للكلمة التالية، فيقوم فعلياً بنسخ جمل كاملة من بيانات التدريب بدلاً من توليد جمل جديدة.</p></template>
+    <template class="content-en"><p>Why do generated 4-gram sentences look almost exactly like original Shakespeare text? Because of <b>data sparsity</b>. In the Shakespeare corpus, 99.96% of possible bigrams were never seen. For 4-grams, sparsity is even worse, meaning the model often has only one choice for the next word, effectively memorizing and regurgitating exact sentences from the training data rather than generating novel ones.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A horizontal number line from 0 to 1 representing a probability distribution for sampling the next word. The line is divided into segments labeled with words and their probabilities: 'the' (0.0 to 0.06), 'of' (0.06 to 0.09), 'a' (0.09 to 0.11), 'to' (0.11 to 0.13), 'in' (0.13 to 0.15), and a large gap leading to 'however' at 0.66 and 'polyphonic' at 0.99. Show a random dice roll or pointer landing on a specific segment to illustrate the sampling process. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 300, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        <linearGradient id="highlightGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)"/>
+            <stop offset="100%" stop-color="var(--brand-800)"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">The Shannon Game: Sampling the Next Word</text>
+    <text x="400" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">لعبة شانون: أخذ عينات الكلمة التالية</text>
+
+    <!-- Context Box -->
+    <rect x="50" y="60" width="180" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="140" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Context: "Once upon a"</text>
+    <text x="140" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">السياق: "Once upon a"</text>
+
+    <!-- Dice Icon & Pointer -->
+    <rect x="240" y="55" width="20" height="20" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <circle cx="246" cy="61" r="2" fill="var(--brand-500)"/>
+    <circle cx="254" cy="69" r="2" fill="var(--brand-500)"/>
+    <circle cx="250" cy="65" r="2" fill="var(--brand-500)"/>
+
+    <text x="250" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Random r = 0.075</text>
+    <text x="250" y="95" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">رقم عشوائي r = 0.075</text>
+
+    <path d="M 250 105 L 250 150" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+
+    <!-- Probability Tape Segments -->
+    <!-- the -->
+    <rect x="50" y="160" width="160" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="130" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">the</text>
+
+    <!-- of (Highlighted) -->
+    <rect x="210" y="160" width="80" height="40" fill="url(#highlightGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="250" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle">of</text>
+
+    <!-- a -->
+    <rect x="290" y="160" width="53" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="316.5" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">a</text>
+
+    <!-- to -->
+    <rect x="343" y="160" width="53" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="369.5" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">to</text>
+
+    <!-- in -->
+    <rect x="396" y="160" width="54" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="423" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">in</text>
+
+    <!-- Gap 1 -->
+    <line x1="450" y1="160" x2="510" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4"/>
+    <line x1="450" y1="200" x2="510" y2="200" stroke="var(--border-color)" stroke-dasharray="4,4"/>
+    <text x="480" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-muted)" text-anchor="middle">...</text>
+
+    <!-- however -->
+    <rect x="510" y="160" width="70" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="545" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">however</text>
+
+    <!-- Gap 2 -->
+    <line x1="580" y1="160" x2="640" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4"/>
+    <line x1="580" y1="200" x2="640" y2="200" stroke="var(--border-color)" stroke-dasharray="4,4"/>
+    <text x="610" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-muted)" text-anchor="middle">...</text>
+
+    <!-- polyphonic -->
+    <rect x="640" y="160" width="110" height="40" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+    <text x="695" y="185" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">polyphonic</text>
+
+    <!-- Ticks and Probabilities -->
+    <path d="M 50 200 v 8 M 210 200 v 8 M 290 200 v 8 M 343 200 v 8 M 396 200 v 8 M 450 200 v 8 M 510 200 v 8 M 580 200 v 8 M 640 200 v 8 M 750 200 v 8" stroke="var(--text-primary)" stroke-width="1.5" fill="none"/>
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="50" y="225">0.0</text>
+        <text x="210" y="225">0.06</text>
+        <text x="290" y="225">0.09</text>
+        <text x="343" y="225">0.11</text>
+        <text x="396" y="225">0.13</text>
+        <text x="450" y="225">0.15</text>
+        <text x="510" y="225">0.66</text>
+        <text x="580" y="225">0.67</text>
+        <text x="640" y="225">0.99</text>
+        <text x="750" y="225">1.0</text>
+    </g>
+
+    <!-- Explanation Box -->
+    <rect x="50" y="260" width="700" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4"/>
+    
+    <text x="400" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">To sample the next word, we generate a random number <tspan fill="var(--brand-ink)" font-weight="bold">r ∈ [0, 1)</tspan></text>
+    <text x="400" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">and select the word whose cumulative probability segment contains <tspan fill="var(--brand-ink)" font-weight="bold">r</tspan>.</text>
+
+    <text x="400" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">لأخذ عينة للكلمة التالية، نقوم بتوليد رقم عشوائي <tspan fill="var(--brand-ink)" font-weight="bold">r ∈ [0, 1)</tspan></text>
+    <text x="400" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">ونختار الكلمة التي تحتوي شريحة احتمالها التراكمي على هذا الرقم <tspan fill="var(--brand-ink)" font-weight="bold">r</tspan>.</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يوضح أخذ العينات من نموذج 4-gram مشكلة فرط التخصيص (Overfitting)؟</template>
+      <template class="content-en">How does sampling from a 4-gram model illustrate the problem of overfitting?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن نموذج 4-gram يحفظ تسلسلات طويلة من بيانات التدريب بسبب ندرة تكرارها، فعند أخذ العينات، فإنه يعيد إنتاج جمل التدريب حرفياً بدلاً من توليد لغة جديدة، مما يدل على أنه لم يعمم القواعد بل حفظ البيانات.</p></template>
+      <template class="content-en"><p>Because a 4-gram model memorizes long sequences from the training data due to sparsity, when sampled, it regurgitates exact training sentences rather than generating novel language, showing it memorized rather than generalized.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="generalization-and-smoothing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التعميم والتنعيم (Laplace Smoothing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Generalization and Laplace Smoothing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التنعيم يحل مشكلة الكلمات غير المرئية (الأصفار) عن طريق أخذ جزء صغير من الاحتمالية من الكلمات الشائعة وإعطائه للكلمات التي لم تظهر في التدريب.</p></template>
+    <template class="content-en"><p>Smoothing solves the unseen words (zeros) problem by taking a small amount of probability mass from frequent words and giving it to words never seen in training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل نماذج N-gram بشكل جيد فقط إذا كانت بيانات الاختبار تشبه بيانات التدريب. المشكلة الكبرى هي <b>الأصفار (Zeros)</b>: تسلسلات كلمات تظهر في الاختبار ولكنها لم تظهر أبداً في التدريب. الاحتمال صفر يؤدي إلى حيرة لا نهائية (Infinite Perplexity).</p><p>لحل ذلك، نستخدم تقنيات <b>التنعيم (Smoothing)</b>. أبسط نوع هو <b><span class="smart-term" data-term-en="Laplace Smoothing" data-ar="تنعيم لابلاس" data-en-def="A smoothing technique that adds 1 to all counts to prevent zero probabilities for unseen events.">تنعيم لابلاس<span class="smart-term-tooltip"></span></span> (Laplace / Add-1 Smoothing)</b>، حيث نضيف 1 إلى كل عدد (Count) قبل الحساب.</p><p>المعادلة: $P^*(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n) + 1}{C(w_{n-1}) + V}$</p><p>حيث $V$ هو حجم <span class="smart-term" data-term-en="Vocabulary (V)" data-ar="المفردات" data-en-def="The set of all unique words known to the language model.">المفردات<span class="smart-term-tooltip"></span></span> (Vocabulary size)، أي عدد الكلمات الفريدة.</p></template>
+    <template class="content-en"><p>N-grams only work well if the test corpus looks like the training corpus.</p><p>The biggest issue is <b>Zeros</b>: word sequences that occur in the test set but never occurred in the training set. A zero probability leads to infinite perplexity.</p><p>To fix this, we use <b>Smoothing</b> techniques. The simplest is <b>Laplace (Add-1) Smoothing</b>, where we pretend we saw every possible sequence one more time than we actually did.</p><p>Formula: $P^*(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n) + 1}{C(w_{n-1}) + V}$</p><p>Where $V$ is the vocabulary size (number of unique words).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>رغم بساطة تنعيم لابلاس، إلا أنه يعتبر سيئاً جداً في معالجة اللغات الطبيعية (NLP). لماذا؟ لأن حجم المفردات $V$ عادة ما يكون كبيراً جداً. إضافة $V$ إلى المقام يسرق كمية هائلة من كتلة الاحتمال (Probability mass) من الأحداث الشائعة ويعطيها للأحداث غير المرئية، مما يشوه التوزيع الاحتمالي بشكل كبير.</p><p>لذلك، في التطبيقات الحقيقية، تُستخدم تقنيات تنعيم أكثر تقدماً مثل Kneser-Ney أو Good-Turing.</p></template>
+    <template class="content-en"><p>While <span class="smart-term" data-term-en="Laplace Smoothing" data-ar="تنعيم لابلاس" data-en-def="A smoothing technique that adds 1 to all counts to prevent zero probabilities for unseen events.">Laplace smoothing<span class="smart-term-tooltip"></span></span> is simple, it is actually very poor for NLP. Why? Because the vocabulary size $V$ is typically huge. Adding $V$ to the denominator steals a massive amount of probability mass from frequent, seen events and distributes it to unseen events, severely distorting the probability distribution.</p><p>Therefore, in real applications, more advanced smoothing techniques like Kneser-Ney or Good-Turing are used.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تنعيم لابلاس (إضافة 1) لنموذج Bigram.</strong></template>
+      <template class="content-en"><strong>Laplace (Add-1) smoothing formula for a Bigram model.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P^*(w_n | w_{n-1}) = \frac{C(w_{n-1} w_n) + 1}{C(w_{n-1}) + V}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان $C(eat\ food) = 0$، و $C(eat) = 686$، وحجم المفردات $V = 1616$. احسب الاحتمال باستخدام تنعيم لابلاس.</template>
+      <template class="content-en">If $C(eat\ food) = 0$, $C(eat) = 686$, and vocabulary size $V = 1616$. Calculate the probability using Laplace smoothing.</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>$P^*(food | eat) = (0 + 1) / (686 + 1616) = 1 / 2302 \approx 0.00043$</p></template>
+      <template class="content-en"><p>$P^*(food | eat) = (0 + 1) / (686 + 1616) = 1 / 2302 \approx 0.00043$</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="interpolation-and-backoff" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الاستيفاء (Interpolation) والتراجع (Backoff)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Interpolation and Backoff</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاستيفاء يمزج بين نماذج N-gram مختلفة (مثل دمج Trigram مع Bigram)، بينما التراجع يستخدم النموذج الأكبر وإذا فشل يتراجع للنموذج الأصغر.</p></template>
+    <template class="content-en"><p>Interpolation mixes different N-gram models together (like blending Trigram with Bigram), while Backoff uses the larger model and falls back to the smaller one only if the larger fails.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحسين التنبؤات والتعامل مع البيانات المتناثرة، ندمج نماذج متعددة:</p><p><b><span class="smart-term" data-term-en="Linear Interpolation" data-ar="الاستيفاء الخطي" data-en-def="Combining different probability models by taking a weighted average of their predictions.">الاستيفاء الخطي<span class="smart-term-tooltip"></span></span> (Linear Interpolation):</b> نقوم بخلط احتمالات Unigram و Bigram و Trigram باستخدام أوزان (Lambdas $\lambda$).</p><p>المعادلة: $\hat{P}(w_n | w_{n-2} w_{n-1}) = \lambda_1 P(w_n | w_{n-2} w_{n-1}) + \lambda_2 P(w_n | w_{n-1}) + \lambda_3 P(w_n)$</p><p>يجب أن يكون مجموع الأوزان يساوي 1: $\sum_i \lambda_i = 1$.</p><p><b><span class="smart-term" data-term-en="Backoff" data-ar="التراجع" data-en-def="A strategy where a model uses the highest-order N-gram possible, and only uses lower-order N-grams if the higher-order one has zero counts.">التراجع<span class="smart-term-tooltip"></span></span> (Backoff):</b> نعتمد على Trigram إذا كان متوفراً (العدد > 0). إذا لم يكن كذلك، نتراجع إلى Bigram. وإذا لم يكن متوفراً، نتراجع إلى Unigram.</p></template>
+    <template class="content-en"><p>To improve predictions and handle sparse data, we combine multiple models:</p><ul><li><b><span class="smart-term" data-term-en="Linear Interpolation" data-ar="الاستيفاء الخطي" data-en-def="Combining different probability models by taking a weighted average of their predictions.">Linear Interpolation<span class="smart-term-tooltip"></span></span>:</b> We mix the probabilities of Unigram, Bigram, and Trigram models using weights (Lambdas $\lambda$). Formula: $\hat{P}(w_n | w_{n-2} w_{n-1}) = \lambda_1 P(w_n | w_{n-2} w_{n-1}) + \lambda_2 P(w_n | w_{n-1}) + \lambda_3 P(w_n)$ The sum of the weights must equal 1: $\sum_i \lambda_i = 1$.</li><li><b><span class="smart-term" data-term-en="Backoff" data-ar="التراجع" data-en-def="A strategy where a model uses the highest-order N-gram possible, and only uses lower-order N-grams if the higher-order one has zero counts.">Backoff<span class="smart-term-tooltip"></span></span>:</b> We rely on the Trigram if it has evidence (count > 0). If not, we back off to the Bigram. If that also has zero count, we back off to the Unigram.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الاستيفاء المتقدم، يمكن جعل الأوزان $\lambda$ مشروطة بالسياق (Conditional on context). بمعنى آخر، إذا كان لدينا ثقة عالية في سياق معين (رأيناه كثيراً)، نعطي وزناً أكبر لـ Trigram. وإذا كان السياق نادراً، نعطي وزناً أكبر للنماذج الأصغر (Bigram أو Unigram).</p></template>
+    <template class="content-en"><p>In advanced interpolation, the weights $\lambda$ can be made conditional on the context. In other words, if we have high confidence in a specific context (we've seen it many times), we give a higher weight to the Trigram. If the context is rare, we give higher weight to the smaller models (Bigram or Unigram).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الاستيفاء الخطي البسيط.</strong></template>
+      <template class="content-en"><strong>Simple linear interpolation formula.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{P}(w_n | w_{n-2} w_{n-1}) = \lambda_1 P_3 + \lambda_2 P_2 + \lambda_3 P_1$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يجب أن يكون مجموع قيم $\lambda$ في الاستيفاء الخطي مساوياً لـ 1؟</template>
+      <template class="content-en">Why must the sum of $\lambda$ values in linear interpolation equal 1?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان أن النتيجة النهائية $\hat{P}$ تظل توزيعاً احتمالياً صحيحاً (حيث يجب أن يكون مجموع كل الاحتمالات الممكنة للكلمة التالية مساوياً لـ 1).</p></template>
+      <template class="content-en"><p>To ensure that the resulting $\hat{P}$ remains a valid probability distribution (where the sum of all possible next word probabilities equals 1).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبنائي في هذه الوحدة المحورية. إذا فهمتم نماذج N-gram، فقد وضعتم أقدامكم على أول طريق فهم النماذج اللغوية الكبيرة (LLMs) مثل ChatGPT. في الامتحان، ركزوا بشدة على كيفية حساب احتمالات Bigram باستخدام MLE (العد والقسمة). لا تنسوا أبداً مشكلة الأصفار (Zeros) وكيف يحلها تنعيم لابلاس (Laplace Smoothing)؛ توقعوا سؤالاً يطلب منكم حساب احتمال مع وبدون التنعيم. تذكروا أيضاً أن الحيرة (Perplexity) هي مقياس عكسي: الرقم الأقل هو الفائز! وأخيراً، إياكم أن تقعوا في فخ 'التدريب على مجموعة الاختبار'؛ إنها الخطيئة الكبرى في التعلم الآلي. راجعوا المعادلات، وتدربوا على الأمثلة الرقمية، وستكونون في أمان تام.</template>
+    <template class="content-en">Welcome to this pivotal module. If you understand N-gram models, you've taken your first step toward understanding Large Language Models (LLMs) like ChatGPT. For the exam, focus heavily on calculating Bigram probabilities using MLE (count and divide). Never forget the Zeros problem and how Laplace Smoothing solves it; expect a question asking you to calculate a probability with and without smoothing. Also, remember that Perplexity is an inverse metric: the lower number wins! Finally, never fall into the trap of 'training on the test set'; it's the cardinal sin of machine learning. Review the formulas, practice the numerical examples, and you will do great.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل النماذج اللغوية الكبيرة (LLMs) في جوهرها؟</template>
+          <template class="content-en">How do Large Language Models (LLMs) work at their core?</template>
+          <span class="content-target">كيف تعمل النماذج اللغوية الكبيرة (LLMs) في جوهرها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في جوهرها، تعمل عن طريق التنبؤ بالكلمة التالية مراراً وتكراراً (Autoregressive) بناءً على السياق السابق.</template>
+          <template class="content-en">At their core, they work by predicting the next word over and over again (autoregressive) based on the previous context.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم قاعدة السلسلة (Chain Rule) كاملة لحساب احتمالات الجمل؟</template>
+          <template class="content-en">Why don't we use the full Chain Rule to calculate sentence probabilities?</template>
+          <span class="content-target">لماذا لا نستخدم قاعدة السلسلة (Chain Rule) كاملة لحساب احتمالات الجمل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب تناثر البيانات (Data Sparsity). لن نرى أبداً بيانات كافية لحساب احتمالات شرطية لتسلسلات طويلة جداً بدقة.</template>
+          <template class="content-en">Because of Data Sparsity. We will never see enough data to accurately calculate conditional probabilities for very long exact sequences.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الحل الذي يقدمه افتراض ماركوف؟</template>
+          <template class="content-en">What solution does the Markov Assumption provide?</template>
+          <span class="content-target">ما هو الحل الذي يقدمه افتراض ماركوف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يبسط الحسابات بافتراض أن الكلمة تعتمد فقط على عدد قليل من الكلمات السابقة (مثل الكلمة السابقة مباشرة في Bigram) بدلاً من التاريخ كله.</template>
+          <template class="content-en">It simplifies calculations by assuming a word depends only on a few previous words (like just the immediately preceding word in a Bigram) instead of the entire history.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة Underflow وكيف نحلها؟</template>
+          <template class="content-en">What is the Underflow problem and how do we solve it?</template>
+          <span class="content-target">ما هي مشكلة Underflow وكيف نحلها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي مشكلة تحدث عند ضرب احتمالات صغيرة جداً فتصبح صفراً في الحاسوب. نحلها باستخدام اللوغاريتمات (جمع اللوغاريتمات بدلاً من ضرب الاحتمالات).</template>
+          <template class="content-en">It's a problem where multiplying very small probabilities results in zero in a computer. We solve it by using logarithms (adding logs instead of multiplying probabilities).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين مجموعة التطوير (Dev set) ومجموعة الاختبار (Test set)؟</template>
+          <template class="content-en">What is the difference between a Dev set and a Test set?</template>
+          <span class="content-target">ما الفرق بين مجموعة التطوير (Dev set) ومجموعة الاختبار (Test set)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مجموعة التطوير تُستخدم لضبط النموذج أثناء بنائه، بينما مجموعة الاختبار تُستخدم مرة واحدة فقط في النهاية لقياس الأداء الحقيقي غير المتحيز.</template>
+          <template class="content-en">The Dev set is used to tune the model during construction, while the Test set is used only once at the very end to measure true, unbiased performance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني قيمة الحيرة (Perplexity) المنخفضة؟</template>
+          <template class="content-en">What does a low Perplexity value mean?</template>
+          <span class="content-target">ماذا تعني قيمة الحيرة (Perplexity) المنخفضة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعني أن النموذج يعطي احتمالية عالية لبيانات الاختبار، أي أنه أقل 'مفاجأة' بها، وبالتالي هو نموذج أفضل.</template>
+          <template class="content-en">It means the model assigns a high probability to the test data, meaning it is less 'surprised' by it, and is therefore a better model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يوضح أخذ العينات (Sampling) مشكلة فرط التخصيص في نماذج 4-gram؟</template>
+          <template class="content-en">How does sampling illustrate overfitting in 4-gram models?</template>
+          <span class="content-target">كيف يوضح أخذ العينات (Sampling) مشكلة فرط التخصيص في نماذج 4-gram؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن تسلسلات 4 كلمات نادرة، النموذج يحفظها. عند أخذ العينات، يقوم النموذج بنسخ جمل التدريب حرفياً بدلاً من توليد جمل جديدة.</template>
+          <template class="content-en">Because 4-word sequences are rare, the model memorizes them. When sampling, the model regurgitates training sentences verbatim instead of generating novel ones.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل تنعيم لابلاس (Add-1)؟</template>
+          <template class="content-en">How does Laplace (Add-1) smoothing work?</template>
+          <span class="content-target">كيف يعمل تنعيم لابلاس (Add-1)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يضيف 1 إلى تكرار كل تسلسل ممكن، ويضيف حجم المفردات (V) إلى المقام، لمنع ظهور احتمالات صفرية للكلمات غير المرئية.</template>
+          <template class="content-en">It adds 1 to the count of every possible sequence, and adds the vocabulary size (V) to the denominator, to prevent zero probabilities for unseen words.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر تنعيم لابلاس سيئاً في معالجة اللغات الطبيعية؟</template>
+          <template class="content-en">Why is Laplace smoothing considered poor in NLP?</template>
+          <span class="content-target">لماذا يعتبر تنعيم لابلاس سيئاً في معالجة اللغات الطبيعية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن حجم المفردات (V) كبير جداً، مما يؤدي إلى سرقة كمية هائلة من الاحتمالية من الكلمات الشائعة وإعطائها للكلمات غير المرئية.</template>
+          <template class="content-en">Because the vocabulary size (V) is very large, which leads to stealing a massive amount of probability mass from frequent words and giving it to unseen words.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يجمع الاستيفاء الخطي (Linear Interpolation) بين النماذج؟</template>
+          <template class="content-en">How does Linear Interpolation combine models?</template>
+          <span class="content-target">كيف يجمع الاستيفاء الخطي (Linear Interpolation) بين النماذج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يأخذ متوسطاً مرجحاً لاحتمالات نماذج مختلفة (مثل Trigram و Bigram و Unigram) باستخدام أوزان (Lambdas) مجموعها يساوي 1.</template>
+          <template class="content-en">It takes a weighted average of the probabilities from different models (like Trigram, Bigram, and Unigram) using weights (Lambdas) that sum to 1.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الهدف الأساسي لنموذج اللغة (LM)؟",
+      "en": "What is the primary goal of a Language Model (LM)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حساب احتمال جملة كاملة أو التنبؤ باحتمال الكلمة القادمة في تسلسل.",
+        "en": "To compute the probability of a sentence or predict the probability of an upcoming word in a sequence."
+      },
+      "example": {
+        "ar": "التنبؤ بأن الكلمة التالية بعد 'I will be back' هي 'soon'.",
+        "en": "Predicting that the next word after 'I will be back' is 'soon'."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الانحدار الذاتي (Autoregressive) في النماذج اللغوية؟",
+      "en": "What does Autoregressive mean in Language Models?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تدريب النموذج على التنبؤ بالكلمة التالية من اليسار إلى اليمين بناءً على الكلمات السابقة.",
+        "en": "Training the model to predict the next word from left-to-right based on previous words."
+      },
+      "example": {
+        "ar": "توليد النص كلمة بكلمة كما تفعل نماذج LLM الحديثة.",
+        "en": "Generating text word by word as modern LLMs do."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي قاعدة السلسلة للاحتمالات (Chain Rule)؟",
+      "en": "What is the Chain Rule of Probability?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاعدة رياضية تفكك الاحتمال المشترك لتسلسل إلى ضرب احتمالات شرطية متتالية.",
+        "en": "A mathematical rule that breaks down the joint probability of a sequence into a product of sequential conditional probabilities."
+      },
+      "example": {
+        "ar": "P(A,B,C) = P(A) * P(B|A) * P(C|A,B)",
+        "en": "P(A,B,C) = P(A) * P(B|A) * P(C|A,B)"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو افتراض ماركوف (Markov Assumption)؟",
+      "en": "What is the Markov Assumption?"
+    },
+    "back": {
+      "definition": {
+        "ar": "افتراض تبسيطي ينص على أن احتمال الكلمة يعتمد فقط على عدد محدود من الكلمات السابقة، وليس على التاريخ بأكمله.",
+        "en": "A simplifying assumption stating that the probability of a word depends only on a limited number of previous words, not the entire history."
+      },
+      "example": {
+        "ar": "في Bigram، نفترض أن P(word | all_previous_words) يساوي تقريباً P(word | previous_word).",
+        "en": "In a Bigram, assuming P(word | all_previous_words) is approximately P(word | previous_word)."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو نموذج Unigram؟",
+      "en": "What is a Unigram model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج لغوي يفترض أن كل كلمة مستقلة تماماً عن الكلمات الأخرى.",
+        "en": "A language model that assumes every word is completely independent of other words."
+      },
+      "example": {
+        "ar": "P(w1, w2, w3) = P(w1) * P(w2) * P(w3)",
+        "en": "P(w1, w2, w3) = P(w1) * P(w2) * P(w3)"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو نموذج Bigram؟",
+      "en": "What is a Bigram model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج لغوي يعتمد فيه احتمال الكلمة على الكلمة التي تسبقها مباشرة فقط.",
+        "en": "A language model where the probability of a word depends only on the immediately preceding word."
+      },
+      "example": {
+        "ar": "P(food | english)",
+        "en": "P(food | english)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "كيف نحسب تقدير الاحتمالية القصوى (MLE) لـ Bigram؟",
+      "en": "How do we calculate the Maximum Likelihood Estimate (MLE) for a Bigram?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بقسمة عدد مرات ظهور الكلمتين معاً على عدد مرات ظهور الكلمة الأولى وحدها.",
+        "en": "By dividing the count of the bigram by the count of the unigram prefix."
+      },
+      "example": {
+        "ar": "P(wn | wn-1) = C(wn-1, wn) / C(wn-1)",
+        "en": "P(wn | wn-1) = C(wn-1, wn) / C(wn-1)"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "لماذا نستخدم اللوغاريتمات (Log probabilities) في نماذج اللغة؟",
+      "en": "Why do we use Log probabilities in language models?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لتجنب مشكلة التدفق السفلي (Underflow) في الحواسيب عند ضرب العديد من الاحتمالات الصغيرة جداً.",
+        "en": "To avoid computer underflow when multiplying many very small probabilities."
+      },
+      "example": {
+        "ar": "بدلاً من p1 * p2، نستخدم log(p1) + log(p2).",
+        "en": "Instead of p1 * p2, we use log(p1) + log(p2)."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما الفرق بين التقييم الخارجي (Extrinsic) والداخلي (Intrinsic)؟",
+      "en": "What is the difference between Extrinsic and Intrinsic evaluation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الخارجي يختبر النموذج في تطبيق حقيقي (مثل الترجمة)، بينما الداخلي يختبره باستخدام مقياس رياضي (مثل الحيرة) على مجموعة اختبار.",
+        "en": "Extrinsic tests the model in a real application (like translation), while Intrinsic tests it using a mathematical metric (like perplexity) on a test set."
+      },
+      "example": {
+        "ar": "الخارجي: دقة الترجمة. الداخلي: حساب قيمة الحيرة (Perplexity).",
+        "en": "Extrinsic: Translation accuracy. Intrinsic: Calculating Perplexity score."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي الحيرة (Perplexity)؟",
+      "en": "What is Perplexity?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس لمدى جودة نموذج اللغة؛ هي الاحتمال العكسي لمجموعة الاختبار مطبعاً بعدد الكلمات. القيمة الأقل تعني نموذجاً أفضل.",
+        "en": "A metric for LM quality; it is the inverse probability of the test set normalized by word count. Lower is better."
+      },
+      "example": {
+        "ar": "نموذج بحيرة 109 أفضل من نموذج بحيرة 170.",
+        "en": "A model with perplexity 109 is better than one with 170."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو عامل التفرع (Branching Factor)؟",
+      "en": "What is the Branching Factor?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عدد الكلمات المحتملة التي يمكن أن تتبع أي كلمة في اللغة. الحيرة هي متوسط عامل التفرع المرجح.",
+        "en": "The number of possible next words that can follow any word. Perplexity is the weighted average branching factor."
+      },
+      "example": {
+        "ar": "إذا كانت الكلمة تتبعها دائماً 3 كلمات محتملة بالتساوي، فعامل التفرع هو 3.",
+        "en": "If a word is always followed by 3 equally likely words, the branching factor is 3."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "لماذا يعتبر 'التدريب على مجموعة الاختبار' خطأً علمياً؟",
+      "en": "Why is 'Training on the test set' a scientific error?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنه يجعل النموذج يعين احتمالية عالية مصطنعة لبيانات الاختبار، مما يعطي وهماً بأداء ممتاز لا يعكس قدرته الحقيقية على التعميم.",
+        "en": "Because it makes the model assign artificially high probability to test data, giving an illusion of excellent performance that doesn't reflect true generalization."
+      },
+      "example": {
+        "ar": "مثل إعطاء الطالب أسئلة الامتحان الفعلي قبل يوم الاختبار.",
+        "en": "Like giving a student the exact exam questions the day before the test."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي مجموعة التطوير (Dev Set)؟",
+      "en": "What is a Dev Set?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة بيانات تُستخدم لضبط النموذج واختباره أثناء مرحلة التطوير لتجنب التعديل المفرط بناءً على مجموعة الاختبار النهائية.",
+        "en": "A dataset used to tune and test the model during development to avoid overfitting to the final test set."
+      },
+      "example": {
+        "ar": "استخدام Dev set لاختيار أفضل قيمة لـ lambda في الاستيفاء.",
+        "en": "Using the Dev set to choose the best lambda values for interpolation."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو تنعيم لابلاس (Laplace Smoothing)؟",
+      "en": "What is Laplace Smoothing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لحل مشكلة الكلمات غير المرئية (الأصفار) عن طريق إضافة 1 إلى كل التكرارات وإضافة حجم المفردات (V) إلى المقام.",
+        "en": "A technique to solve the unseen words (zeros) problem by adding 1 to all counts and adding the vocabulary size (V) to the denominator."
+      },
+      "example": {
+        "ar": "P*(w|w-1) = (Count + 1) / (Total_Count + V)",
+        "en": "P*(w|w-1) = (Count + 1) / (Total_Count + V)"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما الفرق بين الاستيفاء (Interpolation) والتراجع (Backoff)؟",
+      "en": "What is the difference between Interpolation and Backoff?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الاستيفاء يمزج احتمالات نماذج متعددة (مثل Trigram و Bigram) بأوزان، بينما التراجع يستخدم النموذج الأكبر ويتراجع للأصغر فقط إذا كان العدد صفراً.",
+        "en": "Interpolation mixes probabilities of multiple models (e.g., Trigram and Bigram) using weights, while Backoff uses the larger model and only falls back to the smaller if the count is zero."
+      },
+      "example": {
+        "ar": "الاستيفاء: 0.5*P3 + 0.3*P2 + 0.2*P1. التراجع: استخدم P3، إذا كان 0 استخدم P2.",
+        "en": "Interpolation: 0.5*P3 + 0.3*P2 + 0.2*P1. Backoff: Use P3, if 0 use P2."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل افتراض ماركوف لنموذج Bigram؟",
+      "en": "Which of the following represents the Markov assumption for a Bigram model?"
+    },
+    "options": {
+      "ar": [
+        "احتمال الكلمة يعتمد على جميع الكلمات السابقة في الجملة.",
+        "احتمال الكلمة يعتمد فقط على الكلمة التي تسبقها مباشرة.",
+        "احتمال الكلمة مستقل تماماً عن أي كلمات أخرى.",
+        "احتمال الكلمة يعتمد على الكلمتين السابقتين."
+      ],
+      "en": [
+        "The probability of a word depends on all previous words in the sentence.",
+        "The probability of a word depends only on the immediately preceding word.",
+        "The probability of a word is completely independent of any other words.",
+        "The probability of a word depends on the two preceding words."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في نموذج Bigram (ثنائي الكلمات)، ينص افتراض ماركوف على أن الكلمة تعتمد فقط على الكلمة الواحدة التي تسبقها.",
+      "en": "In a Bigram model, the Markov assumption states that a word depends only on the single word that precedes it."
+    },
+    "hint": {
+      "ar": "تذكر أن 'Bi' تعني اثنين (الكلمة الحالية والكلمة السابقة).",
+      "en": "Remember that 'Bi' means two (the current word and the previous word)."
+    },
+    "difficulty": "easy",
+    "conceptId": "chain-rule-and-markov"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "إذا كان C(A) = 100 و C(A B) = 25، فما هو P(B|A) باستخدام تقدير الاحتمالية القصوى (MLE)؟",
+      "en": "If C(A) = 100 and C(A B) = 25, what is P(B|A) using Maximum Likelihood Estimation (MLE)?"
+    },
+    "options": {
+      "ar": [
+        "0.25",
+        "4.0",
+        "0.75",
+        "125"
+      ],
+      "en": [
+        "0.25",
+        "4.0",
+        "0.75",
+        "125"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "حسب معادلة MLE: P(B|A) = C(A B) / C(A) = 25 / 100 = 0.25.",
+      "en": "According to the MLE formula: P(B|A) = C(A B) / C(A) = 25 / 100 = 0.25."
+    },
+    "hint": {
+      "ar": "اقسم عدد مرات ظهور الكلمتين معاً على عدد مرات ظهور الكلمة الأولى.",
+      "en": "Divide the count of both words together by the count of the first word."
+    },
+    "difficulty": "medium",
+    "conceptId": "maximum-likelihood-estimation"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا نستخدم اللوغاريتمات (Log probabilities) بدلاً من ضرب الاحتمالات الخام في نماذج اللغة؟",
+      "en": "Why do we use Log probabilities instead of multiplying raw probabilities in language models?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تزيد من سرعة التدريب بشكل كبير.",
+        "لتجنب مشكلة التدفق السفلي (Underflow) عند ضرب أرقام صغيرة جداً.",
+        "لأنها تقلل من قيمة الحيرة (Perplexity).",
+        "لحل مشكلة الكلمات غير المرئية (Zeros)."
+      ],
+      "en": [
+        "Because it significantly increases training speed.",
+        "To avoid underflow when multiplying very small numbers.",
+        "Because it reduces the Perplexity value.",
+        "To solve the unseen words (Zeros) problem."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ضرب العديد من الاحتمالات (وهي أرقام بين 0 و 1) ينتج عنه رقم صغير جداً لا تستطيع الحواسيب تمثيله (Underflow). جمع اللوغاريتمات يحل هذه المشكلة.",
+      "en": "Multiplying many probabilities (numbers between 0 and 1) results in a number too small for computers to represent (Underflow). Adding logs solves this."
+    },
+    "hint": {
+      "ar": "فكر في القيود الحسابية للحواسيب مع الأرقام العشرية الصغيرة.",
+      "en": "Think about the computational limits of computers with small floating-point numbers."
+    },
+    "difficulty": "medium",
+    "conceptId": "maximum-likelihood-estimation"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي العلاقة بين الحيرة (Perplexity) واحتمال مجموعة الاختبار؟",
+      "en": "What is the relationship between Perplexity and the probability of the test set?"
+    },
+    "options": {
+      "ar": [
+        "علاقة طردية: كلما زاد الاحتمال زادت الحيرة.",
+        "علاقة عكسية: تقليل الحيرة يعني تعظيم الاحتمال.",
+        "لا توجد علاقة رياضية بينهما.",
+        "الحيرة تساوي الاحتمال مضروباً في طول النص."
+      ],
+      "en": [
+        "Direct relationship: higher probability means higher perplexity.",
+        "Inverse relationship: minimizing perplexity means maximizing probability.",
+        "There is no mathematical relationship between them.",
+        "Perplexity equals probability multiplied by text length."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الحيرة هي الاحتمال العكسي (Inverse probability) مطبعاً بطول النص. النموذج الأفضل يعطي احتمالية أعلى للبيانات، مما يؤدي إلى حيرة أقل.",
+      "en": "Perplexity is the inverse probability normalized by text length. A better model assigns higher probability to the data, resulting in lower perplexity."
+    },
+    "hint": {
+      "ar": "تذكر أن النموذج الجيد لا يكون 'محتاراً' (Surprised) بالبيانات.",
+      "en": "Remember that a good model is not 'surprised' by the data."
+    },
+    "difficulty": "medium",
+    "conceptId": "perplexity"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من مجموعة التطوير (Dev set)؟",
+      "en": "What is the primary purpose of a Development (Dev) set?"
+    },
+    "options": {
+      "ar": [
+        "تدريب الأوزان الأساسية للنموذج.",
+        "التقييم النهائي للنموذج لنشره في ورقة بحثية.",
+        "ضبط النموذج واختباره أثناء التطوير دون تلويث مجموعة الاختبار.",
+        "زيادة حجم المفردات (Vocabulary) للنموذج."
+      ],
+      "en": [
+        "Training the core weights of the model.",
+        "Final evaluation of the model for publication.",
+        "Tuning and testing the model during development without contaminating the test set.",
+        "Increasing the vocabulary size of the model."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم مجموعة التطوير لضبط المعلمات الفائقة (Hyperparameters) واختبار التعديلات، مما يحافظ على مجموعة الاختبار نقية للتقييم النهائي العادل.",
+      "en": "The Dev set is used to tune hyperparameters and test tweaks, keeping the Test set pure for a fair final evaluation."
+    },
+    "hint": {
+      "ar": "إنها تعمل كمنطقة تجارب آمنة قبل الاختبار النهائي.",
+      "en": "It acts as a safe testing ground before the final exam."
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluation-and-data-splits"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف يعالج تنعيم لابلاس (Laplace Smoothing) مشكلة الأصفار؟",
+      "en": "How does Laplace Smoothing address the zeros problem?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق حذف الكلمات غير المرئية من القاموس.",
+        "عن طريق إضافة 1 إلى تكرار كل تسلسل ممكن وإضافة حجم المفردات للمقام.",
+        "عن طريق التراجع (Backoff) إلى نموذج Unigram.",
+        "عن طريق استبدال الأصفار بمتوسط الاحتمالات."
+      ],
+      "en": [
+        "By removing unseen words from the dictionary.",
+        "By adding 1 to the count of every possible sequence and adding vocabulary size to the denominator.",
+        "By backing off to a Unigram model.",
+        "By replacing zeros with the average probability."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تنعيم لابلاس (Add-1) يضيف 1 إلى بسط المعادلة (التكرارات) ويضيف حجم المفردات V إلى المقام لضمان أن مجموع الاحتمالات يظل 1.",
+      "en": "Laplace (Add-1) smoothing adds 1 to the numerator (counts) and adds the vocabulary size V to the denominator to ensure probabilities sum to 1."
+    },
+    "hint": {
+      "ar": "تذكر الاسم الآخر لتنعيم لابلاس: Add-1.",
+      "en": "Remember the other name for Laplace smoothing: Add-1."
+    },
+    "difficulty": "medium",
+    "conceptId": "generalization-and-smoothing"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في الاستيفاء الخطي (Linear Interpolation)، ما هو الشرط الرياضي لأوزان لامبدا (λ)؟",
+      "en": "In Linear Interpolation, what is the mathematical requirement for the lambda (λ) weights?"
+    },
+    "options": {
+      "ar": [
+        "يجب أن تكون جميعها متساوية.",
+        "يجب أن يكون مجموعها يساوي 1.",
+        "يجب أن تكون قيمتها أكبر من 1.",
+        "يجب أن تتناقص قيمتها مع النماذج الأصغر."
+      ],
+      "en": [
+        "They must all be equal.",
+        "Their sum must equal 1.",
+        "Their value must be greater than 1.",
+        "Their value must decrease with smaller models."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لضمان أن النتيجة النهائية تمثل توزيعاً احتمالياً صحيحاً، يجب أن يكون مجموع الأوزان المضروبة في الاحتمالات مساوياً لـ 1.",
+      "en": "To ensure the final result represents a valid probability distribution, the sum of the weights must equal 1."
+    },
+    "hint": {
+      "ar": "الاحتمالات دائماً مجموعها 1.",
+      "en": "Probabilities always sum to 1."
+    },
+    "difficulty": "easy",
+    "conceptId": "interpolation-and-backoff"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية في استخدام تنعيم لابلاس (Add-1) في معالجة اللغات الطبيعية (NLP)؟",
+      "en": "What is the main problem with using Laplace (Add-1) smoothing in NLP?"
+    },
+    "options": {
+      "ar": [
+        "أنه معقد جداً من الناحية الحسابية.",
+        "أنه لا يحل مشكلة الأصفار بشكل كامل.",
+        "أنه يسرق كمية كبيرة جداً من الاحتمالية من الكلمات الشائعة لأن حجم المفردات (V) ضخم.",
+        "أنه يتطلب استخدام اللوغاريتمات مما يبطئ النظام."
+      ],
+      "en": [
+        "It is computationally too complex.",
+        "It does not fully solve the zeros problem.",
+        "It steals too much probability mass from frequent words because the vocabulary size (V) is huge.",
+        "It requires using logarithms which slows down the system."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "لأن حجم المفردات V في اللغات الطبيعية كبير جداً، فإن إضافة V إلى المقام يقلل بشكل كبير من احتمالات الكلمات الشائعة التي رأيناها بالفعل، مما يشوه التوزيع.",
+      "en": "Because vocabulary size V in natural languages is huge, adding V to the denominator drastically reduces the probabilities of frequent words we actually saw, distorting the distribution."
+    },
+    "hint": {
+      "ar": "فكر في تأثير إضافة رقم كبير جداً (V) إلى مقام الكسر.",
+      "en": "Think about the effect of adding a very large number (V) to the denominator of a fraction."
+    },
+    "difficulty": "hard",
+    "conceptId": "generalization-and-smoothing"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما الذي يوضحه توليد نصوص عشوائية (Sampling) باستخدام نموذج 4-gram على نصوص شكسبير؟",
+      "en": "What does generating random text (Sampling) using a 4-gram model on Shakespeare's corpus illustrate?"
+    },
+    "options": {
+      "ar": [
+        "أن النموذج فهم القواعد النحوية للغة الإنجليزية تماماً.",
+        "أن النموذج يعاني من فرط التخصيص (Overfitting) ويقوم بنسخ جمل التدريب حرفياً بسبب تناثر البيانات.",
+        "أن نماذج 4-gram أسرع في التوليد من نماذج Bigram.",
+        "أن شكسبير استخدم مفردات محدودة جداً."
+      ],
+      "en": [
+        "That the model perfectly understood English grammar.",
+        "That the model suffers from overfitting and regurgitates training sentences verbatim due to data sparsity.",
+        "That 4-gram models are faster at generation than Bigram models.",
+        "That Shakespeare used a very limited vocabulary."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بسبب ندرة تسلسلات 4 كلمات (Data Sparsity)، يحفظ النموذج الجمل كما هي. عند أخذ العينات، فإنه يعيد إنتاج جمل التدريب بدلاً من توليد جمل جديدة، وهو مثال كلاسيكي لفرط التخصيص.",
+      "en": "Due to the rarity of 4-word sequences (Data Sparsity), the model memorizes sentences. When sampled, it reproduces training sentences instead of generating novel ones, a classic example of overfitting."
+    },
+    "hint": {
+      "ar": "إذا كان النموذج يمتلك خياراً واحداً فقط للكلمة التالية في معظم الأوقات، فماذا يفعل في الواقع؟",
+      "en": "If the model only has one choice for the next word most of the time, what is it actually doing?"
+    },
+    "difficulty": "hard",
+    "conceptId": "sampling-and-shannon-game"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في سياق النماذج اللغوية، ماذا يعني مصطلح 'تناثر البيانات' (Data Sparsity)؟",
+      "en": "In the context of language models, what does the term 'Data Sparsity' mean?"
+    },
+    "options": {
+      "ar": [
+        "أن البيانات تحتوي على الكثير من الأخطاء الإملائية.",
+        "أن معظم التسلسلات الممكنة للكلمات لن تظهر أبداً في بيانات التدريب، مهما كانت كبيرة.",
+        "أن النموذج صغير جداً ولا يمكنه تخزين البيانات.",
+        "أن الكلمات في اللغة الإنجليزية قصيرة جداً."
+      ],
+      "en": [
+        "That the data contains many spelling errors.",
+        "That most possible word sequences will never appear in the training data, no matter how large.",
+        "That the model is too small to store the data.",
+        "That words in the English language are too short."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تناثر البيانات يشير إلى حقيقة أن اللغة واسعة جداً، ومعظم تركيبات الكلمات الممكنة (N-grams) لن تظهر في أي مجموعة تدريب، مما يؤدي إلى احتمالات صفرية.",
+      "en": "Data sparsity refers to the fact that language is vast, and most possible word combinations (N-grams) will not appear in any training corpus, leading to zero probabilities."
+    },
+    "hint": {
+      "ar": "فكر في عدد الجمل الممكنة في اللغة مقارنة بعدد الجمل في أي كتاب.",
+      "en": "Think about the number of possible sentences in a language compared to the number of sentences in any book."
+    },
+    "difficulty": "medium",
+    "conceptId": "language-modeling-basics"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن قيمة الحيرة (Perplexity) الأعلى تعني نموذجاً أفضل. تذكر دائماً: الحيرة تقيس مدى 'مفاجأة' النموذج. كلما كانت المفاجأة أقل (رقم أصغر)، كان النموذج أفضل في التنبؤ.</template>
+    <template class="content-en">Believing that a higher Perplexity value means a better model. Always remember: Perplexity measures how 'surprised' the model is. Less surprise (lower number) means a better predictive model.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">ضرب الاحتمالات الخام لحساب احتمال جملة طويلة في الكود البرمجي. هذا سيؤدي حتماً إلى Underflow (النتيجة صفر). استخدم دائماً جمع اللوغاريتمات (Log probabilities).</template>
+    <template class="content-en">Multiplying raw probabilities to calculate the probability of a long sentence in code. This will inevitably lead to Underflow (result becomes zero). Always use the addition of Log probabilities.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تنعيم لابلاس (Add-1) يبدو رائعاً نظرياً، لكنه كارثي عملياً في NLP. لأن حجم المفردات (V) ضخم جداً، فإنه يسرق جزءاً كبيراً من الاحتمالية من الكلمات التي رأيناها بالفعل ويعطيها للكلمات غير المرئية.</template>
+    <template class="content-en">Laplace (Add-1) smoothing looks great in theory, but is disastrous in practice for NLP. Because vocabulary size (V) is huge, it steals a massive chunk of probability from words we actually saw and gives it to unseen words.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">افتراض ماركوف هو 'شر لا بد منه' في نماذج N-gram للتعامل مع الحسابات، لكنه يفشل تماماً في فهم التبعيات طويلة المدى (Long-distance dependencies) في الجمل المعقدة.</template>
+    <template class="content-en">The Markov assumption is a 'necessary evil' in N-gram models to make computations tractable, but it completely fails to understand long-distance dependencies in complex sentences.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

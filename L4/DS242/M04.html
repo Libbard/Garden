@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="4" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التنقل في البيانات الضخمة باستخدام القواميس (الجزء الأول) · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#understanding-data-dictionaries" class="toc-link" data-bilingual>
+        <template class="content-ar">فهم قواميس البيانات</template>
+        <template class="content-en">Understanding Data Dictionaries</template>
+        <span class="content-target">فهم قواميس البيانات</span>
+      </a>
+      <a href="#creating-a-data-dictionary" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء قاموس بيانات</template>
+        <template class="content-en">Creating a Data Dictionary</template>
+        <span class="content-target">إنشاء قاموس بيانات</span>
+      </a>
+      <a href="#accessing-dictionary-data" class="toc-link" data-bilingual>
+        <template class="content-ar">الوصول إلى بيانات القاموس</template>
+        <template class="content-en">Accessing Dictionary Data</template>
+        <span class="content-target">الوصول إلى بيانات القاموس</span>
+      </a>
+      <a href="#getting-data-with-get" class="toc-link" data-bilingual>
+        <template class="content-ar">استرجاع البيانات بأمان باستخدام get()</template>
+        <template class="content-en">Getting Dictionary Data with get()</template>
+        <span class="content-target">استرجاع البيانات بأمان باستخدام get()</span>
+      </a>
+      <a href="#adding-or-changing-dictionary-data" class="toc-link" data-bilingual>
+        <template class="content-ar">إضافة أو تغيير بيانات القاموس</template>
+        <template class="content-en">Adding or Changing Dictionary Data</template>
+        <span class="content-target">إضافة أو تغيير بيانات القاموس</span>
+      </a>
+      <a href="#looping-through-a-dictionary" class="toc-link" data-bilingual>
+        <template class="content-ar">التكرار عبر القاموس</template>
+        <template class="content-en">Looping through a Dictionary</template>
+        <span class="content-target">التكرار عبر القاموس</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الأول)</h1>
+      <p class="hero-description">مقدمة شاملة لقواميس البيانات في بايثون، تشمل إنشائها، الوصول إلى بياناتها، تعديلها، والتكرار عبر عناصرها.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Cruising Massive Data with Dictionaries (Part 1)</h1>
+      <p class="hero-description">A comprehensive introduction to Python data dictionaries, covering creation, data access, modification, and iteration.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بايثون</span>
+      <span class="tag">هياكل البيانات</span>
+      <span class="tag">القواميس</span>
+      <span class="tag">البرمجة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Python</span>
+      <span class="tag">Data Structures</span>
+      <span class="tag">Dictionaries</span>
+      <span class="tag">Programming</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>إنشاء قاموس بيانات وفهم كيفية التكرار عبر عناصره.</span></li>
+      <li><span class="obj-icon">✦</span><span>نسخ القواميس وحذف العناصر منها (مقدمة).</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام القواميس متعددة المفاتيح لتخزين بيانات معقدة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Producing a data dictionary and seeing how to loop through a dictionary.</span></li>
+      <li><span class="obj-icon">✦</span><span>Copying dictionaries and Deleting items in a dictionary.</span></li>
+      <li><span class="obj-icon">✦</span><span>Using multi-key dictionaries.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="understanding-data-dictionaries" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> فهم قواميس البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Understanding Data Dictionaries</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القاموس هو هيكل بيانات يشبه القائمة، لكنه يستخدم <b>مفاتيح فريدة (Unique Keys)</b> للوصول إلى البيانات بدلاً من الفهارس الرقمية، تماماً مثل دليل الهاتف الذي تبحث فيه بالاسم لتجد الرقم.</p></template>
+    <template class="content-en"><p>A dictionary is a data structure similar to a list, but it uses <b>unique keys</b> to access data instead of numerical indices, much like a phonebook where you look up a name to find a number.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرف قواميس البيانات (Data Dictionaries) في بعض اللغات بالمصفوفات المترابطة (Associative Arrays). على عكس القوائم التي تعتمد على الموضع (الفهرس)، يتم تحديد كل عنصر في القاموس بواسطة <b>مفتاح (Key)</b>.</p><p>يمكن أن يكون المفتاح سلسلة نصية (String) أو رقماً (Number)، والشرط الوحيد هو أن يكون فريداً لكل عنصر داخل القاموس.</p><p>القيمة (Value) المرتبطة بالمفتاح يمكن أن تكون أي شيء:</p><ul><li>رقم،</li><li>سلسلة نصية،</li><li>قائمة،</li><li>أو حتى قاموس آخر (Tuple, List, String, etc.).</li></ul><p>يمكن تخيل القاموس كجدول من عمودين:</p><ul><li><strong>العمود الأول</strong> يحتوي على المفتاح الفريد،</li><li><strong>والعمود الثاني</strong> يحتوي على القيمة المرتبطة به.</li></ul></template>
+    <template class="content-en"><p>Data dictionaries, also called <span class="smart-term" data-term-en="Associative Array" data-ar="المصفوفة المترابطة" data-en-def="Another term for a data dictionary, emphasizing the association between a key and a value.">associative array<span class="smart-term-tooltip"></span></span>s in some languages, are similar to lists. However, each item is identified not by its position, but by a <b>key</b>.</p><p>You can define the key, which can be a string or a number. The only requirement is that it must be unique to each item in the dictionary.</p><p>The value associated with a key can be a number, string, list, tuple — just about anything.</p><p>You can think of a data dictionary as a two-column table where the first column contains a unique key and the second column contains the relevant value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم القواميس؟ توفر القواميس تعقيداً زمنياً قدره O(1) في المتوسط لعمليات البحث، مما يجعلها مثالية للتعامل مع البيانات الضخمة حيث يكون البحث بالفهرس الخطي بطيئاً جداً.</p><p>ملاحظة هامة حول العرض التقديمي: في الشريحة 13، تم ذكر استخدام صيغة <code>object.key</code> (مثل <code>ppatel.full_name</code>).</p><p>في لغة بايثون القياسية، القواميس لا تدعم هذه الصيغة وتتطلب استخدام الأقواس المربعة <code>ppatel['full_name']</code>.</p><p>صيغة النقطة تُستخدم عادة مع الكائنات (Objects) أو الفئات المخصصة (Custom Classes).</p></template>
+    <template class="content-en"><p>Why use dictionaries? They provide an average time complexity of O(1) for lookups, making them highly efficient for massive datasets compared to linear list searches.</p><p>Important note on the slides: Slide 13 mentions using <code>object.key</code> syntax (e.g., <code>ppatel.full_name</code>).</p><p>In standard Python, dictionaries do not support dot notation for key access; you must use bracket notation <code>ppatel['full_name']</code>.</p><p>Dot notation is typically reserved for object attributes or specific libraries like <code>types.SimpleNamespace</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a visual representation of a dictionary as a two-column table. Left column header 'Key' (e.g., 'htanaka', 'ppatel'), Right column header 'Value' (e.g., 'Haru Tanaka', 'Priya Patel'). Show arrows pointing from Keys to Values to illustrate the mapping concept. Style: educational, dark background #0d1117, accent color #007acc, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      text {
+        font-family: system-ui, 'Cairo', 'Inter', sans-serif;
+      }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Data Dictionary (Key-Value Mapping)</text>
+  <text x="400" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">قاموس البيانات (تخطيط المفتاح والقيمة)</text>
+
+  <!-- Subtitle -->
+  <text x="400" y="65" font-size="15" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Associative arrays map unique keys to specific values</text>
+  <text x="400" y="65" font-size="15" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">المصفوفات الترابطية تربط مفاتيح فريدة بقيم محددة</text>
+
+  <!-- Headers -->
+  <!-- Key Header -->
+  <rect x="170" y="100" width="160" height="40" rx="6" fill="var(--brand-500)" />
+  <text x="250" y="126" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Key</text>
+  <text x="250" y="126" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">المفتاح</text>
+
+  <!-- Value Header -->
+  <rect x="450" y="100" width="200" height="40" rx="6" fill="var(--brand-500)" />
+  <text x="550" y="126" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Value</text>
+  <text x="550" y="126" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">القيمة</text>
+
+  <!-- Row 1 -->
+  <rect x="170" y="160" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="250" y="186" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">"htanaka"</text>
+  <text x="250" y="186" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">"htanaka"</text>
+
+  <line x1="340" y1="180" x2="435" y2="180" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="450" y="160" width="200" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="550" y="186" font-size="16" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">"Haru Tanaka"</text>
+  <text x="550" y="186" font-size="16" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">"هارو تاناكا"</text>
+
+  <!-- Row 2 -->
+  <rect x="170" y="230" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="250" y="256" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">"ppatel"</text>
+  <text x="250" y="256" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">"ppatel"</text>
+
+  <line x1="340" y1="250" x2="435" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="450" y="230" width="200" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="550" y="256" font-size="16" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">"Priya Patel"</text>
+  <text x="550" y="256" font-size="16" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">"بريا باتيل"</text>
+
+  <!-- Row 3 -->
+  <rect x="170" y="300" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="250" y="326" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">42</text>
+  <text x="250" y="326" font-size="16" font-family="monospace" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">42</text>
+
+  <line x1="340" y1="320" x2="435" y2="320" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <rect x="450" y="300" width="200" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="550" y="326" font-size="16" font-family="monospace" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">[1, 2, 3]</text>
+  <text x="550" y="326" font-size="16" font-family="monospace" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">[1, 2, 3]</text>
+
+  <!-- Annotations -->
+  <!-- Left Bracket (Keys) -->
+  <path d="M 160 170 L 145 170 L 145 330 L 160 330 M 145 250 L 130 250" fill="none" stroke="var(--brand-400)" stroke-width="2" />
+  <text x="65" y="245" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Unique</text>
+  <text x="65" y="245" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">معرفات</text>
+  <text x="65" y="265" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Identifiers</text>
+  <text x="65" y="265" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">فريدة</text>
+
+  <!-- Right Bracket (Values) -->
+  <path d="M 660 170 L 675 170 L 675 330 L 660 330 M 675 250 L 690 250" fill="none" stroke="var(--border-color)" stroke-width="2" />
+  <text x="745" y="245" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Any Data</text>
+  <text x="745" y="245" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">أي نوع</text>
+  <text x="745" y="265" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Type</text>
+  <text x="745" y="265" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">بيانات</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Lists (القوائم)</th><th>Dictionaries (القواميس)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة الوصول للبيانات</template>
+          <template class="content-en">Data Access Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">بواسطة الفهرس الرقمي (الموضع)</template>
+          <template class="content-en">By numerical index (position)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بواسطة مفتاح فريد (Key)</template>
+          <template class="content-en">By unique key</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع المعرف (Identifier)</template>
+          <template class="content-en">Identifier Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">أرقام صحيحة فقط (Integers)</template>
+          <template class="content-en">Integers only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أي نوع غير قابل للتغيير (نصوص، أرقام)</template>
+          <template class="content-en">Any immutable type (strings, numbers)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكننا استخدام قائمة (List) كمفتاح في القاموس؟</template>
+      <template class="content-en">Why can't we use a list as a key in a dictionary?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المفاتيح في القاموس يجب أن تكون غير قابلة للتغيير (Immutable) لكي يتم حساب قيمة التجزئة (Hash) الخاصة بها بشكل ثابت. القوائم قابلة للتغيير (Mutable)، لذا لا يمكن استخدامها كمفاتيح.</p></template>
+      <template class="content-en"><p>Because dictionary keys must be immutable so their hash value remains constant. Lists are mutable, meaning their contents can change, which would change their hash and break the dictionary's internal structure.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="creating-a-data-dictionary" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> إنشاء قاموس بيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Creating a Data Dictionary</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم إنشاء القاموس باستخدام الأقواس المعكوفة <code>{}</code>، حيث يُفصل بين المفتاح والقيمة بنقطتين رأسيتين <code>:</code>، ويُفصل بين كل زوج وآخر بفاصلة <code>,</code>.</p></template>
+    <template class="content-en"><p>A dictionary is created using curly braces <code>{}</code>, with keys and values separated by a colon <code>:</code>, and each pair separated by a comma <code>,</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الصيغة الأساسية لإنشاء قاموس هي:</p><p><code>name = {key:value, key:value, ...}</code></p><ul><li><b>name:</b> اسم المتغير الذي يمثل القاموس.</li><li><b>الأقواس المعكوفة {}:</b> تحيط بجميع أزواج المفاتيح والقيم.</li><li><b>النقطتان الرأسيتان (:):</b> تفصل بين اسم المفتاح والقيمة المخصصة له.</li><li><b>الفاصلة (,):</b> تفصل بين أزواج (المفتاح:القيمة) المختلفة.</li></ul><p>لجعل الكود أكثر قابلية للقراءة، غالباً ما يضع المطورون كل زوج على سطر منفصل.</p></template>
+    <template class="content-en"><p>The basic syntax for creating a data dictionary is:</p><p><code>name = {key:value, key:value, ...}</code></p><ul><li><b>name:</b> The variable name for the dictionary.</li><li><b>Curly braces {}:</b> Enclose the key-value pairs.</li><li><b>Colon (:):</b> Separates the key name from its assigned value.</li><li><b>Comma (,):</b> Separates distinct key:value pairs.</li></ul><p>To make code more readable, developers often place each key:value pair on a separate line.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من الأخطاء الشائعة عند إنشاء القواميس نسيان الفاصلة بين الأزواج أو استخدام علامة المساواة بدلاً من النقطتين الرأسيتين داخل الأقواس. بايثون صارمة جداً في هذا الصدد وأي خطأ مطبعي سيؤدي إلى <code>SyntaxError</code>.</p><p>يُسمح بترك فاصلة زائدة (Trailing Comma) بعد العنصر الأخير في القاموس، وهو ممارسة جيدة لتسهيل إضافة عناصر جديدة لاحقاً دون التسبب في أخطاء في أنظمة التحكم في الإصدار (مثل Git).</p></template>
+    <template class="content-en"><p>Common syntax errors include forgetting the comma between pairs or using an equals sign instead of a colon inside the braces. Python is strict, and these will raise a <code>SyntaxError</code>.</p><p>Leaving a trailing comma after the last key-value pair is allowed and considered a best practice. It makes adding new items later easier and produces cleaner diffs in version control systems like Git.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>people = {
+    'htanaka': 'Haru Tanaka',
+    'ppatel': 'Priya Patel',
+    'zmin': 'Zhang Min'
+}</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمت نفس المفتاح مرتين أثناء إنشاء القاموس؟</template>
+      <template class="content-en">What happens if you use the same key twice when creating a dictionary?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن يظهر خطأ، لكن بايثون ستحتفظ فقط بالقيمة الأخيرة المخصصة لهذا المفتاح، حيث سيتم الكتابة فوق القيمة الأولى.</p></template>
+      <template class="content-en"><p>No error is thrown, but Python will only keep the last value assigned to that key, overwriting the previous one.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="accessing-dictionary-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الوصول إلى بيانات القاموس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Accessing Dictionary Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك الوصول إلى قيمة معينة باستخدام الأقواس المربعة <code>dict[key]</code>، أو استخدام الدالة <code>len()</code> لمعرفة عدد العناصر، أو الكلمة المفتاحية <code>in</code> للتحقق من وجود مفتاح.</p></template>
+    <template class="content-en"><p>You can access a specific value using bracket notation <code>dict[key]</code>, use <code>len()</code> to get the item count, or the <code>in</code> keyword to check if a key exists.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك عدة طرق للتعامل مع بيانات القاموس:</p><ol><li><b>الطباعة الكاملة:</b> <code>print(people)</code> تطبع القاموس بأكمله.</li><li><b>الوصول المباشر:</b> <code>dictionaryname[key]</code> تُرجع القيمة المرتبطة بالمفتاح. إذا كان المفتاح نصاً، يجب وضعه بين علامتي تنصيص (مثل <code>people['zmin']</code>). يمكن أيضاً استخدام متغير يحتوي على نص المفتاح.</li><li><b>معرفة الطول:</b> <code>len(dictionaryname)</code> تُرجع عدد أزواج (المفتاح:القيمة) في القاموس.</li><li><b>التحقق من الوجود:</b> الكلمة المفتاحية <code>in</code> (مثل <code>'zmin' in people</code>) تُرجع <code>True</code> إذا كان المفتاح موجوداً، و <code>False</code> إذا لم يكن كذلك.</li></ol></template>
+    <template class="content-en"><p>There are several ways to work with dictionary data:</p><ol><li><b>Print all:</b> <code>print(people)</code> outputs the entire dictionary.</li><li><b>Direct Access:</b> <code>dictionaryname[key]</code> returns the value for that key. String keys need quotes (e.g., <code>people['zmin']</code>). You can also use a variable containing the string.</li><li><b>Length:</b> <code>len(dictionaryname)</code> returns the number of key:value pairs.</li><li><b>Existence Check:</b> The <code>in</code> keyword (e.g., <code>'zmin' in people</code>) returns <code>True</code> if the key exists, and <code>False</code> otherwise.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام الأقواس المربعة <code>dict[key]</code> سريع ومباشر، ولكنه يحمل مخاطرة: إذا لم يكن المفتاح موجوداً في القاموس، سيقوم البرنامج بإلقاء استثناء من نوع <code>KeyError</code> ويتوقف عن العمل (Crash). لذلك، يُفضل دائماً التحقق من وجود المفتاح باستخدام <code>in</code> قبل محاولة الوصول إليه بهذه الطريقة، أو استخدام طريقة أكثر أماناً.</p></template>
+    <template class="content-en"><p>Using bracket notation <code>dict[key]</code> is fast and direct, but risky: if the key does not exist, Python raises a <code>KeyError</code> and the program crashes.</p><p>Therefore, it is best practice to either check for existence using the <code>in</code> keyword first, or use a safer retrieval method.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>person = 'zmin'
+print(people[person]) # Prints 'Zhang Min'
+
+print(len(people)) # Prints the total number of items
+
+print('hajackson' in people) # Prints True</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل تبحث الكلمة المفتاحية <code>in</code> في المفاتيح أم في القيم؟</template>
+      <template class="content-en">Does the <code>in</code> keyword search through the keys or the values?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تبحث الكلمة المفتاحية <code>in</code> في المفاتيح (Keys) فقط بشكل افتراضي، ولا تبحث في القيم.</p></template>
+      <template class="content-en"><p>By default, the <code>in</code> keyword only searches through the dictionary's keys, not its values.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="getting-data-with-get" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> استرجاع البيانات بأمان باستخدام get()</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Getting Dictionary Data with get()</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طريقة <code>.get(key)</code> هي البديل الآمن للأقواس المربعة؛ فهي تُرجع القيمة إذا كان المفتاح موجوداً، وتُرجع <code>None</code> (بدون التسبب في انهيار البرنامج) إذا لم يكن موجوداً.</p></template>
+    <template class="content-en"><p>The <code>.get(key)</code> method is the safe alternative to bracket notation; it returns the value if the key exists, and gracefully returns <code>None</code> (without crashing) if it doesn't.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>انهيار البرنامج (Crash) عند البحث عن مفتاح غير موجود باستخدام الأقواس المربعة هو أمر قاسي. الطريقة الأكثر أناقة للتعامل مع هذا الموقف هي استخدام طريقة <code>.get()</code>.</p><p>الصيغة: <code>dictionaryname.get(key)</code></p><p>ما يجعل <code>.get()</code> مختلفة هو ما يحدث عند البحث عن اسم غير موجود: لا تحصل على خطأ، ولا ينهار البرنامج. بدلاً من ذلك، تُرجع الدالة الكلمة <code>None</code> لتعلمك أن المفتاح غير موجود في القاموس.</p></template>
+    <template class="content-en"><p>Having a program crash when looking for a non-existent key using bracket notation is harsh. A more elegant way to handle this is using the <code>.get()</code> method.</p><p>Syntax: <code>dictionaryname.get(key)</code></p><p>What makes <code>.get()</code> different is its behavior with missing keys: you don't get an error, and the program doesn't crash. Instead, it gracefully returns the word <code>None</code> to let you know the key isn't in the dictionary.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>دالة <code>.get()</code> تقبل أيضاً معاملاً ثانياً اختيارياً يمثل القيمة الافتراضية.</p><p>على سبيل المثال: <code>people.get('unknown', 'Not Found')</code> سترجع النص 'Not Found' بدلاً من <code>None</code> إذا لم يكن المفتاح موجوداً.</p><p>هذا يقلل بشكل كبير من الحاجة لكتابة جمل شرطية (if-else) للتحقق من وجود المفاتيح.</p></template>
+    <template class="content-en"><p>The <code>.get()</code> method also accepts an optional second argument as a default value.</p><p>For example, <code>people.get('unknown', 'Not Found')</code> will return 'Not Found' instead of <code>None</code> if the key is missing.</p><p>This significantly reduces the need for boilerplate if-else statements to check key existence.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>person = 'schmeedledorp'
+print(people.get(person)) # Prints: None</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون استخدام الأقواس المربعة <code>[]</code> أفضل من استخدام <code>.get()</code>؟</template>
+      <template class="content-en">When is it better to use bracket notation <code>[]</code> instead of <code>.get()</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون غياب المفتاح خطأً منطقياً فادحاً في البرنامج وتريد أن يتوقف البرنامج فوراً (Fail Fast) لتنبيهك بوجود خلل في البيانات.</p></template>
+      <template class="content-en"><p>When the absence of a key represents a critical logical error in your program, and you want it to 'fail fast' (crash) to alert you to the data inconsistency immediately.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="adding-or-changing-dictionary-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> إضافة أو تغيير بيانات القاموس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Adding or Changing Dictionary Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القواميس <b>قابلة للتغيير (Mutable)</b>. يمكنك تعيين قيمة جديدة لمفتاح باستخدام <code>dict[key] = newvalue</code>، أو استخدام طريقة <code>.update()</code> لإضافة أو تعديل العناصر.</p></template>
+    <template class="content-en"><p>Dictionaries are <b>mutable</b>. You can assign a new value using <code>dict[key] = newvalue</code>, or use the <code>.update()</code> method to add or modify items.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بما أن القواميس قابلة للتغيير، يمكنك تعديل محتوياتها برمجياً:</p><ol><li><b>التخصيص المباشر:</b> <code>dictionaryname[key] = newvalue</code>. إذا كان المفتاح موجوداً، سيتم تحديث قيمته. إذا لم يكن موجوداً، سيتم إضافته كعنصر جديد.</li><li><b>طريقة التحديث:</b> <code>dictionaryname.update({key: value})</code>. تقوم هذه الطريقة بنفس العمل: إذا كان المفتاح موجوداً، يتم تحديث القيمة. وإذا لم يكن موجوداً، يتم إضافة زوج (المفتاح:القيمة) الجديد إلى القاموس.</li></ol></template>
+    <template class="content-en"><p>Because dictionaries are <span class="smart-term" data-term-en="Mutable" data-ar="قابل للتغيير" data-en-def="An object whose state or contents can be modified after it is created (like lists and dictionaries).">mutable<span class="smart-term-tooltip"></span></span>, you can change their contents from code:</p><ol><li><b>Direct Assignment:</b> <code>dictionaryname[key] = newvalue</code>. If the key exists, its value is updated. If it doesn't exist, it is added as a new item.</li><li><b>Update Method:</b> <code>dictionaryname.update({key: value})</code>. This method does the same: if the key exists, the value is changed. If it does not exist, the key-value pair is added.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الميزة الحقيقية لدالة <code>.update()</code> تظهر عندما تريد دمج قاموسين معاً أو تحديث مفاتيح متعددة في سطر واحد، حيث تقبل الدالة قاموساً كاملاً كمعامل (مثال: <code>dict1.update(dict2)</code>). التخصيص المباشر <code>[] =</code> يقتصر على تحديث عنصر واحد في كل مرة.</p></template>
+    <template class="content-en"><p>The real power of the <code>.update()</code> method shines when you need to merge two dictionaries or update multiple keys at once, as it accepts an entire dictionary as an argument (e.g., <code>dict1.update(dict2)</code>). Direct assignment <code>[] =</code> is limited to updating one item at a time.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Change existing key
+people.update({'hrjackson' : 'Henrietta Jackson'})
+
+# Add new key
+people.update({'wwiggins' : 'Wanda Wiggins'})</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا استخدمت <code>dict1.update(dict2)</code> وكان هناك مفتاح مشترك بين القاموسين، قيمة أي قاموس سيتم الاحتفاظ بها؟</template>
+      <template class="content-en">If you use <code>dict1.update(dict2)</code> and there is a shared key between both dictionaries, which dictionary's value is kept?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم الاحتفاظ بقيمة <code>dict2</code>، حيث تقوم الدالة بالكتابة فوق قيم <code>dict1</code> بالقيم القادمة من <code>dict2</code>.</p></template>
+      <template class="content-en"><p>The value from <code>dict2</code> is kept. The method overwrites the values in <code>dict1</code> with the incoming values from <code>dict2</code>.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="looping-through-a-dictionary" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التكرار عبر القاموس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Looping through a Dictionary</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك التكرار عبر القاموس باستخدام حلقة <code>for</code>. افتراضياً، يتم التكرار عبر <b>المفاتيح</b>. للوصول للقيم استخدم <code>.values()</code>، وللوصول للاثنين معاً استخدم <code>.items()</code>.</p></template>
+    <template class="content-en"><p>You can loop through a dictionary using a <code>for</code> loop. By default, it loops through the <b>keys</b>. Use <code>.values()</code> for values, and <code>.items()</code> for both.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر بايثون خيارات متعددة للتكرار عبر القواميس:</p><ol><li><b>التكرار عبر المفاتيح:</b> <code>for person in people:</code> (أو <code>people.keys()</code>). هذا يرجع المفاتيح فقط.</li><li><b>التكرار عبر القيم:</b> <code>for person in people.values():</code>. هذا يرجع القيم المرتبطة فقط.</li><li><b>التكرار عبر المفاتيح والقيم معاً:</b> <code>for key, value in people.items():</code>. هذه هي الطريقة الأكثر شمولاً حيث ترجع الزوج كاملاً في كل دورة.</li></ol><p>إذا كنت تستخدم التكرار الافتراضي (المفاتيح)، يمكنك طباعة القيمة داخل الحلقة باستخدام <code>print(people[person])</code>.</p></template>
+    <template class="content-en"><p>Python provides multiple options for looping through dictionaries:</p><ol><li><b>Looping keys:</b> <code>for person in people:</code> (or <code>people.keys()</code>). This yields only the keys.</li><li><b>Looping values:</b> <code>for person in people.values():</code>. This yields only the values.</li><li><b>Looping both:</b> <code>for key, value in people.items():</code>. This is the most comprehensive method, yielding both the key and value simultaneously.</li></ol><p>If you use the default key loop, you can print the value inside the loop using <code>print(people[person])</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من الناحية الأدائية، استخدام <code>.items()</code> أسرع وأكثر كفاءة إذا كنت تحتاج إلى المفتاح والقيمة معاً، لأنه يتجنب الحاجة إلى إجراء عملية بحث إضافية في القاموس (Hash Lookup) داخل الحلقة كما يحدث عند استخدام <code>dict[key]</code>.</p></template>
+    <template class="content-en"><p>Performance-wise, using <code>.items()</code> is faster and more efficient if you need both the key and the value. It avoids the additional hash lookup required if you iterate over keys and then access the value using <code>dict[key]</code> inside the loop.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Looping through keys to get values
+for person in people:
+    print(people[person])
+
+# Looping directly through values
+for person in people.values():
+    print(person)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل الترتيب الذي تُطبع به العناصر في حلقة <code>for</code> مضمون؟</template>
+      <template class="content-en">Is the order in which items are printed in a <code>for</code> loop guaranteed?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بدءاً من إصدار بايثون 3.7، نعم، القواميس تحافظ على ترتيب إدخال العناصر (Insertion Order). في الإصدارات الأقدم، كان الترتيب عشوائياً.</p></template>
+      <template class="content-en"><p>As of Python 3.7, yes, dictionaries maintain insertion order. In older versions of Python, the order was arbitrary and not guaranteed.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في عالم القواميس! إذا كنتم قد أتقنتم القوائم (Lists)، فأنتم جاهزون للخطوة التالية. تخيلوا القائمة كطابور من الأشخاص، تعرفون كل شخص بموقعه (الأول، الثاني، إلخ). لكن ماذا لو كان الطابور يضم مليون شخص؟ البحث عن شخص معين سيستغرق وقتاً طويلاً. هنا يأتي دور القاموس (Dictionary). القاموس يشبه دليل الهاتف؛ لا يهم موقع الشخص، بل تبحث عنه مباشرة باستخدام 'مفتاح' فريد (اسمه مثلاً) لتحصل على 'القيمة' (رقم هاتفه). في الامتحان، ركزوا جيداً على الفرق بين الوصول للبيانات باستخدام الأقواس المربعة <code>[]</code> (التي قد تسبب انهيار البرنامج إذا أخطأتم المفتاح) وبين استخدام الدالة الآمنة <code>.get()</code>. تذكروا أيضاً أن القواميس قابلة للتغيير (Mutable)، وأن حلقة <code>for</code> الافتراضية تمر على المفاتيح فقط. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome to the world of dictionaries! If you've mastered lists, you're ready for this. Imagine a list as a line of people where you identify everyone by their position (1st, 2nd, etc.). But what if the line has a million people? Finding someone takes forever. Enter the Dictionary. It's like a phonebook; position doesn't matter. You look up a unique 'key' (a name) to instantly get the 'value' (a phone number). For the exam, pay close attention to the difference between accessing data with bracket notation <code>[]</code> (which crashes if the key is missing) versus the safe <code>.get()</code> method. Also, remember that dictionaries are mutable, and a default <code>for</code> loop only iterates over the keys. Good luck studying!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين القائمة (List) والقاموس (Dictionary)؟</template>
+          <template class="content-en">What is the main difference between a List and a Dictionary?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين القائمة (List) والقاموس (Dictionary)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">القائمة تعتمد على الفهرس الرقمي (الموضع) للوصول للبيانات، بينما القاموس يعتمد على مفاتيح فريدة (Keys) يحددها المبرمج.</template>
+          <template class="content-en">A list relies on numerical indices (positions) to access data, whereas a dictionary relies on unique keys defined by the programmer.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم طريقة <code>.get()</code> بدلاً من الأقواس المربعة <code>[]</code>؟</template>
+          <template class="content-en">Why do we use the <code>.get()</code> method instead of bracket notation <code>[]</code>?</template>
+          <span class="content-target">لماذا نستخدم طريقة <code>.get()</code> بدلاً من الأقواس المربعة <code>[]</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الأقواس المربعة تسبب انهيار البرنامج (KeyError) إذا كان المفتاح غير موجود، بينما <code>.get()</code> تُرجع <code>None</code> بأمان وتسمح للبرنامج بالاستمرار.</template>
+          <template class="content-en">Because bracket notation crashes the program (KeyError) if the key is missing, while <code>.get()</code> safely returns <code>None</code> and allows the program to continue.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن أن يحتوي القاموس على مفتاحين بنفس الاسم؟</template>
+          <template class="content-en">Can a dictionary have two keys with the same name?</template>
+          <span class="content-target">هل يمكن أن يحتوي القاموس على مفتاحين بنفس الاسم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، المفاتيح يجب أن تكون فريدة. إذا استخدمت نفس المفتاح مرتين، سيتم الاحتفاظ بالقيمة الأخيرة فقط.</template>
+          <template class="content-en">No, keys must be unique. If you use the same key twice, only the last assigned value is kept.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنني إضافة عنصر جديد إلى قاموس موجود؟</template>
+          <template class="content-en">How can I add a new item to an existing dictionary?</template>
+          <span class="content-target">كيف يمكنني إضافة عنصر جديد إلى قاموس موجود؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكنك استخدام التخصيص المباشر <code>dict['new_key'] = value</code> أو استخدام طريقة التحديث <code>dict.update({'new_key': value})</code>.</template>
+          <template class="content-en">You can use direct assignment <code>dict['new_key'] = value</code> or the update method <code>dict.update({'new_key': value})</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تفعل الكلمة المفتاحية <code>in</code> عند استخدامها مع القواميس؟</template>
+          <template class="content-en">What does the <code>in</code> keyword do when used with dictionaries?</template>
+          <span class="content-target">ماذا تفعل الكلمة المفتاحية <code>in</code> عند استخدامها مع القواميس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تتحقق مما إذا كان المفتاح موجوداً في القاموس وتُرجع <code>True</code> أو <code>False</code>.</template>
+          <template class="content-en">It checks whether a key exists in the dictionary and returns <code>True</code> or <code>False</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كتبت <code>for x in my_dict:</code>، ماذا سيمثل المتغير <code>x</code>؟</template>
+          <template class="content-en">If I write <code>for x in my_dict:</code>, what will the variable <code>x</code> represent?</template>
+          <span class="content-target">إذا كتبت <code>for x in my_dict:</code>، ماذا سيمثل المتغير <code>x</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سيمثل <code>x</code> المفاتيح (Keys) الموجودة في القاموس، وليس القيم.</template>
+          <template class="content-en"><code>x</code> will represent the keys in the dictionary, not the values.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنني طباعة جميع القيم الموجودة في القاموس؟</template>
+          <template class="content-en">How can I print all the values in a dictionary?</template>
+          <span class="content-target">كيف يمكنني طباعة جميع القيم الموجودة في القاموس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكنك استخدام حلقة التكرار مع طريقة <code>.values()</code> هكذا: <code>for v in my_dict.values(): print(v)</code>.</template>
+          <template class="content-en">You can use a loop with the <code>.values()</code> method like this: <code>for v in my_dict.values(): print(v)</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الطريقة الأفضل للحصول على المفتاح والقيمة معاً في حلقة التكرار؟</template>
+          <template class="content-en">What is the best way to get both the key and the value together in a loop?</template>
+          <span class="content-target">ما هي الطريقة الأفضل للحصول على المفتاح والقيمة معاً في حلقة التكرار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدام طريقة <code>.items()</code>، هكذا: <code>for key, value in my_dict.items():</code>.</template>
+          <template class="content-en">Using the <code>.items()</code> method, like this: <code>for key, value in my_dict.items():</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل القواميس قابلة للتغيير (Mutable)؟</template>
+          <template class="content-en">Are dictionaries mutable?</template>
+          <span class="content-target">هل القواميس قابلة للتغيير (Mutable)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يمكنك إضافة، تعديل، وحذف العناصر منها بعد إنشائها.</template>
+          <template class="content-en">Yes, you can add, modify, and delete items from them after they are created.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا استخدمت <code>dict.update()</code> بمفتاح موجود بالفعل؟</template>
+          <template class="content-en">What happens if you use <code>dict.update()</code> with a key that already exists?</template>
+          <span class="content-target">ماذا يحدث إذا استخدمت <code>dict.update()</code> بمفتاح موجود بالفعل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لن يتم إضافة عنصر جديد، بل سيتم تحديث قيمة المفتاح الموجود بالقيمة الجديدة التي مررتها.</template>
+          <template class="content-en">A new item is not added; instead, the value of the existing key is updated with the new value you provided.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو قاموس البيانات (Data Dictionary)؟",
+      "en": "What is a Data Dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هيكل بيانات يشبه القائمة، لكن يتم تحديد كل عنصر فيه بواسطة مفتاح فريد بدلاً من موقعه.",
+        "en": "A data structure similar to a list, but each item is identified by a unique key rather than its position."
+      },
+      "example": {
+        "ar": "people = {'name': 'Ali'}",
+        "en": "people = {'name': 'Ali'}"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الاسم الآخر لقواميس البيانات في بعض لغات البرمجة؟",
+      "en": "What is another name for data dictionaries in some programming languages?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المصفوفات المترابطة (Associative Arrays).",
+        "en": "Associative arrays."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الشرط الأساسي للمفتاح (Key) في القاموس؟",
+      "en": "What is the primary requirement for a key in a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن يكون فريداً (Unique) لكل عنصر في القاموس.",
+        "en": "It must be unique to each item in the dictionary."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي الأقواس المستخدمة لإنشاء قاموس في بايثون؟",
+      "en": "Which braces are used to create a dictionary in Python?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الأقواس المعكوفة { } (Curly braces).",
+        "en": "Curly braces { }."
+      },
+      "example": {
+        "ar": "my_dict = {}",
+        "en": "my_dict = {}"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الرمز المستخدم لفصل المفتاح عن القيمة؟",
+      "en": "What symbol separates a key from its value?"
+    },
+    "back": {
+      "definition": {
+        "ar": "النقطتان الرأسيتان (Colon) :",
+        "en": "A colon (:)."
+      },
+      "example": {
+        "ar": "'key': 'value'",
+        "en": "'key': 'value'"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الرمز المستخدم لفصل أزواج (المفتاح:القيمة) عن بعضها؟",
+      "en": "What symbol separates distinct key:value pairs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الفاصلة (Comma) ,",
+        "en": "A comma (,)."
+      },
+      "example": {
+        "ar": "{'a': 1, 'b': 2}",
+        "en": "{'a': 1, 'b': 2}"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "كيف تصل إلى قيمة محددة في القاموس باستخدام المفتاح؟",
+      "en": "How do you access a specific value in a dictionary using its key?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام الأقواس المربعة واسم المفتاح: dictionaryname[key]",
+        "en": "Using bracket notation: dictionaryname[key]"
+      },
+      "example": {
+        "ar": "people['zmin']",
+        "en": "people['zmin']"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ماذا تفعل الدالة len() عند استخدامها مع قاموس؟",
+      "en": "What does the len() function do when used with a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُرجع عدد العناصر (أزواج المفتاح والقيمة) في القاموس.",
+        "en": "It returns the number of items (key:value pairs) in the dictionary."
+      },
+      "example": {
+        "ar": "len(people)",
+        "en": "len(people)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف تتحقق مما إذا كان مفتاح معين موجوداً في القاموس؟",
+      "en": "How do you check if a specific key exists in a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام الكلمة المفتاحية 'in'.",
+        "en": "Using the 'in' keyword."
+      },
+      "example": {
+        "ar": "'hajackson' in people",
+        "en": "'hajackson' in people"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ماذا يحدث إذا حاولت الوصول إلى مفتاح غير موجود باستخدام الأقواس المربعة dict[key]؟",
+      "en": "What happens if you try to access a non-existent key using bracket notation dict[key]?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ينهار البرنامج ويُلقي خطأ (KeyError).",
+        "en": "The program crashes and throws an error (KeyError)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي الطريقة الآمنة للوصول إلى قيمة قد لا يكون مفتاحها موجوداً؟",
+      "en": "What is the safe method to access a value whose key might not exist?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام طريقة .get()",
+        "en": "Using the .get() method."
+      },
+      "example": {
+        "ar": "people.get('unknown_key')",
+        "en": "people.get('unknown_key')"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ماذا تُرجع طريقة .get() إذا لم يكن المفتاح موجوداً؟",
+      "en": "What does the .get() method return if the key does not exist?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُرجع القيمة None (بدون التسبب في خطأ).",
+        "en": "It returns None (without causing an error)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "هل القواميس قابلة للتغيير (Mutable) أم غير قابلة للتغيير (Immutable)؟",
+      "en": "Are dictionaries mutable or immutable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قابلة للتغيير (Mutable)، مما يعني أنه يمكنك تغيير محتوياتها بعد إنشائها.",
+        "en": "Mutable, meaning you can change their contents after creation."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف تقوم بتغيير قيمة مفتاح موجود أو إضافة مفتاح جديد باستخدام التخصيص المباشر؟",
+      "en": "How do you change an existing key's value or add a new key using direct assignment?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام الصيغة: dictionaryname[key] = newvalue",
+        "en": "Using the syntax: dictionaryname[key] = newvalue"
+      },
+      "example": {
+        "ar": "people['zmin'] = 'New Name'",
+        "en": "people['zmin'] = 'New Name'"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي الطريقة (Method) المستخدمة لإضافة أو تحديث عناصر في القاموس؟",
+      "en": "Which method is used to add or update items in a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة .update()",
+        "en": "The .update() method."
+      },
+      "example": {
+        "ar": "people.update({'key': 'value'})",
+        "en": "people.update({'key': 'value'})"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "عند استخدام حلقة for الافتراضية (for x in dict:)، ما الذي يتم التكرار عليه؟",
+      "en": "When using a default for loop (for x in dict:), what is iterated over?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم التكرار عبر المفاتيح (Keys) فقط.",
+        "en": "It iterates over the keys only."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "كيف تقوم بالتكرار عبر قيم القاموس فقط؟",
+      "en": "How do you loop through only the values of a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بإضافة .values() إلى اسم القاموس في حلقة for.",
+        "en": "By adding .values() to the dictionary name in the for loop."
+      },
+      "example": {
+        "ar": "for val in people.values():",
+        "en": "for val in people.values():"
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "كيف تقوم بالتكرار عبر المفاتيح والقيم معاً في نفس الوقت؟",
+      "en": "How do you loop through both keys and values at the same time?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام طريقة .items()",
+        "en": "By using the .items() method."
+      },
+      "example": {
+        "ar": "for k, v in people.items():",
+        "en": "for k, v in people.items():"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الأقواس التالية يُستخدم لإنشاء قاموس بيانات في بايثون؟",
+      "en": "Which of the following braces are used to create a data dictionary in Python?"
+    },
+    "options": {
+      "ar": [
+        "الأقواس المربعة [ ]",
+        "الأقواس الدائرية ( )",
+        "الأقواس المعكوفة { }",
+        "أقواس الزاوية < >"
+      ],
+      "en": [
+        "Square brackets [ ]",
+        "Parentheses ( )",
+        "Curly braces { }",
+        "Angle brackets < >"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم الأقواس المعكوفة {} لإنشاء القواميس، بينما تُستخدم [] للقوائم و () للـ Tuples.",
+      "en": "Curly braces {} are used for dictionaries, [] for lists, and () for tuples."
+    },
+    "hint": {
+      "ar": "تذكر شكل الأقواس التي تحتوي على أزواج مفتاح:قيمة.",
+      "en": "Remember the shape of the braces that hold key:value pairs."
+    },
+    "difficulty": "easy",
+    "conceptId": "creating-a-data-dictionary"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الرمز الذي يفصل بين المفتاح والقيمة داخل القاموس؟",
+      "en": "What symbol separates a key and a value inside a dictionary?"
+    },
+    "options": {
+      "ar": [
+        "الفاصلة (,)",
+        "النقطتان الرأسيتان (:)",
+        "علامة المساواة (=)",
+        "الفاصلة المنقوطة (;)"
+      ],
+      "en": [
+        "Comma (,)",
+        "Colon (:)",
+        "Equals sign (=)",
+        "Semicolon (;)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم النقطتان الرأسيتان (:) لربط المفتاح بقيمته، مثل 'name': 'Ali'.",
+      "en": "A colon (:) is used to map a key to its value, e.g., 'name': 'Ali'."
+    },
+    "hint": {
+      "ar": "يشبه الرمز المستخدم في تعريفات القواميس اللغوية.",
+      "en": "It looks like the symbol used in real-world dictionary definitions."
+    },
+    "difficulty": "easy",
+    "conceptId": "creating-a-data-dictionary"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ماذا يحدث إذا حاولت الوصول إلى مفتاح غير موجود باستخدام الصيغة <code>dict[key]</code>؟",
+      "en": "What happens if you try to access a non-existent key using the syntax <code>dict[key]</code>?"
+    },
+    "options": {
+      "ar": [
+        "يُرجع القيمة None",
+        "يُرجع القيمة 0",
+        "ينهار البرنامج ويُلقي خطأ",
+        "يتم إنشاء المفتاح تلقائياً"
+      ],
+      "en": [
+        "It returns None",
+        "It returns 0",
+        "The program crashes and throws an error",
+        "The key is automatically created"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الوصول المباشر لمفتاح غير موجود يسبب KeyError ويوقف البرنامج.",
+      "en": "Direct access to a missing key raises a KeyError and crashes the program."
+    },
+    "hint": {
+      "ar": "هذه الطريقة تعتبر 'غير آمنة' إذا لم تكن متأكداً من وجود المفتاح.",
+      "en": "This method is considered 'unsafe' if you aren't sure the key exists."
+    },
+    "difficulty": "medium",
+    "conceptId": "accessing-dictionary-data"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الدالة الآمنة التي تُرجع <code>None</code> بدلاً من الخطأ عند البحث عن مفتاح غير موجود؟",
+      "en": "Which safe method returns <code>None</code> instead of an error when searching for a non-existent key?"
+    },
+    "options": {
+      "ar": [
+        ".find()",
+        ".search()",
+        ".get()",
+        ".value()"
+      ],
+      "en": [
+        ".find()",
+        ".search()",
+        ".get()",
+        ".value()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طريقة .get() مصممة خصيصاً لاسترجاع القيم بأمان دون التسبب في انهيار البرنامج.",
+      "en": "The .get() method is specifically designed to retrieve values safely without crashing."
+    },
+    "hint": {
+      "ar": "فكر في الكلمة الإنجليزية التي تعني 'الحصول على'.",
+      "en": "Think of the English word for 'retrieve'."
+    },
+    "difficulty": "easy",
+    "conceptId": "getting-data-with-get"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من الكلمات المفتاحية التالية تُستخدم للتحقق مما إذا كان المفتاح موجوداً في القاموس؟",
+      "en": "Which of the following keywords is used to check if a key exists in a dictionary?"
+    },
+    "options": {
+      "ar": [
+        "exists",
+        "has",
+        "in",
+        "contains"
+      ],
+      "en": [
+        "exists",
+        "has",
+        "in",
+        "contains"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم الكلمة المفتاحية 'in' للتحقق من وجود المفتاح، وتُرجع True أو False.",
+      "en": "The 'in' keyword is used to check for key existence, returning True or False."
+    },
+    "hint": {
+      "ar": "كلمة قصيرة جداً من حرفين.",
+      "en": "A very short two-letter word."
+    },
+    "difficulty": "easy",
+    "conceptId": "accessing-dictionary-data"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ماذا تفعل الدالة <code>len(my_dict)</code>؟",
+      "en": "What does the function <code>len(my_dict)</code> do?"
+    },
+    "options": {
+      "ar": [
+        "تجمع كل القيم الرقمية في القاموس",
+        "تُرجع عدد أزواج (المفتاح:القيمة) في القاموس",
+        "تُرجع طول أطول مفتاح نصي",
+        "تحذف القاموس"
+      ],
+      "en": [
+        "Sums all numerical values in the dictionary",
+        "Returns the number of key:value pairs in the dictionary",
+        "Returns the length of the longest string key",
+        "Deletes the dictionary"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة len() تحسب عدد العناصر (الأزواج) الموجودة داخل هيكل البيانات.",
+      "en": "The len() function counts the number of items (pairs) inside the data structure."
+    },
+    "hint": {
+      "ar": "len هي اختصار لـ length (الطول).",
+      "en": "len is short for length."
+    },
+    "difficulty": "easy",
+    "conceptId": "accessing-dictionary-data"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "إذا استخدمت <code>dict.update({'key': 'value'})</code> وكان المفتاح موجوداً بالفعل، ماذا سيحدث؟",
+      "en": "If you use <code>dict.update({'key': 'value'})</code> and the key already exists, what happens?"
+    },
+    "options": {
+      "ar": [
+        "سيتم تجاهل الأمر ولن يتغير شيء",
+        "سيتم إضافة مفتاح جديد بنفس الاسم",
+        "سيتم تحديث القيمة القديمة بالقيمة الجديدة",
+        "سيظهر خطأ يمنع التكرار"
+      ],
+      "en": [
+        "The command is ignored and nothing changes",
+        "A new key with the same name is added",
+        "The old value is updated with the new value",
+        "An error is thrown preventing duplication"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "القواميس لا تسمح بتكرار المفاتيح. إذا كان المفتاح موجوداً، فإن update() تقوم بتعديل قيمته.",
+      "en": "Dictionaries do not allow duplicate keys. If the key exists, update() modifies its value."
+    },
+    "hint": {
+      "ar": "تذكر أن القواميس قابلة للتغيير (Mutable).",
+      "en": "Remember that dictionaries are mutable."
+    },
+    "difficulty": "medium",
+    "conceptId": "adding-or-changing-dictionary-data"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "عند كتابة حلقة <code>for item in my_dict:</code>، ما هي القيمة التي يأخذها المتغير <code>item</code> في كل دورة؟",
+      "en": "When writing a loop <code>for item in my_dict:</code>, what value does the variable <code>item</code> take in each iteration?"
+    },
+    "options": {
+      "ar": [
+        "القيمة (Value)",
+        "المفتاح (Key)",
+        "زوج (المفتاح والقيمة) معاً",
+        "الفهرس الرقمي للعنصر"
+      ],
+      "en": [
+        "The Value",
+        "The Key",
+        "The (Key, Value) pair together",
+        "The numerical index of the item"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التكرار الافتراضي على القاموس يمر عبر المفاتيح (Keys) فقط.",
+      "en": "Default iteration over a dictionary yields only the keys."
+    },
+    "hint": {
+      "ar": "هذا هو السلوك الافتراضي ما لم تستخدم طرقاً إضافية مثل .values().",
+      "en": "This is the default behavior unless you use additional methods like .values()."
+    },
+    "difficulty": "medium",
+    "conceptId": "looping-through-a-dictionary"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي طريقة يجب استخدامها في حلقة <code>for</code> للحصول على المفتاح والقيمة معاً في نفس الوقت؟",
+      "en": "Which method should be used in a <code>for</code> loop to get both the key and the value at the same time?"
+    },
+    "options": {
+      "ar": [
+        ".keys()",
+        ".values()",
+        ".items()",
+        ".both()"
+      ],
+      "en": [
+        ".keys()",
+        ".values()",
+        ".items()",
+        ".both()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طريقة .items() تُرجع أزواجاً من (المفتاح، القيمة) في كل دورة من الحلقة.",
+      "en": "The .items() method yields (key, value) pairs in each iteration of the loop."
+    },
+    "hint": {
+      "ar": "فكر في الكلمة التي تعني 'عناصر'.",
+      "en": "Think of the word that means 'items'."
+    },
+    "difficulty": "easy",
+    "conceptId": "looping-through-a-dictionary"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من العبارات التالية صحيحة حول قواميس البيانات؟",
+      "en": "Which of the following statements is true about data dictionaries?"
+    },
+    "options": {
+      "ar": [
+        "يمكن أن تحتوي على مفاتيح مكررة.",
+        "يتم الوصول إلى عناصرها بناءً على موضعها (الفهرس).",
+        "هي هياكل بيانات غير قابلة للتغيير (Immutable).",
+        "يجب أن يكون لكل عنصر مفتاح فريد."
+      ],
+      "en": [
+        "They can contain duplicate keys.",
+        "Their items are accessed based on their position (index).",
+        "They are immutable data structures.",
+        "Each item must have a unique key."
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الشرط الأساسي للقاموس هو أن كل مفتاح يجب أن يكون فريداً لضمان الوصول الصحيح للبيانات.",
+      "en": "The fundamental requirement of a dictionary is that each key must be unique to ensure correct data retrieval."
+    },
+    "hint": {
+      "ar": "كيف سيعرف القاموس أي قيمة يرجعها إذا كان هناك اسمان متطابقان؟",
+      "en": "How would the dictionary know which value to return if there were two identical names?"
+    },
+    "difficulty": "medium",
+    "conceptId": "understanding-data-dictionaries"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الأقواس المربعة <code>dict[key]</code> للبحث عن مفتاح لست متأكداً من وجوده. هذا سيؤدي إلى انهيار البرنامج (KeyError). استخدم دائماً <code>.get(key)</code> أو تحقق باستخدام <code>in</code> أولاً.</template>
+    <template class="content-en">Using bracket notation <code>dict[key]</code> to look up a key you aren't sure exists. This will cause a program crash (KeyError). Always use <code>.get(key)</code> or check with <code>in</code> first.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المفاتيح يجب أن تكون فريدة. إذا قمت بتعيين قيمة لمفتاح موجود بالفعل (سواء باستخدام التخصيص المباشر أو <code>.update()</code>)، سيتم مسح القيمة القديمة واستبدالها بالجديدة دون أي تحذير.</template>
+    <template class="content-en">Keys must be unique. If you assign a value to an already existing key (either via direct assignment or <code>.update()</code>), the old value is silently overwritten with the new one.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">دالة <code>.get()</code> لا تقتصر على إرجاع <code>None</code>. يمكنك تمرير معامل ثانٍ ليكون القيمة الافتراضية، مثل <code>dict.get(key, 0)</code> لترجع صفر بدلاً من <code>None</code> إذا لم تجد المفتاح.</template>
+    <template class="content-en">The <code>.get()</code> method isn't limited to returning <code>None</code>. You can pass a second argument as a default value, like <code>dict.get(key, 0)</code> to return zero instead of <code>None</code> if the key is missing.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في الشريحة 13، تم ذكر صيغة <code>object.key</code> (مثل <code>ppatel.full_name</code>). احذر: هذه الصيغة لا تعمل مع القواميس القياسية في بايثون وستسبب خطأ <code>AttributeError</code>. القواميس تتطلب الأقواس المربعة <code>ppatel['full_name']</code>.</template>
+    <template class="content-en">Slide 13 mentions <code>object.key</code> syntax (e.g., <code>ppatel.full_name</code>). Beware: this syntax does NOT work with standard Python dictionaries and will cause an <code>AttributeError</code>. Dictionaries require bracket notation <code>ppatel['full_name']</code>.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

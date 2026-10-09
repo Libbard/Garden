@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT478" data-module="3" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تشفير المفتاح العام ومصادقة الرسائل · IT478 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT478" data-page-title-en="IT478">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=IT478"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#message-integrity-and-hash-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">سلامة الرسالة ودوال التجزئة</template>
+        <template class="content-en">Message Integrity and Hash Functions</template>
+        <span class="content-target">سلامة الرسالة ودوال التجزئة</span>
+      </a>
+      <a href="#message-authentication-mdc-vs-mac" class="toc-link" data-bilingual>
+        <template class="content-ar">مصادقة الرسائل: MDC مقابل MAC</template>
+        <template class="content-en">Message Authentication: MDC vs MAC</template>
+        <span class="content-target">مصادقة الرسائل: MDC مقابل MAC</span>
+      </a>
+      <a href="#cryptographic-hash-algorithms-sha" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات التجزئة التشفيرية (SHA)</template>
+        <template class="content-en">Cryptographic Hash Algorithms (SHA)</template>
+        <span class="content-target">خوارزميات التجزئة التشفيرية (SHA)</span>
+      </a>
+      <a href="#public-key-cryptography-principles" class="toc-link" data-bilingual>
+        <template class="content-ar">مبادئ تشفير المفتاح العام (غير المتماثل)</template>
+        <template class="content-en">Public-Key (Asymmetric) Cryptography Principles</template>
+        <span class="content-target">مبادئ تشفير المفتاح العام (غير المتماثل)</span>
+      </a>
+      <a href="#rsa-cryptosystem" class="toc-link" data-bilingual>
+        <template class="content-ar">نظام تشفير RSA</template>
+        <template class="content-en">RSA Cryptosystem</template>
+        <span class="content-target">نظام تشفير RSA</span>
+      </a>
+      <a href="#diffie-hellman-key-exchange" class="toc-link" data-bilingual>
+        <template class="content-ar">تبادل مفاتيح ديفي-هيلمان</template>
+        <template class="content-en">Diffie-Hellman Key Exchange</template>
+        <span class="content-target">تبادل مفاتيح ديفي-هيلمان</span>
+      </a>
+      <a href="#digital-signatures-concept-requirements" class="toc-link" data-bilingual>
+        <template class="content-ar">التواقيع الرقمية: المفهوم والمتطلبات</template>
+        <template class="content-en">Digital Signatures: Concept &amp; Requirements</template>
+        <span class="content-target">التواقيع الرقمية: المفهوم والمتطلبات</span>
+      </a>
+      <a href="#digital-signature-production-verification" class="toc-link" data-bilingual>
+        <template class="content-ar">إنتاج والتحقق من التوقيع الرقمي</template>
+        <template class="content-en">Digital Signature Production &amp; Verification</template>
+        <span class="content-target">إنتاج والتحقق من التوقيع الرقمي</span>
+      </a>
+      <a href="#certificate-authorities-and-trust" class="toc-link" data-bilingual>
+        <template class="content-ar">سلطات الشهادات (CA) والثقة</template>
+        <template class="content-en">Certificate Authorities (CA) and Trust</template>
+        <span class="content-target">سلطات الشهادات (CA) والثقة</span>
+      </a>
+      <a href="#digital-signature-services-algorithms" class="toc-link" data-bilingual>
+        <template class="content-ar">خدمات وخوارزميات التوقيع الرقمي</template>
+        <template class="content-en">Digital Signature Services &amp; Algorithms</template>
+        <span class="content-target">خدمات وخوارزميات التوقيع الرقمي</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · IT478
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تشفير المفتاح العام ومصادقة الرسائل</h1>
+      <p class="hero-description">تغطي هذه الوحدة مفاهيم سلامة الرسائل، دوال التجزئة الآمنة، مبادئ وخوارزميات تشفير المفتاح العام (مثل RSA و Diffie-Hellman)، والتواقيع الرقمية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Public-key Cryptography &amp; Message Authentication</h1>
+      <p class="hero-description">This module covers message integrity, secure hash functions, public-key cryptography principles and algorithms (like RSA and Diffie-Hellman), and digital signatures.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن الشبكات</span>
+      <span class="tag">دوال التجزئة</span>
+      <span class="tag">التشفير غير المتماثل</span>
+      <span class="tag">التوقيع الرقمي</span>
+      <span class="tag">RSA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Security</span>
+      <span class="tag">Hash Functions</span>
+      <span class="tag">Asymmetric Cryptography</span>
+      <span class="tag">Digital Signatures</span>
+      <span class="tag">RSA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح مفهوم سلامة الرسالة والمصادقة عليها.</span></li>
+      <li><span class="obj-icon">✦</span><span>توضيح الحاجة إلى دالة التجزئة في مصادقة الرسائل.</span></li>
+      <li><span class="obj-icon">✦</span><span>عرض المبادئ الأساسية للتشفير غير المتماثل.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقديم نظرة عامة على خوارزمية RSA.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم مفهوم التوقيع الرقمي وآلية عمله.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the message integrity and authentication concept.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the needs for a hash function in message authentication.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present the basic principles of asymmetric cryptography.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present an overview of the RSA algorithm.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the digital signature concept.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="message-integrity-and-hash-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> سلامة الرسالة ودوال التجزئة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Message Integrity and Hash Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دالة التجزئة هي خوارزمية رياضية تنشئ بصمة رقمية فريدة للرسالة لضمان عدم تغييرها (سلامة الرسالة).</p></template>
+    <template class="content-en"><p>A hash function is a mathematical algorithm that creates a unique digital fingerprint for a message to ensure it hasn't been altered (message integrity).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>توفر أنظمة التشفير التقليدية السرية، ولكن ليس بالضرورة <b>النزاهة (Integrity)</b>. النزاهة تعني أن المهاجمين لا يمكنهم تغيير أو تدمير المعلومات.</p><p>المعادل الإلكتروني للوثيقة والبصمة هو زوج <b>الرسالة وخلاصة الرسالة (Message Digest)</b>. دالة التجزئة تقبل رسالة متغيرة الحجم كمدخل وتنتج خلاصة رسالة ثابتة الحجم كمخرج.</p><p>خصائص دالة التجزئة الآمنة:</p><ol><li>يمكن تطبيقها على كتلة بيانات بأي حجم.</li><li>تنتج مخرجات بطول ثابت.</li><li>سهلة الحساب نسبياً.</li><li><b>مقاومة للصورة المسبقة (Preimage resistant):</b> من المستحيل حسابياً إيجاد الرسالة الأصلية من التجزئة (دالة ذات اتجاه واحد).</li><li><b>مقاومة للصورة المسبقة الثانية (Second preimage resistant):</b> من المستحيل إيجاد رسالة أخرى لها نفس تجزئة رسالة معينة (مقاومة التصادم الضعيف).</li><li><b>مقاومة التصادم (Collision resistant):</b> من المستحيل إيجاد أي رسالتين مختلفتين لهما نفس التجزئة (مقاومة التصادم القوي).</li></ol></template>
+    <template class="content-en"><p>Traditional cryptography systems provide secrecy, but not necessarily <b>integrity</b>. Integrity means attackers cannot change or destroy information.</p><p>The electronic equivalent of a document and fingerprint is the <b>message and digest pair</b>. A hash function accepts a variable-size message as input and produces a fixed-size message digest as output.</p><p>Properties of a secure hash function:</p><ol><li>Can be applied to a block of data of any size.</li><li>Produces a fixed-length output.</li><li>Relatively easy to compute.</li><li><b><span class="smart-term" data-term-en="Preimage resistant" data-ar="مقاوم للصورة المسبقة" data-en-def="Computationally infeasible to find the input message given only its hash value (one-way).">Preimage resistant<span class="smart-term-tooltip"></span></span> (One-way):</b> Computationally infeasible to find the original message from the hash.</li><li><b>Second preimage resistant (Weak <span class="smart-term" data-term-en="Collision resistant" data-ar="مقاوم للتصادم" data-en-def="Computationally infeasible to find any two distinct inputs that produce the same hash output.">collision resistant<span class="smart-term-tooltip"></span></span>):</b> Infeasible to find another message with the same hash as a given message.</li><li><b>Collision resistant (Strong collision resistant):</b> Infeasible to find ANY two different messages that produce the same hash.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر خاصية الاتجاه الواحد (One-way) حاسمة لأنها تمنع المهاجم من عكس العملية الهندسية للتجزئة لاكتشاف محتوى الرسالة الأصلية. الطريقة الوحيدة لكسرها هي هجوم القوة العمياء أو استخدام جداول قوس قزح (Rainbow tables).</p><p>مقاومة التصادم القوية ضرورية لمنع هجمات أعياد الميلاد (Birthday attacks)، حيث يحاول المهاجم العثور على أي رسالتين عشوائيتين تتطابقان في التجزئة لخداع النظام.</p><p>للتحقق من النزاهة، يقوم المستلم بتشغيل دالة التجزئة على الرسالة المستلمة ومقارنتها بالتجزئة المرفقة. إذا تطابقتا، فالرسالة لم تتغير.</p></template>
+    <template class="content-en"><p>The one-way property is crucial because it prevents an attacker from reverse-engineering the hash to discover the original message content. The only way to break it is a brute-force search or using rainbow tables.</p><p>Strong collision resistance is necessary to prevent birthday attacks, where an attacker tries to find ANY two random messages that hash to the same value to trick the system.</p><p>To check integrity, the recipient runs the hash function on the received message and compares it with the attached digest. If they match, the message is unchanged.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حيث M هي الرسالة متغيرة الطول، H هي دالة التجزئة، و h هي خلاصة الرسالة ثابتة الطول.</strong></template>
+      <template class="content-en"><strong>Where M is the variable-length message, H is the hash function, and h is the fixed-length message digest.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$H(M) = h$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A flowchart showing Message Integrity checking. On the left, a 'Current Message' document flows into a yellow box labeled 'Hash function'. The output is a blue box labeled 'Current digest'. Below it, a black box labeled 'Previous digest'. Both digests point to a diamond decision node labeled 'Same?'. If 'Y' (Yes), arrow points to 'Accept (Message is not changed)'. If 'N' (No), arrow points up to 'Message is changed (discard)'. Style: educational, dark background #0d1117, accent colors yellow and blue, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Hash Function Box -->
+    <linearGradient id="hashGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Connecting Lines and Arrows -->
+  <g id="arrows" stroke="var(--brand-500)" stroke-width="2" fill="none">
+    <!-- Message to Hash Function -->
+    <path d="M 150 150 L 208 150" marker-end="url(#arrow)" />
+    
+    <!-- Hash Function to Current Digest -->
+    <path d="M 340 150 L 378 150" marker-end="url(#arrow)" />
+    
+    <!-- Current Digest to Merge Point -->
+    <path d="M 510 150 L 530 150 L 530 210" />
+    
+    <!-- Previous Digest to Merge Point -->
+    <path d="M 510 270 L 530 270 L 530 210" />
+    
+    <!-- Merge Point to Diamond -->
+    <path d="M 530 210 L 548 210" marker-end="url(#arrow)" />
+    <circle cx="530" cy="210" r="3" fill="var(--brand-500)" stroke="none" />
+    
+    <!-- Diamond to Reject (N) -->
+    <path d="M 600 170 L 600 115" marker-end="url(#arrow)" />
+    
+    <!-- Diamond to Accept (Y) -->
+    <path d="M 600 250 L 600 305" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- Shapes and Nodes -->
+  <g id="nodes">
+    <!-- Current Message (Document Shape) -->
+    <path d="M 50 115 L 120 115 L 150 145 L 150 185 L 50 185 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 120 115 L 120 145 L 150 145" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+    
+    <!-- Hash Function Box -->
+    <rect x="220" y="120" width="120" height="60" rx="8" fill="url(#hashGradient)" stroke="var(--brand-600)" stroke-width="1" />
+    
+    <!-- Current Digest Box -->
+    <rect x="390" y="125" width="120" height="50" rx="4" fill="var(--brand-500)" />
+    
+    <!-- Previous Digest Box -->
+    <rect x="390" y="245" width="120" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Decision Diamond (Same?) -->
+    <polygon points="600,170 640,210 600,250 560,210" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Reject Box (Message is changed) -->
+    <rect x="510" y="30" width="180" height="75" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4" />
+    <!-- Reject Icon (X) -->
+    <path d="M 592 42 L 608 58 M 608 42 L 592 58" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" fill="none" />
+    
+    <!-- Accept Box (Message is not changed) -->
+    <rect x="510" y="315" width="180" height="75" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <!-- Accept Icon (Checkmark) -->
+    <path d="M 590 332 L 598 340 L 610 326" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+
+  <!-- Text Labels -->
+  <g id="labels" font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle">
+    
+    <!-- Current Message -->
+    <text x="100" y="155" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">Current Message</text>
+    <text x="100" y="155" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">الرسالة الحالية</text>
+    
+    <!-- Hash Function -->
+    <text x="280" y="155" class="gsvg-en" fill="var(--on-brand-hi)" font-size="15" font-weight="bold">Hash Function</text>
+    <text x="280" y="155" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="15" font-weight="bold">دالة الهاش</text>
+    
+    <!-- Current Digest -->
+    <text x="450" y="155" class="gsvg-en" fill="var(--on-brand-lo)" font-size="15" font-weight="bold">Current Digest</text>
+    <text x="450" y="155" class="gsvg-ar" fill="var(--on-brand-lo)" font-size="15" font-weight="bold">البصمة الحالية</text>
+    
+    <!-- Previous Digest -->
+    <text x="450" y="275" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">Previous Digest</text>
+    <text x="450" y="275" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">البصمة السابقة</text>
+    
+    <!-- Decision Diamond (Same?) -->
+    <text x="600" y="215" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Same?</text>
+    <text x="600" y="215" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">متطابق؟</text>
+    
+    <!-- Reject Box Text -->
+    <text x="600" y="77" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">Message is changed</text>
+    <text x="600" y="95" class="gsvg-en" fill="var(--text-secondary)" font-size="13">(discard)</text>
+    
+    <text x="600" y="77" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">الرسالة تم تغييرها</text>
+    <text x="600" y="95" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">(تُرفض)</text>
+    
+    <!-- Accept Box Text -->
+    <text x="600" y="362" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="bold">Accept</text>
+    <text x="600" y="380" class="gsvg-en" fill="var(--text-secondary)" font-size="13">(Message is not changed)</text>
+    
+    <text x="600" y="362" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="bold">قبول</text>
+    <text x="600" y="380" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">(الرسالة لم تتغير)</text>
+    
+    <!-- Yes / No Labels -->
+    <text x="615" y="145" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="15" font-weight="bold">N</text>
+    <text x="615" y="145" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="15" font-weight="bold">لا</text>
+    
+    <text x="615" y="285" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="15" font-weight="bold">Y</text>
+    <text x="615" y="285" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="15" font-weight="bold">نعم</text>
+
+  </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>MDC (Modification Detection Code)</th><th>MAC (Message Authentication Code)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الأساسي</template>
+          <template class="content-en">Primary Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">سلامة الرسالة فقط</template>
+          <template class="content-en">Message Integrity only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سلامة الرسالة ومصادقة المصدر</template>
+          <template class="content-en">Message Integrity &amp; Data Origin Authentication</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استخدام المفتاح السري</template>
+          <template class="content-en">Use of Secret Key</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يستخدم مفتاح سري</template>
+          <template class="content-en">Does not use a secret key</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يستخدم مفتاح سري مشترك</template>
+          <template class="content-en">Uses a shared secret key</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">متطلبات القناة</template>
+          <template class="content-en">Channel Requirements</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتطلب قناة محصنة ضد التغيير لإرسال الرمز</template>
+          <template class="content-en">Requires a channel immune to change for the code</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يمكن إرساله عبر قناة غير آمنة</template>
+          <template class="content-en">Can be sent over an insecure channel</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى خاصية 'مقاومة التصادم القوي' إذا كانت 'مقاومة التصادم الضعيف' تمنع المهاجم من تزوير رسالة محددة؟</template>
+      <template class="content-en">Why do we need 'strong collision resistance' if 'weak collision resistance' already prevents an attacker from forging a specific message?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مقاومة التصادم الضعيف تحمي رسالة موجودة مسبقاً. لكن بدون مقاومة التصادم القوي، يمكن للمهاجم إنشاء رسالتين مختلفتين (واحدة بريئة وأخرى خبيثة) لهما نفس التجزئة، وجعل الضحية توقع على البريئة، ثم ينسخ التوقيع إلى الخبيثة.</p></template>
+      <template class="content-en"><p>Weak collision resistance protects an already existing message. But without strong collision resistance, an attacker could generate two different messages (one innocent, one malicious) that have the same hash, get the victim to sign the innocent one, and then copy the signature to the malicious one.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="message-authentication-mdc-vs-mac" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مصادقة الرسائل: MDC مقابل MAC</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Message Authentication: MDC vs MAC</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>رمز اكتشاف التعديل (MDC) يثبت سلامة الرسالة فقط، بينما رمز مصادقة الرسالة (MAC) يثبت السلامة وهوية المرسل باستخدام مفتاح سري مشترك.</p></template>
+    <template class="content-en"><p>A Modification Detection Code (MDC) proves only message integrity, while a Message Authentication Code (MAC) proves both integrity and sender identity using a shared secret key.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>خلاصة الرسالة العادية لا تصادق على مرسل الرسالة. لتوفير <b>مصادقة الرسالة (Message Authentication)</b>، يجب تقديم دليل على أن المرسل الحقيقي هو من أرسل الرسالة وليس مهاجماً.</p><p><b><span class="smart-term" data-term-en="MDC (Modification Detection Code)" data-ar="رمز اكتشاف التعديل" data-en-def="A simple message digest used to verify that a message has not been altered during transit.">رمز اكتشاف التعديل<span class="smart-term-tooltip"></span></span> (MDC):</b> هو خلاصة رسالة تثبت النزاهة فقط. يتم إرسال الرسالة و MDC عبر قناة غير آمنة، ولكن يجب إرسال MDC عبر قناة محصنة ضد التغيير ليكون موثوقاً.</p><p><b><span class="smart-term" data-term-en="MAC (Message Authentication Code)" data-ar="رمز مصادقة الرسالة" data-en-def="A cryptographic checksum that uses a shared secret key to verify both data integrity and the authenticity of a message.">رمز مصادقة الرسالة<span class="smart-term-tooltip"></span></span> (MAC):</b> لضمان النزاهة ومصادقة أصل البيانات، نضيف مفتاحاً سرياً مشتركاً بين المرسل والمستقبل. يتم دمج الرسالة مع المفتاح السري قبل تمريرها لدالة التجزئة. يعتمد أمان MAC على أمان خوارزمية التجزئة الأساسية.</p></template>
+    <template class="content-en"><p>A regular message digest does not authenticate the sender. To provide <b>message authentication</b>, proof must be provided that the genuine sender sent the message and not an attacker.</p><p><b>Modification Detection Code (MDC):</b> A message digest that proves only integrity. The message and MDC are sent, but the MDC must be sent over a channel immune to change to be trusted.</p><p><b>Message Authentication Code (MAC):</b> To ensure both integrity and data origin authentication, a shared secret key is included between the sender and receiver. The message and the secret key are combined before hashing. The security of a MAC depends on the underlying hash algorithm.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في نهج MDC، إذا اعترض المهاجم الرسالة، يمكنه تغييرها وحساب MDC جديد وإرساله للمستلم، ولن يكتشف المستلم التغيير إلا إذا كان مسار MDC محمياً.</p><p>في نهج MAC، حتى لو اعترض المهاجم الرسالة، لا يمكنه حساب MAC الجديد للرسالة المزيفة لأنه لا يمتلك المفتاح السري المشترك (K). هذا يحل مشكلة القناة الآمنة المطلوبة في MDC.</p><p>يمكن تحقيق مصادقة الرسائل باستخدام التشفير التقليدي (حيث يضمن التشفير بالمفتاح المشترك أن المرسل الحقيقي فقط هو من قام بالتشفير) أو بدون تشفير الرسالة (بإرفاق علامة مصادقة، مما يسمح بقراءة الرسالة بسرعة دون فك تشفيرها، لكنه لا يوفر السرية).</p></template>
+    <template class="content-en"><p>In the MDC approach, if an attacker intercepts the message, they can alter it, compute a new MDC, and send it to the receiver. The receiver wouldn't know unless the MDC was sent over a secure, tamper-proof channel.</p><p>In the MAC approach, even if the attacker alters the message, they cannot compute the new MAC for the forged message because they lack the shared secret key (K). This eliminates the need for a tamper-proof channel for the hash.</p><p>Message authentication can be achieved using conventional encryption (where successful decryption implies authenticity) or without encryption (appending an authentication tag, which allows fast reading without decryption but provides no confidentiality).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حيث K هو المفتاح السري المشترك، M هي الرسالة، و H هي دالة التجزئة.</strong></template>
+      <template class="content-en"><strong>Where K is the shared secret key, M is the message, and H is the hash function.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$MAC = H(K || M)$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Two side-by-side flowcharts comparing MDC and MAC. Left (MDC): Alice sends Message (M) and Hash(M)=MDC. M goes through insecure channel, MDC goes through 'Channel immune to change'. Bob hashes received M and compares with received MDC. Right (MAC): Alice combines Message (M) and Secret Key (K), hashes them to create MAC. Both M and MAC go through insecure channel. Bob combines received M with his copy of Key (K), hashes them, and compares with received MAC. Style: educational, dark background #0d1117, clear labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <style>
+        .bg { fill: var(--bg-surface); }
+        .divider { stroke: var(--border-color); stroke-width: 2; stroke-dasharray: 6,6; }
+        
+        .box { fill: var(--bg-elevated); stroke: var(--border-color); stroke-width: 2; rx: 6; }
+        .box-highlight { fill: var(--brand-500); stroke: var(--brand-500); stroke-width: 2; rx: 6; }
+        .box-key { fill: var(--brand-800); stroke: var(--brand-800); stroke-width: 2; rx: 6; }
+        .box-channel { fill: var(--bg-surface); stroke: var(--border-color); stroke-width: 2; stroke-dasharray: 4,4; rx: 6; }
+        .box-channel-secure { fill: var(--bg-surface); stroke: var(--brand-500); stroke-width: 2; rx: 6; }
+        .diamond { fill: var(--bg-elevated); stroke: var(--brand-500); stroke-width: 2; stroke-linejoin: round; }
+        
+        .line { stroke: var(--brand-500); stroke-width: 2; fill: none; }
+        .line-dashed { stroke: var(--brand-400); stroke-width: 2; stroke-dasharray: 4,4; fill: none; }
+        
+        .text-title { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 18px; font-weight: bold; fill: var(--brand-ink); text-anchor: middle; dominant-baseline: middle; }
+        .text-main { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 15px; font-weight: 600; fill: var(--text-primary); text-anchor: middle; dominant-baseline: middle; }
+        .text-on-brand-lo { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 15px; font-weight: 600; fill: var(--on-brand-lo); text-anchor: middle; dominant-baseline: middle; }
+        .text-on-brand-hi { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 15px; font-weight: 600; fill: var(--on-brand-hi); text-anchor: middle; dominant-baseline: middle; }
+        .text-muted { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; font-weight: 500; fill: var(--text-secondary); text-anchor: middle; dominant-baseline: middle; }
+        .text-small { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 13px; font-weight: 500; fill: var(--text-primary); text-anchor: middle; dominant-baseline: middle; }
+    </style>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" class="bg" />
+
+    <!-- Center Divider -->
+    <line x1="450" y1="60" x2="450" y2="680" class="divider" />
+
+    <!-- ========================================== -->
+    <!-- ARROWS & CONNECTIONS                       -->
+    <!-- ========================================== -->
+    <g id="arrows">
+        <!-- MDC Arrows (Left) -->
+        <path d="M 190 120 L 250 120" class="line" marker-end="url(#arrow)" />
+        <path d="M 310 140 L 310 160" class="line" marker-end="url(#arrow)" />
+        <path d="M 140 140 L 140 300" class="line" marker-end="url(#arrow)" />
+        <path d="M 310 210 L 310 300" class="line" marker-end="url(#arrow)" />
+        <path d="M 140 370 L 140 400" class="line" marker-end="url(#arrow)" />
+        <path d="M 310 370 L 310 400" class="line" marker-end="url(#arrow)" />
+        <path d="M 140 450 L 140 470" class="line" marker-end="url(#arrow)" />
+        <path d="M 140 520 L 140 540" class="line" marker-end="url(#arrow)" />
+        <path d="M 140 590 L 140 620 L 165 620" class="line" marker-end="url(#arrow)" />
+        <path d="M 310 450 L 310 620 L 285 620" class="line" marker-end="url(#arrow)" />
+
+        <!-- MAC Arrows (Right) -->
+        <path d="M 560 140 L 560 300" class="line" marker-end="url(#arrow)" />
+        <path d="M 560 155 L 655 155 L 655 160" class="line" marker-end="url(#arrow)" />
+        <circle cx="560" cy="155" r="4" fill="var(--brand-500)" />
+        <path d="M 790 140 L 790 155 L 695 155 L 695 160" class="line" marker-end="url(#arrow)" />
+        <path d="M 675 210 L 675 230" class="line" marker-end="url(#arrow)" />
+        <path d="M 675 280 L 675 300" class="line" marker-end="url(#arrow)" />
+        
+        <path d="M 560 370 L 560 400" class="line" marker-end="url(#arrow)" />
+        <path d="M 675 370 L 675 390 L 790 390 L 790 400" class="line" marker-end="url(#arrow)" />
+        
+        <path d="M 560 450 L 560 465 L 597.5 465 L 597.5 470" class="line" marker-end="url(#arrow)" />
+        <path d="M 675 450 L 675 465 L 637.5 465 L 637.5 470" class="line" marker-end="url(#arrow)" />
+        <path d="M 617.5 520 L 617.5 540" class="line" marker-end="url(#arrow)" />
+        
+        <path d="M 617.5 590 L 617.5 620 L 643.75 620" class="line" marker-end="url(#arrow)" />
+        <path d="M 790 450 L 790 620 L 763.75 620" class="line" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- NODES & SHAPES                             -->
+    <!-- ========================================== -->
+    <g id="nodes">
+        <!-- MDC Nodes (Left) -->
+        <rect x="90" y="100" width="100" height="40" class="box" />
+        <rect x="260" y="100" width="100" height="40" class="box" />
+        <rect x="260" y="170" width="100" height="40" class="box-highlight" />
+        
+        <rect x="90" y="310" width="100" height="60" class="box-channel" />
+        <rect x="250" y="310" width="120" height="60" class="box-channel-secure" />
+        
+        <rect x="90" y="410" width="100" height="40" class="box" />
+        <rect x="260" y="410" width="100" height="40" class="box-highlight" />
+        <rect x="90" y="480" width="100" height="40" class="box" />
+        <rect x="90" y="550" width="100" height="40" class="box-highlight" />
+        
+        <polygon points="225,590 275,620 225,650 175,620" class="diamond" />
+
+        <!-- MAC Nodes (Right) -->
+        <rect x="510" y="100" width="100" height="40" class="box" />
+        <rect x="740" y="100" width="100" height="40" class="box-key" />
+        <rect x="625" y="170" width="100" height="40" class="box" />
+        <rect x="625" y="240" width="100" height="40" class="box-highlight" />
+        
+        <rect x="510" y="310" width="215" height="60" class="box-channel" />
+        
+        <rect x="510" y="410" width="100" height="40" class="box" />
+        <rect x="625" y="410" width="100" height="40" class="box-key" />
+        <rect x="740" y="410" width="100" height="40" class="box-highlight" />
+        <rect x="567.5" y="480" width="100" height="40" class="box" />
+        <rect x="567.5" y="550" width="100" height="40" class="box-highlight" />
+        
+        <polygon points="703.75,590 753.75,620 703.75,650 653.75,620" class="diamond" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- TEXT & LABELS                              -->
+    <!-- ========================================== -->
+    <g id="text">
+        <!-- Titles -->
+        <text x="225" y="40" class="text-title gsvg-en">Modification Detection Code (MDC)</text>
+        <text x="225" y="40" class="text-title gsvg-ar">رمز كشف التعديل (MDC)</text>
+        
+        <text x="675" y="40" class="text-title gsvg-en">Message Authentication Code (MAC)</text>
+        <text x="675" y="40" class="text-title gsvg-ar">رمز مصادقة الرسالة (MAC)</text>
+
+        <!-- Senders / Receivers -->
+        <text x="225" y="75" class="text-muted gsvg-en">Sender (Alice)</text>
+        <text x="225" y="75" class="text-muted gsvg-ar">المرسل (أليس)</text>
+        <text x="675" y="75" class="text-muted gsvg-en">Sender (Alice)</text>
+        <text x="675" y="75" class="text-muted gsvg-ar">المرسل (أليس)</text>
+
+        <text x="225" y="390" class="text-muted gsvg-en">Receiver (Bob)</text>
+        <text x="225" y="390" class="text-muted gsvg-ar">المستقبل (بوب)</text>
+        <text x="675" y="390" class="text-muted gsvg-en">Receiver (Bob)</text>
+        <text x="675" y="390" class="text-muted gsvg-ar">المستقبل (بوب)</text>
+
+        <!-- MDC Text (Left) -->
+        <text x="140" y="120" class="text-main gsvg-en">Message (M)</text>
+        <text x="140" y="120" class="text-main gsvg-ar">الرسالة (M)</text>
+        
+        <text x="310" y="120" class="text-main gsvg-en">Hash Function</text>
+        <text x="310" y="120" class="text-main gsvg-ar">دالة التجزئة</text>
+        
+        <text x="310" y="190" class="text-on-brand-lo gsvg-en">MDC</text>
+        <text x="310" y="190" class="text-on-brand-lo gsvg-ar">MDC</text>
+
+        <text x="140" y="332" class="text-main gsvg-en">
+            <tspan x="140" dy="0">Insecure</tspan>
+            <tspan x="140" dy="16">Channel</tspan>
+        </text>
+        <text x="140" y="332" class="text-main gsvg-ar">
+            <tspan x="140" dy="0">قناة غير</tspan>
+            <tspan x="140" dy="16">آمنة</tspan>
+        </text>
+
+        <text x="310" y="332" class="text-main gsvg-en">
+            <tspan x="310" dy="0">Channel immune</tspan>
+            <tspan x="310" dy="16">to change</tspan>
+        </text>
+        <text x="310" y="332" class="text-main gsvg-ar">
+            <tspan x="310" dy="0">قناة محصنة</tspan>
+            <tspan x="310" dy="16">ضد التغيير</tspan>
+        </text>
+
+        <text x="140" y="430" class="text-main gsvg-en">Received M'</text>
+        <text x="140" y="430" class="text-main gsvg-ar">الرسالة (M')</text>
+        
+        <text x="310" y="430" class="text-on-brand-lo gsvg-en">Received MDC'</text>
+        <text x="310" y="430" class="text-on-brand-lo gsvg-ar">MDC' المستلم</text>
+        
+        <text x="140" y="500" class="text-main gsvg-en">Hash Function</text>
+        <text x="140" y="500" class="text-main gsvg-ar">دالة التجزئة</text>
+        
+        <text x="140" y="570" class="text-on-brand-lo gsvg-en">New MDC'</text>
+        <text x="140" y="570" class="text-on-brand-lo gsvg-ar">MDC' الجديد</text>
+        
+        <text x="225" y="620" class="text-main gsvg-en">Compare</text>
+        <text x="225" y="620" class="text-main gsvg-ar">مقارنة</text>
+        
+        <text x="225" y="670" class="text-main gsvg-en">Accept / Reject</text>
+        <text x="225" y="670" class="text-main gsvg-ar">قبول / رفض</text>
+
+        <!-- MAC Text (Right) -->
+        <text x="560" y="120" class="text-main gsvg-en">Message (M)</text>
+        <text x="560" y="120" class="text-main gsvg-ar">الرسالة (M)</text>
+        
+        <text x="790" y="120" class="text-on-brand-hi gsvg-en">Shared Key (K)</text>
+        <text x="790" y="120" class="text-on-brand-hi gsvg-ar">المفتاح المشترك (K)</text>
+        
+        <text x="675" y="190" class="text-main gsvg-en">Hash Function</text>
+        <text x="675" y="190" class="text-main gsvg-ar">دالة التجزئة</text>
+        
+        <text x="675" y="260" class="text-on-brand-lo gsvg-en">MAC</text>
+        <text x="675" y="260" class="text-on-brand-lo gsvg-ar">MAC</text>
+
+        <text x="617.5" y="340" class="text-main gsvg-en">Insecure Channel</text>
+        <text x="617.5" y="340" class="text-main gsvg-ar">قناة غير آمنة</text>
+
+        <text x="560" y="430" class="text-main gsvg-en">Received M'</text>
+        <text x="560" y="430" class="text-main gsvg-ar">الرسالة (M')</text>
+        
+        <text x="675" y="430" class="text-on-brand-hi gsvg-en">Shared Key (K)</text>
+        <text x="675" y="430" class="text-on-brand-hi gsvg-ar">المفتاح المشترك (K)</text>
+        
+        <text x="790" y="430" class="text-on-brand-lo gsvg-en">Received MAC'</text>
+        <text x="790" y="430" class="text-on-brand-lo gsvg-ar">MAC' المستلم</text>
+        
+        <text x="617.5" y="500" class="text-main gsvg-en">Hash Function</text>
+        <text x="617.5" y="500" class="text-main gsvg-ar">دالة التجزئة</text>
+        
+        <text x="617.5" y="570" class="text-on-brand-lo gsvg-en">New MAC'</text>
+        <text x="617.5" y="570" class="text-on-brand-lo gsvg-ar">MAC' الجديد</text>
+        
+        <text x="703.75" y="620" class="text-main gsvg-en">Compare</text>
+        <text x="703.75" y="620" class="text-main gsvg-ar">مقارنة</text>
+        
+        <text x="703.75" y="670" class="text-main gsvg-en">Accept / Reject</text>
+        <text x="703.75" y="670" class="text-main gsvg-ar">قبول / رفض</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يوفر MAC خاصية عدم التنصل (Non-repudiation)؟ ولماذا؟</template>
+      <template class="content-en">Does a MAC provide non-repudiation? Why or why not?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لا يوفر MAC عدم التنصل. لأن المفتاح السري مشترك بين المرسل والمستقبل، يمكن لأي منهما إنشاء رسالة صالحة مع MAC الخاص بها. لذلك، لا يمكن إثبات لطرف ثالث من قام بإنشاء الرسالة تحديداً.</p></template>
+      <template class="content-en"><p>No, a MAC does not provide non-repudiation. Because the secret key is shared between the sender and the receiver, either party could have generated the message and the valid MAC. Therefore, it cannot be proven to a third party exactly who created it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cryptographic-hash-algorithms-sha" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> خوارزميات التجزئة التشفيرية (SHA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Cryptographic Hash Algorithms (SHA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عائلة SHA هي معايير فيدرالية أمريكية لإنشاء خلاصات رسائل آمنة، تطورت من SHA-1 إلى SHA-2 لزيادة الأمان.</p></template>
+    <template class="content-en"><p>The SHA family are US federal standards for creating secure message digests, evolving from SHA-1 to SHA-2 for increased security.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تطوير خوارزمية التجزئة الآمنة (SHA) بواسطة <span class="smart-term" data-term-en="NIST" data-ar="المعهد الوطني للمعايير والتكنولوجيا" data-en-def="National Institute of Standards and Technology, the US agency that standardizes cryptographic algorithms like SHA and AES.">المعهد الوطني للمعايير والتكنولوجيا<span class="smart-term-tooltip"></span></span> (NIST) ونُشرت كمعيار فيدرالي لمعالجة المعلومات (FIPS 180) في عام 1993.</p><ul><li>تمت مراجعتها في عام 1995 باسم <b>SHA-1</b> (تنتج قيمة تجزئة بطول 160 بت).</li><li>تعتمد في تصميمها بشكل وثيق على دالة التجزئة MD4.</li><li>في عام 2005، أعلن NIST عن نيته التخلص التدريجي من الموافقة على SHA-1 والانتقال إلى الاعتماد على <b>SHA-2</b> بحلول عام 2010 بسبب اكتشاف نقاط ضعف.</li></ul><p>تتضمن عائلة SHA-2 متغيرات مثل SHA-224، SHA-256، SHA-384، و SHA-512، حيث يشير الرقم إلى حجم خلاصة الرسالة بالبتات.</p></template>
+    <template class="content-en"><p>The Secure Hash Algorithm (SHA) was developed by <span class="smart-term" data-term-en="NIST" data-ar="المعهد الوطني للمعايير والتكنولوجيا" data-en-def="National Institute of Standards and Technology, the US agency that standardizes cryptographic algorithms like SHA and AES.">NIST<span class="smart-term-tooltip"></span></span> and published as a federal information processing standard (FIPS 180) in 1993.</p><ul><li>It was revised in 1995 as <b><span class="smart-term" data-term-en="SHA-1" data-ar="خوارزمية التجزئة الآمنة 1" data-en-def="An older cryptographic hash function that produces a 160-bit hash value, now considered vulnerable to collision attacks.">SHA-1<span class="smart-term-tooltip"></span></span></b> (produces 160-bit hash values).</li><li>Based on the hash function MD4 and its design closely models MD4.</li><li>In 2005, NIST announced the intention to phase out approval of SHA-1 and move to a reliance on <b>SHA-2</b> by 2010 due to discovered vulnerabilities.</li></ul><p>The SHA-2 family includes variants like SHA-224, SHA-256, SHA-384, and SHA-512, where the number indicates the message digest size in bits.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كلما زاد حجم خلاصة الرسالة (مثلاً 512 بت بدلاً من 160 بت)، زادت مقاومة الخوارزمية لهجمات القوة العمياء وهجمات أعياد الميلاد، حيث يزداد فضاء البحث بشكل أسي.</p><p>على سبيل المثال، الحد الأقصى لحجم الرسالة في SHA-1 و SHA-256 هو $2^{64}$ بت، بينما في SHA-512 هو $2^{128}$ بت.</p><p>كما يختلف حجم الكتلة (Block Size) وحجم الكلمة (Word Size) وعدد الخطوات بين هذه الإصدارات لتعزيز التعقيد والأمان.</p></template>
+    <template class="content-en"><p>As the message digest size increases (e.g., 512 bits instead of 160 bits), the algorithm's resistance to brute-force and birthday attacks increases exponentially due to the larger search space.</p><p>For instance, the maximum message size for SHA-1 and SHA-256 is $2^{64}$ bits, while for SHA-512 it is $2^{128}$ bits. The block size, word size, and number of steps also vary across these versions to enhance complexity and security.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>RSA</th><th>Diffie-Hellman</th><th>DSS</th><th>Elliptic Curve</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التشفير / فك التشفير</template>
+          <template class="content-en">Encryption / Decryption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوقيع الرقمي</template>
+          <template class="content-en">Digital Signature</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تبادل المفاتيح</template>
+          <template class="content-en">Key Exchange</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تم التخلي عن SHA-1 لصالح SHA-2؟</template>
+      <template class="content-en">Why was SHA-1 phased out in favor of SHA-2?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تم التخلي عن SHA-1 لأن الباحثين وجدوا طرقاً (هجمات تصادم) لإيجاد رسالتين مختلفتين تنتجان نفس تجزئة SHA-1 في وقت أقل بكثير من هجوم القوة العمياء، مما يكسر خاصية مقاومة التصادم.</p></template>
+      <template class="content-en"><p>SHA-1 was phased out because researchers discovered vulnerabilities (collision attacks) that allowed them to find two different messages producing the same SHA-1 hash in significantly less time than a brute-force attack, breaking its collision resistance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="public-key-cryptography-principles" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مبادئ تشفير المفتاح العام (غير المتماثل)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Public-Key (Asymmetric) Cryptography Principles</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم التشفير غير المتماثل مفتاحين منفصلين: مفتاح عام للتشفير (القفل) ومفتاح خاص لفك التشفير (الفتح).</p></template>
+    <template class="content-en"><p>Asymmetric cryptography uses two separate keys: a public key for encryption (locking) and a private key for decryption (unlocking).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تشفير <span class="smart-term" data-term-en="Public Key" data-ar="المفتاح العام" data-en-def="A cryptographic key that can be obtained and used by anyone to encrypt messages intended for a particular recipient.">المفتاح العام<span class="smart-term-tooltip"></span></span> (غير المتماثل) والتشفير المتماثل سيتواجدان بالتوازي ويكملان بعضهما البعض؛ مزايا أحدهما تعوض عيوب الآخر.</p><p>يتميز التشفير غير المتماثل باستخدام مفتاحين: أحدهما يظل <b>خاصاً (Private)</b> والآخر متاح <b>للجمهور (Public)</b>.</p><p>يمكن تصنيف استخدامات أنظمة المفتاح العام إلى ثلاث فئات رئيسية:</p><ol><li><b>التشفير/فك التشفير (Encryption/Decryption):</b> يقوم المرسل بتشفير الرسالة باستخدام المفتاح العام للمستلم. (يوفر السرية).</li><li><b>التوقيع الرقمي (Digital Signature):</b> يقوم المرسل "بتوقيع" الرسالة باستخدام مفتاحه الخاص. (يوفر المصادقة والنزاهة).</li><li><b>تبادل المفاتيح (Key Exchange):</b> يتعاون الطرفان لتبادل مفتاح جلسة (Session Key) سري بأمان.</li></ol></template>
+    <template class="content-en"><p>Symmetric and asymmetric-key cryptography will exist in parallel and complement each other; the advantages of one compensate for the disadvantages of the other.</p><p>Asymmetric key cryptography uses two separate keys: one held <b>private</b> and one available <b>publicly</b>.</p><p>The use of public-key cryptosystems can be classified into three categories:</p><ol><li><b>Encryption/Decryption:</b> The sender encrypts a message with the recipient's <span class="smart-term" data-term-en="Public Key" data-ar="المفتاح العام" data-en-def="A cryptographic key that can be obtained and used by anyone to encrypt messages intended for a particular recipient.">public key<span class="smart-term-tooltip"></span></span>. (Provides confidentiality).</li><li><b>Digital Signature:</b> The sender "signs" a message with their <span class="smart-term" data-term-en="Private Key" data-ar="المفتاح الخاص" data-en-def="A cryptographic key kept secret by the owner, used to decrypt messages encrypted with the corresponding public key, or to create digital signatures.">private key<span class="smart-term-tooltip"></span></span>. (Provides authentication and integrity).</li><li><b>Key Exchange:</b> Two sides cooperate to exchange a session key securely.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المبدأ الأساسي هو أن ما يتم تشفيره بمفتاح لا يمكن فك تشفيره إلا بالمفتاح الآخر من نفس الزوج. إذا شفرت بالمفتاح العام لـ Bob، فإن Bob فقط (الذي يملك <span class="smart-term" data-term-en="Private Key" data-ar="المفتاح الخاص" data-en-def="A cryptographic key kept secret by the owner, used to decrypt messages encrypted with the corresponding public key, or to create digital signatures.">المفتاح الخاص<span class="smart-term-tooltip"></span></span>) يمكنه القراءة. وإذا شفرت بمفتاحك الخاص (توقيع)، يمكن لأي شخص لديه مفتاحك العام التحقق من أنك أنت من أرسلها.</p><p>التشفير غير المتماثل أبطأ بكثير من التشفير المتماثل بسبب العمليات الرياضية المعقدة. لذلك، يُستخدم عادةً لتبادل مفتاح متماثل (مفتاح الجلسة) أو لتوقيع الخلاصات الصغيرة، بدلاً من تشفير كميات كبيرة من البيانات.</p></template>
+    <template class="content-en"><p>The core principle is that data encrypted with one key can only be decrypted by the other key in the pair. If you encrypt with Bob's public key, only Bob (holding the private key) can read it. If you encrypt with your private key (signing), anyone with your public key can verify you sent it.</p><p>Asymmetric cryptography is computationally much slower than symmetric cryptography due to complex mathematics. Therefore, it is typically used to exchange a symmetric key (session key) or to sign small hashes, rather than encrypting bulk data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A diagram showing Public-key cryptography. Alice has a plaintext, encrypts it using Bob's Public Key (represented as a grey key). The ciphertext travels through an insecure channel. Bob receives it and decrypts it using his Private Key (represented as a red key) to get the plaintext. A 'Key-generation procedure' box at Bob's side generates both keys, sending the public key to a public directory. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Solid Arrowhead for Data Flow -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Dashed Arrowhead for Key Distribution -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+
+        <!-- Key Icon Definition -->
+        <g id="key-icon">
+            <circle cx="10" cy="10" r="4" />
+            <path d="M 13 9 L 22 9 L 22 13 L 19 13 L 19 11 L 17 11 L 17 13 L 15 13 L 15 11 L 13 11 Z" />
+        </g>
+    </defs>
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Public-Key Cryptography</text>
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التشفير بالمفتاح العام</text>
+
+    <!-- Domain Backgrounds -->
+    <!-- Alice's Domain -->
+    <rect x="20" y="60" width="280" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="160" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Alice (Sender)</text>
+    <text x="160" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">أليس (المرسل)</text>
+
+    <!-- Bob's Domain -->
+    <rect x="500" y="60" width="280" height="380" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="640" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Bob (Receiver)</text>
+    <text x="640" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">بوب (المستقبل)</text>
+
+    <!-- Insecure Channel Area -->
+    <rect x="320" y="60" width="160" height="120" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="400" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Insecure Channel</text>
+    <text x="400" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قناة غير آمنة</text>
+
+    <!-- Data Flow Connections (Arrows) -->
+    <line x1="130" y1="140" x2="170" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="280" y1="140" x2="340" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="460" y1="140" x2="520" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="630" y1="140" x2="670" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Key Distribution Connections (Dashed Arrows) -->
+    <line x1="225" y1="240" x2="225" y2="165" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <line x1="575" y1="240" x2="575" y2="165" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <line x1="575" y1="360" x2="575" y2="280" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <line x1="505" y1="385" x2="470" y2="385" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+    <path d="M 330 385 L 225 385 L 225 280" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+
+    <!-- Data Flow Nodes -->
+    <!-- Plaintext (Alice) -->
+    <rect x="40" y="120" width="90" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="85" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Plaintext</text>
+    <text x="85" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">نص صريح</text>
+
+    <!-- Encryption -->
+    <rect x="170" y="115" width="110" height="50" rx="8" fill="var(--brand-500)" />
+    <text x="225" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Encryption</text>
+    <text x="225" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">تشفير</text>
+
+    <!-- Ciphertext -->
+    <rect x="340" y="120" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Ciphertext</text>
+    <text x="400" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">نص مشفر</text>
+
+    <!-- Decryption -->
+    <rect x="520" y="115" width="110" height="50" rx="8" fill="var(--brand-500)" />
+    <text x="575" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Decryption</text>
+    <text x="575" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">فك التشفير</text>
+
+    <!-- Plaintext (Bob) -->
+    <rect x="670" y="120" width="90" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="715" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Plaintext</text>
+    <text x="715" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">نص صريح</text>
+
+    <!-- Key Nodes -->
+    <!-- Bob's Public Key -->
+    <rect x="155" y="240" width="140" height="40" rx="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <use href="#key-icon" x="165" y="250" fill="var(--text-muted)" />
+    <text x="240" y="265" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Bob's Public Key</text>
+    <text x="240" y="265" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مفتاح بوب العام</text>
+
+    <!-- Bob's Private Key -->
+    <rect x="505" y="240" width="140" height="40" rx="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <use href="#key-icon" x="515" y="250" fill="var(--brand-500)" />
+    <text x="590" y="265" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Bob's Private Key</text>
+    <text x="590" y="265" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">مفتاح بوب الخاص</text>
+
+    <!-- Key Management Nodes -->
+    <!-- Public Directory -->
+    <rect x="330" y="360" width="140" height="50" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="390" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Public Directory</text>
+    <text x="400" y="390" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">دليل عام</text>
+
+    <!-- Key Generation -->
+    <rect x="505" y="360" width="140" height="50" rx="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+    <text x="575" y="390" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Key Generation</text>
+    <text x="575" y="390" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">توليد المفاتيح</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت إرسال رسالة سرية إلى صديقك والتأكد من أنه يعرف أنك أنت من أرسلها، كيف تستخدم المفاتيح العامة والخاصة؟</template>
+      <template class="content-en">If you want to send a confidential message to a friend and ensure they know it came from you, how do you use the public and private keys?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أولاً، أقوم بتوقيع الرسالة (أو تجزئتها) باستخدام مفتاحي الخاص (لإثبات هويتي). ثم أقوم بتشفير الرسالة الموقعة باستخدام المفتاح العام لصديقي (لضمان السرية). صديقي سيفك التشفير بمفتاحه الخاص، ثم يتحقق من التوقيع بمفتاحي العام.</p></template>
+      <template class="content-en"><p>First, I sign the message (or its hash) using my private key (for authentication). Then, I encrypt the signed message using my friend's public key (for confidentiality). My friend decrypts it with their private key, then verifies the signature with my public key.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rsa-cryptosystem" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> نظام تشفير RSA</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> RSA Cryptosystem</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>RSA هي خوارزمية المفتاح العام الأكثر شيوعاً، وتعتمد أمنياً على صعوبة تحليل الأرقام الأولية الكبيرة جداً.</p></template>
+    <template class="content-en"><p>RSA is the most common public-key algorithm, relying for its security on the computational difficulty of factoring very large prime numbers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نظام RSA (سمي على اسم مخترعيه: Rivest, Shamir, و Adleman) هو خوارزمية المفتاح العام الأكثر شيوعاً. يدعم RSA كلاً من التشفير/فك التشفير والتواقيع الرقمية وتبادل المفاتيح.</p><p>يستخدم RSA <b><span class="smart-term" data-term-en="Modular Exponentiation" data-ar="الأسس المعيارية" data-en-def="A type of exponentiation performed over a modulus, fundamental to the operation of RSA.">الأسس المعيارية<span class="smart-term-tooltip"></span></span> (Modular Exponentiation)</b> للتشفير وفك التشفير.</p><ul><li><b>التشفير:</b> $C = P^e \mod n$ (حيث P هو النص الأصلي، C هو النص المشفر، و e هو المفتاح العام).</li><li><b>فك التشفير:</b> $P = C^d \mod n$ (حيث d هو المفتاح الخاص).</li></ul><p>يعتمد أمان RSA على استخدامه بطريقة تتصدى للهجمات المحتملة. تشمل طرق الهجوم:</p><ol><li>الهجمات الرياضية (محاولة تحليل n إلى عوامله الأولية).</li><li>هجمات التوقيت (Timing attacks).</li><li>هجمات النص المشفر المختار (Chosen ciphertext attacks).</li></ol><p>لمواجهة هجمات النص المشفر المختار المعقدة، يُنصح بتعديل النص الأصلي باستخدام إجراء يُعرف باسم <b><span class="smart-term" data-term-en="OAEP" data-ar="حشو التشفير غير المتماثل الأمثل" data-en-def="Optimal Asymmetric Encryption Padding, a padding scheme often used together with RSA encryption to add randomness and prevent chosen-ciphertext attacks.">حشو التشفير غير المتماثل الأمثل<span class="smart-term-tooltip"></span></span> (OAEP)</b>.</p></template>
+    <template class="content-en"><p>The RSA cryptosystem (named for its inventors: Rivest, Shamir, and Adleman) is the most common public-key algorithm. It supports encryption/decryption, digital signatures, and key exchange.</p><p>RSA uses <b><span class="smart-term" data-term-en="Modular Exponentiation" data-ar="الأسس المعيارية" data-en-def="A type of exponentiation performed over a modulus, fundamental to the operation of RSA.">modular exponentiation<span class="smart-term-tooltip"></span></span></b> for encryption/decryption.</p><ul><li><b>Encryption:</b> $C = P^e \mod n$ (where P is plaintext, C is ciphertext, e is public key).</li><li><b>Decryption:</b> $P = C^d \mod n$ (where d is private key).</li></ul><p>The security of RSA depends on it being used in a way to counter potential attacks. Possible attack approaches are:</p><ol><li>Mathematical attacks (factoring n).</li><li>Timing attacks.</li><li>Chosen ciphertext attacks.</li></ol><p>To counter sophisticated chosen ciphertext attacks, RSA Security Inc recommends modifying the plaintext using a procedure known as <b>Optimal Asymmetric Encryption Padding (<span class="smart-term" data-term-en="OAEP" data-ar="حشو التشفير غير المتماثل الأمثل" data-en-def="Optimal Asymmetric Encryption Padding, a padding scheme often used together with RSA encryption to add randomness and prevent chosen-ciphertext attacks.">OAEP<span class="smart-term-tooltip"></span></span>)</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لكي يكسر المهاجم (Eve) نظام RSA، يحتاج إلى حساب الجذر النوني $P = \sqrt[e]{C} \mod n$، وهو أمر ذو تعقيد أسي (Exponential complexity) بدون معرفة المفتاح الخاص (d)، مما يجعله مستحيلاً حسابياً للأرقام الكبيرة (مثل 2048 بت).</p><p>هجمات التوقيت تستغل الوقت الذي تستغرقه وحدة المعالجة المركزية لإجراء عمليات فك التشفير لاستنتاج البتات الخاصة بالمفتاح الخاص. يتم إحباط ذلك عن طريق إضافة تأخيرات عشوائية (Blinding).</p><p>OAEP يضيف العشوائية (Padding) إلى النص الأصلي قبل التشفير، مما يضمن أن تشفير نفس الرسالة مرتين سينتج نصين مشفرين مختلفين تماماً، مما يمنع هجمات القاموس والنص المشفر المختار.</p></template>
+    <template class="content-en"><p>To attack RSA, Eve needs to calculate $P = \sqrt[e]{C} \mod n$, which has exponential complexity without knowing the private key (d), making it computationally infeasible for large key sizes (e.g., 2048 bits).</p><p>Timing attacks exploit the time the CPU takes to perform decryption operations to deduce bits of the private key. This is thwarted by adding random delays (blinding).</p><p>OAEP adds randomness (padding) to the plaintext before encryption, ensuring that encrypting the same message twice yields completely different ciphertexts, preventing dictionary and chosen-ciphertext attacks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات التشفير وفك التشفير في RSA باستخدام الأسس المعيارية.</strong></template>
+      <template class="content-en"><strong>RSA encryption and decryption equations using modular exponentiation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$C = P^e \mod n \quad \text{and} \quad P = C^d \mod n$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تحليل الرقم (n) إلى عوامله الأولية تهديداً لأمن RSA؟</template>
+      <template class="content-en">Why is factoring the number (n) into its prime components a threat to RSA security?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الرقم (n) هو حاصل ضرب عددين أوليين كبيرين (p و q). إذا تمكن المهاجم من تحليل (n) ومعرفة (p) و (q)، يمكنه بسهولة حساب المفتاح الخاص (d) باستخدام المفتاح العام (e) المتاح للجميع، وبالتالي كسر التشفير بالكامل.</p></template>
+      <template class="content-en"><p>Because (n) is the product of two large primes (p and q). If an attacker can factor (n) to find (p) and (q), they can easily compute the private key (d) using the publicly available public key (e), completely breaking the encryption.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="diffie-hellman-key-exchange" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تبادل مفاتيح ديفي-هيلمان</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Diffie-Hellman Key Exchange</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تسمح لطرفين بإنشاء مفتاح سري مشترك عبر قناة غير آمنة، وتعتمد على صعوبة حساب اللوغاريتمات المنفصلة.</p></template>
+    <template class="content-en"><p>An algorithm that allows two parties to establish a shared secret key over an insecure channel, relying on the difficulty of computing discrete logarithms.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>خوارزمية Diffie-Hellman هي أول خوارزمية مفتاح عام تم نشرها. الغرض الأساسي منها هو تمكين مستخدمين من <b>تبادل مفتاح سري بأمان</b>، والذي يمكن استخدامه لاحقاً لتشفير الرسائل (باستخدام التشفير المتماثل).</p><p>خصائص الخوارزمية:</p><ul><li>تستخدمها العديد من المنتجات التجارية لتبادل المفاتيح.</li><li>الخوارزمية نفسها <b>مقتصرة على تبادل المفاتيح فقط</b> (لا تستخدم لتشفير الرسائل أو التوقيع الرقمي).</li><li>تعتمد فعاليتها وأمنها على الصعوبة الرياضية لحساب <b><span class="smart-term" data-term-en="Discrete Logarithms" data-ar="اللوغاريتمات المنفصلة" data-en-def="A mathematical problem that is easy to compute in one direction but computationally infeasible to reverse, forming the security basis of Diffie-Hellman.">اللوغاريتمات المنفصلة<span class="smart-term-tooltip"></span></span> (Discrete Logarithms)</b>.</li></ul></template>
+    <template class="content-en"><p>The Diffie-Hellman algorithm was the first published public-key algorithm. Its purpose is to enable two users to <b>exchange a secret key securely</b> that can then be used for subsequent encryption of messages (using symmetric encryption).</p><p>Algorithm characteristics:</p><ul><li>Employed by a number of commercial products for key exchange.</li><li>The algorithm itself is <b>limited to the exchange of keys</b> (not used for message encryption or digital signatures).</li><li>Depends for its effectiveness on the difficulty of computing <b><span class="smart-term" data-term-en="Discrete Logarithms" data-ar="اللوغاريتمات المنفصلة" data-en-def="A mathematical problem that is easy to compute in one direction but computationally infeasible to reverse, forming the security basis of Diffie-Hellman.">discrete logarithms<span class="smart-term-tooltip"></span></span></b>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على عكس RSA الذي يمكنه التشفير والتوقيع، صُمم Diffie-Hellman لغرض واحد: الاتفاق على مفتاح. يقوم الطرفان بتبادل مكونات عامة، ويقومان بعمليات حسابية تؤدي في النهاية إلى نفس الرقم السري لدى كليهما، دون أن ينتقل هذا الرقم السري عبر الشبكة إطلاقاً.</p><p>نقطة الضعف الرئيسية في Diffie-Hellman الأساسي هي افتقاره إلى المصادقة، مما يجعله عرضة لهجوم "رجل في المنتصف" (Man-in-the-Middle). لذلك، يتم استخدامه عادةً مع التواقيع الرقمية (مثل RSA أو DSA) لمصادقة الأطراف أثناء تبادل المفاتيح.</p></template>
+    <template class="content-en"><p>Unlike RSA which can encrypt and sign, Diffie-Hellman is designed for one purpose: key agreement. Both parties exchange public components and perform calculations that ultimately result in the exact same secret number on both sides, without that secret ever traversing the network.</p><p>The main vulnerability of basic Diffie-Hellman is its lack of authentication, making it susceptible to Man-in-the-Middle (MitM) attacks. Therefore, it is typically combined with digital signatures (like RSA or DSA) to authenticate the parties during the exchange.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم Diffie-Hellman لتشفير رسالة بريد إلكتروني مباشرة؟</template>
+      <template class="content-en">Why don't we use Diffie-Hellman to directly encrypt an email message?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن خوارزمية Diffie-Hellman مصممة رياضياً فقط لإنشاء مفتاح مشترك بين طرفين متصلين، ولا تمتلك آلية لتشفير أو فك تشفير نصوص الرسائل. نستخدمها لإنشاء المفتاح، ثم نستخدم ذلك المفتاح مع خوارزمية متماثلة (مثل AES) لتشفير البريد.</p></template>
+      <template class="content-en"><p>Because the Diffie-Hellman algorithm is mathematically designed solely to generate a shared secret between two communicating parties. It lacks a mechanism to encrypt or decrypt message plaintext. We use it to establish a key, then use that key with a symmetric algorithm (like AES) to encrypt the email.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="digital-signatures-concept-requirements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التواقيع الرقمية: المفهوم والمتطلبات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Digital Signatures: Concept &amp; Requirements</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التوقيع الرقمي هو رمز إلكتروني فريد يربط الرسالة بمرسلها، ويثبت أن الرسالة لم تتغير وأن المرسل لا يمكنه إنكار إرسالها.</p></template>
+    <template class="content-en"><p>A digital signature is a unique electronic code that binds a message to its sender, proving the message hasn't changed and the sender cannot deny sending it.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التوقيع الرقمي يعمل كبطاقة هوية (ID) على الإنترنت، وهو ضروري للتجارة الإلكترونية. على عكس التوقيع التقليدي المكتوب بخط اليد (والذي هو جزء من الوثيقة)، يتم إرسال التوقيع الرقمي كوثيقة منفصلة أو مرفقة.</p><p>مجرد التقاط صورة رقمية لتوقيع مكتوب لا يوفر الأمان، لأنه يمكن نسخه بسهولة. التواقيع الإلكترونية <b>فريدة للرسالة الموقعة</b> ولن يتم التحقق منها إذا تم نسخها إلى مستند آخر (علاقة واحد لواحد بين التوقيع والرسالة).</p><p>متطلبات التوقيع الرقمي:</p><ul><li>يجب أن يعتمد نمط البتات على الرسالة التي يتم توقيعها.</li><li>يجب أن يستخدم معلومات فريدة للمرسل لمنع <span class="smart-term" data-term-en="Forgery" data-ar="التزوير" data-en-def="The act of creating a fraudulent digital signature that appears to be validly created by a specific sender.">التزوير<span class="smart-term-tooltip"></span></span> والإنكار.</li><li>سهل الإنتاج والتحقق نسبياً.</li><li>من المستحيل حسابياً تزويره (سواء بإنشاء رسالة جديدة لتوقيع موجود، أو توقيع مزيف لرسالة).</li><li>عملي للتخزين.</li></ul></template>
+    <template class="content-en"><p>A digital signature acts as an ID on the Internet, essential for e-commerce. Unlike a conventional handwritten signature (which is part of the document), a digital signature is sent as a separate or attached document.</p><p>Simply taking a digital picture of a written signature does not provide security, as it can be easily copied. Electronic signatures are <b>unique to the message being signed</b> and will not verify if copied to another document (one-to-one relationship between signature and message).</p><p>Requirements for a Digital Signature:</p><ul><li>Must be a bit pattern that depends on the message being signed.</li><li>Must use information unique to the sender to prevent <span class="smart-term" data-term-en="Forgery" data-ar="التزوير" data-en-def="The act of creating a fraudulent digital signature that appears to be validly created by a specific sender.">forgery<span class="smart-term-tooltip"></span></span> and denial.</li><li>Relatively easy to produce and verify.</li><li>Computationally infeasible to forge (either constructing a new message for an existing signature or a fraudulent signature for a given message).</li><li>Practical to store.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الاعتماد على الرسالة (Message-dependent) هو ما يميز التوقيع الرقمي عن التوقيع التقليدي. التوقيع التقليدي لـ Alice هو نفسه على كل شيك. التوقيع الرقمي لـ Alice يتغير تماماً مع كل رسالة توقعها، لأنه يتم حسابه بناءً على محتوى الرسالة نفسها (عبر دالة التجزئة).</p><p>هذا يمنع هجوم "إعادة التشغيل" أو "النسخ واللصق"، حيث لا يمكن للمهاجم أخذ توقيع Alice من وثيقة بريئة ولصقه على عقد مزيف؛ لأن التوقيع لن يتطابق مع تجزئة العقد المزيف.</p></template>
+    <template class="content-en"><p>The message-dependent nature is what distinguishes a digital signature from a conventional one. Alice's conventional signature looks the same on every check. Alice's digital signature changes completely for every message she signs, because it is calculated based on the message content itself (via a hash function).</p><p>This prevents "copy-paste" attacks. An attacker cannot take Alice's signature from an innocent document and attach it to a forged contract, because the signature will fail verification against the hash of the forged contract.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يعتبر مسح توقيعك بخط اليد ضوئياً (Scan) ووضعه في ملف PDF توقيعاً رقمياً آمناً؟</template>
+      <template class="content-en">Why is scanning your handwritten signature and placing it in a PDF not considered a secure digital signature?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الصورة الممسوحة ضوئياً ثابتة ولا ترتبط رياضياً بمحتوى المستند. يمكن لأي شخص نسخ الصورة ولصقها في مستند آخر دون كسرها. التوقيع الرقمي الحقيقي يتغير بتغير محتوى المستند.</p></template>
+      <template class="content-en"><p>Because a scanned image is static and not mathematically bound to the document's content. Anyone can copy the image and paste it into another document without breaking it. A true digital signature changes if the document content changes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="digital-signature-production-verification" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> إنتاج والتحقق من التوقيع الرقمي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Digital Signature Production &amp; Verification</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>للتوقيع، يتم تجزئة الرسالة وتشفير التجزئة بالمفتاح الخاص للمرسل. للتحقق، يتم فك تشفير التجزئة بالمفتاح العام للمرسل ومقارنتها بتجزئة الرسالة المستلمة.</p></template>
+    <template class="content-en"><p>To sign, the message is hashed and encrypted with the sender's private key. To verify, the hash is decrypted with the sender's public key and compared to the hash of the received message.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>خطوات إنتاج التوقيع الرقمي (عند المرسل):</p><ol><li>يقوم المرسل بتشغيل دالة تجزئة أحادية الاتجاه لإنشاء خلاصة رسالة (Hash) بطول ثابت من الرسالة.</li><li>يقوم المرسل بتشفير خلاصة الرسالة باستخدام <b>مفتاحه الخاص</b> لإنشاء التوقيع الرقمي.</li><li>يتم إرسال الرسالة والتوقيع معاً إلى المستلم.</li></ol><p>خطوات التحقق من التوقيع الرقمي (عند المستلم):</p><ol><li>يقوم المستلم بفك تشفير التوقيع باستخدام <b>المفتاح العام للمرسل</b> للكشف عن خلاصة الرسالة الأصلية.</li><li>يقوم المستلم بتطبيق نفس دالة التجزئة على الرسالة التي استلمها لإنتاج خلاصة رسالة جديدة.</li><li>يقارن المستلم الخلاصة التي أنشأها بالخلاصة التي تم فك تشفيرها. إذا كانتا متطابقتين، يتم التحقق من سلامة الرسالة وصحتها.</li></ol></template>
+    <template class="content-en"><p>Steps in making a digital signature (Sender side):</p><ol><li>Sender runs a one-way hash function to create a fixed-length message digest (hash) from the message.</li><li>Sender encrypts the message digest with their <b>private key</b> to create a digital signature.</li><li>The message and the signature are sent to the receiver.</li></ol><p>Steps in verifying a digital signature (Receiver side):</p><ol><li>Receiver decrypts the signature with the <b>sender's public key</b> to reveal the original message digest.</li><li>Receiver applies the same one-way hash function to the received message to produce a new message digest.</li><li>Receiver compares the newly created digest with the decrypted digest. If they are equal, the signature is valid and message integrity is verified.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نقوم بتشفير التجزئة (Hash) بدلاً من تشفير الرسالة بأكملها؟ التشفير غير المتماثل (مثل RSA) بطيء جداً ويتطلب موارد حسابية عالية. تشفير رسالة بحجم 1 جيجابايت سيستغرق وقتاً طويلاً جداً. بدلاً من ذلك، نقوم بتجزئة الرسالة إلى حجم صغير ثابت (مثلاً 256 بت) ونقوم بتشفير هذه التجزئة فقط، مما يجعل العملية سريعة وفعالة للغاية.</p><p>إذا تغير بت واحد في الرسالة أثناء النقل، فإن التجزئة التي يحسبها المستلم ستكون مختلفة تماماً عن التجزئة المرفقة بالتوقيع، مما يؤدي إلى فشل التحقق (كسر التوقيع).</p></template>
+    <template class="content-en"><p>Why do we encrypt the hash instead of the whole message? Asymmetric encryption (like RSA) is computationally expensive and slow. Encrypting a 1GB message with RSA would take an impractical amount of time. Instead, we hash the message to a small, fixed size (e.g., 256 bits) and encrypt only the hash, making the process highly efficient.</p><p>If even a single bit of the message changes in transit, the hash computed by the receiver will be completely different from the decrypted hash, causing the verification to fail (the signature breaks).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>التوقيع هو تشفير التجزئة بالمفتاح الخاص. التحقق هو مقارنة التجزئة بفك التشفير بالمفتاح العام.</strong></template>
+      <template class="content-en"><strong>Signature is encryption of hash with private key. Verification is comparing hash with decryption using public key.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Sig = E(PR_{sender}, H(M)) \quad \text{Verify:} \quad H(M) \stackrel{?}{=} D(PU_{sender}, Sig)$$</div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A flowchart showing Digital Signature process. Sender side: 'Data File' goes into 'Hash Function' to produce 'Hash'. The 'Hash' is encrypted with 'Private Key' to produce 'Digital Signature'. Both 'Data File' and 'Digital Signature' are sent to Receiver. Receiver side: 'Data File' goes into 'Hash Function' to produce a new 'Hash'. The received 'Digital Signature' is decrypted with 'Public Key' to reveal the original 'Hash'. A comparison box checks if both hashes are equal. If yes, 'signature is valid and message accepted'. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Brand Gradient for Encrypt/Decrypt -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Sender Panel -->
+  <rect x="10" y="20" width="350" height="560" rx="16" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+  <text class="gsvg-en" x="185" y="55" text-anchor="middle" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Sender</text>
+  <text class="gsvg-ar" x="185" y="55" text-anchor="middle" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">المُرسِل</text>
+
+  <!-- Receiver Panel -->
+  <rect x="440" y="20" width="540" height="560" rx="16" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8,8" />
+  <text class="gsvg-en" x="710" y="55" text-anchor="middle" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Receiver</text>
+  <text class="gsvg-ar" x="710" y="55" text-anchor="middle" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">المُستقبِل</text>
+
+  <!-- ========================================== -->
+  <!-- PATHS & ARROWS                             -->
+  <!-- ========================================== -->
+
+  <!-- Sender Paths -->
+  <path d="M 200 140 L 200 172" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 200 240 L 200 272" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 200 340 L 200 372" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 100 410 L 112 410" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 200 440 L 200 472" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Transmission Paths -->
+  <path d="M 280 110 L 612 110" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+  <path d="M 280 510 L 612 510" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+
+  <!-- Receiver Paths -->
+  <path d="M 700 140 L 700 160 L 550 160 L 550 172" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 550 240 L 550 272" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 620 310 L 652 310" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 700 480 L 700 460 L 830 460 L 830 448" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 910 410 L 898 410" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 830 380 L 830 348" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 760 310 L 748 310" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 700 270 L 700 248" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- ========================================== -->
+  <!-- SENDER NODES                               -->
+  <!-- ========================================== -->
+
+  <!-- Data File -->
+  <rect x="120" y="80" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="200" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Data File</text>
+  <text class="gsvg-ar" x="200" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">ملف البيانات</text>
+
+  <!-- Hash Function -->
+  <rect x="120" y="180" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="200" y="210" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Hash Function</text>
+  <text class="gsvg-ar" x="200" y="210" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">دالة التجزئة</text>
+
+  <!-- Hash -->
+  <rect x="120" y="280" width="160" height="60" rx="30" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" />
+  <text class="gsvg-en" x="200" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Hash (Digest)</text>
+  <text class="gsvg-ar" x="200" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">التجزئة (البصمة)</text>
+
+  <!-- Encrypt -->
+  <rect x="120" y="380" width="160" height="60" rx="8" fill="url(#brandGradient)" />
+  <rect x="135" y="402" width="12" height="10" rx="2" fill="none" stroke="var(--on-brand-hi)" stroke-width="2" />
+  <path d="M 138 402 V 398 A 3 3 0 0 1 144 398 V 402" fill="none" stroke="var(--on-brand-hi)" stroke-width="2" />
+  <text class="gsvg-en" x="210" y="410" dy="0.3em" text-anchor="middle" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Encrypt</text>
+  <text class="gsvg-ar" x="210" y="410" dy="0.3em" text-anchor="middle" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">تشفير</text>
+
+  <!-- Private Key -->
+  <rect x="20" y="385" width="80" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <circle cx="32" cy="410" r="4" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <path d="M 36 410 L 44 410 M 42 410 V 414 M 39 410 V 414" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <text class="gsvg-en" x="68" y="410" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Private Key</text>
+  <text class="gsvg-ar" x="68" y="410" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">مفتاح خاص</text>
+
+  <!-- Digital Signature -->
+  <rect x="120" y="480" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="200" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Digital Signature</text>
+  <text class="gsvg-ar" x="200" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">التوقيع الرقمي</text>
+
+
+  <!-- ========================================== -->
+  <!-- TRANSMISSION LABELS                        -->
+  <!-- ========================================== -->
+  
+  <rect x="340" y="95" width="120" height="30" fill="var(--bg-surface)" />
+  <text class="gsvg-en" x="400" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Internet / Network</text>
+  <text class="gsvg-ar" x="400" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الإنترنت / الشبكة</text>
+
+  <rect x="340" y="495" width="120" height="30" fill="var(--bg-surface)" />
+  <text class="gsvg-en" x="400" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Internet / Network</text>
+  <text class="gsvg-ar" x="400" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الإنترنت / الشبكة</text>
+
+
+  <!-- ========================================== -->
+  <!-- RECEIVER NODES                             -->
+  <!-- ========================================== -->
+
+  <!-- Data File -->
+  <rect x="620" y="80" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="700" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Data File</text>
+  <text class="gsvg-ar" x="700" y="110" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">ملف البيانات</text>
+
+  <!-- Hash Function -->
+  <rect x="480" y="180" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="550" y="210" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Hash Function</text>
+  <text class="gsvg-ar" x="550" y="210" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">دالة التجزئة</text>
+
+  <!-- New Hash -->
+  <rect x="480" y="280" width="140" height="60" rx="30" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" />
+  <text class="gsvg-en" x="550" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">New Hash</text>
+  <text class="gsvg-ar" x="550" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">التجزئة الجديدة</text>
+
+  <!-- Digital Signature -->
+  <rect x="620" y="480" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="700" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Digital Signature</text>
+  <text class="gsvg-ar" x="700" y="510" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">التوقيع الرقمي</text>
+
+  <!-- Decrypt -->
+  <rect x="770" y="380" width="120" height="60" rx="8" fill="url(#brandGradient)" />
+  <rect x="780" y="402" width="12" height="10" rx="2" fill="none" stroke="var(--on-brand-hi)" stroke-width="2" />
+  <path d="M 783 402 V 398 A 3 3 0 0 1 789 398 V 402" fill="none" stroke="var(--on-brand-hi)" stroke-width="2" />
+  <text class="gsvg-en" x="840" y="410" dy="0.3em" text-anchor="middle" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Decrypt</text>
+  <text class="gsvg-ar" x="840" y="410" dy="0.3em" text-anchor="middle" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">فك التشفير</text>
+
+  <!-- Public Key -->
+  <rect x="910" y="385" width="70" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <circle cx="922" cy="410" r="4" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <path d="M 926 410 L 934 410 M 932 410 V 414 M 929 410 V 414" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  <text class="gsvg-en" x="955" y="410" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Public Key</text>
+  <text class="gsvg-ar" x="955" y="410" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">مفتاح عام</text>
+
+  <!-- Original Hash -->
+  <rect x="760" y="280" width="140" height="60" rx="30" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" />
+  <text class="gsvg-en" x="830" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Original Hash</text>
+  <text class="gsvg-ar" x="830" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">التجزئة الأصلية</text>
+
+  <!-- Compare Diamond -->
+  <polygon points="700,270 740,310 700,350 660,310" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="700" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">Match?</text>
+  <text class="gsvg-ar" x="700" y="310" dy="0.3em" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">تطابق؟</text>
+
+  <!-- Valid Signature -->
+  <rect x="610" y="180" width="180" height="60" rx="8" fill="var(--brand-500)" />
+  <path d="M 625 210 L 635 220 L 655 195" fill="none" stroke="var(--on-brand-lo)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <text class="gsvg-en" x="715" y="210" dy="0.3em" text-anchor="middle" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Valid Signature</text>
+  <text class="gsvg-ar" x="715" y="210" dy="0.3em" text-anchor="middle" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">توقيع صالح</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدم المرسل مفتاحه العام لتوقيع الرسالة بدلاً من مفتاحه الخاص؟</template>
+      <template class="content-en">What happens if the sender uses their public key to sign the message instead of their private key?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا استخدم المفتاح العام، فلن يكون توقيعاً. المفتاح العام متاح للجميع، لذا يمكن لأي شخص إنشاء هذا "التوقيع" المزعوم. التوقيع يكتسب قيمته من حقيقة أن المفتاح الخاص يمتلكه شخص واحد فقط.</p></template>
+      <template class="content-en"><p>If they use the public key, it is not a signature. The public key is available to everyone, so anyone could create this supposed "signature". A signature derives its value from the fact that only one person possesses the private key.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="certificate-authorities-and-trust" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> سلطات الشهادات (CA) والثقة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Certificate Authorities (CA) and Trust</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>سلطة الشهادات (CA) هي جهة خارجية موثوقة تصدر شهادات رقمية لربط المفتاح العام بهوية شخص أو كيان حقيقي، لمنع التزوير.</p></template>
+    <template class="content-en"><p>A Certificate Authority (CA) is a trusted third party that issues digital certificates to bind a public key to a real person or entity's identity, preventing forgery.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>حتى إذا لم يتم كسر التوقيع، قد تقلق من أن شخصاً ما قد زوّر التوقيع. على سبيل المثال، يمكن للمهاجم إنشاء زوج مفاتيح جديد، والادعاء بأنه أنت، وإرسال رسائل موقعة باسمك.</p><p>للتأكد من أن التوقيع أصلي، نتحقق من الجهة التي أصدرت <b><span class="smart-term" data-term-en="Digital Certificate" data-ar="الشهادة الرقمية" data-en-def="An electronic document used to prove the ownership of a public key, issued by a CA.">الشهادة الرقمية<span class="smart-term-tooltip"></span></span> (Digital Certificate)</b>. يتم إصدار كل شهادة بواسطة ما يسمى <b><span class="smart-term" data-term-en="Certificate Authority (CA)" data-ar="سلطة الشهادات" data-en-def="An entity that issues digital certificates, verifying the identity of the certificate owner.">سلطة الشهادات<span class="smart-term-tooltip"></span></span> (Certificate Authority - CA)</b>.</p><ul><li>يمكن أن تكون سلطات الشهادات جهات حكومية أو شركات متخصصة.</li><li>عند عرض توقيع رقمي، يمكنك رؤية الـ CA الذي أصدر الشهادة.</li><li>يجب عليك أن تقرر ما إذا كنت تثق في معايير هذه السلطة (مثلاً، الثقة في شهادة صادرة عن جهة حكومية مقابل جهة غير معروفة).</li></ul><p>تُخزن الشهادات الرقمية على أجهزة الكمبيوتر (محمية بكلمة مرور) أو على <b>البطاقات الذكية (Smart Cards)</b> التي تشبه بطاقات الائتمان، وتُستخدم لتوقيع المعاملات على الإنترنت.</p></template>
+    <template class="content-en"><p>Even if the signature isn't broken, you might be concerned about forgery. An attacker could create a new key pair, claim to be you, and send messages signed with your name.</p><p>To ensure a signature is authentic, you check who issued the <b><span class="smart-term" data-term-en="Digital Certificate" data-ar="الشهادة الرقمية" data-en-def="An electronic document used to prove the ownership of a public key, issued by a CA.">digital certificate<span class="smart-term-tooltip"></span></span></b>. Each certificate is issued by a <b><span class="smart-term" data-term-en="Certificate Authority (CA)" data-ar="سلطة الشهادات" data-en-def="An entity that issues digital certificates, verifying the identity of the certificate owner.">Certificate Authority (CA)<span class="smart-term-tooltip"></span></span></b>.</p><ul><li>CAs can be anyone, from governments to private companies.</li><li>Whenever you view a digital signature, you can see the CA that issued it.</li><li>You must decide whether you trust that CA's criteria (e.g., trusting a State government vs an unknown entity like "Wild Bill").</li></ul><p>Digital certificates are stored on computers (password protected) or on <b><span class="smart-term" data-term-en="Smart Card" data-ar="البطاقة الذكية" data-en-def="A physical card with an embedded integrated circuit that can securely store digital certificates and private keys.">Smart Card<span class="smart-term-tooltip"></span></span>s</b>, which are used to sign things on the Internet like credit card purchases.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تحل سلطة الشهادات (CA) مشكلة "توزيع المفاتيح العامة". بدون CA، إذا أرسل لك شخص مفتاحاً عاماً وقال "أنا البنك"، فليس لديك طريقة للتأكد. الـ CA يوقع رقمياً على الشهادة التي تحتوي على المفتاح العام للبنك، وبما أنك تثق في الـ CA (ومفتاحه العام مدمج في متصفحك)، يمكنك الثقة في مفتاح البنك.</p><p>إذا تم اختراق جهاز الكمبيوتر الخاص بك وسرقة مفتاحك الخاص (أو <span class="smart-term" data-term-en="Smart Card" data-ar="البطاقة الذكية" data-en-def="A physical card with an embedded integrated circuit that can securely store digital certificates and private keys.">البطاقة الذكية<span class="smart-term-tooltip"></span></span>)، يمكن للمهاجم تزوير توقيعك بشكل مثالي. لذلك، حماية المفتاح الخاص (عبر كلمات المرور أو الأجهزة الآمنة) أمر بالغ الأهمية.</p></template>
+    <template class="content-en"><p>The CA solves the "public key distribution" problem. Without a CA, if someone sends you a public key and says "I am the bank," you have no way to verify. The CA digitally signs the certificate containing the bank's public key. Since you trust the CA (its public key is pre-installed in your browser), you can trust the bank's key.</p><p>If your computer is compromised and your private key (or smart card) is stolen, an attacker can forge your signature perfectly. Therefore, protecting the private key (via passwords or secure hardware) is paramount.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يثق متصفح الويب الخاص بك في سلطة الشهادات (CA) في المقام الأول؟</template>
+      <template class="content-en">How does your web browser trust the Certificate Authority (CA) in the first place?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تأتي أنظمة التشغيل ومتصفحات الويب (مثل Chrome و Windows) محملة مسبقاً بقائمة من المفاتيح العامة لسلطات الشهادات الجذرية (Root CAs) الموثوقة عالمياً. هذا هو أساس سلسلة الثقة.</p></template>
+      <template class="content-en"><p>Operating systems and web browsers (like Chrome and Windows) come pre-loaded with a list of public keys for globally trusted Root CAs. This forms the foundation of the chain of trust.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="digital-signature-services-algorithms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> خدمات وخوارزميات التوقيع الرقمي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Digital Signature Services &amp; Algorithms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>توفر التواقيع الرقمية المصادقة، والنزاهة، وعدم التنصل، ولكنها <b>لا توفر السرية (الخصوصية)</b> ما لم يتم إضافة طبقة تشفير أخرى.</p></template>
+    <template class="content-en"><p>Digital signatures provide authentication, integrity, and nonrepudiation, but they <b>do not provide privacy</b> unless another layer of encryption is added.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الخدمات التي يقدمها نظام التوقيع الرقمي الآمن:</p><ul><li><b>مصادقة الرسالة (Message Authentication):</b> التأكد من هوية المرسل.</li><li><b>سلامة الرسالة (Message Integrity):</b> التأكد من عدم تعديل الرسالة.</li><li><b><span class="smart-term" data-term-en="Nonrepudiation" data-ar="عدم التنصل" data-en-def="Assurance that the sender of information is provided with proof of delivery and the recipient is provided with proof of the sender&#x27;s identity, so neither can later deny having processed the information.">عدم التنصل<span class="smart-term-tooltip"></span></span> (Nonrepudiation):</b> يمكن توفيره باستخدام طرف موثوق، مما يمنع المرسل من إنكار إرسال الرسالة.</li><li><b>ملاحظة هامة:</b> التوقيع الرقمي <b>لا يوفر الخصوصية (Privacy)</b>. إذا كانت هناك حاجة للخصوصية، يجب تطبيق طبقة أخرى من التشفير/فك التشفير.</li></ul><p>خوارزميات التوقيع الرقمي الشائعة:</p><ol><li>خوارزمية التوقيع الرقمي (DSA).</li><li>خوارزمية التوقيع الرقمي RSA.</li><li><span class="smart-term" data-term-en="ECDSA" data-ar="خوارزمية التوقيع الرقمي للمنحنى الإهليلجي" data-en-def="A variant of the Digital Signature Algorithm (DSA) which uses elliptic curve cryptography, offering similar security with smaller key sizes.">خوارزمية التوقيع الرقمي للمنحنى الإهليلجي<span class="smart-term-tooltip"></span></span> (ECDSA).</li></ol><p>اختلافات التوقيع الرقمي (Variations):</p><ul><li><b>التواقيع المختومة زمنياً (Time Stamped Signatures):</b> لمنع هجمات إعادة التشغيل (Replay attacks).</li><li><b>التواقيع العمياء (Blind Signatures):</b> الحصول على توقيع على مستند دون الكشف عن محتواه للمُوَقِّع.</li></ul></template>
+    <template class="content-en"><p>Services provided by a secure digital signature scheme:</p><ul><li><b>Message Authentication:</b> Verifying the sender's identity.</li><li><b>Message Integrity:</b> Ensuring the message hasn't been altered.</li><li><b><span class="smart-term" data-term-en="Nonrepudiation" data-ar="عدم التنصل" data-en-def="Assurance that the sender of information is provided with proof of delivery and the recipient is provided with proof of the sender&#x27;s identity, so neither can later deny having processed the information.">Nonrepudiation<span class="smart-term-tooltip"></span></span>:</b> Can be provided using a trusted party, preventing the sender from denying sending the message.</li><li><b>Important Note:</b> A digital signature <b>does not provide privacy</b>. If privacy is needed, another layer of encryption/decryption must be applied.</li></ul><p>Common Digital Signature Algorithms:</p><ol><li>Digital Signature Algorithm (DSA).</li><li>RSA digital signature algorithm.</li><li>Elliptic Curve Digital Signature Algorithm (<span class="smart-term" data-term-en="ECDSA" data-ar="خوارزمية التوقيع الرقمي للمنحنى الإهليلجي" data-en-def="A variant of the Digital Signature Algorithm (DSA) which uses elliptic curve cryptography, offering similar security with smaller key sizes.">ECDSA<span class="smart-term-tooltip"></span></span>).</li></ol><p>Digital Signature Variations:</p><ul><li><b>Time Stamped Signatures:</b> Used to prevent a signed document from being replayed by an adversary.</li><li><b><span class="smart-term" data-term-en="Blind Signature" data-ar="التوقيع الأعمى" data-en-def="A form of digital signature in which the content of a message is disguised (blinded) before it is signed.">Blind Signature<span class="smart-term-tooltip"></span></span>s:</b> Used when we want a document signed without revealing its contents to the signer.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخطأ الشائع هو الاعتقاد بأن التوقيع الرقمي يخفي محتوى الرسالة. التوقيع يرفق فقط رمزاً مشفراً بالرسالة <i>النصية الواضحة</i>. لتوفير الخصوصية، يجب تشفير الرسالة الموقعة بأكملها باستخدام المفتاح العام للمستلم.</p><p>التواقيع العمياء (Blind Signatures) حاسمة في أنظمة التصويت الإلكتروني والعملات الرقمية، حيث تحتاج السلطة إلى التحقق من صحة الرمز (أو الصوت) دون معرفة لمن ينتمي أو محتواه، للحفاظ على إخفاء الهوية.</p><p>التواقيع المختومة زمنياً تمنع المهاجم من أخذ رسالة موقعة صالحة (مثل "ادفع لـ Bob مبلغ 100 دولار") وإعادة إرسالها غداً لخصم المبلغ مرة أخرى. الختم الزمني يجعل التوقيع صالحاً فقط لتلك اللحظة المحددة.</p></template>
+    <template class="content-en"><p>A common misconception is that a digital signature hides the message content. The signature merely attaches an encrypted code to the <i>plaintext</i> message. To provide privacy, the entire signed message must be encrypted using the receiver's public key.</p><p>Blind signatures are crucial in electronic voting and digital cash systems, where an authority needs to validate a token (or vote) without knowing who it belongs to or its content, preserving anonymity.</p><p>Time-stamped signatures prevent an attacker from taking a valid signed message (e.g., "Pay Bob $100") and resending it tomorrow to deduct the amount again. The timestamp makes the signature valid only for that specific moment.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في أي سيناريو واقعي ستحتاج بشدة إلى استخدام 'التوقيع الأعمى'؟</template>
+      <template class="content-en">In what real-world scenario would you strictly need to use a 'Blind Signature'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في التصويت الإلكتروني. تحتاج لجنة الانتخابات إلى توقيع بطاقة الاقتراع الخاصة بك لتأكيد أهليتك للتصويت (أنك ناخب مسجل)، ولكن يجب ألا ترى لمن صوتّ للحفاظ على سرية الاقتراع.</p></template>
+      <template class="content-en"><p>In electronic voting. The election commission needs to sign your ballot to confirm you are an eligible, registered voter, but they must not see who you voted for in order to maintain ballot secrecy.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في ليلة الامتحان. هذه الوحدة هي قلب أمن الشبكات الحديث. ركزوا معي: التشفير التقليدي يحمي سرية بياناتنا، لكن ماذا لو قام شخص بتغيير البيانات في الطريق؟ هنا يأتي دور 'سلامة الرسالة' ودوال التجزئة (Hash). تذكروا أن التجزئة هي طريق ذو اتجاه واحد؛ لا يمكن عكسها. ثم انتقلنا إلى المصادقة: MDC يثبت عدم التغيير، لكن MAC يضيف مفتاحاً سرياً ليثبت 'من' أرسل الرسالة. 
+
+بعد ذلك، دخلنا عالم التشفير غير المتماثل (المفتاح العام والخاص). القاعدة الذهبية هنا: إذا شفرت بالمفتاح العام، فأنت تبحث عن 'السرية' (فقط صاحب المفتاح الخاص يمكنه القراءة). وإذا شفرت بالمفتاح الخاص، فأنت تنشئ 'توقيعاً رقمياً' (أي شخص لديه مفتاحك العام يمكنه التحقق من هويتك). تذكروا جيداً أن التوقيع الرقمي لا يخفي الرسالة! 
+
+أخيراً، لا تنسوا خوارزمية RSA (تعتمد على تحليل الأرقام الأولية) و Diffie-Hellman (مخصصة لتبادل المفاتيح فقط وتعتمد على اللوغاريتمات المنفصلة). راجعوا دور سلطة الشهادات (CA) في منع تزوير المفاتيح العامة. بالتوفيق في الامتحان!</template>
+    <template class="content-en">Welcome to exam prep! This module is the heartbeat of modern network security. Listen closely: traditional encryption hides data, but what if someone alters it in transit? That's where 'Message Integrity' and Hash functions come in. Remember, a hash is a one-way street; it cannot be reversed. Then we added authentication: MDC proves it wasn't changed, but MAC adds a secret key to prove 'who' sent it.
+
+Next, we entered Asymmetric Cryptography (Public/Private keys). The golden rule: If you encrypt with a Public Key, you want 'Confidentiality' (only the private key owner can read it). If you encrypt with a Private Key, you are creating a 'Digital Signature' (anyone with your public key can verify it's you). Never forget: a digital signature DOES NOT hide the message!
+
+Finally, know your algorithms: RSA relies on factoring large primes, while Diffie-Hellman is strictly for Key Exchange and relies on discrete logarithms. Review the role of Certificate Authorities (CAs) in stopping public key forgery. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">دكتور، هل يمكن عكس دالة التجزئة (Hash) لمعرفة الرسالة الأصلية؟</template>
+          <template class="content-en">Professor, can a hash function be reversed to find the original message?</template>
+          <span class="content-target">دكتور، هل يمكن عكس دالة التجزئة (Hash) لمعرفة الرسالة الأصلية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مستحيل حسابياً! هذا هو بيت القصيد من خاصية 'الاتجاه الواحد' (Preimage resistance). الطريقة الوحيدة هي تخمين الرسالة (القوة العمياء) وتجزئتها ومقارنة النتيجة.</template>
+          <template class="content-en">Computationally impossible! That is the whole point of the 'one-way' (preimage resistance) property. The only way is to guess the message (brute-force), hash it, and compare the result.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين مقاومة التصادم الضعيف والقوي؟</template>
+          <template class="content-en">What is the difference between weak and strong collision resistance?</template>
+          <span class="content-target">ما الفرق بين مقاومة التصادم الضعيف والقوي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الضعيف: أعطيك رسالة محددة، وأتحداك أن تجد رسالة *أخرى* لها نفس التجزئة. القوي: أتحداك أن تجد *أي* رسالتين عشوائيتين في العالم لهما نفس التجزئة. القوي أصعب بكثير في تحقيقه ويحمي من هجمات أعياد الميلاد.</template>
+          <template class="content-en">Weak: I give you a specific message, and challenge you to find *another* message with the same hash. Strong: I challenge you to find *ANY* two random messages in the world that share the same hash. Strong is much harder to achieve and protects against birthday attacks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم MAC بدلاً من MDC؟</template>
+          <template class="content-en">Why do we use MAC instead of MDC?</template>
+          <span class="content-target">لماذا نستخدم MAC بدلاً من MDC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن MDC يخبرك فقط أن الرسالة لم تتغير، لكنه لا يخبرك من أرسلها (يمكن للمهاجم تغيير الرسالة وإنشاء MDC جديد). MAC يستخدم مفتاحاً سرياً، لذا يثبت النزاهة ويثبت أيضاً أن المرسل الحقيقي (الذي يملك المفتاح) هو من أرسلها.</template>
+          <template class="content-en">Because MDC only tells you the message didn't change, but not who sent it (an attacker could change the message and make a new MDC). MAC uses a secret key, so it proves integrity AND proves the genuine sender (who holds the key) sent it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا التشفير غير المتماثل بطيء؟</template>
+          <template class="content-en">Why is asymmetric cryptography slow?</template>
+          <span class="content-target">لماذا التشفير غير المتماثل بطيء؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يعتمد على عمليات رياضية معقدة جداً بأرقام ضخمة (مثل الأسس المعيارية في RSA). التشفير المتماثل يستخدم عمليات بسيطة وسريعة مثل XOR والتبديل.</template>
+          <template class="content-en">Because it relies on very complex mathematical operations with massive numbers (like modular exponentiation in RSA). Symmetric encryption uses simple, fast operations like XOR and substitution.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كان التشفير غير المتماثل بطيئاً، فكيف نستخدمه في الواقع؟</template>
+          <template class="content-en">If asymmetric cryptography is slow, how do we actually use it in practice?</template>
+          <span class="content-target">إذا كان التشفير غير المتماثل بطيئاً، فكيف نستخدمه في الواقع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمه بذكاء! نستخدم التشفير غير المتماثل فقط لتبادل 'مفتاح جلسة' متماثل صغير بأمان. ثم نستخدم ذلك المفتاح المتماثل السريع لتشفير البيانات الكبيرة.</template>
+          <template class="content-en">We use it smartly! We only use asymmetric cryptography to securely exchange a small symmetric 'session key'. Then we use that fast symmetric key to encrypt the bulk data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">دكتور، هل التوقيع الرقمي يشفر الرسالة؟</template>
+          <template class="content-en">Professor, does a digital signature encrypt the message?</template>
+          <span class="content-target">دكتور، هل التوقيع الرقمي يشفر الرسالة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا! هذا فخ كلاسيكي. التوقيع الرقمي يشفر *التجزئة* فقط ويرفقها بالرسالة الواضحة. أي شخص يمكنه قراءة الرسالة. إذا أردت السرية، يجب عليك تشفير الرسالة بأكملها بخطوة منفصلة.</template>
+          <template class="content-en">NO! Classic trap. A digital signature only encrypts the *hash* and attaches it to the plaintext message. Anyone can read the message. If you want confidentiality, you must encrypt the whole message in a separate step.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة التي يحلها Diffie-Hellman؟</template>
+          <template class="content-en">What exact problem does Diffie-Hellman solve?</template>
+          <span class="content-target">ما هي المشكلة التي يحلها Diffie-Hellman؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحل مشكلة 'كيف نتفق على مفتاح سري عبر شبكة يراقبها الجميع، دون أن نرسل المفتاح نفسه عبر الشبكة؟'.</template>
+          <template class="content-en">It solves the problem of 'How do we agree on a secret key over a network that everyone is watching, without ever actually sending the key across the network?'.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو هجوم 'رجل في المنتصف' (MitM) على Diffie-Hellman؟</template>
+          <template class="content-en">What is the 'Man-in-the-Middle' attack on Diffie-Hellman?</template>
+          <span class="content-target">ما هو هجوم 'رجل في المنتصف' (MitM) على Diffie-Hellman؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بما أن Diffie-Hellman لا يصادق الأطراف، يمكن للمهاجم الوقوف في المنتصف، وإنشاء مفتاح مشترك معك، ومفتاح آخر مع البنك، وتمرير الرسائل بينكما وأنتما تعتقدان أنكما تتحدثان مباشرة.</template>
+          <template class="content-en">Since basic Diffie-Hellman doesn't authenticate parties, an attacker can sit in the middle, establish one shared key with you, and another with the bank, relaying messages while you both think you are talking directly.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى سلطة الشهادات (CA)؟</template>
+          <template class="content-en">Why do we need a Certificate Authority (CA)?</template>
+          <span class="content-target">لماذا نحتاج إلى سلطة الشهادات (CA)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لمنع التزوير. إذا أرسل لك شخص مفتاحاً عاماً وقال 'أنا أمازون'، كيف تتأكد؟ الـ CA هي جهة موثوقة تتحقق من هويته وتوقع على مفتاحه العام لضمان أنه يخص أمازون فعلاً.</template>
+          <template class="content-en">To prevent spoofing. If someone sends you a public key and says 'I am Amazon', how do you know? The CA is a trusted third party that verifies their identity and signs their public key to guarantee it really belongs to Amazon.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التوقيع الأعمى (Blind Signature)؟</template>
+          <template class="content-en">What is a Blind Signature?</template>
+          <span class="content-target">ما هو التوقيع الأعمى (Blind Signature)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تخيل أنك تضع وثيقة داخل مظروف به نافذة كربونية. يقوم المدير بالتوقيع على المظروف من الخارج، فيُطبع التوقيع على الوثيقة بالداخل دون أن يرى المدير محتواها. يُستخدم هذا في التصويت الإلكتروني للحفاظ على الخصوصية.</template>
+          <template class="content-en">Imagine putting a document inside an envelope with carbon paper. The manager signs the outside of the envelope, transferring the signature to the document inside without seeing its contents. This is used in e-voting to maintain privacy.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض الأساسي من دالة التجزئة (Hash Function)؟",
+      "en": "What is the primary purpose of a Hash Function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل رسالة متغيرة الحجم إلى خلاصة (بصمة) ثابتة الحجم لضمان سلامة الرسالة.",
+        "en": "To map a variable-size message to a fixed-size digest (fingerprint) to ensure message integrity."
+      },
+      "example": {
+        "ar": "استخدام SHA-256 لإنشاء بصمة لملف للتأكد من عدم تعديله.",
+        "en": "Using SHA-256 to create a fingerprint of a file to ensure it hasn't been modified."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ماذا تعني خاصية 'مقاومة الصورة المسبقة' (Preimage resistant)؟",
+      "en": "What does 'Preimage resistant' mean in hash functions?"
+    },
+    "back": {
+      "definition": {
+        "ar": "من المستحيل حسابياً إيجاد الرسالة الأصلية إذا كان لديك فقط قيمة التجزئة الخاصة بها (دالة ذات اتجاه واحد).",
+        "en": "It is computationally infeasible to find the original message if you only have its hash value (one-way function)."
+      },
+      "example": {
+        "ar": "لا يمكنك استعادة كلمة المرور الأصلية من تجزئتها المخزنة في قاعدة البيانات.",
+        "en": "You cannot recover the original password from its hash stored in a database."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الفرق بين MDC و MAC؟",
+      "en": "What is the difference between MDC and MAC?"
+    },
+    "back": {
+      "definition": {
+        "ar": "MDC يثبت سلامة الرسالة فقط، بينما MAC يثبت السلامة والمصادقة باستخدام مفتاح سري مشترك.",
+        "en": "MDC proves only message integrity, while MAC proves integrity and authentication using a shared secret key."
+      },
+      "example": {
+        "ar": "MDC يشبه ختم الشمع العادي، MAC يشبه ختم الشمع الذي يتطلب ختماً سرياً لا يملكه إلا المرسل والمستقبل.",
+        "en": "MDC is like a regular wax seal, MAC is like a wax seal stamped with a secret ring only the sender and receiver have."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي عائلة خوارزميات التجزئة التي حلت محل SHA-1؟",
+      "en": "Which family of hash algorithms replaced SHA-1?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عائلة SHA-2 (مثل SHA-256 و SHA-512).",
+        "en": "The SHA-2 family (e.g., SHA-256, SHA-512)."
+      },
+      "example": {
+        "ar": "أعلن NIST التخلص التدريجي من SHA-1 بحلول عام 2010 بسبب نقاط الضعف.",
+        "en": "NIST announced the phase-out of SHA-1 by 2010 due to vulnerabilities."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "في التشفير غير المتماثل، أي مفتاح يُستخدم لإنشاء التوقيع الرقمي؟",
+      "en": "In asymmetric cryptography, which key is used to create a digital signature?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المفتاح الخاص للمرسل (Sender's Private Key).",
+        "en": "The sender's Private Key."
+      },
+      "example": {
+        "ar": "تقوم Alice بتشفير تجزئة الرسالة بمفتاحها الخاص لتوقيعها.",
+        "en": "Alice encrypts the message hash with her private key to sign it."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "في التشفير غير المتماثل، أي مفتاح يُستخدم للتحقق من التوقيع الرقمي؟",
+      "en": "In asymmetric cryptography, which key is used to verify a digital signature?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المفتاح العام للمرسل (Sender's Public Key).",
+        "en": "The sender's Public Key."
+      },
+      "example": {
+        "ar": "يستخدم Bob المفتاح العام لـ Alice لفك تشفير التوقيع والتحقق منه.",
+        "en": "Bob uses Alice's public key to decrypt and verify the signature."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي الخوارزمية الأكثر شيوعاً لتشفير المفتاح العام؟",
+      "en": "What is the most common public-key algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية RSA.",
+        "en": "The RSA cryptosystem."
+      },
+      "example": {
+        "ar": "تستخدم RSA الأسس المعيارية وتعتمد على صعوبة تحليل الأرقام الأولية الكبيرة.",
+        "en": "RSA uses modular exponentiation and relies on the difficulty of factoring large primes."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو الغرض الوحيد لخوارزمية Diffie-Hellman؟",
+      "en": "What is the sole purpose of the Diffie-Hellman algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تبادل المفاتيح السرية بأمان عبر قناة غير آمنة.",
+        "en": "To securely exchange secret keys over an insecure channel."
+      },
+      "example": {
+        "ar": "لا يمكن استخدام Diffie-Hellman لتشفير الرسائل أو التوقيع الرقمي، بل لإنشاء مفتاح جلسة فقط.",
+        "en": "Diffie-Hellman cannot be used for message encryption or digital signatures, only to establish a session key."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي المشكلة الرياضية التي يعتمد عليها أمان Diffie-Hellman؟",
+      "en": "What mathematical problem does Diffie-Hellman security rely on?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صعوبة حساب اللوغاريتمات المنفصلة (Discrete logarithms).",
+        "en": "The difficulty of computing discrete logarithms."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "هل يوفر التوقيع الرقمي الخصوصية (السرية) للرسالة؟",
+      "en": "Does a digital signature provide privacy (confidentiality) for the message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، التوقيع الرقمي يوفر المصادقة والنزاهة وعدم التنصل فقط. الرسالة نفسها تظل غير مشفرة.",
+        "en": "No, a digital signature only provides authentication, integrity, and nonrepudiation. The message itself remains unencrypted."
+      },
+      "example": {
+        "ar": "للحصول على الخصوصية، يجب تشفير الرسالة الموقعة باستخدام المفتاح العام للمستلم.",
+        "en": "To get privacy, the signed message must be encrypted using the recipient's public key."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو دور سلطة الشهادات (CA)؟",
+      "en": "What is the role of a Certificate Authority (CA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إصدار شهادات رقمية موثوقة تربط المفتاح العام بهوية كيان معين لمنع التزوير.",
+        "en": "To issue trusted digital certificates that bind a public key to a specific entity's identity to prevent forgery."
+      },
+      "example": {
+        "ar": "تؤكد CA أن المفتاح العام الذي تستخدمه ينتمي فعلاً إلى موقع البنك الخاص بك.",
+        "en": "A CA confirms that the public key you are using actually belongs to your bank's website."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو التوقيع المدموغ زمنياً (Time Stamped Signature)؟",
+      "en": "What is a Time Stamped Signature?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توقيع يتضمن وقتاً محدداً لمنع المهاجم من إعادة إرسال (Replay) الرسالة الموقعة لاحقاً.",
+        "en": "A signature that includes a specific time to prevent an attacker from replaying the signed message later."
+      },
+      "example": {
+        "ar": "منع شخص من إعادة إرسال أمر تحويل بنكي تم توقيعه بالأمس.",
+        "en": "Preventing someone from resending a bank transfer order that was signed yesterday."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو التوقيع الأعمى (Blind Signature)؟",
+      "en": "What is a Blind Signature?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحصول على توقيع على مستند دون الكشف عن محتواه للمُوَقِّع.",
+        "en": "Getting a document signed without revealing its contents to the signer."
+      },
+      "example": {
+        "ar": "يُستخدم في أنظمة التصويت الإلكتروني للحفاظ على سرية الاقتراع.",
+        "en": "Used in electronic voting systems to maintain ballot secrecy."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو OAEP ولماذا يُستخدم مع RSA؟",
+      "en": "What is OAEP and why is it used with RSA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حشو التشفير غير المتماثل الأمثل. يُستخدم لتعديل النص الأصلي (إضافة عشوائية) لمواجهة هجمات النص المشفر المختار.",
+        "en": "Optimal Asymmetric Encryption Padding. Used to modify plaintext (add randomness) to counter chosen ciphertext attacks."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي خاصية 'مقاومة التصادم' (Collision resistant)؟",
+      "en": "What is the 'Collision resistant' property?"
+    },
+    "back": {
+      "definition": {
+        "ar": "من المستحيل حسابياً إيجاد أي رسالتين مختلفتين تنتجان نفس قيمة التجزئة.",
+        "en": "It is computationally infeasible to find ANY two different messages that produce the same hash value."
+      },
+      "example": {
+        "ar": "تمنع المهاجم من إنشاء عقد مزيف له نفس تجزئة العقد الحقيقي.",
+        "en": "Prevents an attacker from creating a fake contract that has the same hash as a real contract."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الخصائص التالية لدالة التجزئة تمنع المهاجم من استنتاج الرسالة الأصلية من قيمة التجزئة؟",
+      "en": "Which property of a hash function prevents an attacker from deducing the original message from the hash value?"
+    },
+    "options": {
+      "ar": [
+        "مقاومة التصادم القوي",
+        "مقاومة الصورة المسبقة (الاتجاه الواحد)",
+        "مقاومة الصورة المسبقة الثانية",
+        "الطول الثابت للمخرجات"
+      ],
+      "en": [
+        "Strong collision resistance",
+        "Preimage resistance (One-way)",
+        "Second preimage resistance",
+        "Fixed-length output"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مقاومة الصورة المسبقة (أو خاصية الاتجاه الواحد) تعني أنه من المستحيل حسابياً عكس دالة التجزئة للحصول على المدخلات الأصلية.",
+      "en": "Preimage resistance (or one-way property) means it is computationally infeasible to reverse the hash function to get the original input."
+    },
+    "hint": {
+      "ar": "فكر في طريق ذو اتجاه واحد.",
+      "en": "Think of a one-way street."
+    },
+    "difficulty": "easy",
+    "conceptId": "message-integrity-and-hash-functions"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الاختلاف الرئيسي بين رمز اكتشاف التعديل (MDC) ورمز مصادقة الرسالة (MAC)؟",
+      "en": "What is the main difference between a Modification Detection Code (MDC) and a Message Authentication Code (MAC)?"
+    },
+    "options": {
+      "ar": [
+        "MDC أسرع في الحساب من MAC.",
+        "MAC يستخدم مفتاحاً سرياً مشتركاً، بينما MDC لا يفعل ذلك.",
+        "MDC يوفر السرية، بينما MAC يوفر النزاهة.",
+        "MAC يستخدم التشفير غير المتماثل، بينما MDC يستخدم التشفير المتماثل."
+      ],
+      "en": [
+        "MDC is faster to compute than MAC.",
+        "MAC uses a shared secret key, while MDC does not.",
+        "MDC provides confidentiality, while MAC provides integrity.",
+        "MAC uses asymmetric encryption, while MDC uses symmetric encryption."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يستخدم MAC مفتاحاً سرياً مشتركاً بين المرسل والمستقبل لتوفير مصادقة أصل البيانات بالإضافة إلى النزاهة، بينما يوفر MDC النزاهة فقط.",
+      "en": "A MAC uses a shared secret key between sender and receiver to provide data origin authentication in addition to integrity, whereas MDC only provides integrity."
+    },
+    "hint": {
+      "ar": "كيف يثبت MAC هوية المرسل؟",
+      "en": "How does a MAC prove the sender's identity?"
+    },
+    "difficulty": "medium",
+    "conceptId": "message-authentication-mdc-vs-mac"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي من خوارزميات التجزئة التالية أعلن NIST عن التخلص التدريجي منها بحلول عام 2010؟",
+      "en": "Which of the following hash algorithms did NIST announce to phase out by 2010?"
+    },
+    "options": {
+      "ar": [
+        "SHA-256",
+        "SHA-512",
+        "SHA-1",
+        "MD5"
+      ],
+      "en": [
+        "SHA-256",
+        "SHA-512",
+        "SHA-1",
+        "MD5"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أعلن NIST عن التخلص التدريجي من SHA-1 والانتقال إلى عائلة SHA-2 بسبب اكتشاف نقاط ضعف في SHA-1.",
+      "en": "NIST announced the phase-out of SHA-1 and the move to the SHA-2 family due to discovered vulnerabilities in SHA-1."
+    },
+    "hint": {
+      "ar": "إنها النسخة الأقدم في عائلة SHA المذكورة في المحاضرة.",
+      "en": "It is the oldest version of the SHA family mentioned in the lecture."
+    },
+    "difficulty": "easy",
+    "conceptId": "cryptographic-hash-algorithms-sha"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في التشفير غير المتماثل، إذا أرادت Alice إرسال رسالة سرية إلى Bob، فأي مفتاح يجب أن تستخدمه لتشفير الرسالة؟",
+      "en": "In asymmetric cryptography, if Alice wants to send a confidential message to Bob, which key should she use to encrypt the message?"
+    },
+    "options": {
+      "ar": [
+        "المفتاح الخاص لـ Alice",
+        "المفتاح العام لـ Alice",
+        "المفتاح الخاص لـ Bob",
+        "المفتاح العام لـ Bob"
+      ],
+      "en": [
+        "Alice's private key",
+        "Alice's public key",
+        "Bob's private key",
+        "Bob's public key"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "لضمان السرية، يجب تشفير الرسالة باستخدام المفتاح العام للمستلم (Bob). بهذه الطريقة، فقط Bob (الذي يمتلك المفتاح الخاص المطابق) يمكنه فك تشفيرها.",
+      "en": "To ensure confidentiality, the message must be encrypted with the recipient's (Bob's) public key. This way, only Bob (who holds the matching private key) can decrypt it."
+    },
+    "hint": {
+      "ar": "من الذي يجب أن يكون قادراً على فتح القفل؟",
+      "en": "Who should be able to unlock the message?"
+    },
+    "difficulty": "medium",
+    "conceptId": "public-key-cryptography-principles"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "تعتمد خوارزمية RSA في أمانها على صعوبة أي مشكلة رياضية؟",
+      "en": "The RSA algorithm relies for its security on the difficulty of which mathematical problem?"
+    },
+    "options": {
+      "ar": [
+        "حساب اللوغاريتمات المنفصلة",
+        "تحليل الأرقام الأولية الكبيرة",
+        "حل منحنيات إهليلجية",
+        "عكس دوال التجزئة"
+      ],
+      "en": [
+        "Computing discrete logarithms",
+        "Factoring large prime numbers",
+        "Solving elliptic curves",
+        "Reversing hash functions"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يعتمد أمان RSA على الصعوبة الحسابية لتحليل الأرقام الكبيرة جداً (n) إلى عواملها الأولية (p و q).",
+      "en": "The security of RSA depends on the computational difficulty of factoring very large numbers (n) into their prime components (p and q)."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بضرب رقمين أوليين.",
+      "en": "It involves multiplying two prime numbers."
+    },
+    "difficulty": "medium",
+    "conceptId": "rsa-cryptosystem"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض الوحيد لخوارزمية Diffie-Hellman؟",
+      "en": "What is the sole purpose of the Diffie-Hellman algorithm?"
+    },
+    "options": {
+      "ar": [
+        "تشفير الرسائل الكبيرة",
+        "إنشاء تواقيع رقمية",
+        "تبادل مفتاح سري بأمان",
+        "تجزئة كلمات المرور"
+      ],
+      "en": [
+        "Encrypting large messages",
+        "Creating digital signatures",
+        "Securely exchanging a secret key",
+        "Hashing passwords"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خوارزمية Diffie-Hellman مقتصرة على تبادل المفاتيح فقط ولا يمكن استخدامها للتشفير المباشر للرسائل أو التوقيع الرقمي.",
+      "en": "The Diffie-Hellman algorithm is limited to the exchange of keys only and cannot be used for direct message encryption or digital signatures."
+    },
+    "hint": {
+      "ar": "إنها لا تشفر البيانات، بل تتفق على شيء ما.",
+      "en": "It doesn't encrypt data, it agrees on something."
+    },
+    "difficulty": "easy",
+    "conceptId": "diffie-hellman-key-exchange"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يتم إنتاج التوقيع الرقمي لرسالة؟",
+      "en": "How is a digital signature produced for a message?"
+    },
+    "options": {
+      "ar": [
+        "تشفير الرسالة بالمفتاح العام للمستلم",
+        "تجزئة الرسالة وتشفير التجزئة بالمفتاح الخاص للمرسل",
+        "تجزئة الرسالة وتشفير التجزئة بالمفتاح العام للمرسل",
+        "تشفير الرسالة بالمفتاح الخاص للمستلم"
+      ],
+      "en": [
+        "Encrypting the message with the receiver's public key",
+        "Hashing the message and encrypting the hash with the sender's private key",
+        "Hashing the message and encrypting the hash with the sender's public key",
+        "Encrypting the message with the receiver's private key"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لإنشاء توقيع رقمي، يتم أولاً تمرير الرسالة عبر دالة تجزئة، ثم يتم تشفير هذه التجزئة باستخدام المفتاح الخاص للمرسل.",
+      "en": "To create a digital signature, the message is first hashed, and then this hash is encrypted using the sender's private key."
+    },
+    "hint": {
+      "ar": "التوقيع يثبت هويتك (مفتاحك الخاص) ويحمي الرسالة (التجزئة).",
+      "en": "A signature proves your identity (your private key) and protects the message (hash)."
+    },
+    "difficulty": "medium",
+    "conceptId": "digital-signature-production-verification"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من الخدمات التالية <strong>لا</strong> يوفرها التوقيع الرقمي بشكل افتراضي؟",
+      "en": "Which of the following services is <strong>NOT</strong> provided by a digital signature by default?"
+    },
+    "options": {
+      "ar": [
+        "مصادقة الرسالة",
+        "سلامة الرسالة",
+        "الخصوصية (السرية)",
+        "عدم التنصل"
+      ],
+      "en": [
+        "Message Authentication",
+        "Message Integrity",
+        "Privacy (Confidentiality)",
+        "Nonrepudiation"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التوقيع الرقمي لا يوفر الخصوصية. الرسالة نفسها تُرسل كنص واضح مع التوقيع المرفق. للخصوصية، يجب إضافة طبقة تشفير أخرى.",
+      "en": "A digital signature does not provide privacy. The message itself is sent in plaintext with the signature attached. For privacy, another layer of encryption must be added."
+    },
+    "hint": {
+      "ar": "هل يمكنك قراءة شيك موقع؟ نعم.",
+      "en": "Can you read a signed check? Yes."
+    },
+    "difficulty": "hard",
+    "conceptId": "digital-signature-services-algorithms"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو دور سلطة الشهادات (CA) في التواقيع الرقمية؟",
+      "en": "What is the role of a Certificate Authority (CA) in digital signatures?"
+    },
+    "options": {
+      "ar": [
+        "تشفير الرسائل نيابة عن المستخدمين",
+        "تخزين المفاتيح الخاصة للمستخدمين",
+        "إصدار شهادات رقمية للتحقق من هوية مالك المفتاح العام",
+        "توليد قيم التجزئة للرسائل الكبيرة"
+      ],
+      "en": [
+        "Encrypting messages on behalf of users",
+        "Storing users' private keys",
+        "Issuing digital certificates to verify the identity of a public key owner",
+        "Generating hash values for large messages"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تقوم سلطة الشهادات بإصدار شهادات رقمية تربط المفتاح العام بهوية شخص أو كيان، مما يمنع المهاجمين من تزوير المفاتيح العامة.",
+      "en": "A CA issues digital certificates that bind a public key to a person or entity's identity, preventing attackers from spoofing public keys."
+    },
+    "hint": {
+      "ar": "كيف تتأكد من أن المفتاح العام ينتمي فعلاً للبنك؟",
+      "en": "How do you ensure the public key actually belongs to the bank?"
+    },
+    "difficulty": "medium",
+    "conceptId": "certificate-authorities-and-trust"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "لماذا نستخدم التواقيع المختومة زمنياً (Time Stamped Signatures)؟",
+      "en": "Why do we use Time Stamped Signatures?"
+    },
+    "options": {
+      "ar": [
+        "لإخفاء محتوى الرسالة عن المُوَقِّع",
+        "لمنع هجمات إعادة التشغيل (Replay attacks)",
+        "لتسريع عملية التشفير",
+        "لتقليل حجم التوقيع الرقمي"
+      ],
+      "en": [
+        "To hide the message content from the signer",
+        "To prevent replay attacks",
+        "To speed up the encryption process",
+        "To reduce the size of the digital signature"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم التواقيع المختومة زمنياً لمنع الخصم من أخذ رسالة موقعة صالحة وإعادة إرسالها (إعادة تشغيلها) في وقت لاحق.",
+      "en": "Time-stamped signatures are used to prevent an adversary from taking a valid signed message and resending (replaying) it at a later time."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا أرسل شخص نفس الشيك الموقع مرتين في أيام مختلفة؟",
+      "en": "What happens if someone sends the same signed check twice on different days?"
+    },
+    "difficulty": "medium",
+    "conceptId": "digital-signature-services-algorithms"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر: التوقيع الرقمي <strong>لا</strong> يوفر الخصوصية (السرية). هذا فخ شائع في الامتحانات. التوقيع يثبت فقط من أرسل الرسالة وأنها لم تتغير. يمكن لأي شخص يعترض الرسالة قراءتها ما لم تقم بتشفيرها بشكل منفصل.</template>
+    <template class="content-en">TRAP: A digital signature <strong>DOES NOT</strong> provide privacy (confidentiality). This is a common exam trap. It only proves who sent it and that it hasn't changed. Anyone intercepting the message can read it unless you separately encrypt it.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين التشفير المتماثل وغير المتماثل: المتماثل يستخدم مفتاحاً واحداً (سريع، جيد للبيانات الكبيرة)، غير المتماثل يستخدم مفتاحين (بطيء، يستخدم لتبادل المفاتيح والتواقيع).</template>
+    <template class="content-en">Core difference: Symmetric uses ONE key (fast, good for bulk data). Asymmetric uses TWO keys (slow, used for key exchange and signatures).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في التوقيع الرقمي، نحن لا نقوم بتشفير الرسالة بأكملها بالمفتاح الخاص (لأن ذلك سيكون بطيئاً جداً). نحن نقوم بتجزئة (Hash) الرسالة أولاً، ثم نشفر التجزئة الصغيرة فقط.</template>
+    <template class="content-en">In a digital signature, we DO NOT encrypt the entire message with the private key (that would be too slow). We Hash the message first, and only encrypt the tiny hash.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين خوارزميات التجزئة (مثل SHA) وخوارزميات التشفير (مثل RSA). التجزئة ذات اتجاه واحد ولا يمكن عكسها. التشفير ذو اتجاهين ويمكن فك تشفيره.</template>
+    <template class="content-en">Do not confuse Hash algorithms (like SHA) with Encryption algorithms (like RSA). Hashing is ONE-WAY and cannot be reversed. Encryption is TWO-WAY and can be decrypted.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">خوارزمية Diffie-Hellman مخصصة <strong>لتبادل المفاتيح فقط</strong>. لا يمكنك استخدامها لتشفير رسالة أو توقيع مستند. إنها مجرد طريقة لطرفين للاتفاق على مفتاح سري عبر شبكة عامة.</template>
+    <template class="content-en">Diffie-Hellman is for <strong>KEY EXCHANGE ONLY</strong>. You cannot use it to encrypt a message or sign a document. It is purely a way for two parties to agree on a secret key over a public network.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

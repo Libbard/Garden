@@ -1,0 +1,2723 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS231" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الاحتمالات والنمذجة الإحصائية · DS231 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS231" data-page-title-en="DS231">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=DS231"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#descriptive-vs-inferential-statistics" class="toc-link" data-bilingual>
+        <template class="content-ar">الإحصاء الوصفي مقابل الإحصاء الاستدلالي</template>
+        <template class="content-en">Descriptive vs. Inferential Statistics</template>
+        <span class="content-target">الإحصاء الوصفي مقابل الإحصاء الاستدلالي</span>
+      </a>
+      <a href="#probability-distributions" class="toc-link" data-bilingual>
+        <template class="content-ar">التوزيعات الاحتمالية</template>
+        <template class="content-en">Probability Distributions</template>
+        <span class="content-target">التوزيعات الاحتمالية</span>
+      </a>
+      <a href="#conditional-probability-naive-bayes" class="toc-link" data-bilingual>
+        <template class="content-ar">الاحتمال الشرطي و Naïve Bayes</template>
+        <template class="content-en">Conditional Probability with Naïve Bayes</template>
+        <span class="content-target">الاحتمال الشرطي و Naïve Bayes</span>
+      </a>
+      <a href="#quantifying-correlation" class="toc-link" data-bilingual>
+        <template class="content-ar">قياس الارتباط</template>
+        <template class="content-en">Quantifying Correlation</template>
+        <span class="content-target">قياس الارتباط</span>
+      </a>
+      <a href="#dimensionality-reduction-linear-algebra" class="toc-link" data-bilingual>
+        <template class="content-ar">تقليل الأبعاد باستخدام الجبر الخطي</template>
+        <template class="content-en">Reducing Data Dimensionality with Linear Algebra</template>
+        <span class="content-target">تقليل الأبعاد باستخدام الجبر الخطي</span>
+      </a>
+      <a href="#multiple-criteria-decision-making" class="toc-link" data-bilingual>
+        <template class="content-ar">اتخاذ القرارات متعددة المعايير (MCDM)</template>
+        <template class="content-en">Multiple Criteria Decision-Making (MCDM)</template>
+        <span class="content-target">اتخاذ القرارات متعددة المعايير (MCDM)</span>
+      </a>
+      <a href="#regression-methods" class="toc-link" data-bilingual>
+        <template class="content-ar">طرق الانحدار</template>
+        <template class="content-en">Introducing Regression Methods</template>
+        <span class="content-target">طرق الانحدار</span>
+      </a>
+      <a href="#detecting-outliers" class="toc-link" data-bilingual>
+        <template class="content-ar">اكتشاف القيم المتطرفة</template>
+        <template class="content-en">Detecting Outliers</template>
+        <span class="content-target">اكتشاف القيم المتطرفة</span>
+      </a>
+      <a href="#time-series-analysis" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل السلاسل الزمنية</template>
+        <template class="content-en">Introducing Time Series Analysis</template>
+        <span class="content-target">تحليل السلاسل الزمنية</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · DS231
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الاحتمالات والنمذجة الإحصائية</h1>
+      <p class="hero-description">مقدمة في المفاهيم الأساسية للاحتمالات الإحصائية، تحليل الارتباط، تقليل الأبعاد، اتخاذ القرارات متعددة المعايير، الانحدار، اكتشاف القيم المتطرفة، وتحليل السلاسل الزمنية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Probability, and Statistical Modeling</h1>
+      <p class="hero-description">Introduction to the core basics of statistical probability, correlation analysis, dimensionality reduction, multiple criteria decision-making, regression, outlier detection, and time series analysis.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الإحصاء</span>
+      <span class="tag">الاحتمالات</span>
+      <span class="tag">الارتباط</span>
+      <span class="tag">تقليل الأبعاد</span>
+      <span class="tag">الانحدار</span>
+      <span class="tag">القيم المتطرفة</span>
+      <span class="tag">السلاسل الزمنية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Statistics</span>
+      <span class="tag">Probability</span>
+      <span class="tag">Correlation</span>
+      <span class="tag">Dimensionality Reduction</span>
+      <span class="tag">Regression</span>
+      <span class="tag">Outliers</span>
+      <span class="tag">Time Series</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تقديم الأساسيات الجوهرية للاحتمالات الإحصائية.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد وقياس الارتباط بين المتغيرات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقليل أبعاد مجموعة البيانات باستخدام الجبر الخطي.</span></li>
+      <li><span class="obj-icon">✦</span><span>بناء نماذج القرار باستخدام اتخاذ القرارات متعددة المعايير (MCDM).</span></li>
+      <li><span class="obj-icon">✦</span><span>التعمق في طرق الانحدار للتنبؤ والتحليل.</span></li>
+      <li><span class="obj-icon">✦</span><span>اكتشاف القيم المتطرفة في البيانات أحادية ومتعددة المتغيرات.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Introducing the core basics of statistical probability.</span></li>
+      <li><span class="obj-icon">✦</span><span>Quantifying correlation between variables.</span></li>
+      <li><span class="obj-icon">✦</span><span>Reducing dataset dimensionality using linear algebra.</span></li>
+      <li><span class="obj-icon">✦</span><span>Building decision models with multiple criteria decision-making.</span></li>
+      <li><span class="obj-icon">✦</span><span>Diving into regression methods for prediction and analysis.</span></li>
+      <li><span class="obj-icon">✦</span><span>Detecting outliers in univariate and multivariate data.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="descriptive-vs-inferential-statistics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الإحصاء الوصفي مقابل الإحصاء الاستدلالي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Descriptive vs. Inferential Statistics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإحصاء الوصفي يلخص البيانات الحالية، بينما الإحصاء الاستدلالي يستخدم عينة للتنبؤ بخصائص مجتمع بأكمله.</p></template>
+    <template class="content-en"><p>Descriptive statistics summarize current data, while inferential statistics use a sample to make predictions about an entire population.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الإحصاء هو نتيجة مستمدة من إجراء عملية رياضية على بيانات رقمية، ويستخدم في اتخاذ القرار. ينقسم إلى نوعين رئيسيين:</p><ul><li><b>الإحصاء الوصفي (Descriptive):</b> يقدم وصفاً يوضح بعض خصائص مجموعة البيانات الرقمية، مثل التوزيع، النزعة المركزية (المتوسط، الحد الأدنى، الحد الأقصى)، والتشتت (الانحراف المعياري والتباين). لا يهدف إلى توضيح أي ادعاءات سببية (لا يفترض أن X يسبب Y).</li><li><b>الإحصاء الاستدلالي (Inferential):</b> يقتطع قسماً أصغر من مجموعة البيانات (عينة - Sample) ويحاول استنتاج معلومات مهمة حول مجموعة البيانات الأكبر (المجتمع - Population). على عكس الإحصاء الوصفي، تحاول الطرق الاستدلالية (مثل تحليل الانحدار) التنبؤ من خلال دراسة السببية.</li></ul></template>
+    <template class="content-en"><p>A statistic is a result derived from performing a mathematical operation on numerical data, used in decision-making. It comes in two flavors:</p><ul><li><b>Descriptive:</b> Provides a description illuminating characteristics of a numerical dataset, including distribution, central tendency (mean, min, max), and dispersion (standard deviation, variance). It does not illustrate causal claims (does not assume X causes Y).</li><li><b>Inferential:</b> Carves out a smaller section of the dataset (<span class="smart-term" data-term-en="Sample" data-ar="العينة" data-en-def="A smaller data selection carved out from the population used to infer information.">sample<span class="smart-term-tooltip"></span></span>) to deduce significant information about the larger dataset (<span class="smart-term" data-term-en="Population" data-ar="المجتمع الإحصائي" data-en-def="The larger, complete dataset from which a sample is taken.">population<span class="smart-term-tooltip"></span></span>). Unlike descriptive statistics, inferential methods (like regression) DO try to predict by studying causation.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نهتم بالإحصاء الوصفي إذا كان لا يتنبأ؟ يهتم علماء البيانات بالإحصاء الوصفي لما يكشفه عن المقاييس الواقعية. على سبيل المثال، يمكن استخدامه لاكتشاف القيم المتطرفة، أو التخطيط لمتطلبات المعالجة المسبقة للميزات، أو تحديد الميزات التي يجب استخدامها في التحليل.</p><p>في الإحصاء الاستدلالي، لكي يكون الاستنتاج صحيحاً، يجب اختيار <span class="smart-term" data-term-en="Sample" data-ar="العينة" data-en-def="A smaller data selection carved out from the population used to infer information.">العينة<span class="smart-term-tooltip"></span></span> بعناية لتمثل المجتمع تمثيلاً حقيقياً. وحتى مع العينة الممثلة، ستظهر الأرقام دائماً بعض الضوضاء (التباين العشوائي).</p></template>
+    <template class="content-en"><p>Why care about descriptive statistics if they don't predict? Data scientists are interested in them because of what they reveal about real-world measures. They are used to detect outliers, plan feature preprocessing, or quickly identify which features to use in an analysis.</p><p>In inferential statistics, for an inference to be valid, the sample must be selected carefully to form a true representation of the population. Even then, the sample dataset will always exhibit some noise (random variation).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show two distinct panels. Left panel titled 'Descriptive Statistics' showing a bar chart and a summary box (Mean, Max, Min). Right panel titled 'Inferential Statistics' showing a large group of figures (Population) with an arrow pointing to a smaller subset (Sample), and a magnifying glass over the sample with a predictive trend line pointing back to the population. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for solid lines -->
+    <marker id="arrow-solid" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Arrowhead for dashed lines -->
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Gradient for Bar Chart -->
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-600)" />
+      <stop offset="100%" stop-color="var(--brand-800)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Main Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- LEFT PANEL: DESCRIPTIVE STATISTICS         -->
+  <!-- ========================================== -->
+  <g transform="translate(20, 20)">
+    <!-- Panel Background -->
+    <rect width="390" height="410" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Panel Titles -->
+    <text x="195" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Descriptive Statistics</text>
+    <text x="195" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإحصاء الوصفي</text>
+    
+    <text x="195" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Summarizes and describes data characteristics</text>
+    <text x="195" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يلخص ويصف خصائص البيانات</text>
+
+    <!-- Bar Chart Area -->
+    <g transform="translate(40, 110)">
+      <!-- Grid Lines -->
+      <line x1="20" y1="40" x2="200" y2="40" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+      <line x1="20" y1="100" x2="200" y2="100" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+      <line x1="20" y1="160" x2="200" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+
+      <!-- Axes -->
+      <line x1="20" y1="220" x2="220" y2="220" stroke="var(--text-muted)" stroke-width="2" />
+      <line x1="20" y1="220" x2="20" y2="20" stroke="var(--text-muted)" stroke-width="2" />
+      
+      <!-- Axis Labels -->
+      <text x="120" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Data Values</text>
+      <text x="120" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">قيم البيانات</text>
+      
+      <text x="-120" y="-5" transform="rotate(-90)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Frequency</text>
+      <text x="-120" y="-5" transform="rotate(-90)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">التكرار</text>
+
+      <!-- Distribution Curve (Background) -->
+      <path d="M 20 220 C 50 220, 70 50, 120 50 C 170 50, 190 220, 220 220" fill="var(--brand-500)" fill-opacity="0.1" stroke="var(--brand-500)" stroke-width="3" />
+
+      <!-- Bars -->
+      <rect x="40" y="150" width="24" height="70" rx="3" fill="url(#barGrad)" />
+      <rect x="74" y="90" width="24" height="130" rx="3" fill="url(#barGrad)" />
+      <rect x="108" y="50" width="24" height="170" rx="3" fill="url(#barGrad)" />
+      <rect x="142" y="100" width="24" height="120" rx="3" fill="url(#barGrad)" />
+      <rect x="176" y="160" width="24" height="60" rx="3" fill="url(#barGrad)" />
+    </g>
+
+    <!-- Summary Box -->
+    <g transform="translate(250, 140)">
+      <rect width="120" height="160" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+      
+      <text x="60" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Summary</text>
+      <text x="60" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الخلاصة</text>
+      
+      <line x1="15" y1="35" x2="105" y2="35" stroke="var(--border-color)" stroke-width="1" />
+      
+      <!-- Summary Items -->
+      <text x="60" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Mean: 42</text>
+      <text x="60" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">المتوسط: 42</text>
+      
+      <text x="60" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Max: 89</text>
+      <text x="60" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">الأقصى: 89</text>
+      
+      <text x="60" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Min: 12</text>
+      <text x="60" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">الأدنى: 12</text>
+      
+      <text x="60" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-en">Std Dev: 5.4</text>
+      <text x="60" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)" class="gsvg-ar">الانحراف: 5.4</text>
+    </g>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- RIGHT PANEL: INFERENTIAL STATISTICS        -->
+  <!-- ========================================== -->
+  <g transform="translate(430, 20)">
+    <!-- Panel Background -->
+    <rect width="390" height="410" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Panel Titles -->
+    <text x="195" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Inferential Statistics</text>
+    <text x="195" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإحصاء الاستدلالي</text>
+    
+    <text x="195" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Infers and predicts from a sample</text>
+    <text x="195" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يستنتج ويتنبأ من خلال العينة</text>
+
+    <!-- Population Group -->
+    <g transform="translate(240, 170)">
+      <circle cx="0" cy="0" r="80" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+      <text x="0" y="-95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Population</text>
+      <text x="0" y="-95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المجتمع الإحصائي</text>
+      
+      <!-- Population Dots (Scattered) -->
+      <circle cx="-20" cy="-30" r="3" fill="var(--brand-500)" />
+      <circle cx="10" cy="-40" r="3" fill="var(--brand-500)" />
+      <circle cx="30" cy="-20" r="3" fill="var(--brand-500)" />
+      <circle cx="-40" cy="-10" r="3" fill="var(--brand-500)" />
+      <circle cx="50" cy="0" r="3" fill="var(--brand-500)" />
+      <circle cx="-10" cy="10" r="3" fill="var(--brand-500)" />
+      <circle cx="20" cy="20" r="3" fill="var(--brand-500)" />
+      <circle cx="-30" cy="30" r="3" fill="var(--brand-500)" />
+      <circle cx="40" cy="30" r="3" fill="var(--brand-500)" />
+      <circle cx="0" cy="40" r="3" fill="var(--brand-500)" />
+      <circle cx="-50" cy="10" r="3" fill="var(--brand-500)" />
+      <circle cx="15" cy="-60" r="3" fill="var(--brand-500)" />
+      <circle cx="-15" cy="60" r="3" fill="var(--brand-500)" />
+      <circle cx="60" cy="-15" r="3" fill="var(--brand-500)" />
+      <circle cx="-60" cy="-20" r="3" fill="var(--brand-500)" />
+      <circle cx="35" cy="-50" r="3" fill="var(--brand-500)" />
+      <circle cx="-35" cy="-50" r="3" fill="var(--brand-500)" />
+      <circle cx="55" cy="25" r="3" fill="var(--brand-500)" />
+      <circle cx="-45" cy="45" r="3" fill="var(--brand-500)" />
+      <circle cx="25" cy="55" r="3" fill="var(--brand-500)" />
+      
+      <!-- Sampled Subset Highlight -->
+      <circle cx="-30" cy="20" r="25" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3,3" />
+    </g>
+
+    <!-- Sample Group -->
+    <g transform="translate(80, 300)">
+      <circle cx="0" cy="0" r="50" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+      <text x="0" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sample</text>
+      <text x="0" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">العينة</text>
+      
+      <!-- Sample Dots -->
+      <circle cx="-15" cy="-10" r="3" fill="var(--brand-500)" />
+      <circle cx="10" cy="-20" r="3" fill="var(--brand-500)" />
+      <circle cx="20" cy="5" r="3" fill="var(--brand-500)" />
+      <circle cx="-5" cy="15" r="3" fill="var(--brand-500)" />
+      <circle cx="-25" cy="10" r="3" fill="var(--brand-500)" />
+      <circle cx="15" cy="25" r="3" fill="var(--brand-500)" />
+      <circle cx="0" cy="-5" r="3" fill="var(--brand-500)" />
+
+      <!-- Predictive Trend Line inside Sample -->
+      <path d="M -30 25 L 30 -25" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+    </g>
+
+    <!-- Magnifying Glass -->
+    <g transform="translate(80, 300)">
+      <circle cx="0" cy="0" r="60" fill="none" stroke="var(--brand-500)" stroke-width="4" />
+      <line x1="42" y1="42" x2="75" y2="75" stroke="var(--brand-500)" stroke-width="8" stroke-linecap="round" />
+      <!-- Glass Glare -->
+      <path d="M -45 -20 A 50 50 0 0 1 -20 -45" fill="none" stroke="var(--brand-400)" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+    </g>
+
+    <!-- Extraction Arrow (Population to Sample) -->
+    <path d="M 195 205 L 125 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-solid)" />
+    <text x="175" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Sampling</text>
+    <text x="175" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">أخذ العينة</text>
+
+    <!-- Inference Arrow (Sample back to Population) -->
+    <path d="M 110 275 C 130 220, 140 160, 175 160" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)" />
+    <text x="100" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Prediction &amp; Inference</text>
+    <text x="100" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تنبؤ واستدلال</text>
+
+  </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Descriptive Statistics</th><th>Inferential Statistics</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الأساسي</template>
+          <template class="content-en">Primary Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">وصف وتلخيص البيانات الحالية</template>
+          <template class="content-en">Describe and summarize current data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">استنتاج معلومات حول المجتمع والتنبؤ</template>
+          <template class="content-en">Deduce info about population and predict</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الادعاءات السببية</template>
+          <template class="content-en">Causal Claims</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا تفترض السببية</template>
+          <template class="content-en">Does not assume causation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تحاول التنبؤ بدراسة السببية</template>
+          <template class="content-en">Tries to predict by studying causation</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نطاق البيانات</template>
+          <template class="content-en">Data Scope</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مجموعة البيانات بأكملها المتاحة</template>
+          <template class="content-en">The entire available dataset</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عينة صغيرة تمثل مجتمعاً أكبر</template>
+          <template class="content-en">A small sample representing a larger population</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بحساب متوسط درجات الطلاب في فصلك فقط، فهل هذا إحصاء وصفي أم استدلالي؟</template>
+      <template class="content-en">If you calculate the average grades of students in your class only, is this descriptive or inferential statistics?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إحصاء وصفي، لأنك تصف البيانات التي لديك فقط. سيكون استدلالياً إذا استخدمت درجات فصلك للتنبؤ بمتوسط درجات جميع الفصول في الجامعة.</p></template>
+      <template class="content-en"><p>Descriptive, because you are only summarizing the data you have. It would be inferential if you used your class's grades to predict the average grades of all classes in the university.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="probability-distributions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> التوزيعات الاحتمالية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Probability Distributions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التوزيع الاحتمالي يصف كيف تتوزع احتمالات حدوث أحداث مختلفة، حيث لا يقل الاحتمال عن 0 ولا يزيد عن 1، ومجموع كل الاحتمالات يساوي 1.</p></template>
+    <template class="content-en"><p>A probability distribution describes how probabilities are distributed over different events, where probability is between 0 and 1, and the sum of all probabilities is exactly 1.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم المتغيرات العشوائية والتوزيعات الاحتمالية لنمذجة المتغيرات غير المتوقعة لاتخاذ قرارات مستنيرة بالبيانات. خصائص الاحتمال الهامة هي:</p><ol><li>احتمال أي حدث فردي لا يقل عن 0.0 ولا يتجاوز 1.0.</li><li>مجموع احتمالات جميع الأحداث يساوي 1.0 بالضبط.</li></ol><p>تصنف التوزيعات الاحتمالية إلى نوعين رئيسيين:</p><ul><li><b>متقطع (Discrete):</b> متغير عشوائي يمكن حساب قيمه في مجموعات (مثل لون السيارة: أسود، أحمر، أزرق).</li><li><b>مستمر (Continuous):</b> متغير عشوائي يعين احتمالات لنطاق من القيم (مثل الأميال لكل جالون للسيارة).</li></ul><p>أنواع التوزيعات الشائعة:</p><ul><li><b>التوزيع الطبيعي (Normal):</b> (رقمي مستمر) يُمثل بمنحنى متماثل على شكل جرس.</li><li><b>التوزيع ذو الحدين (Binomial):</b> (رقمي متقطع) ينمذج عدد النجاحات في محاولات عندما يكون هناك نتيجتان فقط ممكنتان (المتغيرات الثنائية).</li><li><b>التوزيع الفئوي (Categorical):</b> (غير رقمي) يمثل المتغيرات الفئوية غير الرقمية أو المتغيرات الترتيبية (مثل درجات مقاعد الطيران: أولى، أعمال، اقتصادية).</li></ul></template>
+    <template class="content-en"><p>Random variables and probability distributions are used to model unpredictable variables to make data-informed decisions. Important characteristics of probability are:</p><ol><li>The probability of any single event never goes below 0.0 or exceeds 1.0.</li><li>The probability of all events always sums to exactly 1.0.</li></ol><p>Probability distributions are classified into two types:</p><ul><li><b>Discrete:</b> A random variable where values can be counted by groupings (e.g., car colors: black, red, blue).</li><li><b>Continuous:</b> A random variable that assigns probabilities to a range of values (e.g., miles per gallon).</li></ul><p>Common distribution types:</p><ul><li><b>Normal distributions:</b> (numeric continuous) Represented by a symmetric bell-shaped curve.</li><li><b>Binomial distributions:</b> (numeric discrete) Models the number of successes in attempts when only two outcomes are possible (binary variables).</li><li><b>Categorical distributions:</b> (non-numeric) Represent nonnumeric categorical variables or ordinal variables (e.g., airline seat classes).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند النظر في احتمال وقوع حدث، يجب أن تعرف ما هي الأحداث الأخرى الممكنة. يجب دائماً تعريف مجموعة الأحداث على أنها <b><span class="smart-term" data-term-en="Mutually Exclusive" data-ar="متنافية" data-en-def="Events where only one can occur at a time.">متنافية<span class="smart-term-tooltip"></span></span> (Mutually Exclusive)</b> — أي يمكن أن يحدث حدث واحد فقط في كل مرة (مثل نتائج رمي حجر النرد الستة).</p><p>التوزيع الطبيعي هو حجر الزاوية في الإحصاء لأن العديد من الظواهر الطبيعية تميل نحو ملاحظة أكثر احتمالاً (في قمة الجرس) مع احتمالية أقل للملاحظات عند الطرفين.</p></template>
+    <template class="content-en"><p>When considering the probability of an event, you must know what other events are possible. Always define the set of events as <b><span class="smart-term" data-term-en="Mutually Exclusive" data-ar="متنافية" data-en-def="Events where only one can occur at a time.">mutually exclusive<span class="smart-term-tooltip"></span></span></b> — only one can occur at a time (e.g., the six possible results of rolling a die).</p><p>The normal distribution is a cornerstone of statistics because many natural phenomena tend toward some most-likely observation (at the top of the bell curve) with observations at the two extremes being less likely.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show three distinct charts side-by-side. 1) A smooth, symmetric bell curve labeled 'Normal Distribution (Continuous)'. 2) A bar chart with discrete bars labeled 'Binomial Distribution (Discrete)'. 3) A bar chart with text labels (e.g., First, Business, Economy) labeled 'Categorical Distribution'. Style: educational, dark background #0d1117, accent colors #007bff and #28a745, viewBox 0 0 900 300, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="normalGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.05" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Global Title -->
+    <text x="450" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold">Probability Distributions</text>
+    <text x="450" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold">التوزيعات الاحتمالية</text>
+    
+    <text x="450" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Modeling unpredictable variables for data-informed decisions</text>
+    <text x="450" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">نمذجة المتغيرات غير المتوقعة لاتخاذ قرارات مبنية على البيانات</text>
+
+    <!-- Chart 1: Normal Distribution -->
+    <rect x="20" y="80" width="280" height="300" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <g id="chart1-normal">
+        <!-- Gridlines -->
+        <line x1="40" y1="220" x2="280" y2="220" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        <line x1="40" y1="160" x2="280" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        
+        <!-- Axes -->
+        <line x1="40" y1="278" x2="280" y2="278" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="40" y1="278" x2="40" y2="100" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="270" y="295" text-anchor="end" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">x</text>
+        <text x="50" y="110" text-anchor="start" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">P(x)</text>
+
+        <!-- Curve -->
+        <path d="M 45 278 L 60 278 C 110 278, 125 120, 160 120 C 195 120, 210 278, 260 278 L 275 278" fill="url(#normalGrad)" />
+        <path d="M 45 278 L 60 278 C 110 278, 125 120, 160 120 C 195 120, 210 278, 260 278 L 275 278" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+        
+        <!-- Area Annotation -->
+        <text x="160" y="250" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">Area = 1.0</text>
+        <text x="160" y="250" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">المساحة = 1.0</text>
+
+        <!-- Chart Titles -->
+        <text x="160" y="330" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Normal (Continuous)</text>
+        <text x="160" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">توزيع طبيعي (مستمر)</text>
+        
+        <text x="160" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Numeric, symmetric curve</text>
+        <text x="160" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">منحنى رقمي متماثل</text>
+    </g>
+
+    <!-- Chart 2: Binomial Distribution -->
+    <rect x="310" y="80" width="280" height="300" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <g id="chart2-binomial">
+        <!-- Gridlines -->
+        <line x1="330" y1="220" x2="570" y2="220" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        <line x1="330" y1="160" x2="570" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        
+        <!-- Axes -->
+        <line x1="330" y1="278" x2="570" y2="278" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="330" y1="278" x2="330" y2="100" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="560" y="295" text-anchor="end" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">x</text>
+        <text x="340" y="110" text-anchor="start" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">P(x)</text>
+
+        <!-- Discrete Lollipops -->
+        <line x1="370" y1="278" x2="370" y2="260" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+        <circle cx="370" cy="260" r="5" fill="var(--brand-500)" />
+        
+        <line x1="410" y1="278" x2="410" y2="190" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+        <circle cx="410" cy="190" r="5" fill="var(--brand-500)" />
+        
+        <line x1="450" y1="278" x2="450" y2="130" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+        <circle cx="450" cy="130" r="5" fill="var(--brand-500)" />
+        
+        <line x1="490" y1="278" x2="490" y2="190" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+        <circle cx="490" cy="190" r="5" fill="var(--brand-500)" />
+        
+        <line x1="530" y1="278" x2="530" y2="260" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" />
+        <circle cx="530" cy="260" r="5" fill="var(--brand-500)" />
+
+        <!-- X-axis Values -->
+        <text x="370" y="298" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">0</text>
+        <text x="410" y="298" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">1</text>
+        <text x="450" y="298" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">2</text>
+        <text x="490" y="298" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">3</text>
+        <text x="530" y="298" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">4</text>
+
+        <!-- Chart Titles -->
+        <text x="450" y="330" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Binomial (Discrete)</text>
+        <text x="450" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">توزيع ثنائي الحدين (متقطع)</text>
+        
+        <text x="450" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Countable binary outcomes</text>
+        <text x="450" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">نتائج ثنائية قابلة للعد</text>
+    </g>
+
+    <!-- Chart 3: Categorical Distribution -->
+    <rect x="600" y="80" width="280" height="300" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <g id="chart3-categorical">
+        <!-- Gridlines -->
+        <line x1="620" y1="220" x2="860" y2="220" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        <line x1="620" y1="160" x2="860" y2="160" stroke="var(--border-color)" stroke-dasharray="4,4" stroke-width="1" />
+        
+        <!-- Axes -->
+        <line x1="620" y1="278" x2="860" y2="278" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="620" y1="278" x2="620" y2="100" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="850" y="295" text-anchor="end" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">x</text>
+        <text x="630" y="110" text-anchor="start" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic">P(x)</text>
+
+        <!-- Categorical Bars -->
+        <path d="M 650 278 L 650 244 Q 650 240 654 240 L 686 240 Q 690 240 690 244 L 690 278 Z" fill="var(--brand-500)" />
+        <path d="M 720 278 L 720 184 Q 720 180 724 180 L 756 180 Q 760 180 760 184 L 760 278 Z" fill="var(--brand-500)" />
+        <path d="M 790 278 L 790 114 Q 790 110 794 110 L 826 110 Q 830 110 830 114 L 830 278 Z" fill="var(--brand-500)" />
+
+        <!-- Bar Percentages -->
+        <text x="670" y="232" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">10%</text>
+        <text x="740" y="172" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">30%</text>
+        <text x="810" y="102" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">60%</text>
+
+        <!-- X-axis Values -->
+        <text x="670" y="298" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">First</text>
+        <text x="670" y="298" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">أولى</text>
+        
+        <text x="740" y="298" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Business</text>
+        <text x="740" y="298" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">أعمال</text>
+        
+        <text x="810" y="298" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Economy</text>
+        <text x="810" y="298" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">سياحية</text>
+
+        <!-- Chart Titles -->
+        <text x="740" y="330" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Categorical</text>
+        <text x="740" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">توزيع فئوي</text>
+        
+        <text x="740" y="355" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Non-numeric groups</text>
+        <text x="740" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">مجموعات غير رقمية</text>
+    </g>
+
+    <!-- Educational Footer -->
+    <rect x="20" y="395" width="860" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="450" y="420" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500">Fundamental Rule: 0.0 ≤ P(x) ≤ 1.0 for any event, and the sum of all probabilities equals 1.0</text>
+    <text x="450" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500">قاعدة أساسية: 0.0 ≤ P(x) ≤ 1.0 لأي حدث، ومجموع كل الاحتمالات يساوي 1.0</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن أن يكون لمتغير يمثل 'درجة الحرارة' توزيع ذو حدين؟ ولماذا؟</template>
+      <template class="content-en">Can a variable representing 'Temperature' have a binomial distribution? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن التوزيع ذو الحدين يتطلب نتيجتين ممكنتين فقط (مثل نجاح/فشل)، بينما درجة الحرارة هي متغير مستمر يمكن أن يأخذ نطاقاً واسعاً من القيم.</p></template>
+      <template class="content-en"><p>No, because a binomial distribution requires only two possible outcomes (e.g., success/failure), whereas temperature is a continuous variable that can take a wide range of values.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="conditional-probability-naive-bayes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الاحتمال الشرطي و Naïve Bayes</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Conditional Probability with Naïve Bayes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية Naïve Bayes تستخدم الاحتمال الشرطي للتنبؤ باحتمالية وقوع حدث بناءً على أدلة سابقة، وهي ممتازة لتصنيف النصوص مثل رسائل البريد المزعج.</p></template>
+    <template class="content-en"><p>The Naïve Bayes algorithm uses conditional probability to predict the likelihood of an event based on prior evidence, excelling at text classification like spam filtering.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكنك استخدام طريقة التعلم الآلي <b>Naïve Bayes</b>، المستعارة مباشرة من مجال الإحصاء، للتنبؤ باحتمالية وقوع حدث ما، بالنظر إلى الأدلة المحددة في ميزات البيانات الخاصة بك — وهو ما يسمى <b><span class="smart-term" data-term-en="Conditional Probability" data-ar="الاحتمال الشرطي" data-en-def="The likelihood of an event occurring given that another event has already occurred.">الاحتمال الشرطي<span class="smart-term-tooltip"></span></span> (Conditional Probability)</b>.</p><p>تعتمد خوارزمية Naïve Bayes على التصنيف والانحدار، وهي مفيدة بشكل خاص إذا كنت بحاجة إلى تصنيف البيانات النصية. المثال الكلاسيكي على ذلك هو تصنيف البريد العشوائي (Spam classification).</p></template>
+    <template class="content-en"><p>You can use the <b>Naïve Bayes</b> machine learning method, borrowed straight from the statistics field, to predict the likelihood that an event will occur, given evidence defined in your data features — something called <b><span class="smart-term" data-term-en="Conditional Probability" data-ar="الاحتمال الشرطي" data-en-def="The likelihood of an event occurring given that another event has already occurred.">conditional probability<span class="smart-term-tooltip"></span></span></b>.</p><p>Naïve Bayes, which is based on classification and regression, is especially useful if you need to classify text data. A classic example is Spam classification.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُسمى هذه الخوارزمية بـ 'الساذجة' (Naïve) لأنها تفترض استقلالية قوية (ساذجة) بين الميزات، وهو افتراض نادراً ما يكون صحيحاً في العالم الحقيقي، ومع ذلك تعمل الخوارزمية بشكل جيد جداً في الممارسة العملية، خاصة في معالجة اللغات الطبيعية.</p></template>
+    <template class="content-en"><p>The algorithm is called 'Naïve' because it makes a strong (naïve) assumption of independence between the features, which is rarely true in the real world. Despite this, it performs surprisingly well in practice, especially in Natural Language Processing (NLP).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر Naïve Bayes مناسبة لتصنيف البريد المزعج؟</template>
+      <template class="content-en">Why is Naïve Bayes suitable for spam classification?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تستطيع حساب احتمالية أن تكون الرسالة مزعجة بناءً على الاحتمال الشرطي لوجود كلمات معينة (مثل 'مجاني'، 'عاجل') ظهرت بكثرة في رسائل مزعجة سابقة.</p></template>
+      <template class="content-en"><p>Because it can calculate the probability of an email being spam based on the conditional probability of certain words (like 'free', 'urgent') appearing, given past evidence of spam emails.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="quantifying-correlation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> قياس الارتباط</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Quantifying Correlation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الارتباط يقيس قوة العلاقة بين متغيرين باستخدام قيمة r التي تتراوح بين -1 و 1.</p></template>
+    <template class="content-en"><p>Correlation measures the strength of the relationship between two variables using an r-value ranging from -1 to 1.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم تحديد الارتباط كمياً من خلال قيمة متغير يسمى <b>r</b>، والذي يتراوح بين -1 و 1. كلما اقتربت <span class="smart-term" data-term-en="r-value" data-ar="قيمة r" data-en-def="A variable ranging from -1 to 1 that quantifies correlation.">قيمة r<span class="smart-term-tooltip"></span></span> من 1 أو -1، زاد الارتباط بين متغيرين. إذا كان لمتغيرين قيمة r قريبة من 0، فقد يشير ذلك إلى أنهما متغيران مستقلان.</p><p>هناك طريقتان شائعتان لحساب الارتباط:</p><ol><li><b>ارتباط بيرسون (Pearson's r):</b> أبسط أشكال تحليل الارتباط للكشف عن العلاقات التابعة بين المتغيرات المستمرة. يفترض أن:<ul><li>البيانات موزعة توزيعاً طبيعياً.</li><li>المتغيرات رقمية مستمرة.</li><li>المتغيرات مرتبطة خطياً.</li></ul></li><li><b>ارتباط رتبة سبيرمان (Spearman's rank correlation):</b> اختبار شائع لتحديد الارتباط بين المتغيرات الترتيبية. يقوم بتحويل أزواج المتغيرات الرقمية إلى رتب. يفترض أن:<ul><li>المتغيرات ترتيبية (Ordinal).</li><li>المتغيرات مرتبطة بشكل غير خطي.</li></ul></li></ol></template>
+    <template class="content-en"><p>Correlation is quantified per the value of a variable called <b>r</b>, which ranges between –1 and 1. The closer the <span class="smart-term" data-term-en="r-value" data-ar="قيمة r" data-en-def="A variable ranging from -1 to 1 that quantifies correlation.">r-value<span class="smart-term-tooltip"></span></span> is to 1 or –1, the more correlation there is between two variables. If two variables have an r-value close to 0, it could indicate they are independent variables.</p><p>There are two common methods to calculate correlation:</p><ol><li><b>Pearson correlation (Pearson's r):</b> The simplest form of correlation analysis to uncover dependent relationships between continuous variables. It assumes:<ul><li>Data is normally distributed.</li><li>Variables are continuous, numeric.</li><li>Variables are linearly related.</li></ul></li><li><b>Spearman's rank correlation:</b> A popular test for determining correlation between ordinal variables. It converts numeric variable-pairs into ranks. It assumes:<ul><li>Variables are ordinal.</li><li>Variables are related nonlinearly.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من الأخطاء الشائعة الخلط بين الارتباط والسببية.</p><p>وجود ارتباط قوي (r قريب من 1) لا يعني بالضرورة أن أحد المتغيرين يسبب الآخر؛ قد يكون هناك متغير ثالث يؤثر عليهما معاً.</p><p>يُفضل استخدام سبيرمان عندما تكون البيانات لا تتبع التوزيع الطبيعي أو عندما تكون العلاقة رتيبة (تتزايد معاً ولكن ليس بخط مستقيم).</p></template>
+    <template class="content-en"><p>A common pitfall is confusing correlation with causation.</p><p>A strong correlation (r close to 1) does not necessarily mean one variable causes the other; a third confounding variable might be affecting both.</p><p>Spearman's is preferred when data violates the normality assumption of Pearson's or when the relationship is monotonic (moving together but not in a straight line).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Show three scatter plots side-by-side. 1) Points forming a tight upward line labeled 'r = 1 (Strong Positive)'. 2) Points scattered randomly with no pattern labeled 'r = 0 (No Correlation)'. 3) Points forming a tight downward line labeled 'r = -1 (Strong Negative)'. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 900 300, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 900 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .gsvg-en { display: none; }
+    .gsvg-ar { display: none; }
+    :root[lang="en"] .gsvg-en { display: block; }
+    :root[lang="ar"] .gsvg-ar { display: block; }
+  </style>
+
+  <defs>
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="450" y="35" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Quantifying Correlation (r-value)</text>
+  <text x="450" y="35" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">قياس الارتباط (قيمة r)</text>
+
+  <!-- Subtitle -->
+  <text x="450" y="60" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">The correlation coefficient (r) measures the strength and direction of a linear relationship.</text>
+  <text x="450" y="60" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">يقيس معامل الارتباط (r) قوة واتجاه العلاقة الخطية بين متغيرين.</text>
+
+  <!-- ================= PLOT 1: r = 1 ================= -->
+  <g transform="translate(75, 90)">
+    <!-- Plot Background -->
+    <rect width="200" height="200" fill="var(--bg-elevated)" rx="8" />
+    
+    <!-- Axes -->
+    <path d="M 15 185 L 185 185" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <path d="M 15 185 L 15 15" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="185" y="198" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">X</text>
+    <text x="5" y="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="start">Y</text>
+
+    <!-- Trendline -->
+    <line x1="25" y1="175" x2="175" y2="25" stroke="var(--brand-500)" stroke-width="4" opacity="0.3" stroke-linecap="round" />
+
+    <!-- Points (Perfect upward line) -->
+    <g fill="var(--brand-500)" stroke="var(--bg-elevated)" stroke-width="1.5">
+      <circle cx="25" cy="175" r="4.5" />
+      <circle cx="35" cy="165" r="4.5" />
+      <circle cx="45" cy="155" r="4.5" />
+      <circle cx="55" cy="145" r="4.5" />
+      <circle cx="65" cy="135" r="4.5" />
+      <circle cx="75" cy="125" r="4.5" />
+      <circle cx="85" cy="115" r="4.5" />
+      <circle cx="95" cy="105" r="4.5" />
+      <circle cx="105" cy="95" r="4.5" />
+      <circle cx="115" cy="85" r="4.5" />
+      <circle cx="125" cy="75" r="4.5" />
+      <circle cx="135" cy="65" r="4.5" />
+      <circle cx="145" cy="55" r="4.5" />
+      <circle cx="155" cy="45" r="4.5" />
+      <circle cx="165" cy="35" r="4.5" />
+      <circle cx="175" cy="25" r="4.5" />
+    </g>
+  </g>
+
+  <!-- Labels for Plot 1 -->
+  <text x="175" y="325" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">r = 1</text>
+  <text x="175" y="325" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">r = 1</text>
+  
+  <text x="175" y="350" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">Strong Positive</text>
+  <text x="175" y="350" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">ارتباط إيجابي قوي</text>
+
+
+  <!-- ================= PLOT 2: r = 0 ================= -->
+  <g transform="translate(350, 90)">
+    <!-- Plot Background -->
+    <rect width="200" height="200" fill="var(--bg-elevated)" rx="8" />
+    
+    <!-- Axes -->
+    <path d="M 15 185 L 185 185" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <path d="M 15 185 L 15 15" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="185" y="198" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">X</text>
+    <text x="5" y="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="start">Y</text>
+
+    <!-- Points (Random scatter) -->
+    <g fill="var(--brand-500)" stroke="var(--bg-elevated)" stroke-width="1.5">
+      <circle cx="30" cy="140" r="4.5" />
+      <circle cx="45" cy="60" r="4.5" />
+      <circle cx="55" cy="170" r="4.5" />
+      <circle cx="70" cy="90" r="4.5" />
+      <circle cx="85" cy="150" r="4.5" />
+      <circle cx="100" cy="40" r="4.5" />
+      <circle cx="115" cy="120" r="4.5" />
+      <circle cx="130" cy="70" r="4.5" />
+      <circle cx="145" cy="160" r="4.5" />
+      <circle cx="160" cy="50" r="4.5" />
+      <circle cx="170" cy="130" r="4.5" />
+      <circle cx="35" cy="80" r="4.5" />
+      <circle cx="50" cy="110" r="4.5" />
+      <circle cx="65" cy="40" r="4.5" />
+      <circle cx="80" cy="165" r="4.5" />
+      <circle cx="95" cy="100" r="4.5" />
+      <circle cx="110" cy="175" r="4.5" />
+      <circle cx="125" cy="30" r="4.5" />
+      <circle cx="140" cy="100" r="4.5" />
+      <circle cx="155" cy="140" r="4.5" />
+      <circle cx="165" cy="85" r="4.5" />
+      <circle cx="40" cy="155" r="4.5" />
+      <circle cx="60" cy="75" r="4.5" />
+      <circle cx="75" cy="125" r="4.5" />
+      <circle cx="90" cy="55" r="4.5" />
+      <circle cx="105" cy="145" r="4.5" />
+      <circle cx="120" cy="95" r="4.5" />
+      <circle cx="135" cy="155" r="4.5" />
+      <circle cx="150" cy="45" r="4.5" />
+    </g>
+  </g>
+
+  <!-- Labels for Plot 2 -->
+  <text x="450" y="325" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">r = 0</text>
+  <text x="450" y="325" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">r = 0</text>
+  
+  <text x="450" y="350" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">No Correlation</text>
+  <text x="450" y="350" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">لا يوجد ارتباط</text>
+
+
+  <!-- ================= PLOT 3: r = -1 ================= -->
+  <g transform="translate(625, 90)">
+    <!-- Plot Background -->
+    <rect width="200" height="200" fill="var(--bg-elevated)" rx="8" />
+    
+    <!-- Axes -->
+    <path d="M 15 185 L 185 185" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <path d="M 15 185 L 15 15" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="185" y="198" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="end">X</text>
+    <text x="5" y="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)" text-anchor="start">Y</text>
+
+    <!-- Trendline -->
+    <line x1="25" y1="25" x2="175" y2="175" stroke="var(--brand-500)" stroke-width="4" opacity="0.3" stroke-linecap="round" />
+
+    <!-- Points (Perfect downward line) -->
+    <g fill="var(--brand-500)" stroke="var(--bg-elevated)" stroke-width="1.5">
+      <circle cx="25" cy="25" r="4.5" />
+      <circle cx="35" cy="35" r="4.5" />
+      <circle cx="45" cy="45" r="4.5" />
+      <circle cx="55" cy="55" r="4.5" />
+      <circle cx="65" cy="65" r="4.5" />
+      <circle cx="75" cy="75" r="4.5" />
+      <circle cx="85" cy="85" r="4.5" />
+      <circle cx="95" cy="95" r="4.5" />
+      <circle cx="105" cy="105" r="4.5" />
+      <circle cx="115" cy="115" r="4.5" />
+      <circle cx="125" cy="125" r="4.5" />
+      <circle cx="135" cy="135" r="4.5" />
+      <circle cx="145" cy="145" r="4.5" />
+      <circle cx="155" cy="155" r="4.5" />
+      <circle cx="165" cy="165" r="4.5" />
+      <circle cx="175" cy="175" r="4.5" />
+    </g>
+  </g>
+
+  <!-- Labels for Plot 3 -->
+  <text x="725" y="325" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">r = -1</text>
+  <text x="725" y="325" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">r = -1</text>
+  
+  <text x="725" y="350" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">Strong Negative</text>
+  <text x="725" y="350" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">ارتباط سلبي قوي</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Pearson's r</th><th>Spearman's rank</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع المتغيرات</template>
+          <template class="content-en">Variable Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">رقمية مستمرة</template>
+          <template class="content-en">Continuous, numeric</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ترتيبية (Ordinal)</template>
+          <template class="content-en">Ordinal</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبيعة العلاقة</template>
+          <template class="content-en">Relationship Nature</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">علاقة خطية</template>
+          <template class="content-en">Linear relationship</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">علاقة غير خطية (رتبية)</template>
+          <template class="content-en">Nonlinear relationship</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">توزيع البيانات</template>
+          <template class="content-en">Data Distribution</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يفترض التوزيع الطبيعي</template>
+          <template class="content-en">Assumes normal distribution</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يفترض التوزيع الطبيعي</template>
+          <template class="content-en">Does not assume normal distribution</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كنت تدرس العلاقة بين 'الترتيب في السباق' (الأول، الثاني، الثالث) و 'مستوى الرضا'، فأي مقياس ارتباط ستستخدم؟</template>
+      <template class="content-en">If you are studying the relationship between 'Race Rank' (1st, 2nd, 3rd) and 'Satisfaction Level', which correlation measure would you use?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ارتباط رتبة سبيرمان، لأن المتغيرات ترتيبية (Ordinal) وليست مستمرة.</p></template>
+      <template class="content-en"><p>Spearman's rank correlation, because the variables are ordinal, not continuous.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dimensionality-reduction-linear-algebra" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقليل الأبعاد باستخدام الجبر الخطي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Reducing Data Dimensionality with Linear Algebra</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل الأبعاد يضغط البيانات ويزيل الضوضاء والمعلومات المكررة باستخدام المصفوفات والجبر الخطي، مما يسهل تحليل مجموعات البيانات الضخمة.</p></template>
+    <template class="content-en"><p>Dimensionality reduction compresses data and removes noise and redundant information using matrices and linear algebra, making large datasets easier to analyze.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتبر المصفوفات (Matrices) والمصفوفات البرمجية (Arrays) بنية البيانات الأساسية في الحوسبة التحليلية. نحتاجها لإجراء عمليات رياضية وإحصائية على مجموعات بيانات كبيرة ومتعددة الأبعاد. خوارزميات تقليل الأبعاد مثالية لضغط البيانات وإزالة المعلومات المكررة والضوضاء. من أهم الطرق:</p><ol><li><b>تحليل القيمة المفردة (SVD):</b> طريقة جبر خطي لتقليل أبعاد مجموعة البيانات. في علم البيانات، يُطبق SVD لتحليل المكونات الرئيسية من مجموعات البيانات الكبيرة والمزعجة والمتناثرة.</li><li><b>تحليل العوامل (Factor Analysis):</b> طريقة لتصفية المعلومات المكررة والضوضاء. عندما تجد تبايناً مشتركاً (Shared variance) في بياناتك، فهذا يعني وجود تكرار للمعلومات. يفترض تحليل العوامل:<ul><li>الميزات مترية (Metric).</li><li>الميزات مستمرة أو ترتيبية.</li><li>أكثر من 100 ملاحظة، وما لا يقل عن 5 ملاحظات لكل ميزة.</li><li>العينة متجانسة.</li><li>يوجد ارتباط r > 0.3 بين الميزات.</li></ul></li><li><b>تحليل المكونات الرئيسية (PCA):</b> تقنية غير خاضعة للإشراف (Unsupervised) مرتبطة ارتباطاً وثيقاً بـ SVD. تجد العلاقات بين الميزات وتحولها إلى مجموعة من المكونات الرئيسية غير المكررة.</li></ol></template>
+    <template class="content-en"><p>Array and matrix objects are the primary data structure in analytical computing. They are needed to perform mathematical operations on large, multidimensional datasets. Dimension reduction algorithms are ideal for compressing datasets while removing redundant information and noise. Key methods include:</p><ol><li><b>Singular Value Decomposition (SVD):</b> A linear algebra method to reduce dimensionality. In data science, SVD is applied to analyze principal components from large, noisy, sparse data sets.</li><li><b>Factor Analysis:</b> A method for filtering out redundant information and noise. <span class="smart-term" data-term-en="Shared Variance" data-ar="التباين المشترك" data-en-def="When multiple variables share variability, indicating information redundancy.">Shared variance<span class="smart-term-tooltip"></span></span> in a dataset means information redundancy is at play. Factor analysis assumes:<ul><li>Features are metric.</li><li>Features are continuous or ordinal.</li><li>More than 100 observations, and at least 5 observations per feature.</li><li>Sample is homogenous.</li><li>There is r > 0.3 correlation between features.</li></ul></li><li><b>Principal Component Analysis (PCA):</b> An unsupervised statistical method closely related to SVD. It finds relationships between features and transforms them into a set of non-information redundant principal components.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على الرغم من تشابه PCA مع تحليل العوامل، إلا أن هناك اختلافين رئيسيين: الأول أن PCA لا يقوم بالانحدار للعثور على سبب أساسي للتباين المشترك، بل يحلل البيانات لتمثيل أهم معلوماتها بإيجاز في عدد أقل من الميزات. الثاني هو أنه في PCA، في المرة الأولى التي تقوم فيها بتشغيل النموذج، لا تحدد عدد المكونات؛ بل تدع النتائج الأولية تخبرك بعدد المكونات التي يجب الاحتفاظ بها، ثم تعيد تشغيل التحليل.</p></template>
+    <template class="content-en"><p>Although PCA is like factor analysis, they have two major differences:</p><ol><li><strong>First</strong>, PCA does not regress to find some underlying cause of shared variance, but instead decomposes a dataset to succinctly represent its most important information in a reduced number of features.</li><li><strong>Second</strong>, with PCA, the first time you run the model, you don't specify the number of components to be discovered. You let the initial model results tell you how many components to keep, and then rerun the analysis.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show a 3D scatter plot of data points being projected onto a 2D plane. Label the 3D space 'Original High-Dimensional Data' and the 2D plane 'Reduced Principal Components (PCA)'. Show arrows indicating the projection. Style: educational, dark background #0d1117, accent colors #007bff and #ffc107, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for 3D Axes -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--text-muted)" />
+        </marker>
+        <!-- Arrowhead for PC1 -->
+        <marker id="arrow-pc1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for PC2 -->
+        <marker id="arrow-pc2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Dimensionality Reduction (PCA)</text>
+    <text x="400" y="35" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">تقليل الأبعاد (PCA)</text>
+
+    <!-- 3D Axes (Reference Frame) -->
+    <g stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-axis)">
+        <line x1="150" y1="320" x2="150" y2="220" /> <!-- Z Axis -->
+        <line x1="150" y1="320" x2="70" y2="370" />  <!-- X Axis -->
+        <line x1="150" y1="320" x2="250" y2="320" /> <!-- Y Axis -->
+    </g>
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">
+        <text x="140" y="210">Z</text>
+        <text x="60" y="385">X</text>
+        <text x="260" y="325">Y</text>
+    </g>
+
+    <!-- 2D Plane (Principal Subspace) -->
+    <!-- Polygon representing the 2D plane in 3D space -->
+    <polygon points="250,250 550,310 700,190 400,130" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+    
+    <!-- Grid lines on the 2D plane to enhance perspective -->
+    <g stroke="var(--border-color)" stroke-width="1">
+        <!-- Parallel to long edge -->
+        <line x1="300" y1="210" x2="600" y2="270" />
+        <line x1="350" y1="170" x2="650" y2="230" />
+        <!-- Parallel to short edge -->
+        <line x1="350" y1="270" x2="500" y2="150" />
+        <line x1="450" y1="290" x2="600" y2="170" />
+    </g>
+
+    <!-- Principal Component Vectors (Arrows on the plane) -->
+    <!-- PC1 (Max Variance) -->
+    <line x1="475" y1="220" x2="625" y2="250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-pc1)" />
+    <!-- PC2 (Orthogonal to PC1) -->
+    <line x1="475" y1="220" x2="400" y2="280" stroke="var(--text-primary)" stroke-width="3" marker-end="url(#arrow-pc2)" />
+
+    <!-- Projected Points (Shadows/Dots on the 2D Plane) -->
+    <g fill="var(--text-muted)">
+        <!-- Points from above -->
+        <ellipse cx="450" cy="200" rx="5" ry="2.5" />
+        <ellipse cx="520" cy="230" rx="5" ry="2.5" />
+        <ellipse cx="380" cy="180" rx="5" ry="2.5" />
+        <ellipse cx="620" cy="210" rx="5" ry="2.5" />
+        <ellipse cx="310" cy="230" rx="5" ry="2.5" />
+        <!-- Points from below -->
+        <ellipse cx="580" cy="240" rx="5" ry="2.5" />
+        <ellipse cx="480" cy="260" rx="5" ry="2.5" />
+        <ellipse cx="350" cy="210" rx="5" ry="2.5" />
+        <ellipse cx="420" cy="230" rx="5" ry="2.5" />
+        <ellipse cx="550" cy="270" rx="5" ry="2.5" />
+    </g>
+
+    <!-- Projection Lines (Dashed lines connecting 3D points to 2D plane) -->
+    <g stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4,4">
+        <!-- Lines for points above the plane -->
+        <line x1="430" y1="130" x2="450" y2="200" />
+        <line x1="500" y1="160" x2="520" y2="230" />
+        <line x1="360" y1="110" x2="380" y2="180" />
+        <line x1="600" y1="140" x2="620" y2="210" />
+        <line x1="290" y1="160" x2="310" y2="230" />
+        <!-- Lines for points below the plane -->
+        <line x1="600" y1="310" x2="580" y2="240" />
+        <line x1="500" y1="330" x2="480" y2="260" />
+        <line x1="370" y1="280" x2="350" y2="210" />
+        <line x1="440" y1="300" x2="420" y2="230" />
+        <line x1="570" y1="340" x2="550" y2="270" />
+    </g>
+
+    <!-- Original High-Dimensional Data Points (Floating 3D Spheres) -->
+    <g fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5">
+        <!-- Points above the plane -->
+        <circle cx="430" cy="130" r="6" />
+        <circle cx="500" cy="160" r="6" />
+        <circle cx="360" cy="110" r="6" />
+        <circle cx="600" cy="140" r="6" />
+        <circle cx="290" cy="160" r="6" />
+        <!-- Points below the plane -->
+        <circle cx="600" cy="310" r="6" />
+        <circle cx="500" cy="330" r="6" />
+        <circle cx="370" cy="280" r="6" />
+        <circle cx="440" cy="300" r="6" />
+        <circle cx="570" cy="340" r="6" />
+    </g>
+
+    <!-- Labels and Annotations -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Label 1: Original High-Dimensional Data -->
+        <rect x="40" y="60" width="280" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="180" y="85" text-anchor="middle" class="gsvg-en" font-size="15" fill="var(--text-primary)">Original High-Dimensional Data</text>
+        <text x="180" y="85" text-anchor="middle" class="gsvg-ar" font-size="15" fill="var(--text-primary)">البيانات الأصلية عالية الأبعاد</text>
+        <!-- Pointer for Label 1 -->
+        <line x1="250" y1="100" x2="345" y2="110" stroke="var(--border-color)" stroke-width="1.5" />
+        <circle cx="345" cy="110" r="3" fill="var(--border-color)" />
+
+        <!-- Label 2: Reduced Principal Components (PCA) -->
+        <rect x="460" y="340" width="300" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="610" y="365" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Reduced Principal Components (PCA)</text>
+        <text x="610" y="365" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">المكونات الأساسية المخفضة (PCA)</text>
+        <!-- Pointer for Label 2 -->
+        <line x1="550" y1="340" x2="520" y2="300" stroke="var(--brand-500)" stroke-width="1.5" />
+        <circle cx="520" cy="300" r="3" fill="var(--brand-500)" />
+
+        <!-- PC1 Label -->
+        <text x="635" y="265" text-anchor="start" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--brand-ink)">PC1 (Max Variance)</text>
+        <text x="635" y="265" text-anchor="start" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--brand-ink)">المكون الأول (أقصى تباين)</text>
+
+        <!-- PC2 Label -->
+        <text x="390" y="295" text-anchor="end" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">PC2</text>
+        <text x="390" y="295" text-anchor="end" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">المكون الثاني</text>
+
+        <!-- Orthogonal Projection Label -->
+        <text x="525" y="190" text-anchor="start" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Orthogonal Projection</text>
+        <text x="525" y="190" text-anchor="start" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">إسقاط متعامد</text>
+        <!-- Small pointer line for Orthogonal Projection text -->
+        <line x1="520" y1="190" x2="510" y2="195" stroke="var(--text-secondary)" stroke-width="1" />
+
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>PCA</th><th>Factor Analysis</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الأساسي</template>
+          <template class="content-en">Primary Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تمثيل المعلومات بإيجاز في ميزات أقل</template>
+          <template class="content-en">Succinctly represent info in reduced features</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">العثور على السبب الأساسي للتباين المشترك</template>
+          <template class="content-en">Find underlying cause of shared variance</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تحديد المكونات</template>
+          <template class="content-en">Specifying Components</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يُحدد بعد التشغيل الأولي للنموذج</template>
+          <template class="content-en">Determined after initial model run</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يُحدد مسبقاً عادةً</template>
+          <template class="content-en">Usually specified beforehand</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نحدد عدد المكونات مسبقاً عند تشغيل PCA لأول مرة؟</template>
+      <template class="content-en">Why don't we specify the number of components in advance when running PCA for the first time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأننا نستخدم التشغيل الأولي كخطوة استكشافية لمعرفة مقدار التباين الذي يفسره كل مكون، وبناءً عليه نقرر العدد الأمثل للمكونات التي تحتفظ بأكبر قدر من المعلومات.</p></template>
+      <template class="content-en"><p>Because we use the initial run as an exploratory step to see how much variance each component explains, allowing us to decide the optimal number of components that retain the most information.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multiple-criteria-decision-making" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> اتخاذ القرارات متعددة المعايير (MCDM)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Multiple Criteria Decision-Making (MCDM)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم نماذج MCDM لتقييم البدائل عندما يكون لديك معياران أو أكثر لاتخاذ القرار، حيث يتطلب تحسين معيار واحد التضحية بمعيار آخر.</p></template>
+    <template class="content-en"><p>MCDM models are used to evaluate alternatives when you have two or more criteria for a decision, where optimizing one criterion requires sacrificing another.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>غالباً ما نُجبر على اتخاذ قرارات حيث تتدخل عدة معايير مختلفة، ويبدو من غير الواضح أي معيار يجب أن تكون له الأولوية. يمكنك استخدام طرق MCDM لتقييم البدائل. لاستخدام MCDM التقليدي، يجب استيفاء افتراضين:</p><ol><li><b>تقييم المعايير المتعددة (Multiple criteria evaluation):</b> يجب أن يكون لديك أكثر من معيار واحد لتحسينه.</li><li><b><span class="smart-term" data-term-en="Zero-sum system" data-ar="نظام المجموع الصفري" data-en-def="A situation where optimizing one criterion comes at the sacrifice of another.">نظام المجموع الصفري<span class="smart-term-tooltip"></span></span> (Zero-sum system):</b> التحسين فيما يتعلق بمعيار واحد يجب أن يأتي على حساب معيار آخر واحد على الأقل.</li></ol><p><b>MCDM الضبابي (Fuzzy MCDM):</b></p><p>إذا كنت تفضل تقييم الملاءمة ضمن نطاق، بدلاً من استخدام شروط العضوية الثنائية (0 أو 1)، يمكنك استخدام FMCDM. يشير مصطلح 'ضبابي' (Fuzzy) إلى حقيقة أن المعايير المستخدمة لتقييم البدائل توفر نطاقاً من المقبولية - بدلاً من المعايير الثنائية الصارمة (Crisp set) المرتبطة بـ MCDM التقليدي.</p></template>
+    <template class="content-en"><p>We are often forced to make decisions where several different criteria come into play, and it seems unclear which criterion should have priority. You can use MCDM methods to help evaluate alternatives. To use traditional MCDM, two assumptions must be satisfied:</p><ol><li><b>Multiple criteria evaluation:</b> You must have more than one criterion to optimize.</li><li><b><span class="smart-term" data-term-en="Zero-sum system" data-ar="نظام المجموع الصفري" data-en-def="A situation where optimizing one criterion comes at the sacrifice of another.">Zero-sum system<span class="smart-term-tooltip"></span></span>:</b> Optimizing with respect to one criterion must come at the sacrifice of at least one other criterion.</li></ol><p><b>Fuzzy MCDM (FMCDM):</b></p><p>If you prefer to evaluate suitability within a range, rather than use binary membership terms of 0 or 1, you can use FMCDM. The term 'fuzzy' refers to the fact that the criteria being used offer a range of acceptability - instead of the binary, crisp set criteria associated with traditional MCDM.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مفهوم 'المجموع الصفري' هو جوهر المقايضات (Trade-offs) في الهندسة والأعمال. على سبيل المثال، عند شراء سيارة، لا يمكنك عادةً الحصول على أعلى سرعة وأقل استهلاك للوقود في نفس الوقت؛ تحسين أحدهما يضر بالآخر.</p><p><span class="smart-term" data-term-en="Fuzzy Logic" data-ar="المنطق الضبابي" data-en-def="Evaluating suitability within a continuous range rather than strict binary 0 or 1.">المنطق الضبابي<span class="smart-term-tooltip"></span></span> (Fuzzy Logic) يسمح للآلات بالتعامل مع المفاهيم البشرية غير الدقيقة مثل 'دافئ' أو 'سريع قليلاً'، مما يجعل نماذج القرار أكثر واقعية ومرونة من المنطق البولياني الصارم (صحيح/خاطئ).</p></template>
+    <template class="content-en"><p>The 'zero-sum' concept is the core of trade-offs in engineering and business. For example, when buying a car, you usually cannot get the highest speed and the lowest fuel consumption simultaneously; optimizing one hurts the other.</p><p><span class="smart-term" data-term-en="Fuzzy Logic" data-ar="المنطق الضبابي" data-en-def="Evaluating suitability within a continuous range rather than strict binary 0 or 1.">Fuzzy Logic<span class="smart-term-tooltip"></span></span> allows machines to handle imprecise human concepts like 'warm' or 'slightly fast', making decision models more realistic and flexible than strict Boolean logic (True/False).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أعط مثالاً على قرار يومي يمثل 'نظام المجموع الصفري'.</template>
+      <template class="content-en">Give an example of an everyday decision that represents a 'zero-sum system'.</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>اختيار شقة: عادةً، كلما اقتربت الشقة من وسط المدينة (تحسين الموقع)، زاد الإيجار (التضحية بالتكلفة).</p></template>
+      <template class="content-en"><p>Choosing an apartment: Usually, the closer the apartment is to the city center (optimizing location), the higher the rent (sacrificing cost).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="regression-methods" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> طرق الانحدار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Introducing Regression Methods</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار هو أسلوب إحصائي يُستخدم لوصف وتحديد العلاقة بين المتغيرات، ويمكن استخدامه للتنبؤ بالقيم المستقبلية بافتراض وجود علاقة سبب ونتيجة.</p></template>
+    <template class="content-en"><p>Regression is a statistical method used to describe and quantify relationships between variables, and can predict future values assuming a cause-and-effect relationship.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تبني خوارزميات التعلم الآلي من نوع الانحدار من مجال الإحصاء لوصف وتحديد العلاقات بين المتغيرات. استخدم تقنيات الانحدار لتحديد قوة الارتباط، وللتنبؤ بالقيم المستقبلية (مع الحذر: طرق الانحدار تفترض علاقة سبب ونتيجة). أهم الطرق:</p><ol><li><b>الانحدار الخطي (Linear regression):</b> يصف العلاقة بين المتغير المستهدف y وميزات مجموعة البيانات (المتغيرات المتوقعة). صيغته البسيطة هي y=mx+b. قيوده وافتراضاته:<ul><li>يعمل فقط مع المتغيرات الرقمية، وليس الفئوية.</li><li>القيم المفقودة تسبب مشاكل ويجب معالجتها.</li><li>القيم المتطرفة تنتج نتائج غير دقيقة.</li><li>يفترض وجود علاقة خطية بين الميزات والهدف.</li><li>يفترض أن جميع الميزات مستقلة عن بعضها البعض.</li><li>يجب أن تكون أخطاء التنبؤ (البواقي - residuals) موزعة توزيعاً طبيعياً.</li></ul></li><li><b>الانحدار اللوجستي (Logistic regression):</b> يُستخدم لتقدير قيم لمتغير مستهدف فئوي (Categorical). يجب أن يكون المتغير المستهدف رقمياً ويحتوي على قيم تصف فئة الهدف. بالإضافة إلى التنبؤ بالفئة، فإنه يشير إلى احتمالية كل تقدير.</li><li><b>المربعات الصغرى العادية (OLS):</b> طريقة إحصائية تلائم خط الانحدار الخطي مع مجموعة البيانات. مفيدة لبناء دالة تقريبية قريبة لبياناتك، خاصة للنماذج التي تحتوي على أكثر من متغير مستقل واحد.</li></ol></template>
+    <template class="content-en"><p>Machine learning regression algorithms were adopted from statistics to describe and quantify relationships between variables. Use them to determine correlation strength and predict future values (Caution: regression assumes a cause-and-effect relationship). Key methods:</p><ol><li><b>Linear regression:</b> Describes the relationship between a target variable y and predictor features. Simple formula: y=mx+b. Limitations/Assumptions:<ul><li>Works only with numerical variables, not categorical.</li><li>Missing values cause problems and must be addressed.</li><li>Outliers produce inaccurate results.</li><li>Assumes a linear relationship exists.</li><li>Assumes all features are independent of each other.</li><li>Prediction errors (<span class="smart-term" data-term-en="Residuals" data-ar="البواقي / أخطاء التنبؤ" data-en-def="The difference between the observed value and the estimated value in a regression model.">residuals<span class="smart-term-tooltip"></span></span>) should be normally distributed.</li></ul></li><li><b>Logistic regression:</b> Used to estimate values for a categorical target variable. The target should be numeric containing values describing the class. It predicts the class AND indicates the probability for each estimate.</li><li><b>Ordinary least squares (OLS):</b> A statistical method that fits a linear regression line to a dataset. Useful for constructing a close approximation function, especially for models with multiple independent variables.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين الانحدار الخطي واللوجستي هو نوع المخرجات: الخطي يتنبأ بقيمة مستمرة (مثل سعر المنزل)، بينما اللوجستي يتنبأ باحتمالية الانتماء لفئة معينة (مثل هل البريد مزعج أم لا؟) ويستخدم دالة 'سيجمويد' (Sigmoid) لضغط المخرجات بين 0 و 1.</p><p>طريقة OLS تعمل عن طريق تقليل مجموع مربعات الفروق (الأخطاء) بين القيم الفعلية والقيم التي يتنبأ بها خط الانحدار.</p></template>
+    <template class="content-en"><p>The fundamental difference between linear and logistic regression is the output type: Linear predicts a continuous value (e.g., house price), while logistic predicts the probability of belonging to a category (e.g., spam or not spam?) using a Sigmoid function to squash outputs between 0 and 1.</p><p>The OLS method works by minimizing the sum of the squares of the differences (residuals) between the observed dependent variable and those predicted by the linear function.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانحدار الخطي البسيط، حيث y هو المتغير التابع، x هو المتغير المستقل، m هو الميل، و b هو التقاطع مع المحور الصادي.</strong></template>
+      <template class="content-en"><strong>Simple linear regression formula, where y is the dependent variable, x is the independent variable, m is the slope, and b is the y-intercept.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$y = mx + b$$</div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Show a scatter plot of data points (e.g., Number of Rooms vs. Home Price) with a straight line of best fit drawn through them. Label the line 'Linear Regression (OLS)'. Show small vertical dashed lines from a few data points to the regression line, labeled 'Residuals'. Style: educational, dark background #0d1117, accent colors #007bff and #ff4444, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for annotation lines -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+    <!-- Arrowhead for axes -->
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--border-color)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="25" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Linear Regression (Ordinary Least Squares)</text>
+  <text x="400" y="25" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الانحدار الخطي (المربعات الصغرى العادية)</text>
+
+  <!-- Grid Lines -->
+  <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+    <line x1="100" y1="280" x2="740" y2="280" />
+    <line x1="100" y1="220" x2="740" y2="220" />
+    <line x1="100" y1="160" x2="740" y2="160" />
+    <line x1="100" y1="100" x2="740" y2="100" />
+    <line x1="200" y1="340" x2="200" y2="50" />
+    <line x1="300" y1="340" x2="300" y2="50" />
+    <line x1="400" y1="340" x2="400" y2="50" />
+    <line x1="500" y1="340" x2="500" y2="50" />
+    <line x1="600" y1="340" x2="600" y2="50" />
+    <line x1="700" y1="340" x2="700" y2="50" />
+  </g>
+
+  <!-- Axes -->
+  <line x1="100" y1="340" x2="750" y2="340" stroke="var(--border-color)" stroke-width="2" marker-end="url(#axis-arrow)" />
+  <line x1="100" y1="340" x2="100" y2="40" stroke="var(--border-color)" stroke-width="2" marker-end="url(#axis-arrow)" />
+
+  <!-- Axis Labels -->
+  <text x="425" y="385" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Number of Rooms (Predictor Feature)</text>
+  <text x="425" y="385" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">عدد الغرف (ميزة التوقع)</text>
+
+  <text x="-190" y="60" transform="rotate(-90)" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Home Price (Target Variable y)</text>
+  <text x="-190" y="60" transform="rotate(-90)" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">سعر المنزل (المتغير المستهدف y)</text>
+
+  <!-- Residuals (Dashed Lines) -->
+  <g stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4">
+    <line x1="150" y1="280" x2="150" y2="308" />
+    <line x1="220" y1="310" x2="220" y2="280" />
+    <line x1="380" y1="250" x2="380" y2="216" />
+    <line x1="450" y1="160" x2="450" y2="188" />
+    <line x1="650" y1="130" x2="650" y2="108" />
+  </g>
+
+  <!-- Regression Line -->
+  <line x1="120" y1="320" x2="680" y2="96" stroke="var(--brand-500)" stroke-width="4" />
+
+  <!-- Data Points -->
+  <g fill="var(--text-secondary)">
+    <!-- Points with residuals drawn -->
+    <circle cx="150" cy="280" r="6" />
+    <circle cx="220" cy="310" r="6" />
+    <circle cx="380" cy="250" r="6" />
+    <circle cx="450" cy="160" r="6" />
+    <circle cx="650" cy="130" r="6" />
+    
+    <!-- Additional scatter points -->
+    <circle cx="180" cy="290" r="6" />
+    <circle cx="250" cy="250" r="6" />
+    <circle cx="300" cy="230" r="6" />
+    <circle cx="340" cy="220" r="6" />
+    <circle cx="410" cy="190" r="6" />
+    <circle cx="480" cy="170" r="6" />
+    <circle cx="520" cy="180" r="6" />
+    <circle cx="560" cy="140" r="6" />
+    <circle cx="600" cy="110" r="6" />
+    <circle cx="620" cy="120" r="6" />
+  </g>
+
+  <!-- Annotations -->
+  
+  <!-- Line of Best Fit Annotation -->
+  <path d="M 520 250 L 480 190" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="520" y="220" width="180" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="610" y="242" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Line of Best Fit</text>
+  <text x="610" y="242" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">خط أفضل تطابق</text>
+  <text x="610" y="266" text-anchor="middle" fill="var(--brand-ink)" font-size="15" font-weight="bold" font-family="monospace">y = mx + b</text>
+
+  <!-- Residuals Annotation -->
+  <path d="M 260 170 L 225 285" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="170" y="110" width="180" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="260" y="132" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Residuals (Errors)</text>
+  <text x="260" y="132" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">البواقي (الأخطاء)</text>
+  <text x="260" y="156" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Distance to regression line</text>
+  <text x="260" y="156" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المسافة إلى خط الانحدار</text>
+
+  <!-- Data Point Annotation -->
+  <path d="M 400 110 L 445 155" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="340" y="70" width="120" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="400" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Data Point</text>
+  <text x="400" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">نقطة بيانات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت التنبؤ بما إذا كان العميل سيشتري منتجاً أم لا (نعم/لا)، فأي نوع من الانحدار ستستخدم؟</template>
+      <template class="content-en">If you want to predict whether a customer will buy a product or not (Yes/No), which type of regression would you use?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الانحدار اللوجستي، لأن المتغير المستهدف فئوي (ثنائي: نعم/لا).</p></template>
+      <template class="content-en"><p>Logistic regression, because the target variable is categorical (binary: Yes/No).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="detecting-outliers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> اكتشاف القيم المتطرفة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Detecting Outliers</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القيم المتطرفة هي نقاط بيانات تختلف بشكل كبير عن الأغلبية، وإزالتها ضرورية لأن العديد من الخوارزميات تفترض عدم وجودها.</p></template>
+    <template class="content-en"><p>Outliers are data points significantly different from the majority; removing them is crucial as many algorithms assume they don't exist.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تفترض العديد من الأساليب الإحصائية والتعلم الآلي أن بياناتك لا تحتوي على قيم متطرفة. إزالة القيم المتطرفة جزء مهم من إعداد البيانات. القيم المتطرفة هي نقاط بيانات ذات قيم تختلف اختلافاً كبيراً عن غالبية نقاط البيانات. يمكن استخدام اكتشافها لاكتشاف الحالات الشاذة التي تمثل الاحتيال أو فشل المعدات أو الهجمات السيبرانية.</p><p>يمكن اكتشاف القيم المتطرفة باستخدام نهجين:</p><ol><li><b>التحليل أحادي المتغير (Univariate analysis):</b> فحص الميزات في مجموعة البيانات بشكل فردي. الطرق البسيطة تشمل:<ul><li>تصنيف توكي للقيم المتطرفة (Tukey outlier labeling).</li><li>مخطط الصندوق لتوكي (Tukey boxplotting).</li></ul></li><li><b>التحليل متعدد المتغيرات (Multivariate analysis):</b> تظهر القيم المتطرفة أحياناً فقط ضمن مجموعات من نقاط البيانات من متغيرات متباينة. يتضمن هذا النهج النظر في متغيرين أو أكثر في وقت واحد. الطرق تشمل:<ul><li>مصفوفة المخطط المبعثر (Scatter-plot matrix).</li><li>مخطط الصندوق (Boxplotting).</li><li><span class="smart-term" data-term-en="DBScan" data-ar="التجميع المكاني القائم على الكثافة" data-en-def="A density-based clustering algorithm used to find multivariate outliers (noise).">التجميع المكاني القائم على الكثافة<span class="smart-term-tooltip"></span></span> للتطبيقات مع الضوضاء (DBScan).</li><li>تحليل المكونات الرئيسية (PCA).</li></ul></li></ol></template>
+    <template class="content-en"><p>Many statistical and machine learning approaches assume your data has no outliers. Outlier removal is an important part of data preparation. Outliers are data points with values significantly different from the majority. Outlier detection is used to spot anomalies representing fraud, equipment failure, or cybersecurity attacks.</p><p>Outliers can be detected using two approaches:</p><ol><li><b>Univariate analysis:</b> Inspecting features individually for anomalous values. Simple methods include:<ul><li>Tukey outlier labeling.</li><li>Tukey boxplotting.</li></ul></li><li><b>Multivariate analysis:</b> Sometimes outliers show up only within combinations of data points from disparate variables. This involves considering two or more variables at a time. Methods include:<ul><li>Scatter-plot matrix.</li><li>Boxplotting.</li><li>Density-based spatial clustering of applications with noise (<span class="smart-term" data-term-en="DBScan" data-ar="التجميع المكاني القائم على الكثافة" data-en-def="A density-based clustering algorithm used to find multivariate outliers (noise).">DBScan<span class="smart-term-tooltip"></span></span>).</li><li>Principal component analysis (PCA).</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى التحليل متعدد المتغيرات؟ تخيل بيانات عن 'العمر' و 'الدخل'. عمر 20 سنة ليس قيمة متطرفة، ودخل 100,000 دولار ليس قيمة متطرفة بحد ذاته. ولكن شخص عمره 20 سنة ودخله 100,000 دولار قد يكون قيمة متطرفة عند النظر للمتغيرين معاً. هذا ما تكتشفه الطرق متعددة المتغيرات مثل DBScan.</p></template>
+    <template class="content-en"><p>Why do we need multivariate analysis? Imagine data on 'Age' and 'Income'. An age of 20 is not an outlier, and an income of $100,000 is not an outlier on its own. However, a 20-year-old making $100,000 might be an outlier when considering both variables together. This is what multivariate methods like DBScan detect.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: Show a Boxplot (Tukey boxplot) horizontally. Label the median, quartiles (Q1, Q3), and the 'whiskers'. Show individual dots far outside the whiskers and label them 'Outliers'. Style: educational, dark background #0d1117, accent colors #007bff and #ff4444 for outliers, viewBox 0 0 800 300, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Pointer Arrowhead -->
+    <marker id="arrow-pointer" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+    <!-- Brand Pointer Arrowhead for Fences -->
+    <marker id="arrow-pointer-brand" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" />
+    </marker>
+    <!-- Axis Arrowhead -->
+    <marker id="axis-arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">Tukey Boxplot (Outlier Detection)</text>
+  <text x="400" y="30" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">مخطط صندوق توكي (اكتشاف القيم المتطرفة)</text>
+
+  <!-- ================= TOP ANNOTATIONS ================= -->
+
+  <!-- Row 1: Min, Median, Max -->
+  <text x="220" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Minimum</text>
+  <text x="220" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الحد الأدنى</text>
+  <line x1="220" y1="80" x2="220" y2="210" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <text x="410" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Median</text>
+  <text x="410" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الوسيط</text>
+  <line x1="410" y1="80" x2="410" y2="190" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <text x="580" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Maximum</text>
+  <text x="580" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الحد الأقصى</text>
+  <line x1="580" y1="80" x2="580" y2="210" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <!-- Row 2: Q1, Q3 -->
+  <text x="350" y="110" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">First Quartile (Q1)</text>
+  <text x="350" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الربع الأول (Q1)</text>
+  <line x1="350" y1="120" x2="350" y2="190" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <text x="450" y="110" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Third Quartile (Q3)</text>
+  <text x="450" y="110" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">الربع الثالث (Q3)</text>
+  <line x1="450" y1="120" x2="450" y2="190" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <!-- Row 3: Outliers -->
+  <text x="140" y="150" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Outliers</text>
+  <text x="140" y="150" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">قيم متطرفة</text>
+  <line x1="140" y1="160" x2="140" y2="235" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+  <text x="685" y="150" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Outliers</text>
+  <text x="685" y="150" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">قيم متطرفة</text>
+  <line x1="685" y1="160" x2="685" y2="235" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-pointer)" />
+
+
+  <!-- ================= MAIN BOXPLOT ================= -->
+
+  <!-- Fences (Tukey Limits) -->
+  <line x1="200" y1="190" x2="200" y2="310" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+  <line x1="600" y1="190" x2="600" y2="310" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" />
+
+  <!-- Whiskers -->
+  <line x1="220" y1="250" x2="350" y2="250" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" />
+  <line x1="450" y1="250" x2="580" y2="250" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" />
+
+  <!-- Whisker Caps -->
+  <line x1="220" y1="220" x2="220" y2="280" stroke="var(--brand-500)" stroke-width="3" />
+  <line x1="580" y1="220" x2="580" y2="280" stroke="var(--brand-500)" stroke-width="3" />
+
+  <!-- Interquartile Range Box -->
+  <rect x="350" y="200" width="100" height="100" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" rx="4" />
+
+  <!-- Median Line -->
+  <line x1="410" y1="200" x2="410" y2="300" stroke="var(--brand-500)" stroke-width="4" />
+
+  <!-- Outlier Data Points -->
+  <circle cx="120" cy="250" r="5" fill="var(--bg-surface)" stroke="var(--brand-ink-strong)" stroke-width="2.5" />
+  <circle cx="160" cy="250" r="5" fill="var(--bg-surface)" stroke="var(--brand-ink-strong)" stroke-width="2.5" />
+  
+  <circle cx="640" cy="250" r="5" fill="var(--bg-surface)" stroke="var(--brand-ink-strong)" stroke-width="2.5" />
+  <circle cx="690" cy="250" r="5" fill="var(--bg-surface)" stroke="var(--brand-ink-strong)" stroke-width="2.5" />
+  <circle cx="730" cy="250" r="5" fill="var(--bg-surface)" stroke="var(--brand-ink-strong)" stroke-width="2.5" />
+
+
+  <!-- ================= BOTTOM ANNOTATIONS ================= -->
+
+  <!-- Brackets -->
+  <path d="M 220 310 L 220 320 L 350 320 L 350 310" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+  <text x="285" y="340" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Whisker</text>
+  <text x="285" y="340" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">الشارب</text>
+
+  <path d="M 350 310 L 350 320 L 450 320 L 450 310" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+  <text x="400" y="340" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Interquartile Range (IQR)</text>
+  <text x="400" y="340" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المدى الربيعي (IQR)</text>
+
+  <path d="M 450 310 L 450 320 L 580 320 L 580 310" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+  <text x="515" y="340" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Whisker</text>
+  <text x="515" y="340" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">الشارب</text>
+
+  <!-- Fence Labels -->
+  <text x="200" y="375" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">Lower Fence (Q1 - 1.5×IQR)</text>
+  <text x="200" y="375" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">السياج الأدنى (Q1 - 1.5×IQR)</text>
+  <line x1="200" y1="360" x2="200" y2="315" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-pointer-brand)" />
+
+  <text x="600" y="375" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">Upper Fence (Q3 + 1.5×IQR)</text>
+  <text x="600" y="375" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600">السياج الأعلى (Q3 + 1.5×IQR)</text>
+  <line x1="600" y1="360" x2="600" y2="315" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-pointer-brand)" />
+
+
+  <!-- ================= AXIS ================= -->
+  
+  <line x1="60" y1="410" x2="760" y2="410" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+  
+  <!-- Axis Ticks -->
+  <path d="M 100 410 L 100 416 M 200 410 L 200 416 M 300 410 L 300 416 M 400 410 L 400 416 M 500 410 L 500 416 M 600 410 L 600 416 M 700 410 L 700 416" stroke="var(--text-muted)" stroke-width="2" fill="none" />
+
+  <text x="760" y="440" text-anchor="end" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Data Value</text>
+  <text x="760" y="440" text-anchor="end" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">قيمة البيانات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يجب دائماً حذف القيم المتطرفة من البيانات؟</template>
+      <template class="content-en">Should outliers always be deleted from the data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، يعتمد ذلك على السياق. إذا كانت القيمة المتطرفة ناتجة عن خطأ في القياس، يجب حذفها. أما إذا كانت تمثل حالة شاذة حقيقية (مثل عملية احتيال بنكي)، فهي بالضبط ما نبحث عنه ويجب دراستها.</p></template>
+      <template class="content-en"><p>No, it depends on the context. If the outlier is a measurement error, it should be removed. But if it represents a true anomaly (like bank fraud), it is exactly what we are looking for and should be studied.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="time-series-analysis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تحليل السلاسل الزمنية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Introducing Time Series Analysis</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>السلسلة الزمنية هي بيانات تُجمع عبر فترات زمنية، وتُستخدم للتنبؤ بالقيم المستقبلية بناءً على الأنماط التاريخية.</p></template>
+    <template class="content-en"><p>A time series is data collected over time intervals, used to forecast future values based on historical patterns.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>السلسلة الزمنية (Time series) هي ببساطة مجموعة من البيانات حول قيم السمات بمرور الوقت. يتم إجراء تحليل السلاسل الزمنية للتنبؤ بالحالات المستقبلية للمقياس بناءً على بيانات المراقبة السابقة. للتنبؤ بالقيم المستقبلية من البيانات الموجودة في مجموعة البيانات الخاصة بك، استخدم تقنيات السلاسل الزمنية.</p><p>تُظهر السلاسل الزمنية أنماطاً محددة (مثل الاتجاهات الثابتة، الاتجاهات المتصاعدة/المتناقصة، والموسمية).</p><p><b>نمذجة بيانات السلاسل الزمنية أحادية المتغير:</b></p><p>على غرار كيفية تحليل العلاقات بين متغيرات متعددة في التحليل متعدد المتغيرات، فإن التحليل أحادي المتغير هو التحليل الكمي لمتغير واحد فقط في كل مرة. عندما تقوم بنمذجة سلسلة زمنية أحادية المتغير، فإنك تقوم بنمذجة تغييرات السلسلة الزمنية التي تمثل تغييرات في متغير واحد بمرور الوقت.</p></template>
+    <template class="content-en"><p>A time series is just a collection of data on attribute values over time. Time series analysis is performed to predict future instances of the measure based on past observational data. To forecast or predict future values from data in your dataset, use time series techniques.</p><p>Time series exhibit specific patterns (e.g., Constant, Trended, Seasonal).</p><p><b>Modeling univariate time series data patterns:</b></p><p>Similar to how multivariate analysis is the analysis of relationships between multiple variables, univariate analysis is the quantitative analysis of only one variable at a time. When you model univariate time series, you're modeling time series changes that represent changes in a single variable over time.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الرئيسي بين الانحدار الخطي العادي وتحليل السلاسل الزمنية هو أن السلاسل الزمنية تتعامل مع بيانات غير مستقلة؛ نقطة البيانات اليوم تعتمد بشكل كبير على نقطة البيانات بالأمس (الارتباط الذاتي - Autocorrelation). لذلك، النماذج الإحصائية العادية التي تفترض استقلالية الملاحظات تفشل هنا.</p></template>
+    <template class="content-en"><p>The main difference between standard linear regression and time series analysis is that time series deals with non-independent data; today's data point heavily depends on yesterday's (Autocorrelation). Therefore, standard statistical models that assume independent observations fail here.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[7]: Detailed SVG generation prompt: Show four small line charts in a 2x2 grid. 1) 'Constant Time Series' (flat noisy line). 2) 'Trended Time Series' (noisy line going upwards). 3) 'Untrended Seasonal Time Series' (wave pattern going straight horizontally). 4) 'Trended Seasonal Time Series' (wave pattern going upwards). Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 600, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="7">
+<svg viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Arrowhead for axes -->
+        <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Global Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Time Series Patterns</text>
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنماط السلاسل الزمنية</text>
+
+    <!-- ==========================================
+         CELL 1: Constant Time Series
+         ========================================== -->
+    <g transform="translate(0, 0)">
+        <!-- Box Background -->
+        <rect x="50" y="80" width="330" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Title -->
+        <text x="215" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Constant Time Series</text>
+        <text x="215" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">سلسلة زمنية ثابتة</text>
+        
+        <!-- Axes -->
+        <path d="M 80 260 L 350 260" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <path d="M 80 260 L 80 140" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="215" y="285" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Time</text>
+        <text x="215" y="285" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الزمن</text>
+        <text x="80" y="125" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Value</text>
+        <text x="80" y="125" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">القيمة</text>
+
+        <!-- Trend Line (Mean) -->
+        <path d="M 80 200 L 350 200" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" opacity="0.8" />
+        
+        <!-- Data Line (Noisy Flat) -->
+        <path d="M 80 200 L 95 185 L 110 215 L 125 190 L 140 205 L 155 180 L 170 220 L 185 195 L 200 210 L 215 185 L 230 215 L 245 190 L 260 205 L 275 180 L 290 215 L 305 195 L 320 205 L 335 190 L 350 200" 
+              fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- ==========================================
+         CELL 2: Trended Time Series
+         ========================================== -->
+    <g transform="translate(0, 0)">
+        <!-- Box Background -->
+        <rect x="420" y="80" width="330" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Title -->
+        <text x="585" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Trended Time Series</text>
+        <text x="585" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">سلسلة زمنية ذات اتجاه</text>
+        
+        <!-- Axes -->
+        <path d="M 450 260 L 720 260" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <path d="M 450 260 L 450 140" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="585" y="285" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Time</text>
+        <text x="585" y="285" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الزمن</text>
+        <text x="450" y="125" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Value</text>
+        <text x="450" y="125" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">القيمة</text>
+
+        <!-- Trend Line (Upward) -->
+        <path d="M 450 240 L 720 140" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" opacity="0.8" />
+        
+        <!-- Data Line (Noisy Upward) -->
+        <path d="M 450 240 L 465 219 L 480 244 L 495 213 L 510 230 L 525 194 L 540 222 L 555 189 L 570 206 L 585 175 L 600 202 L 615 169 L 630 187 L 645 152 L 660 177 L 675 145 L 690 161 L 705 131 L 720 140" 
+              fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- ==========================================
+         CELL 3: Untrended Seasonal Time Series
+         ========================================== -->
+    <g transform="translate(0, 0)">
+        <!-- Box Background -->
+        <rect x="50" y="340" width="330" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Title -->
+        <text x="215" y="370" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Untrended Seasonal</text>
+        <text x="215" y="370" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">موسمية بدون اتجاه</text>
+        
+        <!-- Axes -->
+        <path d="M 80 520 L 350 520" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <path d="M 80 520 L 80 400" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="215" y="545" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Time</text>
+        <text x="215" y="545" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الزمن</text>
+        <text x="80" y="385" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Value</text>
+        <text x="80" y="385" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">القيمة</text>
+
+        <!-- Trend Line (Mean) -->
+        <path d="M 80 460 L 350 460" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" opacity="0.8" />
+        
+        <!-- Data Line (Smooth Wave) -->
+        <path d="M 80 460 Q 95 410, 110 460 T 140 460 T 170 460 T 200 460 T 230 460 T 260 460 T 290 460 T 320 460 T 350 460" 
+              fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- ==========================================
+         CELL 4: Trended Seasonal Time Series
+         ========================================== -->
+    <g transform="translate(0, 0)">
+        <!-- Box Background -->
+        <rect x="420" y="340" width="330" height="220" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Title -->
+        <text x="585" y="370" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Trended Seasonal</text>
+        <text x="585" y="370" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">موسمية ذات اتجاه</text>
+        
+        <!-- Axes -->
+        <path d="M 450 520 L 720 520" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <path d="M 450 520 L 450 400" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="585" y="545" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Time</text>
+        <text x="585" y="545" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الزمن</text>
+        <text x="450" y="385" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Value</text>
+        <text x="450" y="385" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">القيمة</text>
+
+        <!-- Trend Line (Upward) -->
+        <path d="M 450 500 L 720 410" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" opacity="0.8" />
+        
+        <!-- Data Line (Smooth Upward Wave) -->
+        <path d="M 450 500 Q 465 460, 480 490 T 510 480 T 540 470 T 570 460 T 600 450 T 630 440 T 660 430 T 690 420 T 720 410" 
+              fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو النمط الذي تتوقع رؤيته في مبيعات الآيس كريم على مدار عدة سنوات؟</template>
+      <template class="content-en">What pattern would you expect to see in ice cream sales over several years?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سلسلة زمنية موسمية ذات اتجاه (Trended Seasonal)، حيث ترتفع المبيعات في الصيف وتنخفض في الشتاء (موسمية)، وقد يكون هناك اتجاه عام للزيادة إذا كانت الشركة تنمو.</p></template>
+      <template class="content-en"><p>A Trended Seasonal time series, where sales peak in summer and drop in winter (seasonal), with a general upward trend if the business is growing.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة الخامسة. حتى الآن، كنا نجمع البيانات وننظفها، لكن الآن حان الوقت لنجعلها تتحدث لغة الرياضيات. هذه الوحدة هي 'المحرك الرياضي' لعلم البيانات. نبدأ بالاحتمالات والإحصاء؛ حيث نتعلم كيف نفرق بين وصف ما نراه (الإحصاء الوصفي) وبين التنبؤ بما لا نراه (الإحصاء الاستدلالي). ثم ننتقل لقياس العلاقات بين المتغيرات باستخدام الارتباط (بيرسون وسبيرمان). لكن ماذا لو كان لدينا مئات المتغيرات؟ هنا يتدخل الجبر الخطي وتقنيات تقليل الأبعاد مثل PCA و SVD لضغط البيانات دون فقدان جوهرها. بعد ذلك، نتعلم كيف نتخذ قرارات معقدة باستخدام MCDM، وكيف نتنبأ بالمستقبل باستخدام الانحدار الخطي واللوجستي. ولا ننسى أبداً تنظيف بياناتنا من 'القيم المتطرفة' التي قد تدمر نماذجنا. وأخيراً، نلقي نظرة على السلاسل الزمنية للتنبؤ بناءً على التاريخ. للامتحان: ركزوا جيداً على الفروق بين الخوارزميات (متى نستخدم بيرسون مقابل سبيرمان؟ متى نستخدم الانحدار الخطي مقابل اللوجستي؟) وافهموا افتراضات كل نموذج.</template>
+    <template class="content-en">Welcome to Module 5. Until now, we've been gathering and cleaning data, but now it's time to make it speak the language of mathematics. This module is the 'mathematical engine' of data science. We start with probability and statistics, learning to distinguish between describing what we see (Descriptive) and predicting what we don't (Inferential). We then measure relationships using correlation (Pearson vs. Spearman). But what if we have hundreds of variables? That's where linear algebra and dimensionality reduction (PCA, SVD) step in to compress data without losing its essence. Next, we tackle complex decisions with MCDM, and predict the future using Linear and Logistic Regression. We must never forget to clean our data of 'outliers' that can destroy our models. Finally, we touch on Time Series to forecast based on history. For the exam: focus heavily on the differences between algorithms (when to use Pearson vs. Spearman? Linear vs. Logistic?) and memorize the assumptions of each model.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي بالإحصاء الوصفي ونحتاج دائماً للإحصاء الاستدلالي في علم البيانات؟</template>
+          <template class="content-en">Why can't we just rely on descriptive statistics, and why do we always need inferential statistics in data science?</template>
+          <span class="content-target">لماذا لا نكتفي بالإحصاء الوصفي ونحتاج دائماً للإحصاء الاستدلالي في علم البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الإحصاء الوصفي يخبرك فقط بما حدث في الماضي داخل مجموعة البيانات التي تملكها. لكن في علم البيانات، هدفنا هو 'التنبؤ' بالمستقبل أو تعميم النتائج على بيانات لم نرها بعد (المجتمع). هذا التعميم والتنبؤ مستحيل بدون الإحصاء الاستدلالي.</template>
+          <template class="content-en">Descriptive statistics only tell you what happened in the past within the dataset you hold. But in data science, our goal is to 'predict' the future or generalize results to data we haven't seen yet (the population). This generalization and prediction are impossible without inferential statistics.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم التوزيع ذو الحدين (Binomial) بدلاً من التوزيع الطبيعي (Normal)؟</template>
+          <template class="content-en">When should I use a Binomial distribution instead of a Normal distribution?</template>
+          <span class="content-target">متى يجب أن أستخدم التوزيع ذو الحدين (Binomial) بدلاً من التوزيع الطبيعي (Normal)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم التوزيع ذو الحدين عندما تكون بياناتك متقطعة (Discrete) ولها نتيجتان محتملتان فقط (مثل: نجاح/فشل، نقر/لم ينقر). استخدم التوزيع الطبيعي عندما تكون بياناتك مستمرة (Continuous) ويمكن أن تأخذ أي قيمة ضمن نطاق (مثل: الطول، الوزن، السعر).</template>
+          <template class="content-en">Use a Binomial distribution when your data is discrete and has only two possible outcomes (e.g., success/failure, clicked/didn't click). Use a Normal distribution when your data is continuous and can take any value within a range (e.g., height, weight, price).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تُسمى خوارزمية Naïve Bayes بـ 'الساذجة'؟</template>
+          <template class="content-en">Why is the Naïve Bayes algorithm called 'Naïve'?</template>
+          <span class="content-target">لماذا تُسمى خوارزمية Naïve Bayes بـ 'الساذجة'؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُسمى ساذجة لأنها تفترض أن جميع الميزات (Features) مستقلة تماماً عن بعضها البعض. في الواقع، هذا الافتراض نادراً ما يكون صحيحاً (مثلاً في النصوص، كلمة 'صباح' غالباً تتبعها كلمة 'الخير')، لكن رغم هذه 'السذاجة'، الخوارزمية تعمل بكفاءة عالية جداً.</template>
+          <template class="content-en">It's called naïve because it assumes that all features are completely independent of each other. In reality, this assumption is rarely true (e.g., in text, the word 'Good' is often followed by 'Morning'), but despite this 'naivety', the algorithm performs incredibly well.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لدي بيانات عن 'الراتب' و 'مستوى التعليم' (ثانوي، بكالوريوس، ماجستير). هل أستخدم ارتباط بيرسون أم سبيرمان؟</template>
+          <template class="content-en">I have data on 'Salary' and 'Education Level' (High School, Bachelor's, Master's). Should I use Pearson or Spearman correlation?</template>
+          <span class="content-target">لدي بيانات عن 'الراتب' و 'مستوى التعليم' (ثانوي، بكالوريوس، ماجستير). هل أستخدم ارتباط بيرسون أم سبيرمان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب استخدام ارتباط سبيرمان (Spearman). لأن 'مستوى التعليم' هو متغير ترتيبي (Ordinal) وليس مستمراً. ارتباط بيرسون يتطلب أن يكون كلا المتغيرين رقميين مستمرين.</template>
+          <template class="content-en">You must use Spearman correlation. Because 'Education Level' is an ordinal variable, not continuous. Pearson correlation requires both variables to be continuous numeric.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف الحقيقي من تقليل الأبعاد (Dimensionality Reduction) مثل PCA؟</template>
+          <template class="content-en">What is the real goal of Dimensionality Reduction like PCA?</template>
+          <span class="content-target">ما هو الهدف الحقيقي من تقليل الأبعاد (Dimensionality Reduction) مثل PCA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الهدف هو التخلص من 'الضوضاء' والمعلومات المكررة. إذا كان لديك 100 ميزة، ربما 10 منها فقط تحتوي على 95% من المعلومات المفيدة. PCA يضغط هذه الـ 100 ميزة إلى 10 مكونات رئيسية، مما يسرع تدريب النماذج ويمنع مشكلة 'لعنة الأبعاد' (Curse of Dimensionality).</template>
+          <template class="content-en">The goal is to eliminate 'noise' and redundant information. If you have 100 features, maybe only 10 of them contain 95% of the useful information. PCA compresses these 100 features into 10 principal components, speeding up model training and preventing the 'curse of dimensionality'.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف MCDM الضبابي (Fuzzy MCDM) عن MCDM التقليدي؟</template>
+          <template class="content-en">How does Fuzzy MCDM differ from traditional MCDM?</template>
+          <span class="content-target">كيف يختلف MCDM الضبابي (Fuzzy MCDM) عن MCDM التقليدي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">MCDM التقليدي يستخدم منطقاً صارماً (أبيض أو أسود، 0 أو 1). بينما MCDM الضبابي يسمح بدرجات من المقبولية (رمادي). مثلاً، بدلاً من القول إن السيارة 'سريعة' أو 'غير سريعة'، المنطق الضبابي يقول إنها 'سريعة بنسبة 80%'. هذا أقرب لطريقة تفكير البشر.</template>
+          <template class="content-en">Traditional MCDM uses crisp logic (black or white, 0 or 1). Fuzzy MCDM allows for degrees of acceptability (gray). For example, instead of saying a car is 'fast' or 'not fast', fuzzy logic says it is '80% fast'. This is closer to how humans think.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كان الانحدار الخطي يتنبأ بالأرقام، فماذا يفعل الانحدار اللوجستي؟</template>
+          <template class="content-en">If Linear Regression predicts numbers, what does Logistic Regression do?</template>
+          <span class="content-target">إذا كان الانحدار الخطي يتنبأ بالأرقام، فماذا يفعل الانحدار اللوجستي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">على الرغم من اسمه، الانحدار اللوجستي هو خوارزمية 'تصنيف' (Classification). هو لا يتنبأ برقم مطلق، بل يتنبأ بـ 'احتمالية' انتماء عنصر لفئة معينة (قيمة بين 0 و 1). مثلاً: احتمالية 0.8 أن البريد مزعج.</template>
+          <template class="content-en">Despite its name, Logistic Regression is a 'classification' algorithm. It doesn't predict an absolute number; it predicts the 'probability' of an item belonging to a certain class (a value between 0 and 1). E.g., a 0.8 probability that an email is spam.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر القيم المتطرفة (Outliers) خطيرة جداً على الانحدار الخطي (OLS)؟</template>
+          <template class="content-en">Why are outliers so dangerous for Linear Regression (OLS)?</template>
+          <span class="content-target">لماذا تعتبر القيم المتطرفة (Outliers) خطيرة جداً على الانحدار الخطي (OLS)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن طريقة OLS تحاول تقليل 'مربع' الأخطاء. القيمة المتطرفة البعيدة جداً سيكون لها خطأ كبير جداً، وعند تربيعه يصبح ضخماً. هذا يجبر خط الانحدار على الانحراف بشدة نحو القيمة المتطرفة لتقليل هذا الخطأ المربع، مما يفسد النموذج بأكمله.</template>
+          <template class="content-en">Because the OLS method tries to minimize the 'square' of errors. A far outlier will have a huge error, and squaring it makes it massive. This forces the regression line to skew heavily towards the outlier to minimize this squared error, ruining the entire model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين اكتشاف القيم المتطرفة أحادي المتغير ومتعدد المتغيرات؟</template>
+          <template class="content-en">What is the difference between univariate and multivariate outlier detection?</template>
+          <span class="content-target">ما الفرق بين اكتشاف القيم المتطرفة أحادي المتغير ومتعدد المتغيرات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">أحادي المتغير ينظر لعمود واحد فقط (مثلاً: هل هذا الراتب طبيعي؟). متعدد المتغيرات ينظر لعدة أعمدة معاً (مثلاً: راتب 100 ألف طبيعي، وعمر 18 طبيعي، لكن عمر 18 براتب 100 ألف هو قيمة متطرفة). خوارزميات مثل DBScan تكتشف النوع الثاني.</template>
+          <template class="content-en">Univariate looks at only one column (e.g., is this salary normal?). Multivariate looks at multiple columns together (e.g., a 100k salary is normal, and age 18 is normal, but age 18 WITH a 100k salary is an outlier). Algorithms like DBScan detect the latter.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا يمكننا استخدام الانحدار الخطي العادي للتنبؤ بأسعار الأسهم بمرور الوقت؟</template>
+          <template class="content-en">Why can't we use standard linear regression to predict stock prices over time?</template>
+          <span class="content-target">لماذا لا يمكننا استخدام الانحدار الخطي العادي للتنبؤ بأسعار الأسهم بمرور الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الانحدار الخطي يفترض أن جميع نقاط البيانات 'مستقلة' عن بعضها. في بيانات السلاسل الزمنية (مثل الأسهم)، سعر اليوم يعتمد بشدة على سعر الأمس (يوجد ارتباط ذاتي). لذلك نحتاج لنماذج سلاسل زمنية متخصصة تتعامل مع هذا الاعتماد الزمني.</template>
+          <template class="content-en">Because linear regression assumes all data points are 'independent' of each other. In time series data (like stocks), today's price heavily depends on yesterday's price (autocorrelation exists). Therefore, we need specialized time series models that handle this temporal dependence.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الإحصاء الوصفي (Descriptive Statistics)",
+      "en": "Descriptive Statistics"
+    },
+    "back": {
+      "definition": {
+        "ar": "إحصائيات تصف خصائص مجموعة البيانات مثل المتوسط والتباين، ولا تفترض السببية.",
+        "en": "Statistics that describe characteristics of a dataset like mean and variance, and do not assume causation."
+      },
+      "example": {
+        "ar": "حساب متوسط درجات الطلاب في فصل دراسي.",
+        "en": "Calculating the average grades of students in a class."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الإحصاء الاستدلالي (Inferential Statistics)",
+      "en": "Inferential Statistics"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام عينة صغيرة لاستنتاج معلومات حول مجتمع أكبر والتنبؤ بدراسة السببية.",
+        "en": "Using a small sample to deduce information about a larger population and predict by studying causation."
+      },
+      "example": {
+        "ar": "استخدام استطلاع رأي لـ 1000 شخص للتنبؤ بنتيجة الانتخابات الوطنية.",
+        "en": "Using a poll of 1000 people to predict a national election outcome."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "المجتمع الإحصائي (Population)",
+      "en": "Population"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة البيانات الكاملة والأكبر التي يتم أخذ العينة منها.",
+        "en": "The larger, complete dataset from which the sample is taken."
+      },
+      "example": {
+        "ar": "جميع المواطنين في دولة ما.",
+        "en": "All citizens in a country."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "العينة (Sample)",
+      "en": "Sample"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد بيانات أصغر مقتطع من المجتمع لغرض التحليل الاستدلالي.",
+        "en": "A smaller data selection carved out from the population for inferential analysis."
+      },
+      "example": {
+        "ar": "100 طالب تم اختيارهم عشوائياً من جامعة تضم 10,000 طالب.",
+        "en": "100 students randomly selected from a university of 10,000."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "التوزيع المتقطع (Discrete Distribution)",
+      "en": "Discrete Distribution"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير عشوائي يمكن حساب قيمه في مجموعات محددة.",
+        "en": "A random variable where values can be counted by groupings."
+      },
+      "example": {
+        "ar": "ألوان السيارات (أحمر، أزرق، أسود).",
+        "en": "Car colors (red, blue, black)."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "التوزيع المستمر (Continuous Distribution)",
+      "en": "Continuous Distribution"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير عشوائي يعين احتمالات لنطاق من القيم.",
+        "en": "A random variable that assigns probabilities to a range of values."
+      },
+      "example": {
+        "ar": "الأميال المقطوعة لكل جالون وقود.",
+        "en": "Miles per gallon of fuel."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "التوزيع الطبيعي (Normal Distribution)",
+      "en": "Normal Distribution"
+    },
+    "back": {
+      "definition": {
+        "ar": "توزيع رقمي مستمر يُمثل بمنحنى متماثل على شكل جرس.",
+        "en": "A numeric continuous distribution represented by a symmetric bell-shaped curve."
+      },
+      "example": {
+        "ar": "توزيع أطوال البشر البالغين.",
+        "en": "The distribution of adult human heights."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "التوزيع ذو الحدين (Binomial Distribution)",
+      "en": "Binomial Distribution"
+    },
+    "back": {
+      "definition": {
+        "ar": "توزيع رقمي متقطع ينمذج عدد النجاحات عندما يكون هناك نتيجتان فقط ممكنتان.",
+        "en": "A numeric discrete distribution modeling the number of successes when only two outcomes are possible."
+      },
+      "example": {
+        "ar": "عدد مرات ظهور 'صورة' عند رمي عملة معدنية 10 مرات.",
+        "en": "Number of 'heads' when flipping a coin 10 times."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "خوارزمية Naïve Bayes",
+      "en": "Naïve Bayes"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تعلم آلي تستخدم الاحتمال الشرطي للتنبؤ باحتمالية وقوع حدث، مفيدة لتصنيف النصوص.",
+        "en": "A machine learning method using conditional probability to predict event likelihood, useful for text classification."
+      },
+      "example": {
+        "ar": "تصنيف رسائل البريد الإلكتروني إلى مزعجة أو غير مزعجة.",
+        "en": "Classifying emails as spam or not spam."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ارتباط بيرسون (Pearson's r)",
+      "en": "Pearson's r Correlation"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس ارتباط يفترض أن البيانات مستمرة، موزعة طبيعياً، ومرتبطة خطياً.",
+        "en": "A correlation measure assuming data is continuous, normally distributed, and linearly related."
+      },
+      "example": {
+        "ar": "قياس الارتباط بين الطول والوزن.",
+        "en": "Measuring correlation between height and weight."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ارتباط رتبة سبيرمان (Spearman's rank)",
+      "en": "Spearman's rank correlation"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس ارتباط للمتغيرات الترتيبية أو العلاقات غير الخطية.",
+        "en": "A correlation measure for ordinal variables or nonlinear relationships."
+      },
+      "example": {
+        "ar": "الارتباط بين ترتيب الطلاب في الفصل ومستوى رضاهم.",
+        "en": "Correlation between student class rank and satisfaction level."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "تحليل القيمة المفردة (SVD)",
+      "en": "Singular Value Decomposition (SVD)"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة جبر خطي لتقليل أبعاد مجموعة البيانات وإزالة الضوضاء.",
+        "en": "A linear algebra method to reduce dataset dimensionality and remove noise."
+      },
+      "example": {
+        "ar": "ضغط بيانات الصور الكبيرة.",
+        "en": "Compressing large image data."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "تحليل المكونات الرئيسية (PCA)",
+      "en": "Principal Component Analysis (PCA)"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة إحصائية غير خاضعة للإشراف تحول الميزات إلى مكونات رئيسية غير مكررة لتقليل الأبعاد.",
+        "en": "An unsupervised statistical method that transforms features into non-redundant principal components to reduce dimensionality."
+      },
+      "example": {
+        "ar": "تقليل 100 ميزة في مجموعة بيانات إلى 5 مكونات رئيسية فقط.",
+        "en": "Reducing 100 features in a dataset down to 5 principal components."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "نظام المجموع الصفري (Zero-sum system)",
+      "en": "Zero-sum system"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة في اتخاذ القرار حيث يأتي تحسين معيار واحد على حساب التضحية بمعيار آخر.",
+        "en": "A decision-making situation where optimizing one criterion comes at the sacrifice of another."
+      },
+      "example": {
+        "ar": "زيادة جودة المنتج تؤدي إلى زيادة التكلفة.",
+        "en": "Increasing product quality leads to increased cost."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "الانحدار الخطي (Linear Regression)",
+      "en": "Linear Regression"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تصف العلاقة الخطية بين متغير مستهدف وميزات متوقعة (y=mx+b).",
+        "en": "A method describing the linear relationship between a target variable and predictor features (y=mx+b)."
+      },
+      "example": {
+        "ar": "التنبؤ بسعر المنزل بناءً على عدد الغرف.",
+        "en": "Predicting a house price based on the number of rooms."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "الانحدار اللوجستي (Logistic Regression)",
+      "en": "Logistic Regression"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لتقدير قيم لمتغير مستهدف فئوي وتشير إلى احتمالية كل تقدير.",
+        "en": "A method to estimate values for a categorical target variable and indicates the probability of each estimate."
+      },
+      "example": {
+        "ar": "التنبؤ بما إذا كان المريض مصاباً بمرض أم لا (نعم/لا).",
+        "en": "Predicting whether a patient has a disease or not (Yes/No)."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "المربعات الصغرى العادية (OLS)",
+      "en": "Ordinary Least Squares (OLS)"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة إحصائية تلائم خط الانحدار الخطي مع مجموعة البيانات لتقليل أخطاء التنبؤ.",
+        "en": "A statistical method that fits a linear regression line to a dataset to minimize prediction errors."
+      },
+      "example": {
+        "ar": "رسم خط الاتجاه الأفضل عبر نقاط بيانات مبعثرة.",
+        "en": "Drawing the best-fit trend line through scattered data points."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "القيم المتطرفة (Outliers)",
+      "en": "Outliers"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقاط بيانات ذات قيم تختلف اختلافاً كبيراً عن غالبية نقاط البيانات.",
+        "en": "Data points with values significantly different from the majority of data points."
+      },
+      "example": {
+        "ar": "معاملة بنكية بقيمة مليون دولار في حساب متوسط معاملاته 100 دولار.",
+        "en": "A $1,000,000 bank transaction in an account averaging $100."
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "DBScan",
+      "en": "DBScan"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تجميع مكاني قائمة على الكثافة تُستخدم لاكتشاف القيم المتطرفة متعددة المتغيرات.",
+        "en": "A density-based spatial clustering algorithm used to detect multivariate outliers."
+      },
+      "example": {
+        "ar": "اكتشاف نشاط احتيالي بناءً على مجموعة غير عادية من الموقع والوقت والمبلغ.",
+        "en": "Detecting fraudulent activity based on an unusual combination of location, time, and amount."
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "السلسلة الزمنية (Time Series)",
+      "en": "Time Series"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة من البيانات حول قيم السمات بمرور الوقت، تُستخدم للتنبؤ بالقيم المستقبلية.",
+        "en": "A collection of data on attribute values over time, used to predict future values."
+      },
+      "example": {
+        "ar": "تتبع أسعار الأسهم يومياً لمدة عام.",
+        "en": "Tracking daily stock prices for a year."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الإحصائيات التالية تحاول التنبؤ من خلال دراسة السببية؟",
+      "en": "Which of the following statistics tries to predict by studying causation?"
+    },
+    "options": {
+      "ar": [
+        "الإحصاء الوصفي",
+        "الإحصاء الاستدلالي",
+        "التباين",
+        "الانحراف المعياري"
+      ],
+      "en": [
+        "Descriptive statistics",
+        "Inferential statistics",
+        "Variance",
+        "Standard deviation"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الإحصاء الاستدلالي يستخدم عينة لاستنتاج معلومات حول المجتمع ويحاول التنبؤ بدراسة السببية، على عكس الإحصاء الوصفي.",
+      "en": "Inferential statistics use a sample to deduce info about a population and try to predict by studying causation, unlike descriptive statistics."
+    },
+    "hint": {
+      "ar": "فكر في الكلمة التي تعني 'الاستنتاج' أو 'التوقع'.",
+      "en": "Think of the word that means 'to deduce' or 'predict'."
+    },
+    "difficulty": "easy",
+    "conceptId": "descriptive-vs-inferential-statistics"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو مجموع احتمالات جميع الأحداث الممكنة في توزيع احتمالي؟",
+      "en": "What is the sum of the probabilities of all possible events in a probability distribution?"
+    },
+    "options": {
+      "ar": [
+        "0.0",
+        "0.5",
+        "1.0",
+        "100"
+      ],
+      "en": [
+        "0.0",
+        "0.5",
+        "1.0",
+        "100"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "من الخصائص الهامة للاحتمالات أن مجموع احتمالات جميع الأحداث المتنافية يساوي 1.0 بالضبط.",
+      "en": "An important characteristic of probability is that the probability of all mutually exclusive events always sums to exactly 1.0."
+    },
+    "hint": {
+      "ar": "يمثل اليقين التام.",
+      "en": "It represents absolute certainty."
+    },
+    "difficulty": "easy",
+    "conceptId": "probability-distributions"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي توزيع ينمذج عدد النجاحات عندما يكون هناك نتيجتان فقط ممكنتان؟",
+      "en": "Which distribution models the number of successes when only two outcomes are possible?"
+    },
+    "options": {
+      "ar": [
+        "التوزيع الطبيعي",
+        "التوزيع الفئوي",
+        "التوزيع المستمر",
+        "التوزيع ذو الحدين"
+      ],
+      "en": [
+        "Normal distribution",
+        "Categorical distribution",
+        "Continuous distribution",
+        "Binomial distribution"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "التوزيع ذو الحدين (Binomial) هو توزيع رقمي متقطع ينمذج المتغيرات الثنائية (نجاح/فشل).",
+      "en": "The Binomial distribution is a numeric discrete distribution that models binary variables (success/failure)."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة تعني 'اثنين'.",
+      "en": "The name implies 'two' outcomes."
+    },
+    "difficulty": "medium",
+    "conceptId": "probability-distributions"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي خوارزمية تستخدم الاحتمال الشرطي وتعتبر مفيدة جداً لتصنيف البيانات النصية مثل البريد المزعج؟",
+      "en": "Which algorithm uses conditional probability and is especially useful for classifying text data like spam?"
+    },
+    "options": {
+      "ar": [
+        "تحليل المكونات الرئيسية (PCA)",
+        "الانحدار الخطي",
+        "Naïve Bayes",
+        "DBScan"
+      ],
+      "en": [
+        "Principal Component Analysis (PCA)",
+        "Linear Regression",
+        "Naïve Bayes",
+        "DBScan"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تستخدم خوارزمية Naïve Bayes الاحتمال الشرطي للتنبؤ باحتمالية وقوع حدث بناءً على أدلة سابقة، وهي كلاسيكية في تصنيف النصوص.",
+      "en": "The Naïve Bayes algorithm uses conditional probability to predict event likelihood based on prior evidence, and is classic for text classification."
+    },
+    "hint": {
+      "ar": "اسمها يحتوي على كلمة تعني 'ساذج'.",
+      "en": "Its name contains a word meaning 'simple' or 'gullible'."
+    },
+    "difficulty": "medium",
+    "conceptId": "conditional-probability-naive-bayes"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "متى يجب استخدام ارتباط رتبة سبيرمان بدلاً من ارتباط بيرسون؟",
+      "en": "When should you use Spearman's rank correlation instead of Pearson's correlation?"
+    },
+    "options": {
+      "ar": [
+        "عندما تكون المتغيرات مستمرة وموزعة طبيعياً",
+        "عندما تكون المتغيرات ترتيبية (Ordinal) أو مرتبطة بشكل غير خطي",
+        "عندما تريد إثبات السببية",
+        "عندما لا توجد قيم متطرفة في البيانات"
+      ],
+      "en": [
+        "When variables are continuous and normally distributed",
+        "When variables are ordinal or nonlinearly related",
+        "When you want to prove causation",
+        "When there are no outliers in the data"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ارتباط سبيرمان مصمم للمتغيرات الترتيبية والعلاقات غير الخطية، بينما يفترض بيرسون متغيرات مستمرة وعلاقات خطية وتوزيعاً طبيعياً.",
+      "en": "Spearman's is designed for ordinal variables and nonlinear relationships, whereas Pearson assumes continuous variables, linear relationships, and normal distribution."
+    },
+    "hint": {
+      "ar": "سبيرمان يعتمد على 'الرتب'.",
+      "en": "Spearman relies on 'ranks'."
+    },
+    "difficulty": "medium",
+    "conceptId": "quantifying-correlation"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في تحليل العوامل (Factor Analysis)، ما هو الحد الأدنى لقيمة الارتباط (r) المفترضة بين الميزات؟",
+      "en": "In Factor Analysis, what is the assumed minimum correlation (r) value between features?"
+    },
+    "options": {
+      "ar": [
+        "r > 0.1",
+        "r > 0.3",
+        "r > 0.5",
+        "r > 0.9"
+      ],
+      "en": [
+        "r > 0.1",
+        "r > 0.3",
+        "r > 0.5",
+        "r > 0.9"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يفترض تحليل العوامل وجود ارتباط r > 0.3 بين الميزات في مجموعة البيانات لضمان وجود تباين مشترك كافٍ.",
+      "en": "Factor analysis assumes there is an r > 0.3 correlation between the features in your dataset to ensure sufficient shared variance."
+    },
+    "hint": {
+      "ar": "قيمة صغيرة ولكنها أكبر من الصفر بقليل.",
+      "en": "A small value, but slightly greater than zero."
+    },
+    "difficulty": "hard",
+    "conceptId": "dimensionality-reduction-linear-algebra"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الاختلاف الرئيسي بين تحليل المكونات الرئيسية (PCA) وتحليل العوامل؟",
+      "en": "What is a key difference between Principal Component Analysis (PCA) and Factor Analysis?"
+    },
+    "options": {
+      "ar": [
+        "PCA يستخدم للمتغيرات الفئوية فقط",
+        "PCA لا يقوم بالانحدار للعثور على سبب أساسي للتباين المشترك",
+        "تحليل العوامل لا يزيل الضوضاء",
+        "PCA يتطلب تحديد عدد المكونات قبل التشغيل الأول"
+      ],
+      "en": [
+        "PCA is used only for categorical variables",
+        "PCA does not regress to find an underlying cause of shared variance",
+        "Factor analysis does not remove noise",
+        "PCA requires specifying the number of components before the first run"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "على عكس تحليل العوامل، لا يبحث PCA عن سبب أساسي للتباين، بل يقوم ببساطة بضغط البيانات لتمثيل أهم المعلومات. كما أن PCA لا يتطلب تحديد عدد المكونات مسبقاً.",
+      "en": "Unlike factor analysis, PCA does not look for an underlying cause of variance; it simply compresses data to represent the most important info. Also, PCA does not require specifying components upfront."
+    },
+    "hint": {
+      "ar": "PCA يركز على الضغط والتمثيل الموجز.",
+      "en": "PCA focuses on compression and succinct representation."
+    },
+    "difficulty": "hard",
+    "conceptId": "dimensionality-reduction-linear-algebra"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي مما يلي هو افتراض أساسي لاستخدام اتخاذ القرارات متعددة المعايير (MCDM) التقليدي؟",
+      "en": "Which of the following is a core assumption for using traditional Multiple Criteria Decision-Making (MCDM)?"
+    },
+    "options": {
+      "ar": [
+        "نظام المجموع الإيجابي",
+        "نظام المجموع الصفري",
+        "المنطق الضبابي",
+        "الاستقلالية التامة للمعايير"
+      ],
+      "en": [
+        "Positive-sum system",
+        "Zero-sum system",
+        "Fuzzy logic",
+        "Complete independence of criteria"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يفترض MCDM التقليدي نظام المجموع الصفري، حيث أن تحسين معيار واحد يجب أن يأتي على حساب التضحية بمعيار آخر.",
+      "en": "Traditional MCDM assumes a zero-sum system, where optimizing one criterion must come at the sacrifice of another."
+    },
+    "hint": {
+      "ar": "يعني أن المكسب في مكان هو خسارة في مكان آخر.",
+      "en": "It means a gain in one area is a loss in another."
+    },
+    "difficulty": "medium",
+    "conceptId": "multiple-criteria-decision-making"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من القيود التالية ينطبق على الانحدار الخطي (Linear Regression)؟",
+      "en": "Which of the following limitations applies to Linear Regression?"
+    },
+    "options": {
+      "ar": [
+        "يعمل بشكل أفضل مع المتغيرات الفئوية",
+        "لا يتأثر بالقيم المتطرفة",
+        "يفترض أن جميع الميزات مستقلة عن بعضها البعض",
+        "لا يتطلب توزيعاً طبيعياً لأخطاء التنبؤ"
+      ],
+      "en": [
+        "It works best with categorical variables",
+        "It is not affected by outliers",
+        "It assumes that all features are independent of each other",
+        "It does not require normal distribution of prediction errors"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يفترض الانحدار الخطي استقلالية الميزات، ويعمل فقط مع المتغيرات الرقمية، ويتأثر بشدة بالقيم المتطرفة، ويتطلب أن تكون البواقي موزعة طبيعياً.",
+      "en": "Linear regression assumes feature independence, works only with numerical variables, is highly affected by outliers, and requires normally distributed residuals."
+    },
+    "hint": {
+      "ar": "الميزات يجب ألا تكون مرتبطة ببعضها البعض بقوة.",
+      "en": "Features should not be strongly correlated with each other."
+    },
+    "difficulty": "medium",
+    "conceptId": "regression-methods"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من الطرق التالية تُستخدم لاكتشاف القيم المتطرفة متعددة المتغيرات (Multivariate outliers)؟",
+      "en": "Which of the following methods is used to detect multivariate outliers?"
+    },
+    "options": {
+      "ar": [
+        "تصنيف توكي (Tukey labeling)",
+        "DBScan",
+        "الانحدار اللوجستي",
+        "Naïve Bayes"
+      ],
+      "en": [
+        "Tukey labeling",
+        "DBScan",
+        "Logistic Regression",
+        "Naïve Bayes"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "DBScan (التجميع المكاني القائم على الكثافة) هو طريقة تُستخدم لاكتشاف القيم المتطرفة عند النظر في متغيرين أو أكثر في وقت واحد.",
+      "en": "DBScan (Density-based spatial clustering) is a method used to detect outliers when considering two or more variables at a time."
+    },
+    "hint": {
+      "ar": "خوارزمية تعتمد على 'الكثافة' (Density).",
+      "en": "An algorithm based on 'Density'."
+    },
+    "difficulty": "hard",
+    "conceptId": "detecting-outliers"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الارتباط والسببية. الإحصاء الوصفي ومعاملات الارتباط (مثل بيرسون) تخبرك فقط أن متغيرين يتحركان معاً، لكنها لا تثبت أبداً أن أحدهما يسبب الآخر. لإثبات السببية، تحتاج إلى تصميم تجريبي أو طرق استدلالية متقدمة.</template>
+    <template class="content-en">Confusing correlation with causation. Descriptive statistics and correlation coefficients (like Pearson's) only tell you that two variables move together, but they NEVER prove that one causes the other. To prove causation, you need experimental design or advanced inferential methods.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في تحليل المكونات الرئيسية (PCA)، لا تحاول تخمين عدد المكونات مسبقاً. السر هو تشغيل النموذج بكامل الميزات أولاً، ثم فحص 'نسبة التباين المفسر' (Explained Variance Ratio) لمعرفة عدد المكونات التي تحتفظ بـ 90-95% من المعلومات، ثم إعادة تشغيل النموذج بهذا العدد.</template>
+    <template class="content-en">In PCA, don't try to guess the number of components upfront. The secret is to run the model with all features first, examine the 'Explained Variance Ratio' to see how many components retain 90-95% of the information, and then rerun the model with that specific number.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نظام المجموع الصفري (Zero-sum system) في MCDM يعني المقايضة الحتمية. لا يوجد حل 'مثالي' يحسن كل شيء في نفس الوقت. إذا أردت دقة أعلى في نموذجك، قد تضطر للتضحية بالسرعة. فهم هذه المقايضات هو جوهر اتخاذ القرار الهندسي.</template>
+    <template class="content-en">The Zero-sum system in MCDM means inevitable trade-offs. There is no 'perfect' solution that optimizes everything simultaneously. If you want higher accuracy in your model, you might have to sacrifice speed. Understanding these trade-offs is the core of engineering decision-making.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الانحدار الخطي مع بيانات تحتوي على قيم متطرفة (Outliers). الانحدار الخطي (OLS) حساس جداً للقيم المتطرفة لأنها تسحب خط الانحدار نحوها بقوة، مما يفسد التنبؤات لبقية البيانات. قم دائماً باكتشاف وإزالة القيم المتطرفة قبل بناء نموذج خطي.</template>
+    <template class="content-en">Using Linear Regression on data with outliers. Linear regression (OLS) is highly sensitive to outliers because they pull the regression line strongly towards them, ruining predictions for the rest of the data. Always detect and remove outliers before building a linear model.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 3 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

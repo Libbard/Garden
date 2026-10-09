@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="13" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تحميل ومعالجة البيانات باستخدام TensorFlow · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M12.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#tensorflow-data-api" class="toc-link" data-bilingual>
+        <template class="content-ar">واجهة برمجة تطبيقات البيانات (Data API)</template>
+        <template class="content-en">TensorFlow Data API</template>
+        <span class="content-target">واجهة برمجة تطبيقات البيانات (Data API)</span>
+      </a>
+      <a href="#chaining-transformations" class="toc-link" data-bilingual>
+        <template class="content-ar">تسلسل التحويلات (Chaining Transformations)</template>
+        <template class="content-en">Chaining Transformations</template>
+        <span class="content-target">تسلسل التحويلات (Chaining Transformations)</span>
+      </a>
+      <a href="#shuffling-and-interleaving" class="toc-link" data-bilingual>
+        <template class="content-ar">الخلط والتداخل (Shuffling and Interleaving)</template>
+        <template class="content-en">Shuffling and Interleaving</template>
+        <span class="content-target">الخلط والتداخل (Shuffling and Interleaving)</span>
+      </a>
+      <a href="#prefetching-and-multithreading" class="toc-link" data-bilingual>
+        <template class="content-ar">الجلب المسبق وتعدد الخيوط (Prefetching and Multithreading)</template>
+        <template class="content-en">Prefetching and Multithreading</template>
+        <span class="content-target">الجلب المسبق وتعدد الخيوط (Prefetching and Multithreading)</span>
+      </a>
+      <a href="#tfrecord-format" class="toc-link" data-bilingual>
+        <template class="content-ar">تنسيق TFRecord</template>
+        <template class="content-en">The TFRecord Format</template>
+        <span class="content-target">تنسيق TFRecord</span>
+      </a>
+      <a href="#protocol-buffers" class="toc-link" data-bilingual>
+        <template class="content-ar">مخازن البروتوكول (Protocol Buffers - Protobufs)</template>
+        <template class="content-en">Protocol Buffers (Protobufs)</template>
+        <span class="content-target">مخازن البروتوكول (Protocol Buffers - Protobufs)</span>
+      </a>
+      <a href="#parsing-tfrecords" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل أمثلة TFRecord (Parsing Examples)</template>
+        <template class="content-en">Parsing TFRecord Examples</template>
+        <span class="content-target">تحليل أمثلة TFRecord (Parsing Examples)</span>
+      </a>
+      <a href="#sequence-example" class="toc-link" data-bilingual>
+        <template class="content-ar">مخزن بروتوكول SequenceExample</template>
+        <template class="content-en">SequenceExample Protobuf</template>
+        <span class="content-target">مخزن بروتوكول SequenceExample</span>
+      </a>
+      <a href="#tensorflow-datasets-tfds" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعات بيانات TensorFlow (TFDS)</template>
+        <template class="content-en">TensorFlow Datasets (TFDS)</template>
+        <span class="content-target">مجموعات بيانات TensorFlow (TFDS)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 13</template>
+      <template class="content-en">Module 13</template>
+      <span class="content-target">الوحدة 13</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تحميل ومعالجة البيانات باستخدام TensorFlow</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية بناء خطوط أنابيب بيانات فعالة باستخدام واجهة برمجة تطبيقات البيانات (Data API) في TensorFlow، واستخدام تنسيق TFRecord، والتعامل مع Protocol Buffers، واستخدام مكتبة TensorFlow Datasets (TFDS).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Loading and Preprocessing Data with TensorFlow</h1>
+      <p class="hero-description">This module covers building efficient data pipelines using TensorFlow's Data API, utilizing the TFRecord format, handling Protocol Buffers, and using the TensorFlow Datasets (TFDS) library.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تنسر فلو</span>
+      <span class="tag">معالجة البيانات</span>
+      <span class="tag">خطوط أنابيب البيانات</span>
+      <span class="tag">TFRecord</span>
+      <span class="tag">Protocol Buffers</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">TensorFlow</span>
+      <span class="tag">Data Preprocessing</span>
+      <span class="tag">Data Pipelines</span>
+      <span class="tag">TFRecord</span>
+      <span class="tag">Protocol Buffers</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تنفيذ واجهة برمجة تطبيقات البيانات (Data API) في TensorFlow لإنشاء خطوط أنابيب إدخال فعالة.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام تنسيق TFRecord لتخزين ومعالجة مجموعات البيانات الكبيرة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح مفهوم Protocol Buffers وكيفية استخدامها في TensorFlow.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Implement TensorFlow's Data API for creating efficient input pipelines.</span></li>
+      <li><span class="obj-icon">✦</span><span>Utilize the TFRecord format for storing and processing large datasets.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the concept of Protocol Buffers and how they are used in TensorFlow.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="tensorflow-data-api" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> واجهة برمجة تطبيقات البيانات (Data API)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> TensorFlow Data API</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هي واجهة في TensorFlow تبسط استيعاب ومعالجة مجموعات البيانات الضخمة التي لا تتسع في الذاكرة (RAM).</p><p>تخيلها كخط تجميع في مصنع يسحب المواد الخام (البيانات) ويعالجها خطوة بخطوة قبل تسليمها للآلة (النموذج).</p></template>
+    <template class="content-en"><p>An API in TensorFlow that simplifies the ingestion and preprocessing of large datasets that do not fit in RAM.</p><p>Think of it as an assembly line that pulls raw materials (data), processes them step-by-step, and feeds them to the machine (model).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتبر مجموعات البيانات التقليدية الموجودة في الذاكرة مناسبة للتدريب على نطاق صغير، ولكن مجموعات البيانات الكبيرة تمثل تحديات بسبب قيود ذاكرة الوصول العشوائي (RAM). يكمن الحل في <b>Data API</b> الخاص بـ TensorFlow.</p><p>المفاهيم الأساسية:</p><ul><li><b>Dataset:</b> تسلسل من عناصر البيانات المستخدمة لمعالجة البيانات في TensorFlow.</li><li><b>In-Memory Dataset:</b> يمكن إنشاؤه بالكامل في ذاكرة الوصول العشوائي باستخدام <code>tf.data.Dataset.from_tensor_slices()</code>.</li></ul><p>تتعامل واجهة برمجة التطبيقات هذه تلقائيًا مع الخيوط المتعددة (multithreading)، وتجميع الدفعات (batching)، والجلب المسبق (prefetching)، وقوائم الانتظار (queuing). كما يمكنها القراءة من تنسيقات ملفات مختلفة (نصوص، ثنائيات، TFRecord) ومصادر بيانات متعددة.</p></template>
+    <template class="content-en"><p>Traditional in-memory datasets work for small-scale training, but large datasets present challenges due to RAM limitations. TensorFlow's <b><span class="smart-term" data-term-en="Data API" data-ar="واجهة برمجة تطبيقات البيانات" data-en-def="TensorFlow&#x27;s toolset for building complex and efficient input pipelines.">Data API<span class="smart-term-tooltip"></span></span></b> provides the solution.</p><p>Key Concepts:</p><ul><li><b>Dataset:</b> A sequence of data items used for data processing in TensorFlow.</li><li><b>In-Memory Dataset:</b> Can be created entirely in RAM using <code>tf.data.Dataset.from_tensor_slices()</code>.</li></ul><p>The API automatically handles multithreading, batching, prefetching, and queuing. It reads from various file formats (text, binary, TFRecord) and data sources (e.g., SQL databases, BigQuery).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا صُممت Data API بهذا الشكل؟ تم تصميمها لتكون قابلة للتطوير (Scalable) ومرنة. من خلال تمثيل البيانات كتسلسل من العمليات (Graph of operations)، يمكن لـ TensorFlow تحسين التنفيذ وتوزيعه عبر وحدات المعالجة المركزية (CPUs) ووحدات معالجة الرسومات (GPUs).</p><p>تسمح الدالة <code>from_tensor_slices()</code> بتقطيع البيانات على طول البعد الأول، مما يعني أنه إذا مررت مصفوفة بأبعاد (100, 28, 28)، فستحصل على مجموعة بيانات تحتوي على 100 عنصر، كل منها بحجم (28, 28).</p></template>
+    <template class="content-en"><p>Why was the Data API designed this way? It is built for scalability and flexibility.</p><p>By representing data pipelines as a graph of operations, TensorFlow can optimize execution and distribute it across CPUs and GPUs.</p><p>The <code>from_tensor_slices()</code> function slices along the first dimension. This means if you pass a tensor of shape (100, 28, 28), you get a dataset of 100 items, each of shape (28, 28).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>X = tf.range(10) # Creating a tensor
+dataset = tf.data.Dataset.from_tensor_slices(X)
+for item in dataset:
+    print(item)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a visual pipeline of data transformations. Start with a vertical array labeled 'X' containing numbers 0 to 9. An arrow labeled 'from_tensor_slices(X)' points to a stream of individual blocks (0, 1, 2...). Next, an arrow labeled 'repeat(3)' shows this stream looping 3 times. Finally, an arrow labeled 'batch(7)' points to a cylinder grouping these blocks into chunks of 7 (e.g., [0,1,2,3,4,5,6]). Style: educational, dark background #0d1117, accent color #ff6f00, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Standard Arrowhead -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Small Arrowhead for Loop -->
+        <marker id="arrow-small" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text class="gsvg-en" x="500" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">TensorFlow Data API Pipeline</text>
+    <text class="gsvg-ar" x="500" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">خط أنابيب واجهة برمجة تطبيقات بيانات TensorFlow</text>
+
+    <!-- ================= STAGE 1: INPUT TENSOR ================= -->
+    <text class="gsvg-en" x="32" y="90" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">Input Tensor X</text>
+    <text class="gsvg-ar" x="32" y="90" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">موتر الإدخال X</text>
+    
+    <g transform="translate(20, 120)">
+        <!-- 10 blocks representing the input tensor -->
+        <rect x="0" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+        
+        <rect x="0" y="24" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="36" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">1</text>
+        
+        <rect x="0" y="48" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="60" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">2</text>
+        
+        <rect x="0" y="72" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="84" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">3</text>
+        
+        <rect x="0" y="96" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="108" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">4</text>
+        
+        <rect x="0" y="120" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="132" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">5</text>
+        
+        <rect x="0" y="144" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="156" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">6</text>
+        
+        <rect x="0" y="168" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="180" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">7</text>
+        
+        <rect x="0" y="192" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="204" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">8</text>
+        
+        <rect x="0" y="216" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="228" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">9</text>
+    </g>
+
+    <!-- ================= ARROW 1 ================= -->
+    <line x1="55" y1="240" x2="195" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="125" y="230" text-anchor="middle" font-family="monospace" font-size="13" font-weight="600" fill="var(--brand-ink-strong)">from_tensor_slices(X)</text>
+
+    <!-- ================= STAGE 2: SLICES ================= -->
+    <text class="gsvg-en" x="290" y="190" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">Dataset Elements</text>
+    <text class="gsvg-ar" x="290" y="190" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">عناصر مجموعة البيانات</text>
+
+    <g transform="translate(210, 228)">
+        <rect x="0" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+        
+        <rect x="28" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="40" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">1</text>
+        
+        <rect x="56" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="68" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">2</text>
+        
+        <rect x="84" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="96" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">3</text>
+        
+        <rect x="112" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="124" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">4</text>
+        
+        <rect x="140" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="152" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">5</text>
+        
+        <text x="175" y="12" dy="0.35em" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-muted)">...</text>
+    </g>
+
+    <!-- ================= ARROW 2 ================= -->
+    <line x1="405" y1="240" x2="495" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="450" y="230" text-anchor="middle" font-family="monospace" font-size="14" font-weight="600" fill="var(--brand-ink-strong)">repeat(3)</text>
+
+    <!-- ================= STAGE 3: REPEAT ================= -->
+    <text class="gsvg-en" x="590" y="190" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">Repeated Stream</text>
+    <text class="gsvg-ar" x="590" y="190" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">تدفق مكرر</text>
+
+    <g transform="translate(510, 228)">
+        <rect x="0" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">8</text>
+        
+        <rect x="28" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="40" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">9</text>
+        
+        <!-- Loop Separator and Arc -->
+        <line x1="54" y1="-10" x2="54" y2="34" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 2" />
+        <path d="M 40 -8 Q 54 -25 68 -8" fill="none" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-small)" />
+        
+        <rect x="56" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="68" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+        
+        <rect x="84" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="96" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">1</text>
+        
+        <rect x="112" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="124" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">2</text>
+        
+        <rect x="140" y="0" width="24" height="24" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="4" />
+        <text x="152" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">3</text>
+        
+        <text x="175" y="12" dy="0.35em" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-muted)">...</text>
+    </g>
+
+    <!-- ================= ARROW 3 ================= -->
+    <line x1="705" y1="240" x2="775" y2="240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="740" y="230" text-anchor="middle" font-family="monospace" font-size="14" font-weight="600" fill="var(--brand-ink-strong)">batch(7)</text>
+
+    <!-- ================= STAGE 4: BATCH ================= -->
+    <text class="gsvg-en" x="888" y="120" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">Batched Dataset</text>
+    <text class="gsvg-ar" x="888" y="120" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-secondary)">مجموعة بيانات مجمعة</text>
+
+    <g transform="translate(790, 158)">
+        <!-- Batch 1 -->
+        <rect x="0" y="0" width="196" height="44" rx="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <g transform="translate(7, 10)">
+            <rect x="0" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+            <rect x="26" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="38" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">1</text>
+            <rect x="52" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="64" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">2</text>
+            <rect x="78" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="90" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">3</text>
+            <rect x="104" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="116" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">4</text>
+            <rect x="130" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="142" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">5</text>
+            <rect x="156" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="168" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">6</text>
+        </g>
+
+        <!-- Batch 2 -->
+        <rect x="0" y="60" width="196" height="44" rx="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <g transform="translate(7, 70)">
+            <rect x="0" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">7</text>
+            <rect x="26" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="38" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">8</text>
+            <rect x="52" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="64" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">9</text>
+            <rect x="78" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="90" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+            <rect x="104" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="116" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">1</text>
+            <rect x="130" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="142" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">2</text>
+            <rect x="156" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="168" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">3</text>
+        </g>
+
+        <!-- Batch 3 (Faded/Dashed to indicate continuation) -->
+        <rect x="0" y="120" width="196" height="44" rx="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" opacity="0.6" />
+        <g transform="translate(7, 130)" opacity="0.6">
+            <rect x="0" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="12" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">4</text>
+            <rect x="26" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="38" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">5</text>
+            <rect x="52" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="64" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">6</text>
+            <rect x="78" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="90" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">7</text>
+            <rect x="104" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="116" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">8</text>
+            <rect x="130" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="142" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">9</text>
+            <rect x="156" y="0" width="24" height="24" fill="var(--bg-surface)" stroke="var(--border-color)" rx="4" />
+            <text x="168" y="12" dy="0.35em" text-anchor="middle" font-size="13" fill="var(--text-primary)">0</text>
+        </g>
+        
+        <!-- Vertical Ellipsis -->
+        <text x="98" y="185" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-muted)">⋮</text>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>tf.data (Data API)</th><th>TFDS (TensorFlow Datasets)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الغرض الأساسي</template>
+          <template class="content-en">Primary Purpose</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بناء خطوط أنابيب مخصصة من بياناتك الخاصة</template>
+          <template class="content-en">Building custom pipelines from your own data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تنزيل واستخدام مجموعات البيانات العامة الجاهزة</template>
+          <template class="content-en">Downloading and using ready-made public datasets</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المرونة</template>
+          <template class="content-en">Flexibility</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية جدًا (تحكم كامل في التحويلات)</template>
+          <template class="content-en">Very high (full control over transformations)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">محدودة بالبيانات المتوفرة في المكتبة</template>
+          <template class="content-en">Limited to datasets available in the library</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمت <code>from_tensor_slices</code> على مصفوفة ثنائية الأبعاد (Matrix)؟</template>
+      <template class="content-en">What happens if you use <code>from_tensor_slices</code> on a 2D tensor (Matrix)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم تقطيع المصفوفة على طول البعد الأول (الصفوف)، مما ينتج عنه مجموعة بيانات حيث كل عنصر هو متجه أحادي البعد (صف من المصفوفة).</p></template>
+      <template class="content-en"><p>The matrix will be sliced along the first dimension (rows), resulting in a dataset where each item is a 1D tensor (a row of the matrix).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="chaining-transformations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تسلسل التحويلات (Chaining Transformations)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Chaining Transformations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هي عملية ربط عدة دوال معالجة (مثل التكرار، التجميع، التصفية) معًا لإنشاء خط أنابيب بيانات متكامل.</p><p>تشبه وضع عدة فلاتر متتالية لتنقية المياه؛ كل فلتر يؤدي وظيفة محددة ويمرر النتيجة للفلتر التالي.</p></template>
+    <template class="content-en"><p>The process of linking multiple processing methods (like repeat, batch, filter) together to create a complete data pipeline.</p><p>Similar to placing multiple water filters in a sequence; each performs a specific task and passes the result to the next.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تحويل مجموعات البيانات عن طريق تسلسل الطرق (Chaining methods). تشمل الطرق الشائعة ما يلي:</p><ul><li><code>repeat(n)</code>: يكرر مجموعة البيانات n من المرات دون نسخ البيانات في الذاكرة.</li><li><code>batch(n)</code>: يجمع عناصر مجموعة البيانات في دفعات (Batches) بحجم n.</li><li><code>map(func)</code>: يطبق دالة تحويل على كل عنصر في مجموعة البيانات.</li><li><code>filter(cond)</code>: يصفي عناصر مجموعة البيانات بناءً على شرط معين.</li><li><code>take(n)</code>: يعرض أو يأخذ عددًا محدودًا (n) من العناصر.</li></ul></template>
+    <template class="content-en"><p>Datasets can be transformed by chaining methods. Common methods include:</p><ul><li><code>repeat(n)</code>: Repeats the dataset n times without copying data in memory.</li><li><code>batch(n)</code>: Groups dataset items into batches of size n.</li><li><code>map(func)</code>: Applies a transformation function to each dataset item.</li><li><code>filter(cond)</code>: Filters dataset items based on a condition.</li><li><code>take(n)</code>: Views or takes a limited number (n) of items.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ترتيب تسلسل التحويلات مهم جدًا. على سبيل المثال، <code>dataset.repeat(3).batch(7)</code> يختلف عن <code>dataset.batch(7).repeat(3)</code>.</p><ul><li><strong>في الحالة الأولى</strong>، إذا كان حجم البيانات لا يقبل القسمة على 7، فإن الدفعة الأخيرة من التكرار الأول ستندمج مع بداية التكرار الثاني.</li><li><strong>في الحالة الثانية</strong>، سيتم تكرار الدفعات كما هي، مما قد يؤدي إلى دفعات غير مكتملة في نهاية كل تكرار.</li></ul><p>دالة <code>map()</code> مفيدة جدًا لتطبيق عمليات المعالجة المسبقة المعقدة، مثل فك تشفير الصور أو تسوية البيانات (Normalization).</p></template>
+    <template class="content-en"><p>The order of chained transformations is crucial. For example, <code>dataset.repeat(3).batch(7)</code> is different from <code>dataset.batch(7).repeat(3)</code>.</p><ul><li><strong>In the first case</strong>, if the dataset size isn't divisible by 7, the last batch of the first repeat will merge with the start of the second repeat.</li><li><strong>In the second case</strong>, the batches are repeated as-is, potentially leading to incomplete batches at the end of every repeat.</li></ul><p>The <code>map()</code> function is highly useful for applying complex preprocessing operations, such as decoding images or normalizing data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>dataset = dataset.repeat(3).batch(7)
+# Iterating Over Batches:
+for item in dataset:
+    print(item)
+# Batch 1: [0 1 2 3 4 5 6]
+# Batch 2: [7 8 9 0 1 2 3]
+# Final Batch: [8 9] (last batch has fewer items)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>dataset = dataset.map(lambda x: x * 2) # Doubles the items
+dataset = dataset.filter(lambda x: x &lt; 10) # Keeps items less than 10</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم <code>take(3)</code> بدلاً من طباعة مجموعة البيانات بأكملها أثناء التصحيح (Debugging)؟</template>
+      <template class="content-en">Why use <code>take(3)</code> instead of printing the whole dataset during debugging?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مجموعات البيانات غالبًا ما تكون ضخمة جدًا (أو لا نهائية إذا استخدمنا repeat). استخدام take(3) يسمح لنا بفحص عينة صغيرة بسرعة دون استهلاك الذاكرة أو الوقت.</p></template>
+      <template class="content-en"><p>Because datasets are often massive (or infinite if repeat is used). Using take(3) allows us to quickly inspect a small sample without consuming excessive memory or time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="shuffling-and-interleaving" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الخلط والتداخل (Shuffling and Interleaving)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Shuffling and Interleaving</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنيات لضمان عشوائية البيانات أثناء التدريب، وهو أمر بالغ الأهمية لخوارزمية الانحدار المتدرج (Gradient Descent).</p><p>مثل خلط أوراق اللعب جيدًا قبل توزيعها لضمان عدم وجود نمط متوقع.</p></template>
+    <template class="content-en"><p>Techniques to ensure data randomization during training, which is crucial for Gradient Descent.</p><p>Like shuffling a deck of cards thoroughly before dealing to ensure no predictable pattern exists.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتطلب الانحدار المتدرج أن تكون مثيلات التدريب مستقلة وموزعة بشكل متطابق (IID). تساعد طريقة <code>shuffle()</code> في TensorFlow على ضمان عشوائية مجموعة البيانات.</p><p><b>كيف يعمل shuffle():</b></p><ol><li>يتم ملء مخزن مؤقت (Buffer) بعناصر من مجموعة البيانات المصدر.</li><li>يتم سحب عنصر عشوائيًا من المخزن المؤقت واستبداله بعنصر جديد.</li><li>يستمر هذا حتى تتم معالجة مجموعة البيانات بأكملها.</li></ol><p><b>التداخل (Interleaving):</b> لخلط مجموعات البيانات الكبيرة التي لا تتسع في الذاكرة، فإن المخزن المؤقت للخلط وحده قد لا يكون كافيًا. الاستراتيجية الشائعة هي تقسيم مجموعة البيانات إلى ملفات متعددة وقراءتها بترتيب عشوائي باستخدام طريقة <code>interleave()</code>، والتي تقرأ من عدة ملفات في وقت واحد وتتداخل خطوطها.</p></template>
+    <template class="content-en"><p>Gradient Descent requires training instances to be independent and identically distributed (IID). The <code>shuffle()</code> method in TensorFlow helps ensure randomization of the dataset.</p><p><b>How shuffle() works:</b></p><ol><li>A buffer is filled with items from the source dataset.</li><li>An item is randomly pulled from the buffer and replaced with a fresh item.</li><li>This continues until the entire dataset has been processed.</li></ol><p><b>Interleaving:</b> For shuffling large datasets that do not fit in memory, a shuffling buffer alone may not be sufficient. A common strategy is splitting the dataset into multiple files and reading them in a random order using the <code>interleave()</code> method, which reads from a few files at a time and interleaves their lines.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Buffer Size" data-ar="حجم المخزن المؤقت" data-en-def="The number of elements from the dataset that the shuffle algorithm samples from.">حجم المخزن المؤقت<span class="smart-term-tooltip"></span></span> (Buffer size) في <code>shuffle()</code> أمر بالغ الأهمية. يجب أن يكون كبيرًا بما يكفي لضمان خلط فعال، ولكنه يجب ألا يتجاوز ذاكرة الوصول العشوائي (RAM) المتاحة. إذا كان حجم المخزن المؤقت 1، فلن يحدث أي خلط.</p><p>عند استخدام <code>interleave()</code>، يمكنك تمكين التوازي (Parallelism) باستخدام المعلمة <code>num_parallel_calls</code>، مما يسمح بقراءة ملفات متعددة في وقت واحد باستخدام نوى معالجة (CPU cores) متعددة، مما يقلل من عنق الزجاجة في الإدخال/الإخراج (I/O bottleneck).</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Buffer Size" data-ar="حجم المخزن المؤقت" data-en-def="The number of elements from the dataset that the shuffle algorithm samples from.">buffer size<span class="smart-term-tooltip"></span></span> in <code>shuffle()</code> is critical. It must be large enough for efficient shuffling but should not exceed available RAM. If the buffer size is 1, no shuffling occurs.</p><p>When using <code>interleave()</code>, you can enable parallelism with the <code>num_parallel_calls</code> parameter. This allows reading multiple files concurrently using multiple CPU cores, significantly reducing I/O bottlenecks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def csv_reader_dataset(filepaths):
+    dataset = tf.data.Dataset.list_files(filepaths).repeat()
+    dataset = dataset.interleave(lambda filepath: tf.data.TextLineDataset(filepath).skip(1), num_parallel_calls=tf.data.AUTOTUNE)
+    dataset = dataset.shuffle(buffer_size=10000)
+    return dataset</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نكتفي بـ <code>shuffle()</code> فقط لمجموعات البيانات الضخمة (مثل 1 تيرابايت)؟</template>
+      <template class="content-en">Why can't we just rely on <code>shuffle()</code> for massive datasets (e.g., 1 TB)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن <code>shuffle()</code> يتطلب تحميل البيانات في مخزن مؤقت في الذاكرة (RAM). مجموعة بيانات بحجم 1 تيرابايت ستتجاوز سعة الذاكرة، لذا نستخدم <code>interleave()</code> لخلط البيانات على مستوى الملفات أولاً.</p></template>
+      <template class="content-en"><p>Because <code>shuffle()</code> requires loading data into an in-memory buffer. A 1 TB dataset would exceed RAM capacity, so we use <code>interleave()</code> to shuffle data at the file level first.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="prefetching-and-multithreading" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الجلب المسبق وتعدد الخيوط (Prefetching and Multithreading)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Prefetching and Multithreading</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنيات لتحسين الأداء تضمن عدم بقاء وحدة معالجة الرسومات (GPU) عاطلة عن العمل في انتظار البيانات.</p><p>مثل طاهٍ (GPU) لديه مساعد (CPU) يجهز له المكونات التالية مسبقًا، فلا يضطر الطاهي للتوقف عن الطبخ أبدًا.</p></template>
+    <template class="content-en"><p>Performance optimization techniques that ensure the GPU never sits idle waiting for data.</p><p>Like a chef (GPU) having an assistant (CPU) who prepares the next ingredients in advance, so the chef never stops cooking.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحقيق أقصى استفادة من الأجهزة، يجب تحسين خط أنابيب البيانات:</p><ul><li><b><span class="smart-term" data-term-en="Prefetching" data-ar="الجلب المسبق" data-en-def="Loading data for the next step while the current step is still executing.">الجلب المسبق<span class="smart-term-tooltip"></span></span> (Prefetching):</b> يسرع التدريب عن طريق إبقاء الدفعة التالية جاهزة بينما يعالج النموذج الدفعة الحالية. يتم ذلك باستخدام <code>dataset.prefetch(1)</code>، والذي يجلب دفعة واحدة في كل مرة.</li><li><b>تعدد الخيوط (Multithreading):</b> يستخدم نوى وحدة المعالجة المركزية (CPU) المتعددة لتحميل البيانات ومعالجتها مسبقًا بالتوازي، مما يزيد من استخدام وحدة معالجة الرسومات (GPU).</li></ul></template>
+    <template class="content-en"><p>To maximize hardware utilization, the data pipeline must be optimized:</p><ul><li><b><span class="smart-term" data-term-en="Prefetching" data-ar="الجلب المسبق" data-en-def="Loading data for the next step while the current step is still executing.">Prefetching<span class="smart-term-tooltip"></span></span>:</b> Speeds up training by keeping the next batch ready while the model processes the current one. This is done using <code>dataset.prefetch(1)</code>, which prefetches one batch at a time.</li><li><b>Multithreading:</b> Uses multiple CPU cores to load and preprocess data in parallel, maximizing GPU utilization.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون الجلب المسبق، تقوم وحدة المعالجة المركزية (CPU) بإعداد البيانات، ثم تقوم وحدة معالجة الرسومات (GPU) بالتدريب، مما يعني أن أحدهما يكون دائمًا في حالة خمول. مع الجلب المسبق، تعمل وحدة المعالجة المركزية ووحدة معالجة الرسومات بالتوازي.</p><p>غالبًا ما يتم استخدام <code>tf.data.AUTOTUNE</code> مع <code>prefetch()</code> و <code>num_parallel_calls</code> للسماح لـ TensorFlow بتحديد العدد الأمثل للخيوط وحجم المخزن المؤقت ديناميكيًا بناءً على موارد النظام المتاحة في وقت التشغيل.</p></template>
+    <template class="content-en"><p>Without prefetching, the CPU prepares data, then the GPU trains, meaning one is always idle. With prefetching, the CPU and GPU work in parallel.</p><p><code>tf.data.AUTOTUNE</code> is often used with <code>prefetch()</code> and <code>num_parallel_calls</code> to allow TensorFlow to dynamically determine the optimal number of threads and buffer size based on available system resources at runtime.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>dataset = dataset.map(preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+dataset = dataset.batch(32).prefetch(tf.data.AUTOTUNE)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أين يجب وضع <code>prefetch()</code> في خط أنابيب البيانات؟</template>
+      <template class="content-en">Where should <code>prefetch()</code> be placed in the data pipeline?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب أن يكون <code>prefetch()</code> دائمًا هو التحويل الأخير في خط الأنابيب (بعد التجميع batching) لضمان جلب الدفعات النهائية الجاهزة للنموذج.</p></template>
+      <template class="content-en"><p><code>prefetch()</code> should almost always be the very last transformation in the pipeline (after batching) to ensure the final, ready-to-use batches are fetched for the model.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tfrecord-format" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تنسيق TFRecord</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> The TFRecord Format</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هو التنسيق الثنائي المفضل لدى TensorFlow لتخزين كميات كبيرة من البيانات وقراءتها بكفاءة.</p><p>فكر فيه كحاوية شحن قياسية (Container) مصممة خصيصًا لتتحرك بسرعة فائقة عبر موانئ TensorFlow.</p></template>
+    <template class="content-en"><p>TensorFlow’s preferred binary format for storing and efficiently reading large amounts of data.</p><p>Think of it as a standardized shipping container designed specifically to move at lightning speed through TensorFlow's ports.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>TFRecord</b> هو تنسيق ثنائي (Binary format) يتكون من سجلات ثنائية بأحجام مختلفة. يحتوي كل سجل على:</p><ol><li>طول السجل (Length).</li><li>مجموع اختباري CRC لاكتشاف الأخطاء في الطول.</li><li>البيانات الفعلية (Actual data).</li><li>مجموع اختباري CRC آخر لاكتشاف الأخطاء في البيانات.</li></ol><p>لإنشاء ملف TFRecord، نستخدم فئة <code>tf.io.TFRecordWriter</code>. ولقراءة الملفات، نستخدم <code>tf.data.TFRecordDataset</code>. كما يدعم التنسيق ضغط البيانات (مثل GZIP) وهو مفيد جدًا عند تحميل البيانات عبر الشبكة.</p></template>
+    <template class="content-en"><p><b>TFRecord</b> is a binary format consisting of binary records of varying sizes. Each record contains:</p><ol><li>A length.</li><li>A <span class="smart-term" data-term-en="CRC Checksum" data-ar="المجموع الاختباري CRC" data-en-def="Cyclic Redundancy Check, an error-detecting code used to detect accidental changes to raw data.">CRC checksum<span class="smart-term-tooltip"></span></span> for error detection (for the length).</li><li>The actual data.</li><li>Another CRC checksum for the data.</li></ol><p>To create a TFRecord file, use the <code>tf.io.TFRecordWriter</code> class. To read them, use <code>tf.data.TFRecordDataset</code>. The format also supports compression (like GZIP), which is highly useful when data is loaded via a network.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم تنسيقًا ثنائيًا بدلاً من CSV أو JSON؟ التنسيقات النصية بطيئة في التحليل (Parsing) وتستهلك مساحة أكبر. تنسيق TFRecord يجمع البيانات في كتل متجاورة في الذاكرة، مما يجعله مثاليًا لعمليات الإدخال/الإخراج المتسلسلة السريعة (Sequential I/O) التي تتطلبها وحدات معالجة الرسومات.</p><p>عند استخدام الضغط (Compression)، يجب تحديد نوع الضغط عند الكتابة وعند القراءة باستخدام <code>tf.io.TFRecordOptions</code>.</p></template>
+    <template class="content-en"><p>Why use a binary format instead of CSV or JSON? Text formats are slow to parse and consume more space. TFRecord packs data into contiguous memory blocks, making it ideal for the fast sequential I/O required by GPUs.</p><p>When using compression, the compression type must be specified both when writing and reading using <code>tf.io.TFRecordOptions</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>with tf.io.TFRecordWriter("my_data.tfrecord") as f:
+    f.write(b"This is the first record")
+    f.write(b"And this is the second record")
+
+# Reading
+dataset = tf.data.TFRecordDataset(["my_data.tfrecord"])
+for item in dataset:
+    print(item)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>options = tf.io.TFRecordOptions(compression_type="GZIP")
+with tf.io.TFRecordWriter("my_compressed.tfrecord", options) as f:
+    f.write(b"Compressed data")
+
+dataset = tf.data.TFRecordDataset(["my_compressed.tfrecord"], compression_type="GZIP")</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن قراءة ملفات TFRecord متعددة بالتوازي؟</template>
+      <template class="content-en">Can multiple TFRecord files be read in parallel?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، يمكن قراءة ملفات متعددة بالتوازي عن طريق تعيين <code>num_parallel_reads</code> في <code>TFRecordDataset</code>، أو باستخدام <code>list_files()</code> مع <code>interleave()</code>.</p></template>
+      <template class="content-en"><p>Yes, multiple files can be read in parallel by setting <code>num_parallel_reads</code> in <code>TFRecordDataset</code>, or by using <code>list_files()</code> with <code>interleave()</code>.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="protocol-buffers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مخازن البروتوكول (Protocol Buffers - Protobufs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Protocol Buffers (Protobufs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنسيق ثنائي مدمج وقابل للتوسيع طورته Google لتسلسل البيانات المهيكلة (Serialization).</p><p>يشبه XML أو JSON ولكنه أصغر حجمًا وأسرع بكثير في المعالجة.</p></template>
+    <template class="content-en"><p>A compact, extensible binary format developed by Google for serializing structured data.</p><p>Similar to XML or JSON, but much smaller and faster to process.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقوم ملفات TFRecord عادةً بتخزين <b>Protocol Buffers</b> متسلسلة. Protobufs هو تنسيق ثنائي يستخدم على نطاق واسع في Google، خاصة في gRPC.</p><p>في TensorFlow، يتم استخدام رسالة protobuf محددة تسمى <code>Example</code> لتمثيل مثيلات مجموعة البيانات. تحتوي رسالة <code>Example</code> على ميزات مسماة (Named features)، يتم تمثيل كل منها كقائمة من السلاسل النصية (Byte strings) أو الأرقام العشرية (Floats) أو الأعداد الصحيحة (Integers).</p></template>
+    <template class="content-en"><p>TFRecord files usually store serialized <b>Protocol Buffers</b>. Protobufs are a compact, extensible binary format used extensively at Google, particularly in gRPC.</p><p>In TensorFlow, a specific protobuf message called <code>Example</code> is used to represent dataset instances. An <code>Example</code> contains named features, each represented as a list of byte strings, floats, or integers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لإنشاء protobuf، تقوم أولاً بتعريف الهيكل في ملف <code>.proto</code>، ثم تقوم بتجميعه (Compile) لإنشاء فئات Python.</p><p>ومع ذلك، يوفر TensorFlow فئات جاهزة مثل <code>tf.train.Example</code> و <code>tf.train.Feature</code> لتخطي خطوة التجميع للبيانات القياسية.</p><p>يتم تحويل كائن <code>Example</code> إلى سلسلة بايتات (Byte string) باستخدام طريقة <code>SerializeToString()</code> قبل كتابته في ملف TFRecord.</p></template>
+    <template class="content-en"><p>To create a protobuf, you typically define the structure in a <code>.proto</code> file and compile it to generate Python classes. However, TensorFlow provides pre-built classes like <code>tf.train.Example</code> and <code>tf.train.Feature</code> to skip the compilation step for standard data.</p><p>The <code>Example</code> object is converted to a byte string using the <code>SerializeToString()</code> method before being written to a TFRecord file.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from tensorflow.train import BytesList, Int64List, Feature, Features, Example
+
+person_example = Example(
+    features=Features(
+        feature={
+            "name": Feature(bytes_list=BytesList(value=[b"Alice"])),
+            "id": Feature(int64_list=Int64List(value=[123])),
+            "emails": Feature(bytes_list=BytesList(value=[b"a@b.com", b"c@d.com"]))
+        }
+    )
+)
+
+with tf.io.TFRecordWriter("my_contacts.tfrecord") as f:
+    f.write(person_example.SerializeToString())</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم <code>BytesList</code> و <code>Int64List</code> بدلاً من تمرير القيم مباشرة؟</template>
+      <template class="content-en">Why do we use <code>BytesList</code> and <code>Int64List</code> instead of passing values directly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مخطط (Schema) رسالة <code>Feature</code> في Protobuf الخاص بـ TensorFlow يتطلب تحديد نوع البيانات بوضوح (بايتات، أعداد صحيحة، أو أرقام عشرية) كقوائم، لضمان التوافق الصارم والكفاءة أثناء التحليل.</p></template>
+      <template class="content-en"><p>Because the schema of the <code>Feature</code> message in TensorFlow's Protobuf strictly requires specifying the data type (bytes, int64, or float) as lists, ensuring strict compatibility and efficiency during parsing.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="parsing-tfrecords" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تحليل أمثلة TFRecord (Parsing Examples)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Parsing TFRecord Examples</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تحويل السلاسل الثنائية (Byte strings) المقروءة من ملف TFRecord مرة أخرى إلى موترات (Tensors) قابلة للاستخدام في TensorFlow.</p><p>مثل فك تشفير رسالة سرية باستخدام قاموس (وصف الميزات) لفهم محتواها.</p></template>
+    <template class="content-en"><p>The process of converting binary byte strings read from a TFRecord file back into usable TensorFlow Tensors.</p><p>Like decoding a secret message using a dictionary (feature description) to understand its content.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لقراءة رسائل <code>Example</code> المتسلسلة، نستخدم <code>tf.data.TFRecordDataset</code>. ومع ذلك، فإن هذا يعيد سلاسل بايتات خام. لتحليلها، نستخدم الدالة <code>tf.io.parse_single_example()</code>.</p><p>تتطلب هذه الدالة قاموسًا يسمى <b>وصف الميزة (Feature Description)</b>، والذي يخبر TensorFlow بكيفية تحليل كل ميزة. نستخدم:</p><ul><li><code>tf.io.FixedLenFeature</code>: للميزات ذات الطول الثابت (مثل المعرف ID).</li><li><code>tf.io.VarLenFeature</code>: للميزات ذات الطول المتغير (مثل قائمة رسائل البريد الإلكتروني).</li></ul></template>
+    <template class="content-en"><p>To read serialized <code>Example</code> protobufs, we use <code>tf.data.TFRecordDataset</code>. However, this returns raw byte strings. To parse them, we use <code>tf.io.parse_single_example()</code>.</p><p>This function requires a dictionary called a <b>feature description</b>, which tells TensorFlow how to parse each feature. We use:</p><ul><li><code>tf.io.FixedLenFeature</code>: For features with a fixed length (like an ID).</li><li><code>tf.io.VarLenFeature</code>: For features with a variable length (like a list of emails).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لتحسين الأداء، من الأفضل تحليل البيانات في دفعات (Batches) بدلاً من عنصر واحد في كل مرة. يتم ذلك باستخدام <code>tf.io.parse_example()</code> بعد تجميع مجموعة البيانات باستخدام <code>batch()</code>.</p><p>تقوم <code>VarLenFeature</code> بإرجاع مصفوفة متناثرة (SparseTensor) لأن أطوال القوائم قد تختلف من مثال لآخر. يمكن تحويلها إلى مصفوفة كثيفة (DenseTensor) باستخدام <code>tf.sparse.to_dense()</code> إذا لزم الأمر.</p></template>
+    <template class="content-en"><p>For better performance, it is preferable to parse data in batches rather than one item at a time. This is done using <code>tf.io.parse_example()</code> after batching the dataset with <code>batch()</code>.</p><p><code>VarLenFeature</code> returns a <code>SparseTensor</code> because the lengths of the lists may vary across examples. It can be converted to a dense tensor using <code>tf.sparse.to_dense()</code> if needed.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>feature_description = {
+    "name": tf.io.FixedLenFeature([], tf.string, default_value=""),
+    "id": tf.io.FixedLenFeature([], tf.int64, default_value=0),
+    "emails": tf.io.VarLenFeature(tf.string),
+}
+
+dataset = tf.data.TFRecordDataset(["my_contacts.tfrecord"])
+for serialized_example in dataset:
+    parsed_example = tf.io.parse_single_example(serialized_example, feature_description)
+    print(parsed_example)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>dataset = tf.data.TFRecordDataset(["my_contacts.tfrecord"]).batch(10)
+for serialized_examples in dataset:
+    parsed_examples = tf.io.parse_example(serialized_examples, feature_description)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا لم تحدد <code>default_value</code> في <code>FixedLenFeature</code> وكانت الميزة مفقودة في البيانات؟</template>
+      <template class="content-en">What happens if you don't specify a <code>default_value</code> in <code>FixedLenFeature</code> and the feature is missing in the data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيقوم TensorFlow بإلقاء خطأ (Exception) أثناء التحليل، لأن <code>FixedLenFeature</code> يتوقع وجود القيمة ما لم يتم توفير قيمة افتراضية.</p></template>
+      <template class="content-en"><p>TensorFlow will raise an exception during parsing, because <code>FixedLenFeature</code> expects the value to be present unless a default value is provided.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="sequence-example" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> مخزن بروتوكول SequenceExample</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> SequenceExample Protobuf</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نوع خاص من Protobuf في TensorFlow مصمم للتعامل مع البيانات المتسلسلة المعقدة، مثل قوائم القوائم.</p><p>مفيد جدًا في معالجة اللغات الطبيعية (NLP) حيث يتكون المستند من جمل، وكل جملة تتكون من كلمات.</p></template>
+    <template class="content-en"><p>A special type of Protobuf in TensorFlow designed to handle complex sequential data, like lists of lists.</p><p>Highly useful in Natural Language Processing (NLP) where a document consists of sentences, and each sentence consists of words.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>للتعامل مع مجموعات البيانات الأكثر تعقيدًا (على سبيل المثال، قوائم القوائم مثل المستندات التي تحتوي على جمل وتعليقات متعددة)، يوفر TensorFlow مخزن البروتوكول <code>SequenceExample</code>.</p><p>يحتوي <code>SequenceExample</code> على جزأين رئيسيين:</p><ol><li><b>context:</b> يحتوي على بيانات غير متسلسلة (مثل المؤلف، تاريخ النشر).</li><li><b>feature_lists:</b> يحتوي على <span class="smart-term" data-term-en="Sequence Data" data-ar="البيانات المتسلسلة" data-en-def="Data where the order of elements matters, such as time series or text.">البيانات المتسلسلة<span class="smart-term-tooltip"></span></span> (مثل قائمة الجمل، حيث كل جملة هي قائمة من الكلمات).</li></ol></template>
+    <template class="content-en"><p>For handling more complex datasets (e.g., lists of lists like documents with multiple sentences and comments), TensorFlow provides the <code>SequenceExample</code> protobuf.</p><p>A <code>SequenceExample</code> contains two main parts:</p><ol><li><b>context:</b> Contains non-sequential data (e.g., author, publication date).</li><li><b>feature_lists:</b> Contains the sequential data (e.g., a list of sentences, where each sentence is a list of words).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لتحليل <code>SequenceExample</code>، نستخدم الدالة <code>tf.io.parse_single_sequence_example()</code> أو <code>tf.io.parse_sequence_example()</code> للتحليل المجمع. تتطلب هذه الدوال قاموسين منفصلين لوصف الميزات: أحدهما للسياق (context) والآخر لقوائم الميزات (feature_lists).</p><p>هذا الهيكل ضروري للنماذج المتسلسلة مثل الشبكات العصبية المتكررة (RNNs) والمحولات (Transformers) التي تتطلب إدخال بيانات ذات أبعاد زمنية متغيرة.</p></template>
+    <template class="content-en"><p>To parse a <code>SequenceExample</code>, we use <code>tf.io.parse_single_sequence_example()</code> or <code>tf.io.parse_sequence_example()</code> for batch parsing. These functions require two separate feature description dictionaries: one for the context and one for the feature_lists.</p><p>This structure is essential for sequential models like RNNs and Transformers that require input data with variable time dimensions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>protobuf</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>message FeatureList { repeated Feature feature = 1; };
+message FeatureLists { map&lt;string, FeatureList&gt; feature_list = 1; };
+message SequenceExample {
+    Features context = 1;
+    FeatureLists feature_lists = 2;
+};</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تختار استخدام <code>SequenceExample</code> بدلاً من <code>Example</code> العادي؟</template>
+      <template class="content-en">When would you choose to use <code>SequenceExample</code> instead of a regular <code>Example</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تحتوي بياناتك على تسلسلات ذات أطوال متغيرة متداخلة (مثل مستند يحتوي على عدد متغير من الجمل، وكل جملة لها عدد متغير من الكلمات). <code>Example</code> العادي يدعم فقط قائمة واحدة متغيرة الطول.</p></template>
+      <template class="content-en"><p>When your data contains nested variable-length sequences (e.g., a document with a variable number of sentences, and each sentence has a variable number of words). A regular <code>Example</code> only supports a single variable-length list.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tensorflow-datasets-tfds" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> مجموعات بيانات TensorFlow (TFDS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> TensorFlow Datasets (TFDS)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مشروع ومكتبة تبسط عملية تنزيل وإعداد مجموعات البيانات الشائعة للتعلم الآلي.</p><p>مثل متجر تطبيقات جاهز للبيانات؛ بدلاً من البحث عن البيانات وتنظيفها بنفسك، يمكنك تحميلها بسطر كود واحد.</p></template>
+    <template class="content-en"><p>A project and library that simplifies downloading and preparing common datasets for machine learning.</p><p>Like an app store for data; instead of finding and cleaning data yourself, you load it with a single line of code.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يبسط <b>TFDS</b> تنزيل وإعداد مجموعات البيانات الشائعة (صور، نصوص، صوت، فيديو). يتم تثبيته عبر <code>pip install tensorflow-datasets</code>.</p><p>يمكنك تنزيل وتحميل مجموعات البيانات بسهولة باستخدام <code>tfds.load()</code>. بشكل افتراضي، يُرجع TFDS قاموسًا يحتوي على الميزات والتسميات (Labels). نظرًا لأن Keras يتطلب تنسيق صف (Tuple) من <code>(features, labels)</code>، يمكنك إما استخدام <code>map()</code> لتحويل القاموس، أو ببساطة تعيين <code>as_supervised=True</code> عند التحميل.</p></template>
+    <template class="content-en"><p><b>TFDS</b> simplifies downloading and preparing common datasets (images, text, audio, video). It is installed via <code>pip install tensorflow-datasets</code>.</p><p>You can download and load datasets easily with <code>tfds.load()</code>. By default, TFDS returns a dictionary containing features and labels. Since Keras requires a tuple format of <code>(features, labels)</code>, you can either use <code>map()</code> to transform the dictionary, or simply set <code>as_supervised=True</code> when loading.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يقوم TFDS بتنزيل البيانات وتخزينها مؤقتًا محليًا بتنسيق TFRecord افتراضيًا، مما يضمن أداءً عاليًا عند قراءتها لاحقًا. كما يوفر معلومات وصفية (Metadata) غنية عن مجموعة البيانات من خلال كائن <code>DatasetInfo</code>.</p><p>يمكن دمج مجموعات بيانات TFDS مباشرة مع طرق Data API مثل <code>repeat()</code> و <code>batch()</code> و <code>prefetch()</code> لإنشاء خط أنابيب تدريب كامل وفعال يغذي نماذج Keras مباشرة.</p></template>
+    <template class="content-en"><p>TFDS downloads and caches data locally in TFRecord format by default, ensuring high performance when reading it later. It also provides rich metadata about the dataset through the <code>DatasetInfo</code> object.</p><p>TFDS datasets can be directly integrated with Data API methods like <code>repeat()</code>, <code>batch()</code>, and <code>prefetch()</code> to create a complete, efficient training pipeline that feeds directly into Keras models.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import tensorflow_datasets as tfds
+
+# Loading with as_supervised=True for Keras compatibility
+dataset = tfds.load(name="mnist", batch_size=32, as_supervised=True)
+mnist_train = dataset["train"].repeat().prefetch(1)
+
+# Training the model directly
+model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى تحديد <code>steps_per_epoch</code> عند استخدام <code>repeat()</code> مع <code>model.fit()</code>؟</template>
+      <template class="content-en">Why do we need to specify <code>steps_per_epoch</code> when using <code>repeat()</code> with <code>model.fit()</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن <code>repeat()</code> بدون وسيطات يجعل مجموعة البيانات لا نهائية. يحتاج Keras إلى معرفة متى تنتهي الحقبة (Epoch) الحالية، لذا نحدد عدد الخطوات (الدفعات) التي تشكل حقبة واحدة.</p></template>
+      <template class="content-en"><p>Because <code>repeat()</code> without arguments makes the dataset infinite. Keras needs to know when the current epoch ends, so we specify the number of steps (batches) that constitute one epoch.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي البيانات المستقبلين. في هذه الوحدة، ننتقل من النماذج التجريبية الصغيرة إلى العالم الحقيقي للتعلم العميق. في الواقع، البيانات ضخمة جدًا ولن تتسع أبدًا في ذاكرة الوصول العشوائي (RAM) لجهازك. هنا يأتي دور Data API في TensorFlow. تخيل أنك تدير مصنعًا؛ لا يمكنك إحضار كل المواد الخام إلى صالة الإنتاج دفعة واحدة. بدلاً من ذلك، تقوم ببناء خط تجميع (Pipeline) يسحب البيانات، يخلطها (Shuffle)، يعالجها (Map)، ويجمعها في دفعات (Batch)، ثم يجهزها مسبقًا (Prefetch) للآلة (GPU) حتى لا تتوقف عن العمل أبدًا. ولتخزين هذه البيانات بكفاءة، نستخدم حاويات قياسية تسمى TFRecords، وننظم البيانات بداخلها باستخدام Protocol Buffers. تذكروا دائمًا: النموذج الجيد يختنق بدون خط أنابيب بيانات سريع. ركزوا على فهم كيفية تسلسل هذه التحويلات وكيفية تحليل TFRecords للامتحان!</template>
+    <template class="content-en">Welcome, future data engineers. In this module, we transition from toy models to the real world of deep learning. In reality, data is massive and will never fit in your RAM. This is where TensorFlow's Data API shines. Imagine running a factory; you can't bring all raw materials to the floor at once. Instead, you build an assembly line (Pipeline) that pulls data, shuffles it, maps it, batches it, and prefetches it for the machine (GPU) so it never sits idle. To store this data efficiently, we use standardized containers called TFRecords, structuring the data inside with Protocol Buffers. Always remember: a great model starves without a fast data pipeline. Focus on understanding how to chain these transformations and how to parse TFRecords for the exam!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم مصفوفات NumPy العادية لتدريب النماذج الكبيرة؟</template>
+          <template class="content-en">Why don't we use regular NumPy arrays to train large models?</template>
+          <span class="content-target">لماذا لا نستخدم مصفوفات NumPy العادية لتدريب النماذج الكبيرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن مصفوفات NumPy يجب تحميلها بالكامل في الذاكرة (RAM). النماذج الكبيرة تستخدم تيرابايتات من البيانات، مما سيؤدي إلى تعطل النظام. Data API يحل هذا عن طريق تدفق (Streaming) البيانات.</template>
+          <template class="content-en">Because NumPy arrays must be fully loaded into RAM. Large models use terabytes of data, which would crash the system. The Data API solves this by streaming the data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين <code>map()</code> و <code>apply()</code> في Data API؟</template>
+          <template class="content-en">What is the difference between <code>map()</code> and <code>apply()</code> in the Data API?</template>
+          <span class="content-target">ما هو الفرق بين <code>map()</code> و <code>apply()</code> في Data API؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><code>map()</code> يطبق تحويلاً على كل عنصر على حدة (مثل ضرب كل رقم في 2). بينما <code>apply()</code> يطبق تحويلاً على مجموعة البيانات بأكملها ككيان واحد (مثل فك تجميع مجموعة البيانات unbatch).</template>
+          <template class="content-en"><code>map()</code> applies a transformation to each item individually (like multiplying each number by 2). <code>apply()</code> applies a transformation to the entire dataset as a whole (like unbatching the dataset).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل <code>interleave()</code> مشكلة خلط البيانات الضخمة؟</template>
+          <template class="content-en">How does <code>interleave()</code> solve the problem of shuffling massive data?</template>
+          <span class="content-target">كيف يحل <code>interleave()</code> مشكلة خلط البيانات الضخمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من محاولة تحميل البيانات كلها في مخزن مؤقت للخلط، يقوم <code>interleave()</code> بقراءة أجزاء صغيرة من ملفات متعددة في وقت واحد وبشكل عشوائي، مما يخلق خلطًا فعالاً دون استهلاك الذاكرة.</template>
+          <template class="content-en">Instead of trying to load all data into a shuffle buffer, <code>interleave()</code> reads small chunks from multiple files simultaneously and randomly, creating an effective shuffle without consuming memory.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل TFRecord على ملفات CSV؟</template>
+          <template class="content-en">Why do we prefer TFRecord over CSV files?</template>
+          <span class="content-target">لماذا نفضل TFRecord على ملفات CSV؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">CSV هو تنسيق نصي بطيء في القراءة والتحليل. TFRecord هو تنسيق ثنائي مدمج، يدعم الضغط، ويسمح بقراءة متسلسلة سريعة جدًا، وهو ما تحتاجه وحدات معالجة الرسومات (GPUs).</template>
+          <template class="content-en">CSV is a text format that is slow to read and parse. TFRecord is a compact binary format, supports compression, and allows for very fast sequential reading, which is what GPUs need.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور Protocol Buffers في TensorFlow؟</template>
+          <template class="content-en">What is the role of Protocol Buffers in TensorFlow?</template>
+          <span class="content-target">ما هو دور Protocol Buffers في TensorFlow؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إنها توفر هيكلًا قياسيًا (مثل <code>tf.train.Example</code>) لتسلسل البيانات المعقدة (مثل الصور والتسميات) إلى سلاسل ثنائية يمكن حفظها بكفاءة داخل ملفات TFRecord.</template>
+          <template class="content-en">They provide a standardized structure (like <code>tf.train.Example</code>) to serialize complex data (like images and labels) into binary strings that can be efficiently saved inside TFRecord files.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين <code>FixedLenFeature</code> و <code>VarLenFeature</code>؟</template>
+          <template class="content-en">What is the difference between <code>FixedLenFeature</code> and <code>VarLenFeature</code>?</template>
+          <span class="content-target">ما الفرق بين <code>FixedLenFeature</code> و <code>VarLenFeature</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><code>FixedLenFeature</code> يُستخدم للبيانات ذات الحجم الثابت (مثل صورة 28x28) ويُرجع DenseTensor. <code>VarLenFeature</code> يُستخدم للبيانات متغيرة الطول (مثل جملة نصية) ويُرجع SparseTensor.</template>
+          <template class="content-en"><code>FixedLenFeature</code> is used for fixed-size data (like a 28x28 image) and returns a DenseTensor. <code>VarLenFeature</code> is used for variable-length data (like a text sentence) and returns a SparseTensor.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نضطر لاستخدام <code>SequenceExample</code>؟</template>
+          <template class="content-en">When are we forced to use <code>SequenceExample</code>?</template>
+          <span class="content-target">متى نضطر لاستخدام <code>SequenceExample</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما نتعامل مع بيانات متسلسلة متداخلة، مثل مستند يحتوي على عدة جمل، وكل جملة تحتوي على عدد مختلف من الكلمات. <code>Example</code> العادي لا يمكنه التعامل مع قوائم القوائم.</template>
+          <template class="content-en">When dealing with nested sequential data, like a document containing multiple sentences, and each sentence has a different number of words. A regular <code>Example</code> cannot handle lists of lists.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يسهل مشروع TFDS عمل مهندس التعلم الآلي؟</template>
+          <template class="content-en">How does the TFDS project make a machine learning engineer's job easier?</template>
+          <span class="content-target">كيف يسهل مشروع TFDS عمل مهندس التعلم الآلي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يوفر سطر كود واحد <code>tfds.load()</code> لتنزيل، تنظيف، وإعداد مجموعات البيانات الشائعة بتنسيق TFRecord عالي الأداء، مما يوفر ساعات من كتابة نصوص المعالجة المسبقة.</template>
+          <template class="content-en">It provides a single line of code <code>tfds.load()</code> to download, clean, and prepare common datasets in high-performance TFRecord format, saving hours of writing preprocessing scripts.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني <code>tf.data.AUTOTUNE</code>؟</template>
+          <template class="content-en">What does <code>tf.data.AUTOTUNE</code> mean?</template>
+          <span class="content-target">ماذا يعني <code>tf.data.AUTOTUNE</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إنه يخبر TensorFlow بتفويض قرار اختيار عدد الخيوط (Threads) أو حجم المخزن المؤقت (Buffer size) إلى النظام في وقت التشغيل، مما يضمن الأداء الأمثل بناءً على موارد الجهاز الحالية.</template>
+          <template class="content-en">It tells TensorFlow to delegate the decision of choosing the number of threads or buffer size to the system at runtime, ensuring optimal performance based on current hardware resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يجب أن يكون <code>prefetch()</code> هو الخطوة الأخيرة في خط الأنابيب؟</template>
+          <template class="content-en">Why should <code>prefetch()</code> be the last step in the pipeline?</template>
+          <span class="content-target">لماذا يجب أن يكون <code>prefetch()</code> هو الخطوة الأخيرة في خط الأنابيب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأننا نريد جلب النتيجة النهائية الجاهزة (بعد التجميع والمعالجة) ووضعها في الذاكرة السريعة لوحدة معالجة الرسومات. إذا وضعناه مبكرًا، فسنقوم بجلب بيانات غير معالجة.</template>
+          <template class="content-en">Because we want to prefetch the final, ready-to-use result (after batching and mapping) into the GPU's fast memory. If placed earlier, we would prefetch unprocessed data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض من واجهة برمجة تطبيقات البيانات (Data API) في TensorFlow؟",
+      "en": "What is the purpose of the Data API in TensorFlow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تبسيط استيعاب ومعالجة مجموعات البيانات الكبيرة التي لا تتسع في الذاكرة (RAM).",
+        "en": "To simplify the ingestion and preprocessing of large datasets that do not fit in RAM."
+      },
+      "example": {
+        "ar": "استخدام tf.data.Dataset لبناء خط أنابيب يقرأ من ملفات متعددة.",
+        "en": "Using tf.data.Dataset to build a pipeline reading from multiple files."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ماذا تفعل الدالة <code>from_tensor_slices()</code>؟",
+      "en": "What does the <code>from_tensor_slices()</code> function do?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنشئ مجموعة بيانات في الذاكرة عن طريق تقطيع الموتر (Tensor) على طول بعده الأول.",
+        "en": "Creates an in-memory dataset by slicing a tensor along its first dimension."
+      },
+      "example": {
+        "ar": "from_tensor_slices([1, 2, 3]) تنشئ مجموعة بيانات من 3 عناصر.",
+        "en": "from_tensor_slices([1, 2, 3]) creates a dataset of 3 items."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي وظيفة <code>dataset.repeat(n)</code>؟",
+      "en": "What is the function of <code>dataset.repeat(n)</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تكرر مجموعة البيانات n من المرات دون نسخ البيانات فعليًا في الذاكرة.",
+        "en": "Repeats the dataset n times without actually copying the data in memory."
+      },
+      "example": {
+        "ar": "dataset.repeat(3) يجعل البيانات تمر 3 مرات.",
+        "en": "dataset.repeat(3) makes the data pass 3 times."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ماذا تفعل الدالة <code>dataset.batch(n)</code>؟",
+      "en": "What does the <code>dataset.batch(n)</code> function do?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجمع عناصر مجموعة البيانات الفردية في دفعات (Batches) بحجم n.",
+        "en": "Groups individual dataset items into batches of size n."
+      },
+      "example": {
+        "ar": "batch(32) يجمع كل 32 عنصرًا معًا لتدريب النموذج.",
+        "en": "batch(32) groups 32 items together for model training."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف تطبق تحويلاً على كل عنصر في مجموعة البيانات؟",
+      "en": "How do you apply a transformation to every item in a dataset?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام طريقة <code>map()</code>.",
+        "en": "By using the <code>map()</code> method."
+      },
+      "example": {
+        "ar": "dataset.map(lambda x: x * 2)",
+        "en": "dataset.map(lambda x: x * 2)"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "لماذا نستخدم <code>dataset.shuffle()</code>؟",
+      "en": "Why do we use <code>dataset.shuffle()</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لضمان عشوائية البيانات، وهو أمر ضروري لخوارزمية الانحدار المتدرج.",
+        "en": "To ensure data randomization, which is essential for Gradient Descent."
+      },
+      "example": {
+        "ar": "dataset.shuffle(buffer_size=1000)",
+        "en": "dataset.shuffle(buffer_size=1000)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "متى نستخدم <code>dataset.interleave()</code>؟",
+      "en": "When do we use <code>dataset.interleave()</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما تكون مجموعة البيانات كبيرة جدًا ولا تتسع في الذاكرة، فنقرأ من ملفات متعددة ونتداخل خطوطها لخلطها.",
+        "en": "When the dataset is too large for memory, we read from multiple files and interleave their lines to shuffle them."
+      },
+      "example": {
+        "ar": "قراءة 5 ملفات CSV بالتوازي وخلط صفوفها.",
+        "en": "Reading 5 CSV files in parallel and mixing their rows."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي فائدة <code>dataset.prefetch(1)</code>؟",
+      "en": "What is the benefit of <code>dataset.prefetch(1)</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسرع التدريب عن طريق تجهيز الدفعة التالية في وحدة المعالجة المركزية (CPU) بينما تقوم وحدة معالجة الرسومات (GPU) بمعالجة الدفعة الحالية.",
+        "en": "Speeds up training by preparing the next batch on the CPU while the GPU processes the current batch."
+      },
+      "example": {
+        "ar": "يمنع وحدة معالجة الرسومات من البقاء في حالة خمول.",
+        "en": "Prevents the GPU from sitting idle."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو تنسيق TFRecord؟",
+      "en": "What is the TFRecord format?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق ثنائي مفضل لدى TensorFlow لتخزين وقراءة كميات كبيرة من البيانات بكفاءة.",
+        "en": "TensorFlow’s preferred binary format for storing and efficiently reading large amounts of data."
+      },
+      "example": {
+        "ar": "تخزين ملايين الصور في ملفات .tfrecord لتسريع القراءة.",
+        "en": "Storing millions of images in .tfrecord files for faster reading."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي Protocol Buffers (Protobufs)؟",
+      "en": "What are Protocol Buffers (Protobufs)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق ثنائي مدمج وقابل للتوسيع لتسلسل البيانات، يُستخدم عادةً داخل ملفات TFRecord.",
+        "en": "A compact, extensible binary format for serializing data, typically used inside TFRecord files."
+      },
+      "example": {
+        "ar": "رسالة tf.train.Example هي نوع من Protobuf.",
+        "en": "The tf.train.Example message is a type of Protobuf."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو <code>tf.train.Example</code>؟",
+      "en": "What is <code>tf.train.Example</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رسالة Protobuf القياسية المستخدمة في TensorFlow لتمثيل مثيل واحد من البيانات (يحتوي على ميزات).",
+        "en": "The standard Protobuf message used in TensorFlow to represent a single data instance (containing features)."
+      },
+      "example": {
+        "ar": "تمثيل صورة وتسميتها كـ Example قبل حفظها.",
+        "en": "Representing an image and its label as an Example before saving."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "كيف تحلل سلسلة بايتات مقروءة من TFRecord؟",
+      "en": "How do you parse a byte string read from a TFRecord?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام الدالة <code>tf.io.parse_single_example()</code> مع قاموس وصف الميزات.",
+        "en": "Using the <code>tf.io.parse_single_example()</code> function along with a feature description dictionary."
+      },
+      "example": {
+        "ar": "تحويل السلسلة الثنائية إلى موترات (Tensors) قابلة للاستخدام.",
+        "en": "Converting the binary string back into usable Tensors."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "متى تستخدم <code>SequenceExample</code> بدلاً من <code>Example</code>؟",
+      "en": "When do you use <code>SequenceExample</code> instead of <code>Example</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عند التعامل مع بيانات متسلسلة معقدة مثل قوائم القوائم (مثل مستندات تحتوي على جمل).",
+        "en": "When handling complex sequential data like lists of lists (e.g., documents containing sentences)."
+      },
+      "example": {
+        "ar": "بيانات معالجة اللغات الطبيعية (NLP).",
+        "en": "Natural Language Processing (NLP) data."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو مشروع TFDS؟",
+      "en": "What is the TFDS project?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكتبة TensorFlow Datasets التي تبسط تنزيل وإعداد مجموعات البيانات الشائعة.",
+        "en": "TensorFlow Datasets library that simplifies downloading and preparing common datasets."
+      },
+      "example": {
+        "ar": "tfds.load('mnist')",
+        "en": "tfds.load('mnist')"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ماذا تفعل المعلمة <code>as_supervised=True</code> في TFDS؟",
+      "en": "What does the <code>as_supervised=True</code> parameter do in TFDS?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجعل الدالة تُرجع البيانات كصف (Tuple) من (الميزات، التسميات) بدلاً من قاموس، مما يجعلها جاهزة لـ Keras.",
+        "en": "Makes the function return data as a (features, labels) tuple instead of a dictionary, making it ready for Keras."
+      },
+      "example": {
+        "ar": "مطلوب لاستخدام model.fit() مباشرة.",
+        "en": "Required to use model.fit() directly."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي هو التنسيق الثنائي المفضل لدى TensorFlow لتخزين مجموعات البيانات الكبيرة؟",
+      "en": "Which of the following is TensorFlow's preferred binary format for storing large datasets?"
+    },
+    "options": {
+      "ar": [
+        "CSV",
+        "JSON",
+        "TFRecord",
+        "HDF5"
+      ],
+      "en": [
+        "CSV",
+        "JSON",
+        "TFRecord",
+        "HDF5"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "TFRecord هو تنسيق ثنائي مصمم خصيصًا لـ TensorFlow لقراءة البيانات بكفاءة عالية.",
+      "en": "TFRecord is a binary format specifically designed for TensorFlow for highly efficient data reading."
+    },
+    "hint": {
+      "ar": "يحتوي على كلمة Record.",
+      "en": "It contains the word Record."
+    },
+    "difficulty": "easy",
+    "conceptId": "tfrecord-format"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي طريقة في Data API تُستخدم لتطبيق دالة تحويل على كل عنصر في مجموعة البيانات؟",
+      "en": "Which Data API method is used to apply a transformation function to every item in the dataset?"
+    },
+    "options": {
+      "ar": [
+        "filter()",
+        "map()",
+        "batch()",
+        "apply()"
+      ],
+      "en": [
+        "filter()",
+        "map()",
+        "batch()",
+        "apply()"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم طريقة map() لتطبيق دالة (مثل التسوية أو فك التشفير) على كل عنصر على حدة.",
+      "en": "The map() method is used to apply a function (like normalization or decoding) to each individual item."
+    },
+    "hint": {
+      "ar": "نفس اسم الدالة المستخدمة في بايثون لتطبيق دالة على قائمة.",
+      "en": "Same name as the Python built-in function for applying a function to an iterable."
+    },
+    "difficulty": "easy",
+    "conceptId": "chaining-transformations"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض الرئيسي من استخدام <code>dataset.prefetch(1)</code>؟",
+      "en": "What is the primary purpose of using <code>dataset.prefetch(1)</code>?"
+    },
+    "options": {
+      "ar": [
+        "تقليل حجم البيانات في الذاكرة",
+        "خلط البيانات بشكل أفضل",
+        "منع وحدة معالجة الرسومات (GPU) من البقاء في حالة خمول",
+        "تحويل البيانات إلى تنسيق TFRecord"
+      ],
+      "en": [
+        "Reduce data size in memory",
+        "Shuffle data better",
+        "Prevent the GPU from sitting idle",
+        "Convert data to TFRecord format"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يقوم الجلب المسبق بإعداد الدفعة التالية على وحدة المعالجة المركزية بينما تقوم وحدة معالجة الرسومات بتدريب الدفعة الحالية، مما يزيد من الكفاءة.",
+      "en": "Prefetching prepares the next batch on the CPU while the GPU trains on the current batch, maximizing efficiency."
+    },
+    "hint": {
+      "ar": "يتعلق بالأداء والتوازي بين CPU و GPU.",
+      "en": "Relates to performance and CPU/GPU parallelism."
+    },
+    "difficulty": "medium",
+    "conceptId": "prefetching-and-multithreading"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "عند استخدام <code>dataset.shuffle(buffer_size)</code>، ماذا يحدث إذا كان <code>buffer_size</code> يساوي 1؟",
+      "en": "When using <code>dataset.shuffle(buffer_size)</code>, what happens if <code>buffer_size</code> is 1?"
+    },
+    "options": {
+      "ar": [
+        "يتم خلط البيانات بشكل مثالي",
+        "لن يحدث أي خلط للبيانات",
+        "سيتعطل البرنامج بسبب نفاد الذاكرة",
+        "سيتم خلط عنصر واحد فقط"
+      ],
+      "en": [
+        "Data is shuffled perfectly",
+        "No shuffling will occur",
+        "Program crashes due to Out of Memory",
+        "Only one item will be shuffled"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كان حجم المخزن المؤقت 1، فإنه يسحب عنصرًا واحدًا ويخرجه فورًا، مما يعني بقاء البيانات بنفس الترتيب الأصلي.",
+      "en": "If the buffer size is 1, it pulls one item and immediately outputs it, meaning the data remains in its original order."
+    },
+    "hint": {
+      "ar": "تخيل أنك تخلط أوراق اللعب ولكنك تمسك ورقة واحدة فقط في كل مرة.",
+      "en": "Imagine shuffling a deck of cards but you can only hold one card at a time."
+    },
+    "difficulty": "medium",
+    "conceptId": "shuffling-and-interleaving"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي رسالة Protobuf تُستخدم عادةً لتمثيل مثيل بيانات قياسي في TensorFlow؟",
+      "en": "Which Protobuf message is typically used to represent a standard data instance in TensorFlow?"
+    },
+    "options": {
+      "ar": [
+        "tf.train.Instance",
+        "tf.train.DataPoint",
+        "tf.train.Example",
+        "tf.train.Record"
+      ],
+      "en": [
+        "tf.train.Instance",
+        "tf.train.DataPoint",
+        "tf.train.Example",
+        "tf.train.Record"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "رسالة tf.train.Example هي المعيار لتمثيل الميزات في TensorFlow.",
+      "en": "The tf.train.Example message is the standard for representing features in TensorFlow."
+    },
+    "hint": {
+      "ar": "تعني 'مثال' باللغة الإنجليزية.",
+      "en": "Means 'Example'."
+    },
+    "difficulty": "easy",
+    "conceptId": "protocol-buffers"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "لتحليل ميزة ذات طول متغير من ملف TFRecord، أي فئة يجب استخدامها في قاموس وصف الميزات؟",
+      "en": "To parse a variable-length feature from a TFRecord file, which class should be used in the feature description dictionary?"
+    },
+    "options": {
+      "ar": [
+        "tf.io.FixedLenFeature",
+        "tf.io.VarLenFeature",
+        "tf.io.DynamicFeature",
+        "tf.io.SequenceFeature"
+      ],
+      "en": [
+        "tf.io.FixedLenFeature",
+        "tf.io.VarLenFeature",
+        "tf.io.DynamicFeature",
+        "tf.io.SequenceFeature"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم VarLenFeature للميزات التي يختلف طولها من مثال لآخر، وتُرجع SparseTensor.",
+      "en": "VarLenFeature is used for features whose length varies from example to example, returning a SparseTensor."
+    },
+    "hint": {
+      "ar": "اختصار لـ Variable Length.",
+      "en": "Short for Variable Length."
+    },
+    "difficulty": "medium",
+    "conceptId": "parsing-tfrecords"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي الطريقة الأفضل لخلط مجموعة بيانات ضخمة جدًا لا تتسع في الذاكرة (RAM)؟",
+      "en": "What is the best way to shuffle a massive dataset that does not fit in RAM?"
+    },
+    "options": {
+      "ar": [
+        "زيادة buffer_size في دالة shuffle() إلى ما لا نهاية",
+        "استخدام دالة interleave() لقراءة خطوط من ملفات متعددة بترتيب عشوائي",
+        "استخدام دالة map() لإضافة ضوضاء عشوائية",
+        "لا يمكن خلط البيانات التي لا تتسع في الذاكرة"
+      ],
+      "en": [
+        "Increase buffer_size in shuffle() to infinity",
+        "Use interleave() to read lines from multiple files in random order",
+        "Use map() to add random noise",
+        "Data that doesn't fit in memory cannot be shuffled"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقسيم البيانات إلى ملفات واستخدام interleave() يسمح بخلط البيانات على مستوى الملفات دون إرهاق الذاكرة.",
+      "en": "Splitting data into files and using interleave() allows shuffling at the file level without overwhelming memory."
+    },
+    "hint": {
+      "ar": "تتضمن قراءة ملفات متعددة في وقت واحد.",
+      "en": "Involves reading multiple files simultaneously."
+    },
+    "difficulty": "hard",
+    "conceptId": "shuffling-and-interleaving"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في مكتبة TFDS، ماذا تفعل المعلمة <code>as_supervised=True</code> عند تحميل مجموعة بيانات؟",
+      "en": "In the TFDS library, what does the <code>as_supervised=True</code> parameter do when loading a dataset?"
+    },
+    "options": {
+      "ar": [
+        "تُرجع البيانات كقاموس",
+        "تُرجع البيانات كصف (Tuple) يحتوي على الميزات والتسميات",
+        "تقوم بتدريب النموذج تلقائيًا",
+        "تقوم بتنزيل البيانات المشرفة فقط"
+      ],
+      "en": [
+        "Returns data as a dictionary",
+        "Returns data as a tuple containing features and labels",
+        "Automatically trains the model",
+        "Downloads only supervised data"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتطلب Keras أن تكون البيانات بتنسيق (features, labels). هذه المعلمة تقوم بهذا التحويل تلقائيًا بدلاً من إرجاع قاموس.",
+      "en": "Keras requires data in a (features, labels) format. This parameter does this conversion automatically instead of returning a dictionary."
+    },
+    "hint": {
+      "ar": "تجهز البيانات لتكون متوافقة مباشرة مع Keras.",
+      "en": "Prepares data to be directly compatible with Keras."
+    },
+    "difficulty": "medium",
+    "conceptId": "tensorflow-datasets-tfds"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي نوع من Protobuf يجب استخدامه لتمثيل مستند يحتوي على قائمة من الجمل، حيث كل جملة هي قائمة من الكلمات؟",
+      "en": "Which type of Protobuf should be used to represent a document containing a list of sentences, where each sentence is a list of words?"
+    },
+    "options": {
+      "ar": [
+        "tf.train.Example",
+        "tf.train.SequenceExample",
+        "tf.train.FeatureList",
+        "tf.train.NestedExample"
+      ],
+      "en": [
+        "tf.train.Example",
+        "tf.train.SequenceExample",
+        "tf.train.FeatureList",
+        "tf.train.NestedExample"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تم تصميم SequenceExample خصيصًا للتعامل مع البيانات المتسلسلة المعقدة مثل قوائم القوائم.",
+      "en": "SequenceExample is specifically designed to handle complex sequential data like lists of lists."
+    },
+    "hint": {
+      "ar": "يحتوي على كلمة Sequence.",
+      "en": "Contains the word Sequence."
+    },
+    "difficulty": "medium",
+    "conceptId": "sequence-example"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الغرض من المجموع الاختباري (CRC checksum) داخل ملف TFRecord؟",
+      "en": "What is the purpose of the CRC checksum inside a TFRecord file?"
+    },
+    "options": {
+      "ar": [
+        "تشفير البيانات للأمان",
+        "ضغط البيانات لتقليل الحجم",
+        "اكتشاف الأخطاء والتأكد من سلامة البيانات",
+        "تسريع عملية القراءة"
+      ],
+      "en": [
+        "Encrypt data for security",
+        "Compress data to reduce size",
+        "Detect errors and ensure data integrity",
+        "Speed up the reading process"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يُستخدم CRC للتحقق من عدم تلف البيانات أثناء التخزين أو النقل.",
+      "en": "CRC is used to verify that the data has not been corrupted during storage or transmission."
+    },
+    "hint": {
+      "ar": "يتعلق بسلامة البيانات (Integrity).",
+      "en": "Relates to data integrity."
+    },
+    "difficulty": "easy",
+    "conceptId": "tfrecord-format"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>shuffle()</code> مع <code>buffer_size</code> صغير جدًا. إذا كان حجم المخزن المؤقت صغيرًا، فلن يتم خلط البيانات بشكل كافٍ، مما قد يؤدي إلى ضعف أداء النموذج أثناء التدريب.</template>
+    <template class="content-en">Using <code>shuffle()</code> with a very small <code>buffer_size</code>. If the buffer is small, the data won't be shuffled adequately, potentially leading to poor model performance during training.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>prefetch(tf.data.AUTOTUNE)</code> هو السر للحفاظ على عمل وحدة معالجة الرسومات (GPU) بنسبة 100%. فهو يفصل بين إنتاج البيانات واستهلاكها.</template>
+    <template class="content-en">Using <code>prefetch(tf.data.AUTOTUNE)</code> is the secret to keeping your GPU at 100% utilization. It decouples data production from consumption.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">ملف TFRecord هو مجرد حاوية (Container). البيانات الفعلية بداخله يتم هيكلتها عادةً باستخدام Protocol Buffers (مثل <code>tf.train.Example</code>).</template>
+    <template class="content-en">A TFRecord file is just a container. The actual data inside it is typically structured using Protocol Buffers (like <code>tf.train.Example</code>).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تحليل (Parsing) البيانات بعد قراءتها من TFRecord. <code>TFRecordDataset</code> يُرجع سلاسل بايتات خام؛ يجب استخدام <code>parse_single_example</code> أو <code>parse_example</code> لتحويلها إلى Tensors.</template>
+    <template class="content-en">Forgetting to parse the data after reading from a TFRecord. <code>TFRecordDataset</code> returns raw byte strings; you MUST use <code>parse_single_example</code> or <code>parse_example</code> to convert them to Tensors.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">ترتيب التحويلات مهم. <code>dataset.repeat().batch(32)</code> يختلف عن <code>dataset.batch(32).repeat()</code>. الأول يضمن أن جميع الدفعات بحجم 32، بينما الثاني قد ينتج دفعة أصغر في نهاية كل تكرار.</template>
+    <template class="content-en">Order of transformations matters. <code>dataset.repeat().batch(32)</code> is different from <code>dataset.batch(32).repeat()</code>. The first ensures all batches are size 32, while the second might produce a smaller batch at the end of each repeat.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M12.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

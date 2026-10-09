@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT365" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>نمذجة عمليات الأعمال وترميزها (BPMN) - الجزء الأول · IT365 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT365" data-page-title-en="IT365">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=IT365"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#bpmn-introduction" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في BPMN والهدف منها</template>
+        <template class="content-en">Introduction to BPMN and its Primary Goal</template>
+        <span class="content-target">مقدمة في BPMN والهدف منها</span>
+      </a>
+      <a href="#bpmn-core-elements" class="toc-link" data-bilingual>
+        <template class="content-ar">العناصر الأساسية لـ BPMN</template>
+        <template class="content-en">BPMN Core Elements Categories</template>
+        <span class="content-target">العناصر الأساسية لـ BPMN</span>
+      </a>
+      <a href="#flow-objects" class="toc-link" data-bilingual>
+        <template class="content-ar">كائنات التدفق (Flow Objects)</template>
+        <template class="content-en">Flow Objects</template>
+        <span class="content-target">كائنات التدفق (Flow Objects)</span>
+      </a>
+      <a href="#connecting-objects" class="toc-link" data-bilingual>
+        <template class="content-ar">كائنات الربط (Connecting Objects)</template>
+        <template class="content-en">Connecting Objects</template>
+        <span class="content-target">كائنات الربط (Connecting Objects)</span>
+      </a>
+      <a href="#swim-lanes-artifacts" class="toc-link" data-bilingual>
+        <template class="content-ar">المسارات والعناصر الإضافية</template>
+        <template class="content-en">Swim Lanes and Artifacts</template>
+        <span class="content-target">المسارات والعناصر الإضافية</span>
+      </a>
+      <a href="#events-in-detail" class="toc-link" data-bilingual>
+        <template class="content-ar">تفاصيل الأحداث والمحفزات</template>
+        <template class="content-en">Events in Detail: Triggers and Results</template>
+        <span class="content-target">تفاصيل الأحداث والمحفزات</span>
+      </a>
+      <a href="#intermediate-events-gateways" class="toc-link" data-bilingual>
+        <template class="content-ar">الأحداث الوسيطة والبوابات القائمة على الأحداث</template>
+        <template class="content-en">Intermediate Events and Event-Based Gateways</template>
+        <span class="content-target">الأحداث الوسيطة والبوابات القائمة على الأحداث</span>
+      </a>
+      <a href="#activities-subprocesses-looping" class="toc-link" data-bilingual>
+        <template class="content-ar">الأنشطة، العمليات الفرعية، والتكرار</template>
+        <template class="content-en">Activities, Subprocesses, and Looping</template>
+        <span class="content-target">الأنشطة، العمليات الفرعية، والتكرار</span>
+      </a>
+      <a href="#exception-handling" class="toc-link" data-bilingual>
+        <template class="content-ar">معالجة الاستثناءات (Exception Handling)</template>
+        <template class="content-en">Exception Handling</template>
+        <span class="content-target">معالجة الاستثناءات (Exception Handling)</span>
+      </a>
+      <a href="#transactions-compensation" class="toc-link" data-bilingual>
+        <template class="content-ar">المعاملات والتعويض (Transactions and Compensation)</template>
+        <template class="content-en">Transactions and Compensation</template>
+        <span class="content-target">المعاملات والتعويض (Transactions and Compensation)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · IT365
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">نمذجة عمليات الأعمال وترميزها (BPMN) - الجزء الأول</h1>
+      <p class="hero-description">مقدمة شاملة لمعيار BPMN 2.0، تغطي العناصر الأساسية مثل كائنات التدفق، كائنات الربط، المسارات، معالجة الاستثناءات، والمعاملات في أنظمة المؤسسات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Business Process Modeling and Notation (BPMN) - Part 1</h1>
+      <p class="hero-description">A comprehensive introduction to the BPMN 2.0 standard, covering core elements like flow objects, connecting objects, swim lanes, exception handling, and transactions in enterprise systems.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">نمذجة الأعمال</span>
+      <span class="tag">BPMN</span>
+      <span class="tag">كائنات التدفق</span>
+      <span class="tag">معالجة الاستثناءات</span>
+      <span class="tag">المعاملات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Business Modeling</span>
+      <span class="tag">BPMN</span>
+      <span class="tag">Flow Objects</span>
+      <span class="tag">Exception Handling</span>
+      <span class="tag">Transactions</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم العناصر الأساسية لنمذجة عمليات الأعمال وترميزها (BPMN).</span></li>
+      <li><span class="obj-icon">✦</span><span>استيعاب كيفية معالجة الاستثناءات في نمذجة عمليات الأعمال.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم كيفية إدارة المعاملات والتعويضات في نماذج عمليات الأعمال.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand Business Process Modeling and Notation Core Elements.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand Exception Handling in Business Process Modeling.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand Transactions in Business Process Modeling.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="bpmn-introduction" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في BPMN والهدف منها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to BPMN and its Primary Goal</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>معيار BPMN هو لغة بصرية موحدة تسد الفجوة بين محللي الأعمال والمطورين التقنيين.</p></template>
+    <template class="content-en"><p>BPMN is a standardized visual language that bridges the gap between business analysts and technical developers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم اقتراح الإصدار 1.0 من BPMN في مايو 2004 واعتماده من قبل <span class="smart-term" data-term-en="OMG" data-ar="مجموعة إدارة الكائنات" data-en-def="Object Management Group; the consortium that adopted and maintains the BPMN standard.">مجموعة إدارة الكائنات<span class="smart-term-tooltip"></span></span> (OMG) في فبراير 2006. الإصدار الحالي هو BPMN 2.0، والذي يعتمد على مراجعة منهجيات أخرى مثل UML Activity Diagram و IDEF وغيرها.</p><p>الهدف الأساسي من BPMN هو توفير ترميز مفهوم بسهولة لجميع مستخدمي الأعمال، بدءاً من محللي الأعمال الذين ينشئون المسودة الأولية، مروراً بالمطورين التقنيين المسؤولين عن التنفيذ، وصولاً إلى مديري الأعمال الذين يراقبون هذه العمليات.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="BPMN" data-ar="نمذجة عمليات الأعمال وترميزها" data-en-def="Business Process Model and Notation; a standard for business process modeling.">BPMN<span class="smart-term-tooltip"></span></span> version 1.0 was proposed in May 2004 and adopted by the Object Management Group (<span class="smart-term" data-term-en="OMG" data-ar="مجموعة إدارة الكائنات" data-en-def="Object Management Group; the consortium that adopted and maintains the BPMN standard.">OMG<span class="smart-term-tooltip"></span></span>) in February 2006.</p><p>The current version is BPMN 2.0, based on revisions of other notations like UML Activity Diagram, IDEF, etc.</p><p>The primary goal of BPMN is to provide a notation readily understandable by all business users:</p><ul><li>from <strong>business analysts</strong> who draft processes,</li><li>to <strong>technical developers</strong> who implement them,</li><li>and finally to <strong>business people</strong> who manage and monitor them.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تم تصميم BPMN؟ قبل BPMN، كانت هناك فجوة كبيرة بين النماذج التي يفهمها مديرو الأعمال وتلك التي يمكن للمبرمجين تحويلها إلى كود برمجي. جاءت BPMN لتوحيد هذه اللغة.</p><p>من خلال توحيد الرموز، تضمن BPMN عدم ضياع المتطلبات أو إساءة فهمها أثناء انتقالها من مرحلة التصميم إلى مرحلة التنفيذ التقني.</p><p>يرتبط هذا المفهوم ارتباطاً وثيقاً بهندسة البرمجيات وإدارة دورة حياة تطوير النظم (SDLC)، حيث يمثل مرحلة تحليل وتصميم المتطلبات.</p></template>
+    <template class="content-en"><p>Why was BPMN designed? Before BPMN, there was a significant translation gap between models understood by business managers and those executable by programmers. BPMN standardized this language.</p><p>By standardizing the notation, BPMN ensures that requirements are not lost or misinterpreted as they move from business design to technical implementation.</p><p>This concept is closely tied to software engineering and the Systems Development Life Cycle (SDLC), specifically representing the requirements analysis and design phases.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تساهم BPMN في تقليل تكلفة تطوير البرمجيات في المؤسسات الكبيرة؟</template>
+      <template class="content-en">How does BPMN contribute to reducing software development costs in large enterprises?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال توفير لغة مشتركة، تقلل BPMN من سوء الفهم بين محللي الأعمال والمطورين، مما يقلل من الأخطاء وإعادة العمل، وبالتالي يوفر الوقت والتكلفة.</p></template>
+      <template class="content-en"><p>By providing a common language, BPMN reduces misunderstandings between business analysts and developers, minimizing errors and rework, thereby saving time and costs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="bpmn-core-elements" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> العناصر الأساسية لـ BPMN</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> BPMN Core Elements Categories</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتكون مخططات عمليات الأعمال في BPMN من خمس فئات أساسية: كائنات التدفق، البيانات، كائنات الربط، المسارات، والعناصر الإضافية.</p></template>
+    <template class="content-en"><p>BPMN business process diagrams consist of five core categories: Flow objects, Data, Connecting objects, Swim lanes, and Artifacts.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>مخططات العمليات (Process diagrams) هي جوهر نمذجة BPMN. لتنفيذ خصائص هذه المخططات، يحدد BPMN خمس فئات أساسية للعناصر:</p><ol><li><b>كائنات التدفق (Flow objects):</b> العناصر الرسومية الرئيسية التي تحدد سلوك العملية.</li><li><b>البيانات (Data):</b> المعلومات التي تتم معالجتها أو تبادلها.</li><li><b>كائنات الربط (Connecting objects):</b> لربط كائنات التدفق ببعضها أو بالمعلومات.</li><li><b>مسارات السباحة (Swim lanes):</b> لتجميع العناصر الأساسية وتحديد المسؤوليات.</li><li><b>العناصر الإضافية (Artifacts):</b> لتوفير معلومات إضافية حول العملية دون التأثير على التدفق.</li></ol></template>
+    <template class="content-en"><p>Process diagrams are at the core of BPMN modeling. BPMN has five core element categories for implementing the properties of business process diagrams:</p><ol><li><b>Flow objects:</b> The main graphical elements defining process behavior.</li><li><b>Data (or information):</b> Information processed or exchanged.</li><li><b>Connecting objects:</b> Used to connect flow objects or supplementary info.</li><li><b>Swim lanes:</b> Used to group primary modeling elements.</li><li><b>Artifacts:</b> Used to provide additional information about the process.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم تصميم هذه الفئات الخمس لتكون شاملة ومانعة للتداخل قدر الإمكان. فكائنات التدفق تمثل 'ماذا يحدث'، وكائنات الربط تمثل 'متى وبأي ترتيب'، والمسارات تمثل 'من يفعل ذلك'، والبيانات تمثل 'بماذا يتم العمل'.</p><p>هذا التقسيم المعماري يسمح للمخططات بأن تكون بسيطة للمديرين (باستخدام كائنات التدفق الأساسية فقط) ومعقدة للمطورين (بإضافة البيانات والعناصر الإضافية الدقيقة).</p></template>
+    <template class="content-en"><p>These five categories are designed to be mutually exclusive and collectively exhaustive. Flow objects represent 'what happens', connecting objects represent 'when and in what order', swim lanes represent 'who does it', and data represents 'what is being worked on'.</p><p>This architectural division allows diagrams to be simple for managers (using only basic flow objects) and complex for developers (adding precise data and artifacts).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت توضيح القسم المسؤول عن مهمة معينة، أي فئة من العناصر الخمسة ستستخدم؟</template>
+      <template class="content-en">If you want to clarify which department is responsible for a specific task, which of the five element categories would you use?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم مسارات السباحة (Swim lanes)، وتحديداً المسارات (Lanes) لتمثيل الأقسام المختلفة.</p></template>
+      <template class="content-en"><p>I would use Swim lanes, specifically Lanes, to represent the different departments.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="flow-objects" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> كائنات التدفق (Flow Objects)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Flow Objects</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كائنات التدفق هي المحرك الرئيسي للعملية وتشمل: الأحداث (دوائر)، الأنشطة (مستطيلات مستديرة)، والبوابات (معينات).</p></template>
+    <template class="content-en"><p>Flow objects are the main graphical elements defining behavior, including: Events (circles), Activities (rounded rectangles), and Gateways (diamonds).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>كائنات التدفق هي العناصر الرسومية الرئيسية في BPMN وتحدد سلوك العملية. تنقسم إلى ثلاثة أنواع:</p><ul><li><b>الأحداث (Events):</b> تُمثل بدائرة. تشير إلى شيء يحدث (بداية، وسط، نهاية). <span class="smart-term" data-term-en="Event" data-ar="الحدث" data-en-def="Something that happens during the course of a process (Start, Intermediate, End).">الحدث<span class="smart-term-tooltip"></span></span> الوسيط (Intermediate) يقع بين البداية والنهاية ويستخدم للرد على محفز أو إطلاقه.</li><li><b>الأنشطة (Activities):</b> تُمثل بمستطيل ذو زوايا مستديرة. هي خطوة في العملية تنجز عملاً. يمكن أن تكون مهمة (Task) غير قابلة للتجزئة، أو عملية فرعية (Subprocess) قابلة للتجزئة.</li><li><b>البوابات (Gateways):</b> تُمثل بشكل مَعِين (Diamond). تستخدم لتقسيم (Splitting) أو دمج (Joining) التدفقات، وعادة ما تمثل قرارات شرطية (if-then-else).</li></ul></template>
+    <template class="content-en"><p>Flow objects are the main graphical elements of BPMN and define the behavior of a process. There are three separate types:</p><ul><li><b><span class="smart-term" data-term-en="Event" data-ar="الحدث" data-en-def="Something that happens during the course of a process (Start, Intermediate, End).">Event<span class="smart-term-tooltip"></span></span>s:</b> Displayed as a circle. They come in start, intermediate, and end forms. Intermediate events occur between start and end and respond to or trigger another element.</li><li><b>Activities:</b> Displayed as a rectangle with rounded corners. A step that performs work. Can be an atomic Task or a non-atomic Subprocess.</li><li><b><span class="smart-term" data-term-en="Gateway" data-ar="البوابة" data-en-def="A routing element used to control the divergence and convergence of sequence flow.">Gateway<span class="smart-term-tooltip"></span></span>s:</b> Displayed as a diamond. Used for splitting and joining flows, typically for if-then-else decisions.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التمييز البصري الصارم (دائرة، مستطيل، معين) هو ما يجعل BPMN قابلة للقراءة السريعة. الأحداث تمثل 'حالة' (State)، بينما الأنشطة تمثل 'عملاً' (Action)، والبوابات تمثل 'توجيهاً' (Routing).</p><p>من الأخطاء الشائعة استخدام البوابات للقيام بعمل فعلي؛ البوابات لا تقوم بأي عمل، بل تقوم فقط بتوجيه مسار التدفق بناءً على شروط تم تقييمها مسبقاً.</p></template>
+    <template class="content-en"><p>The strict visual distinction (circle, rectangle, diamond) makes BPMN quickly readable. Events represent a 'State', Activities represent an 'Action', and Gateways represent 'Routing'.</p><p>A common mistake is using gateways to perform actual work; gateways do no work, they merely route the flow based on previously evaluated conditions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a table showing Flow Objects. Row 1: 'Events' with three circles (thin border for Start, double border for Intermediate, thick border for End). Row 2: 'Activities' with a rounded rectangle. Row 3: 'Gateways' with a diamond shape. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <style>
+      .gsvg-en { display: block; }
+      .gsvg-ar { display: none; }
+      :root[lang="ar"] .gsvg-en { display: none; }
+      :root[lang="ar"] .gsvg-ar { display: block; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">BPMN Flow Objects</text>
+  <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائنات التدفق في BPMN</text>
+
+  <!-- Table Headers -->
+  <text x="150" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Category</text>
+  <text x="150" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الفئة</text>
+
+  <text x="400" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Symbol</text>
+  <text x="400" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الرمز</text>
+
+  <text x="650" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Description</text>
+  <text x="650" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الوصف</text>
+
+  <!-- Grid Lines -->
+  <line x1="50" y1="100" x2="750" y2="100" stroke="var(--border-color)" stroke-width="2"/>
+  <line x1="50" y1="220" x2="750" y2="220" stroke="var(--border-color)" stroke-width="1"/>
+  <line x1="50" y1="340" x2="750" y2="340" stroke="var(--border-color)" stroke-width="1"/>
+  <line x1="50" y1="460" x2="750" y2="460" stroke="var(--border-color)" stroke-width="2"/>
+
+  <!-- ================= ROW 1: EVENTS ================= -->
+  <text x="150" y="165" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Events</text>
+  <text x="150" y="165" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الأحداث</text>
+
+  <!-- Start Event -->
+  <circle cx="280" cy="150" r="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="280" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Start</text>
+  <text x="280" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">البداية</text>
+
+  <!-- Intermediate Event -->
+  <circle cx="400" cy="150" r="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1.5"/>
+  <circle cx="400" cy="150" r="17" fill="none" stroke="var(--brand-500)" stroke-width="1.5"/>
+  <text x="400" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Intermediate</text>
+  <text x="400" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">وسيط</text>
+
+  <!-- End Event -->
+  <circle cx="520" cy="150" r="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="5"/>
+  <text x="520" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">End</text>
+  <text x="520" y="195" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">النهاية</text>
+
+  <!-- Events Description -->
+  <text x="650" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">
+    <tspan x="650" dy="-10">Triggers or results</tspan>
+    <tspan x="650" dy="22">of a process</tspan>
+  </text>
+  <text x="650" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">
+    <tspan x="650" dy="-10">محفزات أو نتائج</tspan>
+    <tspan x="650" dy="22">العملية</tspan>
+  </text>
+
+  <!-- ================= ROW 2: ACTIVITIES ================= -->
+  <text x="150" y="285" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Activities</text>
+  <text x="150" y="285" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الأنشطة</text>
+
+  <!-- Activity Symbol -->
+  <rect x="330" y="250" width="140" height="60" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Task</text>
+  <text x="400" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مهمة</text>
+
+  <!-- Activities Description -->
+  <text x="650" y="280" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">
+    <tspan x="650" dy="-10">Work performed</tspan>
+    <tspan x="650" dy="22">within a process</tspan>
+  </text>
+  <text x="650" y="280" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">
+    <tspan x="650" dy="-10">العمل المنجز</tspan>
+    <tspan x="650" dy="22">داخل العملية</tspan>
+  </text>
+
+  <!-- ================= ROW 3: GATEWAYS ================= -->
+  <text x="150" y="405" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Gateways</text>
+  <text x="150" y="405" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">البوابات</text>
+
+  <!-- Gateway Symbol -->
+  <polygon points="400,360 440,400 400,440 360,400" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <!-- Inner X for Exclusive Gateway -->
+  <path d="M 390 390 L 410 410 M 410 390 L 390 410" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Gateways Description -->
+  <text x="650" y="400" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">
+    <tspan x="650" dy="-10">Controls flow divergence</tspan>
+    <tspan x="650" dy="22">&amp; convergence</tspan>
+  </text>
+  <text x="650" y="400" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">
+    <tspan x="650" dy="-10">تتحكم في تفرع وتجمع</tspan>
+    <tspan x="650" dy="22">مسار التدفق</tspan>
+  </text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم تمثيل الحدث الوسيط بدائرتين متداخلتين بينما حدث البداية بدائرة واحدة؟</template>
+      <template class="content-en">Why is an intermediate event represented by a double circle while a start event is a single circle?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>هذا التمييز البصري يساعد القارئ على التعرف فوراً على نوع الحدث وموقعه المنطقي في التدفق دون الحاجة لقراءة نصوص إضافية.</p></template>
+      <template class="content-en"><p>This visual distinction helps the reader immediately identify the event type and its logical position in the flow without needing to read additional text.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="connecting-objects" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> كائنات الربط (Connecting Objects)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Connecting Objects</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كائنات الربط تحدد مسار العملية وتشمل: تدفق التسلسل (خط متصل)، تدفق الرسائل (خط متقطع)، والارتباط (خط منقط).</p></template>
+    <template class="content-en"><p>Connecting objects define the path of the process and include: Sequence flow (solid line), Message flow (dashed line), and Association (dotted line).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تسمح كائنات الربط بتوصيل كائنات التدفق ببعضها أو بالمعلومات التكميلية. هناك ثلاثة أنواع:</p><ul><li><b><span class="smart-term" data-term-en="Sequence Flow" data-ar="تدفق التسلسل" data-en-def="A solid line showing the order of execution within a single pool.">تدفق التسلسل<span class="smart-term-tooltip"></span></span> (Sequence Flow):</b> خط متصل بسهم مصمت. يحدد تسلسل الأنشطة التي سيتم تنفيذها داخل العملية (نفس الحوض).</li><li><b><span class="smart-term" data-term-en="Message Flow" data-ar="تدفق الرسائل" data-en-def="A dashed line showing communication between different pools (participants).">تدفق الرسائل<span class="smart-term-tooltip"></span></span> (Message Flow):</b> خط متقطع بسهم مفتوح. يوضح تدفق الرسائل بين مشاركين اثنين (بين حوضين مختلفين). لا يمكن استخدامه لربط كائنين داخل نفس الحوض.</li><li><b>الارتباط (Association):</b> خط منقط. يربط البيانات والنصوص والعناصر الإضافية بكائنات التدفق. يمكن استخدام رأس السهم لإظهار اتجاه المدخلات والمخرجات.</li></ul></template>
+    <template class="content-en"><p>Connecting objects allow connecting flow objects to one another or to supplementary information. There are three types:</p><ul><li><b><span class="smart-term" data-term-en="Sequence Flow" data-ar="تدفق التسلسل" data-en-def="A solid line showing the order of execution within a single pool.">Sequence Flow<span class="smart-term-tooltip"></span></span>:</b> Solid line with a solid arrow. Defines the sequence of activities to be performed in a process (within the same pool).</li><li><b><span class="smart-term" data-term-en="Message Flow" data-ar="تدفق الرسائل" data-en-def="A dashed line showing communication between different pools (participants).">Message Flow<span class="smart-term-tooltip"></span></span>:</b> Dashed line with an open arrow. Shows the flow of messages between two participants (separate pools). Never connects objects within the same pool.</li><li><b>Association:</b> Dotted line. Associates data, text, and artifacts with flow objects. Arrowheads can show inputs and outputs.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>القاعدة الذهبية في BPMN: لا يمكن لتدفق التسلسل (Sequence Flow) أن يعبر حدود الحوض (Pool)، ولا يمكن لتدفق الرسائل (Message Flow) أن يربط عناصر داخل نفس الحوض.</p><p>هذا القيد المعماري يفرض فصلاً واضحاً بين 'التحكم الداخلي' (Sequence) و'التواصل الخارجي' (Message)، مما يعكس الواقع المؤسسي حيث لا تملك التحكم المباشر في عمليات الشركاء الخارجيين.</p></template>
+    <template class="content-en"><p>The golden rule in BPMN: Sequence Flow cannot cross Pool boundaries, and Message Flow cannot connect objects within the same Pool.</p><p>This architectural constraint enforces a clear separation between 'internal control' (Sequence) and 'external communication' (Message), reflecting enterprise reality where you don't control external partners' processes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create a table showing Connecting Objects. Row 1: 'Sequence Flow' with a solid black line and solid arrowhead. Row 2: 'Message Flow' with a dashed line, open circle at start, and open arrowhead at end. Row 3: 'Association' with a dotted line and optional open arrowhead. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      text {
+        font-family: system-ui, 'Cairo', 'Inter', sans-serif;
+      }
+    </style>
+
+    <!-- Solid Arrow for Sequence Flow -->
+    <marker id="solid-arrow" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 0 2 L 12 7 L 0 12 Z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Open Arrow for Message Flow and Association -->
+    <marker id="open-arrow" viewBox="0 0 14 14" refX="12" refY="7" markerWidth="12" markerHeight="12" orient="auto">
+      <path d="M 2 2 L 12 7 L 2 12" fill="none" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+    </marker>
+
+    <!-- Open Circle for Message Flow Start -->
+    <marker id="open-circle" viewBox="0 0 14 14" refX="7" refY="7" markerWidth="12" markerHeight="12" orient="auto">
+      <circle cx="7" cy="7" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">BPMN Connecting Objects</text>
+  <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائنات الربط في BPMN</text>
+
+  <!-- Table Header Background -->
+  <path d="M 40 73 A 8 8 0 0 1 48 65 L 752 65 A 8 8 0 0 1 760 73 L 760 115 L 40 115 Z" fill="var(--bg-elevated)" />
+
+  <!-- Table Bounding Box -->
+  <rect x="40" y="65" width="720" height="350" fill="none" stroke="var(--border-color)" stroke-width="2" rx="8" />
+
+  <!-- Horizontal Dividers -->
+  <line x1="40" y1="115" x2="760" y2="115" stroke="var(--border-color)" stroke-width="2" />
+  <line x1="40" y1="215" x2="760" y2="215" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="40" y1="315" x2="760" y2="315" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- Header Texts -->
+  <text x="130" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Type</text>
+  <text x="130" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">النوع</text>
+
+  <text x="350" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Symbol</text>
+  <text x="350" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الرمز</text>
+
+  <text x="610" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Description</text>
+  <text x="610" y="96" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الوصف</text>
+
+  <!-- Row 1: Sequence Flow -->
+  <rect x="50" y="149" width="160" height="32" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="16" />
+  <text x="130" y="170" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Sequence Flow</text>
+  <text x="130" y="170" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تدفق التسلسل</text>
+
+  <line x1="240" y1="165" x2="460" y2="165" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#solid-arrow)" />
+
+  <text x="610" y="170" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Defines execution order within a pool.</text>
+  <text x="610" y="170" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">يحدد ترتيب التنفيذ داخل نفس الحوض.</text>
+
+  <!-- Row 2: Message Flow -->
+  <rect x="50" y="249" width="160" height="32" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="16" />
+  <text x="130" y="270" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Message Flow</text>
+  <text x="130" y="270" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تدفق الرسائل</text>
+
+  <line x1="240" y1="265" x2="460" y2="265" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="10,8" marker-start="url(#open-circle)" marker-end="url(#open-arrow)" />
+
+  <text x="610" y="270" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Shows communication between separate pools.</text>
+  <text x="610" y="270" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">يعرض التواصل بين أحواض منفصلة.</text>
+
+  <!-- Row 3: Association -->
+  <rect x="50" y="349" width="160" height="32" fill="var(--bg-elevated)" stroke="var(--border-color)" rx="16" />
+  <text x="130" y="370" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Association</text>
+  <text x="130" y="370" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">ارتباط</text>
+
+  <line x1="240" y1="365" x2="460" y2="365" stroke="var(--brand-500)" stroke-width="4" stroke-dasharray="2,8" stroke-linecap="round" marker-end="url(#open-arrow)" />
+
+  <text x="610" y="370" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-en">Links artifacts and data to flow objects.</text>
+  <text x="610" y="370" text-anchor="middle" font-size="14" fill="var(--text-primary)" class="gsvg-ar">يربط الكائنات والبيانات بكائنات التدفق.</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمت تدفق التسلسل لربط نشاط في شركة بنشاط في شركة أخرى؟</template>
+      <template class="content-en">What happens if you use a sequence flow to connect an activity in one company to an activity in another company?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>هذا يعتبر خطأ قواعدي في BPMN. يجب استخدام تدفق الرسائل (Message Flow) للتواصل بين كيانات مستقلة (أحواض مختلفة).</p></template>
+      <template class="content-en"><p>This is a syntax error in BPMN. Message Flow must be used for communication between independent entities (different pools).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="swim-lanes-artifacts" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> المسارات والعناصر الإضافية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Swim Lanes and Artifacts</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المسارات (الأحواض والمسارات الفرعية) تنظم الأنشطة حسب المسؤولية، بينما العناصر الإضافية (البيانات، المجموعات، الملاحظات) تضيف سياقاً دون تغيير التدفق.</p></template>
+    <template class="content-en"><p>Swim lanes (Pools and Lanes) organize activities by responsibility, while Artifacts (Data, Groups, Annotations) add context without changing the flow.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مسارات السباحة (Swim lanes):</b> تستخدم لتجميع العناصر الأساسية. لها نوعان:</p><ul><li><b>الأحواض (Pools):</b> تمثل مشاركاً مستقلاً في العملية (مثل شركة أو كيان خارجي).</li><li><b><span class="smart-term" data-term-en="Lane" data-ar="المسار" data-en-def="A sub-partition within a pool, often representing a role or department.">المسار<span class="smart-term-tooltip"></span></span>ات (Lanes):</b> تقسيمات فرعية داخل <span class="smart-term" data-term-en="Pool" data-ar="الحوض" data-en-def="Represents a participant in a process; acts as a container for a single process.">الحوض<span class="smart-term-tooltip"></span></span>، تستخدم لتقسيم الأنشطة حسب القسم المنفذ (مثل قسم المبيعات، قسم المحاسبة).</li></ul><p><b>العناصر الإضافية (Artifacts):</b> توفر معلومات إضافية ولا تؤثر على تدفق التسلسل:</p><ul><li><b>كائن البيانات (Data object):</b> يوضح كيف تتطلب الأنشطة البيانات أو تنتجها.</li><li><b>المجموعة (Group):</b> إطار متقطع يستخدم للتوثيق أو التحليل.</li><li><b>التعليق التوضيحي (Text annotation):</b> نص إضافي لمساعدة القارئ على فهم المخطط.</li></ul></template>
+    <template class="content-en"><p><b>Swim <span class="smart-term" data-term-en="Lane" data-ar="المسار" data-en-def="A sub-partition within a pool, often representing a role or department.">lane<span class="smart-term-tooltip"></span></span>s:</b> Used to group primary modeling elements. Two types:</p><ul><li><b><span class="smart-term" data-term-en="Pool" data-ar="الحوض" data-en-def="Represents a participant in a process; acts as a container for a single process.">Pool<span class="smart-term-tooltip"></span></span>s:</b> Represent a participant in a process (e.g., a company). Different pools are connected by message flows.</li><li><b>Lanes:</b> Sub-partitions within a pool. Used to divide activities, e.g., according to executing department.</li></ul><p><b>Artifacts:</b> Provide additional information without affecting sequence flows:</p><ul><li><b>Data object:</b> Shows how data is required or produced by activities.</li><li><b>Group:</b> A dashed box used for documentation or analysis purposes.</li><li><b>Text annotation:</b> Provides additional text information to the reader.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من الناحية التقنية، الحوض (Pool) يمثل عملية (Process) مستقلة بالكامل لها سياقها الخاص. لذلك، لا يمكن للمتغيرات (البيانات) أن تنتقل مباشرة بين الأحواض إلا عبر الرسائل.</p><p>المجموعات (Groups) تختلف عن العمليات الفرعية (Subprocesses) في أنها لا تضيف أي قيود منطقية أو نطاق تنفيذي؛ هي مجرد أداة بصرية للمحلل.</p></template>
+    <template class="content-en"><p>Technically, a Pool represents a completely independent Process with its own context. Therefore, variables (data) cannot pass directly between pools except via messages.</p><p>Groups differ from Subprocesses in that they add no logical constraints or execution scope; they are purely a visual tool for the analyst.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Create a diagram showing Swim Lanes and Artifacts. Left side: A large rectangle (Pool) divided horizontally into two smaller rectangles (Lanes). Right side: A Data Object (document icon), a Group (dashed rectangle), and a Text Annotation (bracket with text connected by dotted line). Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for Sequence Flows -->
+    <marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0,0 L 10,5 L 0,10 Z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Pool Header -->
+    <linearGradient id="poolGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="425" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">BPMN Elements: Swim Lanes &amp; Artifacts</text>
+  <text x="425" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">عناصر BPMN: مسارات السباحة والملحقات</text>
+
+  <!-- ========================================== -->
+  <!-- LEFT SIDE: SWIM LANES (POOL & LANES)       -->
+  <!-- ========================================== -->
+
+  <!-- Pool Outer Border -->
+  <rect x="40" y="80" width="400" height="300" fill="none" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Pool Header -->
+  <rect x="40" y="80" width="40" height="300" fill="url(#poolGrad)" stroke="var(--border-color)" stroke-width="1" />
+  <text transform="translate(65, 230) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Pool (Participant)</text>
+  <text transform="translate(65, 230) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">تجمع (مشارك)</text>
+
+  <!-- Lane 1 -->
+  <rect x="80" y="80" width="40" height="150" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <rect x="120" y="80" width="320" height="150" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text transform="translate(105, 155) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Lane 1 (e.g., Sales)</text>
+  <text transform="translate(105, 155) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مسار 1 (مثل: المبيعات)</text>
+
+  <!-- Lane 2 -->
+  <rect x="80" y="230" width="40" height="150" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <rect x="120" y="230" width="320" height="150" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text transform="translate(105, 305) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Lane 2 (e.g., IT)</text>
+  <text transform="translate(105, 305) rotate(-90)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مسار 2 (مثل: تقنية المعلومات)</text>
+
+  <!-- Activities inside Lanes -->
+  <!-- Start Event -->
+  <circle cx="170" cy="155" r="15" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  
+  <!-- Task 1 -->
+  <rect x="230" y="135" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="280" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Activity A</text>
+  <text x="280" y="160" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">نشاط أ</text>
+
+  <!-- Task 2 -->
+  <rect x="230" y="285" width="100" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="280" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Activity B</text>
+  <text x="280" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">نشاط ب</text>
+
+  <!-- End Event -->
+  <circle cx="390" cy="305" r="15" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="4" />
+
+  <!-- Sequence Flows -->
+  <path d="M 185,155 L 225,155" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#flow-arrow)" />
+  <path d="M 280,175 L 280,280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#flow-arrow)" />
+  <path d="M 330,305 L 370,305" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#flow-arrow)" />
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SIDE: ARTIFACTS                      -->
+  <!-- ========================================== -->
+
+  <!-- Artifacts Section Background -->
+  <rect x="480" y="80" width="330" height="300" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="645" y="105" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">Artifacts</text>
+  <text x="645" y="105" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">الملحقات</text>
+
+  <!-- Data Object -->
+  <path d="M 520,130 L 548,130 L 560,142 L 560,185 L 520,185 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 548,130 L 548,142 L 560,142" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <!-- Document lines -->
+  <path d="M 528,150 L 552,150 M 528,160 L 552,160 M 528,170 L 545,170" fill="none" stroke="var(--brand-400)" stroke-width="1.5" />
+  
+  <text x="540" y="210" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Data Object</text>
+  <text x="540" y="210" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">كائن بيانات</text>
+
+  <!-- Association Line (Data Object to Task 1) -->
+  <path d="M 330,155 L 520,155" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6,4" />
+
+  <!-- Group -->
+  <rect x="620" y="125" width="160" height="90" rx="8" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,6" />
+  <text x="700" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Group</text>
+  <text x="700" y="145" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">مجموعة</text>
+  
+  <!-- Dummy elements inside Group -->
+  <rect x="640" y="165" width="40" height="25" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <rect x="720" y="165" width="40" height="25" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <path d="M 680,177 L 720,177" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="2,2" />
+
+  <!-- Text Annotation -->
+  <path d="M 640,250 L 620,250 L 620,330 L 640,330" fill="none" stroke="var(--text-primary)" stroke-width="2" />
+  
+  <text x="700" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Text Annotation:</text>
+  <text x="700" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Provides info</text>
+  <text x="700" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">without affecting flow</text>
+
+  <text x="700" y="275" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">تعليق نصي:</text>
+  <text x="700" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">يوفر معلومات</text>
+  <text x="700" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">دون التأثير على التدفق</text>
+
+  <!-- Association Line (Group to Text Annotation) -->
+  <path d="M 700,215 L 700,290 L 620,290" fill="none" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,4" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن أن يحتوي المسار (Lane) على حوض (Pool) بداخله؟</template>
+      <template class="content-en">Can a Lane contain a Pool inside it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، التسلسل الهرمي صارم: المخطط يحتوي على أحواض، والحوض يحتوي على مسارات.</p></template>
+      <template class="content-en"><p>No, the hierarchy is strict: A diagram contains Pools, and a Pool contains Lanes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="events-in-detail" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تفاصيل الأحداث والمحفزات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Events in Detail: Triggers and Results</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الأحداث يمكن أن تُحفز (Triggers) بواسطة رسائل أو وقت أو شروط، ويمكن أن تنتج نتائج (Results) عند انتهائها.</p></template>
+    <template class="content-en"><p>Events can be activated by Triggers (messages, timers, conditions) and can produce Results upon completion.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الأحداث الأكثر شيوعاً هي أحداث البداية والنهاية. يعتمد نوع الحدث على كيفية تحفيزه أو نتيجته:</p><ul><li><b>محفزات أحداث البداية (Start Event Triggers):</b><ul><li>محفز الرسالة (Message trigger): الأكثر شيوعاً لبدء العملية.</li><li>محفز المؤقت (Timer trigger): يبدأ بناءً على وقت محدد.</li><li>محفز الشرط (Condition trigger): يبدأ عندما يصبح شرط معين صحيحاً.</li><li>محفز الإشارة (Signal trigger): يشبه الرسالة ولكنه يُبث للجميع (Broadcast).</li><li>محفزات متعددة (Multiple triggers).</li></ul></li><li><b>نتائج أحداث النهاية (End Event Results):</b> تمثل النتائج المختلفة التي تنتجها العملية (نتيجة رسالة، نتيجة إشارة، نتائج متعددة).</li></ul></template>
+    <template class="content-en"><p>The most common types of events are start and end events. Event types depend on <span class="smart-term" data-term-en="Trigger" data-ar="المحفز" data-en-def="The mechanism that causes an event to occur (e.g., a timer going off or a message arriving).">trigger<span class="smart-term-tooltip"></span></span>s and results:</p><ul><li><b>Start Event Triggers:</b><ul><li>Message trigger: Most common way to start a BPMN process.</li><li>Timer trigger: Starts based on a specific time/date.</li><li>Condition trigger: Starts when a business condition becomes true.</li><li>Signal trigger: Similar to a message but broadcasted.</li><li>Multiple and parallel multiple triggers.</li></ul></li><li><b>End Event Results:</b> Represent different results a process may produce (Message result, Signal result, Multiple results).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين 'الرسالة' (Message) و'الإشارة' (Signal) في BPMN هو أن الرسالة موجهة من مرسل محدد إلى مستقبل محدد (Point-to-Point)، بينما الإشارة تُبث في النظام ويمكن التقاطها بواسطة أي عملية تستمع إليها (Publish-Subscribe).</p></template>
+    <template class="content-en"><p>The fundamental difference between a 'Message' and a 'Signal' in BPMN is that a Message is directed from a specific sender to a specific receiver (Point-to-Point), whereas a Signal is broadcasted and can be caught by any process listening for it (Publish-Subscribe).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت إيقاف 5 عمليات مختلفة في نفس الوقت بسبب حالة طوارئ، هل تستخدم رسالة أم إشارة؟</template>
+      <template class="content-en">If you want to stop 5 different processes simultaneously due to an emergency, would you use a message or a signal?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم إشارة (Signal)، لأنها تُبث للجميع ويمكن للعمليات الخمس التقاطها في نفس الوقت، بينما الرسالة تتطلب إرسال 5 رسائل منفصلة.</p></template>
+      <template class="content-en"><p>I would use a Signal, because it is broadcasted and all 5 processes can catch it simultaneously, whereas a message would require sending 5 separate messages.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="intermediate-events-gateways" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الأحداث الوسيطة والبوابات القائمة على الأحداث</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Intermediate Events and Event-Based Gateways</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الأحداث الوسيطة إما تلتقط (Catching) مدخلات أو ترمي (Throwing) مخرجات، والبوابة القائمة على الأحداث توجه التدفق بناءً على الحدث الذي يقع أولاً.</p></template>
+    <template class="content-en"><p>Intermediate events either Catch inputs or Throw outputs, and Event-Based Gateways route flow based on which event occurs first.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الأحداث الوسيطة (Intermediate Events):</b> تحدث في مكان ما على طول مسار العملية.</p><ul><li><b>الالتقاط (Catching):</b> الحدث الذي ينتظر مدخلات (مثل انتظار رسالة أو مؤقت).</li><li><b>الرمي (Throwing):</b> الحدث الذي ينتج مخرجات (مثل إرسال رسالة).</li></ul><p><b>البوابة القائمة على الأحداث (Event-Based Gateway):</b> تشبه حدثاً وسيطاً بمحفزات متعددة. الحدث الذي يقع أولاً سيحدد المسار الذي سيتم اتباعه، وسيتم تخطي المسارات المتبقية. إذا كانت هذه البوابة هي العنصر الأول في العملية، فإن الحدث الأول الذي يقع سيقوم بإنشاء مثيل للعملية (Instantiates the process).</p></template>
+    <template class="content-en"><p><b>Intermediate Events:</b> Occur somewhere along the flow of the process.</p><ul><li><b>Catching:</b> An event that waits for some input (e.g., waiting for a message or timer).</li><li><b>Throwing:</b> An event that produces some output (e.g., sending a message).</li></ul><p><b><span class="smart-term" data-term-en="Event-Based Gateway" data-ar="بوابة قائمة على الأحداث" data-en-def="A gateway that routes flow based on which of several events occurs first.">Event-Based Gateway<span class="smart-term-tooltip"></span></span>:</b> Similar to an intermediate event with multiple triggers. The event that occurs first determines the branch to be followed, and remaining branches are skipped. If it's the first element, the first event to occur instantiates the process.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>البوابة القائمة على الأحداث (Event-Based Gateway) تختلف جذرياً عن البوابة الحصرية (Exclusive Gateway).</p><ul><li><strong>البوابة الحصرية</strong> تتخذ قراراً بناءً على بيانات موجودة بالفعل (مثال: هل الرصيد > 100؟).</li><li>بينما <strong>البوابة القائمة على الأحداث</strong> تتوقف وتنتظر أحداثاً خارجية (مثال: هل سيصل رد العميل أولاً أم سينتهي المؤقت الزمني؟).</li></ul></template>
+    <template class="content-en"><p>An Event-Based Gateway is fundamentally different from an Exclusive Gateway.</p><ul><li><strong>An Exclusive Gateway</strong> makes a decision based on existing data (e.g., is balance > 100?).</li><li><strong>An Event-Based Gateway</strong> pauses and waits for external events (e.g., will the customer reply arrive first, or will the timer expire?).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Catching Event</th><th>Throwing Event</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الوظيفة الأساسية</template>
+          <template class="content-en">Primary Function</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ينتظر مدخلات أو محفز خارجي</template>
+          <template class="content-en">Waits for input or external trigger</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ينتج مخرجات أو يرسل محفز</template>
+          <template class="content-en">Produces output or sends a trigger</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تأثيره على التدفق</template>
+          <template class="content-en">Effect on Flow</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يوقف التدفق مؤقتاً حتى يقع الحدث</template>
+          <template class="content-en">Pauses flow until the event occurs</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يُنفذ فوراً ويستمر التدفق</template>
+          <template class="content-en">Executes immediately and flow continues</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نظام طلبات البيتزا، كيف تمثل حالة: 'انتظر استلام البيتزا، ولكن إذا مر 45 دقيقة قم بالاتصال بالمطعم'؟</template>
+      <template class="content-en">In a pizza ordering system, how do you represent: 'Wait to receive pizza, but if 45 minutes pass, call the restaurant'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>باستخدام بوابة قائمة على الأحداث (Event-Based Gateway) تتفرع إلى مسارين: الأول حدث التقاط رسالة (استلام البيتزا)، والثاني حدث مؤقت (45 دقيقة). أيهما يحدث أولاً يحدد المسار.</p></template>
+      <template class="content-en"><p>Using an Event-Based Gateway branching into two paths: a message catching event (receive pizza) and a timer event (45 mins). Whichever happens first determines the path.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="activities-subprocesses-looping" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الأنشطة، العمليات الفرعية، والتكرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Activities, Subprocesses, and Looping</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الأنشطة يمكن أن تكون مهام بسيطة أو عمليات فرعية معقدة (مطوية أو موسعة)، ويمكن ضبطها لتتكرر (Looping) حتى يتحقق شرط معين.</p></template>
+    <template class="content-en"><p>Activities can be simple tasks or complex subprocesses (collapsed or expanded), and can be set to loop until a condition is met.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>أنواع الأنشطة:</b> يحدد BPMN 2.0 عدة أنواع مثل: مهمة خدمة (Service)، إرسال (Send)، استقبال (Receive)، مهمة يدوية (Manual)، <span class="smart-term" data-term-en="User Task" data-ar="مهمة مستخدم" data-en-def="A typical workflow task where a human performer executes the task with the assistance of a software application.">مهمة مستخدم<span class="smart-term-tooltip"></span></span> (User)، مهمة نص برمجي (Script)، ومهمة قاعدة عمل (Business rule).</p><p><b>العمليات الفرعية (Subprocesses):</b> نشاط يعمل كعنصر نائب لمنطق عملية إضافي. لها شكلان:</p><ul><li><b>مطوية (Collapsed):</b> تبدو كنشاط عادي مع علامة زائد (+) تشير لوجود تفاصيل داخلية.</li><li><b>موسعة (Expanded):</b> تُظهر المنطق الداخلي (بداية، أنشطة، نهاية). يجب أن تصل لنهايتها حتى تكمل العملية الأب مسارها.</li></ul><p><b>التكرار (Looping):</b> يمكن تحديد النشاط ليتم تنفيذه عدة مرات. نشاط التكرار (Loop activity) يستمر في العمل حتى يصبح شرط معين صحيحاً. يمكن أيضاً إنشاء تكرار باستخدام البوابات (Sequence looping).</p></template>
+    <template class="content-en"><p><b>Activity Types:</b> BPMN 2.0 defines several kinds: Service task, Send task, Receive task, Manual task, <span class="smart-term" data-term-en="User Task" data-ar="مهمة مستخدم" data-en-def="A typical workflow task where a human performer executes the task with the assistance of a software application.">User task<span class="smart-term-tooltip"></span></span>, Script task, Business rule task.</p><p><b>Subprocesses:</b> An activity that is a placeholder for additional process logic. Two forms:</p><ul><li><b>Collapsed:</b> Looks like a regular activity with a plus sign (+) indicating hidden logic.</li><li><b>Expanded:</b> Shows the logic inside (start, activities, end). The parent process proceeds only when the subprocess reaches its end event.</li></ul><p><b>Looping:</b> An activity can be executed multiple times. A loop activity keeps running until a condition is true. Loops can also be made using gateways (Sequence looping).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق بين 'مهمة المستخدم' (User Task) و'المهمة اليدوية' (Manual Task) دقيق ولكنه مهم: مهمة المستخدم تتطلب تفاعلاً مع نظام برمجي (مثل إدخال بيانات في شاشة)، بينما المهمة اليدوية تتم خارج النظام بالكامل (مثل تحميل صناديق في شاحنة).</p><p>استخدام العمليات الفرعية المطوية ضروري لإدارة التعقيد (Abstraction) في النماذج الكبيرة، مما يسمح للمديرين برؤية الصورة الكبيرة دون الغرق في التفاصيل.</p></template>
+    <template class="content-en"><p>The difference between a 'User Task' and a 'Manual Task' is subtle but important: A User Task requires interaction with a software system (e.g., entering data into a UI), while a Manual Task is performed entirely outside the system (e.g., loading boxes onto a truck).</p><p>Using <span class="smart-term" data-term-en="Collapsed Subprocess" data-ar="عملية فرعية مطوية" data-en-def="A subprocess whose internal details are hidden, marked with a plus sign.">collapsed subprocess<span class="smart-term-tooltip"></span></span>es is essential for managing complexity (Abstraction) in large models, allowing managers to see the big picture without drowning in details.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show two types of looping. Left: 'Activity Looping' showing a rounded rectangle with a circular arrow icon at the bottom center. Right: 'Sequence Looping' showing a sequence flow going from a task to a gateway, and a sequence flow looping back from the gateway to the task. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Drop Shadow for Elevated Elements -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="var(--text-primary)" flood-opacity="0.15"/>
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="45" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">BPMN Looping Mechanisms</text>
+    <text x="400" y="45" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">آليات التكرار في BPMN</text>
+
+    <!-- Center Divider -->
+    <line x1="400" y1="80" x2="400" y2="360" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDE: ACTIVITY LOOPING                -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="200" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">Activity Looping</text>
+    <text x="200" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">تكرار النشاط</text>
+    
+    <text x="200" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Loop condition evaluated internally</text>
+    <text x="200" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">يتم تقييم شرط التكرار داخلياً</text>
+
+    <!-- Start Event -->
+    <circle cx="70" cy="190" r="15" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" filter="url(#shadow)" />
+    <text x="70" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">Start</text>
+    <text x="70" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">البداية</text>
+    <line x1="85" y1="190" x2="118" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Task Box -->
+    <rect x="120" y="150" width="160" height="80" rx="10" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)" />
+    <text x="200" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Process Item</text>
+    <text x="200" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">عنصر العملية</text>
+
+    <!-- Loop Marker (Circular Arrow inside bottom center of task box) -->
+    <g transform="translate(0, 0)">
+        <path d="M 200 212 A 8 8 0 1 1 192 220 M 192 220 L 189 225 M 192 220 L 195 225" fill="none" stroke="var(--text-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- End Event -->
+    <line x1="280" y1="190" x2="313" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <circle cx="330" cy="190" r="15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="4" filter="url(#shadow)" />
+    <text x="330" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">End</text>
+    <text x="330" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">النهاية</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT SIDE: SEQUENCE LOOPING               -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="600" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">Sequence Looping</text>
+    <text x="600" y="310" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">تكرار التسلسل</text>
+    
+    <text x="600" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Loop controlled by a gateway</text>
+    <text x="600" y="335" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">يتم التحكم في التكرار بواسطة بوابة</text>
+
+    <!-- Start Event -->
+    <circle cx="390" cy="190" r="15" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" filter="url(#shadow)" />
+    <text x="390" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">Start</text>
+    <text x="390" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">البداية</text>
+    <line x1="405" y1="190" x2="448" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Task Box -->
+    <rect x="450" y="150" width="120" height="80" rx="10" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)" />
+    <text x="510" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Process Item</text>
+    <text x="510" y="195" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">عنصر العملية</text>
+
+    <!-- Task to Gateway Flow -->
+    <line x1="570" y1="190" x2="648" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Gateway -->
+    <polygon points="680,160 710,190 680,220 650,190" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)" />
+    <path d="M 672,182 L 688,198 M 688,182 L 672,198" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Loop-back Flow (Gateway to Task) -->
+    <path d="M 680,160 L 680,110 Q 680,100 670,100 L 520,100 Q 510,100 510,110 L 510,148" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="595" y="92" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">Condition = True</text>
+    <text x="595" y="92" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">الشرط = صحيح</text>
+
+    <!-- Forward Flow (Gateway to End) -->
+    <line x1="710" y1="190" x2="753" y2="190" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="735" y="182" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-en">False</text>
+    <text x="735" y="182" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="var(--brand-ink)" class="gsvg-ar">خطأ</text>
+
+    <!-- End Event -->
+    <circle cx="770" cy="190" r="15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="4" filter="url(#shadow)" />
+    <text x="770" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">End</text>
+    <text x="770" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">النهاية</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام نشاط التكرار (Loop Activity) بدلاً من التكرار باستخدام البوابات (Sequence Looping)؟</template>
+      <template class="content-en">When would you prefer using a Loop Activity over Sequence Looping with gateways?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يُفضل نشاط التكرار عندما يكون التكرار محصوراً في مهمة واحدة محددة، مما يجعل المخطط أنظف. التكرار بالبوابات يُستخدم عندما يتضمن التكرار سلسلة من المهام المتعددة.</p></template>
+      <template class="content-en"><p>A Loop Activity is preferred when the repetition is confined to a single specific task, keeping the diagram cleaner. Sequence looping is used when the loop involves a series of multiple tasks.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="exception-handling" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> معالجة الاستثناءات (Exception Handling)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Exception Handling</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يوفر BPMN أدوات للتعامل مع الأخطاء والمواقف غير المتوقعة من خلال أحداث الخطأ، أحداث التصعيد، والعمليات الفرعية للأحداث.</p></template>
+    <template class="content-en"><p>BPMN provides tools to handle errors and unexpected situations through Error events, Escalation events, and Event subprocesses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر BPMN 2.0 عدة هياكل لتمثيل معالجة الاستثناءات:</p><ol><li><b>أحداث الخطأ (Error events):</b> الحل التقليدي. يمكن أن تكون حدثاً وسيطاً (لالتقاط الخطأ Catching) متصلاً بحدود النشاط، أو حدث نهاية (لرمي الخطأ Throwing).</li><li><b>الأحداث الوسيطة المرفقة (Attached Intermediate events):</b> تُرفق بحدود النشاط. عادة ما تكون <i>مقاطِعة (Interrupting)</i> (توقف النشاط الأصلي)، ولكن BPMN يدعم أيضاً الأحداث <i>غير المقاطِعة (Non-interrupting)</i> (مثل الرد على استفسار أثناء استمرار النشاط).</li><li><b>أحداث التصعيد (Escalation events):</b> تنبيه شخص أعلى في الهيكل الإداري (مثل المشرف) للتدخل. يمكن رميها بأحداث وسيطة والتقاطها بأحداث غير مقاطعة.</li><li><b>العمليات الفرعية للأحداث (Event subprocesses):</b> تُحفز بحدث يقع بالتوازي مع التدفق الرئيسي. تستمر في الاستماع للأحداث طوال مدة العملية، عكس الأحداث الوسيطة التي تتوقف عن الاستماع بمجرد انتهاء نشاطها.</li></ol></template>
+    <template class="content-en"><p>BPMN 2.0 provides several constructs to represent exception handling:</p><ol><li><b>Error events:</b> The traditional solution. Can be an intermediate event (catching the error) attached to an activity's boundary, or an end event (throwing the error).</li><li><b>Attached Intermediate events:</b> Attached to activity boundaries. Usually <i>interrupting</i> (stops the activity), but BPMN enables <i>non-interrupting</i> events (e.g., handling an inquiry while the activity keeps running).</li><li><b><span class="smart-term" data-term-en="Escalation Event" data-ar="حدث التصعيد" data-en-def="An event used to alert someone with higher responsibility of a problematic situation without necessarily aborting the process.">Escalation event<span class="smart-term-tooltip"></span></span>s:</b> Alerting someone higher up (e.g., a supervisor) to intervene. Can be thrown by intermediate events and caught by non-interrupting attached events.</li><li><b><span class="smart-term" data-term-en="Event Subprocess" data-ar="عملية فرعية لحدث" data-en-def="A subprocess triggered by an event that occurs in parallel with the main process flow.">Event subprocess<span class="smart-term-tooltip"></span></span>es:</b> Triggered by an event occurring in parallel with the main flow. They keep listening for events during the entire duration of a process.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق بين حدث الخطأ (Error) و<span class="smart-term" data-term-en="Escalation Event" data-ar="حدث التصعيد" data-en-def="An event used to alert someone with higher responsibility of a problematic situation without necessarily aborting the process.">حدث التصعيد<span class="smart-term-tooltip"></span></span> (Escalation) هو أن الخطأ عادة ما يكون قاتلاً للنشاط الحالي (يجب مقاطعته وإلغاؤه)، بينما التصعيد غالباً ما يكون غير مقاطع؛ العملية تستمر ولكن يتم إبلاغ الإدارة بوجود تأخير أو مشكلة.</p><p>العمليات الفرعية للأحداث (Event Subprocesses) قوية جداً لأنها تعمل كـ 'مستمع عام' (Global Listener) على مستوى العملية بأكملها، بدلاً من ربط مستمع بكل نشاط على حدة.</p></template>
+    <template class="content-en"><p>The difference between an Error and an Escalation is that an Error is typically fatal to the current activity (it must be interrupted and aborted), while an Escalation is often non-interrupting; the process continues, but management is notified of a delay or issue.</p><p>Event Subprocesses are highly powerful because they act as a 'Global Listener' at the process level, rather than attaching a listener to every single activity.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Error Event</th><th>Escalation Event</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبيعة الحدث</template>
+          <template class="content-en">Nature of Event</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مشكلة حرجة تمنع الإكمال</template>
+          <template class="content-en">Critical issue preventing completion</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">موقف يتطلب انتباهاً إدارياً</template>
+          <template class="content-en">Situation requiring management attention</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تأثير المقاطعة</template>
+          <template class="content-en">Interrupting Effect</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يقاطع النشاط دائماً</template>
+          <template class="content-en">Always interrupts the activity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يمكن أن يكون غير مقاطع (تستمر العملية)</template>
+          <template class="content-en">Can be non-interrupting (process continues)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان العميل يستطيع إلغاء الطلب في أي وقت خلال عملية التجهيز التي تستغرق أياماً، ما هو أفضل عنصر BPMN لنمذجة ذلك؟</template>
+      <template class="content-en">If a customer can cancel an order at any time during a multi-day preparation process, what is the best BPMN element to model this?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أفضل عنصر هو 'العملية الفرعية للحدث' (Event Subprocess) التي تستمع لرسالة الإلغاء، لأنها تظل نشطة طوال مدة العملية الرئيسية.</p></template>
+      <template class="content-en"><p>The best element is an 'Event Subprocess' listening for a cancellation message, because it remains active throughout the entire duration of the main process.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transactions-compensation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> المعاملات والتعويض (Transactions and Compensation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Transactions and Compensation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في عمليات الأعمال، المعاملات طويلة الأمد ولا يمكن التراجع عنها ببساطة (Rollback)، بل تتطلب آليات تعويض (Compensation) لعكس تأثير المهام المكتملة.</p></template>
+    <template class="content-en"><p>In business processes, transactions are long-running and cannot simply be rolled back; they require Compensation mechanisms to reverse completed tasks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل المعاملات في عمليات الأعمال بشكل مختلف عن المعاملات التقليدية في قواعد البيانات. في عمليات الأعمال، توجد معاملات طويلة الأمد (Long-running transactions)، حيث يتم تأكيد العمل (Committed) بشكل تدريجي بدلاً من الاحتفاظ به حتى نهاية المعاملة.</p><p>يوفر BPMN هياكل لتمثيل المعاملات والتعويض:</p><ul><li><b>معالجات التعويض (Compensation handlers):</b> ارتباط بين المهمة (أ) والمهمة (ب)، حيث تكون المهمة (ب) هي <span class="smart-term" data-term-en="Compensation Handler" data-ar="معالج التعويض" data-en-def="A specific task designed to undo or mitigate the effects of a previously completed task.">معالج التعويض<span class="smart-term-tooltip"></span></span> للمهمة (أ) (أي تقوم بعكس تأثيرها).</li><li><b>العمليات الفرعية للمعاملات (Transactional subprocesses):</b> تعمل كحاوية للأنشطة التي يجب أن تنجح معاً أو تفشل معاً (ويتم تعويضها).</li><li><b>أحداث التعويض (Compensation events):</b> يمكن تحفيز معالجات التعويض صراحةً من خلال استخدام أحداث التعويض.</li></ul></template>
+    <template class="content-en"><p>In business processes, transactions work differently from traditional database transactions. There are <span class="smart-term" data-term-en="Long-running transaction" data-ar="معاملة طويلة الأمد" data-en-def="A transaction in a business process that takes a long time to complete and commits work stepwise.">long-running transaction<span class="smart-term-tooltip"></span></span>s, where work is committed in a stepwise fashion instead of being held until the very end.</p><p>BPMN provides constructs to represent transactions and compensation:</p><ul><li><b><span class="smart-term" data-term-en="Compensation Handler" data-ar="معالج التعويض" data-en-def="A specific task designed to undo or mitigate the effects of a previously completed task.">Compensation handler<span class="smart-term-tooltip"></span></span>s:</b> An association between task A and task B, meaning task B is the compensation handler for task A (it reverses A's effects).</li><li><b>Transactional subprocesses:</b> A container for activities that must succeed together or fail together (and be compensated).</li><li><b>Compensation events:</b> Compensation handlers can be triggered explicitly through compensation events.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج التعويض؟ في قواعد البيانات، إذا فشلت معاملة، يتم عمل Rollback فوري. في الأعمال، إذا قمت بحجز تذكرة طيران (تم التأكيد) ثم فشل حجز الفندق، لا يمكنك عمل Rollback لقاعدة بيانات شركة الطيران. يجب عليك تنفيذ معاملة جديدة (إلغاء الحجز ودفع غرامة)، وهذا ما يسمى بالتعويض (Compensation).</p></template>
+    <template class="content-en"><p>Why do we need compensation? In databases, if a transaction fails, an immediate Rollback occurs. In business, if you book a flight (committed) and then the hotel booking fails, you cannot rollback the airline's database. You must execute a new transaction (cancel flight, pay fee), which is called Compensation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أعط مثالاً واقعياً لمهمة ومعالج التعويض الخاص بها.</template>
+      <template class="content-en">Give a real-world example of a task and its compensation handler.</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المهمة: 'خصم المبلغ من بطاقة الائتمان'. معالج التعويض: 'إرجاع المبلغ (Refund) إلى بطاقة الائتمان'.</p></template>
+      <template class="content-en"><p>Task: 'Charge credit card'. Compensation handler: 'Refund credit card'.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في عالم نمذجة الأعمال. تخيلوا أن BPMN هي لغة الإسبرانتو لعالم الشركات؛ لغة يفهمها المدير الذي لا يعرف البرمجة، والمبرمج الذي لا يعرف الإدارة. في هذا الجزء، ركزنا على القواعد الأساسية لهذه اللغة: العناصر الخمسة. تذكروا دائماً الأشكال الهندسية: الدائرة للحدث، المستطيل للنشاط، والمعين للبوابة. للامتحان، ركزوا بشدة على الفرق بين تدفق التسلسل وتدفق الرسائل (هذا فخ كلاسيكي!). افهموا جيداً كيف تختلف البوابة القائمة على الأحداث عن البوابات العادية، وكيف نتعامل مع الأخطاء ليس فقط بإيقاف النظام، بل بالتصعيد أو التعويض. التعويض (Compensation) مفهوم حيوي جداً؛ في العالم الحقيقي لا يوجد زر 'تراجع' لحجز طيران، بل يوجد 'إلغاء ودفع غرامة'. راجعوا هذه المفاهيم، فهي أساس تصميم أي نظام مؤسسي ناجح.</template>
+    <template class="content-en">Welcome, future engineers, to the world of business modeling. Imagine BPMN as the Esperanto of the corporate world; a language understood by managers who don't code, and coders who don't manage. In this part, we focused on the grammar of this language: the five core elements. Always remember the shapes: Circle for Event, Rectangle for Activity, Diamond for Gateway. For the exam, focus heavily on the strict rule separating Sequence Flow and Message Flow (a classic trap!). Understand how Event-Based Gateways differ from regular ones, and how we handle exceptions not just by crashing, but through Escalation and Compensation. Compensation is vital; in the real world, there is no 'Ctrl+Z' for a flight booking, only 'cancel and pay a fee'. Master these, as they are the blueprint for any successful enterprise system.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تم إنشاء معيار BPMN أساساً؟</template>
+          <template class="content-en">Why was the BPMN standard created in the first place?</template>
+          <span class="content-target">لماذا تم إنشاء معيار BPMN أساساً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لسد الفجوة بين تصميم الأعمال والتنفيذ التقني. كان مديرو الأعمال يستخدمون نماذج لا يفهمها المبرمجون، فجاء BPMN ليوفر لغة بصرية موحدة يفهمها الجميع.</template>
+          <template class="content-en">To bridge the gap between business design and technical implementation. Business managers used models programmers couldn't execute, so BPMN provided a standardized visual language understood by all.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي القاعدة الذهبية لربط العناصر بين الأحواض (Pools) المختلفة؟</template>
+          <template class="content-en">What is the golden rule for connecting elements between different Pools?</template>
+          <span class="content-target">ما هي القاعدة الذهبية لربط العناصر بين الأحواض (Pools) المختلفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب استخدام 'تدفق الرسائل' (Message Flow - خط متقطع) فقط. يمنع منعاً باتاً استخدام 'تدفق التسلسل' (Sequence Flow) لعبور حدود الحوض.</template>
+          <template class="content-en">You MUST use 'Message Flow' (dashed line) only. It is strictly forbidden to use 'Sequence Flow' to cross Pool boundaries.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم البوابة القائمة على الأحداث (Event-Based Gateway)؟</template>
+          <template class="content-en">When do we use an Event-Based Gateway?</template>
+          <span class="content-target">متى نستخدم البوابة القائمة على الأحداث (Event-Based Gateway)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما يعتمد مسار العملية على حدث خارجي مستقبلي (مثل: أيهما يحدث أولاً، وصول رد العميل أم انتهاء مهلة 24 ساعة؟) وليس على بيانات حالية.</template>
+          <template class="content-en">When the process path depends on a future external event (e.g., which happens first: customer reply arrives OR 24-hour timer expires?) rather than current data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الحدث الوسيط 'الالتقاطي' (Catching) و'الرامي' (Throwing)؟</template>
+          <template class="content-en">What is the difference between a 'Catching' and 'Throwing' intermediate event?</template>
+          <span class="content-target">ما الفرق بين الحدث الوسيط 'الالتقاطي' (Catching) و'الرامي' (Throwing)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الالتقاطي يوقف العملية وينتظر محفزاً (مثل انتظار رسالة). الرامي ينفذ إجراءً فورياً (مثل إرسال رسالة) وتستمر العملية دونه توقف.</template>
+          <template class="content-en">Catching pauses the process waiting for a trigger (like waiting for a message). Throwing performs an immediate action (like sending a message) and the process continues.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف حدث التصعيد (Escalation) عن حدث الخطأ (Error)؟</template>
+          <template class="content-en">How does an Escalation event differ from an Error event?</template>
+          <span class="content-target">كيف يختلف حدث التصعيد (Escalation) عن حدث الخطأ (Error)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخطأ عادة ينهي النشاط الحالي (مقاطع). التصعيد يُستخدم لإبلاغ مستوى إداري أعلى بمشكلة، وغالباً ما يكون غير مقاطع (تستمر العملية أثناء معالجة المشكلة).</template>
+          <template class="content-en">An Error typically terminates the current activity (interrupting). Escalation is used to notify higher management of an issue and is often non-interrupting (process continues while issue is handled).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي فائدة العملية الفرعية المطوية (Collapsed Subprocess)؟</template>
+          <template class="content-en">What is the benefit of a Collapsed Subprocess?</template>
+          <span class="content-target">ما هي فائدة العملية الفرعية المطوية (Collapsed Subprocess)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إخفاء التعقيد. تسمح بعرض المخطط بمستوى عالٍ من التجريد للمديرين، بينما يمكن للمطورين توسيعها لرؤية التفاصيل التقنية الدقيقة.</template>
+          <template class="content-en">Hiding complexity. It allows displaying the diagram at a high level of abstraction for managers, while developers can expand it to see precise technical details.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم التراجع (Rollback) في عمليات الأعمال كما نفعل في قواعد البيانات؟</template>
+          <template class="content-en">Why don't we use Rollback in business processes like we do in databases?</template>
+          <span class="content-target">لماذا لا نستخدم التراجع (Rollback) في عمليات الأعمال كما نفعل في قواعد البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن عمليات الأعمال طويلة الأمد وتتفاعل مع أنظمة خارجية وواقع مادي (مثل شحن بضاعة). لا يمكنك التراجع عن شحن بضاعة برمجياً، بل يجب 'تعويضها' (إرجاع البضاعة).</template>
+          <template class="content-en">Because business processes are long-running and interact with external systems and physical reality (like shipping goods). You can't programmatically rollback a shipment; you must 'compensate' (return the goods).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور 'معالج التعويض' (Compensation Handler)؟</template>
+          <template class="content-en">What is the role of a 'Compensation Handler'?</template>
+          <span class="content-target">ما هو دور 'معالج التعويض' (Compensation Handler)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو نشاط مخصص لعكس أو إلغاء تأثير نشاط تم إكماله بنجاح سابقاً، في حال فشلت العملية الكلية لاحقاً.</template>
+          <template class="content-en">It is a specific activity designed to reverse or undo the effects of a previously successfully completed activity, in case the overall process fails later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين 'الرسالة' (Message) و'الإشارة' (Signal) في محفزات الأحداث؟</template>
+          <template class="content-en">What is the difference between a 'Message' and a 'Signal' in event triggers?</template>
+          <span class="content-target">ما الفرق بين 'الرسالة' (Message) و'الإشارة' (Signal) في محفزات الأحداث؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الرسالة موجهة من مرسل محدد إلى مستقبل محدد. الإشارة تُبث (Broadcast) للجميع، وأي عملية تستمع لهذه الإشارة يمكنها التقاطها والتفاعل معها.</template>
+          <template class="content-en">A Message is directed from a specific sender to a specific receiver. A Signal is broadcasted, and any process listening for that signal can catch it and react.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن لـ 'المجموعة' (Group) أن تؤثر على تسلسل تنفيذ العملية؟</template>
+          <template class="content-en">Can a 'Group' affect the execution sequence of a process?</template>
+          <span class="content-target">هل يمكن لـ 'المجموعة' (Group) أن تؤثر على تسلسل تنفيذ العملية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، المجموعة هي مجرد 'عنصر إضافي' (Artifact) يُستخدم للتوثيق البصري أو التحليل، ولا يضيف أي قيود منطقية على التنفيذ.</template>
+          <template class="content-en">No, a Group is merely an 'Artifact' used for visual documentation or analysis, and it adds no logical constraints to the execution.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الهدف الأساسي من BPMN؟",
+      "en": "What is the primary goal of BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توفير ترميز مفهوم بسهولة لجميع مستخدمي الأعمال (محللين، مطورين، مدراء) لسد الفجوة بينهم.",
+        "en": "To provide a notation readily understandable by all business users to bridge the gap between business and IT."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي الفئات الخمس الأساسية لعناصر BPMN؟",
+      "en": "What are the five core element categories of BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كائنات التدفق، البيانات، كائنات الربط، مسارات السباحة، والعناصر الإضافية.",
+        "en": "Flow objects, Data, Connecting objects, Swim lanes, and Artifacts."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي الأنواع الثلاثة لكائنات التدفق (Flow Objects)؟",
+      "en": "What are the three types of Flow Objects?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الأحداث (Events)، الأنشطة (Activities)، والبوابات (Gateways).",
+        "en": "Events, Activities, and Gateways."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "كيف يتم تمثيل الحدث (Event) بصرياً في BPMN؟",
+      "en": "How is an Event visually represented in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمثيله بدائرة (Circle).",
+        "en": "It is displayed as a circle."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف يتم تمثيل النشاط (Activity) بصرياً في BPMN؟",
+      "en": "How is an Activity visually represented in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمثيله بمستطيل ذو زوايا مستديرة.",
+        "en": "It is displayed as a rectangle with rounded corners."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف يتم تمثيل البوابة (Gateway) بصرياً في BPMN؟",
+      "en": "How is a Gateway visually represented in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمثيلها بشكل مَعِين (Diamond).",
+        "en": "It is displayed as a diamond."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو تدفق التسلسل (Sequence Flow)؟",
+      "en": "What is a Sequence Flow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خط متصل يحدد تسلسل الأنشطة التي سيتم تنفيذها داخل نفس العملية (نفس الحوض).",
+        "en": "A solid line that defines the sequence of activities to be performed within a process (same pool)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو تدفق الرسائل (Message Flow)؟",
+      "en": "What is a Message Flow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خط متقطع يوضح تدفق الرسائل بين مشاركين اثنين (بين أحواض مختلفة).",
+        "en": "A dashed line that shows the flow of messages between two participants (separate pools)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو الفرق بين الحوض (Pool) والمسار (Lane)؟",
+      "en": "What is the difference between a Pool and a Lane?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحوض يمثل مشاركاً مستقلاً (مثل شركة)، بينما المسار هو تقسيم فرعي داخل الحوض (مثل قسم داخل الشركة).",
+        "en": "A Pool represents an independent participant (e.g., a company), while a Lane is a sub-partition within a pool (e.g., a department)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي العناصر الإضافية (Artifacts) في BPMN؟",
+      "en": "What are Artifacts in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عناصر توفر معلومات إضافية دون التأثير على التدفق، مثل كائنات البيانات، المجموعات، والتعليقات التوضيحية.",
+        "en": "Elements that provide additional information without affecting flow, such as Data objects, Groups, and Text annotations."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو الحدث الوسيط الالتقاطي (Catching Intermediate Event)؟",
+      "en": "What is a Catching Intermediate Event?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حدث ينتظر مدخلات معينة (مثل رسالة أو وقت) قبل أن يستمر التدفق.",
+        "en": "An event that waits for some input (like a message or timer) before the flow continues."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الحدث الوسيط الرامي (Throwing Intermediate Event)؟",
+      "en": "What is a Throwing Intermediate Event?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حدث ينتج مخرجات (مثل إرسال رسالة) ويستمر التدفق فوراً.",
+        "en": "An event that produces some output (like sending a message) and immediately continues the flow."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف تعمل البوابة القائمة على الأحداث (Event-Based Gateway)؟",
+      "en": "How does an Event-Based Gateway work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توجه التدفق بناءً على الحدث الذي يقع أولاً من بين عدة أحداث محتملة، وتتجاهل الباقي.",
+        "en": "It routes flow based on which of several possible events occurs first, skipping the remaining branches."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي العملية الفرعية المطوية (Collapsed Subprocess)؟",
+      "en": "What is a Collapsed Subprocess?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نشاط يحتوي على منطق إضافي مخفي، ويُميز بعلامة زائد (+) في أسفله.",
+        "en": "An activity containing hidden additional logic, indicated by a plus sign (+) at the bottom."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو حدث التصعيد (Escalation Event)؟",
+      "en": "What is an Escalation Event?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حدث يستخدم لتنبيه شخص ذو مسؤولية أعلى بوجود مشكلة، وقد يكون غير مقاطع للعملية.",
+        "en": "An event used to alert someone with higher responsibility of an issue, which can be non-interrupting."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هي ميزة العملية الفرعية للحدث (Event Subprocess)؟",
+      "en": "What is the advantage of an Event Subprocess?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستمر في الاستماع للأحداث طوال مدة العملية الرئيسية، وتعمل بالتوازي معها عند تحفيزها.",
+        "en": "It keeps listening for events during the entire duration of a process and runs in parallel when triggered."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "كيف تختلف المعاملات في عمليات الأعمال عن قواعد البيانات؟",
+      "en": "How do transactions in business processes differ from databases?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي معاملات طويلة الأمد يتم تأكيدها تدريجياً، ولا يمكن التراجع عنها (Rollback) بل تتطلب تعويضاً (Compensation).",
+        "en": "They are long-running transactions committed stepwise, requiring Compensation rather than simple Rollbacks."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هو معالج التعويض (Compensation Handler)؟",
+      "en": "What is a Compensation Handler?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مهمة مرتبطة بمهمة أخرى، وظيفتها عكس أو إلغاء تأثير المهمة الأصلية إذا فشلت المعاملة الأكبر.",
+        "en": "A task associated with another task, designed to reverse or undo the original task's effects if the larger transaction fails."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من العناصر التالية يُستخدم لتمثيل 'الأنشطة' في BPMN؟",
+      "en": "Which of the following elements is used to represent 'Activities' in BPMN?"
+    },
+    "options": {
+      "ar": [
+        "دائرة",
+        "مستطيل ذو زوايا مستديرة",
+        "معين (Diamond)",
+        "خط متقطع"
+      ],
+      "en": [
+        "Circle",
+        "Rectangle with rounded corners",
+        "Diamond",
+        "Dashed line"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في BPMN، تُمثل الأنشطة بمستطيلات ذات زوايا مستديرة، الأحداث بدوائر، والبوابات بمعينات.",
+      "en": "In BPMN, Activities are represented by rectangles with rounded corners, Events by circles, and Gateways by diamonds."
+    },
+    "hint": {
+      "ar": "تذكر أن الأنشطة تمثل 'العمل' الذي يتم إنجازه.",
+      "en": "Remember that activities represent the 'work' being performed."
+    },
+    "difficulty": "easy",
+    "conceptId": "flow-objects"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو نوع كائن الربط الذي يجب استخدامه لتوضيح التواصل بين شركتين مختلفتين؟",
+      "en": "Which type of connecting object must be used to show communication between two different companies?"
+    },
+    "options": {
+      "ar": [
+        "تدفق التسلسل (Sequence Flow)",
+        "الارتباط (Association)",
+        "تدفق الرسائل (Message Flow)",
+        "المجموعة (Group)"
+      ],
+      "en": [
+        "Sequence Flow",
+        "Association",
+        "Message Flow",
+        "Group"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تدفق الرسائل يُستخدم للتواصل بين مشاركين مختلفين (أحواض مختلفة)، بينما تدفق التسلسل لا يمكنه عبور حدود الحوض.",
+      "en": "Message Flow is used for communication between different participants (separate pools), whereas Sequence Flow cannot cross pool boundaries."
+    },
+    "hint": {
+      "ar": "الشركتان تمثلان 'أحواض' (Pools) مختلفة.",
+      "en": "The two companies represent different 'Pools'."
+    },
+    "difficulty": "medium",
+    "conceptId": "connecting-objects"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي من التالي يُعتبر من 'العناصر الإضافية' (Artifacts) في BPMN؟",
+      "en": "Which of the following is considered an 'Artifact' in BPMN?"
+    },
+    "options": {
+      "ar": [
+        "البوابة (Gateway)",
+        "المسار (Lane)",
+        "التعليق التوضيحي (Text annotation)",
+        "حدث النهاية (End event)"
+      ],
+      "en": [
+        "Gateway",
+        "Lane",
+        "Text annotation",
+        "End event"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "العناصر الإضافية تشمل كائنات البيانات، المجموعات، والتعليقات التوضيحية. البوابات والأحداث هي كائنات تدفق، والمسارات هي مسارات سباحة.",
+      "en": "Artifacts include Data objects, Groups, and Text annotations. Gateways and Events are flow objects, and Lanes are swim lanes."
+    },
+    "hint": {
+      "ar": "ابحث عن العنصر الذي يضيف معلومات دون التأثير على مسار العملية.",
+      "en": "Look for the element that adds information without affecting the process flow."
+    },
+    "difficulty": "easy",
+    "conceptId": "swim-lanes-artifacts"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ماذا تعني علامة الزائد (+) أسفل نشاط في مخطط BPMN؟",
+      "en": "What does a plus sign (+) at the bottom of an activity in a BPMN diagram indicate?"
+    },
+    "options": {
+      "ar": [
+        "أن النشاط يتكرر (Looping)",
+        "أن النشاط هو عملية فرعية مطوية (Collapsed Subprocess)",
+        "أن النشاط يتطلب تدخلاً يدوياً",
+        "أن النشاط يولد خطأ (Error)"
+      ],
+      "en": [
+        "The activity is looping",
+        "The activity is a collapsed subprocess",
+        "The activity requires manual intervention",
+        "The activity generates an error"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "علامة الزائد تشير إلى أن النشاط هو عملية فرعية مطوية تحتوي على منطق إضافي مخفي بداخلها.",
+      "en": "The plus sign indicates that the activity is a collapsed subprocess containing additional hidden logic."
+    },
+    "hint": {
+      "ar": "فكر في شيء يمكن 'توسيعه' لرؤية المزيد من التفاصيل.",
+      "en": "Think of something that can be 'expanded' to see more details."
+    },
+    "difficulty": "medium",
+    "conceptId": "activities-subprocesses-looping"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف تتخذ 'البوابة القائمة على الأحداث' (Event-Based Gateway) قرار توجيه التدفق؟",
+      "en": "How does an 'Event-Based Gateway' make a routing decision?"
+    },
+    "options": {
+      "ar": [
+        "بناءً على تقييم بيانات المتغيرات الحالية",
+        "بناءً على الحدث الذي يقع أولاً من بين الأحداث المرتبطة بها",
+        "تقوم بتنفيذ جميع المسارات بالتوازي",
+        "تنتظر حتى تقع جميع الأحداث المرتبطة بها"
+      ],
+      "en": [
+        "Based on evaluating current data variables",
+        "Based on which of the associated events occurs first",
+        "It executes all paths in parallel",
+        "It waits until all associated events occur"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البوابة القائمة على الأحداث تنتظر، والحدث الذي يقع أولاً يحدد المسار الذي سيتم اتباعه، ويتم تخطي الباقي.",
+      "en": "An Event-Based Gateway waits, and the event that occurs first determines the branch to be followed, skipping the rest."
+    },
+    "hint": {
+      "ar": "إنها بمثابة سباق بين عدة أحداث محتملة.",
+      "en": "It acts like a race between several possible events."
+    },
+    "difficulty": "medium",
+    "conceptId": "intermediate-events-gateways"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من الأحداث التالية يمكن أن يكون 'غير مقاطع' (Non-interrupting) للنشاط الذي يرتبط به؟",
+      "en": "Which of the following events can be 'non-interrupting' to the activity it is attached to?"
+    },
+    "options": {
+      "ar": [
+        "حدث الخطأ (Error Event)",
+        "حدث النهاية (End Event)",
+        "حدث التصعيد (Escalation Event)",
+        "حدث البداية (Start Event)"
+      ],
+      "en": [
+        "Error Event",
+        "End Event",
+        "Escalation Event",
+        "Start Event"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أحداث التصعيد يمكن أن تكون غير مقاطعة (تُعلم الإدارة وتستمر العملية)، بينما أحداث الخطأ تقاطع النشاط دائماً.",
+      "en": "Escalation events can be non-interrupting (notifying management while the process continues), whereas Error events always interrupt the activity."
+    },
+    "hint": {
+      "ar": "فكر في حدث يهدف إلى 'إبلاغ' شخص أعلى دون إيقاف العمل.",
+      "en": "Think of an event meant to 'notify' someone higher up without stopping the work."
+    },
+    "difficulty": "hard",
+    "conceptId": "exception-handling"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية للعملية الفرعية للحدث (Event Subprocess) مقارنة بالحدث الوسيط المرفق؟",
+      "en": "What is the main advantage of an Event Subprocess compared to an attached intermediate event?"
+    },
+    "options": {
+      "ar": [
+        "أنها أسرع في التنفيذ",
+        "أنها تستمر في الاستماع للأحداث طوال مدة العملية بأكملها",
+        "أنها لا تتطلب حدث بداية",
+        "أنها يمكن أن تعبر حدود الأحواض (Pools)"
+      ],
+      "en": [
+        "It is faster to execute",
+        "It keeps listening for events during the entire duration of the process",
+        "It does not require a start event",
+        "It can cross Pool boundaries"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "العملية الفرعية للحدث تعمل كمستمع عام طوال مدة العملية، بينما الحدث المرفق يستمع فقط طالما أن نشاطه المحدد قيد التنفيذ.",
+      "en": "An Event Subprocess acts as a global listener throughout the process duration, while an attached event only listens while its specific activity is running."
+    },
+    "hint": {
+      "ar": "قارن بين الاستماع على مستوى 'مهمة واحدة' والاستماع على مستوى 'العملية ككل'.",
+      "en": "Compare listening at the 'single task' level vs. the 'whole process' level."
+    },
+    "difficulty": "hard",
+    "conceptId": "exception-handling"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في سياق BPMN، لماذا نحتاج إلى 'معالجات التعويض' (Compensation Handlers)؟",
+      "en": "In the context of BPMN, why do we need 'Compensation Handlers'?"
+    },
+    "options": {
+      "ar": [
+        "لإصلاح الأخطاء البرمجية في النظام",
+        "للتراجع الفوري (Rollback) عن قاعدة البيانات",
+        "لعكس تأثير المهام المكتملة في المعاملات طويلة الأمد",
+        "لتعويض الموظفين عن العمل الإضافي"
+      ],
+      "en": [
+        "To fix software bugs in the system",
+        "For immediate database rollback",
+        "To reverse the effects of completed tasks in long-running transactions",
+        "To compensate employees for overtime"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في عمليات الأعمال، المعاملات طويلة الأمد ولا يمكن التراجع عنها ببساطة. التعويض هو تنفيذ مهام جديدة لعكس تأثير المهام السابقة (مثل إلغاء حجز).",
+      "en": "In business processes, transactions are long-running and cannot simply be rolled back. Compensation is executing new tasks to reverse previous ones (like canceling a booking)."
+    },
+    "hint": {
+      "ar": "فكر في كيفية التراجع عن حجز طيران تم تأكيده بالفعل.",
+      "en": "Think about how to undo a flight booking that has already been confirmed."
+    },
+    "difficulty": "medium",
+    "conceptId": "transactions-compensation"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من المحفزات التالية يُستخدم عندما نريد أن يستجيب النظام لحدث زمني محدد (مثل: بعد 3 أيام)؟",
+      "en": "Which of the following triggers is used when we want the system to respond to a specific time event (e.g., after 3 days)?"
+    },
+    "options": {
+      "ar": [
+        "محفز الرسالة (Message trigger)",
+        "محفز الإشارة (Signal trigger)",
+        "محفز الشرط (Condition trigger)",
+        "محفز المؤقت (Timer trigger)"
+      ],
+      "en": [
+        "Message trigger",
+        "Signal trigger",
+        "Condition trigger",
+        "Timer trigger"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "محفز المؤقت (Timer trigger) يُستخدم للانتظار حتى موعد نهائي معين أو مرور فترة زمنية محددة.",
+      "en": "A Timer trigger is used to wait until a certain deadline is reached or a specific amount of time has passed."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بالوقت.",
+      "en": "It is related to time."
+    },
+    "difficulty": "easy",
+    "conceptId": "events-in-detail"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الحدث الوسيط 'الرامي' (Throwing)؟",
+      "en": "What is a 'Throwing' intermediate event?"
+    },
+    "options": {
+      "ar": [
+        "حدث ينتظر وصول رسالة من نظام خارجي",
+        "حدث ينتج مخرجات (مثل إرسال رسالة) أثناء سير العملية",
+        "حدث ينهي العملية بالكامل",
+        "حدث يوجه التدفق بناءً على شرط رياضي"
+      ],
+      "en": [
+        "An event waiting for a message from an external system",
+        "An event that produces output (like sending a message) during the process flow",
+        "An event that completely terminates the process",
+        "An event that routes flow based on a mathematical condition"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الحدث الرامي (Throwing) هو الذي يقوم بفعل أو ينتج مخرجات (مثل رمي رسالة أو إشارة)، عكس الحدث الالتقاطي (Catching) الذي ينتظر.",
+      "en": "A Throwing event performs an action or produces output (like throwing a message or signal), unlike a Catching event which waits."
+    },
+    "hint": {
+      "ar": "الرمي يعني 'الإرسال' أو 'الإنتاج'.",
+      "en": "Throwing implies 'sending' or 'producing'."
+    },
+    "difficulty": "medium",
+    "conceptId": "intermediate-events-gateways"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين تدفق التسلسل (Sequence Flow) وتدفق الرسائل (Message Flow). تذكر: التسلسل لا يخرج أبداً من الحوض (Pool)، والرسائل لا تُستخدم أبداً داخل نفس الحوض.</template>
+    <template class="content-en">Confusing Sequence Flow with Message Flow. Remember: Sequence Flow NEVER leaves a Pool, and Message Flow is NEVER used within the same Pool.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">البوابة (Gateway) لا تقوم بأي عمل أو معالجة للبيانات. إنها مجرد نقطة توجيه (Routing) تتخذ قرار المسار بناءً على شروط تم تقييمها في الأنشطة السابقة.</template>
+    <template class="content-en">A Gateway does NOT perform any work or data processing. It is purely a routing mechanism that decides the path based on conditions evaluated in previous activities.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">العمليات الفرعية للأحداث (Event Subprocesses) قوية جداً لأنها تعمل كمستمع عام (Global Listener) طوال دورة حياة العملية، مما يغنيك عن رسم أحداث مرفقة بكل نشاط على حدة لمعالجة نفس الاستثناء (مثل الإلغاء).</template>
+    <template class="content-en">Event Subprocesses are incredibly powerful because they act as a Global Listener throughout the process lifecycle, saving you from attaching the same event (like cancellation) to every single activity.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن المعاملات في BPMN يمكن التراجع عنها (Rollback) بسهولة كما في قواعد البيانات. في الأعمال، المعاملات طويلة الأمد وتتطلب 'تعويضاً' (Compensation) لعكس المهام المكتملة.</template>
+    <template class="content-en">Believing that BPMN transactions can be easily rolled back like in databases. In business, transactions are long-running and require 'Compensation' to reverse completed tasks.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

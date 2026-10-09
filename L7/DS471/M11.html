@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="11" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تدريب الشبكات العصبية العميقة · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M10.html" data-gh-next="M12.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#vanishing-exploding-gradients" class="toc-link" data-bilingual>
+        <template class="content-ar">مشكلة تلاشي وانفجار التدرجات</template>
+        <template class="content-en">Vanishing and Exploding Gradients Problem</template>
+        <span class="content-target">مشكلة تلاشي وانفجار التدرجات</span>
+      </a>
+      <a href="#weight-initialization" class="toc-link" data-bilingual>
+        <template class="content-ar">تهيئة الأوزان (Glorot و He)</template>
+        <template class="content-en">Weight Initialization (Glorot and He)</template>
+        <span class="content-target">تهيئة الأوزان (Glorot و He)</span>
+      </a>
+      <a href="#advanced-activation-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">دوال التنشيط المتقدمة (ReLU ومشتقاتها)</template>
+        <template class="content-en">Advanced Activation Functions (ReLU and Variants)</template>
+        <span class="content-target">دوال التنشيط المتقدمة (ReLU ومشتقاتها)</span>
+      </a>
+      <a href="#batch-normalization" class="toc-link" data-bilingual>
+        <template class="content-ar">تسوية الدفعات (Batch Normalization)</template>
+        <template class="content-en">Batch Normalization</template>
+        <span class="content-target">تسوية الدفعات (Batch Normalization)</span>
+      </a>
+      <a href="#gradient-clipping" class="toc-link" data-bilingual>
+        <template class="content-ar">قص التدرج (Gradient Clipping)</template>
+        <template class="content-en">Gradient Clipping</template>
+        <span class="content-target">قص التدرج (Gradient Clipping)</span>
+      </a>
+      <a href="#transfer-learning" class="toc-link" data-bilingual>
+        <template class="content-ar">نقل التعلم والضبط الدقيق (Transfer Learning &amp; Fine-tuning)</template>
+        <template class="content-en">Transfer Learning and Fine-tuning</template>
+        <span class="content-target">نقل التعلم والضبط الدقيق (Transfer Learning &amp; Fine-tuning)</span>
+      </a>
+      <a href="#unsupervised-pretraining" class="toc-link" data-bilingual>
+        <template class="content-ar">التدريب المسبق غير الخاضع للإشراف (Unsupervised Pretraining)</template>
+        <template class="content-en">Unsupervised Pretraining</template>
+        <span class="content-target">التدريب المسبق غير الخاضع للإشراف (Unsupervised Pretraining)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 11</template>
+      <template class="content-en">Module 11</template>
+      <span class="content-target">الوحدة 11</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تدريب الشبكات العصبية العميقة</h1>
+      <p class="hero-description">تغطي هذه الوحدة التحديات الرئيسية في تدريب الشبكات العصبية العميقة مثل تلاشي وانفجار التدرجات، وتقدم حلولاً متقدمة تشمل تهيئة الأوزان، دوال التنشيط الحديثة، تسوية الدفعات، قص التدرج، ونقل التعلم.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Training Deep Neural Networks</h1>
+      <p class="hero-description">This module covers key challenges in training deep neural networks such as vanishing/exploding gradients, and introduces advanced solutions including weight initialization, modern activation functions, batch normalization, gradient clipping, and transfer learning.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">تلاشي التدرجات</span>
+      <span class="tag">تسوية الدفعات</span>
+      <span class="tag">نقل التعلم</span>
+      <span class="tag">تهيئة الأوزان</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Vanishing Gradients</span>
+      <span class="tag">Batch Normalization</span>
+      <span class="tag">Transfer Learning</span>
+      <span class="tag">Weight Initialization</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح مشكلة تلاشي/انفجار التدرجات والتقنيات المستخدمة للتخفيف منها.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ تقنيات مثل تسوية الدفعات ونقل التعلم لتحسين تدريب الشبكات العصبية العميقة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق طرق التنظيم لمنع التجهيز الزائد في الشبكات العصبية العميقة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the vanishing/exploding gradients problem and techniques to mitigate it.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement techniques like batch normalization and transfer learning to improve the training of deep neural networks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply regularization methods to prevent overfitting in deep neural networks.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="vanishing-exploding-gradients" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مشكلة تلاشي وانفجار التدرجات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Vanishing and Exploding Gradients Problem</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هي مشكلة تحدث أثناء الانتشار الخلفي حيث تصبح التدرجات صغيرة جداً (تتلاشى) أو كبيرة جداً (تنفجر)، مما يعيق تعلم الطبقات السفلية.</p><p>تخيل ضبط مكبر صوت: إذا كان مستوى الصوت منخفضاً جداً فلن يُسمع (تلاشي)، وإذا كان مرتفعاً جداً سيتشوه الصوت (انفجار).</p></template>
+    <template class="content-en"><p>A problem during backpropagation where gradients become extremely small (vanish) or excessively large (explode), hindering the learning of lower layers.</p><p>Imagine adjusting a microphone amplifier: if the volume is too low, it's inaudible (vanishing); if too high, the sound distorts (exploding).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الشبكات العصبية العميقة، تقوم خوارزمية الانتشار الخلفي بنشر تدرج الخطأ من طبقة المخرجات عائداً إلى طبقة المدخلات لتحديث الأوزان.</p><ul><li><strong><b><span class="smart-term" data-term-en="Vanishing Gradients" data-ar="تلاشي التدرجات" data-en-def="Gradients becoming too small during backpropagation, preventing lower layers from learning.">تلاشي التدرجات<span class="smart-term-tooltip"></span></span> (Vanishing Gradients):</b></strong> كلما اتجهت الخوارزمية نحو الطبقات السفلية، تصبح التدرجات صغيرة جداً. هذا يتسبب في تغير أوزان الطبقات السفلية بشكل طفيف جداً، مما يؤدي فعلياً إلى تجميدها ومنع الشبكة من التعلم.</li><li><strong><b><span class="smart-term" data-term-en="Exploding Gradients" data-ar="انفجار التدرجات" data-en-def="Gradients becoming excessively large, causing massive weight updates and model divergence.">انفجار التدرجات<span class="smart-term-tooltip"></span></span> (Exploding Gradients):</b></strong> في حالات أخرى، تصبح التدرجات كبيرة بشكل مفرط أثناء انتشارها للخلف. هذا يؤدي إلى تحديثات ضخمة للأوزان، مما يتسبب في تباعد النموذج (Divergence)، وهي مشكلة شائعة خاصة في الشبكات العصبية المتكررة (RNNs).</li></ul><p><b>الأسباب الرئيسية:</b></p><ul><li>استخدام دوال تنشيط مثل Sigmoid و Tanh التي تتشبع عند القيم الكبيرة أو الصغيرة،</li><li>بالإضافة إلى طرق التهيئة القديمة (توزيع طبيعي بمتوسط 0 وانحراف معياري 1) التي تزيد من التباين عبر الطبقات.</li></ul></template>
+    <template class="content-en"><p>In deep neural networks, the backpropagation algorithm propagates the error gradient from the output layer back to the input layer to update weights.</p><p><b><span class="smart-term" data-term-en="Vanishing Gradients" data-ar="تلاشي التدرجات" data-en-def="Gradients becoming too small during backpropagation, preventing lower layers from learning.">Vanishing Gradients<span class="smart-term-tooltip"></span></span>:</b> As the algorithm moves towards the lower layers, gradients can become extremely small. This causes the weights of the lower layers to change very little, effectively freezing them and preventing the network from learning.</p><p><b><span class="smart-term" data-term-en="Exploding Gradients" data-ar="انفجار التدرجات" data-en-def="Gradients becoming excessively large, causing massive weight updates and model divergence.">Exploding Gradients<span class="smart-term-tooltip"></span></span>:</b> In some cases, gradients become excessively large as they are propagated back. This leads to very large weight updates, causing the model to diverge, especially in recurrent neural networks (RNNs).</p><p><b>Key Causes:</b> Activation functions like sigmoid and tanh saturate when inputs are too large or too small. Early methods used random normal initialization (mean 0, std 1), causing variance to increase as signals pass through layers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تاريخياً، أدت هذه المشكلة إلى التخلي عن الشبكات العصبية العميقة لفترة طويلة، حيث لم يكن هناك فهم واضح لعدم استقرار التدرج حتى عام 2010.</p><p>أثبتت ورقة بحثية لـ Xavier Glorot و Yoshua Bengio عام 2010 أن دوال التنشيط مثل sigmoid تسبب زيادة تراكمية في التباين، مما يساهم بشكل مباشر في تلاشي التدرجات.</p><p>يؤدي عدم استقرار التدرج بشكل عام إلى تعلم بعض الطبقات بشكل أسرع بكثير من غيرها، مما يدمر التوازن المطلوب لتحسين النموذج بأكمله.</p></template>
+    <template class="content-en"><p>Historically, deep neural networks were largely abandoned due to gradient instability, with no clear understanding of the problem until around 2010.</p><p>Xavier Glorot and Yoshua Bengio’s 2010 paper demonstrated that activation functions like sigmoid cause a cumulative increase in variance, which directly contributes to vanishing gradients.</p><p>General gradient instability means different layers experience unstable gradients, with some layers learning faster than others, destroying the optimization process.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر مشكلة انفجار التدرجات أكثر شيوعاً في الشبكات العصبية المتكررة (RNNs) مقارنة بالشبكات العصبية العادية؟</template>
+      <template class="content-en">Why is the exploding gradients problem more common in Recurrent Neural Networks (RNNs) compared to standard feedforward networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الشبكات المتكررة تقوم بضرب نفس مصفوفة الأوزان بشكل متكرر عبر خطوات زمنية متعددة. إذا كانت القيم الذاتية (Eigenvalues) لهذه المصفوفة أكبر من 1، فإن التدرجات ستنمو بشكل أسي (تنفجر).</p></template>
+      <template class="content-en"><p>Because RNNs repeatedly multiply the same weight matrix across multiple time steps. If the eigenvalues of this matrix are greater than 1, the gradients will grow exponentially (explode) over time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="weight-initialization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تهيئة الأوزان (Glorot و He)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Weight Initialization (Glorot and He)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنيات لضبط القيم الأولية للأوزان بناءً على حجم الطبقة للحفاظ على استقرار التباين ومنع تلاشي أو انفجار الإشارات.</p><p>يشبه ذلك ضبط ضغط الماء في شبكة أنابيب معقدة بحيث لا يضعف التدفق في النهاية ولا تنفجر الأنابيب في البداية.</p></template>
+    <template class="content-en"><p>Techniques to set initial weight values based on layer size to maintain variance stability and prevent signals from vanishing or exploding.</p><p>It's like adjusting water pressure in a complex pipe network so it doesn't trickle out at the end or burst at the beginning.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الهدف من تهيئة الأوزان المتقدمة هو الحفاظ على تباين المدخلات والمخرجات لضمان استقرار التدرجات أثناء الانتشار الأمامي والخلفي.</p><p><b>تهيئة Glorot (Xavier):</b> تقوم بتوسيع الأوزان بناءً على عدد المدخلات (fan_in) والمخرجات (fan_out) في كل طبقة. تستخدم عادة مع دوال التنشيط Sigmoid و Tanh.</p><p><b>تهيئة He:</b> اقترحها K. He وهي مصممة خصيصاً للشبكات التي تستخدم دالة التنشيط ReLU. تساعد في تجنب انفجار التدرجات وموت الخلايا العصبية عن طريق توسيع التهيئة بشكل أكبر.</p></template>
+    <template class="content-en"><p>The goal of advanced weight initialization is to maintain the variance of inputs and outputs to ensure stable gradients during forward and backward propagation.</p><p><b>Glorot (Xavier) Initialization:</b> Scales the weights based on the number of inputs (fan_in) and outputs (fan_out) in each layer, stabilizing the variance across layers. Typically used with Sigmoid and Tanh.</p><p><b><span class="smart-term" data-term-en="He Initialization" data-ar="تهيئة هي" data-en-def="Weight initialization optimized for ReLU activation, accounting for the zeroed-out negative values.">He Initialization<span class="smart-term-tooltip"></span></span>:</b> Proposed by K. He, designed specifically for ReLU-based networks. It helps avoid exploding gradients and dying neurons by scaling the initialization further.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>توازن تهيئة Glorot تدفق الإشارة في كلا الاتجاهين (الأمامي والخلفي) مما يسرع عملية التدريب بشكل كبير مقارنة بالتهيئة العشوائية البسيطة.</p><p>بالنسبة لـ He Initialization، نظراً لأن دالة ReLU تقطع نصف مساحة الإدخال (القيم السالبة تصبح صفراً)، فإن التباين ينخفض إلى النصف. لذلك، تقوم تهيئة He بالتعويض عن ذلك بضرب التباين في 2.</p><p>اختيار التهيئة الخاطئة لدالة التنشيط (مثلاً استخدام Glorot مع ReLU) يمكن أن يعيد إدخال مشكلة تلاشي التدرجات في الشبكات العميقة جداً.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Glorot Initialization" data-ar="تهيئة غلوروت (كزافييه)" data-en-def="Weight initialization technique that scales weights based on input and output counts to stabilize variance.">Glorot initialization<span class="smart-term-tooltip"></span></span> balances signal flow in both directions (forward and backward), which significantly speeds up training compared to naive random initialization.</p><p>For He Initialization, because the ReLU function cuts off half of the input space (negative values become zero), the variance is halved. He initialization compensates for this by multiplying the variance by 2.</p><p>Choosing the wrong initialization for an activation function (e.g., using Glorot with ReLU) can reintroduce the vanishing gradient problem in very deep networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات التباين لتهيئة Glorot و He.</strong></template>
+      <template class="content-en"><strong>Variance formulas for Glorot and He initialization.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{Glorot Variance: } \sigma^2 = \frac{1}{\text{fan}_{avg}} \quad \text{He Variance: } \sigma^2 = \frac{2}{\text{fan}_{in}}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>keras.layers.Dense(10, activation="relu", kernel_initializer="he_normal")</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتمد تهيئة He على عدد المدخلات (fan_in) فقط في بعض التطبيقات بدلاً من المتوسط بين المدخلات والمخرجات؟</template>
+      <template class="content-en">Why does He initialization often rely only on the number of inputs (fan_in) rather than the average of inputs and outputs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الهدف الأساسي في شبكات ReLU هو الحفاظ على تباين التنشيطات أثناء الانتشار الأمامي، والاعتماد على fan_in يحقق ذلك بشكل كافٍ لتعويض فقدان التباين الناتج عن تصفير القيم السالبة.</p></template>
+      <template class="content-en"><p>Because the primary goal in ReLU networks is to maintain the variance of activations during forward propagation, and relying on fan_in is sufficient to compensate for the variance lost by zeroing out negative values.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="advanced-activation-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> دوال التنشيط المتقدمة (ReLU ومشتقاتها)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Advanced Activation Functions (ReLU and Variants)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دوال رياضية لا تتشبع عند القيم الموجبة الكبيرة، وتسمح بمرور تدرجات صغيرة للقيم السالبة لمنع موت الخلايا العصبية.</p><p>تعمل كصمام يسمح دائماً بمرور القليل من الماء حتى عند إغلاقه، لمنع انسداد الأنابيب بالكامل.</p></template>
+    <template class="content-en"><p>Mathematical functions that do not saturate for large positive values and allow small gradients for negative values to prevent dying neurons.</p><p>They act like a valve that always lets a little water through even when closed, preventing a complete blockage.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>ReLU (Rectified Linear Unit):</b> على عكس Sigmoid، لا تتشبع ReLU للقيم الموجبة الكبيرة، مما يقلل من مشكلة تلاشي التدرج. ومع ذلك، تعاني من مشكلة "<span class="smart-term" data-term-en="Dying Neurons" data-ar="الخلايا العصبية الميتة" data-en-def="A state where a neuron consistently outputs zero and stops updating its weights during training.">الخلايا العصبية الميتة<span class="smart-term-tooltip"></span></span>" حيث يصبح المخرج 0 بشكل دائم لبعض الخلايا.</p><p><b>Leaky ReLU:</b> تمنع موت الخلايا العصبية من خلال السماح بتدرج صغير غير صفري عندما يكون الإدخال سالباً. المعادلة: $LeakyReLU_\alpha(z) = \max(\alpha z, z)$، حيث $\alpha$ عادة 0.01.</p><p><b>متغيرات أخرى:</b><ol><li><b>RReLU (Randomized):</b> يتم اختيار $\alpha$ عشوائياً أثناء التدريب.</li><li><b>PReLU (Parametric):</b> يتم تعلم $\alpha$ كمعلمة أثناء التدريب.</li></ol></p><p><b>SELU (Scaled Exponential Linear Unit):</b> دالة متقدمة تسمح بالتطبيع الذاتي (Self-normalization) للشبكة.</p></template>
+    <template class="content-en"><p><b>ReLU (Rectified Linear Unit):</b> Unlike sigmoid, ReLU does not saturate for large positive values, reducing the vanishing gradient issue. However, it suffers from "<span class="smart-term" data-term-en="Dying Neurons" data-ar="الخلايا العصبية الميتة" data-en-def="A state where a neuron consistently outputs zero and stops updating its weights during training.">dying neurons<span class="smart-term-tooltip"></span></span>" where the output becomes 0 permanently.</p><p><b>Leaky ReLU:</b> Prevents neurons from dying by allowing a small, non-zero gradient when the input is negative. Formula: $LeakyReLU_\alpha(z) = \max(\alpha z, z)$, where $\alpha$ is typically 0.01.</p><p><b>Other Variants:</b><ol><li><b>RReLU (Randomized):</b> $\alpha$ is randomly chosen during training.</li><li><b>PReLU (Parametric):</b> $\alpha$ is learned during training.</li></ol></p><p><b>SELU (Scaled Exponential Linear Unit):</b> An advanced activation function that allows self-normalization of the network.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تحدث مشكلة الخلايا العصبية الميتة في ReLU عندما يتم تحديث الأوزان بتدرج كبير يجعل المجموع الموزون للمدخلات سالباً لجميع نقاط البيانات، مما يؤدي إلى إخراج صفر دائم وتوقف الخلية عن التعلم.</p><p>الشبكات العصبية ذات التطبيع الذاتي (باستخدام SELU) تضمن أن المخرجات لها متوسط 0 وانحراف معياري 1. لنجاح ذلك، يجب توحيد ميزات الإدخال (Standardized) وتهيئة الأوزان باستخدام تهيئة LeCun.</p><p>تتفوق PReLU على Leaky ReLU في المجموعات البيانية الكبيرة لأنها تتعلم الميل الأمثل، ولكنها قد تؤدي إلى التجهيز الزائد (Overfitting) في المجموعات الصغيرة.</p></template>
+    <template class="content-en"><p>The dying ReLU problem occurs when a large gradient updates weights such that the weighted sum of inputs is negative for all instances, causing the neuron to always output zero and stop learning.</p><p>Self-Normalizing Neural Networks (using SELU) ensure that outputs have a mean of 0 and a standard deviation of 1. For success, input features must be standardized and weights initialized with LeCun initialization.</p><p>PReLU often outperforms Leaky ReLU on large datasets because it learns the optimal slope, but it risks overfitting on smaller datasets.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات Leaky ReLU و SELU.</strong></template>
+      <template class="content-en"><strong>Formulas for Leaky ReLU and SELU.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$LeakyReLU_\alpha(z) = \max(\alpha z, z) \\ SELU(z) = \lambda \begin{cases} z &amp; \text{if } z \ge 0 \\ \alpha(e^z - 1) &amp; \text{if } z &lt; 0 \end{cases}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>leaky_relu = keras.layers.LeakyReLU(alpha=0.2)
+keras.layers.Dense(10, activation=leaky_relu, kernel_initializer="he_normal")
+
+# SELU Example
+keras.layers.Dense(10, activation="selu", kernel_initializer="lecun_normal")</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت شبكتك تعاني من التجهيز الزائد (Overfitting) وموت الخلايا العصبية في نفس الوقت، أي دالة تنشيط تختار ولماذا؟</template>
+      <template class="content-en">If your network is suffering from both overfitting and dying neurons, which activation function would you choose and why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأختار Leaky ReLU أو RReLU. تمنع كلتاهما موت الخلايا العصبية، وتوفر RReLU (بسبب العشوائية في اختيار ألفا) تأثيراً تنظيمياً (Regularization) يساعد في تقليل التجهيز الزائد، بينما قد تزيد PReLU من التجهيز الزائد.</p></template>
+      <template class="content-en"><p>I would choose Leaky ReLU or RReLU. Both prevent dying neurons, and RReLU (due to its random alpha during training) acts as a regularizer, helping to reduce overfitting, whereas PReLU might exacerbate it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="batch-normalization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تسوية الدفعات (Batch Normalization)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Batch Normalization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية تقوم بتوحيد مدخلات كل طبقة مخفية ليكون لها متوسط صفر وتباين واحد، ثم تقوم بإعادة قياسها وإزاحتها.</p><p>مثل طاهٍ يتذوق ويضبط الملح والبهارات في كل مرحلة من مراحل الطبخ بدلاً من الانتظار حتى النهاية.</p></template>
+    <template class="content-en"><p>A technique that normalizes the inputs to each hidden layer to have zero mean and unit variance, then rescales and shifts them.</p><p>Like a chef tasting and adjusting seasoning at every step of cooking, rather than waiting until the very end.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قُدمت <span class="smart-term" data-term-en="Batch Normalization" data-ar="تسوية الدفعات" data-en-def="Normalizing inputs of a layer per mini-batch to stabilize training.">تسوية الدفعات<span class="smart-term-tooltip"></span></span> (BN) بواسطة Sergey Ioffe و Christian Szegedy في 2015 لمعالجة مشكلة تلاشي/انفجار التدرجات.</p><p><b>الخوارزمية:</b><ol><li>حساب المتوسط ($\mu_B$) والانحراف المعياري ($\sigma_B$) لكل دفعة صغيرة (mini-batch).</li><li>تسوية الإدخال: $x_{inorm} = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$</li><li>إعادة القياس والإزاحة: $z_i = \gamma \cdot x_{inorm} + \beta$</li></ol></p><p><b>الفوائد الرئيسية:</b> تساعد في تقليل تلاشي التدرجات، تسمح بمعدلات تعلم أكبر (تدريب أسرع)، وتعمل كمنظم (Regularizer) مما يقلل الحاجة إلى تقنية Dropout.</p><p><b>أثناء التدريب مقابل الاختبار:</b> أثناء التدريب، تستخدم BN إحصائيات الدفعة الصغيرة. أثناء الاختبار (الاستدلال)، تستخدم <span class="smart-term" data-term-en="Moving Averages" data-ar="المتوسطات المتحركة" data-en-def="Statistics tracked during training to be used for normalization during inference/testing.">المتوسطات المتحركة<span class="smart-term-tooltip"></span></span> (Moving averages) للمتوسط والانحراف المعياري التي تم جمعها أثناء التدريب.</p></template>
+    <template class="content-en"><p>BN was introduced by Sergey Ioffe and Christian Szegedy in 2015 to address the vanishing/exploding gradients problem.</p><p><b>Algorithm:</b><ol><li>Compute mean ($\mu_B$) and standard deviation ($\sigma_B$) for each mini-batch.</li><li>Normalize input: $x_{inorm} = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$</li><li>Rescale and shift: $z_i = \gamma \cdot x_{inorm} + \beta$</li></ol></p><p><b>Key Benefits:</b> Helps reduce vanishing gradients, enables larger learning rates (faster training), and acts as a regularizer, reducing the need for dropout.</p><p><b>Training vs. Testing:</b> During training, BN uses mini-batch statistics. During testing (inference), it uses the <span class="smart-term" data-term-en="Moving Averages" data-ar="المتوسطات المتحركة" data-en-def="Statistics tracked during training to be used for normalization during inference/testing.">moving averages<span class="smart-term-tooltip"></span></span> of the mean and std dev collected during training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعلمات $\gamma$ (المقياس) و $\beta$ (الإزاحة) يتم تعلمها بواسطة الشبكة أثناء التدريب من خلال الانتشار الخلفي، مما يسمح للشبكة باستعادة التوزيع الأصلي إذا كان ذلك هو الأمثل.</p><p>المتوسطات المتحركة ضرورية في مرحلة الاختبار لأنه قد يتم تمرير عينة واحدة فقط للنموذج، ولا يمكن حساب إحصائيات دفعة من عينة واحدة.</p><p>في Keras، يتحكم المعامل <code>momentum</code> في معدل تحديث المتوسطات المتحركة (القيم النموذجية بين 0.9 و 0.999). يحدد المعامل <code>axis</code> المحور الذي يتم التسوية عليه (الافتراضي هو -1).</p></template>
+    <template class="content-en"><p>The parameters $\gamma$ (scale) and $\beta$ (shift) are learned by the network during training via backpropagation, allowing the network to undo the normalization if the original distribution was optimal.</p><p>Moving averages are crucial during inference because the model might be predicting on a single instance, making it impossible to compute mini-batch statistics.</p><p>In Keras, the <code>momentum</code> hyperparameter adjusts the update rate for moving averages (typical values 0.9 to 0.999). The <code>axis</code> parameter defines which axis to normalize (default is -1 for the last axis).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تسوية الدفعات.</strong></template>
+      <template class="content-en"><strong>Batch Normalization equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$x_{inorm} = \frac{x_i - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}} \quad ; \quad z_i = \gamma x_{inorm} + \beta$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>model = keras.models.Sequential([
+ keras.layers.Flatten(input_shape=[28, 28]),
+ keras.layers.BatchNormalization(),
+ keras.layers.Dense(300, activation="elu", kernel_initializer="he_normal"),
+ keras.layers.BatchNormalization(),
+ keras.layers.Dense(100, activation="elu", kernel_initializer="he_normal"),
+ keras.layers.BatchNormalization(),
+ keras.layers.Dense(10, activation="softmax")
+])</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Training Phase</th><th>Testing Phase</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مصدر الإحصائيات (المتوسط والتباين)</template>
+          <template class="content-en">Statistics Source (Mean &amp; Variance)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتم حسابها من الدفعة الصغيرة (Mini-batch) الحالية</template>
+          <template class="content-en">Calculated from the current mini-batch</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تُستخدم المتوسطات المتحركة المحسوبة أثناء التدريب</template>
+          <template class="content-en">Uses moving averages collected during training</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعمل تسوية الدفعات (Batch Normalization) كمنظم (Regularizer) يقلل من التجهيز الزائد؟</template>
+      <template class="content-en">Why does Batch Normalization act as a regularizer that reduces overfitting?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حساب المتوسط والانحراف المعياري يعتمد على الدفعة الصغيرة (mini-batch) الحالية، مما يضيف قدراً من الضوضاء (Noise) إلى التنشيطات. هذه الضوضاء تمنع الشبكة من الاعتماد المفرط على ميزات معينة، بشكل مشابه لعمل Dropout.</p></template>
+      <template class="content-en"><p>Because the mean and standard deviation are calculated based on the current mini-batch, which adds a bit of noise to the activations. This noise prevents the network from over-relying on specific features, similar to how Dropout works.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="gradient-clipping" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> قص التدرج (Gradient Clipping)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Gradient Clipping</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية لمكافحة انفجار التدرجات عن طريق وضع حد أقصى لقيمة التدرج أثناء الانتشار الخلفي.</p><p>تعمل مثل محدد السرعة في السيارة، يمنعها من تجاوز سرعة خطرة بغض النظر عن مدى ضغطك على دواسة الوقود.</p></template>
+    <template class="content-en"><p>A technique to combat exploding gradients by capping the gradients at a maximum threshold during backpropagation.</p><p>It acts like a speed limiter on a car, preventing it from exceeding a dangerous speed regardless of how hard you press the gas.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Gradient Clipping" data-ar="قص التدرج" data-en-def="Capping gradients during backpropagation to prevent them from exploding.">قص التدرج<span class="smart-term-tooltip"></span></span> يضمن أن التدرجات لا تتجاوز عتبة معينة، وهو فعال بشكل خاص في الشبكات العصبية المتكررة (RNNs) حيث يصعب تطبيق تسوية الدفعات.</p><p><b>أنواع قص التدرج:</b><ol><li><b>القص حسب القيمة (Clipping by Value):</b> يقص كل مكون من مكونات التدرج بشكل فردي (مثلاً بين -1.0 و 1.0). هذا قد يغير اتجاه متجه التدرج.</li><li><b><span class="smart-term" data-term-en="Clipping by Norm" data-ar="القص حسب المعيار" data-en-def="Scaling down the entire gradient vector to keep its length within a limit, preserving its direction.">القص حسب المعيار<span class="smart-term-tooltip"></span></span> (Clipping by Norm):</b> يقص متجه التدرج بأكمله إذا تجاوز معيار $\ell_2$ الخاص به عتبة معينة. هذا يحافظ على اتجاه التدرج.</li></ol></p><p><b>مثال:</b> إذا كان التدرج [0.9, 100.0]، القص بالقيمة (الحد 1.0) يجعله [0.9, 1.0]. القص بالمعيار يجعله [0.0089, 0.9999].</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Gradient Clipping" data-ar="قص التدرج" data-en-def="Capping gradients during backpropagation to prevent them from exploding.">Gradient Clipping<span class="smart-term-tooltip"></span></span> ensures that gradients do not exceed a certain threshold. It is particularly effective in Recurrent Neural Networks (RNNs), where Batch Normalization can be challenging.</p><p><b>Types of Clipping:</b><ol><li><b>Clipping by Value:</b> Clips each gradient component individually (e.g., between -1.0 and 1.0). This may change the gradient direction.</li><li><b><span class="smart-term" data-term-en="Clipping by Norm" data-ar="القص حسب المعيار" data-en-def="Scaling down the entire gradient vector to keep its length within a limit, preserving its direction.">Clipping by Norm<span class="smart-term-tooltip"></span></span>:</b> Clips the entire gradient vector if its $\ell_2$ norm exceeds a threshold. This preserves gradient orientation.</li></ol></p><p><b>Example:</b> If gradient is [0.9, 100.0], clipping by value (threshold 1.0) makes it [0.9, 1.0]. Clipping by norm makes it [0.0089, 0.9999].</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تغيير اتجاه التدرج (في القص حسب القيمة) يمكن أن يدفع عملية التحسين في اتجاه دون المستوى الأمثل، لذلك يُفضل غالباً القص حسب المعيار (Norm) في الممارسة العملية.</p><p>في Keras، يتم تنفيذ ذلك بسهولة عن طريق تمرير <code>clipvalue</code> أو <code>clipnorm</code> عند إنشاء المُحسّن (Optimizer).</p><p>يُستخدم قص التدرج كحل أخير أو كإجراء وقائي في الشبكات العميقة جداً عندما تفشل تقنيات التهيئة وتسوية الدفعات في احتواء الانفجار.</p></template>
+    <template class="content-en"><p>Changing the gradient direction (in clipping by value) can push the optimization in a suboptimal direction, which is why clipping by norm is often preferred in practice.</p><p>In Keras, this is easily implemented by passing <code>clipvalue</code> or <code>clipnorm</code> when instantiating an optimizer.</p><p>Gradient clipping is often used as a fallback or safety measure in very deep networks when initialization and batch normalization fail to contain explosions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>optimizer = keras.optimizers.SGD(clipvalue=1.0)
+model.compile(loss="mse", optimizer=optimizer)</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Clipping by Value</th><th>Clipping by Norm</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">آلية العمل</template>
+          <template class="content-en">Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يقص كل مكون فردي للتدرج</template>
+          <template class="content-en">Clips each individual gradient component</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يقص متجه التدرج بأكمله بناءً على طوله</template>
+          <template class="content-en">Clips the entire gradient vector based on its length</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الحفاظ على الاتجاه</template>
+          <template class="content-en">Preserves Direction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا، قد يغير اتجاه التدرج</template>
+          <template class="content-en">No, may change gradient direction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم، يحافظ على الاتجاه الأصلي</template>
+          <template class="content-en">Yes, preserves original orientation</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون من الأفضل استخدام القص حسب المعيار (Norm) بدلاً من القص حسب القيمة (Value)؟</template>
+      <template class="content-en">When is it better to use Clipping by Norm instead of Clipping by Value?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون الحفاظ على اتجاه التدرج الأصلي مهماً لعملية التحسين. القص بالقيمة يغير الاتجاه إذا تم قص بعض المكونات دون غيرها، مما قد يوجه النموذج نحو مسار خاطئ.</p></template>
+      <template class="content-en"><p>When preserving the original direction of the gradient is important for optimization. Clipping by value changes the direction if only some components are clipped, potentially steering the model down a wrong path.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transfer-learning" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> نقل التعلم والضبط الدقيق (Transfer Learning &amp; Fine-tuning)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Transfer Learning and Fine-tuning</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>إعادة استخدام الطبقات المدربة مسبقاً من نموذج تم تدريبه على مهمة مشابهة لحل مهمة جديدة.</p><p>مثل طاهٍ محترف يتعلم الخبز؛ فهو لا يحتاج لتعلم كيفية استخدام السكين أو الفرن من الصفر، بل يبني على مهاراته الأساسية.</p></template>
+    <template class="content-en"><p>Reusing pretrained layers from a model trained on a similar task to solve a new task.</p><p>Like a professional chef learning to bake; they don't need to learn how to use a knife or oven from scratch, they build on existing skills.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Transfer Learning" data-ar="نقل التعلم" data-en-def="Reusing a pretrained model on a new, related problem.">نقل التعلم<span class="smart-term-tooltip"></span></span> يقلل من وقت التدريب ويتطلب بيانات أقل. مثال: استخدام نموذج مُدرب لتصنيف الحيوانات والنباتات لتصنيف أنواع معينة من المركبات.</p><p><b>استراتيجية إعادة استخدام الطبقات:</b><ol><li>المهام ذات الميزات منخفضة المستوى المتشابهة $\rightarrow$ إعادة استخدام المزيد من الطبقات السفلية.</li><li>استبدال طبقة المخرجات (المهمة الجديدة لها متطلبات إخراج مختلفة).</li></ol></p><p><b>عملية التدريب (<span class="smart-term" data-term-en="Fine-tuning" data-ar="الضبط الدقيق" data-en-def="Unfreezing some of the top layers of a frozen model base and jointly training both the newly-added classifier layers and the last layers of the base model.">الضبط الدقيق<span class="smart-term-tooltip"></span></span> - Fine-tuning):</b><ol><li>في البداية، قم بتجميد (Freeze) الطبقات المدربة مسبقاً وقم بتدريب طبقة المخرجات الجديدة فقط.</li><li>بعد عدة حقب (Epochs)، قم بإلغاء تجميد (Unfreeze) بعض الطبقات العلوية.</li><li>قلل معدل التعلم (Learning Rate) وقم بإجراء الضبط الدقيق.</li></ol></p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Transfer Learning" data-ar="نقل التعلم" data-en-def="Reusing a pretrained model on a new, related problem.">Transfer Learning<span class="smart-term-tooltip"></span></span> reduces training time and requires less data. Example: Using a model trained to classify animals and plants to classify specific vehicle types.</p><p><b>Layer Reuse Strategy:</b><ol><li>Tasks with similar low-level features $\rightarrow$ reuse more lower layers.</li><li>Replace the output layer (new task has different output requirements).</li></ol></p><p><b>Training Process (<span class="smart-term" data-term-en="Fine-tuning" data-ar="الضبط الدقيق" data-en-def="Unfreezing some of the top layers of a frozen model base and jointly training both the newly-added classifier layers and the last layers of the base model.">Fine-tuning<span class="smart-term-tooltip"></span></span>):</b><ol><li>Initially freeze pretrained layers and train only the new output layer.</li><li>After a few epochs, unfreeze some upper layers.</li><li>Reduce the learning rate and fine-tune the network.</li></ol></p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نعيد استخدام الطبقات السفلية؟ لأن الطبقات السفلية في الشبكات العميقة تتعلم ميزات عامة جداً (مثل الحواف، الزوايا، الأنسجة) التي تكون مفيدة عبر مهام متعددة، بينما تتعلم الطبقات العلوية ميزات محددة جداً للمهمة الأصلية.</p><p>يجب تجميد الطبقات في البداية لأن طبقة المخرجات الجديدة تمتلك أوزاناً عشوائية. إذا لم نقم بالتجميد، فإن الأخطاء الكبيرة الناتجة عن الطبقة العشوائية ستنتشر للخلف وتدمر الأوزان الجيدة في الطبقات المدربة مسبقاً.</p><p>تقليل معدل التعلم أثناء الضبط الدقيق ضروري لتجنب إجراء تغييرات جذرية على الأوزان التي تم تعلمها مسبقاً.</p></template>
+    <template class="content-en"><p>Why reuse lower layers? Lower layers in deep networks learn highly generic features (edges, corners, textures) useful across many tasks, while upper layers learn highly task-specific features.</p><p>Layers must be frozen initially because the new output layer has random weights. If not frozen, large errors from the random layer would backpropagate and wreck the carefully tuned weights of the pretrained layers.</p><p>Reducing the learning rate during fine-tuning is critical to avoid making drastic changes to the previously learned weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>model_A = keras.models.load_model("my_model_A.h5")
+model_B_on_A = keras.models.Sequential(model_A.layers[:-1])
+model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid"))
+
+# Fine-tuning process
+for layer in model_B_on_A.layers[:-1]:
+ layer.trainable = True
+optimizer = keras.optimizers.SGD(lr=1e-4)
+model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a diagram showing Transfer Learning Layer Reuse Strategy. Left side: 'Existing DNN for task A' showing Input layer -> Hidden 1 -> Hidden 2 -> Hidden 3 -> Hidden 4 -> Hidden 5 -> Output. Right side: 'New DNN for similar task B' showing Input layer -> Hidden 1 -> Hidden 2 -> Hidden 3 -> Hidden 4 -> Output. Draw arrows from Hidden 1, 2, 3 on the left to the corresponding layers on the right, labeled 'Reuse'. Add a padlock icon next to Hidden 1 and 2 on the right, labeled 'Fixed weights'. Add an unlocked padlock next to Hidden 3 and 4 on the right, labeled 'Trainable weights'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Gradient for Reused Layers -->
+    <linearGradient id="reuse-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Arrowhead for Vertical Flow -->
+    <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+
+    <!-- Arrowhead for Reuse Flow -->
+    <marker id="arrow-right" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Titles -->
+  <text x="200" y="40" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle">Existing DNN for Task A</text>
+  <text x="200" y="40" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle">شبكة عصبية عميقة حالية للمهمة أ</text>
+
+  <text x="550" y="40" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle">New DNN for Task B</text>
+  <text x="550" y="40" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle">شبكة عصبية عميقة جديدة للمهمة ب</text>
+
+  <!-- ================= LEFT DNN (Task A) ================= -->
+  <g stroke-width="2">
+    <!-- Input Layer -->
+    <rect x="120" y="70" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="200" y="95" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Input Layer</text>
+    <text x="200" y="95" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">طبقة الإدخال</text>
+
+    <!-- Hidden Layer 1 -->
+    <rect x="120" y="130" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="200" y="155" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 1</text>
+    <text x="200" y="155" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 1</text>
+
+    <!-- Hidden Layer 2 -->
+    <rect x="120" y="190" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="200" y="215" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 2</text>
+    <text x="200" y="215" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 2</text>
+
+    <!-- Hidden Layer 3 -->
+    <rect x="120" y="250" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="200" y="275" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 3</text>
+    <text x="200" y="275" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 3</text>
+
+    <!-- Hidden Layer 4 -->
+    <rect x="120" y="310" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="200" y="335" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 4</text>
+    <text x="200" y="335" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 4</text>
+
+    <!-- Hidden Layer 5 -->
+    <rect x="120" y="370" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="200" y="395" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 5</text>
+    <text x="200" y="395" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 5</text>
+
+    <!-- Output Layer -->
+    <rect x="120" y="430" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="200" y="455" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Output Layer</text>
+    <text x="200" y="455" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">طبقة الإخراج</text>
+  </g>
+
+  <!-- Vertical Arrows Left -->
+  <g stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-down)">
+    <line x1="200" y1="110" x2="200" y2="124" />
+    <line x1="200" y1="170" x2="200" y2="184" />
+    <line x1="200" y1="230" x2="200" y2="244" />
+    <line x1="200" y1="290" x2="200" y2="304" />
+    <line x1="200" y1="350" x2="200" y2="364" />
+    <line x1="200" y1="410" x2="200" y2="424" />
+  </g>
+
+  <!-- ================= RIGHT DNN (Task B) ================= -->
+  <g stroke-width="2">
+    <!-- Input Layer -->
+    <rect x="470" y="70" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="550" y="95" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Input Layer</text>
+    <text x="550" y="95" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">طبقة الإدخال</text>
+
+    <!-- Hidden Layer 1 -->
+    <rect x="470" y="130" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="550" y="155" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 1</text>
+    <text x="550" y="155" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 1</text>
+
+    <!-- Hidden Layer 2 -->
+    <rect x="470" y="190" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="550" y="215" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 2</text>
+    <text x="550" y="215" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 2</text>
+
+    <!-- Hidden Layer 3 -->
+    <rect x="470" y="250" width="160" height="40" rx="6" fill="url(#reuse-grad)" stroke="var(--brand-500)" />
+    <text x="550" y="275" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 3</text>
+    <text x="550" y="275" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 3</text>
+
+    <!-- Hidden Layer 4 (New) -->
+    <rect x="470" y="310" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" />
+    <text x="550" y="335" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Hidden Layer 4</text>
+    <text x="550" y="335" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">الطبقة المخفية 4</text>
+
+    <!-- Output Layer (New) -->
+    <rect x="470" y="370" width="160" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" />
+    <text x="550" y="395" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">Output Layer</text>
+    <text x="550" y="395" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" text-anchor="middle">طبقة الإخراج</text>
+  </g>
+
+  <!-- Vertical Arrows Right -->
+  <g stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-down)">
+    <line x1="550" y1="110" x2="550" y2="124" />
+    <line x1="550" y1="170" x2="550" y2="184" />
+    <line x1="550" y1="230" x2="550" y2="244" />
+    <line x1="550" y1="290" x2="550" y2="304" />
+    <line x1="550" y1="350" x2="550" y2="364" />
+  </g>
+
+  <!-- ================= REUSE ARROWS ================= -->
+  <g stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-right)">
+    <line x1="280" y1="150" x2="462" y2="150" />
+    <line x1="280" y1="210" x2="462" y2="210" />
+    <line x1="280" y1="270" x2="462" y2="270" />
+  </g>
+
+  <!-- Reuse Labels -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">
+    <text x="375" y="142" class="gsvg-en">Reuse</text>
+    <text x="375" y="142" class="gsvg-ar">إعادة استخدام</text>
+    
+    <text x="375" y="202" class="gsvg-en">Reuse</text>
+    <text x="375" y="202" class="gsvg-ar">إعادة استخدام</text>
+    
+    <text x="375" y="262" class="gsvg-en">Reuse</text>
+    <text x="375" y="262" class="gsvg-ar">إعادة استخدام</text>
+  </g>
+
+  <!-- ================= RIGHT ANNOTATIONS ================= -->
+  
+  <!-- Fixed Weights (H1 & H2) -->
+  <g>
+    <!-- Bracket -->
+    <path d="M 638 150 L 648 150 L 648 210 L 638 210" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+    
+    <!-- Locked Padlock Icon -->
+    <rect x="654" y="176" width="14" height="10" rx="2" fill="var(--text-muted)" />
+    <path d="M 657 176 V 171 A 4 4 0 0 1 665 171 V 176" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+    <circle cx="661" cy="181" r="1.5" fill="var(--bg-surface)" />
+    
+    <!-- Label -->
+    <text x="750" y="185" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle">Fixed weights</text>
+    <text x="750" y="185" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" text-anchor="middle">أوزان ثابتة (مجمدة)</text>
+  </g>
+
+  <!-- Trainable Weights (H3 & H4) -->
+  <g>
+    <!-- Bracket -->
+    <path d="M 638 270 L 648 270 L 648 330 L 638 330" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Unlocked Padlock Icon -->
+    <rect x="654" y="296" width="14" height="10" rx="2" fill="var(--brand-500)" />
+    <path d="M 657 296 V 289 A 4 4 0 0 1 665 289" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="661" cy="301" r="1.5" fill="var(--bg-surface)" />
+    
+    <!-- Label -->
+    <text x="750" y="305" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle">Trainable weights</text>
+    <text x="750" y="305" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle">أوزان قابلة للتدريب</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا قمت بإلغاء تجميد جميع الطبقات المدربة مسبقاً واستخدمت معدل تعلم مرتفع منذ البداية في نقل التعلم؟</template>
+      <template class="content-en">What happens if you unfreeze all pretrained layers and use a high learning rate right from the start in transfer learning?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستنتج طبقة المخرجات العشوائية الجديدة أخطاء ضخمة. مع معدل التعلم المرتفع، ستنتشر هذه الأخطاء للخلف وتدمر الأوزان المفيدة التي تم تعلمها مسبقاً في الطبقات السفلية، مما يلغي فائدة نقل التعلم.</p></template>
+      <template class="content-en"><p>The new, randomly initialized output layer will produce massive errors. With a high learning rate, these errors will backpropagate and destroy the useful, previously learned weights in the lower layers, defeating the purpose of transfer learning.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="unsupervised-pretraining" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التدريب المسبق غير الخاضع للإشراف (Unsupervised Pretraining)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Unsupervised Pretraining</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تدريب طبقات الشبكة باستخدام بيانات غير مسماة أولاً، ثم استخدام البيانات المسماة للضبط الدقيق.</p><p>مثل تعلم القواعد العامة للغة من خلال الاستماع فقط (غير خاضع للإشراف) قبل أخذ دروس رسمية لاجتياز اختبار محدد (خاضع للإشراف).</p></template>
+    <template class="content-en"><p>Training network layers using unlabeled data first, then using labeled data for fine-tuning.</p><p>Like learning the general rules of a language just by listening (unsupervised) before taking formal classes to pass a specific exam (supervised).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُستخدم <span class="smart-term" data-term-en="Unsupervised Pretraining" data-ar="التدريب المسبق غير الخاضع للإشراف" data-en-def="Training a model on unlabeled data to learn feature representations before fine-tuning on labeled data.">التدريب المسبق غير الخاضع للإشراف<span class="smart-term-tooltip"></span></span> عندما تكون البيانات المسماة (Labeled data) نادرة أو مكلفة، بينما تتوفر كميات كبيرة من البيانات غير المسماة.</p><p><b>العملية:</b><ol><li>يتم تدريب الطبقات السفلية واحدة تلو الأخرى باستخدام تقنيات غير خاضعة للإشراف (مثل Autoencoders).</li><li>بمجرد تدريب هذه الطبقات، يتم إضافة طبقة مخرجات وتدريب الشبكة بأكملها باستخدام البيانات المسماة المتاحة (الضبط الدقيق عبر الانتشار الخلفي).</li></ol></p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Unsupervised Pretraining" data-ar="التدريب المسبق غير الخاضع للإشراف" data-en-def="Training a model on unlabeled data to learn feature representations before fine-tuning on labeled data.">Unsupervised pretraining<span class="smart-term-tooltip"></span></span> is used when labeled data is scarce or expensive, but large amounts of unlabeled data are available.</p><p><b>Process:</b><ol><li>Lower layers are trained one by one using unsupervised techniques (e.g., Autoencoders).</li><li>Once these layers are trained, an output layer is added, and the entire network is fine-tuned using the available labeled data (via backpropagation).</li></ol></p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>[DEEP_EXPANSION_NEEDED] تعتمد هذه التقنية على فكرة أن الميزات التي تساعد في إعادة بناء المدخلات (في Autoencoders) هي غالباً ميزات مفيدة لمهام التصنيف اللاحقة.</p><p>كانت هذه التقنية هي المحفز الرئيسي لنهضة التعلم العميق في عام 2006 (بواسطة جيفري هينتون)، ولكن مع ظهور تقنيات مثل Batch Normalization و ReLU، قل الاعتماد عليها إلا في حالات النقص الشديد في البيانات المسماة.</p></template>
+    <template class="content-en"><p>[DEEP_EXPANSION_NEEDED] This technique relies on the idea that features useful for reconstructing the input (in Autoencoders) are often useful for subsequent classification tasks.</p><p>This technique was the main catalyst for the deep learning revival in 2006 (by Geoffrey Hinton), but with the advent of Batch Normalization and ReLU, it is less commonly used today unless labeled data is severely lacking.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create a diagram showing Unsupervised Pretraining. Show a sequence of steps. Step 1: 'Unlabeled data' feeds into 'Input layer' -> 'Hidden 1' (Train layer 1). Step 2: 'Hidden 1' (now locked) feeds into 'Hidden 2' (Train layer 2). Step 3: 'Hidden 2' (locked) feeds into 'Hidden 3' (Train layer 3). Final Step: 'Labeled data' feeds into the full stack 'Input' -> 'Hidden 1' -> 'Hidden 2' -> 'Hidden 3' -> 'Output', labeled 'Supervised (backprop): Train output layer & fine-tune top layers'. Use padlock icons to indicate frozen layers during the unsupervised steps. Style: educational, dark background #0d1117, accent colors. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <!-- Training Gradient -->
+        <linearGradient id="trainGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)"/>
+            <stop offset="100%" stop-color="var(--brand-800)"/>
+        </linearGradient>
+
+        <!-- Padlock Icon -->
+        <g id="padlock">
+            <path d="M -3 -2 V -5 A 3 3 0 0 1 3 -5 V -2" fill="none" stroke="var(--text-muted)" stroke-width="1.5"/>
+            <rect x="-4" y="-2" width="8" height="7" rx="1" fill="var(--text-muted)"/>
+        </g>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Main Title -->
+    <text x="500" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Unsupervised Pretraining Process</text>
+    <text x="500" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">عملية التدريب المسبق غير الخاضع للإشراف</text>
+
+    <!-- Column Titles -->
+    <g font-size="18" font-weight="bold" fill="var(--brand-ink)">
+        <text x="140" y="90" text-anchor="middle" class="gsvg-en">Step 1: Train Layer 1</text>
+        <text x="140" y="90" text-anchor="middle" class="gsvg-ar">الخطوة 1: تدريب الطبقة 1</text>
+        
+        <text x="380" y="90" text-anchor="middle" class="gsvg-en">Step 2: Train Layer 2</text>
+        <text x="380" y="90" text-anchor="middle" class="gsvg-ar">الخطوة 2: تدريب الطبقة 2</text>
+        
+        <text x="620" y="90" text-anchor="middle" class="gsvg-en">Step 3: Train Layer 3</text>
+        <text x="620" y="90" text-anchor="middle" class="gsvg-ar">الخطوة 3: تدريب الطبقة 3</text>
+        
+        <text x="860" y="90" text-anchor="middle" class="gsvg-en">Step 4: Fine-Tuning</text>
+        <text x="860" y="90" text-anchor="middle" class="gsvg-ar">الخطوة 4: الضبط الدقيق</text>
+    </g>
+
+    <!-- ================= COLUMN 1 ================= -->
+    <!-- Arrows -->
+    <line x1="140" y1="505" x2="140" y2="475" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="140" y1="430" x2="140" y2="405" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Data -->
+    <g transform="translate(140, 525)">
+        <rect x="-70" y="-20" width="140" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Unlabeled Data</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بيانات غير مسماة</text>
+    </g>
+    <!-- Input Layer -->
+    <g transform="translate(140, 450)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Input Layer</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">طبقة الإدخال</text>
+    </g>
+    <!-- Hidden 1 (Training) -->
+    <g transform="translate(140, 380)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 1</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 1</text>
+    </g>
+
+
+    <!-- ================= COLUMN 2 ================= -->
+    <!-- Arrows -->
+    <line x1="380" y1="505" x2="380" y2="475" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="380" y1="430" x2="380" y2="405" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="380" y1="360" x2="380" y2="335" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Data -->
+    <g transform="translate(380, 525)">
+        <rect x="-70" y="-20" width="140" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Unlabeled Data</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بيانات غير مسماة</text>
+    </g>
+    <!-- Input Layer -->
+    <g transform="translate(380, 450)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Input Layer</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">طبقة الإدخال</text>
+    </g>
+    <!-- Hidden 1 (Frozen) -->
+    <g transform="translate(380, 380)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Hidden 1</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">المخفية 1</text>
+        <use href="#padlock" x="55" y="0"/>
+    </g>
+    <!-- Hidden 2 (Training) -->
+    <g transform="translate(380, 310)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 2</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 2</text>
+    </g>
+
+
+    <!-- ================= COLUMN 3 ================= -->
+    <!-- Arrows -->
+    <line x1="620" y1="505" x2="620" y2="475" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="620" y1="430" x2="620" y2="405" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="620" y1="360" x2="620" y2="335" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="620" y1="290" x2="620" y2="265" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Data -->
+    <g transform="translate(620, 525)">
+        <rect x="-70" y="-20" width="140" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Unlabeled Data</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بيانات غير مسماة</text>
+    </g>
+    <!-- Input Layer -->
+    <g transform="translate(620, 450)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Input Layer</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">طبقة الإدخال</text>
+    </g>
+    <!-- Hidden 1 (Frozen) -->
+    <g transform="translate(620, 380)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Hidden 1</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">المخفية 1</text>
+        <use href="#padlock" x="55" y="0"/>
+    </g>
+    <!-- Hidden 2 (Frozen) -->
+    <g transform="translate(620, 310)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Hidden 2</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">المخفية 2</text>
+        <use href="#padlock" x="55" y="0"/>
+    </g>
+    <!-- Hidden 3 (Training) -->
+    <g transform="translate(620, 240)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 3</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 3</text>
+    </g>
+
+
+    <!-- ================= COLUMN 4 ================= -->
+    <!-- Arrows -->
+    <line x1="860" y1="505" x2="860" y2="475" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="860" y1="430" x2="860" y2="405" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="860" y1="360" x2="860" y2="335" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="860" y1="290" x2="860" y2="265" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="860" y1="220" x2="860" y2="195" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Data -->
+    <g transform="translate(860, 525)">
+        <rect x="-70" y="-20" width="140" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Labeled Data</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">بيانات مسماة</text>
+    </g>
+    <!-- Input Layer -->
+    <g transform="translate(860, 450)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Input Layer</text>
+        <text y="5" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">طبقة الإدخال</text>
+    </g>
+    <!-- Hidden 1 (Fine-Tuning) -->
+    <g transform="translate(860, 380)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 1</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 1</text>
+    </g>
+    <!-- Hidden 2 (Fine-Tuning) -->
+    <g transform="translate(860, 310)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 2</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 2</text>
+    </g>
+    <!-- Hidden 3 (Fine-Tuning) -->
+    <g transform="translate(860, 240)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Hidden 3</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">المخفية 3</text>
+    </g>
+    <!-- Output Layer (Training) -->
+    <g transform="translate(860, 170)">
+        <rect x="-70" y="-20" width="140" height="40" rx="6" fill="url(#trainGrad)"/>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Output Layer</text>
+        <text y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">طبقة الإخراج</text>
+    </g>
+
+    <!-- Backpropagation Arrow -->
+    <path d="M 930 170 L 960 170 L 960 450 L 930 450" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+    <g transform="translate(975, 310) rotate(90)">
+        <text x="0" y="0" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Supervised (Backprop)</text>
+        <text x="0" y="0" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">إشراف (انتشار خلفي)</text>
+    </g>
+
+    <!-- Legend -->
+    <g transform="translate(500, 590)">
+        <!-- Training Legend -->
+        <rect x="-160" y="-10" width="20" height="20" rx="4" fill="url(#trainGrad)"/>
+        <text x="-90" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Training Layer</text>
+        <text x="-90" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">طبقة قيد التدريب</text>
+        
+        <!-- Frozen Legend -->
+        <rect x="10" y="-10" width="20" height="20" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <use href="#padlock" x="20" y="0"/>
+        <text x="85" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Frozen Layer</text>
+        <text x="85" y="5" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">طبقة مجمدة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قل استخدام التدريب المسبق غير الخاضع للإشراف في السنوات الأخيرة للشبكات العصبية القياسية؟</template>
+      <template class="content-en">Why has the use of unsupervised pretraining declined in recent years for standard neural networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بسبب تطور تقنيات مثل تهيئة الأوزان المتقدمة (He/Glorot)، دوال التنشيط الأفضل (ReLU)، وتسوية الدفعات (Batch Normalization)، والتي جعلت تدريب الشبكات العميقة جداً من الصفر ممكناً وفعالاً دون الحاجة لخطوة التدريب المسبق المعقدة.</p></template>
+      <template class="content-en"><p>Due to the development of advanced weight initialization (He/Glorot), better activation functions (ReLU), and Batch Normalization, which made training very deep networks from scratch possible and efficient without the complex pretraining step.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المفصلية. إذا كنتم تتساءلون لماذا كانت الشبكات العصبية العميقة تعتبر 'فاشلة' قبل عام 2010، فالإجابة تكمن في هذه الوحدة: مشكلة تلاشي وانفجار التدرجات. تخيلوا أنكم تحاولون إيصال رسالة عبر طابور طويل من الأشخاص؛ إما أن يختفي الصوت تماماً (تلاشي) أو يتحول إلى صراخ مزعج (انفجار). لحل هذه المعضلة، سلحنا أنفسنا بأدوات قوية: أولاً، قمنا بضبط 'الضغط' الأولي باستخدام تهيئة Glorot و He. ثانياً، استبدلنا الأنابيب المسدودة (Sigmoid) بصمامات ذكية (ReLU ومشتقاتها). ثالثاً، أضفنا نقاط تفتيش لتنظيم التدفق (Batch Normalization). وإذا خرجت الأمور عن السيطرة، نستخدم مكابح الطوارئ (Gradient Clipping). وأخيراً، تعلمنا كيف نكون أذكياء ولا نبدأ من الصفر دائماً باستخدام نقل التعلم (Transfer Learning). ركزوا جيداً على الفرق بين التدريب والاختبار في Batch Normalization، ولماذا نجمد الطبقات في نقل التعلم، فهذه النقاط هي المفضلة في الامتحانات!</template>
+    <template class="content-en">Welcome friends to this crucial module. If you ever wondered why deep neural networks were considered a 'failure' before 2010, the answer lies here: the vanishing and exploding gradients problem. Imagine passing a message down a long line of people; the sound either dies out completely (vanishing) or turns into distorted shouting (exploding). To solve this, we armed ourselves with powerful tools: First, we adjusted the initial 'pressure' using Glorot and He initialization. Second, we replaced clogging pipes (Sigmoid) with smart valves (ReLU and its variants). Third, we added checkpoints to regulate the flow (Batch Normalization). If things still get out of hand, we use emergency brakes (Gradient Clipping). Finally, we learned to work smart, not hard, by not starting from scratch using Transfer Learning. Pay close attention to the difference between training and testing in Batch Normalization, and why we freeze layers in Transfer Learning—these are absolute exam favorites!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا فشلت الشبكات العصبية العميقة في التعلم قبل عام 2010؟</template>
+          <template class="content-en">Why did deep neural networks fail to learn before 2010?</template>
+          <span class="content-target">لماذا فشلت الشبكات العصبية العميقة في التعلم قبل عام 2010؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب مشكلة تلاشي وانفجار التدرجات. استخدام دالة Sigmoid مع التهيئة العشوائية الطبيعية كان يؤدي إلى تضاؤل التدرجات كلما اتجهنا للطبقات السفلية، مما يمنعها من تحديث أوزانها.</template>
+          <template class="content-en">Due to the vanishing and exploding gradients problem. Using the Sigmoid function with standard normal initialization caused gradients to shrink as they moved to lower layers, preventing them from updating their weights.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحل دالة ReLU مشكلة تلاشي التدرجات؟</template>
+          <template class="content-en">How does ReLU solve the vanishing gradients problem?</template>
+          <span class="content-target">كيف تحل دالة ReLU مشكلة تلاشي التدرجات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">على عكس Sigmoid، دالة ReLU لا تتشبع (لا تصبح مسطحة) للقيم الموجبة الكبيرة. مشتقتها للقيم الموجبة هي دائماً 1، مما يسمح للتدرجات بالتدفق بقوة عبر الطبقات العميقة دون أن تتلاشى.</template>
+          <template class="content-en">Unlike Sigmoid, ReLU does not saturate (become flat) for large positive values. Its derivative for positive values is always 1, allowing gradients to flow strongly through deep layers without vanishing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى تهيئة He إذا كان لدينا بالفعل تهيئة Glorot؟</template>
+          <template class="content-en">Why do we need He initialization if we already have Glorot initialization?</template>
+          <span class="content-target">لماذا نحتاج إلى تهيئة He إذا كان لدينا بالفعل تهيئة Glorot؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تهيئة Glorot تفترض أن دالة التنشيط خطية تقريباً حول الصفر (مثل Tanh). دالة ReLU تقطع نصف القيم (القيم السالبة تصبح صفراً)، مما يقلل التباين للنصف. تهيئة He تعوض هذا بضرب التباين في 2.</template>
+          <template class="content-en">Glorot assumes the activation function is roughly linear around zero (like Tanh). ReLU cuts off half the values (negatives become zero), halving the variance. He initialization compensates by multiplying the variance by 2.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين Leaky ReLU و PReLU؟</template>
+          <template class="content-en">What is the main difference between Leaky ReLU and PReLU?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين Leaky ReLU و PReLU؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في Leaky ReLU، يكون الميل للقيم السالبة (ألفا) قيمة ثابتة محددة مسبقاً (مثل 0.01). في PReLU، ألفا هي معلمة يتم تعلمها بواسطة الشبكة أثناء التدريب.</template>
+          <template class="content-en">In Leaky ReLU, the slope for negative values (alpha) is a fixed, predefined hyperparameter (e.g., 0.01). In PReLU, alpha is a parameter learned by the network during training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل تسوية الدفعات (Batch Normalization) كمنظم (Regularizer)؟</template>
+          <template class="content-en">How does Batch Normalization act as a regularizer?</template>
+          <span class="content-target">كيف تعمل تسوية الدفعات (Batch Normalization) كمنظم (Regularizer)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تحسب المتوسط والانحراف المعياري بناءً على الدفعة الصغيرة الحالية (والتي تتغير في كل خطوة)، فإنها تضيف ضوضاء طفيفة إلى التنشيطات. هذه الضوضاء تمنع الشبكة من الاعتماد المفرط على ميزات معينة، مما يقلل التجهيز الزائد.</template>
+          <template class="content-en">Because it computes the mean and std dev based on the current mini-batch (which changes every step), it adds slight noise to the activations. This noise prevents the network from over-relying on specific features, reducing overfitting.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُفضل قص التدرج (Gradient Clipping) في الشبكات المتكررة (RNNs) بدلاً من تسوية الدفعات؟</template>
+          <template class="content-en">Why is Gradient Clipping preferred in RNNs instead of Batch Normalization?</template>
+          <span class="content-target">لماذا يُفضل قص التدرج (Gradient Clipping) في الشبكات المتكررة (RNNs) بدلاً من تسوية الدفعات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تطبيق تسوية الدفعات في RNNs معقد جداً لأن الشبكة تفتح (unroll) عبر الزمن، والإحصائيات تتغير في كل خطوة زمنية. قص التدرج هو حل أبسط وأكثر استقراراً لمنع انفجار التدرجات في هذه الحالة.</template>
+          <template class="content-en">Applying Batch Normalization in RNNs is very complex because the network unrolls over time, and statistics change at each time step. Gradient clipping is a simpler, more stable solution to prevent exploding gradients here.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين القص بالقيمة (Value) والقص بالمعيار (Norm)؟</template>
+          <template class="content-en">What is the difference between clipping by value and clipping by norm?</template>
+          <span class="content-target">ما الفرق بين القص بالقيمة (Value) والقص بالمعيار (Norm)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">القص بالقيمة يحد كل رقم في متجه التدرج بشكل منفصل، مما قد يغير اتجاه المتجه. القص بالمعيار يقلص المتجه بأكمله بنسبة متساوية إذا تجاوز طوله حداً معيناً، مما يحافظ على اتجاهه الأصلي.</template>
+          <template class="content-en">Value clipping caps each number in the gradient vector separately, which can change the vector's direction. Norm clipping scales the entire vector proportionally if its length exceeds a limit, preserving its original direction.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم نقل التعلم (Transfer Learning)؟</template>
+          <template class="content-en">When should I use Transfer Learning?</template>
+          <span class="content-target">متى يجب أن أستخدم نقل التعلم (Transfer Learning)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما يكون لديك مهمة جديدة تشترك في ميزات منخفضة المستوى مع مهمة تم تدريب نموذج ضخم عليها مسبقاً، وخاصة عندما يكون لديك كمية محدودة من البيانات المسماة لمهمتك الجديدة.</template>
+          <template class="content-en">When you have a new task that shares low-level features with a task a massive model was already trained on, especially when you have a limited amount of labeled data for your new task.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقوم بتجميد الطبقات في بداية نقل التعلم؟</template>
+          <template class="content-en">Why do we freeze layers at the beginning of transfer learning?</template>
+          <span class="content-target">لماذا نقوم بتجميد الطبقات في بداية نقل التعلم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأننا نضيف طبقة مخرجات جديدة بأوزان عشوائية. إذا لم نجمد الطبقات السفلية، فإن الأخطاء الضخمة الناتجة عن الطبقة العشوائية ستنتشر للخلف وتدمر الأوزان الممتازة التي تم تعلمها مسبقاً.</template>
+          <template class="content-en">Because we add a new output layer with random weights. If we don't freeze the lower layers, the massive errors from the random layer will backpropagate and destroy the excellent, previously learned weights.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الشروط اللازمة لنجاح التطبيع الذاتي باستخدام دالة SELU؟</template>
+          <template class="content-en">What are the conditions for successful self-normalization using the SELU function?</template>
+          <span class="content-target">ما هي الشروط اللازمة لنجاح التطبيع الذاتي باستخدام دالة SELU؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب أن تكون ميزات الإدخال موحدة (Standardized بمتوسط 0 وتباين 1)، ويجب تهيئة أوزان الشبكة باستخدام تهيئة LeCun (LeCun initialization).</template>
+          <template class="content-en">Input features must be standardized (mean 0, variance 1), and the network's weights must be initialized using LeCun initialization.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي مشكلة تلاشي التدرجات (Vanishing Gradients)؟",
+      "en": "What is the Vanishing Gradients problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصبح التدرجات صغيرة جداً أثناء الانتشار الخلفي، مما يمنع الطبقات السفلية من التعلم.",
+        "en": "Gradients become extremely small during backpropagation, preventing lower layers from learning."
+      },
+      "example": {
+        "ar": "توقف تحديث أوزان الطبقات الأولى في شبكة عميقة تستخدم دالة Sigmoid.",
+        "en": "Weights in the first layers of a deep network using Sigmoid stop updating."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي مشكلة انفجار التدرجات (Exploding Gradients)؟",
+      "en": "What is the Exploding Gradients problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصبح التدرجات كبيرة جداً، مما يؤدي إلى تحديثات ضخمة للأوزان وتباعد النموذج.",
+        "en": "Gradients become excessively large, leading to massive weight updates and model divergence."
+      },
+      "example": {
+        "ar": "شائعة في الشبكات العصبية المتكررة (RNNs).",
+        "en": "Common in Recurrent Neural Networks (RNNs)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الهدف من تهيئة Glorot (Xavier)؟",
+      "en": "What is the goal of Glorot (Xavier) Initialization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحفاظ على تباين المدخلات والمخرجات لضمان استقرار التدرجات، وتستخدم عادة مع Sigmoid/Tanh.",
+        "en": "Maintain the variance of inputs and outputs to ensure stable gradients, typically used with Sigmoid/Tanh."
+      },
+      "example": {
+        "ar": "توسيع الأوزان بناءً على عدد المدخلات والمخرجات للطبقة.",
+        "en": "Scaling weights based on the number of inputs and outputs of the layer."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "لماذا صُممت تهيئة He (He Initialization)؟",
+      "en": "Why was He Initialization designed?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صُممت خصيصاً للشبكات التي تستخدم دالة ReLU لتعويض فقدان التباين الناتج عن تصفير القيم السالبة.",
+        "en": "Designed specifically for ReLU networks to compensate for the variance lost by zeroing out negative values."
+      },
+      "example": {
+        "ar": "keras.layers.Dense(10, activation='relu', kernel_initializer='he_normal')",
+        "en": "keras.layers.Dense(10, activation='relu', kernel_initializer='he_normal')"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي مشكلة الخلايا العصبية الميتة (Dying Neurons)؟",
+      "en": "What is the Dying Neurons problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة في دالة ReLU حيث يصبح مخرج الخلية صفراً بشكل دائم وتتوقف عن تحديث أوزانها.",
+        "en": "A state in ReLU where a neuron permanently outputs zero and stops updating its weights."
+      },
+      "example": {
+        "ar": "تحدث عندما يدفع تدرج كبير الأوزان لتكون سالبة دائماً لجميع المدخلات.",
+        "en": "Occurs when a large gradient pushes weights to be negative for all inputs."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف تحل دالة Leaky ReLU مشكلة الخلايا الميتة؟",
+      "en": "How does Leaky ReLU solve the dying neurons problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسمح بتدرج صغير غير صفري عندما يكون الإدخال سالباً.",
+        "en": "It allows a small, non-zero gradient when the input is negative."
+      },
+      "example": {
+        "ar": "LeakyReLU(z) = max(0.01 * z, z)",
+        "en": "LeakyReLU(z) = max(0.01 * z, z)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي ميزة دالة التنشيط SELU؟",
+      "en": "What is the advantage of the SELU activation function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسمح بإنشاء شبكات ذات تطبيع ذاتي (Self-Normalizing) تحافظ على متوسط 0 وانحراف معياري 1.",
+        "en": "Allows the creation of Self-Normalizing networks that maintain a mean of 0 and standard deviation of 1."
+      },
+      "example": {
+        "ar": "تتطلب مدخلات موحدة وتهيئة LeCun لتعمل بشكل صحيح.",
+        "en": "Requires standardized inputs and LeCun initialization to work correctly."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو الغرض من تسوية الدفعات (Batch Normalization)؟",
+      "en": "What is the purpose of Batch Normalization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "توحيد مدخلات كل طبقة مخفية لتسريع التدريب وتقليل تلاشي/انفجار التدرجات.",
+        "en": "Normalizing inputs to each hidden layer to accelerate training and reduce vanishing/exploding gradients."
+      },
+      "example": {
+        "ar": "تطبيق BN قبل دالة التنشيط ReLU.",
+        "en": "Applying BN before the ReLU activation function."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي المعلمات التي تتعلمها طبقة Batch Normalization أثناء التدريب؟",
+      "en": "What parameters does a Batch Normalization layer learn during training?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتعلم معلمة المقياس (Gamma) ومعلمة الإزاحة (Beta).",
+        "en": "It learns the scale parameter (Gamma) and the shift parameter (Beta)."
+      },
+      "example": {
+        "ar": "\\(z_i\\) = gamma * x_norm + beta",
+        "en": "\\(z_i\\) = gamma * x_norm + beta"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف تعمل تسوية الدفعات (BN) أثناء مرحلة الاختبار (Inference)؟",
+      "en": "How does Batch Normalization work during the testing (inference) phase?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم المتوسطات المتحركة (Moving averages) للمتوسط والانحراف المعياري التي تم جمعها أثناء التدريب.",
+        "en": "It uses the moving averages of the mean and standard deviation collected during training."
+      },
+      "example": {
+        "ar": "لأنه لا يمكن حساب إحصائيات دفعة عند التنبؤ بصورة واحدة.",
+        "en": "Because mini-batch statistics cannot be calculated when predicting a single image."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو قص التدرج (Gradient Clipping)؟",
+      "en": "What is Gradient Clipping?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لمكافحة انفجار التدرجات عن طريق وضع حد أقصى لقيمتها أثناء الانتشار الخلفي.",
+        "en": "A technique to combat exploding gradients by capping their values during backpropagation."
+      },
+      "example": {
+        "ar": "يستخدم بكثرة في الشبكات العصبية المتكررة (RNNs).",
+        "en": "Heavily used in Recurrent Neural Networks (RNNs)."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما الفرق بين القص بالقيمة (Value) والقص بالمعيار (Norm)؟",
+      "en": "What is the difference between Clipping by Value and Clipping by Norm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "القص بالقيمة يحد كل مكون وقد يغير اتجاه التدرج، بينما القص بالمعيار يحد المتجه بأكمله ويحافظ على الاتجاه.",
+        "en": "Value clipping caps individual components and may change direction; Norm clipping caps the whole vector, preserving direction."
+      },
+      "example": {
+        "ar": "القص بالمعيار مفضل لأنه لا يوجه التحسين في مسار خاطئ.",
+        "en": "Norm clipping is preferred as it doesn't steer optimization in the wrong path."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو نقل التعلم (Transfer Learning)؟",
+      "en": "What is Transfer Learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إعادة استخدام الطبقات المدربة مسبقاً من نموذج لحل مهمة جديدة مشابهة.",
+        "en": "Reusing pretrained layers from a model to solve a new, similar task."
+      },
+      "example": {
+        "ar": "استخدام نموذج مدرب على ImageNet لتصنيف أنواع السيارات.",
+        "en": "Using a model trained on ImageNet to classify car models."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "لماذا نقوم بتجميد (Freeze) الطبقات في بداية نقل التعلم؟",
+      "en": "Why do we freeze layers at the beginning of transfer learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لمنع الأخطاء الكبيرة الناتجة عن طبقة المخرجات العشوائية الجديدة من تدمير الأوزان المدربة مسبقاً.",
+        "en": "To prevent large errors from the new, random output layer from destroying the pretrained weights."
+      },
+      "example": {
+        "ar": "layer.trainable = False",
+        "en": "layer.trainable = False"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الضبط الدقيق (Fine-tuning) في نقل التعلم؟",
+      "en": "What is Fine-tuning in transfer learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إلغاء تجميد بعض الطبقات العلوية وتدريبها بمعدل تعلم منخفض جداً لتكييفها مع المهمة الجديدة.",
+        "en": "Unfreezing some top layers and training them with a very low learning rate to adapt to the new task."
+      },
+      "example": {
+        "ar": "يتم بعد تدريب طبقة المخرجات الجديدة مبدئياً.",
+        "en": "Done after the new output layer has been initially trained."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "متى نستخدم التدريب المسبق غير الخاضع للإشراف؟",
+      "en": "When do we use Unsupervised Pretraining?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما تكون البيانات المسماة نادرة، ولكن تتوفر كميات كبيرة من البيانات غير المسماة.",
+        "en": "When labeled data is scarce, but large amounts of unlabeled data are available."
+      },
+      "example": {
+        "ar": "تدريب طبقات باستخدام Autoencoders قبل الضبط الدقيق ببيانات مسماة.",
+        "en": "Training layers using Autoencoders before fine-tuning with labeled data."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية تساهم بشكل كبير في مشكلة تلاشي التدرجات عند استخدامها في الشبكات العميقة؟",
+      "en": "Which of the following activation functions significantly contributes to the vanishing gradients problem when used in deep networks?"
+    },
+    "options": {
+      "ar": [
+        "ReLU",
+        "Leaky ReLU",
+        "Sigmoid",
+        "SELU"
+      ],
+      "en": [
+        "ReLU",
+        "Leaky ReLU",
+        "Sigmoid",
+        "SELU"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة Sigmoid تتشبع عند القيم الكبيرة والصغيرة، مما يجعل مشتقتها قريبة من الصفر، وهذا يسبب تلاشي التدرجات.",
+      "en": "The Sigmoid function saturates at large and small values, making its derivative close to zero, which causes vanishing gradients."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة التي تتشبع (تصبح مسطحة) عند الأطراف.",
+      "en": "Look for the function that saturates (becomes flat) at the extremes."
+    },
+    "difficulty": "easy",
+    "conceptId": "vanishing-exploding-gradients"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي تقنية تهيئة أوزان هي الأنسب لشبكة عصبية تستخدم دالة التنشيط ReLU؟",
+      "en": "Which weight initialization technique is most appropriate for a neural network using the ReLU activation function?"
+    },
+    "options": {
+      "ar": [
+        "تهيئة Glorot (Xavier)",
+        "تهيئة He",
+        "تهيئة LeCun",
+        "تهيئة عشوائية طبيعية (متوسط 0، تباين 1)"
+      ],
+      "en": [
+        "Glorot (Xavier) Initialization",
+        "He Initialization",
+        "LeCun Initialization",
+        "Random Normal Initialization (mean 0, var 1)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تهيئة He مصممة خصيصاً لتعويض فقدان التباين الذي يحدث في دالة ReLU (التي تصفر القيم السالبة).",
+      "en": "He initialization is specifically designed to compensate for the variance lost in the ReLU function (which zeroes out negative values)."
+    },
+    "hint": {
+      "ar": "اقترحها K. He لحل مشاكل ReLU.",
+      "en": "Proposed by K. He to solve ReLU issues."
+    },
+    "difficulty": "medium",
+    "conceptId": "weight-initialization"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية التي تحلها دالة Leaky ReLU مقارنة بدالة ReLU العادية؟",
+      "en": "What is the main problem that Leaky ReLU solves compared to standard ReLU?"
+    },
+    "options": {
+      "ar": [
+        "انفجار التدرجات",
+        "التجهيز الزائد (Overfitting)",
+        "موت الخلايا العصبية (Dying Neurons)",
+        "بطء التدريب"
+      ],
+      "en": [
+        "Exploding Gradients",
+        "Overfitting",
+        "Dying Neurons",
+        "Slow Training"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تسمح Leaky ReLU بتدرج صغير للقيم السالبة، مما يمنع الخلايا العصبية من إخراج صفر دائم والتوقف عن التعلم.",
+      "en": "Leaky ReLU allows a small gradient for negative values, preventing neurons from permanently outputting zero and stopping learning."
+    },
+    "hint": {
+      "ar": "ماذا يحدث عندما يكون إدخال ReLU سالباً دائماً؟",
+      "en": "What happens when a ReLU input is always negative?"
+    },
+    "difficulty": "medium",
+    "conceptId": "advanced-activation-functions"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أثناء مرحلة الاختبار (Inference)، من أين تحصل طبقة Batch Normalization على قيم المتوسط والانحراف المعياري؟",
+      "en": "During the testing (inference) phase, where does the Batch Normalization layer get its mean and standard deviation values?"
+    },
+    "options": {
+      "ar": [
+        "تحسبها من بيانات الاختبار الحالية",
+        "تستخدم المتوسطات المتحركة المحسوبة أثناء التدريب",
+        "تستخدم قيماً عشوائية",
+        "تستخدم المعلمات غاما (Gamma) وبيتا (Beta) كمتوسط وتباين"
+      ],
+      "en": [
+        "Calculates them from the current test data",
+        "Uses moving averages calculated during training",
+        "Uses random values",
+        "Uses Gamma and Beta parameters as mean and variance"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "أثناء الاختبار، لا يمكن ضمان وجود دفعة (قد يتم التنبؤ بعينة واحدة)، لذا تستخدم الشبكة المتوسطات المتحركة التي تم تتبعها أثناء التدريب.",
+      "en": "During testing, a batch cannot be guaranteed (might predict on a single sample), so the network uses moving averages tracked during training."
+    },
+    "hint": {
+      "ar": "كيف تتصرف الشبكة إذا تم إعطاؤها صورة واحدة فقط لتصنيفها؟",
+      "en": "How does the network behave if given only a single image to classify?"
+    },
+    "difficulty": "hard",
+    "conceptId": "batch-normalization"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "لماذا يُفضل غالباً قص التدرج حسب المعيار (Clipping by Norm) على القص حسب القيمة (Clipping by Value)؟",
+      "en": "Why is Gradient Clipping by Norm often preferred over Clipping by Value?"
+    },
+    "options": {
+      "ar": [
+        "لأنه أسرع في الحساب",
+        "لأنه يحافظ على اتجاه متجه التدرج",
+        "لأنه يمنع تلاشي التدرجات",
+        "لأنه لا يتطلب تحديد عتبة (Threshold)"
+      ],
+      "en": [
+        "Because it is faster to compute",
+        "Because it preserves the direction of the gradient vector",
+        "Because it prevents vanishing gradients",
+        "Because it does not require setting a threshold"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القص بالمعيار يقلص المتجه بأكمله بنسبة متساوية، مما يحافظ على اتجاهه ويمنع توجيه التحسين في مسار خاطئ.",
+      "en": "Norm clipping scales down the entire vector proportionally, preserving its direction and preventing optimization from steering into a wrong path."
+    },
+    "hint": {
+      "ar": "فكر في التدرج كمتجه له مقدار واتجاه.",
+      "en": "Think of the gradient as a vector with magnitude and direction."
+    },
+    "difficulty": "medium",
+    "conceptId": "gradient-clipping"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في نقل التعلم (Transfer Learning)، ما هي الخطوة الأولى الموصى بها عند تدريب النموذج على المهمة الجديدة؟",
+      "en": "In Transfer Learning, what is the recommended first step when training the model on the new task?"
+    },
+    "options": {
+      "ar": [
+        "إلغاء تجميد جميع الطبقات واستخدام معدل تعلم مرتفع",
+        "تجميد الطبقات المدربة مسبقاً وتدريب طبقة المخرجات الجديدة فقط",
+        "إعادة تهيئة جميع الأوزان عشوائياً",
+        "استخدام التدريب المسبق غير الخاضع للإشراف"
+      ],
+      "en": [
+        "Unfreeze all layers and use a high learning rate",
+        "Freeze pretrained layers and train only the new output layer",
+        "Randomly reinitialize all weights",
+        "Use unsupervised pretraining"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب تجميد الطبقات المدربة مسبقاً أولاً لمنع الأخطاء الكبيرة من طبقة المخرجات العشوائية من تدمير الأوزان الجيدة.",
+      "en": "Pretrained layers must be frozen first to prevent large errors from the random output layer from destroying the good weights."
+    },
+    "hint": {
+      "ar": "كيف تحمي المعرفة السابقة من التدمير بسبب الطبقة الجديدة العشوائية؟",
+      "en": "How do you protect prior knowledge from being destroyed by the random new layer?"
+    },
+    "difficulty": "medium",
+    "conceptId": "transfer-learning"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية تسمح بإنشاء شبكات عصبية ذات تطبيع ذاتي (Self-Normalizing)؟",
+      "en": "Which of the following activation functions allows the creation of Self-Normalizing neural networks?"
+    },
+    "options": {
+      "ar": [
+        "ReLU",
+        "Tanh",
+        "SELU",
+        "PReLU"
+      ],
+      "en": [
+        "ReLU",
+        "Tanh",
+        "SELU",
+        "PReLU"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة SELU (Scaled Exponential Linear Unit) مصممة خصيصاً للحفاظ على متوسط 0 وانحراف معياري 1 عبر الطبقات.",
+      "en": "SELU (Scaled Exponential Linear Unit) is specifically designed to maintain a mean of 0 and standard deviation of 1 across layers."
+    },
+    "hint": {
+      "ar": "الحرف 'S' في بداية اسمها يرمز إلى Scaled، وهي مرتبطة بالتطبيع الذاتي.",
+      "en": "The 'S' stands for Scaled, and it's associated with self-normalization."
+    },
+    "difficulty": "easy",
+    "conceptId": "advanced-activation-functions"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الفائدة الإضافية لتسوية الدفعات (Batch Normalization) بجانب تسريع التدريب؟",
+      "en": "What is an additional benefit of Batch Normalization besides accelerating training?"
+    },
+    "options": {
+      "ar": [
+        "تقلل من حجم النموذج في الذاكرة",
+        "تعمل كمنظم (Regularizer) وتقلل الحاجة إلى Dropout",
+        "تلغي الحاجة إلى دوال التنشيط",
+        "تمنع الخلايا العصبية الميتة تماماً"
+      ],
+      "en": [
+        "Reduces the model size in memory",
+        "Acts as a regularizer and reduces the need for Dropout",
+        "Eliminates the need for activation functions",
+        "Completely prevents dying neurons"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لأنها تحسب الإحصائيات بناءً على الدفعة الصغيرة الحالية، فإنها تضيف ضوضاء طفيفة تعمل كمنظم يقلل من التجهيز الزائد.",
+      "en": "Because it calculates statistics based on the current mini-batch, it adds slight noise that acts as a regularizer, reducing overfitting."
+    },
+    "hint": {
+      "ar": "كيف تؤثر الضوضاء المضافة من الدفعة الصغيرة على التجهيز الزائد؟",
+      "en": "How does the noise added from the mini-batch affect overfitting?"
+    },
+    "difficulty": "medium",
+    "conceptId": "batch-normalization"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "متى يكون التدريب المسبق غير الخاضع للإشراف (Unsupervised Pretraining) مفيداً بشكل خاص؟",
+      "en": "When is Unsupervised Pretraining particularly useful?"
+    },
+    "options": {
+      "ar": [
+        "عندما يكون لديك كمية ضخمة من البيانات المسماة (Labeled data)",
+        "عندما تكون البيانات المسماة نادرة ولكن البيانات غير المسماة متوفرة بكثرة",
+        "عند استخدام شبكات عصبية متكررة (RNNs) فقط",
+        "عندما تريد تسريع وقت الاستدلال (Inference time)"
+      ],
+      "en": [
+        "When you have a massive amount of labeled data",
+        "When labeled data is scarce but unlabeled data is abundant",
+        "Only when using Recurrent Neural Networks (RNNs)",
+        "When you want to speed up inference time"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يسمح للنموذج بتعلم ميزات مفيدة من البيانات غير المسماة قبل الضبط الدقيق باستخدام الكمية المحدودة من البيانات المسماة.",
+      "en": "It allows the model to learn useful features from unlabeled data before fine-tuning with the limited labeled data."
+    },
+    "hint": {
+      "ar": "فكر في التكلفة العالية لتسمية البيانات.",
+      "en": "Think about the high cost of labeling data."
+    },
+    "difficulty": "easy",
+    "conceptId": "unsupervised-pretraining"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في سياق نقل التعلم، ماذا يعني 'الضبط الدقيق' (Fine-tuning)؟",
+      "en": "In the context of transfer learning, what does 'Fine-tuning' mean?"
+    },
+    "options": {
+      "ar": [
+        "تغيير بنية الشبكة بالكامل",
+        "إلغاء تجميد بعض الطبقات العلوية وتدريبها بمعدل تعلم منخفض",
+        "استخدام خوارزمية تحسين مختلفة",
+        "تدريب النموذج من الصفر باستخدام بيانات جديدة"
+      ],
+      "en": [
+        "Changing the entire network architecture",
+        "Unfreezing some top layers and training them with a low learning rate",
+        "Using a different optimization algorithm",
+        "Training the model from scratch using new data"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الضبط الدقيق يتضمن تكييف الأوزان المدربة مسبقاً في الطبقات العلوية ببطء (بمعدل تعلم منخفض) لتناسب المهمة الجديدة.",
+      "en": "Fine-tuning involves slowly adapting the pretrained weights in the upper layers (with a low learning rate) to fit the new task."
+    },
+    "hint": {
+      "ar": "كيف نكيف الطبقات العلوية دون تدمير ما تعلمته؟",
+      "en": "How do we adapt the top layers without destroying what they learned?"
+    },
+    "difficulty": "medium",
+    "conceptId": "transfer-learning"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن طبقة Batch Normalization تستخدم إحصائيات الدفعة (Mini-batch) أثناء مرحلة الاختبار. في الواقع، هي تستخدم المتوسطات المتحركة التي تم حسابها أثناء التدريب، وإلا فلن تتمكن من التنبؤ بعينة واحدة.</template>
+    <template class="content-en">Believing that Batch Normalization uses mini-batch statistics during testing. In reality, it uses moving averages calculated during training, otherwise it couldn't predict on a single sample.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قص التدرج حسب القيمة (Clipping by Value) يمكن أن يغير اتجاه متجه التدرج، مما قد يدفع خوارزمية التحسين في اتجاه خاطئ. لذلك، القص حسب المعيار (Clipping by Norm) هو الخيار الأكثر أماناً وشيوعاً.</template>
+    <template class="content-en">Gradient clipping by value can change the direction of the gradient vector, potentially pushing the optimization algorithm in the wrong direction. Therefore, clipping by norm is the safer and more common choice.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مشكلة الخلايا العصبية الميتة (Dying ReLU) لا تعني أن الخلية معطلة برمجياً، بل تعني أن الأوزان تم تحديثها بقوة بحيث أصبح المجموع الموزون سالباً دائماً، وبما أن مشتقة ReLU للقيم السالبة هي صفر، فلن تتحدث الأوزان أبداً بعد ذلك.</template>
+    <template class="content-en">The Dying ReLU problem doesn't mean the neuron is broken in code; it means weights were updated so strongly that the weighted sum is always negative. Since the derivative of ReLU for negative values is zero, the weights will never update again.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">إلغاء تجميد جميع الطبقات المدربة مسبقاً فوراً في نقل التعلم. هذا خطأ فادح لأن طبقة المخرجات الجديدة العشوائية ستولد أخطاء ضخمة تدمر الأوزان القيمة في الطبقات السفلية. يجب تدريب طبقة المخرجات أولاً.</template>
+    <template class="content-en">Immediately unfreezing all pretrained layers in transfer learning. This is a fatal mistake because the random new output layer will generate massive errors that destroy the valuable weights in lower layers. Train the output layer first.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الطبقات السفلية في الشبكات العصبية العميقة تتعلم ميزات عامة (مثل الحواف والخطوط)، بينما تتعلم الطبقات العلوية ميزات محددة للمهمة. هذا هو السبب الأساسي لنجاح نقل التعلم (Transfer Learning).</template>
+    <template class="content-en">Lower layers in deep neural networks learn generic features (like edges and lines), while upper layers learn task-specific features. This is the fundamental reason why Transfer Learning works.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M10.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M12.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

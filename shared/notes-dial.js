@@ -2951,6 +2951,7 @@
 
   window.GardenNotesDial = {
     mount: function (opts) { return new Dial(opts); },
+    penButtons: function () { var o = { penBtnDialog: Dial.prototype.penBtnDialog }; return o.penBtnDialog(); },
     RING1: RING1,
     TONES: TONES
   };

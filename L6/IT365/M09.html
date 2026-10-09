@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT365" data-module="9" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>نمذجة عمليات الأعمال وترميزها (BPMN) - الجزء الثاني · IT365 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT365" data-page-title-en="IT365">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=IT365"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#sample-purchasing-scenario-bpmn" class="toc-link" data-bilingual>
+        <template class="content-ar">سيناريو الشراء باستخدام BPMN</template>
+        <template class="content-en">Sample Purchasing Scenario in BPMN</template>
+        <span class="content-target">سيناريو الشراء باستخدام BPMN</span>
+      </a>
+      <a href="#bpmn-software-engineering-characteristics" class="toc-link" data-bilingual>
+        <template class="content-ar">خصائص BPMN في هندسة البرمجيات</template>
+        <template class="content-en">Characteristics of BPMN for Software Engineering Processes</template>
+        <span class="content-target">خصائص BPMN في هندسة البرمجيات</span>
+      </a>
+      <a href="#spreadsheet-based-process-modeling" class="toc-link" data-bilingual>
+        <template class="content-ar">نمذجة العمليات باستخدام جداول البيانات</template>
+        <template class="content-en">Spreadsheet-Based Process Modeling</template>
+        <span class="content-target">نمذجة العمليات باستخدام جداول البيانات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · IT365
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">نمذجة عمليات الأعمال وترميزها (BPMN) - الجزء الثاني</h1>
+      <p class="hero-description">يغطي هذا الوحدة سيناريو تطبيقي لعملية الشراء باستخدام BPMN، ويحلل خصائص ونقاط قوة وضعف BPMN في هندسة البرمجيات، ويقدم نمذجة العمليات القائمة على جداول البيانات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Business Process Modeling and Notation (BPMN) - Part 2</h1>
+      <p class="hero-description">This module covers an applied purchasing scenario using BPMN, analyzes the characteristics, strengths, and weaknesses of BPMN in software engineering, and introduces spreadsheet-based process modeling.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">نمذجة الأعمال</span>
+      <span class="tag">BPMN</span>
+      <span class="tag">هندسة البرمجيات</span>
+      <span class="tag">جداول البيانات</span>
+      <span class="tag">تحويل العمليات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Business Modeling</span>
+      <span class="tag">BPMN</span>
+      <span class="tag">Software Engineering</span>
+      <span class="tag">Spreadsheets</span>
+      <span class="tag">Process Transformation</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم سيناريو تطبيقي لعملية الشراء ممثل باستخدام نمذجة إجراءات الأعمال والترميز (BPMN).</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل خصائص ونقاط قوة وضعف BPMN عند استخدامها لنمذجة عمليات هندسة البرمجيات.</span></li>
+      <li><span class="obj-icon">✦</span><span>استيعاب مفهوم نمذجة العمليات القائمة على جداول البيانات وكيفية تحويلها من وإلى BPMN.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand a Sample Purchasing Scenario Represented in Business Process Modeling and Notation.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the Characteristics of Business Process Modeling and Notation for Modeling Software Engineering Processes.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand Spreadsheet-Based Process Modeling and its transformations.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="sample-purchasing-scenario-bpmn" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> سيناريو الشراء باستخدام BPMN</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Sample Purchasing Scenario in BPMN</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق عملي لـ BPMN يوضح كيف تتفاعل الأقسام المختلفة (الموظف، المستودع، المشتريات) لإنجاز طلب شراء.</p></template>
+    <template class="content-en"><p>A practical application of BPMN showing how different departments (Employee, Warehouse, Purchasing) interact to fulfill a purchase request.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوضح سيناريو الشراء الهيكل الأساسي وعناصر نموذج BPMN. يتكون النموذج من كيانين رئيسيين: الشركة والمورّد.</p><p>يتم تمثيل العملية من خلال:</p><ol><li><b>حوض عملية الشراء (Purchase Process Pool):</b> ينقسم إلى ثلاثة مسارات (Swim lanes) تمثل الوحدات التنظيمية: الموظف (يطلب المنتج)، المستودع (يخزن المنتج ويفحص توفره)، وقسم المشتريات (يعالج طلب الشراء الخارجي).</li><li><b>حوض المورّد (Supplier Pool):</b> يُترك فارغاً (Black-box) لأنه لا يُعرف شيء عن سلوكه الداخلي سوى أنه يستلم طلب الشراء ويعيد تأكيد الطلب.</li></ol><p>تبدأ العملية بحدث بداية في مسار الموظف (تعبئة الطلب)، ثم تنتقل لمسار المستودع للتحقق من التوفر. إذا كان متوفراً، يتم إرساله؛ وإلا، يقوم قسم المشتريات بإرسال طلب للمورد.</p></template>
+    <template class="content-en"><p>The purchasing scenario illustrates the basic structure and elements of a BPMN model. It consists of two main entities: the company and the supplier.</p><p>The process is represented by:</p><ol><li><b>A "purchase process" pool:</b> Subdivided into three <span class="smart-term" data-term-en="Swim lane" data-ar="مسار / حارة" data-en-def="A placeholder for BPMN flow constructs used to assign responsibility for tasks to a specific organizational unit.">swim lane<span class="smart-term-tooltip"></span></span>s representing organizational units: Employee (requests product), Warehouse (stores product, checks availability), and Purchasing department (processes external purchase).</li><li><b>A "supplier" pool:</b> Left blank (black-box) because nothing is known about its internal behavior other than it receives the order and returns a confirmation.</li></ol><p>The process begins with a start event in the employee lane (fill in requisition), moves to the warehouse to check availability. If available, it's dispatched; otherwise, purchasing sends an order to the supplier.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>لماذا نستخدم المسارات (Swim lanes)؟</strong> تُعد المسارات وسيلة لتعيين المسؤولية عن مهام معينة لوحدة تنظيمية محددة؛ أي شيء يوضع داخل المسار يُفترض أنه يحدث ضمن سياق تلك الوحدة.</p><p>في هذا السيناريو، توجد <span class="smart-term" data-term-en="Exclusive Gateway" data-ar="بوابة حصرية" data-en-def="A gateway that splits the flow into mutually exclusive paths based on conditions.">بوابة حصرية<span class="smart-term-tooltip"></span></span> (Exclusive Gateway) للتفرع، ولكن لا يوجد بوابة دمج مطابقة. هذا ممكن ومقبول في BPMN لأن كلا المسارين يؤديان في النهاية إلى حدث نهاية (End Event) منفصل، لذا لا حاجة لدمجهما مرة أخرى في تدفق مشترك.</p><p>يمكن إعادة تصميم العملية إذا كان نشاط "الإرسال" متطابقاً في كلا المسارين، بحيث يتم طلب المنتج أولاً (إذا لم يكن متوفراً) ثم يتدفق المساران إلى نشاط إرسال واحد قبل الانتهاء.</p></template>
+    <template class="content-en"><p><strong>Why use swim lanes?</strong> A swim lane is a means to assign responsibility for certain tasks to a given organizational unit; whatever is placed inside a swim lane is assumed to happen within the context of that unit.</p><p>In this scenario, there is a splitting <span class="smart-term" data-term-en="Exclusive Gateway" data-ar="بوابة حصرية" data-en-def="A gateway that splits the flow into mutually exclusive paths based on conditions.">exclusive gateway<span class="smart-term-tooltip"></span></span>, but no matching merge. This is possible because both paths eventually lead to an end event, so there is no need to merge them back to a common flow.</p><p>The process can be redesigned if the dispatch activity is exactly the same in both paths. If the product is not available, it is ordered first, and then both paths converge into a single "dispatch product" activity before ending.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a BPMN diagram for a purchasing scenario. Two main pools: 'Purchase Process' (top) and 'Supplier' (bottom, empty/collapsed). The 'Purchase Process' pool has 3 horizontal swimlanes: 'Employee', 'Warehouse', 'Purchasing'. Flow: Start event in Employee -> 'Fill in requisition' task -> flow to Warehouse lane -> 'Check product availability' task -> Exclusive Gateway (X). Gateway Yes path -> 'Dispatch product' task -> End event. Gateway No path -> flow to Purchasing lane -> 'Send purchase order' task -> Message flow to Supplier pool -> Message flow back to 'Order confirmation' intermediate message event -> flow to Warehouse lane -> 'Receive product' task -> 'Dispatch product' task -> End event. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 1000 500, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Sequence Flow Arrow -->
+        <marker id="arrow-seq" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Message Flow Arrow (Open) -->
+        <marker id="arrow-msg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        
+        <!-- Message Flow Start Circle -->
+        <marker id="circle-start" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <circle cx="5" cy="5" r="3" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- ================= POOLS & SWIMLANES ================= -->
+        
+        <!-- Purchase Process Pool -->
+        <rect x="50" y="40" width="900" height="360" fill="none" stroke="var(--border-color)" stroke-width="2"/>
+        <rect x="50" y="40" width="40" height="360" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <!-- Swimlane Labels Area -->
+        <rect x="90" y="40" width="30" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        <rect x="90" y="160" width="30" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        <rect x="90" y="280" width="30" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <!-- Swimlane Separators -->
+        <line x1="90" y1="160" x2="950" y2="160" stroke="var(--border-color)" stroke-width="2"/>
+        <line x1="90" y1="280" x2="950" y2="280" stroke="var(--border-color)" stroke-width="2"/>
+
+        <!-- Supplier Pool (Collapsed) -->
+        <rect x="50" y="480" width="900" height="60" fill="none" stroke="var(--border-color)" stroke-width="2"/>
+        <rect x="50" y="480" width="40" height="60" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+
+        <!-- Pool & Swimlane Text Labels -->
+        <text class="gsvg-en" x="-220" y="75" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">Purchase Process</text>
+        <text class="gsvg-ar" x="-220" y="75" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">عملية الشراء</text>
+
+        <text class="gsvg-en" x="-100" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">Employee</text>
+        <text class="gsvg-ar" x="-100" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">الموظف</text>
+
+        <text class="gsvg-en" x="-220" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">Warehouse</text>
+        <text class="gsvg-ar" x="-220" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">المستودع</text>
+
+        <text class="gsvg-en" x="-340" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">Purchasing</text>
+        <text class="gsvg-ar" x="-340" y="110" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="14">المشتريات</text>
+
+        <text class="gsvg-en" x="-510" y="75" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">Supplier</text>
+        <text class="gsvg-ar" x="-510" y="75" transform="rotate(-90)" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="bold">المورد</text>
+
+
+        <!-- ================= EDGES (FLOWS) ================= -->
+        
+        <!-- Sequence Flows -->
+        <path d="M 180 100 L 215 100" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        <path d="M 280 130 L 280 190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        <path d="M 345 220 L 410 220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        
+        <!-- Gateway Yes Path -->
+        <path d="M 440 190 L 440 180 Q 440 175 445 175 L 775 175 Q 780 175 780 180 L 780 190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        
+        <!-- Gateway No Path -->
+        <path d="M 440 250 L 440 310" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        
+        <path d="M 600 320 L 600 250" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        <path d="M 665 220 L 715 220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+        <path d="M 845 220 L 900 220" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-seq)"/>
+
+        <!-- Message Flows -->
+        <path d="M 440 370 L 440 480" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#circle-start)" marker-end="url(#arrow-msg)"/>
+        <path d="M 600 480 L 600 360" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#circle-start)" marker-end="url(#arrow-msg)"/>
+
+
+        <!-- ================= NODES ================= -->
+        
+        <!-- Start Event -->
+        <circle cx="160" cy="100" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="160" y="140" text-anchor="middle" fill="var(--text-secondary)" font-size="13">Start</text>
+        <text class="gsvg-ar" x="160" y="140" text-anchor="middle" fill="var(--text-secondary)" font-size="13">البداية</text>
+
+        <!-- Task 1: Fill in requisition -->
+        <rect x="215" y="70" width="130" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="280" y="96" text-anchor="middle" fill="var(--text-primary)" font-size="14">
+            <tspan x="280" dy="-8">Fill in</tspan>
+            <tspan x="280" dy="18">requisition</tspan>
+        </text>
+        <text class="gsvg-ar" x="280" y="105" text-anchor="middle" fill="var(--text-primary)" font-size="14">تعبئة طلب الشراء</text>
+
+        <!-- Task 2: Check product availability -->
+        <rect x="215" y="190" width="130" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="280" y="216" text-anchor="middle" fill="var(--text-primary)" font-size="14">
+            <tspan x="280" dy="-8">Check product</tspan>
+            <tspan x="280" dy="18">availability</tspan>
+        </text>
+        <text class="gsvg-ar" x="280" y="225" text-anchor="middle" fill="var(--text-primary)" font-size="14">التحقق من التوفر</text>
+
+        <!-- Exclusive Gateway -->
+        <polygon points="440,190 470,220 440,250 410,220" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <path d="M 433 213 L 447 227 M 447 213 L 433 227" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round"/>
+        
+        <text class="gsvg-en" x="485" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="13">Available?</text>
+        <text class="gsvg-ar" x="485" y="195" text-anchor="start" fill="var(--text-secondary)" font-size="13">متاح؟</text>
+        
+        <text class="gsvg-en" x="455" y="165" text-anchor="start" fill="var(--brand-ink)" font-size="13" font-weight="bold">Yes</text>
+        <text class="gsvg-ar" x="455" y="165" text-anchor="start" fill="var(--brand-ink)" font-size="13" font-weight="bold">نعم</text>
+        
+        <text class="gsvg-en" x="455" y="280" text-anchor="start" fill="var(--brand-ink)" font-size="13" font-weight="bold">No</text>
+        <text class="gsvg-ar" x="455" y="280" text-anchor="start" fill="var(--brand-ink)" font-size="13" font-weight="bold">لا</text>
+
+        <!-- Task 3: Send purchase order -->
+        <rect x="375" y="310" width="130" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="440" y="336" text-anchor="middle" fill="var(--text-primary)" font-size="14">
+            <tspan x="440" dy="-8">Send purchase</tspan>
+            <tspan x="440" dy="18">order</tspan>
+        </text>
+        <text class="gsvg-ar" x="440" y="345" text-anchor="middle" fill="var(--text-primary)" font-size="14">إرسال أمر الشراء</text>
+
+        <!-- Intermediate Message Event: Order confirmation -->
+        <circle cx="600" cy="340" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <circle cx="600" cy="340" r="16" fill="none" stroke="var(--brand-500)" stroke-width="1.5"/>
+        <path d="M 590 334 L 610 334 L 610 346 L 590 346 Z" fill="none" stroke="var(--brand-500)" stroke-width="1.5"/>
+        <path d="M 590 334 L 600 340 L 610 334" fill="none" stroke="var(--brand-500)" stroke-width="1.5"/>
+        
+        <text class="gsvg-en" x="600" y="380" text-anchor="middle" fill="var(--text-secondary)" font-size="13">Order confirmation</text>
+        <text class="gsvg-ar" x="600" y="380" text-anchor="middle" fill="var(--text-secondary)" font-size="13">تأكيد الطلب</text>
+
+        <!-- Task 4: Receive product -->
+        <rect x="535" y="190" width="130" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="600" y="216" text-anchor="middle" fill="var(--text-primary)" font-size="14">
+            <tspan x="600" dy="-8">Receive</tspan>
+            <tspan x="600" dy="18">product</tspan>
+        </text>
+        <text class="gsvg-ar" x="600" y="225" text-anchor="middle" fill="var(--text-primary)" font-size="14">استلام المنتج</text>
+
+        <!-- Task 5: Dispatch product -->
+        <rect x="715" y="190" width="130" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text class="gsvg-en" x="780" y="216" text-anchor="middle" fill="var(--text-primary)" font-size="14">
+            <tspan x="780" dy="-8">Dispatch</tspan>
+            <tspan x="780" dy="18">product</tspan>
+        </text>
+        <text class="gsvg-ar" x="780" y="225" text-anchor="middle" fill="var(--text-primary)" font-size="14">صرف المنتج</text>
+
+        <!-- End Event -->
+        <circle cx="920" cy="220" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="4"/>
+        <text class="gsvg-en" x="920" y="260" text-anchor="middle" fill="var(--text-secondary)" font-size="13">End</text>
+        <text class="gsvg-ar" x="920" y="260" text-anchor="middle" fill="var(--text-secondary)" font-size="13">النهاية</text>
+
+        <!-- Message Flow Labels -->
+        <text class="gsvg-en" x="450" y="430" text-anchor="start" fill="var(--text-secondary)" font-size="13">Purchase Order</text>
+        <text class="gsvg-ar" x="450" y="430" text-anchor="start" fill="var(--text-secondary)" font-size="13">أمر الشراء</text>
+
+        <text class="gsvg-en" x="610" y="430" text-anchor="start" fill="var(--text-secondary)" font-size="13">Confirmation</text>
+        <text class="gsvg-ar" x="610" y="430" text-anchor="start" fill="var(--text-secondary)" font-size="13">التأكيد</text>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُترك حوض المورّد (Supplier Pool) فارغاً في نموذج BPMN لعملية الشراء الداخلية؟</template>
+      <template class="content-en">Why is the Supplier Pool left blank in the BPMN model for the internal purchasing process?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الشركة لا تعرف (ولا تهتم بـ) التفاصيل الداخلية لكيفية معالجة المورّد للطلب؛ كل ما يهم هو التفاعل الخارجي (إرسال الطلب واستلام التأكيد).</p></template>
+      <template class="content-en"><p>Because the company does not know (and does not care about) the internal details of how the supplier processes the order; only the external interaction (sending order, receiving confirmation) matters.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="bpmn-software-engineering-characteristics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> خصائص BPMN في هندسة البرمجيات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Characteristics of BPMN for Software Engineering Processes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقييم لمدى ملاءمة BPMN لنمذجة عمليات تطوير البرمجيات، مع إبراز قوتها في التحكم بالتدفق وضعفها في إدارة الموارد والبيانات.</p></template>
+    <template class="content-en"><p>An evaluation of BPMN's suitability for modeling software development processes, highlighting its strong control flows but weak resource and data management.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعتمد BPMN على ثلاثة افتراضات أساسية تؤثر على نطاق تطبيقه:</p><ol><li>تتكون العملية من مجموعة من حالات العملية المعزولة (Process instances) التي تتفاعل بشكل محدود.</li><li>الحالة هي تسلسل من الأنشطة التي تحول الكائنات من حالة البداية إلى حالة النهاية.</li><li>كل مهمة هي وحدة عمل ذرية (Atomic unit) ينفذها ممثل واحد.</li></ol><p><b>نقاط القوة:</b></p><ul><li>نمذجة تدفقات التحكم المعقدة باستخدام بوابات خاصة.</li><li>نمذجة الأحداث والرسائل بأنواع غنية (مؤقت، رسالة، خطأ، تعويض).</li><li>دعم العمليات القابلة للتنفيذ (Executable processes).</li></ul></template>
+    <template class="content-en"><p>BPMN relies on three fundamental assumptions that affect its scope of applicability:</p><ol><li>A process consists of a set of isolated <span class="smart-term" data-term-en="Process Instance" data-ar="حالة العملية" data-en-def="An isolated execution or case of a specific process model.">process instance<span class="smart-term-tooltip"></span></span>s (cases) that interact in very limited ways.</li><li>An instance is a sequence of activities that transform objects from a start state to an end state.</li><li>Each <span class="smart-term" data-term-en="Atomic Activity" data-ar="نشاط ذري" data-en-def="An indivisible unit of work performed by a single actor in a process.">atomic activity<span class="smart-term-tooltip"></span></span> task is an atomic unit of work performed by a single actor.</li></ol><p><b>Strengths:</b></p><ul><li>Modeling complex control flows using special gateways.</li><li>Richness of event types (timer, message, conditional, error, etc.).</li><li>Modeling executable processes for enactment.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على الرغم من نجاح BPMN، إلا أن لها قيوداً جوهرية (Weaknesses) تعيق استخدامها في هندسة البرمجيات. فهي محدودة جداً من منظور الموارد (Resources) ومنظور البيانات (Data)، حيث تعتمد فقط على كائنات بيانات بسيطة تُقرأ أو تُعدل بواسطة المهام.</p><p>أحد العوائق الرئيسية (Drawbacks) هو أن BPMN لا توفر آلية لربط اكتمال مهمة معينة بحالة أو شرط في كائنات البيانات. لا يمكن التعبير عن أن المهمة تكتمل تلقائياً بمجرد أن يصبح شرط معين صحيحاً.</p><p>بدلاً من ذلك، يجب الإشارة صراحةً إلى اكتمال المهمة من قبل المورد (الشخص أو النظام) الذي ينفذها، مما يجعلها أقل مرونة للعمليات البرمجية الديناميكية التي تعتمد بشدة على حالة البيانات.</p></template>
+    <template class="content-en"><p>Despite its success, BPMN has inherent limitations (Weaknesses) that hinder its use for software processes. It is rather limited in the resource perspective and the data perspective, relying primarily on simple data objects read or modified by tasks.</p><p>A major drawback is that BPMN does not provide a mechanism to link the completion of a task to a condition on the data objects manipulated by the process. It cannot express that a task completes automatically when a condition becomes true.</p><p>Instead, task completion must be explicitly signaled by the resource performing it, making it less flexible for dynamic, data-driven software engineering processes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يؤثر غياب "الاكتمال المعتمد على البيانات" في BPMN على نمذجة عمليات اختبار البرمجيات؟</template>
+      <template class="content-en">How does the lack of "data-driven completion" in BPMN affect the modeling of software testing processes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في اختبار البرمجيات، قد تنتهي المهمة تلقائياً إذا وصلت نسبة الأخطاء المكتشفة إلى صفر (حالة بيانات). في BPMN، لا يمكن أتمتة هذا الإنهاء بناءً على البيانات، بل يجب على المُختبر إغلاق المهمة يدوياً.</p></template>
+      <template class="content-en"><p>In software testing, a task might naturally end when the bug count reaches zero (a data state). In BPMN, this termination cannot be automated based on the data; the tester must manually signal the task's completion.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="spreadsheet-based-process-modeling" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> نمذجة العمليات باستخدام جداول البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Spreadsheet-Based Process Modeling</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام جداول البيانات كبديل مبسط للرسوم البيانية المعقدة لسد الفجوة بين خبراء نمذجة العمليات وخبراء المجال (Domain Experts).</p></template>
+    <template class="content-en"><p>Using spreadsheets as a simplified alternative to complex graphical models to bridge the gap between BPM experts and <span class="smart-term" data-term-en="Domain Expert" data-ar="خبير المجال" data-en-def="A person with special knowledge or skills in a particular area of endeavor, often lacking formal BPMN training.">domain expert<span class="smart-term-tooltip"></span></span>s.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>توفر جداول البيانات طريقة بسيطة ومعروفة (خاصة في الأعمال) لتنظيم البيانات في صفوف وأعمدة. لسد الفجوة بين الخبراء، تم تطوير خوارزميات تحويل (Transformations) تتيح المزامنة بين نماذج BPMN وجداول البيانات.</p><p>هناك ثلاثة مناهج لنمذجة العمليات باستخدام جداول البيانات:</p><ol><li><b>منهج التسلسل البسيط (Simple sequence approach):</b> يدعم فقط نمذجة تسلسل الأنشطة. يمكن تعيين خصائص للأنشطة عدة مرات (مثل نشاط يتطلب مدخلين من البيانات).</li><li><b>منهج التفرع (Branching approach):</b> يضيف عناصر جديدة وخاصية "الخَلَف" (Successor) لدعم هياكل التحكم المعقدة مثل البوابات والأحداث.</li><li><b>منهج الخصائص الإضافية (Additional properties approach):</b> يسمح بتمثيل عناصر مثل كائنات البيانات كصفوف مرتبطة بالأنشطة، بدلاً من مجرد نصوص بسيطة.</li></ol></template>
+    <template class="content-en"><p>Spreadsheets offer a simple and well-known way to organize data in rows and columns. To close the gap between experts, transformation algorithms enable a model to roundtrip between BPMN and spreadsheets.</p><p>There are three approaches to modeling processes using spreadsheets:</p><ol><li><b>The simple sequence approach:</b> Supports only sequences of activities. Properties can be assigned multiple times per activity (e.g., for two input data objects).</li><li><b>The branching approach:</b> Adds new elements and a successor property to address complex control flow structures (gateways and events).</li><li><b>The additional properties approach:</b> Enables elements like data objects to be represented by rows linked to activities, rather than just simple strings.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كيف يتم التحويل من جدول بيانات إلى BPMN؟ تُفسر كل صف في جدول البيانات على أنه "نشاط" (Activity)، إلا إذا استوفى معايير معينة:</p><ul><li>إذا بدأ الاسم بـ AND أو XOR أو OR، يُعتبر العنصر بوابة (Gateway).</li><li>إذا لم يكن للعنصر سلف/خلف (predecessor/successor)، يُعتبر حدث بداية/نهاية.</li><li>إذا تم تعيين خاصية 'ref'، يُعتبر العنصر عملية فرعية مطوية (Collapsed subprocess).</li></ul><p>ومع ذلك، هناك عناصر في BPMN لا يمكن تحويلها بسهولة إلى جداول بيانات، مثل تدفقات الرسائل (Message flows) التي تُستخدم لنمذجة التفاعل بين عمليات مختلفة، لأنها بنية معقدة جداً وتتعارض مع هدف البساطة في جداول البيانات.</p></template>
+    <template class="content-en"><p>How is a spreadsheet transformed into BPMN? Every row is interpreted as an activity, except if specific criteria are met:</p><ul><li>If the name starts with AND, XOR, or OR, the element is a gateway.</li><li>If the element has no predecessor/successor, it is a start/end event.</li><li>If the 'ref' property is set, the element is a collapsed subprocess.</li></ul><p>However, many BPMN elements cannot be transformed into spreadsheets. For example, Message flows (used to model interactions between different processes) are too complicated and cannot be pressed into a spreadsheet model that aims for simplicity.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Simple Sequence</th><th>Branching</th><th>Additional Properties</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دعم التفرع والبوابات</template>
+          <template class="content-en">Support for Branching/Gateways</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير مدعوم</template>
+          <template class="content-en">Not supported</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدعوم (عبر خاصية الخلف)</template>
+          <template class="content-en">Supported (via successor property)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدعوم</template>
+          <template class="content-en">Supported</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تمثيل كائنات البيانات</template>
+          <template class="content-en">Data Object Representation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">نصوص بسيطة فقط</template>
+          <template class="content-en">Simple strings only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">نصوص بسيطة فقط</template>
+          <template class="content-en">Simple strings only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">صفوف مستقلة مرتبطة بالأنشطة</template>
+          <template class="content-en">Independent rows linked to activities</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعد تحويل "تدفق الرسائل" (Message Flow) إلى جدول بيانات أمراً صعباً؟</template>
+      <template class="content-en">Why is transforming a "Message Flow" into a spreadsheet difficult?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تدفق الرسائل يربط بين كيانات مستقلة (Pools مختلفة) تعمل بشكل غير متزامن، بينما جداول البيانات مصممة لتمثيل تسلسل خطي أو متفرع داخل سياق واحد، مما يجعل تمثيل التفاعلات الخارجية المعقدة أمراً صعباً.</p></template>
+      <template class="content-en"><p>Because message flows connect independent entities (different Pools) operating asynchronously, whereas spreadsheets are designed to represent linear or branching sequences within a single context, making complex external interactions hard to represent simply.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الجزء الثاني من رحلتنا مع BPMN. في هذا الجزء، ننتقل من النظرية إلى التطبيق العملي. بدأنا بسيناريو شراء واقعي، حيث رأينا كيف تُقسم المسارات (Swim lanes) المسؤوليات بين الموظف والمستودع والمشتريات، وكيف نتعامل مع المورد كـ 'صندوق أسود'. لكن، هل BPMN مثالية لكل شيء؟ هنا ننتقل للتحليل النقدي: BPMN ممتازة لتدفق الأعمال، لكنها تعاني في هندسة البرمجيات لأنها لا تستطيع إنهاء المهام تلقائياً بناءً على حالة البيانات. وأخيراً، لأن BPMN قد تكون معقدة لغير التقنيين، استكشفنا حلاً عملياً جداً: استخدام جداول البيانات (Spreadsheets) لنمذجة العمليات. ركزوا جيداً في الامتحان على كيفية التحويل بين جداول البيانات و BPMN (متى نعتبر الصف بوابة؟ متى نعتبره حدث نهاية؟)، وتذكروا دائماً نقاط ضعف BPMN في التعامل مع البيانات.</template>
+    <template class="content-en">Welcome to Part 2 of our BPMN journey. Here, we move from theory to practice. We started with a realistic purchasing scenario, seeing how swim lanes divide responsibilities and how we treat external suppliers as a 'black box'. But is BPMN perfect for everything? We critically analyzed its use in software engineering: it's great for workflow but struggles because it cannot automatically complete tasks based on data states. Finally, because BPMN can be complex for non-technical domain experts, we explored a pragmatic workaround: Spreadsheet-based modeling. For the exam, focus heavily on the transformation rules between spreadsheets and BPMN (when is a row a gateway? when is it an end event?), and always remember BPMN's limitations regarding data-driven task completion.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم المسارات (Swim lanes) في نموذج BPMN؟</template>
+          <template class="content-en">Why do we use Swim lanes in a BPMN model?</template>
+          <span class="content-target">لماذا نستخدم المسارات (Swim lanes) في نموذج BPMN؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمها لتعيين المسؤوليات. كل مسار يمثل وحدة تنظيمية (مثل قسم المشتريات)، وأي مهمة داخل هذا المسار تقع ضمن مسؤولية تلك الوحدة.</template>
+          <template class="content-en">We use them to assign responsibilities. Each lane represents an organizational unit (like Purchasing), and any task inside it is the responsibility of that unit.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الحوض الفارغ (Black-box pool) ولماذا يُستخدم؟</template>
+          <template class="content-en">What is a Black-box pool and why is it used?</template>
+          <span class="content-target">ما هو الحوض الفارغ (Black-box pool) ولماذا يُستخدم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو حوض يمثل كياناً خارجياً (مثل المورد) لا نعرف تفاصيل عملياته الداخلية. نستخدمه لتمثيل التفاعلات الخارجية (الرسائل) فقط دون تفصيل المهام الداخلية.</template>
+          <template class="content-en">It's a pool representing an external entity (like a supplier) whose internal processes are unknown. We use it to model external interactions (messages) without detailing internal tasks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يجب دمج كل مسار متفرع في BPMN؟</template>
+          <template class="content-en">Must every branched path in BPMN be merged?</template>
+          <span class="content-target">هل يجب دمج كل مسار متفرع في BPMN؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا. إذا كان كل مسار يؤدي إلى نتيجة نهائية مختلفة (حدث نهاية مستقل)، فلا حاجة لاستخدام بوابة دمج.</template>
+          <template class="content-en">No. If each path leads to a different final outcome (independent end event), there is no need to use a merge gateway.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أبرز نقاط ضعف BPMN في هندسة البرمجيات؟</template>
+          <template class="content-en">What are the main weaknesses of BPMN in software engineering?</template>
+          <span class="content-target">ما هي أبرز نقاط ضعف BPMN في هندسة البرمجيات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">محدوديتها في التعامل مع الموارد والبيانات. والأهم أنها لا تستطيع إنهاء المهام تلقائياً بناءً على تحقق شرط معين في البيانات.</template>
+          <template class="content-en">Its limitations in handling resources and data. Most importantly, it cannot automatically complete tasks based on a specific data condition being met.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تنتهي المهمة في BPMN إذا لم تكن تعتمد على البيانات؟</template>
+          <template class="content-en">How does a task end in BPMN if it's not data-driven?</template>
+          <span class="content-target">كيف تنتهي المهمة في BPMN إذا لم تكن تعتمد على البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب على المورد (الشخص أو النظام) الذي ينفذ المهمة أن يرسل إشارة صريحة (Explicit signal) تفيد باكتمال المهمة.</template>
+          <template class="content-en">The resource (person or system) performing the task must send an explicit signal indicating the task is complete.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نلجأ إلى نمذجة العمليات باستخدام جداول البيانات؟</template>
+          <template class="content-en">Why do we resort to spreadsheet-based process modeling?</template>
+          <span class="content-target">لماذا نلجأ إلى نمذجة العمليات باستخدام جداول البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن جداول البيانات بسيطة ومألوفة لخبراء المجال (Domain experts)، مما يسهل عليهم توثيق العمليات دون الحاجة لتعلم تعقيدات BPMN.</template>
+          <template class="content-en">Because spreadsheets are simple and familiar to domain experts, making it easier for them to document processes without learning BPMN complexities.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين منهج التسلسل البسيط ومنهج التفرع في جداول البيانات؟</template>
+          <template class="content-en">What is the difference between the simple sequence and branching approaches in spreadsheets?</template>
+          <span class="content-target">ما الفرق بين منهج التسلسل البسيط ومنهج التفرع في جداول البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التسلسل البسيط يدعم فقط الخطوات الخطية المتتالية. بينما يضيف منهج التفرع خاصية 'الخلف' (Successor) لدعم البوابات والمسارات المتعددة.</template>
+          <template class="content-en">Simple sequence only supports linear consecutive steps. The branching approach adds a 'successor' property to support gateways and multiple paths.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">عند تحويل جدول بيانات إلى BPMN، كيف نعرف أن هذا الصف يمثل بوابة (Gateway)؟</template>
+          <template class="content-en">When transforming a spreadsheet to BPMN, how do we know a row represents a gateway?</template>
+          <span class="content-target">عند تحويل جدول بيانات إلى BPMN، كيف نعرف أن هذا الصف يمثل بوابة (Gateway)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا كان اسم العنصر في الصف يبدأ بكلمات مفتاحية مثل AND أو XOR أو OR.</template>
+          <template class="content-en">If the element's name in the row starts with keywords like AND, XOR, or OR.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحدد حدث البداية وحدث النهاية في جداول البيانات؟</template>
+          <template class="content-en">How do we identify start and end events in spreadsheets?</template>
+          <span class="content-target">كيف نحدد حدث البداية وحدث النهاية في جداول البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العنصر الذي ليس له سلف (Predecessor) هو البداية، والعنصر الذي ليس له خلف (Successor) هو النهاية.</template>
+          <template class="content-en">An element with no predecessor is the start, and an element with no successor is the end.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن تحويل تدفقات الرسائل (Message flows) بسهولة إلى جداول بيانات؟ ولماذا؟</template>
+          <template class="content-en">Can message flows be easily transformed into spreadsheets? Why?</template>
+          <span class="content-target">هل يمكن تحويل تدفقات الرسائل (Message flows) بسهولة إلى جداول بيانات؟ ولماذا؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، لأنها تمثل تفاعلات معقدة بين عمليات مستقلة، وهذا يتعارض مع الطبيعة البسيطة والخطية لجداول البيانات.</template>
+          <template class="content-en">No, because they represent complex interactions between independent processes, which contradicts the simple, linear nature of spreadsheets.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض من المسار (Swim lane) في BPMN؟",
+      "en": "What is the purpose of a Swim lane in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وسيلة لتعيين المسؤولية عن مهام معينة لوحدة تنظيمية محددة.",
+        "en": "A means to assign responsibility for certain tasks to a given organizational unit."
+      },
+      "example": {
+        "ar": "مسار 'المستودع' يحتوي على مهمة 'التحقق من توفر المنتج'.",
+        "en": "The 'Warehouse' swim lane contains the 'Check product availability' task."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "لماذا يُترك حوض المورّد (Supplier Pool) فارغاً أحياناً؟",
+      "en": "Why is the Supplier Pool sometimes left blank?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنه لا يُعرف شيء عن السلوك الداخلي للمورد سوى تفاعلاته الخارجية (استلام طلب، إرسال تأكيد).",
+        "en": "Because nothing is known about the internal behavior of the supplier other than its external interactions (receiving order, sending confirmation)."
+      },
+      "example": {
+        "ar": "يُسمى هذا الحوض بـ Black-box pool.",
+        "en": "This is referred to as a Black-box pool."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "هل يجب أن يكون لكل بوابة تفرع (Splitting Gateway) بوابة دمج (Merge Gateway) مطابقة؟",
+      "en": "Must every splitting gateway have a matching merge gateway?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، خاصة إذا كان كلا المسارين يؤديان في النهاية إلى أحداث نهاية (End events) منفصلة.",
+        "en": "No, especially if both paths eventually lead to separate end events."
+      },
+      "example": {
+        "ar": "مسار ينتهي بإرسال المنتج، ومسار آخر ينتهي بإلغاء الطلب.",
+        "en": "One path ends with dispatching the product, another ends with order cancellation."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو الافتراض الأساسي لـ BPMN حول حالات العملية (Process Instances)؟",
+      "en": "What is a fundamental assumption of BPMN regarding Process Instances?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أن العملية تتكون من مجموعة من حالات العملية المعزولة التي تتفاعل مع بعضها بشكل محدود جداً.",
+        "en": "A process consists of a set of isolated process instances that interact with each other in very limited ways."
+      },
+      "example": {
+        "ar": "طلب شراء الموظف (أ) معزول تماماً عن طلب الموظف (ب).",
+        "en": "Employee A's purchase request is completely isolated from Employee B's request."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي الوحدة الذرية (Atomic Activity) في BPMN؟",
+      "en": "What is an Atomic Activity in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي وحدة عمل أساسية غير قابلة للتجزئة ينفذها ممثل (Actor) واحد.",
+        "en": "An atomic unit of work performed by a single actor."
+      },
+      "example": {
+        "ar": "مهمة 'تعبئة نموذج الطلب'.",
+        "en": "The task 'Fill in requisition'."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "اذكر إحدى نقاط قوة BPMN في نمذجة العمليات.",
+      "en": "Name one strength of BPMN in process modeling."
+    },
+    "back": {
+      "definition": {
+        "ar": "نمذجة تدفقات التحكم المعقدة، وغنى أنواع الأحداث، ودعم العمليات القابلة للتنفيذ.",
+        "en": "Modeling complex control flows, richness of event types, and supporting executable processes."
+      },
+      "example": {
+        "ar": "استخدام أحداث المؤقت (Timer) أو التعويض (Compensation).",
+        "en": "Using Timer or Compensation events."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الضعف الرئيسي لـ BPMN في منظور البيانات؟",
+      "en": "What is a major weakness of BPMN in the data perspective?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعتمد بشكل أساسي على كائنات بيانات بسيطة تُقرأ أو تُعدل، ولا يمكنها ربط اكتمال المهمة تلقائياً بحالة البيانات.",
+        "en": "It relies primarily on simple data objects read or modified, and cannot automatically link task completion to a data state."
+      },
+      "example": {
+        "ar": "لا يمكن إنهاء مهمة تلقائياً بمجرد أن يصبح متغير 'تمت الموافقة' صحيحاً.",
+        "en": "Cannot automatically end a task just because an 'isApproved' variable becomes true."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "كيف يتم تحديد اكتمال المهمة في BPMN؟",
+      "en": "How is task completion determined in BPMN?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب الإشارة صراحةً إلى اكتمال المهمة من قبل المورد (الشخص/النظام) الذي ينفذها.",
+        "en": "The completion of a task has to be explicitly signaled by the resource performing the task."
+      },
+      "example": {
+        "ar": "يجب على الموظف النقر على زر 'إرسال' لإنهاء المهمة.",
+        "en": "The employee must click a 'Submit' button to finish the task."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "لماذا نستخدم نمذجة العمليات القائمة على جداول البيانات؟",
+      "en": "Why use Spreadsheet-Based Process Modeling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لسد الفجوة بين خبراء أساليب BPM وخبراء المجال (Domain experts) باستخدام أداة بسيطة ومألوفة.",
+        "en": "To close the gap between BPM method experts and domain experts using a simple, well-known tool."
+      },
+      "example": {
+        "ar": "مدير مبيعات يفضل كتابة الخطوات في Excel بدلاً من رسم نموذج BPMN معقد.",
+        "en": "A sales manager prefers writing steps in Excel rather than drawing a complex BPMN model."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو منهج التسلسل البسيط (Simple sequence approach) في جداول البيانات؟",
+      "en": "What is the Simple sequence approach in spreadsheets?"
+    },
+    "back": {
+      "definition": {
+        "ar": "منهج يدعم فقط نمذجة تسلسل الأنشطة بشكل خطي دون تفرعات.",
+        "en": "An approach that supports only the modeling of sequences of activities linearly without branches."
+      },
+      "example": {
+        "ar": "قائمة مهام متتالية من 1 إلى 5.",
+        "en": "A sequential list of tasks from 1 to 5."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "كيف يدعم منهج التفرع (Branching approach) البوابات في جداول البيانات؟",
+      "en": "How does the Branching approach support gateways in spreadsheets?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق إضافة عناصر جديدة وخاصية 'الخَلَف' (Successor) لكل عنصر لتحديد مسار التدفق.",
+        "en": "By adding new elements and a successor property to each element to define the flow path."
+      },
+      "example": {
+        "ar": "النشاط أ يشير إلى أن خلفه هو النشاط ب أو ج.",
+        "en": "Activity A indicates its successor is Activity B or C."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما الذي يميز منهج الخصائص الإضافية (Additional properties approach)؟",
+      "en": "What distinguishes the Additional properties approach?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسمح بتمثيل عناصر مثل كائنات البيانات كصفوف مرتبطة بالأنشطة، بدلاً من نصوص بسيطة.",
+        "en": "It enables elements like data objects to be represented by rows that are linked to activities, rather than simple strings."
+      },
+      "example": {
+        "ar": "صف مخصص لـ 'مستند الفاتورة' يرتبط بنشاط 'الدفع'.",
+        "en": "A dedicated row for 'Invoice Document' linked to the 'Payment' activity."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "في تحويل جداول البيانات إلى BPMN، كيف يتم التعرف على البوابة (Gateway)؟",
+      "en": "In spreadsheet to BPMN transformation, how is a gateway identified?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إذا بدأ اسم العنصر (الصف) بـ AND أو XOR أو OR.",
+        "en": "If the name starts with AND, XOR, or OR, the element is a gateway."
+      },
+      "example": {
+        "ar": "صف باسم 'XOR: Check Stock'.",
+        "en": "A row named 'XOR: Check Stock'."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف يتم التعرف على حدث البداية/النهاية في جداول البيانات؟",
+      "en": "How is a start/end event identified in spreadsheets?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إذا لم يكن للعنصر سلف (Predecessor) فهو بداية، وإذا لم يكن له خلف (Successor) فهو نهاية.",
+        "en": "If the element has no predecessor, it's a start event; if it has no successor, it's an end event."
+      },
+      "example": {
+        "ar": "الصف الأول بدون سلف يُترجم إلى Start Event.",
+        "en": "The first row with no predecessor translates to a Start Event."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "اذكر عنصراً في BPMN لا يمكن تحويله بسهولة إلى جدول بيانات.",
+      "en": "Name a BPMN element that cannot be easily transformed into a spreadsheet."
+    },
+    "back": {
+      "definition": {
+        "ar": "تدفقات الرسائل (Message flows) والعمليات الفرعية (Subprocesses).",
+        "en": "Message flows and subprocesses."
+      },
+      "example": {
+        "ar": "تدفق رسالة بين حوض الشركة وحوض المورد.",
+        "en": "A message flow between the Company pool and the Supplier pool."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هي المزامنة ذهاباً وإياباً (Roundtrip synchronization)؟",
+      "en": "What is Roundtrip synchronization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية تسمح بتحويل النموذج بين الرسوم البيانية (BPMN) وجداول البيانات دون فقدان الهيكل الأساسي.",
+        "en": "A mechanism that enables a model to transform back and forth between graphical notation (BPMN) and spreadsheets."
+      },
+      "example": {
+        "ar": "تعديل جدول الإكسل ينعكس تلقائياً على رسم BPMN والعكس.",
+        "en": "Editing the Excel sheet automatically updates the BPMN diagram and vice versa."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "في نموذج BPMN لعملية الشراء، ماذا يمثل المسار (Swim lane)؟",
+      "en": "In the BPMN purchasing scenario model, what does a swim lane represent?"
+    },
+    "options": {
+      "ar": [
+        "قاعدة بيانات خارجية",
+        "وحدة تنظيمية أو مسؤولية",
+        "بوابة حصرية",
+        "حالة بيانات"
+      ],
+      "en": [
+        "An external database",
+        "An organizational unit or responsibility",
+        "An exclusive gateway",
+        "A data state"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُستخدم المسار لتعيين المسؤولية عن مهام معينة لوحدة تنظيمية محددة (مثل الموظف، المستودع).",
+      "en": "A swim lane is used to assign responsibility for certain tasks to a given organizational unit (e.g., Employee, Warehouse)."
+    },
+    "hint": {
+      "ar": "فكر في من يقوم بتنفيذ المهمة.",
+      "en": "Think about WHO is performing the task."
+    },
+    "difficulty": "easy",
+    "conceptId": "sample-purchasing-scenario-bpmn"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "لماذا يُترك حوض المورّد (Supplier pool) فارغاً في نموذج الشراء؟",
+      "en": "Why is the supplier pool left blank in the purchasing model?"
+    },
+    "options": {
+      "ar": [
+        "لأن المورد لا يملك نظام BPMN",
+        "لأنه لا يُعرف شيء عن السلوك الداخلي للمورد",
+        "لأن المورد لا يشارك في العملية",
+        "لتوفير مساحة في الرسم البياني"
+      ],
+      "en": [
+        "Because the supplier doesn't have a BPMN system",
+        "Because nothing is known about the internal behavior of the supplier",
+        "Because the supplier is not involved in the process",
+        "To save space on the diagram"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُترك فارغاً (Black-box) لأن الشركة تهتم فقط بالتفاعلات الخارجية (الرسائل) ولا تعرف العمليات الداخلية للمورد.",
+      "en": "It is left blank (black-box) because the company only cares about external interactions (messages) and doesn't know the supplier's internal processes."
+    },
+    "hint": {
+      "ar": "يُسمى هذا النوع بالحوض الصندوق الأسود (Black-box pool).",
+      "en": "This is called a Black-box pool."
+    },
+    "difficulty": "medium",
+    "conceptId": "sample-purchasing-scenario-bpmn"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي مما يلي يُعد من نقاط ضعف BPMN عند نمذجة عمليات هندسة البرمجيات؟",
+      "en": "Which of the following is a weakness of BPMN when modeling software engineering processes?"
+    },
+    "options": {
+      "ar": [
+        "عدم القدرة على نمذجة تدفقات التحكم المعقدة",
+        "الافتقار إلى أنواع الأحداث",
+        "محدودية منظور الموارد والبيانات",
+        "عدم دعم العمليات القابلة للتنفيذ"
+      ],
+      "en": [
+        "Inability to model complex control flows",
+        "Lack of event types",
+        "Limited resource and data perspective",
+        "Lack of support for executable processes"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "BPMN قوية في التحكم والأحداث، لكنها محدودة جداً في كيفية تعاملها مع الموارد والبيانات المعقدة.",
+      "en": "BPMN is strong in control and events, but rather limited in how it handles complex resources and data."
+    },
+    "hint": {
+      "ar": "تذكر أن BPMN تركز على التدفق أكثر من تركيزها على الكائنات.",
+      "en": "Remember BPMN focuses more on flow than on objects."
+    },
+    "difficulty": "medium",
+    "conceptId": "bpmn-software-engineering-characteristics"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كيف يتم تحديد اكتمال المهمة في BPMN؟",
+      "en": "How is the completion of a task determined in BPMN?"
+    },
+    "options": {
+      "ar": [
+        "تلقائياً بناءً على حالة كائنات البيانات",
+        "يجب الإشارة إليه صراحةً من قبل المورد الذي ينفذ المهمة",
+        "بواسطة بوابة حصرية",
+        "بواسطة حدث مؤقت فقط"
+      ],
+      "en": [
+        "Automatically based on the state of data objects",
+        "It must be explicitly signaled by the resource performing the task",
+        "By an exclusive gateway",
+        "By a timer event only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لا تدعم BPMN الاكتمال المعتمد على البيانات؛ يجب على الممثل (Actor) إنهاء المهمة صراحةً.",
+      "en": "BPMN does not support data-driven completion; the actor must explicitly finish the task."
+    },
+    "hint": {
+      "ar": "هل يمكن لـ BPMN قراءة البيانات لإنهاء المهمة وحدها؟",
+      "en": "Can BPMN read data to end a task on its own?"
+    },
+    "difficulty": "hard",
+    "conceptId": "bpmn-software-engineering-characteristics"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الهدف الرئيسي من استخدام نمذجة العمليات القائمة على جداول البيانات؟",
+      "en": "What is the main goal of using spreadsheet-based process modeling?"
+    },
+    "options": {
+      "ar": [
+        "استبدال BPMN بالكامل في جميع الشركات",
+        "سد الفجوة بين خبراء BPM وخبراء المجال",
+        "تسريع تنفيذ التعليمات البرمجية",
+        "إنشاء رسوم بيانية ثلاثية الأبعاد"
+      ],
+      "en": [
+        "To completely replace BPMN in all companies",
+        "To close the gap between BPM experts and domain experts",
+        "To speed up code execution",
+        "To create 3D graphical models"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "جداول البيانات مألوفة لخبراء المجال (غير التقنيين)، مما يسهل عليهم المشاركة في تصميم العمليات.",
+      "en": "Spreadsheets are familiar to domain experts (non-technical), making it easier for them to participate in process design."
+    },
+    "hint": {
+      "ar": "فكر في من يجد صعوبة في قراءة رسوم BPMN المعقدة.",
+      "en": "Think about who finds complex BPMN diagrams hard to read."
+    },
+    "difficulty": "easy",
+    "conceptId": "spreadsheet-based-process-modeling"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في منهج التفرع (Branching approach) لجداول البيانات، كيف يتم دعم هياكل التحكم المعقدة؟",
+      "en": "In the branching approach for spreadsheets, how are complex control structures supported?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق إزالة جميع البوابات",
+        "عن طريق إضافة خاصية 'الخَلَف' (Successor) لكل عنصر",
+        "عن طريق استخدام الماكرو (Macros) فقط",
+        "لا يمكن دعمها في جداول البيانات"
+      ],
+      "en": [
+        "By removing all gateways",
+        "By adding a 'successor' property to each element",
+        "By using Macros only",
+        "They cannot be supported in spreadsheets"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُضاف خاصية الخلف (Successor) لتحديد المسار التالي، مما يسمح بتمثيل التفرعات والبوابات.",
+      "en": "A successor property is added to define the next path, allowing the representation of branches and gateways."
+    },
+    "hint": {
+      "ar": "كيف يعرف الجدول الخطوة التالية إذا كان هناك خياران؟",
+      "en": "How does the sheet know the next step if there are two options?"
+    },
+    "difficulty": "medium",
+    "conceptId": "spreadsheet-based-process-modeling"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "عند تحويل جدول بيانات إلى BPMN، ماذا يعني أن يبدأ اسم العنصر بـ 'XOR'؟",
+      "en": "When transforming a spreadsheet to BPMN, what does it mean if an element's name starts with 'XOR'?"
+    },
+    "options": {
+      "ar": [
+        "إنه حدث نهاية",
+        "إنه عملية فرعية",
+        "إنه بوابة (Gateway)",
+        "إنه كائن بيانات"
+      ],
+      "en": [
+        "It is an end event",
+        "It is a subprocess",
+        "It is a gateway",
+        "It is a data object"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الكلمات المفتاحية AND، XOR، OR في بداية الاسم تُستخدم لتعريف البوابات أثناء التحويل.",
+      "en": "Keywords AND, XOR, OR at the start of the name are used to identify gateways during transformation."
+    },
+    "hint": {
+      "ar": "XOR تعني 'أو الحصرية'.",
+      "en": "XOR stands for Exclusive OR."
+    },
+    "difficulty": "easy",
+    "conceptId": "spreadsheet-based-process-modeling"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من عناصر BPMN التالية يُعتبر معقداً جداً ولا يمكن تحويله بسهولة إلى نموذج جدول بيانات بسيط؟",
+      "en": "Which of the following BPMN elements is considered too complex and cannot be easily transformed into a simple spreadsheet model?"
+    },
+    "options": {
+      "ar": [
+        "المهام (Tasks)",
+        "تدفقات الرسائل (Message flows)",
+        "أحداث البداية (Start events)",
+        "التسلسل الخطي (Linear sequence)"
+      ],
+      "en": [
+        "Tasks",
+        "Message flows",
+        "Start events",
+        "Linear sequence"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تدفقات الرسائل تربط بين عمليات مختلفة وتُعد بنية معقدة لا تتناسب مع بساطة جداول البيانات.",
+      "en": "Message flows connect different processes and are a complex construct that doesn't fit the simplicity of spreadsheets."
+    },
+    "hint": {
+      "ar": "فكر في التفاعلات الخارجية بين الأحواض (Pools).",
+      "en": "Think about external interactions between Pools."
+    },
+    "difficulty": "medium",
+    "conceptId": "spreadsheet-based-process-modeling"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في نموذج BPMN، هل من الضروري دائماً دمج المسارات المتفرعة (Merge) إذا تم استخدام بوابة تقسيم (Splitting gateway)؟",
+      "en": "In a BPMN model, is it always necessary to merge branching paths if a splitting gateway is used?"
+    },
+    "options": {
+      "ar": [
+        "نعم، دائماً لتجنب الأخطاء",
+        "لا، يمكن أن يؤدي كل مسار إلى حدث نهاية منفصل",
+        "نعم، ولكن فقط في العمليات الفرعية",
+        "لا، البوابات لا تتطلب دمجاً أبداً"
+      ],
+      "en": [
+        "Yes, always to avoid errors",
+        "No, each path can lead to a separate end event",
+        "Yes, but only in subprocesses",
+        "No, gateways never require merging"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كان كلا المسارين يؤديان إلى نهايات مختلفة للعملية، فلا حاجة لدمجهما مرة أخرى.",
+      "en": "If both paths lead to different ends of the process, there is no need to merge them back."
+    },
+    "hint": {
+      "ar": "تذكر سيناريو الشراء: مسار ينتهي بإرسال المنتج، ومسار آخر قد ينتهي بشكل مختلف.",
+      "en": "Remember the purchasing scenario: one path ends with dispatch, another might end differently."
+    },
+    "difficulty": "medium",
+    "conceptId": "sample-purchasing-scenario-bpmn"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف يتم التعرف على حدث النهاية (End event) عند تحويل جدول بيانات إلى BPMN؟",
+      "en": "How is an End event identified when transforming a spreadsheet to BPMN?"
+    },
+    "options": {
+      "ar": [
+        "إذا كان العنصر لا يحتوي على سلف (Predecessor)",
+        "إذا كان العنصر لا يحتوي على خلف (Successor)",
+        "إذا كان اسم العنصر يبدأ بـ END",
+        "إذا كان يحتوي على خاصية 'ref'"
+      ],
+      "en": [
+        "If the element has no predecessor",
+        "If the element has no successor",
+        "If the element's name starts with END",
+        "If it contains a 'ref' property"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "العنصر الذي ليس له خطوة تالية (خلف) يُعتبر منطقياً نهاية العملية.",
+      "en": "An element with no next step (successor) is logically considered the end of the process."
+    },
+    "hint": {
+      "ar": "الخلف (Successor) يعني الخطوة التالية.",
+      "en": "Successor means the next step."
+    },
+    "difficulty": "easy",
+    "conceptId": "spreadsheet-based-process-modeling"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن BPMN يمكنها إنهاء المهام تلقائياً بناءً على تغيرات البيانات. في الواقع، تتطلب BPMN إشارة صريحة (Explicit signal) من المورد لإنهاء المهمة.</template>
+    <template class="content-en">Believing that BPMN can automatically complete tasks based on data changes. In reality, BPMN requires an explicit signal from the resource to finish a task.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في BPMN، ليس كل تفرع (Split) يحتاج إلى دمج (Merge). إذا كانت المسارات تؤدي إلى نتائج نهائية مختلفة (End events مستقلة)، فلا حاجة لبوابة دمج.</template>
+    <template class="content-en">In BPMN, not every split needs a merge. If the paths lead to different final outcomes (independent End events), a merge gateway is unnecessary.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الهدف الأساسي من استخدام جداول البيانات لنمذجة العمليات هو 'الديمقراطية'؛ فهي تسمح لخبراء المجال (غير التقنيين) بتوثيق العمليات دون الحاجة لتعلم تعقيدات BPMN.</template>
+    <template class="content-en">The primary goal of using spreadsheets for process modeling is 'democratization'; it allows domain experts (non-technical) to document processes without learning BPMN complexities.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">افتراض أن التحويل بين جداول البيانات و BPMN مثالي 100%. عناصر مثل 'تدفقات الرسائل' (Message flows) والعمليات الفرعية المطوية غالباً ما تُفقد أو يصعب تمثيلها في جداول البيانات.</template>
+    <template class="content-en">Assuming the transformation between spreadsheets and BPMN is 100% perfect. Elements like 'Message flows' and collapsed subprocesses are often lost or hard to represent in spreadsheets.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

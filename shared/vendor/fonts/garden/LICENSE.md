@@ -67,6 +67,31 @@ glyph actually needs it. Picking a font from the library costs one request.
 | Source Sans 3 | Paul D. Hunt |
 | Geist | Andrés Briganti, Mateo Zaragoza, Guillermo Rauch, Evil Rabbit, José Rago, Facundo Santana |
 
+## `skins/base.css` — site skins
+
+Declared in the skins stylesheet, fetched only while a reader has chosen a skin
+that uses them. Special Elite is the one exception to OFL here: it is licensed
+under the Apache License 2.0 (<https://www.apache.org/licenses/LICENSE-2.0>),
+which also permits bundling and redistribution.
+
+| Family | Designers / Foundry |
+|---|---|
+| Reem Kufi | Khaled Hosny, Santiago Orozco |
+| Cinzel | Natanael Gama |
+| Aref Ruqaa | Abdullah Aref, Khaled Hosny, Hermann Zapf |
+| Caveat | Impallari Type |
+| Geist Mono | Andrés Briganti, Mateo Zaragoza, Guillermo Rauch, Evil Rabbit, José Rago, Facundo Santana |
+| Lalezar | Borna Izadpanah |
+| Baloo Bhaijaan 2 | Ek Type |
+| Changa | Eduardo Tunni |
+| Special Elite | Astigmatic — **Apache License 2.0**, not OFL |
+| Courier Prime | Alan Dague-Greene |
+| IBM Plex Mono | Mike Abbink, Bold Monday |
+| Barlow Condensed | Jeremy Tribby |
+| Marhey | Nur Syamsi, Bustanul Arifin |
+| Bricolage Grotesque | Mathieu Triay |
+| Marcellus | Astigmatic |
+
 ## Thmanyah — used by permission, not open licence
 
 | Family | Weights bundled |

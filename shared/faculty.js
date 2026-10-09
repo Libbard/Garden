@@ -97,6 +97,11 @@
         buildFilters();
         paintStats();
         paintHow();
+        if (!state.qUrl) {
+          state.qUrl = 1;
+          var qm = /[?&]q=([^&]+)/.exec(location.search || '');
+          if (qm) { state.q = decodeURIComponent(qm[1].replace(/\+/g, ' ')); $('#fc-q').value = state.q; }
+        }
         apply();
         openFromHash();
         openFromQuery();

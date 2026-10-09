@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الشبكات العصبية الخطية للانحدار · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#linear-regression-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">العناصر الأساسية للانحدار الخطي</template>
+        <template class="content-en">Basic Elements of Linear Regression</template>
+        <span class="content-target">العناصر الأساسية للانحدار الخطي</span>
+      </a>
+      <a href="#squared-loss-function" class="toc-link" data-bilingual>
+        <template class="content-ar">دالة الخسارة (الخطأ التربيعي)</template>
+        <template class="content-en">Loss Function (Squared Error)</template>
+        <span class="content-target">دالة الخسارة (الخطأ التربيعي)</span>
+      </a>
+      <a href="#minibatch-sgd" class="toc-link" data-bilingual>
+        <template class="content-ar">الانحدار الاشتقاقي العشوائي للحزم الصغيرة</template>
+        <template class="content-en">Minibatch Stochastic Gradient Descent (SGD)</template>
+        <span class="content-target">الانحدار الاشتقاقي العشوائي للحزم الصغيرة</span>
+      </a>
+      <a href="#vectorization-speed" class="toc-link" data-bilingual>
+        <template class="content-ar">التوجيه (Vectorization) من أجل السرعة</template>
+        <template class="content-en">Vectorization for Speed</template>
+        <span class="content-target">التوجيه (Vectorization) من أجل السرعة</span>
+      </a>
+      <a href="#normal-distribution-mle" class="toc-link" data-bilingual>
+        <template class="content-ar">التوزيع الطبيعي وتقدير الاحتمالية القصوى</template>
+        <template class="content-en">Normal Distribution and Maximum Likelihood</template>
+        <span class="content-target">التوزيع الطبيعي وتقدير الاحتمالية القصوى</span>
+      </a>
+      <a href="#linear-regression-neural-network" class="toc-link" data-bilingual>
+        <template class="content-ar">الانحدار الخطي كشبكة عصبية</template>
+        <template class="content-en">From Linear Regression to Deep Networks</template>
+        <span class="content-target">الانحدار الخطي كشبكة عصبية</span>
+      </a>
+      <a href="#implementation-from-scratch" class="toc-link" data-bilingual>
+        <template class="content-ar">التنفيذ من الصفر (Implementation from Scratch)</template>
+        <template class="content-en">Implementation from Scratch</template>
+        <span class="content-target">التنفيذ من الصفر (Implementation from Scratch)</span>
+      </a>
+      <a href="#concise-implementation" class="toc-link" data-bilingual>
+        <template class="content-ar">التنفيذ الموجز (باستخدام واجهات برمجة التطبيقات)</template>
+        <template class="content-en">Concise Implementation of Linear Regression</template>
+        <span class="content-target">التنفيذ الموجز (باستخدام واجهات برمجة التطبيقات)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الشبكات العصبية الخطية للانحدار</h1>
+      <p class="hero-description">مقدمة شاملة للانحدار الخطي، دالة الخسارة، التحسين باستخدام الانحدار الاشتقاقي العشوائي، والتنفيذ البرمجي من الصفر وباستخدام واجهات برمجة التطبيقات عالية المستوى.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Linear Neural Networks for Regression</h1>
+      <p class="hero-description">Comprehensive introduction to Linear Regression, loss functions, optimization using Minibatch SGD, and implementation both from scratch and using high-level APIs.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">الانحدار الخطي</span>
+      <span class="tag">التحسين</span>
+      <span class="tag">الشبكات العصبية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Linear Regression</span>
+      <span class="tag">Optimization</span>
+      <span class="tag">Neural Networks</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم مفهوم الانحدار الخطي واستخدام الشبكات العميقة للنمذجة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ الانحدار الخطي برمجياً من الصفر لفهم الآليات الداخلية.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام واجهات برمجة التطبيقات عالية المستوى لتنفيذ الانحدار الخطي بشكل موجز.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Learn about the concept of Linear Regression and use Deep Networks to model.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn to implement Linear Regression from scratch.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn concise implementation of Linear Regression.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="linear-regression-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> العناصر الأساسية للانحدار الخطي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Basic Elements of Linear Regression</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار الخطي هو نموذج يفترض علاقة خطية بين الميزات المدخلة والمخرجات المستهدفة، ويتم التعبير عنه كمجموع مرجح مضافاً إليه انحياز.</p></template>
+    <template class="content-en"><p>Linear regression models the relationship between input features and a target output assuming a linear relationship, expressed as a weighted sum plus a bias.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعتمد الانحدار الخطي على افتراض أن العلاقة بين المتغيرات المستقلة (الميزات) والمتغير التابع (الهدف) هي علاقة خطية. يمكن التعبير عن التوقع كتحويل تآلفي (Affine Transformation) للميزات.</p><p>المعادلة الأساسية لمثال واحد هي: <code>y = w_1 x_1 + ... + w_d x_d + b</code>، حيث تمثل <code>w</code> الأوزان و <code>b</code> الانحياز.</p><p>عند التعامل مع مجموعة بيانات كاملة تحتوي على <code>n</code> من الأمثلة و <code>d</code> من الميزات، نستخدم <span class="smart-term" data-term-en="Design Matrix" data-ar="مصفوفة التصميم" data-en-def="A matrix X containing one row for every example and one column for every feature in the dataset.">مصفوفة التصميم<span class="smart-term-tooltip"></span></span> <code>X</code>، وتصبح المعادلة الموجهة: <code>y = Xw + b</code>.</p></template>
+    <template class="content-en"><p>Linear regression flows from the assumption that the relationship between independent variables (features) and the dependent variable (target) is linear. The prediction is an <span class="smart-term" data-term-en="Affine Transformation" data-ar="التحويل التآلفي" data-en-def="A linear transformation of features via weighted sum, combined with a translation via added bias.">affine transformation<span class="smart-term-tooltip"></span></span> of the features.</p><p>The basic equation for a single example is: <code>y = w_1 x_1 + ... + w_d x_d + b</code>, where <code>w</code> represents weights and <code>b</code> is the bias.</p><p>For an entire dataset of <code>n</code> examples and <code>d</code> features, we use the <span class="smart-term" data-term-en="Design Matrix" data-ar="مصفوفة التصميم" data-en-def="A matrix X containing one row for every example and one column for every feature in the dataset.">design matrix<span class="smart-term-tooltip"></span></span> <code>X</code>, and the vectorized equation becomes: <code>y = Xw + b</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم <span class="smart-term" data-term-en="Affine Transformation" data-ar="التحويل التآلفي" data-en-def="A linear transformation of features via weighted sum, combined with a translation via added bias.">التحويل التآلفي<span class="smart-term-tooltip"></span></span>؟ لأنه يجمع بين التحويل الخطي (عبر الأوزان التي تحدد تأثير كل ميزة) والإزاحة (عبر الانحياز الذي يحدد القيمة عندما تكون جميع الميزات صفراً).</p><p>في التعلم الآلي، نادراً ما نجد بيانات حقيقية تتطابق تماماً مع خط مستقيم، لذلك نضيف مصطلح ضوضاء (Noise) لتمثيل الأخطاء أو المتغيرات غير المقاسة.</p><p>استخدام مصفوفة التصميم <code>X</code> يسمح لنا بالاستفادة من مكتبات الجبر الخطي السريعة لحساب التوقعات لجميع الأمثلة في وقت واحد (Vectorization).</p></template>
+    <template class="content-en"><p>Why use an affine transformation? It combines a linear transformation (via weights determining feature influence) with a translation (via bias setting the baseline when features are zero).</p><p>In machine learning, real-world data rarely fits a line perfectly, so we incorporate a noise term to account for measurement errors or unobserved variables.</p><p>Using the design matrix <code>X</code> allows us to leverage fast linear algebra libraries to compute predictions for all examples simultaneously (Vectorization).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانحدار الخطي الموجهة لمجموعة بيانات كاملة.</strong></template>
+      <template class="content-en"><strong>Vectorized linear regression equation for an entire dataset.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{\mathbf{y}} = \mathbf{X}\mathbf{w} + b$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث لنموذج الانحدار الخطي إذا قمنا بإزالة مصطلح الانحياز (b)؟</template>
+      <template class="content-en">What happens to the linear regression model if we remove the bias term (b)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إزالة الانحياز تجبر الخط (أو المستوى الفائق) على المرور عبر نقطة الأصل (0,0). هذا يقلل من مرونة النموذج وقد يؤدي إلى ضعف الأداء إذا كانت البيانات الفعلية لا تمر عبر نقطة الأصل.</p></template>
+      <template class="content-en"><p>Removing the bias forces the line (or hyperplane) to pass through the origin (0,0). This reduces the model's flexibility and can lead to poor fit if the true data distribution does not naturally pass through the origin.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="squared-loss-function" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> دالة الخسارة (الخطأ التربيعي)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Loss Function (Squared Error)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دالة الخسارة تقيس مدى بعد التوقعات عن القيم الحقيقية، والخطأ التربيعي هو الأكثر شيوعاً في مشاكل الانحدار.</p></template>
+    <template class="content-en"><p>The loss function quantifies the distance between predictions and real values; squared error is the most popular for regression problems.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتدريب النموذج، نحتاج إلى مقياس لجودة الملاءمة.</p><p><span class="smart-term" data-term-en="Loss Function" data-ar="دالة الخسارة" data-en-def="A function that quantifies the distance between the real and predicted value of the target.">دالة الخسارة<span class="smart-term-tooltip"></span></span> تعيد رقماً غير سالب حيث القيم الأصغر تعني أداءً أفضل.</p><p>دالة الخطأ التربيعي لمثال واحد تُعرّف كالتالي: <code>l(w, b) = 1/2 * (y_hat - y)^2</code>.</p><p>لقياس جودة النموذج على مجموعة البيانات بأكملها، نقوم بحساب متوسط الخسائر لجميع الأمثلة التدريبية.</p></template>
+    <template class="content-en"><p>To train the model, we need a measure of fitness. The <span class="smart-term" data-term-en="Loss Function" data-ar="دالة الخسارة" data-en-def="A function that quantifies the distance between the real and predicted value of the target.">loss function<span class="smart-term-tooltip"></span></span> returns a non-negative number where smaller values are better.</p><p>The squared error loss for a single example is defined as: <code>l(w, b) = 1/2 * (y_hat - y)^2</code>.</p><p>To measure the quality of a model on the entire dataset, we average the losses across all training examples.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم الثابت <code>1/2</code>؟ هذا الثابت لا يؤثر على موقع الحد الأدنى للدالة، ولكنه يجعل الحسابات الرياضية أسهل عند أخذ المشتقة، حيث يلغي الأس <code>2</code>.</p><p>الاعتماد التربيعي يعني أن الأخطاء الكبيرة تُعاقب بشكل غير متناسب مقارنة بالأخطاء الصغيرة (النموذج حساس للقيم المتطرفة Outliers).</p></template>
+    <template class="content-en"><p>Why use the constant <code>1/2</code>? It makes no difference to the minimum's location but proves notationally convenient, cancelling out the exponent <code>2</code> when we take the derivative of the loss.</p><p>The quadratic dependence means that large differences between estimates and observations lead to even larger contributions to the loss (making the model sensitive to outliers).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>متوسط دالة الخطأ التربيعي لمجموعة البيانات بأكملها.</strong></template>
+      <template class="content-en"><strong>Average squared error loss over the entire dataset.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$L(\mathbf{w}, b) = \frac{1}{n} \sum_{i=1}^{n} \frac{1}{2} (\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)})^2$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a 2D scatter plot showing data points (blue dots) and a linear fit line (white/gray line). Draw vertical red dashed lines from each data point to the fit line to represent the residual errors (y_hat - y). Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, Arabic + English labels for axes (x, y). -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="30" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Squared Error Loss</text>
+  <text x="400" y="30" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">دالة خسارة الخطأ التربيعي</text>
+
+  <!-- Grid -->
+  <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+    <line x1="100" y1="100" x2="750" y2="100" />
+    <line x1="100" y1="150" x2="750" y2="150" />
+    <line x1="100" y1="200" x2="750" y2="200" />
+    <line x1="100" y1="250" x2="750" y2="250" />
+    <line x1="100" y1="300" x2="750" y2="300" />
+    <line x1="200" y1="60" x2="200" y2="350" />
+    <line x1="300" y1="60" x2="300" y2="350" />
+    <line x1="400" y1="60" x2="400" y2="350" />
+    <line x1="500" y1="60" x2="500" y2="350" />
+    <line x1="600" y1="60" x2="600" y2="350" />
+    <line x1="700" y1="60" x2="700" y2="350" />
+  </g>
+
+  <!-- Axes -->
+  <line x1="100" y1="350" x2="760" y2="350" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="100" y1="350" x2="100" y2="50" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Axis Labels -->
+  <text x="425" y="390" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Feature (x)</text>
+  <text x="425" y="390" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الميزة (x)</text>
+
+  <text x="60" y="200" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle" transform="rotate(-90, 60, 200)" class="gsvg-en">Target (y)</text>
+  <text x="60" y="200" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-secondary)" text-anchor="middle" transform="rotate(-90, 60, 200)" class="gsvg-ar">الهدف (y)</text>
+
+  <!-- Fit Line -->
+  <line x1="100" y1="350" x2="750" y2="90" stroke="var(--text-primary)" stroke-width="2" />
+
+  <!-- Residuals (Dashed Lines) -->
+  <line x1="200" y1="240" x2="200" y2="310" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+  <line x1="300" y1="320" x2="300" y2="270" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+  <line x1="400" y1="160" x2="400" y2="230" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+  <line x1="500" y1="120" x2="500" y2="190" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+  <line x1="600" y1="70" x2="600" y2="150" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+  <line x1="680" y1="200" x2="680" y2="118" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5,5" />
+
+  <!-- Data Points -->
+  <circle cx="200" cy="240" r="6" fill="var(--brand-500)" />
+  <circle cx="300" cy="320" r="6" fill="var(--brand-500)" />
+  <circle cx="400" cy="160" r="6" fill="var(--brand-500)" />
+  <circle cx="500" cy="120" r="6" fill="var(--brand-500)" />
+  <circle cx="600" cy="70" r="6" fill="var(--brand-500)" />
+  <circle cx="680" cy="200" r="6" fill="var(--brand-500)" />
+
+  <!-- Annotations for Point 3 (400, 160) -->
+  <text x="375" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">y</text>
+  <text x="375" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">y</text>
+  
+  <circle cx="400" cy="230" r="4" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+  <text x="375" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">ŷ</text>
+  <text x="375" y="235" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">ŷ</text>
+  
+  <text x="465" y="200" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Error (ŷ - y)</text>
+  <text x="465" y="200" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">الخطأ (ŷ - y)</text>
+
+  <!-- Legend -->
+  <rect x="120" y="60" width="210" height="100" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <circle cx="140" cy="80" r="5" fill="var(--brand-500)" />
+  <text x="220" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Data Point (y)</text>
+  <text x="220" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">نقطة البيانات (y)</text>
+  
+  <line x1="130" y1="110" x2="150" y2="110" stroke="var(--text-primary)" stroke-width="2" />
+  <text x="220" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Fit Line (ŷ)</text>
+  <text x="220" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">خط المطابقة (ŷ)</text>
+  
+  <line x1="140" y1="130" x2="140" y2="145" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,3" />
+  <text x="220" y="142" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Residual Error</text>
+  <text x="220" y="142" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الخطأ المتبقي</text>
+
+  <!-- Formula Box -->
+  <rect x="510" y="230" width="240" height="90" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="630" y="260" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Squared Error Loss</text>
+  <text x="630" y="260" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">خسارة الخطأ التربيعي</text>
+  <text x="630" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">l(w, b) = ½ (ŷ - y)²</text>
+  <text x="630" y="295" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">l(w, b) = ½ (ŷ - y)²</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل الخطأ التربيعي على الخطأ المطلق (Absolute Error) في الانحدار الخطي الكلاسيكي؟</template>
+      <template class="content-en">Why do we prefer Squared Error over Absolute Error in classic linear regression?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الخطأ التربيعي قابل للاشتقاق في كل مكان، مما يسهل استخدام طرق التحسين القائمة على التدرج (Gradient-based). الخطأ المطلق غير قابل للاشتقاق عند الصفر.</p></template>
+      <template class="content-en"><p>Squared error is differentiable everywhere, making it mathematically convenient for gradient-based optimization methods. Absolute error is non-differentiable at zero.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="minibatch-sgd" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الانحدار الاشتقاقي العشوائي للحزم الصغيرة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Minibatch Stochastic Gradient Descent (SGD)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تحسين تقوم بتحديث معلمات النموذج تدريجياً في اتجاه يقلل الخسارة، باستخدام عينة عشوائية صغيرة من البيانات في كل خطوة.</p></template>
+    <template class="content-en"><p>An optimization algorithm that iteratively updates model parameters in the direction that reduces loss, using a small random sample of data at each step.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الحالات التي لا يمكننا فيها حل النماذج تحليلياً، نستخدم الانحدار الاشتقاقي. التطبيق الساذج (استخدام كل البيانات) بطيء جداً.</p><p>لذلك نستخدم <b>Minibatch SGD</b>:</p><ol><li>نسحب عشوائياً حزمة صغيرة (Minibatch) بحجم ثابت من البيانات.</li><li>نحسب التدرج (المشتقة) لمتوسط الخسارة على هذه الحزمة بالنسبة للمعلمات.</li><li>نضرب التدرج في <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A positive value that determines the step size at each iteration while moving toward a minimum of a loss function.">معدل التعلم<span class="smart-term-tooltip"></span></span> (Learning Rate) ونطرحه من المعلمات الحالية.</li></ol></template>
+    <template class="content-en"><p>When analytic solutions are impossible or computationally expensive, we use gradient descent. The naive application (using the whole dataset) is extremely slow.</p><p>Thus, we use <b>Minibatch SGD</b>:</p><ol><li>Randomly sample a minibatch of a fixed size from the training data.</li><li>Compute the gradient (derivative) of the average loss on the minibatch with respect to the parameters.</li><li>Multiply the gradient by the <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A positive value that determines the step size at each iteration while moving toward a minimum of a loss function.">learning rate<span class="smart-term-tooltip"></span></span> and subtract it from the current parameters.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حجم الحزمة (Batch Size) ومعدل التعلم (Learning Rate) هما <b>معلمات فائقة (Hyperparameters)</b>، أي يتم تحديدهما يدوياً ولا يتم تعلمهما أثناء التدريب.</p><p>يتم ضبط هذه <span class="smart-term" data-term-en="Hyperparameters" data-ar="المعلمات الفائقة" data-en-def="Parameters that are tuneable but not updated in the training loop (e.g., learning rate, batch size).">المعلمات الفائقة<span class="smart-term-tooltip"></span></span> عادةً باستخدام مجموعة بيانات تحقق (Validation Dataset) منفصلة.</p><p>لا يضمن SGD الوصول إلى الحد الأدنى الدقيق في عدد محدود من الخطوات، ولكنه يقترب منه بشكل كافٍ للتنبؤ الدقيق.</p></template>
+    <template class="content-en"><p>The batch size and learning rate are <b><span class="smart-term" data-term-en="Hyperparameters" data-ar="المعلمات الفائقة" data-en-def="Parameters that are tuneable but not updated in the training loop (e.g., learning rate, batch size).">hyperparameters<span class="smart-term-tooltip"></span></span></b>, meaning they are manually pre-specified and not learned through the training loop.</p><p>Hyperparameter tuning typically requires adjusting them based on results assessed on a separate validation dataset.</p><p>SGD does not guarantee finding the exact minimum in a finite number of steps, but it converges close enough for highly accurate predictions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>قاعدة تحديث الأوزان في الانحدار الاشتقاقي العشوائي للحزم الصغيرة.</strong></template>
+      <template class="content-en"><strong>Weight update rule in Minibatch Stochastic Gradient Descent.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\mathbf{w} \leftarrow \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} (\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)})$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Draw a 2D convex loss surface (a parabola curve). Show a starting point high on the curve, and draw arrows pointing downwards along the curve towards the global minimum (Point of convergence). Label the axes 'Value of weight' (x) and 'loss' (y). Style: educational, dark background #0d1117, accent colors #ff7b72 and #79c0ff, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead for Gradient Steps -->
+    <marker id="step-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <!-- Arrowhead for Axes -->
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Axes -->
+  <path d="M 100 380 L 100 50" stroke="var(--text-muted)" stroke-width="2" fill="none" marker-end="url(#axis-arrow)" />
+  <path d="M 100 380 L 750 380" stroke="var(--text-muted)" stroke-width="2" fill="none" marker-end="url(#axis-arrow)" />
+
+  <!-- Axis Labels -->
+  <text x="60" y="215" transform="rotate(-90, 60, 215)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-en" fill="var(--text-primary)">Loss (L)</text>
+  <text x="60" y="215" transform="rotate(-90, 60, 215)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-ar" fill="var(--text-primary)">الخسارة (L)</text>
+
+  <text x="425" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-en" fill="var(--text-primary)">Value of Weight (w)</text>
+  <text x="425" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-ar" fill="var(--text-primary)">قيمة الوزن (w)</text>
+
+  <!-- Convex Loss Surface (Parabola) -->
+  <path d="M 150 80 Q 450 500 750 80" stroke="var(--text-muted)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+  <!-- Optimal Weight Indicator (Dashed Line) -->
+  <line x1="450" y1="298" x2="450" y2="380" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" />
+  <text x="450" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-en" fill="var(--brand-ink)">w*</text>
+  <text x="450" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-ar" fill="var(--brand-ink)">w*</text>
+
+  <!-- Gradient Descent Step Arrows -->
+  <line x1="185" y1="126" x2="232" y2="178" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#step-arrow)" />
+  <line x1="246" y1="192" x2="291" y2="230" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#step-arrow)" />
+  <line x1="307" y1="241" x2="350" y2="265" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#step-arrow)" />
+  <line x1="368" y1="273" x2="438" y2="287.5" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#step-arrow)" />
+
+  <!-- Gradient Descent Points -->
+  <circle cx="180" cy="120" r="6" fill="var(--brand-500)" />
+  <circle cx="240" cy="187" r="6" fill="var(--brand-500)" />
+  <circle cx="300" cy="237.5" r="6" fill="var(--brand-500)" />
+  <circle cx="360" cy="271" r="6" fill="var(--brand-500)" />
+  
+  <!-- Global Minimum Point -->
+  <circle cx="450" cy="290" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+  <!-- Starting Point Annotation -->
+  <line x1="150" y1="70" x2="175" y2="110" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="3,3" />
+  <text x="150" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-en" fill="var(--text-primary)">Starting Point</text>
+  <text x="150" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-ar" fill="var(--text-primary)">نقطة البداية</text>
+
+  <!-- Global Minimum Annotation -->
+  <line x1="530" y1="315" x2="460" y2="295" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="3,3" />
+  <text x="530" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-en" fill="var(--brand-ink)">Global Minimum</text>
+  <text x="530" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-ar" fill="var(--brand-ink)">الحد الأدنى العالمي</text>
+
+  <!-- Gradient Step Annotation -->
+  <line x1="350" y1="175" x2="280" y2="205" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="3,3" />
+  <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-en" fill="var(--text-primary)">Gradient Step</text>
+  <text x="400" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" class="gsvg-ar" fill="var(--text-primary)">خطوة الانحدار</text>
+  
+  <text x="400" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en" fill="var(--text-secondary)">w = w - α∇L</text>
+  <text x="400" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar" fill="var(--text-secondary)">w = w - α∇L</text>
+
+  <!-- Minibatch SGD Callout Box -->
+  <rect x="520" y="60" width="240" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  
+  <text x="640" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-en" fill="var(--text-primary)">Minibatch SGD</text>
+  <text x="640" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" class="gsvg-ar" fill="var(--text-primary)">الانحدار بدفعة صغيرة</text>
+  
+  <line x1="540" y1="100" x2="740" y2="100" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="640" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en" fill="var(--text-secondary)">1. Sample random minibatch</text>
+  <text x="640" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar" fill="var(--text-secondary)">1. أخذ عينة عشوائية</text>
+  
+  <text x="640" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en" fill="var(--text-secondary)">2. Compute average gradient</text>
+  <text x="640" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar" fill="var(--text-secondary)">2. حساب متوسط الانحدار</text>
+  
+  <text x="640" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en" fill="var(--text-secondary)">3. Update parameters (w)</text>
+  <text x="640" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar" fill="var(--text-secondary)">3. تحديث المعلمات (w)</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Analytic Solution</th><th>Minibatch SGD</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الدقة</template>
+          <template class="content-en">Accuracy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">دقيق تماماً (رياضياً)</template>
+          <template class="content-en">Exact mathematical minimum</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">تقريبي (يقترب من الحد الأدنى)</template>
+          <template class="content-en">Approximate (converges towards minimum)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قابلية التطبيق</template>
+          <template class="content-en">Applicability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">محدود جداً (فقط للنماذج الخطية البسيطة)</template>
+          <template class="content-en">Highly restrictive (only simple linear models)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عام (يعمل مع جميع نماذج التعلم العميق تقريباً)</template>
+          <template class="content-en">Universal (works for nearly all deep learning models)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التكلفة الحسابية للبيانات الضخمة</template>
+          <template class="content-en">Computational Cost for Big Data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مكلف جداً (يتطلب عكس مصفوفة ضخمة)</template>
+          <template class="content-en">Very expensive (requires matrix inversion)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">فعال (يعالج حزم صغيرة تدريجياً)</template>
+          <template class="content-en">Efficient (processes small batches iteratively)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي مخاطر اختيار معدل تعلم (Learning Rate) كبير جداً أو صغير جداً؟</template>
+      <template class="content-en">What are the risks of choosing a learning rate that is too large or too small?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا كان كبيراً جداً، قد يتجاوز الخوارزم الحد الأدنى ويفشل في التقارب (يتذبذب أو يتباعد). إذا كان صغيراً جداً، سيستغرق التدريب وقتاً طويلاً جداً للوصول إلى الحد الأدنى وقد يعلق في حد أدنى محلي (في النماذج غير المحدبة).</p></template>
+      <template class="content-en"><p>If too large, the algorithm may overshoot the minimum and fail to converge (diverge or oscillate). If too small, training will take an impractically long time and might get stuck in local minima (in non-convex models).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="vectorization-speed" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التوجيه (Vectorization) من أجل السرعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Vectorization for Speed</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التوجيه هو استخدام مكتبات الجبر الخطي السريعة لمعالجة مصفوفات كاملة من البيانات في وقت واحد بدلاً من استخدام حلقات التكرار (For-loops) البطيئة.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Vectorization" data-ar="التوجيه (المتجهات)" data-en-def="The process of converting an algorithm from operating on a single value at a time to operating on a set of values (vectors) at one time.">Vectorization<span class="smart-term-tooltip"></span></span> leverages fast linear algebra libraries to process whole minibatches of examples simultaneously, avoiding slow Python for-loops.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند تدريب النماذج، نريد معالجة حزم صغيرة كاملة في وقت واحد. القيام بذلك بكفاءة يتطلب توجيه العمليات الحسابية.</p><p>في بايثون، استخدام حلقة <code>for</code> لجمع متجهين عنصراً بعنصر بطيء جداً.</p><p>البديل هو الاعتماد على العمليات الموجهة (مثل عامل <code>+</code> في مكتبة NumPy) لحساب المجموع للعناصر بأكملها في استدعاء واحد.</p></template>
+    <template class="content-en"><p>When training models, we typically want to process whole minibatches of examples simultaneously. Doing this efficiently requires vectorizing calculations.</p><p>In Python, using a <code>for</code> loop to add two vectors coordinate by coordinate is extremely slow.</p><p>Alternatively, relying on the reloaded <code>+</code> operator (e.g., in NumPy) computes the elementwise sum in a single call, which is dramatically faster.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يوفر التوجيه تسريعاً هائلاً (Order-of-magnitude speedups) لأنه يدفع العمليات الحسابية إلى طبقات منخفضة المستوى (C/C++) ويستفيد من تعليمات الأجهزة المتوازية (SIMD) في المعالجات الحديثة ووحدات معالجة الرسومات (GPUs).</p></template>
+    <template class="content-en"><p>Vectorizing code yields order-of-magnitude speedups because it pushes the loop down into highly optimized low-level C/C++ code and leverages parallel hardware instructions (SIMD) on modern CPUs and GPUs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Slow method using for-loop
+c = np.zeros(n)
+for i in range(n):
+    c[i] = a[i] + b[i]
+
+# Fast method using vectorization
+d = a + b</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر حلقات for في بايثون بطيئة مقارنة بالعمليات الموجهة في NumPy؟</template>
+      <template class="content-en">Why are Python for-loops slow compared to vectorized operations in NumPy?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بايثون لغة مفسرة وديناميكية النوع، مما يضيف عبئاً (Overhead) في كل تكرار للتحقق من الأنواع. NumPy مكتوبة بلغة C وتنفذ العمليات على كتل متجاورة من الذاكرة دون هذا العبء.</p></template>
+      <template class="content-en"><p>Python is interpreted and dynamically typed, adding overhead in each iteration for type checking and dispatching. NumPy is implemented in C and operates on contiguous memory blocks without this overhead.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="normal-distribution-mle" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> التوزيع الطبيعي وتقدير الاحتمالية القصوى</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Normal Distribution and Maximum Likelihood</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل الخطأ التربيعي في الانحدار الخطي يكافئ رياضياً إيجاد المعلمات التي تزيد من احتمالية البيانات بافتراض وجود ضوضاء تتبع التوزيع الطبيعي.</p></template>
+    <template class="content-en"><p>Minimizing squared error is mathematically equivalent to <span class="smart-term" data-term-en="Maximum Likelihood Estimation (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a probability distribution by maximizing a likelihood function.">maximum likelihood estimation (MLE)<span class="smart-term-tooltip"></span></span> under the assumption of additive Gaussian noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحفيز استخدام دالة الخطأ التربيعي، نفترض أن الملاحظات تنشأ من نموذج خطي مع ضوضاء مضافة تتبع التوزيع الطبيعي (Gaussian): <code>y = Xw + b + epsilon</code> حيث <code>epsilon ~ N(0, sigma^2)</code>.</p><p>وفقاً لمبدأ <span class="smart-term" data-term-en="Maximum Likelihood Estimation (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a probability distribution by maximizing a likelihood function.">تقدير الاحتمالية القصوى<span class="smart-term-tooltip"></span></span> (MLE)، أفضل المعلمات هي تلك التي تزيد من احتمالية رؤية مجموعة البيانات بأكملها.</p><p>نظراً لأن تعظيم حاصل ضرب الدوال الأسية أمر صعب، نقوم بدلاً من ذلك بتقليل اللوغاريتم السالب للاحتمالية (Negative Log-Likelihood).</p></template>
+    <template class="content-en"><p>To motivate the squared loss function, assume observations arise from a linear model with additive normally distributed noise: <code>y = Xw + b + epsilon</code> where <code>epsilon ~ N(0, sigma^2)</code>.</p><p>According to the principle of maximum likelihood (MLE), the best parameters maximize the likelihood of the entire dataset.</p><p>Since maximizing the product of exponential functions is difficult, we instead minimize the negative log-likelihood.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند تبسيط معادلة اللوغاريتم السالب للاحتمالية، نجد أن الحد الذي يعتمد على المعلمات <code>w</code> و <code>b</code> يتطابق تماماً مع دالة الخطأ التربيعي.</p><p>هذا يثبت أن الانحدار الخطي باستخدام الخطأ التربيعي ليس مجرد اختيار عشوائي، بل له أساس احتمالي قوي.</p><p>الحل الأمثل لا يعتمد على التباين <code>sigma^2</code> للضوضاء.</p></template>
+    <template class="content-en"><p>When simplifying the negative log-likelihood equation, the term depending on parameters <code>w</code> and <code>b</code> is identical to the squared error loss (up to a multiplicative constant).</p><p>This proves that linear regression with squared loss is not arbitrary; it has a strong probabilistic foundation.</p><p>The optimal solution does not depend on the noise variance <code>sigma^2</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>اللوغاريتم السالب للاحتمالية، والذي يوضح العلاقة مع الخطأ التربيعي.</strong></template>
+      <template class="content-en"><strong>Negative log-likelihood, showing the connection to squared error.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$- \log P(\mathbf{y} \mid \mathbf{X}) = \sum_{i=1}^{n} \frac{1}{2} \log(2\pi\sigma^2) + \frac{1}{2\sigma^2} (y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b)^2$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Plot three bell curves (Normal distributions) on the same axis. Curve 1: mean 0, std 1 (solid blue). Curve 2: mean 0, std 2 (dashed magenta). Curve 3: mean 3, std 1 (dash-dot green). X-axis labeled 'x', Y-axis labeled 'p(x)'. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="30" text-anchor="middle" class="gsvg-en" font-size="20" font-weight="bold" fill="var(--text-primary)">Normal Distributions</text>
+    <text x="400" y="30" text-anchor="middle" class="gsvg-ar" font-size="20" font-weight="bold" fill="var(--text-primary)">التوزيعات الطبيعية</text>
+
+    <!-- Grid Lines -->
+    <g stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" fill="none">
+        <path d="M 80,273.3 L 760,273.3" />
+        <path d="M 80,206.7 L 760,206.7" />
+        <path d="M 80,140.0 L 760,140.0" />
+        <path d="M 80,73.3 L 760,73.3" />
+    </g>
+
+    <!-- Axes -->
+    <path d="M 80,340 L 760,340" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+    <path d="M 371.4,340 L 371.4,50" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+
+    <!-- Axis Labels -->
+    <text x="770" y="345" font-size="16" font-style="italic" fill="var(--text-primary)">x</text>
+    <text x="355" y="55" text-anchor="end" font-size="16" font-style="italic" fill="var(--text-primary)">p(x)</text>
+
+    <!-- X Axis Ticks and Labels -->
+    <g stroke="var(--text-muted)" stroke-width="2" fill="none">
+        <path d="M 177.1,340 L 177.1,345" />
+        <path d="M 274.3,340 L 274.3,345" />
+        <path d="M 468.6,340 L 468.6,345" />
+        <path d="M 565.7,340 L 565.7,345" />
+        <path d="M 662.9,340 L 662.9,345" />
+    </g>
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="177.1" y="365">-4</text>
+        <text x="274.3" y="365">-2</text>
+        <text x="468.6" y="365">2</text>
+        <text x="565.7" y="365">4</text>
+        <text x="662.9" y="365">6</text>
+    </g>
+
+    <!-- Y Axis Ticks and Labels -->
+    <g stroke="var(--text-muted)" stroke-width="2" fill="none">
+        <path d="M 371.4,273.3 L 366.4,273.3" />
+        <path d="M 371.4,206.7 L 366.4,206.7" />
+        <path d="M 371.4,140.0 L 366.4,140.0" />
+        <path d="M 371.4,73.3 L 366.4,73.3" />
+    </g>
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="end">
+        <text x="360" y="278">0.1</text>
+        <text x="360" y="211">0.2</text>
+        <text x="360" y="145">0.3</text>
+        <text x="360" y="78">0.4</text>
+    </g>
+
+    <!-- Curve 2: Mean 0, Std 2 (Dashed) -->
+    <path d="M 80.0,338.5 L 128.6,334.1 L 177.1,322.0 L 201.4,311.3 L 225.7,296.8 L 250.0,279.1 L 274.3,259.3 L 298.6,239.6 L 322.9,222.7 L 347.1,211.1 L 371.4,207.0 L 395.7,211.1 L 420.0,222.7 L 444.3,239.6 L 468.6,259.3 L 492.9,279.1 L 517.1,296.8 L 541.4,311.3 L 565.7,322.0 L 614.3,334.1 L 662.9,338.5" fill="none" stroke="var(--text-primary)" stroke-width="3" stroke-dasharray="8,6" />
+
+    <!-- Curve 3: Mean 3, Std 1 (Dash-Dot) -->
+    <path d="M 322.8,340.0 L 347.1,339.4 L 371.4,337.1 L 395.7,328.3 L 420.0,304.0 L 432.1,282.5 L 444.3,253.7 L 456.4,218.3 L 468.6,178.7 L 480.7,139.3 L 492.9,105.3 L 505.0,82.2 L 517.1,74.1 L 529.3,82.2 L 541.4,105.3 L 553.6,139.3 L 565.7,178.7 L 577.8,218.3 L 590.0,253.7 L 602.1,282.5 L 614.3,304.0 L 638.6,328.3 L 662.8,337.1 L 687.1,339.4 L 711.4,340.0" fill="none" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="12,4,3,4" />
+
+    <!-- Curve 1: Mean 0, Std 1 (Solid) -->
+    <path d="M 177.1,340.0 L 201.4,339.4 L 225.7,337.1 L 250.0,328.3 L 274.3,304.0 L 286.4,282.5 L 298.6,253.7 L 310.7,218.3 L 322.9,178.7 L 335.0,139.3 L 347.1,105.3 L 359.3,82.2 L 371.4,74.1 L 383.6,82.2 L 395.7,105.3 L 407.9,139.3 L 420.0,178.7 L 432.1,218.3 L 444.3,253.7 L 456.4,282.5 L 468.6,304.0 L 492.9,328.3 L 517.1,337.1 L 541.4,339.4 L 565.7,340.0" fill="none" stroke="var(--brand-500)" stroke-width="3" />
+
+    <!-- Legend -->
+    <g transform="translate(100, 60)">
+        <rect x="0" y="0" width="160" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        
+        <!-- Legend Item 1 -->
+        <path d="M 15,25 L 45,25" stroke="var(--brand-500)" stroke-width="3" fill="none" />
+        <text x="55" y="30" font-size="14" fill="var(--text-primary)">μ = 0, σ = 1</text>
+        
+        <!-- Legend Item 2 -->
+        <path d="M 15,55 L 45,55" stroke="var(--text-primary)" stroke-width="3" stroke-dasharray="8,6" fill="none" />
+        <text x="55" y="60" font-size="14" fill="var(--text-primary)">μ = 0, σ = 2</text>
+        
+        <!-- Legend Item 3 -->
+        <path d="M 15,85 L 45,85" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="12,4,3,4" fill="none" />
+        <text x="55" y="90" font-size="14" fill="var(--text-primary)">μ = 3, σ = 1</text>
+    </g>
+
+    <!-- Concept Text -->
+    <text x="400" y="395" text-anchor="middle" class="gsvg-en" font-size="15" fill="var(--text-secondary)">Maximum Likelihood Estimation seeks the parameters that maximize p(x)</text>
+    <text x="400" y="395" text-anchor="middle" class="gsvg-ar" font-size="15" fill="var(--text-secondary)">يبحث تقدير الاحتمالية القصوى عن المعلمات التي تعظم p(x)</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا افترضنا أن الضوضاء تتبع توزيع لابلاس (Laplace Distribution) بدلاً من التوزيع الطبيعي، فما هي دالة الخسارة التي سينتج عنها تقدير الاحتمالية القصوى؟</template>
+      <template class="content-en">If we assume the noise follows a Laplace distribution instead of a Normal distribution, what loss function would Maximum Likelihood Estimation yield?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سينتج عنها دالة الخطأ المطلق (Absolute Error Loss أو L1 Loss).</p></template>
+      <template class="content-en"><p>It would yield the Absolute Error Loss (L1 Loss).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="linear-regression-neural-network" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الانحدار الخطي كشبكة عصبية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> From Linear Regression to Deep Networks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن تمثيل نموذج الانحدار الخطي كشبكة عصبية بسيطة تتكون من طبقة واحدة متصلة بالكامل (Dense Layer).</p></template>
+    <template class="content-en"><p>A linear regression model can be depicted as a simple neural network consisting of a single fully-connected (dense) layer.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكننا التعبير عن النموذج الخطي بلغة الشبكات العصبية. في هذا التمثيل:</p><ul><li>المدخلات هي <code>x_1, ..., x_d</code>، لذا فإن عدد المدخلات في طبقة الإدخال هو <code>d</code>.</li><li>مخرج الشبكة هو <code>o_1</code>، لذا فإن عدد المخرجات هو 1.</li><li>لا نأخذ طبقة الإدخال في الاعتبار عند حساب عدد الطبقات، لذا فهي شبكة عصبية ذات طبقة واحدة.</li></ul><p>نظراً لأن كل مدخل متصل بكل مخرج، تُعرف هذه الطبقة بالطبقة المتصلة بالكامل (Fully-connected layer) أو <span class="smart-term" data-term-en="Dense Layer" data-ar="الطبقة الكثيفة" data-en-def="A neural network layer where every input is connected to every output by means of a matrix-vector multiplication.">الطبقة الكثيفة<span class="smart-term-tooltip"></span></span> (Dense layer).</p></template>
+    <template class="content-en"><p>We can express the linear model in the language of neural networks. In this depiction:</p><ul><li>The inputs are <code>x_1, ..., x_d</code>, so the number of inputs in the input layer is <code>d</code>.</li><li>The output of the network is <code>o_1</code>, so the number of outputs is 1.</li><li>We do not consider the input layer when counting layers, so it is a single-layer neural network.</li></ul><p>Since every input is connected to every output, this transformation is regarded as a fully-connected layer or <span class="smart-term" data-term-en="Dense Layer" data-ar="الطبقة الكثيفة" data-en-def="A neural network layer where every input is connected to every output by means of a matrix-vector multiplication.">dense layer<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا التجريد يربط الإحصاء الكلاسيكي بالتعلم العميق الحديث. الخلايا العصبية الاصطناعية مستوحاة بشكل فضفاض من علم الأعصاب (التشعبات تستقبل المدخلات، النواة تجمعها، والمحور العصبي يرسل المخرجات).</p><p>في الشبكات العميقة الحقيقية، نضيف دوال تنشيط غير خطية (Non-linear activation functions) بعد هذه المجاميع المرجحة لتعلم أنماط معقدة، وهو ما يفتقر إليه الانحدار الخطي.</p></template>
+    <template class="content-en"><p>This abstraction bridges classical statistics with modern deep learning. Artificial neurons are loosely inspired by neuroscience (dendrites receive inputs, nucleus aggregates, axon outputs).</p><p>In true deep networks, we add non-linear activation functions after these weighted sums to learn complex patterns, which linear regression lacks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Draw a neural network diagram for linear regression. Bottom layer: d input nodes labeled x_1, x_2, ..., x_d (blue circles). Top layer: 1 output node labeled o_1 (blue circle). Draw arrows from EVERY input node to the single output node. Label the diagram 'Input layer' and 'Output layer'. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 600 400. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead marker for solid lines -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="27" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Arrowhead marker for dashed lines -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="27" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" />
+        </marker>
+
+        <!-- Gradient for the output node to make it stand out -->
+        <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Title -->
+        <g transform="translate(400, 40)">
+            <text x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">Linear Regression as a Neural Network</text>
+            <text x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">الانحدار الخطي كشبكة عصبية</text>
+        </g>
+
+        <!-- Layer Bounding Boxes -->
+        <!-- Output Layer Box -->
+        <rect x="330" y="90" width="140" height="110" rx="20" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,4" opacity="0.6" />
+        
+        <!-- Input Layer Box -->
+        <rect x="130" y="290" width="540" height="110" rx="20" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8,4" opacity="0.6" />
+
+        <!-- Layer Labels -->
+        <g transform="translate(400, 75)">
+            <text x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="16" font-weight="bold">Output Layer (1 node)</text>
+            <text x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="16" font-weight="bold">طبقة الإخراج (عقدة واحدة)</text>
+        </g>
+
+        <g transform="translate(400, 435)">
+            <text x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="16" font-weight="bold">Input Layer (d nodes)</text>
+            <text x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="16" font-weight="bold">طبقة الإدخال (d من العقد)</text>
+        </g>
+
+        <!-- Edges (Connections) -->
+        <g id="edges">
+            <!-- From x1 -->
+            <line x1="200" y1="350" x2="400" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <!-- From x2 -->
+            <line x1="300" y1="350" x2="400" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <!-- From x3 -->
+            <line x1="400" y1="350" x2="400" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <!-- From ellipsis (dashed) -->
+            <line x1="500" y1="350" x2="400" y2="150" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)" opacity="0.6" />
+            <!-- From xd -->
+            <line x1="600" y1="350" x2="400" y2="150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+
+        <!-- Edge Weights -->
+        <g id="weights" fill="var(--text-secondary)" font-size="16" font-style="italic">
+            <text x="280" y="240" text-anchor="end">w<tspan dy="4" font-size="13">1</tspan></text>
+            <text x="335" y="250" text-anchor="end">w<tspan dy="4" font-size="13">2</tspan></text>
+            <text x="415" y="250" text-anchor="start">w<tspan dy="4" font-size="13">3</tspan></text>
+            <text x="520" y="240" text-anchor="start">w<tspan dy="4" font-size="13">d</tspan></text>
+        </g>
+
+        <!-- Connection Type Label -->
+        <text x="680" y="240" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">
+            Fully-Connected
+            <tspan x="680" dy="22">(Dense) Layer</tspan>
+        </text>
+        <text x="680" y="240" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">
+            طبقة متصلة بالكامل
+            <tspan x="680" dy="22">(كثيفة)</tspan>
+        </text>
+
+        <!-- Equation Callout -->
+        <rect x="600" y="85" width="170" height="46" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="685" y="113" text-anchor="middle" fill="var(--text-primary)" font-size="18">
+            o<tspan dy="4" font-size="13">1</tspan><tspan dy="-4"> = Σ w</tspan><tspan dy="4" font-size="13">i</tspan><tspan dy="-4"> x</tspan><tspan dy="4" font-size="13">i</tspan><tspan dy="-4"> + b</tspan>
+        </text>
+
+        <!-- Nodes -->
+        <g id="nodes">
+            <!-- Output Node -->
+            <circle cx="400" cy="150" r="30" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="400" y="156" text-anchor="middle" fill="var(--on-brand-hi)" font-size="20" font-weight="bold">o<tspan dy="5" font-size="13">1</tspan></text>
+
+            <!-- Input Nodes -->
+            <!-- x1 -->
+            <circle cx="200" cy="350" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+            <text x="200" y="356" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold">x<tspan dy="5" font-size="13">1</tspan></text>
+
+            <!-- x2 -->
+            <circle cx="300" cy="350" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+            <text x="300" y="356" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold">x<tspan dy="5" font-size="13">2</tspan></text>
+
+            <!-- x3 -->
+            <circle cx="400" cy="350" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+            <text x="400" y="356" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold">x<tspan dy="5" font-size="13">3</tspan></text>
+
+            <!-- Ellipsis -->
+            <text x="500" y="356" text-anchor="middle" fill="var(--text-primary)" font-size="24" font-weight="bold">...</text>
+
+            <!-- xd -->
+            <circle cx="600" cy="350" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+            <text x="600" y="356" text-anchor="middle" fill="var(--text-primary)" font-size="20" font-weight="bold">x<tspan dy="5" font-size="13">d</tspan></text>
+        </g>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نعتبر طبقة الإدخال عند حساب عدد طبقات الشبكة العصبية؟</template>
+      <template class="content-en">Why do we not consider the input layer when counting the number of layers in a neural network?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن طبقة الإدخال لا تقوم بأي عمليات حسابية أو تحويلات؛ إنها مجرد حاوية للبيانات الأولية. نحن نحسب فقط الطبقات التي تحتوي على أوزان قابلة للتعلم.</p></template>
+      <template class="content-en"><p>Because the input layer performs no computations or transformations; it merely holds the raw data. We only count layers that have learnable weights.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="implementation-from-scratch" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التنفيذ من الصفر (Implementation from Scratch)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Implementation from Scratch</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بناء خط أنابيب البيانات، النموذج، دالة الخسارة، والمُحسِّن باستخدام الموترات (Tensors) والاشتقاق التلقائي فقط، دون استخدام طبقات جاهزة.</p></template>
+    <template class="content-en"><p>Building the data pipeline, model, loss function, and optimizer using only tensors and auto-differentiation, without predefined layers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتضمن التنفيذ من الصفر الخطوات التالية:</p><ol><li><b>توليد البيانات:</b> إنشاء بيانات اصطناعية <code>y = Xw + b + noise</code> لاختبار النموذج.</li><li><b>قراءة البيانات:</b> دالة <code>data_iter</code> لخلط البيانات وتقسيمها إلى حزم صغيرة (Minibatches).</li><li><b>تهيئة المعلمات:</b> تعيين قيم ابتدائية عشوائية للأوزان <code>w</code> وأصفار للانحياز <code>b</code>، وإرفاق التدرجات بها.</li><li><b>تعريف النموذج والخسارة:</b> برمجة دالة الضرب النقطي <code>np.dot(X, w) + b</code> ودالة الخطأ التربيعي.</li><li><b>حلقة التدريب:</b> المرور عبر البيانات (Epochs)، حساب التدرجات باستخدام <code>backward()</code>، وتحديث المعلمات باستخدام دالة <code>sgd</code>.</li></ol></template>
+    <template class="content-en"><p>Implementation from scratch involves the following steps:</p><ol><li><b>Generating Data:</b> Creating synthetic data <code>y = Xw + b + noise</code> to test the model.</li><li><b>Reading Data:</b> A <code>data_iter</code> function to shuffle and yield minibatches.</li><li><b>Initializing Parameters:</b> Setting random initial values for weights <code>w</code> and zeros for bias <code>b</code>, and attaching gradients.</li><li><b>Defining Model & Loss:</b> Coding the dot product <code>np.dot(X, w) + b</code> and the squared loss function.</li><li><b>Training Loop:</b> Iterating over <span class="smart-term" data-term-en="Epoch" data-ar="حقبة (دورة تدريبية)" data-en-def="One complete pass through the entire training dataset.">epoch<span class="smart-term-tooltip"></span></span>s, computing gradients via <code>backward()</code>, and updating parameters using the <code>sgd</code> function.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا النهج ضروري لفهم الآليات الداخلية للتعلم العميق. يوضح كيف تتدفق البيانات (Forward pass)، وكيف تُحسب الأخطاء، وكيف تتدفق التدرجات عكسياً (Backpropagation).</p><p>في دالة <code>sgd</code>، نقوم بتقسيم التدرج على <code>batch_size</code> لتطبيع حجم الخطوة، بحيث لا يعتمد معدل التعلم بشكل كبير على حجم الحزمة المختار.</p></template>
+    <template class="content-en"><p>This approach is crucial for understanding the inner workings of deep learning. It shows how data flows forward, how errors are computed, and how gradients flow backward (Backpropagation).</p><p>In the <code>sgd</code> function, we divide the gradient by <code>batch_size</code> to normalize the step size, ensuring the learning rate doesn't depend heavily on the chosen batch size.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def sgd(params, lr, batch_size):
+    """Minibatch stochastic gradient descent."""
+    for param in params:
+        param[:] = param - lr * param.grad / batch_size</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في دالة SGD، لماذا نستخدم <code>param[:] = ...</code> بدلاً من <code>param = ...</code>؟</template>
+      <template class="content-en">In the SGD function, why do we use <code>param[:] = ...</code> instead of <code>param = ...</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>استخدام <code>param[:]</code> يقوم بتحديث القيم في نفس موقع الذاكرة (In-place update)، وهو أمر ضروري للحفاظ على ارتباط المتغير بآلية الاشتقاق التلقائي. التعيين المباشر سيخلق متغيراً جديداً ويفقد التدرجات.</p></template>
+      <template class="content-en"><p>Using <code>param[:]</code> performs an in-place update, modifying the values in the existing memory location. This is required to keep the parameter tied to the auto-differentiation graph. Direct assignment would create a new tensor and lose the gradient history.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="concise-implementation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التنفيذ الموجز (باستخدام واجهات برمجة التطبيقات)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Concise Implementation of Linear Regression</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام واجهات برمجة التطبيقات (APIs) عالية المستوى مثل Gluon/MXNet لبناء وتدريب النماذج بكود أقل وبكفاءة أعلى.</p></template>
+    <template class="content-en"><p>Using high-level APIs like Gluon/MXNet to build and train models with less boilerplate code and higher efficiency.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>توفر أطر التعلم العميق أدوات جاهزة تبسط العملية:</p><ul><li><b>البيانات:</b> استخدام <code>DataLoader</code> لقراءة وخلط البيانات بكفاءة.</li><li><b>النموذج:</b> استخدام <code>nn.Sequential()</code> لتجميع الطبقات، و <code>nn.Dense(1)</code> لإنشاء طبقة متصلة بالكامل بمخرج واحد.</li><li><b>التهيئة:</b> استخدام وحدة <code>init</code> لتهيئة الأوزان (مثال: <code>init.Normal(sigma=0.01)</code>).</li><li><b>الخسارة والمُحسِّن:</b> استخدام <code>gluon.loss.L2Loss()</code> و <code>gluon.Trainer</code> مع خوارزمية <code>sgd</code>.</li></ul></template>
+    <template class="content-en"><p>Deep learning frameworks provide predefined tools that simplify the process:</p><ul><li><b>Data:</b> Using <code>DataLoader</code> to efficiently read and shuffle data.</li><li><b>Model:</b> Using <code>nn.Sequential()</code> to chain layers, and <code>nn.Dense(1)</code> for a fully-connected layer with 1 output.</li><li><b>Initialization:</b> Using the <code>init</code> module (e.g., <code>init.Normal(sigma=0.01)</code>).</li><li><b>Loss & Optimizer:</b> Using <code>gluon.loss.L2Loss()</code> and <code>gluon.Trainer</code> with the <code>sgd</code> algorithm.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ميزة قوية في Gluon هي <b><span class="smart-term" data-term-en="Deferred Initialization" data-ar="التهيئة المؤجلة" data-en-def="A feature where the framework waits to initialize parameters until the first forward pass, allowing it to automatically infer input dimensions.">التهيئة المؤجلة<span class="smart-term-tooltip"></span></span> (Deferred Initialization)</b>. لا نحتاج إلى تحديد أبعاد الإدخال لطبقة <code>Dense</code> عند إنشائها. يكتشف الإطار الأبعاد تلقائياً عند تمرير أول حزمة بيانات عبر الشبكة.</p><p>هذا يقلل من الأخطاء البرمجية ويجعل الكود أكثر مرونة عند تغيير حجم البيانات المدخلة.</p></template>
+    <template class="content-en"><p>A powerful feature in Gluon is <b><span class="smart-term" data-term-en="Deferred Initialization" data-ar="التهيئة المؤجلة" data-en-def="A feature where the framework waits to initialize parameters until the first forward pass, allowing it to automatically infer input dimensions.">Deferred Initialization<span class="smart-term-tooltip"></span></span></b>.</p><p>We don't need to specify the input dimensions for the <code>Dense</code> layer upon creation. The framework infers it automatically during the first forward pass.</p><p>This reduces boilerplate code and makes the architecture more flexible to changes in input data shapes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from mxnet.gluon import nn
+net = nn.Sequential()
+net.add(nn.Dense(1))
+net.initialize(init.Normal(sigma=0.01))
+trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي ميزة استخدام <code>DataLoader</code> المدمج بدلاً من كتابة دالة <code>data_iter</code> الخاصة بنا؟</template>
+      <template class="content-en">What is the advantage of using the built-in <code>DataLoader</code> instead of writing our own <code>data_iter</code> function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الـ <code>DataLoader</code> المدمج مُحسّن بشكل كبير، يمكنه تحميل البيانات بالتوازي باستخدام عمليات متعددة (Multiprocessing)، ويتعامل بكفاءة مع البيانات المخزنة في الملفات أو المتدفقة، مما يمنع اختناقات الذاكرة.</p></template>
+      <template class="content-en"><p>The built-in <code>DataLoader</code> is highly optimized, can load data in parallel using multiple workers, and efficiently handles data stored in files or streams, preventing memory bottlenecks.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في عالم التعلم العميق. اليوم نضع حجر الأساس: الانحدار الخطي. قد يبدو بسيطاً، لكنه جوهر كل ما سنبنيه لاحقاً. تخيلوا أننا نحاول رسم خط يمر بأقرب نقطة ممكنة من مجموعة بيانات متناثرة. كيف نعرف أن الخط جيد؟ نستخدم 'دالة الخسارة' (الخطأ التربيعي). كيف نحسن هذا الخط؟ نستخدم 'الانحدار الاشتقاقي العشوائي' (Minibatch SGD) للنزول تدريجياً نحو أقل خطأ ممكن. في الامتحان، ركزوا جيداً على الفرق بين المعلمات (الأوزان والانحياز) التي يتعلمها النموذج، والمعلمات الفائقة (معدل التعلم وحجم الحزمة) التي نحددها نحن. تذكروا أيضاً أن التوجيه (Vectorization) هو سر السرعة، وأن الانحدار الخطي ما هو إلا شبكة عصبية بطبقة واحدة. فهمكم لكيفية بناء هذا من الصفر سيجعل استخدام المكتبات الجاهزة (مثل Gluon) لاحقاً أمراً بديهياً. بالتوفيق!</template>
+    <template class="content-en">Welcome, future engineers, to the world of Deep Learning. Today we lay the foundation: Linear Regression. It might seem simple, but it's the core of everything we will build. Imagine trying to draw a line as close as possible to a scatter of data points. How do we know the line is good? We use a 'Loss Function' (Squared Error). How do we improve it? We use 'Minibatch SGD' to step down towards the lowest possible error. For the exam, focus heavily on the difference between parameters (weights, bias) that the model learns, and hyperparameters (learning rate, batch size) that we set. Remember that Vectorization is the secret to speed, and that linear regression is just a single-layer neural network. Understanding how to build this from scratch will make using high-level APIs (like Gluon) intuitive. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم الحل التحليلي (Analytic Solution) دائماً طالما أنه يعطي النتيجة الدقيقة؟</template>
+          <template class="content-en">Why don't we always use the Analytic Solution since it gives the exact result?</template>
+          <span class="content-target">لماذا لا نستخدم الحل التحليلي (Analytic Solution) دائماً طالما أنه يعطي النتيجة الدقيقة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يتطلب حساب معكوس المصفوفة (Matrix Inversion)، وهي عملية مكلفة جداً \((O(n^3))\) عندما يكون عدد الميزات كبيراً. كما أنه لا ينطبق على النماذج غير الخطية التي سنستخدمها في التعلم العميق.</template>
+          <template class="content-en">Because it requires matrix inversion, which is computationally very expensive \((O(n^3))\) when the number of features is large. Also, it does not apply to the non-linear models we will use in deep learning.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين المعلمات (Parameters) والمعلمات الفائقة (Hyperparameters)؟</template>
+          <template class="content-en">What is the difference between Parameters and Hyperparameters?</template>
+          <span class="content-target">ما هو الفرق بين المعلمات (Parameters) والمعلمات الفائقة (Hyperparameters)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المعلمات (مثل الأوزان والانحياز) يتعلمها النموذج ويحدثها تلقائياً أثناء التدريب. المعلمات الفائقة (مثل معدل التعلم وحجم الحزمة) نحددها نحن يدوياً قبل بدء التدريب.</template>
+          <template class="content-en">Parameters (like weights and bias) are learned and updated automatically by the model during training. Hyperparameters (like learning rate and batch size) are set manually by us before training begins.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم 'الحزم الصغيرة' (Minibatches) بدلاً من تحديث الأوزان بعد كل مثال واحد؟</template>
+          <template class="content-en">Why do we use 'Minibatches' instead of updating weights after every single example?</template>
+          <span class="content-target">لماذا نستخدم 'الحزم الصغيرة' (Minibatches) بدلاً من تحديث الأوزان بعد كل مثال واحد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التحديث بعد كل مثال (Stochastic Gradient Descent النقي) يكون صاخباً جداً وغير مستقر، ولا يستفيد من التوجيه (Vectorization). الحزم الصغيرة توفر تدرجاً أكثر استقراراً وتسمح بحسابات متوازية سريعة.</template>
+          <template class="content-en">Updating after every example (pure SGD) is very noisy, unstable, and fails to leverage vectorization. Minibatches provide a more stable gradient and allow for fast parallel computations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني 'التهيئة المؤجلة' (Deferred Initialization) ولماذا هي مفيدة؟</template>
+          <template class="content-en">What does 'Deferred Initialization' mean and why is it useful?</template>
+          <span class="content-target">ماذا تعني 'التهيئة المؤجلة' (Deferred Initialization) ولماذا هي مفيدة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعني أن إطار العمل يؤجل إنشاء مصفوفات الأوزان حتى تمرير أول دفعة من البيانات. هذا مفيد لأنه يعفينا من حساب وتحديد أبعاد الإدخال لكل طبقة يدوياً.</template>
+          <template class="content-en">It means the framework delays creating weight matrices until the first batch of data is passed. This is useful because it frees us from manually calculating and specifying input dimensions for every layer.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي العلاقة بين التوزيع الطبيعي (Gaussian) والخطأ التربيعي؟</template>
+          <template class="content-en">What is the relationship between the Normal (Gaussian) distribution and Squared Error?</template>
+          <span class="content-target">ما هي العلاقة بين التوزيع الطبيعي (Gaussian) والخطأ التربيعي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا افترضنا أن الضوضاء في بياناتنا تتبع توزيعاً طبيعياً، فإن تطبيق مبدأ 'تقدير الاحتمالية القصوى' (MLE) يقودنا رياضياً إلى نفس معادلة تقليل الخطأ التربيعي.</template>
+          <template class="content-en">If we assume the noise in our data follows a normal distribution, applying the principle of Maximum Likelihood Estimation (MLE) mathematically leads us to the exact same equation as minimizing the squared error.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في كود التدريب، لماذا نقسم التدرج على حجم الحزمة (batch_size)؟</template>
+          <template class="content-en">In the training code, why do we divide the gradient by the batch_size?</template>
+          <span class="content-target">في كود التدريب، لماذا نقسم التدرج على حجم الحزمة (batch_size)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لتطبيع (Normalize) حجم خطوة التحديث. هذا يضمن أن معدل التعلم لا يحتاج إلى تعديل جذري إذا قررنا تغيير حجم الحزمة لاحقاً.</template>
+          <template class="content-en">To normalize the update step size. This ensures that the learning rate doesn't need drastic adjustment if we decide to change the batch size later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمثل الانحدار الخطي شبكة عصبية؟</template>
+          <template class="content-en">How does linear regression represent a neural network?</template>
+          <span class="content-target">كيف يمثل الانحدار الخطي شبكة عصبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكن اعتباره شبكة عصبية ذات طبقة واحدة متصلة بالكامل (Dense Layer)، حيث ترتبط جميع المدخلات (الميزات) بمخرج واحد عبر أوزان، ويضاف إليها انحياز.</template>
+          <template class="content-en">It can be viewed as a single-layer fully-connected (Dense) neural network, where all inputs (features) are connected to a single output via weights, with an added bias.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور دالة <code>autograd.record()</code> في الكود؟</template>
+          <template class="content-en">What is the role of the <code>autograd.record()</code> function in the code?</template>
+          <span class="content-target">ما هو دور دالة <code>autograd.record()</code> في الكود؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تخبر إطار العمل ببدء تسجيل العمليات الحسابية التي تتم داخل نطاقها، وذلك لبناء الرسم البياني الحسابي (Computational Graph) اللازم لحساب التدرجات لاحقاً.</template>
+          <template class="content-en">It tells the framework to start recording the mathematical operations performed within its scope, building the computational graph needed to calculate gradients later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا كان معدل التعلم (Learning Rate) كبيراً جداً؟</template>
+          <template class="content-en">What happens if the Learning Rate is too large?</template>
+          <span class="content-target">ماذا يحدث إذا كان معدل التعلم (Learning Rate) كبيراً جداً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سيأخذ المُحسِّن خطوات كبيرة جداً، مما قد يؤدي إلى تجاوز الحد الأدنى لدالة الخسارة، وبالتالي يتذبذب النموذج أو يتباعد (Diverge) بدلاً من أن يتعلم.</template>
+          <template class="content-en">The optimizer will take steps that are too large, potentially overshooting the minimum of the loss function, causing the model to oscillate or diverge instead of learning.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم التوجيه (Vectorization) بدلاً من حلقات for؟</template>
+          <template class="content-en">Why do we use Vectorization instead of for-loops?</template>
+          <span class="content-target">لماذا نستخدم التوجيه (Vectorization) بدلاً من حلقات for؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">حلقات for في بايثون بطيئة بسبب طبيعة اللغة المفسرة. التوجيه يدفع العمليات إلى مكتبات C/C++ منخفضة المستوى ويستفيد من التوازي في الأجهزة (SIMD/GPUs)، مما يسرع الكود بشكل هائل.</template>
+          <template class="content-en">Python for-loops are slow due to the interpreted nature of the language. Vectorization pushes operations to low-level C/C++ libraries and leverages hardware parallelism (SIMD/GPUs), speeding up the code massively.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الانحدار الخطي (Linear Regression)",
+      "en": "Linear Regression"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة من الطرق لنمذجة العلاقة بين متغيرات مستقلة ومتغير تابع بافتراض علاقة خطية.",
+        "en": "A set of methods for modeling the relationship between independent variables and a dependent variable assuming a linear relationship."
+      },
+      "example": {
+        "ar": "التنبؤ بأسعار المنازل بناءً على المساحة والعمر.",
+        "en": "Predicting house prices based on area and age."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الأوزان (Weights)",
+      "en": "Weights"
+    },
+    "back": {
+      "definition": {
+        "ar": "المعلمات التي تحدد تأثير كل ميزة مدخلة على التنبؤ النهائي.",
+        "en": "Parameters that determine the influence of each input feature on the final prediction."
+      },
+      "example": {
+        "ar": "وزن مساحة المنزل في معادلة السعر.",
+        "en": "The weight of the house area in the price equation."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الانحياز (Bias / Offset)",
+      "en": "Bias (Offset)"
+    },
+    "back": {
+      "definition": {
+        "ar": "القيمة التي يتخذها التنبؤ عندما تكون جميع الميزات المدخلة صفراً.",
+        "en": "The value the predicted output should take when all features take the value 0."
+      },
+      "example": {
+        "ar": "السعر الأساسي للأرض حتى لو لم يكن هناك بناء.",
+        "en": "The base price of the land even if there is no building."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "التحويل التآلفي (Affine Transformation)",
+      "en": "Affine Transformation"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل خطي للميزات عبر مجموع مرجح، مدمج مع إزاحة عبر الانحياز المضاف.",
+        "en": "A linear transformation of features via weighted sum, combined with a translation via the added bias."
+      },
+      "example": {
+        "ar": "المعادلة y = Xw + b",
+        "en": "The equation y = Xw + b"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مصفوفة التصميم (Design Matrix)",
+      "en": "Design Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة تحتوي على صف لكل مثال في مجموعة البيانات وعمود لكل ميزة.",
+        "en": "A matrix containing one row for every example and one column for every feature in the dataset."
+      },
+      "example": {
+        "ar": "مصفوفة X بأبعاد n × d.",
+        "en": "Matrix X with dimensions n × d."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "دالة الخسارة (Loss Function)",
+      "en": "Loss Function"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تقيس المسافة بين القيمة الحقيقية والقيمة المتوقعة للهدف.",
+        "en": "A function that quantifies the distance between the real and predicted value of the target."
+      },
+      "example": {
+        "ar": "الخطأ التربيعي (Squared Error).",
+        "en": "Squared Error."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "الخطأ التربيعي (Squared Error)",
+      "en": "Squared Error"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة خسارة تحسب مربع الفرق بين التوقع والقيمة الحقيقية.",
+        "en": "A loss function that calculates the square of the difference between the prediction and the true value."
+      },
+      "example": {
+        "ar": "1/2 * (y_hat - y)^2",
+        "en": "1/2 * (y_hat - y)^2"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الحل التحليلي (Analytic Solution)",
+      "en": "Analytic Solution"
+    },
+    "back": {
+      "definition": {
+        "ar": "صيغة رياضية مغلقة تحسب المعلمات المثلى مباشرة عن طريق مساواة المشتقة بالصفر.",
+        "en": "A closed-form mathematical formula that calculates optimal parameters directly by setting the derivative to zero."
+      },
+      "example": {
+        "ar": "w* = \\((X^T X)^{-1} X^T y\\)",
+        "en": "w* = \\((X^T X)^{-1} X^T y\\)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الانحدار الاشتقاقي (Gradient Descent)",
+      "en": "Gradient Descent"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تحسين تقلل الخطأ تكرارياً بتحديث المعلمات في اتجاه التدرج السالب لدالة الخسارة.",
+        "en": "An optimization technique that iteratively reduces error by updating parameters in the direction of the negative gradient of the loss function."
+      },
+      "example": {
+        "ar": "النزول خطوة بخطوة نحو قاع الوادي.",
+        "en": "Taking steps down a valley to reach the bottom."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "الانحدار الاشتقاقي العشوائي للحزم الصغيرة (Minibatch SGD)",
+      "en": "Minibatch SGD"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسخة من الانحدار الاشتقاقي تحسب التحديثات باستخدام عينة عشوائية صغيرة من البيانات بدلاً من المجموعة كاملة.",
+        "en": "A variant of gradient descent that computes updates using a small random sample of data rather than the entire dataset."
+      },
+      "example": {
+        "ar": "تحديث الأوزان بعد رؤية 32 مثالاً فقط.",
+        "en": "Updating weights after seeing only 32 examples."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "المعلمات الفائقة (Hyperparameters)",
+      "en": "Hyperparameters"
+    },
+    "back": {
+      "definition": {
+        "ar": "معلمات يتم تحديدها يدوياً قبل التدريب ولا يتم تحديثها بواسطة خوارزمية التحسين.",
+        "en": "Parameters that are manually pre-specified and not updated in the training loop."
+      },
+      "example": {
+        "ar": "معدل التعلم، حجم الحزمة.",
+        "en": "Learning rate, batch size."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "معدل التعلم (Learning Rate)",
+      "en": "Learning Rate"
+    },
+    "back": {
+      "definition": {
+        "ar": "قيمة موجبة تحدد حجم الخطوة التي يتخذها المُحسِّن في كل تكرار.",
+        "en": "A positive value determining the step size the optimizer takes at each iteration."
+      },
+      "example": {
+        "ar": "lr = 0.03",
+        "en": "lr = 0.03"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "التوجيه (Vectorization)",
+      "en": "Vectorization"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام مكتبات الجبر الخطي لمعالجة مصفوفات كاملة في وقت واحد لتسريع الحسابات.",
+        "en": "Leveraging linear algebra libraries to process whole matrices simultaneously to speed up calculations."
+      },
+      "example": {
+        "ar": "استخدام a + b في NumPy بدلاً من حلقة for.",
+        "en": "Using a + b in NumPy instead of a for-loop."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "تقدير الاحتمالية القصوى (MLE)",
+      "en": "Maximum Likelihood Estimation"
+    },
+    "back": {
+      "definition": {
+        "ar": "مبدأ لاختيار المعلمات التي تجعل البيانات المرصودة هي الأكثر احتمالاً للحدوث.",
+        "en": "A principle for choosing parameters that make the observed data most probable."
+      },
+      "example": {
+        "ar": "تقليل الخطأ التربيعي يكافئ MLE بافتراض ضوضاء غاوسية.",
+        "en": "Minimizing squared error is equivalent to MLE assuming Gaussian noise."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "الطبقة الكثيفة (Dense Layer)",
+      "en": "Dense Layer"
+    },
+    "back": {
+      "definition": {
+        "ar": "طبقة في الشبكة العصبية حيث يكون كل مدخل متصلاً بكل مخرج.",
+        "en": "A neural network layer where every input is connected to every output."
+      },
+      "example": {
+        "ar": "nn.Dense(1) في Gluon.",
+        "en": "nn.Dense(1) in Gluon."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "التهيئة المؤجلة (Deferred Initialization)",
+      "en": "Deferred Initialization"
+    },
+    "back": {
+      "definition": {
+        "ar": "ميزة في بعض الأطر تؤجل تهيئة الأوزان حتى التمريرة الأمامية الأولى لاستنتاج أبعاد الإدخال تلقائياً.",
+        "en": "A feature where weight initialization is delayed until the first forward pass to automatically infer input dimensions."
+      },
+      "example": {
+        "ar": "عدم الحاجة لتحديد حجم الإدخال عند تعريف nn.Dense().",
+        "en": "Not needing to specify input size when defining nn.Dense()."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من مصطلح الانحياز (Bias) في نموذج الانحدار الخطي؟",
+      "en": "What is the primary purpose of the bias term in a linear regression model?"
+    },
+    "options": {
+      "ar": [
+        "تحديد تأثير كل ميزة على المخرجات.",
+        "السماح للنموذج بالتنبؤ بقيمة غير صفرية عندما تكون جميع الميزات صفراً.",
+        "تقليل التباين في مجموعة البيانات.",
+        "تحويل النموذج الخطي إلى نموذج غير خطي."
+      ],
+      "en": [
+        "To determine the influence of each feature on the output.",
+        "To allow the model to predict a non-zero value when all features are zero.",
+        "To reduce the variance in the dataset.",
+        "To transform the linear model into a non-linear model."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الانحياز يمثل الإزاحة (Translation) في التحويل التآلفي، مما يمنع الخط من الانجبار على المرور عبر نقطة الأصل.",
+      "en": "The bias represents the translation in the affine transformation, preventing the line from being forced through the origin."
+    },
+    "hint": {
+      "ar": "فكر في معادلة الخط المستقيم y = mx + c. ماذا يمثل c؟",
+      "en": "Think of the line equation y = mx + c. What does c represent?"
+    },
+    "difficulty": "easy",
+    "conceptId": "linear-regression-basics"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "لماذا يتم ضرب دالة الخطأ التربيعي بالثابت 1/2؟",
+      "en": "Why is the squared error loss function multiplied by the constant 1/2?"
+    },
+    "options": {
+      "ar": [
+        "لتقليل قيمة الخسارة النهائية.",
+        "لمنع التجهيز الزائد (Overfitting).",
+        "لتبسيط العمليات الرياضية عند حساب المشتقة.",
+        "لأنها متطلب أساسي لتقدير الاحتمالية القصوى."
+      ],
+      "en": [
+        "To reduce the final loss value.",
+        "To prevent overfitting.",
+        "To simplify mathematical operations when calculating the derivative.",
+        "Because it is a strict requirement for Maximum Likelihood Estimation."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الثابت 1/2 يلغي الأس 2 عند اشتقاق الدالة، مما يجعل معادلة التدرج أبسط ولا يؤثر على موقع الحد الأدنى.",
+      "en": "The 1/2 constant cancels out the exponent 2 when deriving the function, making the gradient equation simpler without affecting the minimum's location."
+    },
+    "hint": {
+      "ar": "ما هي مشتقة \\(x^2\\)؟",
+      "en": "What is the derivative of \\(x^2\\)?"
+    },
+    "difficulty": "medium",
+    "conceptId": "squared-loss-function"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي مما يلي يُعتبر معلمة فائقة (Hyperparameter)؟",
+      "en": "Which of the following is considered a hyperparameter?"
+    },
+    "options": {
+      "ar": [
+        "الأوزان (Weights)",
+        "الانحياز (Bias)",
+        "معدل التعلم (Learning Rate)",
+        "التوقعات (Predictions)"
+      ],
+      "en": [
+        "Weights",
+        "Bias",
+        "Learning Rate",
+        "Predictions"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعلمات الفائقة هي القيم التي نحددها يدوياً قبل التدريب (مثل معدل التعلم وحجم الحزمة)، بينما الأوزان والانحياز هي معلمات يتعلمها النموذج.",
+      "en": "Hyperparameters are values set manually before training (like learning rate and batch size), whereas weights and bias are parameters learned by the model."
+    },
+    "hint": {
+      "ar": "ابحث عن القيمة التي لا يتم تحديثها بواسطة خوارزمية التحسين.",
+      "en": "Look for the value that is not updated by the optimization algorithm."
+    },
+    "difficulty": "easy",
+    "conceptId": "minibatch-sgd"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "لماذا نستخدم الانحدار الاشتقاقي العشوائي للحزم الصغيرة (Minibatch SGD) بدلاً من استخدام مجموعة البيانات بأكملها في كل خطوة؟",
+      "en": "Why do we use Minibatch SGD instead of using the entire dataset at each step?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يضمن العثور على الحد الأدنى العالمي دائماً.",
+        "لأن استخدام مجموعة البيانات بأكملها بطيء جداً ومكلف حسابياً.",
+        "لأنه يقلل من عدد المعلمات الفائقة المطلوبة.",
+        "لأنه يسمح لنا بالاستغناء عن دالة الخسارة."
+      ],
+      "en": [
+        "Because it always guarantees finding the global minimum.",
+        "Because using the entire dataset is extremely slow and computationally expensive.",
+        "Because it reduces the number of required hyperparameters.",
+        "Because it allows us to discard the loss function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حساب التدرج على مجموعة البيانات بأكملها (Full Batch) يتطلب وقتاً طويلاً قبل إجراء تحديث واحد. الحزم الصغيرة توفر توازناً بين سرعة التحديث واستقرار التدرج.",
+      "en": "Computing the gradient on the full dataset takes too long before making a single update. Minibatches offer a balance between update speed and gradient stability."
+    },
+    "hint": {
+      "ar": "فكر في الكفاءة والسرعة عند التعامل مع ملايين السجلات.",
+      "en": "Think about efficiency and speed when dealing with millions of records."
+    },
+    "difficulty": "medium",
+    "conceptId": "minibatch-sgd"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الفائدة الرئيسية للتوجيه (Vectorization) في كتابة كود التعلم العميق؟",
+      "en": "What is the main benefit of Vectorization in writing deep learning code?"
+    },
+    "options": {
+      "ar": [
+        "يقلل من حجم الذاكرة المطلوبة لتخزين البيانات.",
+        "يوفر تسريعاً هائلاً عن طريق تجنب حلقات for البطيئة في بايثون.",
+        "يحسن دقة النموذج بشكل مباشر.",
+        "يسمح للنموذج بتعلم علاقات غير خطية."
+      ],
+      "en": [
+        "It reduces the memory required to store data.",
+        "It provides order-of-magnitude speedups by avoiding slow Python for-loops.",
+        "It directly improves the model's accuracy.",
+        "It allows the model to learn non-linear relationships."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوجيه يستفيد من مكتبات الجبر الخطي المحسنة (مثل NumPy) لمعالجة المصفوفات بالتوازي، مما يسرع العمليات الحسابية بشكل كبير.",
+      "en": "Vectorization leverages optimized linear algebra libraries (like NumPy) to process matrices in parallel, drastically speeding up computations."
+    },
+    "hint": {
+      "ar": "قارن بين تنفيذ عملية رياضية عنصراً بعنصر مقابل تنفيذها ككتلة واحدة.",
+      "en": "Compare executing a math operation element-by-element vs. as a single block."
+    },
+    "difficulty": "easy",
+    "conceptId": "vectorization-speed"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "تقليل الخطأ التربيعي يكافئ رياضياً تقدير الاحتمالية القصوى (MLE) تحت أي افتراض؟",
+      "en": "Minimizing squared error is mathematically equivalent to Maximum Likelihood Estimation (MLE) under what assumption?"
+    },
+    "options": {
+      "ar": [
+        "البيانات خالية تماماً من الضوضاء.",
+        "الضوضاء تتبع توزيعاً منتظماً (Uniform Distribution).",
+        "الضوضاء تتبع توزيعاً طبيعياً (Gaussian Distribution).",
+        "العلاقة بين الميزات والهدف غير خطية."
+      ],
+      "en": [
+        "The data is completely noise-free.",
+        "The noise follows a Uniform Distribution.",
+        "The noise follows a Normal (Gaussian) Distribution.",
+        "The relationship between features and target is non-linear."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إذا افترضنا أن الأخطاء (الضوضاء) موزعة طبيعياً، فإن تعظيم احتمالية البيانات يؤدي رياضياً إلى نفس معادلة تقليل الخطأ التربيعي.",
+      "en": "If we assume errors (noise) are normally distributed, maximizing the likelihood of the data mathematically simplifies to minimizing the squared error."
+    },
+    "hint": {
+      "ar": "تذكر شكل المنحنى الجرسي (Bell curve).",
+      "en": "Remember the shape of the bell curve."
+    },
+    "difficulty": "hard",
+    "conceptId": "normal-distribution-mle"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كم عدد الطبقات في الشبكة العصبية التي تمثل نموذج الانحدار الخطي؟",
+      "en": "How many layers are in a neural network that represents a linear regression model?"
+    },
+    "options": {
+      "ar": [
+        "0",
+        "1",
+        "2",
+        "يعتمد على عدد الميزات."
+      ],
+      "en": [
+        "0",
+        "1",
+        "2",
+        "Depends on the number of features."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الانحدار الخطي يمثل شبكة عصبية ذات طبقة واحدة (Single-layer). لا يتم حساب طبقة الإدخال ضمن عدد الطبقات.",
+      "en": "Linear regression represents a single-layer neural network. The input layer is not counted in the total number of layers."
+    },
+    "hint": {
+      "ar": "هل نعد طبقة الإدخال عند حساب طبقات الشبكة؟",
+      "en": "Do we count the input layer when calculating network layers?"
+    },
+    "difficulty": "medium",
+    "conceptId": "linear-regression-neural-network"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي ميزة 'التهيئة المؤجلة' (Deferred Initialization) في أطر العمل مثل Gluon؟",
+      "en": "What is the advantage of 'Deferred Initialization' in frameworks like Gluon?"
+    },
+    "options": {
+      "ar": [
+        "تسمح بتدريب النموذج بدون دالة خسارة.",
+        "تستنتج تلقائياً أبعاد الإدخال للطبقات عند التمريرة الأمامية الأولى.",
+        "تمنع الحاجة إلى استخدام الانحدار الاشتقاقي.",
+        "تقوم بتهيئة الأوزان بأصفار دائماً لتسريع التدريب."
+      ],
+      "en": [
+        "It allows training the model without a loss function.",
+        "It automatically infers input dimensions for layers during the first forward pass.",
+        "It eliminates the need for gradient descent.",
+        "It always initializes weights to zeros to speed up training."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التهيئة المؤجلة تعني أنك لست مضطراً لتحديد حجم الإدخال عند تعريف الطبقة (مثل nn.Dense(1)). الإطار يكتشف ذلك بمجرد تمرير البيانات لأول مرة.",
+      "en": "Deferred initialization means you don't have to specify the input size when defining a layer (like nn.Dense(1)). The framework figures it out once data is passed through."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا لم تخبر الطبقة بعدد الميزات المدخلة مسبقاً؟",
+      "en": "What happens if you don't tell the layer the number of input features beforehand?"
+    },
+    "difficulty": "medium",
+    "conceptId": "concise-implementation"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في كود التدريب من الصفر، ما هو دور الدالة <code>l.backward()</code>؟",
+      "en": "In the from-scratch training code, what is the role of the <code>l.backward()</code> function?"
+    },
+    "options": {
+      "ar": [
+        "تحديث الأوزان والانحياز.",
+        "حساب التدرجات (المشتقات) للخسارة بالنسبة للمعلمات.",
+        "حساب التوقع (Forward pass).",
+        "إعادة تعيين التدرجات إلى الصفر."
+      ],
+      "en": [
+        "To update the weights and bias.",
+        "To compute the gradients (derivatives) of the loss with respect to the parameters.",
+        "To compute the prediction (Forward pass).",
+        "To reset the gradients to zero."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة backward تقوم بتشغيل خوارزمية الانتشار الخلفي (Backpropagation) لحساب التدرجات وتخزينها في خاصية .grad الخاصة بالمعلمات.",
+      "en": "The backward function triggers backpropagation to compute the gradients and store them in the .grad attribute of the parameters."
+    },
+    "hint": {
+      "ar": "ماذا نحتاج أن نحسب قبل أن نتمكن من اتخاذ خطوة في الانحدار الاشتقاقي؟",
+      "en": "What do we need to calculate before we can take a step in gradient descent?"
+    },
+    "difficulty": "medium",
+    "conceptId": "implementation-from-scratch"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "إذا كان لدينا مجموعة بيانات تحتوي على 1000 مثال، وكل مثال يحتوي على ميزتين (Features)، فما هو شكل (Shape) مصفوفة التصميم X؟",
+      "en": "If we have a dataset with 1000 examples, and each example has 2 features, what is the shape of the design matrix X?"
+    },
+    "options": {
+      "ar": [
+        "2 × 1000",
+        "1000 × 1",
+        "1000 × 2",
+        "2 × 2"
+      ],
+      "en": [
+        "2 × 1000",
+        "1000 × 1",
+        "1000 × 2",
+        "2 × 2"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مصفوفة التصميم X تحتوي على صف لكل مثال وعمود لكل ميزة، لذا ستكون أبعادها n × d، أي 1000 × 2.",
+      "en": "The design matrix X contains a row for each example and a column for each feature, so its dimensions are n × d, which is 1000 × 2."
+    },
+    "hint": {
+      "ar": "تذكر: الصفوف للأمثلة، والأعمدة للميزات.",
+      "en": "Remember: Rows for examples, columns for features."
+    },
+    "difficulty": "easy",
+    "conceptId": "linear-regression-basics"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الحل التحليلي (Analytic Solution) هو الأفضل دائماً. في الواقع، يتطلب الحل التحليلي عكس مصفوفة، وهو أمر مكلف جداً حسابياً للبيانات الضخمة ولا ينطبق على النماذج غير الخطية في التعلم العميق.</template>
+    <template class="content-en">Believing the Analytic Solution is always best. In reality, it requires matrix inversion, which is computationally prohibitive for large datasets and inapplicable to non-linear deep learning models.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الثابت 1/2 في دالة الخطأ التربيعي ليس له أي تأثير على النتيجة النهائية للتدريب. وجوده هو مجرد 'حيلة رياضية' لتبسيط شكل المشتقة (التدرج) أثناء خوارزمية التحسين.</template>
+    <template class="content-en">The 1/2 constant in the squared error loss has no effect on the final training outcome. Its presence is merely a 'mathematical trick' to simplify the derivative (gradient) during optimization.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التوجيه (Vectorization) ليس مجرد تحسين اختياري للكود، بل هو ضرورة مطلقة. استخدام حلقات for في بايثون لتدريب النماذج سيجعل العملية بطيئة لدرجة تجعلها غير قابلة للاستخدام العملي.</template>
+    <template class="content-en">Vectorization is not just an optional code optimization; it is an absolute necessity. Using Python for-loops to train models makes the process impractically slow.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان استدعاء دالة التهيئة (Initialization) قبل تمرير البيانات للنموذج عند استخدام واجهات برمجة التطبيقات. سيؤدي هذا إلى خطأ لأن الأوزان لم يتم تخصيصها في الذاكرة بعد.</template>
+    <template class="content-en">Forgetting to call the initialization function before passing data to the model when using APIs. This will cause an error because weights haven't been allocated in memory yet.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التهيئة المؤجلة (Deferred Initialization) في Gluon تعني أنك تبني هيكل الشبكة دون القلق بشأن توافق أبعاد المصفوفات بين الطبقات؛ الإطار يحل هذه المشكلة ديناميكياً في أول تمريرة.</template>
+    <template class="content-en">Deferred Initialization in Gluon means you build the network architecture without worrying about matrix dimension compatibility between layers; the framework resolves this dynamically on the first pass.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

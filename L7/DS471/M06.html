@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أشجار القرار: التدريب والتصور · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#decision-trees-introduction" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في أشجار القرار</template>
+        <template class="content-en">Introduction to Decision Trees</template>
+        <span class="content-target">مقدمة في أشجار القرار</span>
+      </a>
+      <a href="#training-and-traversing" class="toc-link" data-bilingual>
+        <template class="content-ar">تدريب واجتياز أشجار القرار</template>
+        <template class="content-en">Training and Traversing Decision Trees</template>
+        <span class="content-target">تدريب واجتياز أشجار القرار</span>
+      </a>
+      <a href="#sklearn-implementation" class="toc-link" data-bilingual>
+        <template class="content-ar">تنفيذ أشجار القرار باستخدام Scikit-Learn</template>
+        <template class="content-en">Implementing Decision Trees with Scikit-Learn</template>
+        <span class="content-target">تنفيذ أشجار القرار باستخدام Scikit-Learn</span>
+      </a>
+      <a href="#visualizing-decision-trees" class="toc-link" data-bilingual>
+        <template class="content-ar">تصور أشجار القرار</template>
+        <template class="content-en">Visualizing Decision Trees</template>
+        <span class="content-target">تصور أشجار القرار</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أشجار القرار: التدريب والتصور</h1>
+      <p class="hero-description">مقدمة شاملة لخوارزميات أشجار القرار، بما في ذلك مفاهيم التدريب، التنفيذ باستخدام Scikit-Learn، وتقنيات التصور.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Decision Trees: Training and Visualization</h1>
+      <p class="hero-description">Comprehensive introduction to Decision Tree algorithms, including training concepts, implementation with Scikit-Learn, and visualization techniques.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">أشجار القرار</span>
+      <span class="tag">التصنيف</span>
+      <span class="tag">الانحدار</span>
+      <span class="tag">Scikit-Learn</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Decision Trees</span>
+      <span class="tag">Classification</span>
+      <span class="tag">Regression</span>
+      <span class="tag">Scikit-Learn</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح مزايا وعيوب أشجار القرار مقارنة بالنماذج الأخرى.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ شجرة قرار باستخدام مكتبة scikit-learn وتصور هيكلها.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات مثل التقليم والتوقف المبكر لمنع فرط التخصيص في أشجار القرار.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the advantages and disadvantages of decision trees compared to other models.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement a decision tree using scikit-learn and visualize its structure.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply techniques like pruning and early stopping to prevent overfitting in decision trees.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="decision-trees-introduction" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في أشجار القرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Decision Trees</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أشجار القرار هي خوارزميات تعلم آلي متعددة الاستخدامات تشبه المخطط الانسيابي، حيث تمثل كل عقدة قراراً يؤدي في النهاية إلى تصنيف أو قيمة.</p></template>
+    <template class="content-en"><p>Decision Trees are versatile, flowchart-like Machine Learning algorithms where each node represents a decision leading ultimately to a classification or value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أشجار القرار هي خوارزميات قوية قادرة على أداء مهام التصنيف (Classification)، الانحدار (Regression)، والمهام متعددة المخرجات (Multioutput tasks). تتميز بقدرتها على ملاءمة مجموعات البيانات المعقدة.</p><p>تعتبر هذه الخوارزميات المكونات الأساسية لنماذج الغابات العشوائية (Random Forests). في شجرة القرار، يتم تقسيم البيانات بناءً على قيم الميزات (Feature values). تمثل كل عقدة (Node) نقطة اتخاذ قرار، والهدف النهائي هو إنشاء فروع تؤدي إلى عقد طرفية نقية (Pure leaf nodes)، وهي العقد التي تنتمي فيها جميع العينات إلى فئة واحدة.</p></template>
+    <template class="content-en"><p>Decision Trees are powerful algorithms capable of performing classification, regression, and multioutput tasks. They are highly capable of fitting complex datasets.</p><p>These algorithms serve as the fundamental components of <span class="smart-term" data-term-en="Random Forest" data-ar="الغابة العشوائية" data-en-def="An ensemble learning method that operates by constructing a multitude of decision trees at training time.">Random Forest<span class="smart-term-tooltip"></span></span>s. In a decision tree, data is split based on feature values. Each node represents a decision point, and the ultimate goal is to create branches that lead to <span class="smart-term" data-term-en="Pure Leaf Node" data-ar="العقدة الطرفية النقية" data-en-def="A terminal node in a decision tree where all training instances belong to the exact same target class.">pure leaf node<span class="smart-term-tooltip"></span></span>s—nodes where all instances belong to a single class.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نهدف إلى العقد النقية؟ العقدة النقية تعني أن النموذج قد فصل البيانات بشكل مثالي بناءً على الميزات المتاحة، مما يقلل من عدم اليقين (الإنتروبيا) إلى الصفر في تلك العقدة.</p><p>من أهم ميزات أشجار القرار أنها نماذج الصندوق الأبيض (White-box models)، مما يعني أن قراراتها قابلة للتفسير البشري بسهولة، على عكس الشبكات العصبية.</p><p>ومع ذلك، فإن قدرتها العالية على ملاءمة البيانات المعقدة تجعلها عرضة بشكل كبير لمشكلة فرط التخصيص (Overfitting) إذا لم يتم التحكم في نموها.</p></template>
+    <template class="content-en"><p>Why aim for pure nodes? A pure node indicates that the model has perfectly separated the data based on the available features, reducing uncertainty (entropy or Gini impurity) to zero at that specific node.</p><p>One of the most significant advantages of Decision Trees is that they are white-box models. This means their decision-making process is highly interpretable by humans, unlike black-box models such as neural networks.</p><p>However, their high capacity to fit complex datasets makes them extremely prone to overfitting if their growth is left unconstrained.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a hierarchical tree diagram representing a Decision Tree. Top node (Root) splits into two branches. Each branch leads to an internal node, which further splits into Leaf nodes. Use distinct colors for Root (blue), Internal Nodes (yellow), and Leaf Nodes (green). Add labels 'Root Node', 'Decision Node', and 'Pure Leaf Node'. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="rootGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-400)" />
+      <stop offset="100%" stop-color="var(--brand-300)" />
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <!-- Title -->
+    <text x="400" y="25" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Decision Tree Architecture</text>
+    <text x="400" y="25" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">هيكلية شجرة القرار</text>
+
+    <!-- Edges (Paths) -->
+    <path d="M 400 110 C 400 145, 210 145, 210 177" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 400 110 C 400 145, 590 145, 590 177" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <path d="M 210 240 C 210 275, 110 275, 110 307" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 210 240 C 210 275, 290 275, 290 307" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <path d="M 590 240 C 590 275, 510 275, 510 307" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 590 240 C 590 275, 690 275, 690 307" fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Edge Labels (Badges) -->
+    <!-- Root to Decision L -->
+    <rect x="280" y="133" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="305" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">True</text>
+    <text x="305" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">صحيح</text>
+
+    <!-- Root to Decision R -->
+    <rect x="470" y="133" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="495" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">False</text>
+    <text x="495" y="150" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">خطأ</text>
+
+    <!-- Decision L to Leaf 1 -->
+    <rect x="135" y="263" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="160" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">True</text>
+    <text x="160" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">صحيح</text>
+
+    <!-- Decision L to Leaf 2 -->
+    <rect x="225" y="263" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="250" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">False</text>
+    <text x="250" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">خطأ</text>
+
+    <!-- Decision R to Leaf 3 -->
+    <rect x="525" y="263" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="550" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">True</text>
+    <text x="550" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">صحيح</text>
+
+    <!-- Decision R to Leaf 4 -->
+    <rect x="615" y="263" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="640" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">False</text>
+    <text x="640" y="280" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">خطأ</text>
+
+    <!-- Nodes -->
+    <!-- Root Node -->
+    <rect x="320" y="50" width="160" height="60" rx="8" fill="url(#rootGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="74" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Root Node</text>
+    <text x="400" y="74" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">العقدة الجذرية</text>
+    <text x="400" y="94" text-anchor="middle" font-size="13" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-en">(Entire Dataset)</text>
+    <text x="400" y="94" text-anchor="middle" font-size="13" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-ar">(مجموعة البيانات كاملة)</text>
+
+    <!-- Decision Node Left -->
+    <rect x="130" y="180" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="210" y="204" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Decision Node</text>
+    <text x="210" y="204" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">عقدة قرار</text>
+    <text x="210" y="224" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Feature Test)</text>
+    <text x="210" y="224" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(اختبار خاصية)</text>
+
+    <!-- Decision Node Right -->
+    <rect x="510" y="180" width="160" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="590" y="204" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Decision Node</text>
+    <text x="590" y="204" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">عقدة قرار</text>
+    <text x="590" y="224" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Feature Test)</text>
+    <text x="590" y="224" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(اختبار خاصية)</text>
+
+    <!-- Leaf Node 1 -->
+    <rect x="40" y="310" width="140" height="60" rx="30" fill="url(#leafGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="110" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Pure Leaf Node</text>
+    <text x="110" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">عقدة ورقية نقية</text>
+    <text x="110" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-en">(Single Class)</text>
+    <text x="110" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-ar">(فئة واحدة)</text>
+
+    <!-- Leaf Node 2 -->
+    <rect x="220" y="310" width="140" height="60" rx="30" fill="url(#leafGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="290" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Pure Leaf Node</text>
+    <text x="290" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">عقدة ورقية نقية</text>
+    <text x="290" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-en">(Single Class)</text>
+    <text x="290" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-ar">(فئة واحدة)</text>
+
+    <!-- Leaf Node 3 -->
+    <rect x="440" y="310" width="140" height="60" rx="30" fill="url(#leafGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="510" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Pure Leaf Node</text>
+    <text x="510" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">عقدة ورقية نقية</text>
+    <text x="510" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-en">(Single Class)</text>
+    <text x="510" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-ar">(فئة واحدة)</text>
+
+    <!-- Leaf Node 4 -->
+    <rect x="620" y="310" width="140" height="60" rx="30" fill="url(#leafGrad)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="690" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Pure Leaf Node</text>
+    <text x="690" y="334" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">عقدة ورقية نقية</text>
+    <text x="690" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-en">(Single Class)</text>
+    <text x="690" y="354" text-anchor="middle" font-size="13" fill="var(--on-brand-lo)" opacity="0.9" class="gsvg-ar">(فئة واحدة)</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت شجرة القرار قادرة على ملاءمة أي مجموعة بيانات تدريبية بشكل مثالي (الوصول إلى عقد نقية 100٪)، فلماذا يعتبر هذا أحياناً أمراً سيئاً؟</template>
+      <template class="content-en">If a decision tree can perfectly fit any training dataset (reaching 100% pure nodes), why is this sometimes considered a bad thing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن ذلك يؤدي غالباً إلى فرط التخصيص (Overfitting). الشجرة ستحفظ ضوضاء بيانات التدريب ولن تعمم بشكل جيد على البيانات الجديدة غير المرئية.</p></template>
+      <template class="content-en"><p>Because it often leads to overfitting. The tree will memorize the noise in the training data and will fail to generalize well to new, unseen data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="training-and-traversing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تدريب واجتياز أشجار القرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Training and Traversing Decision Trees</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تدريب الشجرة بتقسيم البيانات عند كل عقدة لتعظيم <span class="smart-term" data-term-en="Information Gain" data-ar="اكتساب المعلومات" data-en-def="A metric used to determine which feature provides the best split by measuring the reduction in entropy.">اكتساب المعلومات<span class="smart-term-tooltip"></span></span>، ويتم التنبؤ باجتياز الشجرة من الجذر إلى الورقة.</p></template>
+    <template class="content-en"><p>The tree is trained by splitting data at each node to maximize information gain, and predictions are made by traversing from root to leaf.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أثناء مرحلة التدريب، تقوم الخوارزمية بتقسيم البيانات بناءً على قيم الميزات. تمثل كل عقدة نقطة قرار حيث يتم اختبار ميزة معينة. الهدف من هذه الانقسامات هو إنشاء فروع تؤدي إلى عقد طرفية نقية.</p><p>لإجراء تنبؤ لعينة جديدة، تبدأ العملية من <span class="smart-term" data-term-en="Root Node" data-ar="العقدة الجذرية" data-en-def="The topmost node in a decision tree, representing the entire dataset before any splits.">العقدة الجذرية<span class="smart-term-tooltip"></span></span> (Root node). يتم اجتياز الشجرة (Traverse) بالانتقال عبر الفروع بناءً على قيم ميزات العينة حتى يتم الوصول إلى عقدة طرفية (Leaf node). توفر هذه العقدة الطرفية التنبؤ النهائي للفئة أو القيمة.</p></template>
+    <template class="content-en"><p>During the training phase, the algorithm splits the data based on feature values. Each node represents a decision point where a specific feature is tested. The goal of these splits is to create branches that lead to pure leaf nodes.</p><p>To make a prediction for a new instance, the process starts at the <span class="smart-term" data-term-en="Root Node" data-ar="العقدة الجذرية" data-en-def="The topmost node in a decision tree, representing the entire dataset before any splits.">root node<span class="smart-term-tooltip"></span></span>. The tree is traversed by moving down the branches based on the instance's feature values until a leaf node is reached. This leaf node provides the final class or value prediction.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عملية التقسيم تعتمد على اختيار الميزة التي توفر أفضل انقسام، والذي يُقاس عادةً بأعلى اكتساب للمعلومات (Information Gain) أو أقل شوائب جيني (Gini Impurity).</p><p>الاجتياز هو عملية سريعة جداً، حيث يتطلب عدد خطوات يتناسب مع عمق الشجرة (O(log(m)) للأشجار المتوازنة)، مما يجعل التنبؤ سريعاً حتى في مجموعات البيانات الكبيرة.</p></template>
+    <template class="content-en"><p>The splitting process relies on selecting the feature that provides the best split, typically measured by the highest <span class="smart-term" data-term-en="Information Gain" data-ar="اكتساب المعلومات" data-en-def="A metric used to determine which feature provides the best split by measuring the reduction in entropy.">Information Gain<span class="smart-term-tooltip"></span></span> or the lowest Gini Impurity.</p><p>Traversal is a very fast process, requiring a number of steps proportional to the depth of the tree (O(log(m)) for balanced trees), making predictions extremely fast even for large datasets.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو التعقيد الزمني (Time Complexity) لإجراء تنبؤ باستخدام شجرة قرار متوازنة تحتوي على m من العقد؟</template>
+      <template class="content-en">What is the time complexity of making a prediction using a balanced decision tree with m nodes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التعقيد الزمني هو O(log(m))، لأننا ننزل مساراً واحداً من الجذر إلى الورقة.</p></template>
+      <template class="content-en"><p>The time complexity is O(log(m)), because we traverse a single path from the root to a leaf.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="sklearn-implementation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تنفيذ أشجار القرار باستخدام Scikit-Learn</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Implementing Decision Trees with Scikit-Learn</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن بناء وتدريب أشجار القرار بسهولة في بايثون باستخدام فئة <code>DecisionTreeClassifier</code> من مكتبة <code>sklearn.tree</code>.</p></template>
+    <template class="content-en"><p>Decision trees can be easily built and trained in Python using the <code>DecisionTreeClassifier</code> class from the <code>sklearn.tree</code> module.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتنفيذ شجرة قرار، نحتاج أولاً إلى استيراد المكتبات اللازمة. نستخدم <code>load_iris</code> من <code>sklearn.datasets</code> لتحميل مجموعة البيانات، و <code>DecisionTreeClassifier</code> من <code>sklearn.tree</code> لإنشاء النموذج.</p><p>خطوات التنفيذ الأساسية تشمل:</p><ol><li>تحميل البيانات وتحديد الميزات (X) والهدف (y).</li><li>تهيئة النموذج مع تحديد المعلمات الفائقة (Hyperparameters) مثل <code>max_depth</code> لمنع فرط التخصيص.</li><li>تدريب النموذج باستخدام دالة <code>fit(X, y)</code>.</li></ol></template>
+    <template class="content-en"><p>To implement a decision tree, we first import the necessary libraries. We use <code>load_iris</code> from <code>sklearn.datasets</code> to load the dataset, and <code>DecisionTreeClassifier</code> from <code>sklearn.tree</code> to create the model.</p><p>The basic implementation steps include:</p><ol><li>Loading the data and defining features (X) and target (y).</li><li>Initializing the model and setting hyperparameters like <code>max_depth</code> to prevent overfitting.</li><li>Training the model using the <code>fit(X, y)</code> function.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعلمة <code>max_depth=2</code> في الكود تحد من عمق الشجرة إلى مستويين فقط. هذا شكل من أشكال التنظيم (Regularization) أو التوقف المبكر (Early stopping) الذي يمنع الشجرة من النمو بشكل معقد جداً وحفظ بيانات التدريب.</p><p>في مجموعة بيانات Iris، تم استخدام الميزتين الأخيرتين فقط (طول وعرض البتلة) في المثال <code>X = iris.data[:, 2:]</code> لتسهيل التصور ثنائي الأبعاد لاحقاً.</p></template>
+    <template class="content-en"><p>The parameter <code>max_depth=2</code> in the code limits the depth of the tree to only 2 levels. This is a form of regularization or early stopping that prevents the tree from growing too complex and memorizing the training data.</p><p>In the Iris dataset, only the last two features (petal length and width) were used in the example <code>X = iris.data[:, 2:]</code> to facilitate 2D visualization later.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+
+# Load dataset
+iris = load_iris()
+X = iris.data[:, 2:] # petal length and width
+y = iris.target
+
+# Train the model
+tree_clf = DecisionTreeClassifier(max_depth=2)
+tree_clf.fit(X, y)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا لم نقم بتعيين قيمة للمعلمة <code>max_depth</code> عند تدريب شجرة القرار؟</template>
+      <template class="content-en">What would happen if we do not set a value for the <code>max_depth</code> parameter when training a decision tree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستستمر الشجرة في النمو حتى تصبح جميع العقد الطرفية نقية تماماً، مما سيؤدي على الأرجح إلى فرط التخصيص (Overfitting).</p></template>
+      <template class="content-en"><p>The tree will continue to grow until all leaf nodes are perfectly pure, which will highly likely result in overfitting.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="visualizing-decision-trees" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تصور أشجار القرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Visualizing Decision Trees</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن تصدير أشجار القرار المدربة إلى ملفات <code>.dot</code> باستخدام <code>export_graphviz</code> وتحويلها إلى صور لفهم قواعد اتخاذ القرار.</p></template>
+    <template class="content-en"><p>Trained decision trees can be exported to <code>.dot</code> files using <code>export_graphviz</code> and converted to images to understand the decision rules.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لفهم كيفية اتخاذ النموذج لقراراته، يمكننا تصور الشجرة. نستخدم دالة <code>export_graphviz</code> من <code>sklearn.tree</code> لإنشاء ملف تعريف رسم بياني بامتداد <code>.dot</code>.</p><p>تأخذ هذه الدالة عدة معلمات لتحسين التصور:</p><ul><li><code>out_file</code>: اسم ملف الإخراج.</li><li><code>feature_names</code>: أسماء الميزات المستخدمة.</li><li><code>class_names</code>: أسماء الفئات المستهدفة.</li><li><code>rounded=True, filled=True</code>: لتحسين المظهر الجمالي للعقد (تلوينها وتدوير حوافها).</li></ul><p>بعد إنشاء ملف <code>.dot</code>، يمكن استخدام أداة سطر الأوامر <code>dot</code> من حزمة <code>graphviz</code> لتحويله إلى صورة PNG.</p></template>
+    <template class="content-en"><p>To understand how the model makes its decisions, we can visualize the tree. We use the <code>export_graphviz</code> function from <code>sklearn.tree</code> to create a graph definition file with a <code>.dot</code> extension.</p><p>This function takes several parameters to enhance the visualization:</p><ul><li><code>out_file</code>: Name of the output file.</li><li><code>feature_names</code>: Names of the features used.</li><li><code>class_names</code>: Names of the target classes.</li><li><code>rounded=True, filled=True</code>: For better aesthetics (coloring and rounding node edges).</li></ul><p>After creating the <code>.dot</code> file, the <code>dot</code> command-line tool from the <code>graphviz</code> package can be used to convert it into a PNG image.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الرسم البياني الناتج، تمثل كل عقدة داخلية شرطاً منطقياً يعتمد على ميزة واحدة (مثلاً: هل طول البتلة <= 2.45؟). بناءً على الإجابة، يتم توجيه البيانات يميناً أو يساراً.</p><p>توضح العقد الطرفية التنبؤ النهائي. يتيح هذا التصور للمهندسين التحقق من صحة المنطق الذي تعلمه النموذج واكتشاف أي تحيزات أو قواعد غير منطقية قد يكون استنتجها من البيانات.</p></template>
+    <template class="content-en"><p>In the resulting diagram, each internal node represents a logical condition based on a single feature (e.g., is petal length <= 2.45?). Based on the answer, the data is routed left or right.</p><p>The leaf nodes show the final prediction. This visualization allows engineers to validate the logic learned by the model and detect any biases or nonsensical rules it might have inferred from the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.tree import export_graphviz
+
+export_graphviz(
+    tree_clf,
+    out_file="iris_tree.dot",
+    feature_names=iris.feature_names[2:],
+    class_names=iris.target_names,
+    rounded=True,
+    filled=True
+)
+
+# Command line conversion:
+# dot -Tpng iris_tree.dot -o iris_tree.png</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نمرر <code>feature_names</code> و <code>class_names</code> إلى دالة <code>export_graphviz</code>؟</template>
+      <template class="content-en">Why do we pass <code>feature_names</code> and <code>class_names</code> to the <code>export_graphviz</code> function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لجعل الرسم البياني الناتج قابلاً للقراءة والفهم للبشر، حيث يتم استبدال فهارس الميزات والفئات بأسمائها الحقيقية.</p></template>
+      <template class="content-en"><p>To make the resulting diagram human-readable, replacing feature and class indices with their actual descriptive names.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المهمة جداً. اليوم دخلنا عالم 'أشجار القرار'، وهي واحدة من أكثر الخوارزميات بديهية في تعلم الآلة. تخيل أنك تلعب لعبة '20 سؤالاً'؛ هذا بالضبط ما تفعله الشجرة! تبدأ من 'العقدة الجذرية' وتطرح أسئلة تقسم البيانات بناءً على الميزات حتى تصل إلى إجابة نهائية في 'العقدة الطرفية'. للامتحان، ركزوا جيداً على مفهوم 'فرط التخصيص' (Overfitting) وكيف نستخدم معلمة <code>max_depth</code> كدرع واقٍ لمنع الشجرة من حفظ البيانات بدلاً من فهمها. تأكدوا أيضاً من فهمكم لكيفية كتابة كود Scikit-Learn البسيط لتدريب النموذج، وكيف نستخدم <code>export_graphviz</code> لتحويل هذا النموذج الرياضي إلى رسم بياني جميل ومفهوم. هذه الخوارزمية هي حجر الأساس لمفاهيم متقدمة قادمة مثل الغابات العشوائية، لذا تأكدوا من هضمها جيداً!</template>
+    <template class="content-en">Welcome, my friends, to this crucial module. Today we entered the world of 'Decision Trees', one of the most intuitive algorithms in machine learning. Imagine playing '20 Questions'; that's exactly what the tree does! It starts at the 'root node' and asks questions that split the data based on features until it reaches a final answer at a 'leaf node'. For the exam, focus heavily on the concept of 'overfitting' and how we use the <code>max_depth</code> parameter as a shield to prevent the tree from memorizing the data instead of understanding it. Also, make sure you understand how to write the simple Scikit-Learn code to train the model, and how we use <code>export_graphviz</code> to turn this mathematical model into a beautiful, understandable diagram. This algorithm is the stepping stone for upcoming advanced concepts like Random Forests, so make sure you digest it well!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل أحياناً استخدام أشجار القرار على الشبكات العصبية المعقدة؟</template>
+          <template class="content-en">Why do we sometimes prefer using Decision Trees over complex Neural Networks?</template>
+          <span class="content-target">لماذا نفضل أحياناً استخدام أشجار القرار على الشبكات العصبية المعقدة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن أشجار القرار هي نماذج 'صندوق أبيض' (White-box). يمكننا بسهولة رسم الشجرة وفهم المنطق الدقيق وراء كل تنبؤ، وهو أمر حاسم في مجالات مثل الطب أو التمويل حيث التفسير مطلوب.</template>
+          <template class="content-en">Because Decision Trees are 'white-box' models. We can easily draw the tree and understand the exact logic behind every prediction, which is crucial in fields like medicine or finance where interpretability is required.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الخطر الأكبر عند تدريب شجرة قرار وكيف نتجنبه؟</template>
+          <template class="content-en">What is the biggest risk when training a decision tree and how do we avoid it?</template>
+          <span class="content-target">ما هو الخطر الأكبر عند تدريب شجرة قرار وكيف نتجنبه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخطر الأكبر هو فرط التخصيص (Overfitting). نتجنبه باستخدام تقنيات التنظيم مثل تحديد الحد الأقصى للعمق باستخدام المعلمة <code>max_depth</code>.</template>
+          <template class="content-en">The biggest risk is overfitting. We avoid it by using regularization techniques such as limiting the maximum depth using the <code>max_depth</code> parameter.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني 'العقدة النقية' (Pure Node)؟</template>
+          <template class="content-en">What does a 'Pure Node' mean?</template>
+          <span class="content-target">ماذا تعني 'العقدة النقية' (Pure Node)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي عقدة طرفية تحتوي فقط على عينات تنتمي إلى فئة واحدة محددة، مما يعني أن الشجرة قد فصلت هذه المجموعة من البيانات بشكل مثالي.</template>
+          <template class="content-en">It is a leaf node that contains only instances belonging to one specific class, meaning the tree has perfectly separated this subset of data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في كود Scikit-Learn، ماذا تفعل الدالة <code>fit(X, y)</code>؟</template>
+          <template class="content-en">In the Scikit-Learn code, what does the <code>fit(X, y)</code> function do?</template>
+          <span class="content-target">في كود Scikit-Learn، ماذا تفعل الدالة <code>fit(X, y)</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هذه الدالة هي التي تقوم فعلياً بتدريب النموذج. تأخذ ميزات التدريب (X) والتسميات المستهدفة (y) وتقوم ببناء الشجرة عن طريق إيجاد أفضل الانقسامات.</template>
+          <template class="content-en">This function is what actually trains the model. It takes the training features (X) and target labels (y) and builds the tree by finding the best splits.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة من تصدير الشجرة إلى ملف <code>.dot</code>؟</template>
+          <template class="content-en">What is the benefit of exporting the tree to a <code>.dot</code> file?</template>
+          <span class="content-target">ما هي الفائدة من تصدير الشجرة إلى ملف <code>.dot</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ملف <code>.dot</code> يحتوي على وصف هيكلي للشجرة. يمكننا استخدام أدوات مثل Graphviz لتحويل هذا الملف إلى صورة مرئية (مثل PNG) تتيح لنا رؤية القواعد التي تعلمها النموذج.</template>
+          <template class="content-en">The <code>.dot</code> file contains a structural description of the tree. We can use tools like Graphviz to convert this file into a visual image (like PNG) that allows us to see the rules the model learned.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تقرر الشجرة أي ميزة تستخدم للتقسيم في عقدة معينة؟</template>
+          <template class="content-en">How does the tree decide which feature to use for splitting at a given node?</template>
+          <span class="content-target">كيف تقرر الشجرة أي ميزة تستخدم للتقسيم في عقدة معينة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم بتقييم جميع الميزات المتاحة وتختار الميزة التي توفر 'أفضل انقسام'، والذي يُقاس عادةً بأنه الانقسام الذي يعطي أعلى 'اكتساب للمعلومات' (Information Gain).</template>
+          <template class="content-en">It evaluates all available features and chooses the one that provides the 'best split', typically measured as the split that yields the highest 'Information Gain'.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن لأشجار القرار التنبؤ بقيم مستمرة (أرقام) أم أنها تقتصر على الفئات فقط؟</template>
+          <template class="content-en">Can decision trees predict continuous values (numbers), or are they limited to classes only?</template>
+          <span class="content-target">هل يمكن لأشجار القرار التنبؤ بقيم مستمرة (أرقام) أم أنها تقتصر على الفئات فقط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يمكنها ذلك. أشجار القرار قادرة على أداء مهام التصنيف (للفئات) ومهام الانحدار (للقيم المستمرة).</template>
+          <template class="content-en">Yes, they can. Decision trees are capable of performing both classification tasks (for classes) and regression tasks (for continuous values).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور خوارزمية أشجار القرار في نموذج 'الغابات العشوائية'؟</template>
+          <template class="content-en">What is the role of the decision tree algorithm in a 'Random Forest' model?</template>
+          <span class="content-target">ما هو دور خوارزمية أشجار القرار في نموذج 'الغابات العشوائية'؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">أشجار القرار هي اللبنات الأساسية. الغابة العشوائية تقوم ببساطة بتدريب عدد كبير من أشجار القرار المستقلة وتأخذ تصويت الأغلبية لتنبؤاتها.</template>
+          <template class="content-en">Decision trees are the building blocks. A Random Forest simply trains a large number of independent decision trees and takes a majority vote for its predictions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">عند تصور الشجرة، لماذا نمرر <code>feature_names</code>؟</template>
+          <template class="content-en">When visualizing the tree, why do we pass <code>feature_names</code>?</template>
+          <span class="content-target">عند تصور الشجرة، لماذا نمرر <code>feature_names</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدون تمريرها، سيعرض الرسم البياني فهارس الميزات (مثل X[0]، X[1]). تمرير الأسماء يجعل الرسم البياني قابلاً للقراءة (مثل 'طول البتلة').</template>
+          <template class="content-en">Without passing them, the diagram would show feature indices (like X[0], X[1]). Passing the names makes the diagram readable (like 'petal length').</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث أثناء 'اجتياز' (Traversing) الشجرة؟</template>
+          <template class="content-en">What happens during the 'traversing' of the tree?</template>
+          <span class="content-target">ماذا يحدث أثناء 'اجتياز' (Traversing) الشجرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الاجتياز هو عملية التنبؤ. نأخذ عينة جديدة، ونبدأ من الجذر، ونجيب على الشروط المنطقية في كل عقدة للتحرك يميناً أو يساراً حتى نصل إلى ورقة تعطينا النتيجة.</template>
+          <template class="content-en">Traversing is the prediction process. We take a new instance, start at the root, and answer the logical conditions at each node to move left or right until we reach a leaf that gives us the result.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي المهام التي يمكن لأشجار القرار أداؤها؟",
+      "en": "What tasks can Decision Trees perform?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التصنيف، الانحدار، والمهام متعددة المخرجات.",
+        "en": "Classification, regression, and multioutput tasks."
+      },
+      "example": {
+        "ar": "تصنيف أنواع الزهور أو التنبؤ بأسعار المنازل.",
+        "en": "Classifying flower species or predicting house prices."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ماذا تمثل كل عقدة (Node) في شجرة القرار؟",
+      "en": "What does each node represent in a Decision Tree?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثل نقطة اتخاذ قرار بناءً على قيمة ميزة معينة.",
+        "en": "It represents a decision point based on a specific feature value."
+      },
+      "example": {
+        "ar": "عقدة تسأل: هل طول البتلة أقل من 2.45 سم؟",
+        "en": "A node asking: Is petal length < 2.45 cm?"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الهدف النهائي عند بناء فروع شجرة القرار؟",
+      "en": "What is the ultimate goal when creating branches in a Decision Tree?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوصول إلى عقد طرفية نقية (Pure leaf nodes).",
+        "en": "To reach pure leaf nodes."
+      },
+      "example": {
+        "ar": "عقدة تحتوي فقط على زهور من نوع Setosa.",
+        "en": "A node containing only Setosa flowers."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي العقدة الطرفية النقية (Pure Leaf Node)؟",
+      "en": "What is a Pure Leaf Node?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عقدة تنتمي فيها جميع العينات إلى فئة واحدة فقط.",
+        "en": "A node where all instances belong to one single class."
+      },
+      "example": {
+        "ar": "عقدة بها 50 عينة، جميعها من الفئة A.",
+        "en": "A node with 50 instances, all belonging to Class A."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف يتم اجتياز شجرة القرار لإجراء تنبؤ؟",
+      "en": "How is a Decision Tree traversed to make a prediction?"
+    },
+    "back": {
+      "definition": {
+        "ar": "البدء من العقدة الجذرية والانتقال عبر الفروع بناءً على قيم الميزات حتى الوصول إلى عقدة طرفية.",
+        "en": "Start at the root node and traverse branches based on feature values until reaching a leaf node."
+      },
+      "example": {
+        "ar": "البدء من الجذر، التحقق من الطول، ثم التحقق من العرض، ثم الوصول للنتيجة.",
+        "en": "Start at root, check length, then check width, then reach the result."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي العقدة الجذرية (Root Node)؟",
+      "en": "What is the Root Node?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي العقدة الأولى في أعلى الشجرة والتي يبدأ منها الاجتياز.",
+        "en": "The topmost node in the tree where traversal begins."
+      },
+      "example": {
+        "ar": "أول سؤال يتم طرحه على مجموعة البيانات بأكملها.",
+        "en": "The very first question asked on the entire dataset."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي الفئة المستخدمة في Scikit-Learn لإنشاء شجرة قرار للتصنيف؟",
+      "en": "Which class in Scikit-Learn is used to create a classification decision tree?"
+    },
+    "back": {
+      "definition": {
+        "ar": "DecisionTreeClassifier",
+        "en": "DecisionTreeClassifier"
+      },
+      "example": {
+        "ar": "tree_clf = DecisionTreeClassifier()",
+        "en": "tree_clf = DecisionTreeClassifier()"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي وظيفة المعلمة <code>max_depth</code>؟",
+      "en": "What is the function of the <code>max_depth</code> parameter?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحد من عمق الشجرة لمنع مشكلة فرط التخصيص (Overfitting).",
+        "en": "It limits the depth of the tree to prevent overfitting."
+      },
+      "example": {
+        "ar": "max_depth=2 يوقف نمو الشجرة بعد مستويين.",
+        "en": "max_depth=2 stops the tree from growing beyond 2 levels."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي الدالة المستخدمة لتدريب النموذج في Scikit-Learn؟",
+      "en": "Which function is used to train the model in Scikit-Learn?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة <code>fit(X, y)</code>",
+        "en": "The <code>fit(X, y)</code> function."
+      },
+      "example": {
+        "ar": "tree_clf.fit(X, y)",
+        "en": "tree_clf.fit(X, y)"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي الأداة المستخدمة لتصدير شجرة القرار إلى ملف نصي؟",
+      "en": "Which tool is used to export a decision tree to a text file?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة <code>export_graphviz</code>",
+        "en": "The <code>export_graphviz</code> function."
+      },
+      "example": {
+        "ar": "export_graphviz(tree_clf, out_file='tree.dot')",
+        "en": "export_graphviz(tree_clf, out_file='tree.dot')"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو امتداد الملف الناتج عن <code>export_graphviz</code>؟",
+      "en": "What is the extension of the file generated by <code>export_graphviz</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "امتداد <code>.dot</code>",
+        "en": "The <code>.dot</code> extension."
+      },
+      "example": {
+        "ar": "iris_tree.dot",
+        "en": "iris_tree.dot"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "كيف يتم تحويل ملف <code>.dot</code> إلى صورة PNG؟",
+      "en": "How is a <code>.dot</code> file converted to a PNG image?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام أداة سطر الأوامر <code>dot</code> من حزمة graphviz.",
+        "en": "Using the <code>dot</code> command-line tool from the graphviz package."
+      },
+      "example": {
+        "ar": "dot -Tpng tree.dot -o tree.png",
+        "en": "dot -Tpng tree.dot -o tree.png"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ماذا تفعل المعلمات <code>rounded=True</code> و <code>filled=True</code> في التصور؟",
+      "en": "What do the parameters <code>rounded=True</code> and <code>filled=True</code> do in visualization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحسن المظهر الجمالي بتدوير حواف العقد وتلوينها بناءً على الفئة.",
+        "en": "They improve aesthetics by rounding node edges and coloring them based on the class."
+      },
+      "example": {
+        "ar": "عقدة خضراء بحواف دائرية تمثل فئة معينة.",
+        "en": "A green node with rounded edges representing a specific class."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "على أي أساس يتم تقسيم البيانات في كل عقدة؟",
+      "en": "On what basis is data split at each node?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بناءً على الميزة التي توفر أفضل انقسام (أعلى اكتساب للمعلومات).",
+        "en": "Based on the feature that provides the best split (highest information gain)."
+      },
+      "example": {
+        "ar": "اختيار طول البتلة بدلاً من عرضها إذا كان يفصل الفئات بشكل أفضل.",
+        "en": "Choosing petal length over width if it separates classes better."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي المشكلة الرئيسية التي تعاني منها أشجار القرار إذا لم يتم تقييدها؟",
+      "en": "What is the main problem decision trees suffer from if left unconstrained?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فرط التخصيص (Overfitting).",
+        "en": "Overfitting."
+      },
+      "example": {
+        "ar": "شجرة معقدة جداً تحفظ بيانات التدريب وتفشل في التنبؤ ببيانات جديدة.",
+        "en": "A highly complex tree that memorizes training data and fails on new data."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من المهام التالية يمكن لأشجار القرار أداؤها؟",
+      "en": "Which of the following tasks can Decision Trees perform?"
+    },
+    "options": {
+      "ar": [
+        "التصنيف فقط",
+        "الانحدار فقط",
+        "التصنيف والانحدار والمهام متعددة المخرجات",
+        "التجميع (Clustering) فقط"
+      ],
+      "en": [
+        "Classification only",
+        "Regression only",
+        "Classification, regression, and multioutput tasks",
+        "Clustering only"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أشجار القرار هي خوارزميات متعددة الاستخدامات قادرة على أداء مهام التصنيف والانحدار والمهام متعددة المخرجات.",
+      "en": "Decision Trees are versatile algorithms capable of performing classification, regression, and multioutput tasks."
+    },
+    "hint": {
+      "ar": "تذكر أنها خوارزميات متعددة الاستخدامات.",
+      "en": "Remember they are versatile algorithms."
+    },
+    "difficulty": "easy",
+    "conceptId": "decision-trees-introduction"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الهدف النهائي لعملية التقسيم في شجرة القرار؟",
+      "en": "What is the ultimate goal of the splitting process in a decision tree?"
+    },
+    "options": {
+      "ar": [
+        "زيادة عمق الشجرة إلى أقصى حد",
+        "الوصول إلى عقد طرفية نقية",
+        "تقليل عدد الميزات",
+        "إنشاء عقدة جذرية جديدة"
+      ],
+      "en": [
+        "Maximize the depth of the tree",
+        "Reach pure leaf nodes",
+        "Reduce the number of features",
+        "Create a new root node"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الهدف هو إنشاء فروع تؤدي إلى عقد طرفية نقية حيث تنتمي جميع العينات إلى فئة واحدة.",
+      "en": "The goal is to create branches that lead to pure leaf nodes where all instances belong to one class."
+    },
+    "hint": {
+      "ar": "نحن نريد أن نكون متأكدين بنسبة 100٪ من الفئة في النهاية.",
+      "en": "We want to be 100% sure of the class at the end."
+    },
+    "difficulty": "medium",
+    "conceptId": "decision-trees-introduction"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي معلمة تستخدم للتحكم في عمق الشجرة لمنع فرط التخصيص؟",
+      "en": "Which parameter is used to control the depth of the tree to prevent overfitting?"
+    },
+    "options": {
+      "ar": [
+        "min_samples_split",
+        "max_features",
+        "max_depth",
+        "learning_rate"
+      ],
+      "en": [
+        "min_samples_split",
+        "max_features",
+        "max_depth",
+        "learning_rate"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعلمة max_depth تحدد الحد الأقصى لعدد المستويات في الشجرة، مما يمنعها من حفظ بيانات التدريب.",
+      "en": "The max_depth parameter sets the maximum number of levels in the tree, preventing it from memorizing training data."
+    },
+    "hint": {
+      "ar": "الاسم يحتوي على كلمة تعني 'العمق'.",
+      "en": "The name contains a word meaning 'depth'."
+    },
+    "difficulty": "easy",
+    "conceptId": "sklearn-implementation"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كيف يتم إجراء التنبؤ لعينة جديدة في شجرة القرار؟",
+      "en": "How is a prediction made for a new instance in a decision tree?"
+    },
+    "options": {
+      "ar": [
+        "بالبدء من العقدة الطرفية والصعود للجذر",
+        "بحساب متوسط جميع العقد",
+        "بالبدء من العقدة الجذرية واجتياز الشجرة حتى الوصول لعقدة طرفية",
+        "باختيار عقدة عشوائية"
+      ],
+      "en": [
+        "Starting from a leaf node and going up to the root",
+        "Calculating the average of all nodes",
+        "Starting at the root node and traversing the tree until reaching a leaf node",
+        "Choosing a random node"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التنبؤ يتطلب اجتياز الشجرة من أعلى (الجذر) إلى أسفل (الورقة) بناءً على ميزات العينة.",
+      "en": "Prediction requires traversing the tree from top (root) to bottom (leaf) based on the instance's features."
+    },
+    "hint": {
+      "ar": "فكر في كيفية قراءة المخطط الانسيابي.",
+      "en": "Think about how you read a flowchart."
+    },
+    "difficulty": "medium",
+    "conceptId": "training-and-traversing"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الدالة المستخدمة في Scikit-Learn لتصدير الشجرة للتصور؟",
+      "en": "Which function in Scikit-Learn is used to export the tree for visualization?"
+    },
+    "options": {
+      "ar": [
+        "plot_tree",
+        "export_graphviz",
+        "visualize_tree",
+        "draw_graph"
+      ],
+      "en": [
+        "plot_tree",
+        "export_graphviz",
+        "visualize_tree",
+        "draw_graph"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة export_graphviz تستخدم لإنشاء ملف .dot يمكن تحويله إلى صورة.",
+      "en": "The export_graphviz function is used to create a .dot file that can be converted to an image."
+    },
+    "hint": {
+      "ar": "تحتوي على اسم الحزمة المستخدمة للرسم البياني.",
+      "en": "Contains the name of the package used for graphing."
+    },
+    "difficulty": "easy",
+    "conceptId": "visualizing-decision-trees"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو امتداد الملف الذي تنتجه دالة <code>export_graphviz</code>؟",
+      "en": "What is the file extension produced by the <code>export_graphviz</code> function?"
+    },
+    "options": {
+      "ar": [
+        ".png",
+        ".txt",
+        ".dot",
+        ".csv"
+      ],
+      "en": [
+        ".png",
+        ".txt",
+        ".dot",
+        ".csv"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تنتج الدالة ملفاً بامتداد .dot والذي يصف هيكل الرسم البياني.",
+      "en": "The function produces a file with a .dot extension which describes the graph structure."
+    },
+    "hint": {
+      "ar": "يتكون من ثلاثة أحرف ويبدأ بحرف d.",
+      "en": "Three letters starting with d."
+    },
+    "difficulty": "easy",
+    "conceptId": "visualizing-decision-trees"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في سطر الأوامر <code>dot -Tpng iris_tree.dot -o iris_tree.png</code>، ماذا يفعل هذا الأمر؟",
+      "en": "In the command line <code>dot -Tpng iris_tree.dot -o iris_tree.png</code>, what does this command do?"
+    },
+    "options": {
+      "ar": [
+        "يدرب نموذج شجرة القرار",
+        "يحول ملف dot إلى صورة PNG",
+        "يستورد البيانات من ملف PNG",
+        "يحذف ملف dot"
+      ],
+      "en": [
+        "Trains the decision tree model",
+        "Converts the dot file to a PNG image",
+        "Imports data from a PNG file",
+        "Deletes the dot file"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذا الأمر يستخدم أداة dot لتحويل ملف النص الهيكلي إلى صورة مرئية بصيغة PNG.",
+      "en": "This command uses the dot tool to convert the structural text file into a visual PNG image."
+    },
+    "hint": {
+      "ar": "انظر إلى الامتدادات في الأمر.",
+      "en": "Look at the extensions in the command."
+    },
+    "difficulty": "medium",
+    "conceptId": "visualizing-decision-trees"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "لماذا نستخدم المعلمات <code>feature_names</code> و <code>class_names</code> عند تصدير الشجرة؟",
+      "en": "Why do we use the <code>feature_names</code> and <code>class_names</code> parameters when exporting the tree?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عملية التدريب",
+        "لجعل الرسم البياني الناتج قابلاً للقراءة بأسماء حقيقية بدلاً من الفهارس",
+        "لمنع فرط التخصيص",
+        "لزيادة دقة النموذج"
+      ],
+      "en": [
+        "To speed up the training process",
+        "To make the resulting diagram readable with actual names instead of indices",
+        "To prevent overfitting",
+        "To increase model accuracy"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذه المعلمات تضيف تسميات وصفية للعقد، مما يسهل على البشر فهم القواعد التي تعلمها النموذج.",
+      "en": "These parameters add descriptive labels to the nodes, making it easier for humans to understand the rules the model learned."
+    },
+    "hint": {
+      "ar": "الأمر يتعلق بالتصور والفهم البشري.",
+      "en": "It's about visualization and human understanding."
+    },
+    "difficulty": "medium",
+    "conceptId": "visualizing-decision-trees"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو المعيار الأساسي الذي تقرر الشجرة بناءً عليه كيفية تقسيم البيانات في عقدة معينة؟",
+      "en": "What is the primary criterion based on which the tree decides how to split data at a given node?"
+    },
+    "options": {
+      "ar": [
+        "الميزة التي توفر أقل اكتساب للمعلومات",
+        "الميزة التي توفر أفضل انقسام (أعلى اكتساب للمعلومات)",
+        "اختيار ميزة عشوائية",
+        "الميزة ذات القيم الأكبر"
+      ],
+      "en": [
+        "The feature that provides the lowest information gain",
+        "The feature that provides the best split (highest information gain)",
+        "Choosing a random feature",
+        "The feature with the largest values"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تبحث الخوارزمية دائماً عن الانقسام الذي يزيد من نقاء العقد الناتجة، وهو ما يُعرف بأعلى اكتساب للمعلومات.",
+      "en": "The algorithm always looks for the split that maximizes the purity of the resulting nodes, known as the highest information gain."
+    },
+    "hint": {
+      "ar": "نحن نريد أفضل فصل ممكن للبيانات.",
+      "en": "We want the best possible separation of data."
+    },
+    "difficulty": "hard",
+    "conceptId": "training-and-traversing"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من التالي يعتبر من المكونات الأساسية التي تعتمد عليها خوارزمية الغابات العشوائية (Random Forests)؟",
+      "en": "Which of the following is a fundamental component that the Random Forests algorithm relies on?"
+    },
+    "options": {
+      "ar": [
+        "الشبكات العصبية",
+        "آلات المتجهات الداعمة (SVM)",
+        "أشجار القرار",
+        "الانحدار الخطي"
+      ],
+      "en": [
+        "Neural Networks",
+        "Support Vector Machines (SVM)",
+        "Decision Trees",
+        "Linear Regression"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الغابات العشوائية هي نموذج مجمع (Ensemble) يتكون من العديد من أشجار القرار.",
+      "en": "Random Forests is an ensemble model made up of many decision trees."
+    },
+    "hint": {
+      "ar": "الغابة تتكون من ماذا؟",
+      "en": "What is a forest made of?"
+    },
+    "difficulty": "easy",
+    "conceptId": "decision-trees-introduction"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">أشجار القرار هي نماذج 'صندوق أبيض' (White-box)، مما يعني أن قراراتها شفافة ويمكن تتبعها بسهولة من الجذر إلى الورقة، على عكس الشبكات العصبية.</template>
+    <template class="content-en">Decision Trees are 'white-box' models, meaning their decisions are transparent and can be easily traced from root to leaf, unlike neural networks.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من ترك شجرة القرار تنمو دون قيود (بدون تحديد max_depth). سيؤدي ذلك حتماً إلى فرط التخصيص (Overfitting) حيث ستحفظ الشجرة كل نقطة بيانات في مجموعة التدريب.</template>
+    <template class="content-en">Beware of letting a decision tree grow unconstrained (without setting max_depth). This will inevitably lead to overfitting as the tree will memorize every data point in the training set.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند استخدام <code>export_graphviz</code>، فإن تمرير <code>rounded=True</code> و <code>filled=True</code> ليس مجرد تجميل؛ بل يساعد بصرياً في تحديد الفئة السائدة في كل عقدة بسرعة من خلال كثافة اللون.</template>
+    <template class="content-en">When using <code>export_graphviz</code>, passing <code>rounded=True</code> and <code>filled=True</code> isn't just cosmetic; it visually helps quickly identify the dominant class in each node through color intensity.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الهدف الأساسي لخوارزمية التدريب هو العثور على الميزة وقيمة العتبة التي تزيد من 'اكتساب المعلومات' (Information Gain) للوصول إلى عقد نقية بأسرع ما يمكن.</template>
+    <template class="content-en">The primary goal of the training algorithm is to find the feature and threshold value that maximizes 'Information Gain' to reach pure nodes as quickly as possible.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين العقدة الجذرية (Root) والعقدة الطرفية (Leaf). الجذر هو نقطة البداية التي تحتوي على كل البيانات، بينما الورقة هي نقطة النهاية التي تعطي التنبؤ.</template>
+    <template class="content-en">Do not confuse the Root node with the Leaf node. The root is the starting point containing all data, while the leaf is the endpoint that gives the prediction.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

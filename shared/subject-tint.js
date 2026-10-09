@@ -363,11 +363,126 @@
     try { document.dispatchEvent(new CustomEvent('garden:moduleDesignChanged', { detail: { design: _design || 'garden' } })); } catch (e) {}
   }
 
+  var SK = { hunter: { js: 1 }, planner: { js: 1 }, bento: {}, editor: { js: 1 }, manga: {}, sugar: {}, andalus: {}, quiet: { js: 1 }, dexter: { js: 1 }, witcher: { js: 1 }, saudi: { js: 1 }, rain: { js: 1 }, abyss: { js: 1 }, departures: { js: 1 }, lofi: { js: 1 }, album: { js: 1 } };
+  var SK_IDS = Object.keys(SK), _skin = null;
+  var BGT = ['color', 'mesh', 'waves', 'pixels', 'photo', 'pattern'];
+  function skinChosen() {
+    if (isCourse()) return '';
+    var p = quickPrefs() || {};
+    return typeof p.siteSkin === 'string' && SK[p.siteSkin] ? p.siteSkin : '';
+  }
+  function skinLink(n) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = _fontBase + 'shared/' + n + '.css';
+    l.setAttribute('data-garden-skin', n);
+    document.head.appendChild(l);
+    return l;
+  }
+  function skinMount(id) {
+    var G = window.GardenSkins && window.GardenSkins[id];
+    if (G) { if (!G.__on && G.mount) { try { G.mount(); } catch (e) {} G.__on = true; } return; }
+    designScript('../skins/' + id, function () {
+      var g = window.GardenSkins && window.GardenSkins[id];
+      if (!g || _skin !== id) return;
+      if (g.mount) { try { g.mount(); } catch (e) {} }
+      g.__on = true;
+    });
+  }
+  function skinUnmount(id) {
+    var G = id && window.GardenSkins && window.GardenSkins[id];
+    if (G && G.__on && G.unmount) { try { G.unmount(); } catch (e) {} }
+    if (G) G.__on = false;
+  }
+  function applySkin() {
+    var root = document.documentElement, id = skinChosen();
+    if (id === _skin) return;
+    var old = _skin === null ? (root.getAttribute('data-skin') || '') : _skin;
+    _skin = id;
+    if (old && old !== id) skinUnmount(old);
+    var want = id ? ['skins/base', 'skins/' + id, 'vendor/fonts/garden/garden-fonts'] : [];
+    var have = {}, drop = [], wait = 0;
+    var ls = document.querySelectorAll('link[data-garden-skin]');
+    for (var i = 0; i < ls.length; i++) {
+      var n = ls[i].getAttribute('data-garden-skin');
+      if (n === 'bg') continue;
+      if (want.indexOf(n) > -1 && !have[n]) have[n] = 1; else drop.push(ls[i]);
+    }
+    function swap() {
+      drop.forEach(function (l) { if (l.parentNode) l.parentNode.removeChild(l); });
+      drop = [];
+      if (id) root.setAttribute('data-skin', id); else root.removeAttribute('data-skin');
+      if (id && SK[id].js) {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { if (_skin === id) skinMount(id); }, { once: true });
+        else skinMount(id);
+      }
+    }
+    want.forEach(function (n) {
+      if (have[n]) return;
+      var l = skinLink(n);
+      if (n.indexOf('vendor/') === 0) return;
+      wait++;
+      l.addEventListener('load', done); l.addEventListener('error', done);
+    });
+    function done() { if (--wait <= 0) swap(); }
+    if (!wait) swap();
+  }
+  function applyTone() {
+    var root = document.documentElement, p = isCourse() ? (quickPrefs() || {}) : {};
+    var id = typeof p.siteSkin === 'string' && SK[p.siteSkin] ? p.siteSkin : '';
+    if (!id) { root.removeAttribute('data-skin-tone'); return; }
+    if (!document.querySelector('link[data-garden-tone]')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = _fontBase + 'shared/skins/tone.css';
+      l.setAttribute('data-garden-tone', '');
+      if (document.readyState === 'loading') l.setAttribute('blocking', 'render');
+      document.head.appendChild(l);
+    }
+    root.setAttribute('data-skin-tone', id);
+  }
+  function setSkin(id) {
+    var p = readPrefs();
+    if (SK[id]) p.siteSkin = id; else delete p.siteSkin;
+    savePrefs(p);
+    applySkin();
+    try { document.dispatchEvent(new CustomEvent('garden:skinChanged', { detail: { skin: _skin || 'garden' } })); } catch (e) {}
+  }
+  function bgChosen() {
+    if (isCourse()) return null;
+    var p = quickPrefs() || {}, b = p.siteBg;
+    return b && typeof b === 'object' && BGT.indexOf(b.type) > -1 ? b : null;
+  }
+  function applyBg() {
+    var root = document.documentElement, b = bgChosen();
+    if (!b) {
+      root.removeAttribute('data-bg');
+      root.style.removeProperty('--gbg-c');
+      if (window.GardenBg && GardenBg.unmount) { try { GardenBg.unmount(); } catch (e) {} }
+      return;
+    }
+    if (!document.querySelector('link[data-garden-skin="bg"]')) skinLink('skins/bg').setAttribute('data-garden-skin', 'bg');
+    root.setAttribute('data-bg', b.type);
+    if (b.type === 'color' && /^#[0-9a-f]{6}$/i.test(b.c || '')) root.style.setProperty('--gbg-c', b.c); else root.style.removeProperty('--gbg-c');
+    function go() { if (window.GardenBg && GardenBg.mount) { try { GardenBg.mount(b); } catch (e) {} } }
+    if (window.GardenBg) go(); else designScript('../skins/bg', go);
+  }
+  function setBg(b) {
+    var p = readPrefs();
+    if (b && BGT.indexOf(b.type) > -1) p.siteBg = b; else delete p.siteBg;
+    savePrefs(p);
+    applyBg();
+    try { document.dispatchEvent(new CustomEvent('garden:bgChanged', { detail: { bg: bgChosen() } })); } catch (e) {}
+  }
+
   function run() {
     var root = document.documentElement;
     modTheme();
     modFont();
     try { modDesign(); } catch (e) {}
+    try { applySkin(); } catch (e) {}
+    try { applyTone(); } catch (e) {}
+    try { applyBg(); } catch (e) {}
     var code = root.getAttribute('data-subject');
     var hex = chosen(code);
     /*@3.SUTJ.17*/
@@ -398,6 +513,8 @@
     THEMES: MT_IDS, THEME_BASE: MT_BASE, applyTheme: modTheme, clearTheme: clearTheme,
     siteSync: siteSync, setSiteTheme: setSiteTheme, isCourse: isCourse,
     FONTS: MF_AR, FONTS_LAT: MF_LAT, applyFont: modFont, fontSheet: fontSheet, clearFont: clearFont,
-    DESIGNS: MD_IDS, design: function () { return _design || 'garden'; }, setDesign: setDesign
+    DESIGNS: MD_IDS, design: function () { return _design || 'garden'; }, setDesign: setDesign,
+    SKINS: SK_IDS, skin: function () { return _skin || 'garden'; }, setSkin: setSkin,
+    BGS: BGT, bg: bgChosen, setBg: setBg
   };
 })();

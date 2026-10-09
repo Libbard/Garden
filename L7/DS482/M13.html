@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="13" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الشبكات العصبية التلافيفية · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M12.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#from-mlp-to-cnn" class="toc-link" data-bilingual>
+        <template class="content-ar">من الطبقات المتصلة بالكامل إلى التلافيف</template>
+        <template class="content-en">From Fully-Connected Layers to Convolutions</template>
+        <span class="content-target">من الطبقات المتصلة بالكامل إلى التلافيف</span>
+      </a>
+      <a href="#cross-correlation-convolution" class="toc-link" data-bilingual>
+        <template class="content-ar">الارتباط المتبادل والتلافيف</template>
+        <template class="content-en">Cross-Correlation and Convolution</template>
+        <span class="content-target">الارتباط المتبادل والتلافيف</span>
+      </a>
+      <a href="#padding-and-stride" class="toc-link" data-bilingual>
+        <template class="content-ar">الحشو والخطوة</template>
+        <template class="content-en">Padding and Stride</template>
+        <span class="content-target">الحشو والخطوة</span>
+      </a>
+      <a href="#multiple-channels" class="toc-link" data-bilingual>
+        <template class="content-ar">القنوات المتعددة (الإدخال والإخراج)</template>
+        <template class="content-en">Multiple Input and Output Channels</template>
+        <span class="content-target">القنوات المتعددة (الإدخال والإخراج)</span>
+      </a>
+      <a href="#1x1-convolution" class="toc-link" data-bilingual>
+        <template class="content-ar">الطبقة التلافيفية 1x1</template>
+        <template class="content-en">1x1 Convolutional Layer</template>
+        <span class="content-target">الطبقة التلافيفية 1x1</span>
+      </a>
+      <a href="#pooling-layers" class="toc-link" data-bilingual>
+        <template class="content-ar">طبقات التجميع (Pooling)</template>
+        <template class="content-en">Pooling Layers</template>
+        <span class="content-target">طبقات التجميع (Pooling)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 13</template>
+      <template class="content-en">Module 13</template>
+      <span class="content-target">الوحدة 13</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الشبكات العصبية التلافيفية</h1>
+      <p class="hero-description">مقدمة شاملة للشبكات العصبية التلافيفية (CNNs)، تشمل الدوافع من الشبكات متصلة بالكامل، عمليات الارتباط المتبادل، الحشو، الخطوة، القنوات المتعددة، وعمليات التجميع.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Convolutional Neural Networks</h1>
+      <p class="hero-description">A comprehensive introduction to Convolutional Neural Networks (CNNs), covering the transition from fully-connected layers, cross-correlation operations, padding, stride, multiple channels, and pooling.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">الرؤية الحاسوبية</span>
+      <span class="tag">الشبكات التلافيفية</span>
+      <span class="tag">معالجة الصور</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Computer Vision</span>
+      <span class="tag">CNN</span>
+      <span class="tag">Image Processing</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف الانتقال من الطبقات المتصلة بالكامل إلى الطبقات التلافيفية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح عمليات التلافيف للصور.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح مفاهيم الحشو (Padding) والخطوة (Stride).</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح قنوات الإدخال والإخراج المتعددة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح عملية التجميع (Pooling).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>To describe from fully connected layers to Convolutions.</span></li>
+      <li><span class="obj-icon">✦</span><span>To explain convolutions for images.</span></li>
+      <li><span class="obj-icon">✦</span><span>To explain Padding and Stride.</span></li>
+      <li><span class="obj-icon">✦</span><span>To explain Multiple input and multiple output channels.</span></li>
+      <li><span class="obj-icon">✦</span><span>To explain Pooling.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="from-mlp-to-cnn" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> من الطبقات المتصلة بالكامل إلى التلافيف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> From Fully-Connected Layers to Convolutions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الشبكات العصبية التلافيفية (CNNs) تستغل البنية المكانية للصور لتقليل عدد المعلمات بشكل كبير مقارنة بالشبكات المتصلة بالكامل (MLPs).</p></template>
+    <template class="content-en"><p>CNNs exploit the spatial structure of images to drastically reduce parameters compared to MLPs by using translation invariance and locality.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند التعامل مع الصور عالية الدقة باستخدام شبكات متصلة بالكامل (MLPs)، نواجه مشكلة الانفجار في عدد المعلمات. على سبيل المثال، صورة بدقة 1 ميجابكسل مع طبقة مخفية بحجم 1000 تتطلب مليار معلمة \((10^9)\). لحل هذه المشكلة، تعتمد الشبكات التلافيفية على مبدأين أساسيين:</p><ol><li><b><span class="smart-term" data-term-en="Translation Invariance" data-ar="الثبات تجاه الانتقال" data-en-def="The property where a network responds similarly to a pattern regardless of its location in the input.">الثبات تجاه الانتقال<span class="smart-term-tooltip"></span></span> (Translation Invariance):</b> يجب أن تستجيب الشبكة لنفس النمط (مثل كائن معين) بغض النظر عن موقعه في الصورة.</li><li><b><span class="smart-term" data-term-en="Locality" data-ar="المحلية" data-en-def="The principle that early network layers should focus only on local, nearby regions of the input.">المحلية<span class="smart-term-tooltip"></span></span> (Locality):</b> يجب أن تركز الطبقات الأولى على المناطق المحلية القريبة دون الاهتمام بالمناطق البعيدة.</li></ol></template>
+    <template class="content-en"><p>When dealing with high-resolution images using MLPs, we face a parameter explosion. For instance, a 1-megapixel image with a hidden layer of size 1000 requires 1 billion parameters \((10^9)\). To solve this, CNNs rely on two key principles:</p><ol><li><b><span class="smart-term" data-term-en="Translation Invariance" data-ar="الثبات تجاه الانتقال" data-en-def="The property where a network responds similarly to a pattern regardless of its location in the input.">Translation Invariance<span class="smart-term-tooltip"></span></span>:</b> The network should respond similarly to the same patch, regardless of where it appears in the image.</li><li><b><span class="smart-term" data-term-en="Locality" data-ar="المحلية" data-en-def="The principle that early network layers should focus only on local, nearby regions of the input.">Locality<span class="smart-term-tooltip"></span></span>:</b> The earliest layers should focus on local regions, without regard for distant contents.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا صُممت هكذا؟ لأن الصور الطبيعية تحتوي على بنية غنية؛ فالبيكسلات المجاورة مرتبطة ببعضها البعض بقوة. هذا يمثل "انحيازاً استقرائياً" (Inductive Bias) فعالاً.</p><p>إذا لم تتوافق هذه الانحيازات مع الواقع (مثلاً، إذا كانت البيانات لا تتمتع بخاصية الثبات تجاه الانتقال)، فقد تواجه النماذج صعوبة في التعلم حتى من بيانات التدريب.</p><p>يؤدي هذا التصميم إلى نماذج ذات كفاءة عالية في استخدام العينات (Sample-efficient) وقابلة للتعميم بشكل أفضل.</p></template>
+    <template class="content-en"><p>Why designed this way? Natural images have rich structure where nearby pixels are highly correlated. This acts as a powerful inductive bias.</p><p>If these biases do not agree with reality (e.g., if the data is not translation invariant), the models might struggle even to fit the training data.</p><p>This design leads to highly sample-efficient models that generalize well to unseen data and are computationally efficient to parallelize on GPUs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كنا نحلل بيانات نصية بدلاً من الصور، هل ينطبق مبدأ 'الثبات تجاه الانتقال'؟</template>
+      <template class="content-en">If we were analyzing text data instead of images, does the principle of 'translation invariance' still apply?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، إلى حد ما. الكلمة أو العبارة (مثل 'رائع') تحمل نفس المعنى تقريباً سواء ظهرت في بداية الجملة أو نهايتها، مما يجعل الشبكات التلافيفية 1D مفيدة للنصوص أيضاً.</p></template>
+      <template class="content-en"><p>Yes, to some extent. A word or phrase (like 'awesome') carries roughly the same meaning whether it appears at the beginning or end of a sentence, which is why 1D CNNs are also useful for text.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-correlation-convolution" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الارتباط المتبادل والتلافيف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Cross-Correlation and Convolution</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>العملية الأساسية في الطبقات التلافيفية هي 'الارتباط المتبادل'، حيث تنزلق نافذة (نواة) فوق مصفوفة الإدخال لحساب مجموع الجداءات.</p></template>
+    <template class="content-en"><p>The core operation in convolutional layers is 'cross-correlation', where a window (kernel) slides over the input tensor to compute the sum of element-wise products.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في عملية <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">الارتباط المتبادل<span class="smart-term-tooltip"></span></span> ثنائية الأبعاد، نبدأ بوضع نافذة التلافيف في الزاوية العلوية اليسرى من مصفوفة الإدخال ونقوم بتمريرها من اليسار لليمين ومن الأعلى للأسفل.</p><p>عند كل موضع، يتم ضرب عناصر الإدخال داخل النافذة مع عناصر النواة (Kernel) عنصراً بعنصر، ثم تُجمع النواتج لتعطي قيمة عددية واحدة في مصفوفة الإخراج (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">خريطة الميزات<span class="smart-term-tooltip"></span></span>).</p><p>ملاحظة: التلافيف الرياضي الدقيق يتطلب قلب النواة أفقياً وعمودياً قبل العملية. ولكن بما أن الأوزان (النواة) يتم تعلمها من البيانات، فإن استخدام الارتباط المتبادل يعطي نفس النتائج عملياً.</p></template>
+    <template class="content-en"><p>In the 2D <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">cross-correlation<span class="smart-term-tooltip"></span></span> operation, we begin with the convolution window at the top-left corner of the input tensor and slide it across from left to right and top to bottom.</p><p>At each position, the input subtensor and the kernel tensor are multiplied element-wise, and the resulting tensor is summed up yielding a single scalar value in the output (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">feature map<span class="smart-term-tooltip"></span></span>).</p><p>Note: Strict mathematical convolution requires flipping the kernel horizontally and vertically. However, since kernels are learned from data, using cross-correlation yields equivalent results in practice.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُطلق على مصفوفة الإخراج اسم 'خريطة الميزات' (Feature Map). كل عنصر فيها يمتلك 'مجال استقبال' (Receptive Field)، وهو مجموعة العناصر من الطبقات السابقة التي أثرت في حسابه.</p><p>كلما تعمقنا في الشبكة، يصبح <span class="smart-term" data-term-en="Receptive Field" data-ar="مجال الاستقبال" data-en-def="The region in the input space that a particular CNN feature is looking at.">مجال الاستقبال<span class="smart-term-tooltip"></span></span> أكبر، مما يسمح للشبكة باكتشاف ميزات أوسع وأكثر تعقيداً في الصورة الأصلية.</p><p>يمكن استخدام هذه العملية البسيطة لاكتشاف الحواف (Edge Detection) عن طريق تصميم نواة مخصصة (مثل [1, -1]).</p></template>
+    <template class="content-en"><p>The output tensor is called a 'feature map'. Each element in it has a '<span class="smart-term" data-term-en="Receptive Field" data-ar="مجال الاستقبال" data-en-def="The region in the input space that a particular CNN feature is looking at.">receptive field<span class="smart-term-tooltip"></span></span>', which refers to all elements from previous layers that affected its calculation.</p><p>As we go deeper into the network, the receptive field becomes larger, allowing the network to detect broader and more complex features in the original image.</p><p>This simple operation can be used for Edge Detection by designing a specific kernel (e.g., [1, -1] to find pixel changes).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>المعادلة الرياضية للارتباط المتبادل ثنائي الأبعاد.</strong></template>
+      <template class="content-en"><strong>Mathematical equation for 2D cross-correlation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$(f * g)(i, j) = \sum_a \sum_b f(a, b) g(i - a, j - b)$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a 2D cross-correlation operation. On the left, a 3x3 input grid (values 0-8). In the middle, a 2x2 kernel grid (values 0,1,2,3). On the right, a 2x2 output grid. Highlight the top-left 2x2 area of the input and show arrows pointing to the calculation of the top-left output cell (0x0 + 1x1 + 3x2 + 4x3 = 19). Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Drop Shadow for Calculation Box -->
+        <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.08" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">2D Cross-Correlation Operation</text>
+    <text x="400" y="40" font-size="22" font-weight="bold" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">عملية الارتباط المتبادل ثنائية الأبعاد</text>
+
+    <!-- Grid Titles -->
+    <text x="139" y="80" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Input (3×3)</text>
+    <text x="139" y="80" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">المدخلات (3×3)</text>
+
+    <text x="379" y="100" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Kernel (2×2)</text>
+    <text x="379" y="100" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">النواة (2×2)</text>
+
+    <text x="619" y="100" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Output (2×2)</text>
+    <text x="619" y="100" font-size="16" font-weight="600" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">المخرجات (2×2)</text>
+
+    <!-- ================= INPUT GRID (3x3) ================= -->
+    <g id="input-grid">
+        <!-- Highlight Bounding Box -->
+        <rect x="76" y="96" width="86" height="86" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+        
+        <!-- Row 0 -->
+        <rect x="80" y="100" width="38" height="38" rx="4" fill="var(--brand-500)" />
+        <text x="99" y="125" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)">0</text>
+        
+        <rect x="120" y="100" width="38" height="38" rx="4" fill="var(--brand-500)" />
+        <text x="139" y="125" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)">1</text>
+        
+        <rect x="160" y="100" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="179" y="125" font-size="16" text-anchor="middle" fill="var(--text-primary)">2</text>
+
+        <!-- Row 1 -->
+        <rect x="80" y="140" width="38" height="38" rx="4" fill="var(--brand-500)" />
+        <text x="99" y="165" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)">3</text>
+        
+        <rect x="120" y="140" width="38" height="38" rx="4" fill="var(--brand-500)" />
+        <text x="139" y="165" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)">4</text>
+        
+        <rect x="160" y="140" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="179" y="165" font-size="16" text-anchor="middle" fill="var(--text-primary)">5</text>
+
+        <!-- Row 2 -->
+        <rect x="80" y="180" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="99" y="205" font-size="16" text-anchor="middle" fill="var(--text-primary)">6</text>
+        
+        <rect x="120" y="180" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="139" y="205" font-size="16" text-anchor="middle" fill="var(--text-primary)">7</text>
+        
+        <rect x="160" y="180" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="179" y="205" font-size="16" text-anchor="middle" fill="var(--text-primary)">8</text>
+    </g>
+
+    <!-- Operator: Multiply -->
+    <text x="259" y="165" font-size="28" font-weight="bold" text-anchor="middle" fill="var(--text-muted)">*</text>
+
+    <!-- ================= KERNEL GRID (2x2) ================= -->
+    <g id="kernel-grid">
+        <!-- Kernel Bounding Box -->
+        <rect x="336" y="116" width="86" height="86" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <!-- Row 0 -->
+        <rect x="340" y="120" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+        <text x="359" y="145" font-size="16" text-anchor="middle" fill="var(--text-primary)">0</text>
+        
+        <rect x="380" y="120" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+        <text x="399" y="145" font-size="16" text-anchor="middle" fill="var(--text-primary)">1</text>
+
+        <!-- Row 1 -->
+        <rect x="340" y="160" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+        <text x="359" y="185" font-size="16" text-anchor="middle" fill="var(--text-primary)">2</text>
+        
+        <rect x="380" y="160" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" />
+        <text x="399" y="185" font-size="16" text-anchor="middle" fill="var(--text-primary)">3</text>
+    </g>
+
+    <!-- Operator: Equals -->
+    <text x="499" y="165" font-size="28" font-weight="bold" text-anchor="middle" fill="var(--text-muted)">=</text>
+
+    <!-- ================= OUTPUT GRID (2x2) ================= -->
+    <g id="output-grid">
+        <!-- Highlight Bounding Box -->
+        <rect x="576" y="116" width="46" height="46" rx="6" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+        
+        <!-- Row 0 -->
+        <rect x="580" y="120" width="38" height="38" rx="4" fill="var(--brand-500)" />
+        <text x="599" y="145" font-size="16" font-weight="bold" text-anchor="middle" fill="var(--on-brand-lo)">19</text>
+        
+        <rect x="620" y="120" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="639" y="145" font-size="16" text-anchor="middle" fill="var(--text-primary)">25</text>
+
+        <!-- Row 1 -->
+        <rect x="580" y="160" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="599" y="185" font-size="16" text-anchor="middle" fill="var(--text-primary)">37</text>
+        
+        <rect x="620" y="160" width="38" height="38" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="639" y="185" font-size="16" text-anchor="middle" fill="var(--text-primary)">43</text>
+    </g>
+
+    <!-- ================= CALCULATION SECTION ================= -->
+    
+    <!-- Connecting Arrows -->
+    <!-- Input to Calc -->
+    <line x1="119" y1="182" x2="119" y2="252" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" stroke-linecap="round" marker-end="url(#arrow)" />
+    
+    <!-- Kernel to Calc -->
+    <line x1="379" y1="202" x2="379" y2="252" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" stroke-linecap="round" marker-end="url(#arrow)" />
+    
+    <!-- Calc to Output -->
+    <line x1="599" y1="260" x2="599" y2="170" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" marker-end="url(#arrow)" />
+
+    <!-- Calculation Box -->
+    <rect x="99" y="260" width="560" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    
+    <!-- Equation Text -->
+    <text x="379" y="296" font-size="18" font-weight="500" text-anchor="middle" fill="var(--text-primary)">
+        (<tspan fill="var(--brand-ink)">0</tspan> × 0) + 
+        (<tspan fill="var(--brand-ink)">1</tspan> × 1) + 
+        (<tspan fill="var(--brand-ink)">3</tspan> × 2) + 
+        (<tspan fill="var(--brand-ink)">4</tspan> × 3) = 
+        <tspan fill="var(--brand-ink-strong)" font-weight="bold">19</tspan>
+    </text>
+
+    <!-- Calculation Subtext -->
+    <text x="379" y="345" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-en">Element-wise multiplication and sum</text>
+    <text x="379" y="345" font-size="14" text-anchor="middle" fill="var(--text-secondary)" class="gsvg-ar">الضرب للعناصر المتقابلة والجمع</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Cross-Correlation</th><th>Strict Convolution</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قلب النواة (Kernel Flipping)</template>
+          <template class="content-en">Kernel Flipping</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يتم قلب النواة</template>
+          <template class="content-en">Kernel is not flipped</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتم قلب النواة أفقياً وعمودياً</template>
+          <template class="content-en">Kernel is flipped horizontally and vertically</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاستخدام في التعلم العميق</template>
+          <template class="content-en">Usage in Deep Learning</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">العملية الفعلية المستخدمة في مكتبات الـ DL</template>
+          <template class="content-en">The actual operation used in DL frameworks</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير مستخدمة عملياً (لأن الأوزان تُتعلم)</template>
+          <template class="content-en">Not used in practice (since weights are learned)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نهتم بقلب النواة (Kernel) في التعلم العميق كما نفعل في الرياضيات البحتة؟</template>
+      <template class="content-en">Why don't we bother flipping the kernel in deep learning like we do in pure mathematics?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن قيم النواة يتم تعلمها أثناء التدريب. إذا كانت النواة المقلوبة هي الأمثل، فإن الشبكة ستتعلم ببساطة تلك القيم مباشرة دون الحاجة لخطوة القلب.</p></template>
+      <template class="content-en"><p>Because the kernel values are learned during training. If the flipped kernel is optimal, the network will simply learn those values directly without needing an explicit flipping step.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="padding-and-stride" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الحشو والخطوة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Padding and Stride</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يُستخدم الحشو (Padding) للحفاظ على الأبعاد المكانية للصورة، بينما تُستخدم الخطوة (Stride) لتقليل الأبعاد (Downsampling) وتسريع الحسابات.</p></template>
+    <template class="content-en"><p>Padding is used to preserve the spatial dimensions of the image, while Stride is used to downsample the output and speed up computations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Padding" data-ar="الحشو" data-en-def="Adding extra pixels (usually zeros) around the boundary of an input image to control output shape.">الحشو<span class="smart-term-tooltip"></span></span> (Padding):</b> عند تطبيق التلافيف، نفقد عادةً بيكسلات من حواف الصورة. لحل ذلك، نضيف صفوفاً وأعمدة إضافية (عادةً أصفار) حول حدود الإدخال. هذا يمنع الصورة من الانكماش السريع ويحافظ على معلومات الحواف.</p><p><b><span class="smart-term" data-term-en="Stride" data-ar="الخطوة" data-en-def="The number of rows and columns traversed per slide of the convolution window.">الخطوة<span class="smart-term-tooltip"></span></span> (Stride):</b> بدلاً من تحريك نافذة التلافيف عنصراً واحداً في كل مرة، يمكننا تحريكها بعدة عناصر (مثلاً خطوة = 2). هذا يقلل من حجم المخرجات بشكل كبير (Downsampling).</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Padding" data-ar="الحشو" data-en-def="Adding extra pixels (usually zeros) around the boundary of an input image to control output shape.">Padding<span class="smart-term-tooltip"></span></span>:</b> When applying convolutions, we tend to lose pixels on the perimeter. To solve this, we add extra pixels (usually zeros) around the boundary of the input. This prevents rapid shrinking and preserves edge information.</p><p><b><span class="smart-term" data-term-en="Stride" data-ar="الخطوة" data-en-def="The number of rows and columns traversed per slide of the convolution window.">Stride<span class="smart-term-tooltip"></span></span>:</b> Instead of sliding the window one element at a time, we can move it by multiple elements (e.g., stride = 2). This drastically reduces the output dimensionality (downsampling).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُفضل الشبكات العصبية التلافيفية استخدام نويات ذات أحجام فردية (مثل 1، 3، 5، 7). الفائدة من ذلك هي إمكانية الحفاظ على الأبعاد المكانية بدقة عن طريق إضافة نفس عدد صفوف الحشو في الأعلى والأسفل، واليمين واليسار.</p><p>بالإضافة إلى ذلك، مع النويات الفردية، يكون بيكسل الإخراج متمركزاً تماماً فوق بيكسل الإدخال المقابل له.</p><p>الخطوة الأكبر من 1 مفيدة جداً عندما تكون دقة الإدخال الأصلية كبيرة جداً وغير عملية للحساب.</p></template>
+    <template class="content-en"><p>CNNs commonly use odd-sized kernels (e.g., 1, 3, 5, 7). The benefit is that we can preserve spatial dimensionality by padding with the same number of rows/columns on all sides.</p><p>Moreover, with odd kernels, the output pixel is perfectly centered over the corresponding input pixel.</p><p>Strides > 1 are highly useful when the original input resolution is unwieldy and we need computational efficiency.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show two side-by-step diagrams. Left: Padding. A 3x3 grid surrounded by a border of 0s making it 5x5. Right: Stride. A grid showing a 2x2 kernel jumping by 2 cells horizontally and 3 cells vertically, leaving gaps. Style: educational, dark background #0d1117, accent colors #2ea043 and #f85149, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Center Divider -->
+  <line x1="400" y1="60" x2="400" y2="360" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+  <!-- ========================================== -->
+  <!-- LEFT DIAGRAM: PADDING                      -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="200" y="50" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">Padding</text>
+  <text x="200" y="50" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">الحشو (Padding)</text>
+
+  <!-- Padding Label & Arrow -->
+  <text x="200" y="90" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Padding = 1</text>
+  <text x="200" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">الحشو = 1</text>
+  <path d="M 200 100 L 200 132" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Grid Backgrounds -->
+  <!-- Outer 5x5 (Padding) -->
+  <rect x="100" y="140" width="200" height="200" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+  <!-- Inner 3x3 (Original Input) -->
+  <rect x="140" y="180" width="120" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Grid Lines -->
+  <g stroke="var(--border-color)" stroke-width="1" opacity="0.5">
+    <!-- Verticals -->
+    <line x1="140" y1="140" x2="140" y2="340" />
+    <line x1="180" y1="140" x2="180" y2="340" />
+    <line x1="220" y1="140" x2="220" y2="340" />
+    <line x1="260" y1="140" x2="260" y2="340" />
+    <!-- Horizontals -->
+    <line x1="100" y1="180" x2="300" y2="180" />
+    <line x1="100" y1="220" x2="300" y2="220" />
+    <line x1="100" y1="260" x2="300" y2="260" />
+    <line x1="100" y1="300" x2="300" y2="300" />
+  </g>
+
+  <!-- Padding Zeros -->
+  <g fill="var(--brand-ink)" font-size="16" font-weight="bold" text-anchor="middle">
+    <!-- Top Row -->
+    <text x="120" y="166">0</text>
+    <text x="160" y="166">0</text>
+    <text x="200" y="166">0</text>
+    <text x="240" y="166">0</text>
+    <text x="280" y="166">0</text>
+    <!-- Middle Rows (Edges) -->
+    <text x="120" y="206">0</text> <text x="280" y="206">0</text>
+    <text x="120" y="246">0</text> <text x="280" y="246">0</text>
+    <text x="120" y="286">0</text> <text x="280" y="286">0</text>
+    <!-- Bottom Row -->
+    <text x="120" y="326">0</text>
+    <text x="160" y="326">0</text>
+    <text x="200" y="326">0</text>
+    <text x="240" y="326">0</text>
+    <text x="280" y="326">0</text>
+  </g>
+
+  <!-- Subtitle -->
+  <text x="200" y="380" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Adds zeros to preserve spatial dimensions</text>
+  <text x="200" y="380" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">إضافة أصفار للحفاظ على الأبعاد المكانية</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT DIAGRAM: STRIDE                      -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="600" y="50" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">Stride</text>
+  <text x="600" y="50" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">الخطوة (Stride)</text>
+
+  <!-- Stride Labels -->
+  <text x="600" y="80" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Stride = 2</text>
+  <text x="600" y="80" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">الخطوة = 2</text>
+  
+  <text x="445" y="245" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Stride = 3</text>
+  <text x="445" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">الخطوة = 3</text>
+
+  <!-- Stride Arrows -->
+  <!-- Horizontal Jump -->
+  <path d="M 560 130 Q 600 90 640 130" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <!-- Vertical Jump -->
+  <path d="M 510 180 Q 460 240 510 300" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Grid Background (5x5) -->
+  <rect x="520" y="140" width="200" height="200" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Grid Lines -->
+  <g stroke="var(--border-color)" stroke-width="1" opacity="0.5">
+    <!-- Verticals -->
+    <line x1="560" y1="140" x2="560" y2="340" />
+    <line x1="600" y1="140" x2="600" y2="340" />
+    <line x1="640" y1="140" x2="640" y2="340" />
+    <line x1="680" y1="140" x2="680" y2="340" />
+    <!-- Horizontals -->
+    <line x1="520" y1="180" x2="720" y2="180" />
+    <line x1="520" y1="220" x2="720" y2="220" />
+    <line x1="520" y1="260" x2="720" y2="260" />
+    <line x1="520" y1="300" x2="720" y2="300" />
+  </g>
+
+  <!-- Kernels (2x2) -->
+  <!-- Initial Position (0,0) -->
+  <rect x="520" y="140" width="80" height="80" fill="var(--brand-500)" opacity="0.15" stroke="var(--brand-500)" stroke-width="3" rx="4" />
+  
+  <!-- Jumped Position Horizontal (2,0) -->
+  <rect x="600" y="140" width="80" height="80" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" rx="4" />
+  
+  <!-- Jumped Position Vertical (0,3) -->
+  <rect x="520" y="260" width="80" height="80" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" rx="4" />
+  
+  <!-- Jumped Position Both (2,3) -->
+  <rect x="600" y="260" width="80" height="80" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" rx="4" />
+
+  <!-- Subtitle -->
+  <text x="600" y="380" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Jumps multiple pixels to downsample the output</text>
+  <text x="600" y="380" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">القفز بعدة بكسلات لتقليل أبعاد المخرجات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا صورة 240x240 وطبقنا 10 طبقات تلافيفية بنواة 5x5 بدون حشو، ماذا سيحدث لحجم الصورة؟</template>
+      <template class="content-en">If we have a 240x240 image and apply 10 convolutional layers with a 5x5 kernel and no padding, what happens to the image size?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>كل طبقة ستقلص الحجم بمقدار 4 بيكسلات (5-1). بعد 10 طبقات، سيتقلص الحجم بمقدار 40 بيكسل، لتصبح الصورة 200x200، مما يؤدي إلى فقدان معلومات الحواف.</p></template>
+      <template class="content-en"><p>Each layer reduces the size by 4 pixels (5-1). After 10 layers, it reduces by 40 pixels, making the image 200x200, obliterating edge information.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multiple-channels" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> القنوات المتعددة (الإدخال والإخراج)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Multiple Input and Output Channels</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتعامل الشبكات التلافيفية مع الصور ككائنات ثلاثية الأبعاد (عرض، ارتفاع، قنوات)، وتستخدم نويات ثلاثية الأبعاد لإنتاج خرائط ميزات متعددة القنوات.</p></template>
+    <template class="content-en"><p>CNNs treat images as 3D tensors (width, height, channels) and use 3D kernels to produce multi-channel feature maps.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>قنوات الإدخال:</b> الصور الحقيقية ليست ثنائية الأبعاد، بل تحتوي على قنوات (مثل RGB). لذلك، يجب أن تحتوي النواة (Kernel) على نفس عدد قنوات الإدخال. يتم حساب الارتباط المتبادل لكل قناة على حدة، ثم تُجمع النتائج معاً لإنتاج قيمة واحدة.</p><p><b>قنوات الإخراج:</b> عادة ما نزيد عدد القنوات كلما تعمقنا في الشبكة. للحصول على قنوات إخراج متعددة، نقوم بإنشاء نواة منفصلة (ثلاثية الأبعاد) لكل قناة إخراج، ثم ندمج (Concatenate) النتائج.</p></template>
+    <template class="content-en"><p><b>Input Channels:</b> Real images have channels (e.g., RGB). Thus, the kernel must have the same number of input channels. Cross-correlation is performed per channel, and the results are summed up.</p><p><b>Output Channels:</b> We typically increase the <span class="smart-term" data-term-en="Channel Dimension" data-ar="بُعد القناة" data-en-def="The third axis of an image tensor, representing different aspects like color (RGB) or learned features.">channel dimension<span class="smart-term-tooltip"></span></span> deeper in the network. To get multiple output channels, we create a separate 3D kernel for every output channel and concatenate the results.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حدسياً، يمكن التفكير في كل قناة إخراج على أنها تستجيب لمجموعة مختلفة من الميزات (مثلاً: قناة لاكتشاف الحواف، وأخرى للنسيج).</p><p>في الواقع، التمثيلات لا يتم تعلمها بشكل مستقل، بل يتم تحسينها لتكون مفيدة بشكل مشترك. قد لا تتعلم قناة واحدة ميزة محددة، بل إن اتجاهاً معيناً في 'فضاء القنوات' هو ما يمثل الميزة.</p><p>هذا التصميم يسمح بمبادلة الدقة المكانية (التي تقل) بعمق القنوات (الذي يزداد) لاستخراج ميزات دلالية أعقد.</p></template>
+    <template class="content-en"><p>Intuitively, each output channel can be thought of as responding to a different set of features (e.g., edges vs. textures).</p><p>In reality, representations are not learned independently but are optimized to be jointly useful. A specific feature might correspond to a direction in the channel space rather than a single channel.</p><p>This allows trading off spatial resolution (which decreases) for greater channel depth (which increases) to extract complex semantic features.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا إدخال بـ 3 قنوات، ونريد إخراجاً بـ 10 قنوات باستخدام نواة 3x3، ما هو شكل مصفوفة الأوزان (النواة) الكلية؟</template>
+      <template class="content-en">If we have an input with 3 channels and want an output with 10 channels using a 3x3 kernel, what is the shape of the total weight tensor?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشكل سيكون: 10 (قنوات الإخراج) × 3 (قنوات الإدخال) × 3 (الارتفاع) × 3 (العرض).</p></template>
+      <template class="content-en"><p>The shape will be: 10 (output channels) x 3 (input channels) x 3 (height) x 3 (width).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="1x1-convolution" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الطبقة التلافيفية 1x1</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> 1x1 Convolutional Layer</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تعمل الطبقة التلافيفية 1x1 كطبقة متصلة بالكامل تُطبق على كل بيكسل على حدة، وتُستخدم أساساً لتعديل عدد القنوات.</p></template>
+    <template class="content-en"><p>A 1x1 convolutional layer acts as a fully-connected layer applied on a per-pixel basis, primarily used to adjust the number of channels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>للوهلة الأولى، قد يبدو التلافيف بحجم 1x1 بلا معنى لأنه لا يربط البيكسلات المتجاورة مكانياً. ومع ذلك، فهو عملية شائعة جداً في الشبكات العميقة المعقدة.</p><p>بما أن النافذة هي 1x1، فإن هذه الطبقة تفقد القدرة على التعرف على الأنماط المكانية. بدلاً من ذلك، يحدث الحساب بالكامل عبر <b>بُعد القنوات</b>.</p><p>كل عنصر في الإخراج هو عبارة عن تركيبة خطية (Linear Combination) للعناصر الموجودة في نفس الموضع المكاني عبر قنوات الإدخال المختلفة.</p></template>
+    <template class="content-en"><p>At first, a <span class="smart-term" data-term-en="1x1 Convolution" data-ar="تلافيف 1x1" data-en-def="A convolution operation with a 1x1 kernel, used to mix channels and adjust depth without affecting spatial dimensions.">1x1 convolution<span class="smart-term-tooltip"></span></span> seems to make no sense because it doesn't correlate adjacent spatial pixels. Nonetheless, it is highly popular in complex deep networks.</p><p>Because the window is 1x1, it loses the ability to recognize spatial patterns. Instead, the computation occurs entirely on the <b>channel dimension</b>.</p><p>Each output element is a linear combination of elements at the same spatial position across the input channels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يمكن التفكير في ال<span class="smart-term" data-term-en="1x1 Convolution" data-ar="تلافيف 1x1" data-en-def="A convolution operation with a 1x1 kernel, used to mix channels and adjust depth without affecting spatial dimensions.">تلافيف 1x1<span class="smart-term-tooltip"></span></span> على أنه طبقة متصلة بالكامل (MLP) تُطبق في كل موقع بيكسل لتحويل قيم الإدخال إلى قيم إخراج جديدة.</p><p>تُستخدم هذه الطبقات بشكل استراتيجي للتحكم في تعقيد النموذج (Model Complexity) وتقليل الأبعاد (Dimensionality Reduction) عبر القنوات قبل تطبيق تلافيفات أكبر وأكثر تكلفة حسابياً.</p><p>تتطلب هذه الطبقة عدد أوزان يساوي (قنوات الإخراج × قنوات الإدخال).</p></template>
+    <template class="content-en"><p>You can think of a 1x1 convolution as a fully-connected layer applied at every single pixel location to transform input values into output values.</p><p>These layers are strategically used to control model complexity and perform dimensionality reduction across channels before applying more computationally expensive larger convolutions.</p><p>The 1x1 layer requires (output channels x input channels) weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لتلافيف 1x1 أن يقلل من التكلفة الحسابية للشبكة؟</template>
+      <template class="content-en">How can a 1x1 convolution reduce the computational cost of a network?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال تقليل عدد القنوات (مثلاً من 256 إلى 64) قبل تمرير البيانات إلى طبقة تلافيفية 3x3، مما يقلل بشكل كبير من عدد عمليات الضرب المطلوبة في الطبقة التالية.</p></template>
+      <template class="content-en"><p>By reducing the number of channels (e.g., from 256 to 64) before passing the data to a 3x3 convolutional layer, drastically reducing the number of multiplications needed in the subsequent layer.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pooling-layers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> طبقات التجميع (Pooling)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Pooling Layers</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقوم طبقات التجميع بتقليل الدقة المكانية للبيانات وتوفير ثبات إضافي تجاه الانتقال، وذلك بدون استخدام أي معلمات قابلة للتعلم.</p></template>
+    <template class="content-en"><p>Pooling layers reduce spatial resolution and provide additional translation invariance, without using any learnable parameters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>غالباً ما نحتاج إلى تقليل الدقة المكانية تدريجياً لتجميع المعلومات، بحيث تصبح العقد في الطبقات العليا حساسة لمجال استقبال أكبر (رؤية أوسع للصورة).</p><p>تتكون طبقات التجميع من نافذة ثابتة تنزلق فوق الإدخال. على عكس التلافيف، <b>لا تحتوي طبقات التجميع على معلمات (لا يوجد أوزان)</b>.</p><p>العمليتان الأكثر شيوعاً هما:</p><ul><li><b><span class="smart-term" data-term-en="Max Pooling" data-ar="التجميع الأقصى" data-en-def="A pooling operation that outputs the maximum value within the pooling window.">التجميع الأقصى<span class="smart-term-tooltip"></span></span> (Max Pooling):</b> يأخذ القيمة القصوى داخل النافذة.</li><li><b><span class="smart-term" data-term-en="Average Pooling" data-ar="التجميع المتوسط" data-en-def="A pooling operation that outputs the average value within the pooling window.">التجميع المتوسط<span class="smart-term-tooltip"></span></span> (Average Pooling):</b> يأخذ متوسط القيم داخل النافذة.</li></ul></template>
+    <template class="content-en"><p>We often want to gradually reduce spatial resolution to aggregate information, so higher nodes become sensitive to a larger receptive field (broader view of the image).</p><p>Pooling layers consist of a fixed-shape window sliding over the input. Unlike convolutions, <b>pooling layers contain no parameters (no weights)</b>.</p><p>The two most common operations are:</p><ul><li><b><span class="smart-term" data-term-en="Max Pooling" data-ar="التجميع الأقصى" data-en-def="A pooling operation that outputs the maximum value within the pooling window.">Max Pooling<span class="smart-term-tooltip"></span></span>:</b> Takes the maximum value in the window.</li><li><b><span class="smart-term" data-term-en="Average Pooling" data-ar="التجميع المتوسط" data-en-def="A pooling operation that outputs the average value within the pooling window.">Average Pooling<span class="smart-term-tooltip"></span></span>:</b> Takes the average value in the window.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفائدة الكبرى للتجميع هي تخفيف الحساسية المفرطة للموقع الدقيق للميزات. في الواقع، نادراً ما تظهر الكائنات في نفس المكان بالضبط (بسبب اهتزاز الكاميرا مثلاً). التجميع الأقصى يضمن أنه إذا تحركت الميزة بيكسلاً واحداً، فإن المخرجات قد لا تتغير.</p><p>عند معالجة بيانات متعددة القنوات، تقوم طبقة التجميع بمعالجة <b>كل قناة على حدة</b>، بدلاً من جمعها كما يحدث في التلافيف. لذلك، عدد قنوات الإخراج يساوي عدد قنوات الإدخال.</p><p>يمكن أيضاً تطبيق الحشو والخطوة (Padding & Stride) على طبقات التجميع للتحكم في حجم المخرجات.</p></template>
+    <template class="content-en"><p>A major benefit of pooling is alleviating excessive sensitivity to exact feature locations. In reality, objects rarely occur in the exact same place (e.g., due to camera vibration). Max pooling ensures that if a feature shifts by a pixel, the output might remain unchanged.</p><p>When processing multi-channel data, the pooling layer pools <b>each channel separately</b>, rather than summing them up like convolutions. Thus, output channels equal input channels.</p><p>Padding and stride can also be applied to pooling layers to control output dimensions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Show a 2x2 Max Pooling operation. Input is a 3x3 grid. A 2x2 window highlights the top-left (values 0,1,3,4) -> outputs 4. Show the window sliding to produce a 2x2 output grid. Style: educational, dark background #0d1117, accent color #d2a8ff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for primary brand color -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for secondary/muted brand color -->
+        <marker id="arrow-brand-400" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+        <!-- Drop shadow for elevated elements -->
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.1" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Titles -->
+        <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-size="22" font-weight="bold" fill="var(--text-primary)">Max Pooling Layer</text>
+        <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-size="22" font-weight="bold" fill="var(--text-primary)">طبقة التجميع الأقصى</text>
+        
+        <text x="400" y="65" text-anchor="middle" class="gsvg-en" font-size="15" fill="var(--text-secondary)">Slides a 2x2 window to extract the maximum value, reducing spatial dimensions</text>
+        <text x="400" y="65" text-anchor="middle" class="gsvg-ar" font-size="15" fill="var(--text-secondary)">تمرير نافذة 2×2 لاستخراج القيمة القصوى، مما يقلل الأبعاد المكانية</text>
+
+        <!-- ================= INPUT GRID SECTION ================= -->
+        <g>
+            <!-- Base Grid Background -->
+            <rect x="80" y="145" width="150" height="150" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            
+            <!-- Ghost Window (Next Position) -->
+            <rect x="130" y="145" width="100" height="100" fill="none" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="6,4" />
+            
+            <!-- Highlighted Window Fill -->
+            <rect x="80" y="145" width="100" height="100" fill="var(--brand-500)" />
+            
+            <!-- Grid Inner Lines -->
+            <line x1="130" y1="145" x2="130" y2="295" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="180" y1="145" x2="180" y2="295" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="80" y1="195" x2="230" y2="195" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="80" y1="245" x2="230" y2="245" stroke="var(--border-color)" stroke-width="2" />
+            
+            <!-- Highlighted Window Border (On Top) -->
+            <rect x="80" y="145" width="100" height="100" fill="none" stroke="var(--brand-500)" stroke-width="3" />
+
+            <!-- Input Values -->
+            <g font-size="18" font-weight="bold" text-anchor="middle">
+                <!-- Row 1 -->
+                <text x="105" y="170" dy=".3em" fill="var(--on-brand-lo)">0</text>
+                <text x="155" y="170" dy=".3em" fill="var(--on-brand-lo)">1</text>
+                <text x="205" y="170" dy=".3em" fill="var(--text-primary)">2</text>
+                <!-- Row 2 -->
+                <text x="105" y="220" dy=".3em" fill="var(--on-brand-lo)">3</text>
+                <text x="155" y="220" dy=".3em" fill="var(--on-brand-lo)">4</text>
+                <text x="205" y="220" dy=".3em" fill="var(--text-primary)">5</text>
+                <!-- Row 3 -->
+                <text x="105" y="270" dy=".3em" fill="var(--text-primary)">6</text>
+                <text x="155" y="270" dy=".3em" fill="var(--text-primary)">7</text>
+                <text x="205" y="270" dy=".3em" fill="var(--text-primary)">8</text>
+            </g>
+
+            <!-- Slide Indicator -->
+            <path d="M 130 130 L 170 130" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-brand-400)" />
+            <text x="150" y="120" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--brand-ink)">Stride = 1</text>
+            <text x="150" y="120" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--brand-ink)">الخطوة = 1</text>
+
+            <!-- Input Label -->
+            <text x="155" y="325" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">Input Feature Map (3x3)</text>
+            <text x="155" y="325" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">خريطة الميزات المدخلة (3×3)</text>
+        </g>
+
+        <!-- ================= MIDDLE OPERATION SECTION ================= -->
+        <g>
+            <!-- Path from Input to Max Box -->
+            <path d="M 190 195 L 335 195" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <text x="262.5" y="185" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">{0, 1, 3, 4}</text>
+            <text x="262.5" y="185" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">{0, 1, 3, 4}</text>
+
+            <!-- Max Operation Box -->
+            <rect x="345" y="165" width="105" height="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="8" filter="url(#shadow)" />
+            <text x="397.5" y="195" dy=".3em" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)">Max()</text>
+            <text x="397.5" y="195" dy=".3em" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)">أقصى()</text>
+            
+            <text x="397.5" y="245" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-muted)">No learnable parameters</text>
+            <text x="397.5" y="245" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-muted)">لا توجد معلمات قابلة للتعلم</text>
+
+            <!-- Path from Max Box to Output -->
+            <path d="M 460 195 L 605 195" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <text x="532.5" y="185" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)">4</text>
+            <text x="532.5" y="185" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)">4</text>
+        </g>
+
+        <!-- ================= OUTPUT GRID SECTION ================= -->
+        <g>
+            <!-- Base Grid Background -->
+            <rect x="620" y="170" width="100" height="100" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+            
+            <!-- Ghost Cell (Next Position) -->
+            <rect x="670" y="170" width="50" height="50" fill="none" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="6,4" />
+            
+            <!-- Highlighted Cell Fill -->
+            <rect x="620" y="170" width="50" height="50" fill="var(--brand-500)" />
+            
+            <!-- Grid Inner Lines -->
+            <line x1="670" y1="170" x2="670" y2="270" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="620" y1="220" x2="720" y2="220" stroke="var(--border-color)" stroke-width="2" />
+            
+            <!-- Highlighted Cell Border (On Top) -->
+            <rect x="620" y="170" width="50" height="50" fill="none" stroke="var(--brand-500)" stroke-width="3" />
+
+            <!-- Output Values -->
+            <g font-size="18" font-weight="bold" text-anchor="middle">
+                <text x="645" y="195" dy=".3em" fill="var(--on-brand-lo)">4</text>
+                <text x="695" y="195" dy=".3em" fill="var(--text-primary)">5</text>
+                <text x="645" y="245" dy=".3em" fill="var(--text-primary)">7</text>
+                <text x="695" y="245" dy=".3em" fill="var(--text-primary)">8</text>
+            </g>
+
+            <!-- Slide Indicator -->
+            <path d="M 645 155 L 685 155" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-brand-400)" />
+            <text x="665" y="145" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--brand-ink)">Next</text>
+            <text x="665" y="145" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--brand-ink)">التالي</text>
+
+            <!-- Output Label -->
+            <text x="670" y="300" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">Pooled Map (2x2)</text>
+            <text x="670" y="300" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">الخريطة المجمعة (2×2)</text>
+        </g>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Max Pooling</th><th>Average Pooling</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة الحساب</template>
+          <template class="content-en">Calculation Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يأخذ أعلى قيمة في النافذة</template>
+          <template class="content-en">Takes the highest value in the window</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يأخذ متوسط القيم في النافذة</template>
+          <template class="content-en">Takes the average of values in the window</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفضل التجميع الأقصى (Max Pooling) غالباً على التجميع المتوسط في مهام الرؤية الحاسوبية؟</template>
+      <template class="content-en">Why is Max Pooling often preferred over Average Pooling in computer vision tasks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التجميع الأقصى يحافظ على أقوى استجابة للميزة (مثل حافة حادة) داخل النافذة، بينما التجميع المتوسط قد يخفف أو يضعف هذه الاستجابة.</p></template>
+      <template class="content-en"><p>Because Max Pooling preserves the strongest feature activation (like a sharp edge) within the window, whereas Average Pooling dilutes or blurs it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. لقد رأينا كيف أن الشبكات المتصلة بالكامل (MLPs) تنهار أمام الصور بسبب الانفجار في عدد المعلمات. الحل؟ الشبكات العصبية التلافيفية (CNNs). تذكروا دائماً المبدأين السحريين: 'الثبات تجاه الانتقال' و'المحلية'. بدلاً من ربط كل شيء بكل شيء، نستخدم 'نواة' (Kernel) صغيرة تنزلق فوق الصورة وتقوم بعملية 'الارتباط المتبادل'. لكي لا تتقلص الصورة وتختفي حوافها، نستخدم 'الحشو' (Padding). وإذا أردنا تسريع العمل وتقليل الحجم، نزيد 'الخطوة' (Stride). لا تنسوا أن الصور ملونة (قنوات متعددة)، لذا نوياتنا ثلاثية الأبعاد. وإذا أردنا التحكم في عدد القنوات بذكاء، نستخدم التلافيف 1x1. أخيراً، لنجعل شبكتنا أقل حساسية للاهتزازات البسيطة، نمرر البيانات عبر طبقات 'التجميع' (Pooling) التي لا تحتوي على أي أوزان. ركزوا على هذه المفاهيم، فهي أساس كل تطبيقات الرؤية الحاسوبية الحديثة!</template>
+    <template class="content-en">Welcome, friends, to this pivotal module. We've seen how MLPs fail with images due to parameter explosion. The solution? CNNs. Always remember the two magic principles: 'Translation Invariance' and 'Locality'. Instead of connecting everything, we slide a small 'kernel' over the image using 'cross-correlation'. To stop the image from shrinking, we use 'Padding'. To downsample and speed things up, we increase the 'Stride'. Remember, images have depth (RGB channels), so our kernels are 3D. To smartly control channel depth, we use 1x1 convolutions. Finally, to make our network robust to slight shifts, we use parameter-free 'Pooling' layers. Master these building blocks; they are the foundation of all modern computer vision!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم الشبكات المتصلة بالكامل (MLPs) للصور؟</template>
+          <template class="content-en">Why don't we use MLPs for images?</template>
+          <span class="content-target">لماذا لا نستخدم الشبكات المتصلة بالكامل (MLPs) للصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تتجاهل البنية المكانية وتتطلب عدداً هائلاً من المعلمات (مليارات لصور عالية الدقة)، مما يجعل التدريب مستحيلاً.</template>
+          <template class="content-en">Because they ignore spatial structure and require an enormous number of parameters (billions for high-res images), making training impossible.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الثبات تجاه الانتقال (Translation Invariance)؟</template>
+          <template class="content-en">What is Translation Invariance?</template>
+          <span class="content-target">ما هو الثبات تجاه الانتقال (Translation Invariance)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو قدرة الشبكة على التعرف على نفس النمط (مثل وجه) بغض النظر عن مكانه في الصورة.</template>
+          <template class="content-en">It's the network's ability to recognize the same pattern (like a face) regardless of where it is located in the image.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مبدأ المحلية (Locality)؟</template>
+          <template class="content-en">What is the Locality principle?</template>
+          <span class="content-target">ما هو مبدأ المحلية (Locality)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو افتراض أن البيكسلات القريبة من بعضها مرتبطة بقوة، لذا يجب أن تركز الطبقات الأولى على مناطق صغيرة ومحلية فقط.</template>
+          <template class="content-en">The assumption that nearby pixels are strongly related, so early layers should focus only on small, local regions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق العملي بين التلافيف والارتباط المتبادل في التعلم العميق؟</template>
+          <template class="content-en">What is the practical difference between convolution and cross-correlation in DL?</template>
+          <span class="content-target">ما الفرق العملي بين التلافيف والارتباط المتبادل في التعلم العميق؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا يوجد فرق عملي. التلافيف الرياضي يتطلب قلب النواة، لكن في التعلم العميق نستخدم الارتباط المتبادل (بدون قلب) لأن الأوزان تُتعلم من البيانات.</template>
+          <template class="content-en">No practical difference. Math convolution requires flipping the kernel, but in DL we use cross-correlation (no flip) because weights are learned from data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مجال الاستقبال (Receptive Field)؟</template>
+          <template class="content-en">What is a Receptive Field?</template>
+          <span class="content-target">ما هو مجال الاستقبال (Receptive Field)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو المنطقة في صورة الإدخال الأصلية التي تؤثر على قيمة بيكسل معين في خريطة الميزات الحالية.</template>
+          <template class="content-en">The region in the original input image that affects the value of a specific pixel in the current feature map.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الحشو (Padding)؟</template>
+          <template class="content-en">Why do we use Padding?</template>
+          <span class="content-target">لماذا نستخدم الحشو (Padding)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لمنع الصورة من الانكماش بعد كل طبقة تلافيفية وللحفاظ على المعلومات الموجودة على حواف الصورة.</template>
+          <template class="content-en">To prevent the image from shrinking after every convolutional layer and to preserve information at the image edges.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل النويات ذات الأحجام الفردية (مثل 3x3)؟</template>
+          <template class="content-en">Why do we prefer odd-sized kernels (like 3x3)?</template>
+          <span class="content-target">لماذا نفضل النويات ذات الأحجام الفردية (مثل 3x3)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تسمح بإضافة حشو متماثل من جميع الجهات، وتجعل بيكسل الإخراج متمركزاً تماماً فوق بيكسل الإدخال.</template>
+          <template class="content-en">Because they allow symmetric padding on all sides and keep the output pixel perfectly centered over the input pixel.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور الخطوة (Stride)؟</template>
+          <template class="content-en">What is the role of Stride?</template>
+          <span class="content-target">ما هو دور الخطوة (Stride)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحديد مسافة تحرك النافذة. زيادة الخطوة يقلل من حجم المخرجات (Downsampling) ويسرع الحسابات.</template>
+          <template class="content-en">It determines how far the window moves. Increasing stride reduces the output size (downsampling) and speeds up computation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفائدة من التلافيف 1x1؟</template>
+          <template class="content-en">What is the benefit of a 1x1 convolution?</template>
+          <span class="content-target">ما الفائدة من التلافيف 1x1؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يُستخدم لدمج القنوات وتقليل أو زيادة عددها دون تغيير الأبعاد المكانية للصورة، مما يتحكم في تعقيد النموذج.</template>
+          <template class="content-en">It is used to mix channels and reduce or increase their number without changing spatial dimensions, controlling model complexity.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم طبقات التجميع (Pooling)؟</template>
+          <template class="content-en">Why do we use Pooling layers?</template>
+          <span class="content-target">لماذا نستخدم طبقات التجميع (Pooling)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لتقليل الدقة المكانية وتوفير ثبات تجاه التغيرات الطفيفة في الموقع (مثل اهتزاز الكاميرا)، وكل ذلك بدون إضافة أي معلمات للتعلم.</template>
+          <template class="content-en">To reduce spatial resolution and provide invariance to slight location shifts (like camera shake), all without adding any learnable parameters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي المشكلة الرئيسية في استخدام الشبكات المتصلة بالكامل (MLPs) للصور؟",
+      "en": "What is the main problem with using MLPs for images?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتطلب عدداً هائلاً من المعلمات (Parameter Explosion) وتتجاهل البنية المكانية للصورة.",
+        "en": "They require an enormous number of parameters (Parameter Explosion) and ignore the spatial structure of the image."
+      },
+      "example": {
+        "ar": "صورة 1 ميجابكسل قد تتطلب مليار معلمة لطبقة مخفية واحدة.",
+        "en": "A 1-megapixel image might require 1 billion parameters for a single hidden layer."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو مبدأ 'الثبات تجاه الانتقال' (Translation Invariance)؟",
+      "en": "What is the principle of 'Translation Invariance'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استجابة الشبكة لنفس النمط بشكل مماثل بغض النظر عن موقعه في الصورة.",
+        "en": "The network responds similarly to the same pattern regardless of where it appears in the image."
+      },
+      "example": {
+        "ar": "التعرف على قطة سواء كانت في أعلى يمين الصورة أو أسفل يسارها.",
+        "en": "Recognizing a cat whether it's in the top-right or bottom-left of the image."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو مبدأ 'المحلية' (Locality) في الشبكات التلافيفية؟",
+      "en": "What is the principle of 'Locality' in CNNs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تركيز الطبقات الأولى على المناطق المحلية القريبة دون الاهتمام بالمناطق البعيدة.",
+        "en": "The earliest layers focus on local regions without regard for distant contents."
+      },
+      "example": {
+        "ar": "اكتشاف حافة يتطلب فقط النظر إلى البيكسلات المجاورة مباشرة.",
+        "en": "Detecting an edge only requires looking at immediately adjacent pixels."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما الفرق بين التلافيف (Convolution) والارتباط المتبادل (Cross-Correlation)؟",
+      "en": "What is the difference between Convolution and Cross-Correlation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التلافيف الرياضي يتطلب قلب النواة أفقياً وعمودياً، بينما الارتباط المتبادل لا يفعل ذلك.",
+        "en": "Mathematical convolution requires flipping the kernel horizontally and vertically, while cross-correlation does not."
+      },
+      "example": {
+        "ar": "في التعلم العميق، نستخدم الارتباط المتبادل لأن الأوزان تُتعلم من البيانات.",
+        "en": "In deep learning, we use cross-correlation because the weights are learned from data."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي 'خريطة الميزات' (Feature Map)؟",
+      "en": "What is a 'Feature Map'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي مصفوفة الإخراج الناتجة من الطبقة التلافيفية، وتمثل الميزات المكانية المُتعلمة.",
+        "en": "The output tensor of a convolutional layer, representing learned spatial features."
+      },
+      "example": {
+        "ar": "خريطة ميزات قد تبرز جميع الحواف العمودية في الصورة.",
+        "en": "A feature map might highlight all vertical edges in the image."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو 'مجال الاستقبال' (Receptive Field)؟",
+      "en": "What is a 'Receptive Field'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة العناصر من الطبقات السابقة (أو الإدخال الأصلي) التي تؤثر على حساب عنصر معين في الشبكة.",
+        "en": "All the elements from previous layers (or original input) that affect the calculation of a specific element."
+      },
+      "example": {
+        "ar": "كلما تعمقنا في الشبكة، زاد حجم مجال الاستقبال لرؤية الصورة بشكل أوسع.",
+        "en": "Deeper in the network, the receptive field grows to see a broader view of the image."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الغرض من 'الحشو' (Padding)؟",
+      "en": "What is the purpose of 'Padding'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إضافة بيكسلات (عادة أصفار) حول حدود الصورة لمنع انكماش الأبعاد المكانية بعد التلافيف.",
+        "en": "Adding pixels (usually zeros) around the image boundary to prevent spatial dimensions from shrinking after convolution."
+      },
+      "example": {
+        "ar": "حشو صورة 3x3 لتصبح 5x5 قبل تطبيق نواة 3x3 للحفاظ على الإخراج بحجم 3x3.",
+        "en": "Padding a 3x3 image to 5x5 before applying a 3x3 kernel to keep the output 3x3."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "لماذا تُفضل النويات ذات الأحجام الفردية (مثل 3x3 أو 5x5)؟",
+      "en": "Why are odd-sized kernels (like 3x3 or 5x5) preferred?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنها تسمح بحشو متماثل (نفس العدد من كل الجهات) وتجعل بيكسل الإخراج متمركزاً فوق بيكسل الإدخال.",
+        "en": "Because they allow symmetric padding (same amount on all sides) and keep the output pixel centered over the input pixel."
+      },
+      "example": {
+        "ar": "نواة 3x3 تتطلب حشواً بصف واحد من كل جهة للحفاظ على الحجم.",
+        "en": "A 3x3 kernel requires padding of 1 on all sides to preserve size."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو دور 'الخطوة' (Stride) في الشبكات التلافيفية؟",
+      "en": "What is the role of 'Stride' in CNNs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد عدد الخطوات التي تتحركها النافذة. خطوة أكبر من 1 تؤدي إلى تقليل حجم المخرجات (Downsampling).",
+        "en": "Determines how many pixels the window moves. A stride > 1 downsamples the output size."
+      },
+      "example": {
+        "ar": "استخدام خطوة = 2 يقلل أبعاد الصورة إلى النصف تقريباً.",
+        "en": "Using a stride of 2 reduces the image dimensions by roughly half."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف تتعامل الطبقة التلافيفية مع قنوات الإدخال المتعددة (مثل RGB)؟",
+      "en": "How does a convolutional layer handle multiple input channels (like RGB)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم نواة ثلاثية الأبعاد بعمق يساوي عدد قنوات الإدخال، وتحسب الارتباط المتبادل لكل قناة ثم تجمعها.",
+        "en": "It uses a 3D kernel with depth equal to the input channels, computes cross-correlation per channel, and sums them."
+      },
+      "example": {
+        "ar": "لصورة RGB، النواة تكون بحجم 3x3x3.",
+        "en": "For an RGB image, the kernel size would be 3x3x3."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "كيف تنتج الشبكة التلافيفية قنوات إخراج متعددة؟",
+      "en": "How does a CNN produce multiple output channels?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام نواة منفصلة (ثلاثية الأبعاد) لكل قناة إخراج مطلوبة، ثم دمج النتائج.",
+        "en": "By using a separate 3D kernel for each desired output channel and concatenating the results."
+      },
+      "example": {
+        "ar": "للحصول على 10 قنوات إخراج، نستخدم 10 نويات مختلفة.",
+        "en": "To get 10 output channels, we use 10 different kernels."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي وظيفة الطبقة التلافيفية 1x1؟",
+      "en": "What is the function of a 1x1 convolutional layer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعمل كطبقة متصلة بالكامل لكل بيكسل، وتُستخدم لتعديل عدد القنوات (تقليل الأبعاد) دون تغيير الأبعاد المكانية.",
+        "en": "Acts as a per-pixel fully connected layer, used to adjust the number of channels (dimensionality reduction) without changing spatial dimensions."
+      },
+      "example": {
+        "ar": "تقليل عمق القنوات من 256 إلى 64 لتقليل التكلفة الحسابية.",
+        "en": "Reducing channel depth from 256 to 64 to save computational cost."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "هل تحتوي طبقات التجميع (Pooling) على معلمات قابلة للتعلم؟",
+      "en": "Do pooling layers have learnable parameters?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، طبقات التجميع حتمية (Deterministic) ولا تحتوي على أوزان أو نويات للتعلم.",
+        "en": "No, pooling layers are deterministic and contain no weights or kernels to learn."
+      },
+      "example": {
+        "ar": "التجميع الأقصى يختار ببساطة أكبر رقم في النافذة.",
+        "en": "Max pooling simply picks the largest number in the window."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "كيف تتعامل طبقة التجميع مع القنوات المتعددة؟",
+      "en": "How does a pooling layer handle multiple channels?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقوم بتجميع كل قناة على حدة، مما يعني أن عدد قنوات الإخراج يساوي عدد قنوات الإدخال.",
+        "en": "It pools each channel separately, meaning the number of output channels equals the number of input channels."
+      },
+      "example": {
+        "ar": "إدخال بـ 64 قناة سينتج إخراجاً بـ 64 قناة بعد التجميع.",
+        "en": "An input with 64 channels will produce an output with 64 channels after pooling."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي الفائدة الرئيسية لطبقة التجميع (Pooling)؟",
+      "en": "What is the main benefit of a pooling layer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تخفيف الحساسية المفرطة للموقع الدقيق للميزات (توفير ثبات مكاني) وتقليل الدقة المكانية.",
+        "en": "Alleviating excessive sensitivity to exact feature locations (providing spatial invariance) and reducing spatial resolution."
+      },
+      "example": {
+        "ar": "إذا اهتزت الكاميرا وتحركت الميزة بيكسلاً واحداً، التجميع الأقصى قد يعطي نفس النتيجة.",
+        "en": "If the camera vibrates and a feature shifts by one pixel, max pooling might yield the same output."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "لماذا تعتبر الشبكات المتصلة بالكامل (MLPs) غير عملية لمعالجة الصور عالية الدقة؟",
+      "en": "Why are Fully-Connected Networks (MLPs) impractical for processing high-resolution images?"
+    },
+    "options": {
+      "ar": [
+        "لأنها لا تستطيع معالجة الألوان.",
+        "لأنها تتطلب عدداً هائلاً من المعلمات مما يجعل التدريب مستحيلاً تقريباً.",
+        "لأنها تتطلب دوال تنشيط معقدة جداً.",
+        "لأنها لا تدعم الانتشار الخلفي (Backpropagation)."
+      ],
+      "en": [
+        "Because they cannot process colors.",
+        "Because they require an enormous number of parameters, making training nearly impossible.",
+        "Because they require very complex activation functions.",
+        "Because they do not support backpropagation."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "صورة بدقة 1 ميجابكسل مع 1000 عقدة مخفية تتطلب مليار معلمة، مما يؤدي إلى انفجار في عدد المعلمات.",
+      "en": "A 1-megapixel image with 1000 hidden nodes requires 1 billion parameters, leading to a parameter explosion."
+    },
+    "hint": {
+      "ar": "فكر في عدد الأوزان المطلوبة لربط كل بيكسل بكل عقدة مخفية.",
+      "en": "Think about the number of weights needed to connect every pixel to every hidden node."
+    },
+    "difficulty": "easy",
+    "conceptId": "from-mlp-to-cnn"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي مبدأ ينص على أن الشبكة يجب أن تستجيب لنفس النمط بغض النظر عن موقعه في الصورة؟",
+      "en": "Which principle states that the network should respond to the same pattern regardless of its location in the image?"
+    },
+    "options": {
+      "ar": [
+        "المحلية (Locality)",
+        "الثبات تجاه الانتقال (Translation Invariance)",
+        "التجميع الأقصى (Max Pooling)",
+        "الحشو (Padding)"
+      ],
+      "en": [
+        "Locality",
+        "Translation Invariance",
+        "Max Pooling",
+        "Padding"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الثبات تجاه الانتقال يعني أن الميزة (مثل وجه قطة) سيتم التعرف عليها سواء كانت في الزاوية أو في المنتصف.",
+      "en": "Translation invariance means a feature (like a cat's face) will be recognized whether it's in the corner or the center."
+    },
+    "hint": {
+      "ar": "تذكر لعبة 'أين والدو؟'.",
+      "en": "Remember the 'Where's Waldo?' analogy."
+    },
+    "difficulty": "medium",
+    "conceptId": "from-mlp-to-cnn"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في أطر التعلم العميق، ما هي العملية الرياضية التي يتم تنفيذها فعلياً في 'الطبقة التلافيفية'؟",
+      "en": "In deep learning frameworks, what mathematical operation is actually performed in a 'convolutional layer'?"
+    },
+    "options": {
+      "ar": [
+        "التلافيف الدقيق (Strict Convolution)",
+        "الارتباط المتبادل (Cross-Correlation)",
+        "الضرب النقطي للمصفوفات (Matrix Dot Product)",
+        "التجميع المتوسط (Average Pooling)"
+      ],
+      "en": [
+        "Strict Convolution",
+        "Cross-Correlation",
+        "Matrix Dot Product",
+        "Average Pooling"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتم استخدام الارتباط المتبادل لأنه لا يتطلب قلب النواة، وبما أن الأوزان يتم تعلمها، فإن النتيجة مكافئة عملياً.",
+      "en": "Cross-correlation is used because it doesn't require flipping the kernel, and since weights are learned, the result is practically equivalent."
+    },
+    "hint": {
+      "ar": "العملية لا تتضمن قلب النواة (Kernel Flipping).",
+      "en": "The operation does not involve kernel flipping."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-correlation-convolution"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من استخدام الحشو (Padding) في الشبكات التلافيفية؟",
+      "en": "What is the primary purpose of using Padding in CNNs?"
+    },
+    "options": {
+      "ar": [
+        "تقليل عدد المعلمات في الشبكة.",
+        "تسريع عملية التدريب.",
+        "الحفاظ على الأبعاد المكانية للصورة ومنع فقدان معلومات الحواف.",
+        "زيادة عدد قنوات الإخراج."
+      ],
+      "en": [
+        "To reduce the number of parameters in the network.",
+        "To speed up the training process.",
+        "To preserve the spatial dimensions of the image and prevent loss of edge information.",
+        "To increase the number of output channels."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بدون الحشو، تتقلص الصورة بعد كل طبقة تلافيفية، مما يؤدي إلى فقدان المعلومات الموجودة على حواف الصورة.",
+      "en": "Without padding, the image shrinks after every convolutional layer, leading to the loss of information at the image boundaries."
+    },
+    "hint": {
+      "ar": "ماذا يحدث لحجم الصورة إذا طبقنا نواة 5x5 عدة مرات؟",
+      "en": "What happens to the image size if we apply a 5x5 kernel multiple times?"
+    },
+    "difficulty": "easy",
+    "conceptId": "padding-and-stride"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "إذا أردنا تقليل الدقة المكانية (Downsample) للإخراج بشكل كبير أثناء التلافيف، ماذا يجب أن نعدل؟",
+      "en": "If we want to drastically reduce the spatial resolution (downsample) of the output during convolution, what should we adjust?"
+    },
+    "options": {
+      "ar": [
+        "زيادة الحشو (Padding)",
+        "استخدام خطوة (Stride) أكبر من 1",
+        "استخدام نواة بحجم 1x1",
+        "زيادة عدد قنوات الإخراج"
+      ],
+      "en": [
+        "Increase the Padding",
+        "Use a Stride greater than 1",
+        "Use a 1x1 kernel",
+        "Increase the number of output channels"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخطوة (Stride) تحدد مقدار تحرك النافذة. خطوة أكبر تعني تخطي بيكسلات، مما يقلل حجم الإخراج.",
+      "en": "Stride determines how much the window moves. A larger stride skips pixels, reducing the output size."
+    },
+    "hint": {
+      "ar": "نحتاج إلى القفز فوق بعض البيكسلات بدلاً من معالجتها واحدة تلو الأخرى.",
+      "en": "We need to skip over some pixels instead of processing them one by one."
+    },
+    "difficulty": "easy",
+    "conceptId": "padding-and-stride"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف تتعامل الطبقة التلافيفية مع صورة إدخال تحتوي على 3 قنوات (RGB)؟",
+      "en": "How does a convolutional layer handle an input image with 3 channels (RGB)?"
+    },
+    "options": {
+      "ar": [
+        "تستخدم 3 نويات ثنائية الأبعاد منفصلة وتضرب نتائجها.",
+        "تستخدم نواة واحدة ثلاثية الأبعاد بعمق 3، وتجمع نتائج الارتباط المتبادل لكل قناة.",
+        "تتجاهل قناتين وتعالج قناة واحدة فقط.",
+        "تحول الصورة إلى تدرج الرمادي (Grayscale) قبل المعالجة."
+      ],
+      "en": [
+        "It uses 3 separate 2D kernels and multiplies their results.",
+        "It uses a single 3D kernel with a depth of 3, and sums the cross-correlation results of each channel.",
+        "It ignores two channels and processes only one.",
+        "It converts the image to grayscale before processing."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب أن يتطابق عمق النواة مع عدد قنوات الإدخال. يتم حساب الارتباط المتبادل لكل قناة ثم تُجمع النتائج لإنتاج قيمة واحدة.",
+      "en": "The kernel depth must match the input channels. Cross-correlation is computed per channel and summed to produce a single value."
+    },
+    "hint": {
+      "ar": "النواة يجب أن تكون ثلاثية الأبعاد.",
+      "en": "The kernel must be a 3D tensor."
+    },
+    "difficulty": "medium",
+    "conceptId": "multiple-channels"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الاستخدام الرئيسي للطبقة التلافيفية 1x1؟",
+      "en": "What is the primary use of a 1x1 convolutional layer?"
+    },
+    "options": {
+      "ar": [
+        "اكتشاف الحواف المكانية الواسعة.",
+        "تعديل عدد القنوات (تقليل أو زيادة الأبعاد) دون تغيير الأبعاد المكانية.",
+        "إضافة حشو (Padding) للصورة.",
+        "استبدال طبقة التجميع الأقصى (Max Pooling)."
+      ],
+      "en": [
+        "Detecting broad spatial edges.",
+        "Adjusting the number of channels (dimensionality reduction/increase) without changing spatial dimensions.",
+        "Adding padding to the image.",
+        "Replacing the Max Pooling layer."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التلافيف 1x1 لا ينظر إلى البيكسلات المجاورة، بل يدمج القنوات في نفس الموقع المكاني، مما يجعله مثالياً للتحكم في عمق القنوات.",
+      "en": "A 1x1 convolution doesn't look at spatial neighbors; it mixes channels at the same spatial location, making it ideal for controlling channel depth."
+    },
+    "hint": {
+      "ar": "فكر فيها كطبقة متصلة بالكامل تُطبق على كل بيكسل على حدة.",
+      "en": "Think of it as a fully-connected layer applied per-pixel."
+    },
+    "difficulty": "hard",
+    "conceptId": "1x1-convolution"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من العبارات التالية صحيحة حول طبقات التجميع (Pooling Layers)؟",
+      "en": "Which of the following statements is true about Pooling Layers?"
+    },
+    "options": {
+      "ar": [
+        "تحتوي على أوزان قابلة للتعلم يتم تحديثها أثناء الانتشار الخلفي.",
+        "تقوم بجمع القنوات المتعددة في قناة إخراج واحدة.",
+        "لا تحتوي على أي معلمات قابلة للتعلم (بدون أوزان).",
+        "تزيد دائماً من الدقة المكانية للصورة."
+      ],
+      "en": [
+        "They contain learnable weights updated during backpropagation.",
+        "They sum multiple channels into a single output channel.",
+        "They contain no learnable parameters (no weights).",
+        "They always increase the spatial resolution of the image."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طبقات التجميع هي عمليات حتمية (مثل أخذ الحد الأقصى أو المتوسط) ولا تحتوي على نويات أو أوزان للتعلم.",
+      "en": "Pooling layers are deterministic operations (like taking the max or average) and contain no kernels or weights to learn."
+    },
+    "hint": {
+      "ar": "هل تحتاج إلى تدريب شبكة لمعرفة ما هو الرقم الأكبر بين 4 أرقام؟",
+      "en": "Do you need to train a network to find the maximum of 4 numbers?"
+    },
+    "difficulty": "medium",
+    "conceptId": "pooling-layers"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "كيف تعالج طبقة التجميع (Pooling) بيانات الإدخال متعددة القنوات؟",
+      "en": "How does a pooling layer process multi-channel input data?"
+    },
+    "options": {
+      "ar": [
+        "تجمع كل القنوات معاً لإنتاج قناة إخراج واحدة.",
+        "تعالج كل قناة إدخال على حدة، مما يحافظ على نفس عدد القنوات في الإخراج.",
+        "تختار القناة التي تحتوي على أعلى القيم وتتجاهل الباقي.",
+        "تتطلب نواة ثلاثية الأبعاد لدمج القنوات."
+      ],
+      "en": [
+        "It sums all channels together to produce a single output channel.",
+        "It processes each input channel separately, maintaining the same number of channels in the output.",
+        "It selects the channel with the highest values and ignores the rest.",
+        "It requires a 3D kernel to merge the channels."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "على عكس التلافيف، التجميع يعمل بشكل مستقل على كل قناة، لذا فإن عدد قنوات الإخراج يساوي عدد قنوات الإدخال.",
+      "en": "Unlike convolution, pooling operates independently on each channel, so the number of output channels equals the number of input channels."
+    },
+    "hint": {
+      "ar": "التجميع لا يخلط المعلومات بين القنوات المختلفة.",
+      "en": "Pooling does not mix information between different channels."
+    },
+    "difficulty": "medium",
+    "conceptId": "pooling-layers"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الفائدة الرئيسية من استخدام التجميع الأقصى (Max Pooling) في الشبكات التلافيفية؟",
+      "en": "What is the main benefit of using Max Pooling in CNNs?"
+    },
+    "options": {
+      "ar": [
+        "تخفيف الحساسية المفرطة للموقع الدقيق للميزات (توفير ثبات مكاني).",
+        "زيادة عدد المعلمات لجعل النموذج أكثر تعقيداً.",
+        "تحويل الصورة إلى ألوان RGB.",
+        "استبدال دوال التنشيط غير الخطية."
+      ],
+      "en": [
+        "Alleviating excessive sensitivity to exact feature locations (providing spatial invariance).",
+        "Increasing the number of parameters to make the model more complex.",
+        "Converting the image to RGB colors.",
+        "Replacing non-linear activation functions."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "التجميع الأقصى يضمن أنه إذا تحركت الميزة قليلاً (بسبب اهتزاز الكاميرا مثلاً)، فإن الشبكة ستظل قادرة على اكتشافها.",
+      "en": "Max pooling ensures that if a feature shifts slightly (e.g., due to camera shake), the network can still detect it."
+    },
+    "hint": {
+      "ar": "فكر في تأثير اهتزاز الكاميرا على موقع البيكسلات.",
+      "en": "Think about the effect of camera shake on pixel locations."
+    },
+    "difficulty": "medium",
+    "conceptId": "pooling-layers"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن طبقات التجميع (Pooling) تحتوي على أوزان يتم تحديثها أثناء التدريب. هذا خطأ؛ التجميع عملية رياضية ثابتة (حتمية) لا تحتوي على أي معلمات.</template>
+    <template class="content-en">Thinking that pooling layers have weights that are updated during training. This is false; pooling is a fixed (deterministic) mathematical operation with zero parameters.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الطبقة التلافيفية 1x1 هي في الحقيقة مجرد شبكة عصبية متصلة بالكامل (MLP) يتم تطبيقها بشكل مستقل على كل بيكسل عبر جميع القنوات. إنها الأداة السحرية لتقليل الأبعاد في الشبكات العميقة.</template>
+    <template class="content-en">A 1x1 convolutional layer is essentially just a fully-connected network (MLP) applied independently to each pixel across all channels. It's the magic tool for dimensionality reduction in deep networks.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الشبكات التلافيفية تعمل بكفاءة لأنها تفرض 'انحيازات استقرائية' (Inductive Biases) تتوافق مع طبيعة الصور: 'الثبات تجاه الانتقال' (القطة هي قطة في أي مكان) و'المحلية' (البيكسلات المجاورة تشكل حوافاً وأشكالاً).</template>
+    <template class="content-en">CNNs work efficiently because they impose 'inductive biases' that match the nature of images: 'Translation Invariance' (a cat is a cat anywhere) and 'Locality' (nearby pixels form edges and shapes).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين التلافيف الرياضي الدقيق والارتباط المتبادل. في التعلم العميق، ما نسميه 'تلافيف' هو في الواقع 'ارتباط متبادل' لأننا لا نقوم بقلب النواة (Kernel)، حيث أن الأوزان تُتعلم تلقائياً.</template>
+    <template class="content-en">Confusing strict mathematical convolution with cross-correlation. In deep learning, what we call 'convolution' is actually 'cross-correlation' because we don't flip the kernel, as weights are learned automatically.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M12.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

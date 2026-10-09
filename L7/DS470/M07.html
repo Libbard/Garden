@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS470" data-module="7" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تجاوز سعة المخزن المؤقت وقضايا أمن البرمجيات · DS470 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS470" data-page-title-en="DS470">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=DS470"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#buffer-overflow-fundamentals" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات تجاوز سعة المخزن المؤقت</template>
+        <template class="content-en">Buffer Overflow Fundamentals</template>
+        <span class="content-target">أساسيات تجاوز سعة المخزن المؤقت</span>
+      </a>
+      <a href="#stack-buffer-overflow-shellcode" class="toc-link" data-bilingual>
+        <template class="content-ar">تجاوز سعة المكدس وكود الصدفة (Shellcode)</template>
+        <template class="content-en">Stack Buffer Overflow &amp; Shellcode</template>
+        <span class="content-target">تجاوز سعة المكدس وكود الصدفة (Shellcode)</span>
+      </a>
+      <a href="#buffer-overflow-defenses" class="toc-link" data-bilingual>
+        <template class="content-ar">الدفاعات ضد تجاوز سعة المخزن المؤقت</template>
+        <template class="content-en">Buffer Overflow Defenses</template>
+        <span class="content-target">الدفاعات ضد تجاوز سعة المخزن المؤقت</span>
+      </a>
+      <a href="#other-overflow-attacks" class="toc-link" data-bilingual>
+        <template class="content-ar">هجمات التجاوز الأخرى</template>
+        <template class="content-en">Other Overflow Attacks</template>
+        <span class="content-target">هجمات التجاوز الأخرى</span>
+      </a>
+      <a href="#software-security-defensive-programming" class="toc-link" data-bilingual>
+        <template class="content-ar">أمن البرمجيات والبرمجة الدفاعية</template>
+        <template class="content-en">Software Security &amp; Defensive Programming</template>
+        <span class="content-target">أمن البرمجيات والبرمجة الدفاعية</span>
+      </a>
+      <a href="#handling-input-injection-attacks" class="toc-link" data-bilingual>
+        <template class="content-ar">معالجة المدخلات وهجمات الحقن</template>
+        <template class="content-en">Handling Program Input &amp; Injection Attacks</template>
+        <span class="content-target">معالجة المدخلات وهجمات الحقن</span>
+      </a>
+      <a href="#cross-site-scripting-xss" class="toc-link" data-bilingual>
+        <template class="content-ar">البرمجة عبر المواقع (XSS)</template>
+        <template class="content-en">Cross Site Scripting (XSS) Attacks</template>
+        <span class="content-target">البرمجة عبر المواقع (XSS)</span>
+      </a>
+      <a href="#input-validation-fuzzing" class="toc-link" data-bilingual>
+        <template class="content-ar">التحقق من المدخلات واختبار التشويش (Fuzzing)</template>
+        <template class="content-en">Input Validation &amp; Fuzzing</template>
+        <span class="content-target">التحقق من المدخلات واختبار التشويش (Fuzzing)</span>
+      </a>
+      <a href="#memory-management-race-conditions" class="toc-link" data-bilingual>
+        <template class="content-ar">إدارة الذاكرة وحالات السباق</template>
+        <template class="content-en">Memory Management &amp; Race Conditions</template>
+        <span class="content-target">إدارة الذاكرة وحالات السباق</span>
+      </a>
+      <a href="#os-interaction-least-privilege" class="toc-link" data-bilingual>
+        <template class="content-ar">التفاعل مع نظام التشغيل وأقل الصلاحيات</template>
+        <template class="content-en">OS Interaction &amp; Least Privilege</template>
+        <span class="content-target">التفاعل مع نظام التشغيل وأقل الصلاحيات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 7</template>
+      <template class="content-en">Module 7</template>
+      <span class="content-target">الوحدة 7</span>
+    </span> · DS470
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تجاوز سعة المخزن المؤقت وقضايا أمن البرمجيات</h1>
+      <p class="hero-description">تغطي هذه الوحدة آليات هجمات تجاوز سعة المخزن المؤقت (Buffer Overflow)، وعواقبها، وطرق الدفاع عنها. كما تستكشف قضايا أمن البرمجيات الناتجة عن ممارسات البرمجة السيئة، ومعالجة المدخلات، وحالات السباق، والتفاعل مع نظام التشغيل.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Buffer Overflow and Software Security Issues</h1>
+      <p class="hero-description">This module covers the mechanisms of buffer overflow attacks, their consequences, and defenses. It also explores software security issues resulting from poor programming practices, input handling, race conditions, and OS interaction.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن البرمجيات</span>
+      <span class="tag">تجاوز سعة المخزن المؤقت</span>
+      <span class="tag">البرمجة الدفاعية</span>
+      <span class="tag">حقن الأكواد</span>
+      <span class="tag">حالة السباق</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Software Security</span>
+      <span class="tag">Buffer Overflow</span>
+      <span class="tag">Defensive Programming</span>
+      <span class="tag">Code Injection</span>
+      <span class="tag">Race Conditions</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تعريف تجاوز سعة المخزن المؤقت، وعواقبه، والدفاعات المختلفة ضده.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على كيفية كون الثغرات الأمنية في الكمبيوتر نتيجة لممارسات البرمجة السيئة.</span></li>
+      <li><span class="obj-icon">✦</span><span>سرد المشاكل التي تحدث بسبب إدخال برنامج غير صحيح، وتنفيذ البرنامج، وعدم التوافق بين البرنامج ونظام التشغيل.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Define buffer overflow, its consequences and various defenses against the buffer overflow attacks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize how computer security vulnerabilities are consequences of poor programming practices.</span></li>
+      <li><span class="obj-icon">✦</span><span>List the problems occurring due to incorrect or invalid program input, program implementation and incompatibility between the program and OS.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="buffer-overflow-fundamentals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات تجاوز سعة المخزن المؤقت</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Buffer Overflow Fundamentals</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حالة يتم فيها وضع بيانات في المخزن المؤقت أكثر من سعته المخصصة، مما يؤدي إلى الكتابة فوق المعلومات المجاورة. تخيل سكب لتر من الماء في كوب يتسع لنصف لتر فقط.</p></template>
+    <template class="content-en"><p>A condition where more input is placed into a buffer than its allocated capacity, overwriting adjacent memory. Imagine pouring a gallon of water into a pint glass.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحدث <span class="smart-term" data-term-en="Buffer Overflow" data-ar="تجاوز سعة المخزن المؤقت" data-en-def="A condition where more data is written to a buffer than it can hold, overwriting adjacent memory.">تجاوز سعة المخزن المؤقت<span class="smart-term-tooltip"></span></span> (Buffer Overflow) بسبب أخطاء برمجية، عادة في لغات البرمجة التي تسمح بالوصول المباشر إلى الذاكرة مثل C و C++. يسمح هذا الخطأ بتخزين بيانات تفوق سعة المخزن المؤقت ذي الحجم الثابت، والذي يمكن أن يكون موجوداً في المكدس (Stack) أو الكومة (Heap) أو البيانات العامة.</p><p>تشمل العواقب تلف بيانات البرنامج، أو النقل غير المتوقع للتحكم، أو انتهاك الوصول إلى الذاكرة، أو تنفيذ تعليمات برمجية خاصة بالمهاجم. لاستغلال هذه الثغرة، يجب على المهاجم تحديد الثغرة وفهم كيفية تخزين المخزن المؤقت في الذاكرة.</p></template>
+    <template class="content-en"><p>A <span class="smart-term" data-term-en="Buffer Overflow" data-ar="تجاوز سعة المخزن المؤقت" data-en-def="A condition where more data is written to a buffer than it can hold, overwriting adjacent memory.">buffer overflow<span class="smart-term-tooltip"></span></span> is caused by a programming error, usually in systems programming languages like C/C++ that allow direct memory access. It allows more data to be stored than the capacity of a fixed-sized buffer, which can be on the stack, heap, or global data.</p><p>Consequences include corruption of program data, unexpected transfer of control, memory access violation, and execution of attackers' code. To exploit this, an attacker must identify the vulnerability and understand how the buffer is stored in memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا تزال هذه المشكلة موجودة رغم معرفتنا بها؟ يعود ذلك إلى وجود كميات هائلة من الأكواد القديمة (Legacy Code) المكتوبة بلغات غير آمنة مثل C/C++، بالإضافة إلى ممارسات البرمجة السيئة.</p><p>اللغات الحديثة عالية المستوى (مثل Java أو Python) تمتلك آليات قوية للتحقق من الأنواع والحدود، مما يجعلها محصنة ضد هذا النوع من الهجمات، ولكنها قد تستهلك موارد أكثر (Overhead).</p><p>تاريخياً، تم استخدام هذه الثغرة في هجمات شهيرة جداً مثل دودة موريس (1988)، و Code Red (2001)، و Slammer (2003).</p></template>
+    <template class="content-en"><p>Why is this still a concern despite knowing prevention techniques? It is largely due to the massive amount of legacy code written in unsafe languages like C/C++ deployed in OS and software tools, combined with poor programming practices.</p><p>Modern high-level programming languages have a strong notion of type and valid operations, making them generally not vulnerable to buffer overflows, though this incurs some performance overhead.</p><p>Historically, this mechanism was widely used by notorious malware such as the Morris Worm (1988), Code Red (2001), and Slammer (2003).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر لغة C أكثر عرضة لهجمات تجاوز سعة المخزن المؤقت مقارنة بلغة Java؟</template>
+      <template class="content-en">Why is the C language more susceptible to buffer overflow attacks compared to Java?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن لغة C تسمح بالوصول المباشر إلى الذاكرة ولا تقوم بالتحقق التلقائي من حدود المصفوفات (Bounds Checking) أثناء وقت التشغيل، بينما تقوم Java بإدارة الذاكرة تلقائياً وتتحقق من الحدود.</p></template>
+      <template class="content-en"><p>Because C allows direct memory access and does not perform automatic bounds checking at runtime, whereas Java manages memory automatically and enforces strict bounds checking.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="stack-buffer-overflow-shellcode" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تجاوز سعة المكدس وكود الصدفة (Shellcode)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Stack Buffer Overflow &amp; Shellcode</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هجوم يستهدف المخازن المؤقتة الموجودة في المكدس (Stack) للكتابة فوق عنوان العودة (Return Address)، مما يوجه البرنامج لتنفيذ كود خبيث يُعرف باسم Shellcode.</p></template>
+    <template class="content-en"><p>An attack targeting buffers on the stack to overwrite the return address, redirecting the program to execute malicious code known as Shellcode.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحدث تجاوز سعة المكدس عندما يكون المخزن المؤقت موجوداً على المكدس (Stack). يحتوي <span class="smart-term" data-term-en="Stack Frame" data-ar="إطار المكدس" data-en-def="A data structure on the stack that stores the return address, parameters, and local variables for a function call.">إطار المكدس<span class="smart-term-tooltip"></span></span> (Stack Frame) على المتغيرات المحلية، ومؤشر الإطار القديم، وعنوان العودة (Return Address).</p><p>نظراً لأن المتغيرات المحلية تقع أسفل عنوان العودة في الذاكرة، فإن تجاوز سعة المخزن المؤقت المحلي يمكن أن يكتب فوق عنوان العودة. يقوم المهاجم باستبدال هذا العنوان بعنوان الكود الخبيث الذي يرغب في تنفيذه.</p><p><b><span class="smart-term" data-term-en="Shellcode" data-ar="كود الصدفة" data-en-def="Malicious machine code supplied by an attacker, often used to spawn a command shell.">كود الصدفة<span class="smart-term-tooltip"></span></span> (Shellcode):</b> هو الكود الذي يوفره المهاجم، وغالباً ما يتم حفظه في المخزن المؤقت الذي تم تجاوزه. تقليدياً، كان هذا الكود ينقل التحكم إلى مترجم الأوامر (Shell). وهو عبارة عن كود آلة (Machine Code) خاص بالمعالج ونظام التشغيل.</p></template>
+    <template class="content-en"><p>A stack buffer overflow occurs when the buffer is located on the stack. A <span class="smart-term" data-term-en="Stack Frame" data-ar="إطار المكدس" data-en-def="A data structure on the stack that stores the return address, parameters, and local variables for a function call.">stack frame<span class="smart-term-tooltip"></span></span> contains local variables, the saved frame pointer, and the return address.</p><p>Because local variables are located below the saved frame pointer and return address in memory, overflowing a local buffer can overwrite these key control items. The attacker overwrites the return address with the address of their desired code.</p><p><b><span class="smart-term" data-term-en="Shellcode" data-ar="كود الصدفة" data-en-def="Malicious machine code supplied by an attacker, often used to spawn a command shell.">Shellcode<span class="smart-term-tooltip"></span></span>:</b> This is the code supplied by the attacker, often saved in the buffer being overflowed. Traditionally, it transferred control to a shell interpreter. It is machine code, specific to the processor and operating system.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كتابة Shellcode تتطلب مهارات عالية في لغة التجميع (Assembly)، حيث يجب أن يكون الكود مستقلاً عن الموضع (Position-Independent) وألا يحتوي على بايتات صفرية (Null Bytes) التي قد تنهي السلسلة النصية مبكراً.</p><p>في الوقت الحاضر، توفر أدوات مثل مشروع Metasploit معلومات مفيدة وأكواد جاهزة لتطوير التوقيعات واستغلال الثغرات، مما يقلل من الحاجة لكتابة Shellcode من الصفر.</p><p>يمكن أن تكون أهداف الهجوم برامج مساعدة موثوقة في النظام، أو خدمات الشبكة، أو مكتبات شائعة الاستخدام، بهدف تصعيد الصلاحيات (Privilege Escalation).</p></template>
+    <template class="content-en"><p>Writing shellcode traditionally required strong assembly language skills. The code often needs to be position-independent and avoid null bytes, which would prematurely terminate string copy operations.</p><p>Today, automated tools and sites like the Metasploit Project provide extensive resources for generating shellcode, making it easier to perform penetration testing and exploit research.</p><p>The target program for these attacks can be a trusted system utility, a network service daemon, or commonly used library code, often with the goal of escalating privileges to root/administrator.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a memory stack frame before and after a buffer overflow. Left side (Before): A vertical block showing 'Return Addr', 'Old Frame Pointer', 'Local Buffer'. Right side (After): The 'Local Buffer' is filled with 'Attacker Code (Shellcode)', and the overflow extends upwards, overwriting the 'Old Frame Pointer' and replacing the 'Return Addr' with a 'New Address Pointing to Shellcode'. Use red to highlight the overwritten areas. Style: educational, dark background #0d1117, accent color #ff4444, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrow Markers -->
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-text" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+
+    <!-- Malicious Payload Gradient (Bottom to Top) -->
+    <linearGradient id="malicious-grad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Memory Address Direction Indicator -->
+  <line x1="80" y1="340" x2="80" y2="100" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-text)" />
+  
+  <text x="70" y="220" transform="rotate(-90 70 220)" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en">Memory Addresses</text>
+  <text x="70" y="220" transform="rotate(-90 70 220)" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar">عناوين الذاكرة</text>
+
+  <text x="80" y="80" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en">Higher Addresses</text>
+  <text x="80" y="80" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar">عناوين أعلى</text>
+
+  <text x="80" y="365" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en">Lower Addresses</text>
+  <text x="80" y="365" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar">عناوين أدنى</text>
+
+  <!-- ================= LEFT SIDE: BEFORE OVERFLOW ================= -->
+  
+  <!-- Title -->
+  <text x="260" y="60" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-en">Before Overflow</text>
+  <text x="260" y="60" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-ar">قبل تجاوز السعة</text>
+
+  <!-- Return Address Block -->
+  <rect x="160" y="100" width="200" height="50" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  <text x="260" y="130" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-en">Return Address</text>
+  <text x="260" y="130" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-ar">عنوان العودة</text>
+
+  <!-- Old Frame Pointer Block -->
+  <rect x="160" y="150" width="200" height="50" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  <text x="260" y="180" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-en">Saved Frame Pointer</text>
+  <text x="260" y="180" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-ar">مؤشر الإطار المحفوظ</text>
+
+  <!-- Local Buffer Block -->
+  <rect x="160" y="200" width="200" height="120" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  <text x="260" y="265" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-en">Local Buffer</text>
+  <text x="260" y="265" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-ar">المخزن المؤقت المحلي</text>
+
+
+  <!-- ================= RIGHT SIDE: AFTER OVERFLOW ================= -->
+  
+  <!-- Title -->
+  <text x="580" y="60" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-en">After Overflow</text>
+  <text x="580" y="60" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-ar">بعد تجاوز السعة</text>
+
+  <!-- Overwritten Return Address Block -->
+  <rect x="480" y="100" width="200" height="50" fill="url(#malicious-grad)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+  <text x="580" y="130" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" class="gsvg-en">New Return Address</text>
+  <text x="580" y="130" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle" class="gsvg-ar">عنوان عودة جديد</text>
+
+  <!-- Overwritten Frame Pointer Block -->
+  <rect x="480" y="150" width="200" height="50" fill="url(#malicious-grad)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+  <text x="580" y="180" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-en">Overwritten Pointer</text>
+  <text x="580" y="180" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" text-anchor="middle" class="gsvg-ar">مؤشر مكتوب عليه</text>
+
+  <!-- Malicious Local Buffer Block -->
+  <rect x="480" y="200" width="200" height="120" fill="url(#malicious-grad)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+  <text x="580" y="250" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en">Shellcode<tspan x="580" dy="22" font-size="14" font-weight="normal">(Attacker Code)</tspan></text>
+  <text x="580" y="250" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar">كود خبيث<tspan x="580" dy="22" font-size="14" font-weight="normal">(Shellcode)</tspan></text>
+
+
+  <!-- ================= ARROWS & FLOW INDICATORS ================= -->
+
+  <!-- Jump to Shellcode Arrow (Left of Right Stack) -->
+  <circle cx="480" cy="125" r="4" fill="var(--brand-500)" />
+  <path d="M 480 125 L 430 125 L 430 260 L 465 260" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+  
+  <text x="420" y="195" transform="rotate(-90 420 195)" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" class="gsvg-en">Jumps to Shellcode</text>
+  <text x="420" y="195" transform="rotate(-90 420 195)" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" class="gsvg-ar">يقفز إلى Shellcode</text>
+
+  <!-- Buffer Overflow Upward Arrow (Right of Right Stack) -->
+  <circle cx="680" cy="260" r="4" fill="var(--brand-500)" />
+  <path d="M 680 260 L 720 260 L 720 125 L 695 125" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow-brand)" />
+  
+  <text x="735" y="195" transform="rotate(-90 735 195)" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" class="gsvg-en">Buffer Overflow</text>
+  <text x="735" y="195" transform="rotate(-90 735 195)" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" class="gsvg-ar">تجاوز سعة المخزن</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يجب أن يكون كود Shellcode خاصاً بنظام التشغيل والمعالج؟</template>
+      <template class="content-en">Why must shellcode be specific to the operating system and processor?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن Shellcode يُكتب بلغة الآلة (Machine Code) التي تعتمد بشكل مباشر على بنية المعالج (مثل x86 أو ARM) ويستخدم استدعاءات النظام (System Calls) التي تختلف من نظام تشغيل لآخر (مثل Windows مقابل Linux).</p></template>
+      <template class="content-en"><p>Because shellcode is written in machine code, which directly depends on the processor architecture (e.g., x86, ARM), and it relies on system calls that vary between operating systems (e.g., Windows vs. Linux).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="buffer-overflow-defenses" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الدفاعات ضد تجاوز سعة المخزن المؤقت</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Buffer Overflow Defenses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنقسم الدفاعات إلى نهجين: دفاعات وقت الترجمة (Compile-time) لتقوية البرامج الجديدة، ودفاعات وقت التشغيل (Run-time) للتعامل مع الهجمات على البرامج الحالية.</p></template>
+    <template class="content-en"><p>Defenses are split into two approaches: Compile-time defenses to harden new programs, and Run-time defenses to handle attacks on existing programs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>دفاعات وقت الترجمة (Compile-Time):</b></p><ul><li><b>لغة البرمجة:</b> استخدام لغات حديثة عالية المستوى ذات كتابة قوية (Strong Typing).</li><li><b>المكتبات الآمنة:</b> استخدام متغيرات مكتبية قياسية أكثر أماناً كبديل للمكتبات غير الآمنة في C.</li><li><b>حماية المكدس (Stack Protection):</b> مثل Stackguard، الذي يضيف كوداً عند دخول/خروج الدالة للتحقق من علامات الفساد في المكدس (Canaries)، أو حفظ نسخة آمنة من عنوان العودة.</li><li><b>تقنيات التشفير الآمن:</b> مراجعة الأكواد وكتابتها بأمان من البداية.</li></ul><p><b>دفاعات وقت التشغيل (Run-Time):</b></p><ul><li><b>مساحة عناوين غير قابلة للتنفيذ (NX Bit):</b> جعل بعض مناطق الذاكرة (مثل المكدس والكومة) غير قابلة للتنفيذ لمنع تشغيل كود المهاجم.</li><li><b>عشوائية مساحة العناوين (ASLR):</b> التلاعب بمواقع هياكل البيانات الرئيسية والمكتبات في الذاكرة بشكل عشوائي، مما يصعب على المهاجم معرفة العناوين الدقيقة.</li><li><b><span class="smart-term" data-term-en="Guard Pages" data-ar="صفحات الحراسة" data-en-def="Unmapped memory pages placed between allocations; accessing them causes a segmentation fault, stopping sequential overflows.">صفحات الحراسة<span class="smart-term-tooltip"></span></span> (Guard Pages):</b> وضع صفحات حراسة بين مناطق الذاكرة الحرجة لاكتشاف التجاوزات.</li></ul></template>
+    <template class="content-en"><p><b>Compile-Time Defenses:</b></p><ul><li><b>Programming Language:</b> Using modern high-level languages with strong typing.</li><li><b>Safe Libraries:</b> Using safer standard library variants to replace vulnerable C functions.</li><li><b>Stack Protection:</b> Tools like Stackguard add function entry/exit code to check the stack for corruption (using canaries), or save a safe copy of the return address (e.g., RAD).</li><li><b>Safe Coding Techniques:</b> Writing safe code by design and conducting extensive code reviews.</li></ul><p><b>Run-Time Defenses:</b></p><ul><li><b>Non-Executable Address Space:</b> Using virtual memory support to make regions like the stack and heap non-executable, preventing the attacker's code from running.</li><li><b>Address Space Randomization (<span class="smart-term" data-term-en="ASLR" data-ar="عشوائية تخطيط مساحة العناوين" data-en-def="A computer security technique involved in preventing exploitation of memory corruption vulnerabilities by randomly arranging the address space positions of key data areas of a process.">ASLR<span class="smart-term-tooltip"></span></span>):</b> Randomizing the location of heap buffers, stack frames, and standard library functions to make addresses unpredictable.</li><li><b><span class="smart-term" data-term-en="Guard Pages" data-ar="صفحات الحراسة" data-en-def="Unmapped memory pages placed between allocations; accessing them causes a segmentation fault, stopping sequential overflows.">Guard Pages<span class="smart-term-tooltip"></span></span>:</b> Placing guard pages between critical memory regions or stack frames to detect overflows.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر حماية المكدس (Stackguard) فعالة جداً ضد الهجمات التقليدية، لكنها لا تمنع تجاوز سعة الكومة (Heap Overflow).</p><p>تعتمد هذه التقنية على وضع قيمة عشوائية (Canary) قبل عنوان العودة، والتحقق منها قبل العودة من الدالة.</p><p>تقنية ASLR تجعل من الصعب جداً على المهاجمين استخدام عناوين ثابتة (Hardcoded Addresses) في أكواد الاستغلال الخاصة بهم، مما يجبرهم على البحث عن طرق لتسريب الذاكرة (Memory Leaks) أولاً.</p><p>على الرغم من هذه الدفاعات، يبتكر المهاجمون تقنيات جديدة مثل Return-Oriented Programming (ROP) لتجاوز حماية الذاكرة غير القابلة للتنفيذ (NX).</p></template>
+    <template class="content-en"><p>Stack protection (like Stackguard) is highly effective against traditional stack smashing but does not protect against heap overflows.</p><p>It works by placing a random value (canary) before the return address and checking its integrity before the function returns.</p><p>ASLR makes it extremely difficult for attackers to use hardcoded memory addresses in their exploits, forcing them to find memory leak vulnerabilities first to bypass the randomization.</p><p>Despite these robust defenses, the arms race continues.</p><p>Attackers developed techniques like Return-Oriented Programming (ROP) specifically to bypass Non-Executable (NX) memory protections by chaining together existing snippets of executable code.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Compile-Time Defenses</th><th>Run-Time Defenses</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف</template>
+          <template class="content-en">Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقوية البرامج الجديدة أثناء التطوير</template>
+          <template class="content-en">Harden new programs during development</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">التعامل مع الهجمات على البرامج الحالية</template>
+          <template class="content-en">Handle attacks on existing programs</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أمثلة على التقنيات</template>
+          <template class="content-en">Example Techniques</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لغات عالية المستوى، مكتبات آمنة، Stackguard</template>
+          <template class="content-en">High-level languages, Safe libraries, Stackguard</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مساحة غير قابلة للتنفيذ (NX)، ASLR، صفحات الحراسة</template>
+          <template class="content-en">Non-Executable Space (NX), ASLR, Guard Pages</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن للمهاجم تجاوز حماية الذاكرة غير القابلة للتنفيذ (Non-Executable Stack)؟</template>
+      <template class="content-en">How can an attacker bypass a Non-Executable Stack protection?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكن للمهاجم استخدام تقنية 'العودة إلى استدعاء النظام' (Return-to-libc) أو ROP، حيث يقوم بتوجيه عنوان العودة إلى دالة مكتبية قياسية موجودة بالفعل في الذاكرة القابلة للتنفيذ (مثل دالة system()) بدلاً من محاولة تنفيذ كود جديد في المكدس.</p></template>
+      <template class="content-en"><p>An attacker can use a 'Return-to-libc' attack or ROP, where they overwrite the return address to point to a standard library function already present in executable memory (like system()), rather than trying to execute new code on the stack.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="other-overflow-attacks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> هجمات التجاوز الأخرى</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Other Overflow Attacks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لا تقتصر هجمات التجاوز على المكدس، بل تشمل الكومة (Heap)، والبيانات العامة (Global Data)، وتقنيات متقدمة مثل Return-to-libc لتجاوز الدفاعات الحديثة.</p></template>
+    <template class="content-en"><p>Overflow attacks are not limited to the stack; they include Heap overflows, Global Data overflows, and advanced techniques like Return-to-libc to bypass modern defenses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>العودة إلى استدعاء النظام (Return to System Call):</b> استجابةً لدفاعات المكدس غير القابل للتنفيذ، يقوم المهاجم باستبدال عنوان العودة بوظيفة مكتبة قياسية (مثل <code>system("shell commands")</code>). يقوم المهاجم ببناء المعلمات المناسبة على المكدس فوق عنوان العودة.</p><p><b><span class="smart-term" data-term-en="Heap Overflow" data-ar="تجاوز سعة الكومة" data-en-def="A type of buffer overflow that occurs in the heap data area, often targeting dynamic memory management structures or function pointers.">تجاوز سعة الكومة<span class="smart-term-tooltip"></span></span> (Heap Overflow):</b> استهداف المخازن المؤقتة الموجودة في الكومة (الذاكرة المخصصة ديناميكياً). لا يوجد عنوان عودة هنا، لذا يستهدف المهاجم مؤشرات الدوال (Function Pointers) أو يتلاعب بهياكل بيانات إدارة الذاكرة. الدفاع: جعل الكومة غير قابلة للتنفيذ وعشوائية التخصيص.</p><p><b>تجاوز البيانات العامة (Global Data Overflow):</b> استهداف المخازن المؤقتة في البيانات العامة. يهدف المهاجم إلى الكتابة فوق مؤشر دالة سيتم استدعاؤه لاحقاً. الدفاع: جعل المنطقة غير قابلة للتنفيذ، أو عشوائية، أو استخدام صفحات الحراسة.</p></template>
+    <template class="content-en"><p><b>Return to System Call (<span class="smart-term" data-term-en="Return-to-libc" data-ar="العودة إلى مكتبة C" data-en-def="A computer security attack usually starting with a buffer overflow in which a subroutine return address on a call stack is replaced by an address of a subroutine that is already present in the process&#x27;s executable memory.">Return-to-libc<span class="smart-term-tooltip"></span></span>):</b> A response to non-executable stack defenses. The attacker replaces the return address with a standard library function (e.g., <code>system("shell commands")</code>) and constructs suitable parameters on the stack above the return address.</p><p><b><span class="smart-term" data-term-en="Heap Overflow" data-ar="تجاوز سعة الكومة" data-en-def="A type of buffer overflow that occurs in the heap data area, often targeting dynamic memory management structures or function pointers.">Heap Overflow<span class="smart-term-tooltip"></span></span>:</b> Attacks buffers located in the heap (dynamically allocated memory). Since there is no return address, attackers exploit function pointers or manipulate memory management data structures. Defenses include making the heap non-executable and randomizing memory allocation.</p><p><b>Global Data Overflow:</b> Attacks buffers located in global data. The aim is to overwrite a function pointer that is called later. Defenses include non-executable or random global data regions, moving function pointers, and guard pages.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هجمات الكومة (Heap Overflows) تعتبر أكثر تعقيداً من هجمات المكدس لأن تخطيط الكومة ديناميكي ويتغير باستمرار بناءً على طلبات تخصيص الذاكرة (malloc/free).</p><p>في هجوم Return-to-libc، لا يقوم المهاجم بحقن أي كود جديد، بل يعيد استخدام الأكواد الموجودة بالفعل في مساحة ذاكرة البرنامج، مما يجعله هجوماً من نوع (Living off the Land).</p><p>تجاوز الأعداد الصحيحة (Integer Overflow) هو متغير آخر خطير، حيث يمكن أن يؤدي التلاعب بالعمليات الحسابية إلى تخصيص مخزن مؤقت صغير جداً، مما يمهد الطريق لتجاوز السعة لاحقاً.</p></template>
+    <template class="content-en"><p>Heap overflows are generally more complex to exploit than stack overflows because the heap layout is dynamic and constantly changing based on memory allocation requests (malloc/free).</p><p>In a Return-to-libc attack, the attacker does not inject any new code. Instead, they reuse code already present in the program's memory space, making it a 'Living off the Land' style attack.</p><p>Integer overflow is another critical variant, where manipulating arithmetic operations can lead to allocating a buffer that is too small, paving the way for a subsequent buffer overflow when data is copied into it.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكن استخدام تقنية الكتابة فوق 'عنوان العودة' (Return Address) في هجمات الكومة (Heap)؟</template>
+      <template class="content-en">Why can't the technique of overwriting the 'Return Address' be used in Heap attacks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الكومة (Heap) تُستخدم لتخزين البيانات المخصصة ديناميكياً ولا تحتوي على إطارات المكدس (Stack Frames) التي تتضمن عناوين العودة. بدلاً من ذلك، يجب على المهاجم استهداف هياكل إدارة الذاكرة أو مؤشرات الدوال.</p></template>
+      <template class="content-en"><p>Because the heap is used for dynamically allocated data and does not contain stack frames, which hold return addresses. Instead, an attacker must target memory management structures or function pointers.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="software-security-defensive-programming" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> أمن البرمجيات والبرمجة الدفاعية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Software Security &amp; Defensive Programming</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>البرمجة الدفاعية هي تصميم البرامج لتستمر في العمل بأمان حتى عند مواجهة استخدام غير متوقع أو مدخلات خبيثة، بناءً على مبدأ 'لا تفترض شيئاً، وتحقق من كل شيء'.</p></template>
+    <template class="content-en"><p>Defensive programming is designing software to continue functioning safely even when faced with unforeseen usage or malicious input, based on the principle 'assume nothing, check everything'.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تنتج العديد من الثغرات الأمنية عن ممارسات البرمجة السيئة. تتضمن قائمة OWASP لأهم 10 ثغرات 5 عيوب متعلقة بالبرمجيات (مثل المدخلات غير المصدقة، XSS، تجاوز سعة المخزن المؤقت، عيوب الحقن).</p><p><b>جودة البرمجيات مقابل الأمن:</b> الجودة تهتم بالفشل العرضي (مدخلات غير متوقعة عشوائية). أما الأمن فيهتم بالمهاجم الذي يختار توزيع المدخلات لاستهداف الكود المعيب عمداً (مدخلات غير محتملة جداً لا تكتشفها الاختبارات العادية).</p><p><b><span class="smart-term" data-term-en="Defensive Programming" data-ar="البرمجة الدفاعية" data-en-def="A form of defensive design intended to ensure the continuing function of a piece of software under unforeseen circumstances.">البرمجة الدفاعية<span class="smart-term-tooltip"></span></span> (البرمجة الآمنة):</b> تتطلب الانتباه إلى جميع جوانب تنفيذ البرنامج والبيئة والبيانات المعالجة. يجب على المبرمج ألا يفترض شيئاً، وأن يتحقق من جميع الأخطاء المحتملة، وأن يصدق على جميع الافتراضات (تأثير قانون مورفي).</p></template>
+    <template class="content-en"><p>Many vulnerabilities result from poor programming practices. The OWASP Top Ten includes 5 software-related flaws (Unvalidated input, XSS, Buffer overflow, Injection flaws, Improper error handling).</p><p><b>Software Quality vs. Security:</b> Quality is concerned with accidental failure from theoretically random, unanticipated input. Security is concerned with an attacker who deliberately chooses input distributions specifically targeting buggy code to exploit it (highly unlikely inputs that common tests miss).</p><p><b><span class="smart-term" data-term-en="Defensive Programming" data-ar="البرمجة الدفاعية" data-en-def="A form of defensive design intended to ensure the continuing function of a piece of software under unforeseen circumstances.">Defensive Programming<span class="smart-term-tooltip"></span></span> (Secure Programming):</b> A form of defensive design to ensure continued function despite unforeseen usage. It requires attention to all aspects of execution, environment, and data. Programmers must assume nothing, check all potential errors, and validate all assumptions (Murphy's Law effect).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يقدم تقرير NISTIR 8151 نُهجاً لتقليل ثغرات البرمجيات: إيقاف الثغرات قبل حدوثها (مواصفات وبناء أفضل)، العثور عليها قبل استغلالها (اختبارات أفضل)، وتقليل تأثيرها (بناء بنيات أكثر مرونة).</p><p>الأمن حسب التصميم (Security by Design) هو هدف هندسي شائع، لكن تطوير البرمجيات يتسامح تاريخياً مع مستويات فشل أعلى بكثير من التخصصات الهندسية الأخرى (مثل بناء الجسور).</p><p>التحول في التفكير من 'كيف أجعل هذا البرنامج يعمل؟' إلى 'كيف يمكن لشخص ما كسر هذا البرنامج؟' هو جوهر البرمجة الدفاعية.</p></template>
+    <template class="content-en"><p>NISTIR 8151 presents approaches to reduce software vulnerabilities:</p><ul><li><strong>stop them before they occur</strong> (better specification/building),</li><li><strong>find them before exploitation</strong> (better testing), and</li><li><strong>reduce their impact</strong> (resilient architectures).</li></ul><p>Security by Design is a common engineering goal, but software development has historically tolerated much higher failure levels compared to other disciplines (like civil engineering for bridges).</p><p>The paradigm shift from 'how do I make this work?' to 'how could someone break this?' is the core essence of defensive programming.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Software Quality</th><th>Software Security</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبيعة الفشل</template>
+          <template class="content-en">Nature of Failure</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">فشل عرضي وعشوائي نظرياً</template>
+          <template class="content-en">Accidental failure, theoretically random</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">فشل مستهدف ومقصود</template>
+          <template class="content-en">Targeted and intentional failure</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع المدخلات</template>
+          <template class="content-en">Input Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدخلات غير متوقعة أو تفاعل نظام عادي</template>
+          <template class="content-en">Unanticipated input or normal system interaction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مدخلات غير محتملة جداً يختارها المهاجم خصيصاً</template>
+          <template class="content-en">Highly unlikely inputs specifically chosen by an attacker</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التركيز على الأخطاء (Bugs)</template>
+          <template class="content-en">Focus on Bugs</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يهتم بعدد الأخطاء، بل بمدى تكرار حدوثها</template>
+          <template class="content-en">Not concerned with how many bugs, but how often triggered</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يهتم باكتشاف واستغلال خطأ واحد محدد</template>
+          <template class="content-en">Concerned with finding and exploiting specific buggy code</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تكفي اختبارات ضمان الجودة (QA) التقليدية لاكتشاف الثغرات الأمنية؟</template>
+      <template class="content-en">Why are traditional Quality Assurance (QA) tests insufficient for discovering security vulnerabilities?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن اختبارات QA تركز عادةً على 'المدخلات العادية والمتوقعة' للتأكد من أن البرنامج يؤدي وظيفته، بينما يبحث المهاجمون عن 'مدخلات غير محتملة وشاذة' (Edge Cases) مصممة خصيصاً لكسر البرنامج، والتي نادراً ما تغطيها اختبارات QA القياسية.</p></template>
+      <template class="content-en"><p>Because QA tests typically focus on 'normal, expected inputs' to ensure the program functions correctly, whereas attackers look for 'highly unlikely, anomalous inputs' (edge cases) specifically designed to break the program, which standard QA tests rarely cover.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="handling-input-injection-attacks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> معالجة المدخلات وهجمات الحقن</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Handling Program Input &amp; Injection Attacks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحدث هجمات الحقن عندما يتم تمرير بيانات غير موثوقة إلى مترجم (Interpreter) كجزء من أمر أو استعلام، مما يخدع النظام لتنفيذ أوامر غير مقصودة.</p></template>
+    <template class="content-en"><p>Injection attacks occur when untrusted data is sent to an interpreter as part of a command or query, tricking the system into executing unintended commands.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>معالجة المدخلات:</b> المعالجة غير الصحيحة هي فشل شائع جداً. المدخلات هي أي مصدر بيانات من الخارج (لوحة مفاتيح، ملف، شبكة، بيئة التنفيذ). يجب التحقق من صحة الافتراضات حول حجم ونوع القيم قبل الاستخدام. البرمجة الآمنة تعتبر جميع المدخلات خطيرة.</p><p><b>تفسير المدخلات:</b> قد تكون المدخلات ثنائية (Binary) أو نصية. الفشل في التحقق من صحة التفسير قد يؤدي إلى ثغرات (مثل خطأ Heartbleed في OpenSSL عام 2014).</p><p><b>هجمات الحقن (Injection Attacks):</b> عيوب تتعلق بمعالجة المدخلات غير الصالحة والتي تؤثر بعد ذلك على تنفيذ البرنامج.</p><ul><li><b>حقن الأوامر (Command Injection):</b> إدخال أوامر نظام التشغيل عبر مدخلات البرنامج.</li><li><b>حقن SQL (SQL Injection):</b> استغلال واسع النطاق حيث تُستخدم المدخلات في استعلام قاعدة البيانات. يجب التحقق من الأحرف الوصفية (Meta-characters).</li><li><b>حقن الكود (Code Injection):</b> تحتوي المدخلات على كود يتم تنفيذه لاحقاً (مثل ثغرة الإدراج عن بُعد في PHP).</li></ul></template>
+    <template class="content-en"><p><b>Handling Program Input:</b> Incorrect handling is a very common failing. Input is any source of data from outside (keyboard, file, network, execution environment). Assumptions on size and type must be validated before use. Safe coding treats all input as dangerous.</p><p><b>Interpretation of Input:</b> Input may be binary or text. Failure to validate interpretation can result in vulnerabilities (e.g., the 2014 <span class="smart-term" data-term-en="Heartbleed" data-ar="نزيف القلب" data-en-def="A major security bug in the OpenSSL cryptography library (2014) caused by a failure to validate the length of a binary input value in the TLS heartbeat extension.">Heartbleed<span class="smart-term-tooltip"></span></span> OpenSSL bug regarding binary input validation).</p><p><b>Injection Attacks:</b> Flaws relating to invalid input handling which then influences program execution.</p><ul><li><b>Command Injection:</b> Injecting OS commands via program input.</li><li><b><span class="smart-term" data-term-en="SQL Injection" data-ar="حقن لغة الاستعلام المهيكلة" data-en-def="A code injection technique used to attack data-driven applications, in which malicious SQL statements are inserted into entry fields for execution.">SQL Injection<span class="smart-term-tooltip"></span></span>:</b> Widely exploited; occurs when input is used directly in an SQL query. Requires checking/validating SQL meta-characters.</li><li><b>Code Injection:</b> Input contains code that is then executed (e.g., PHP remote code injection).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب الجذري لجميع هجمات الحقن هو الخلط بين 'مستوى البيانات' (Data Plane) و 'مستوى التحكم' (Control Plane). عندما يعجز المترجم عن التمييز بين ما هو بيانات وما هو أمر، يحدث الحقن.</p><p>أفضل دفاع ضد حقن SQL هو استخدام الاستعلامات ذات المعلمات (Parameterized Queries) أو العبارات المحضرة (Prepared Statements)، والتي تفصل بشكل صارم بين الكود والبيانات.</p><p>في حقن الأوامر، غالباً ما يستغل المهاجمون برامج مساعدة (Helper Programs) يتم استدعاؤها بواسطة البرنامج الرئيسي باستخدام دوال مثل <code>system()</code> أو <code>exec()</code>.</p></template>
+    <template class="content-en"><p>The root cause of all injection attacks is the conflation of the 'Data Plane' and the 'Control Plane'. When an interpreter cannot distinguish between what is intended as data and what is intended as a command, injection occurs.</p><p>The most robust defense against SQL injection is the use of Parameterized Queries (or Prepared Statements), which strictly separate the SQL code from the user-supplied data.</p><p>In command injection, attackers often exploit helper programs invoked by the main application using functions like <code>system()</code> or <code>exec()</code>, appending their own commands using shell metacharacters like <code>;</code> or <code>|</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف حقن الكود (Code Injection) عن حقن الأوامر (Command Injection)؟</template>
+      <template class="content-en">How does Code Injection differ from Command Injection?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في حقن الكود، يقوم المهاجم بإضافة كود برمجي (مثل PHP أو Python) يتم تنفيذه بواسطة التطبيق نفسه. أما في حقن الأوامر، يقوم المهاجم بإضافة أوامر نظام تشغيل (مثل أوامر Linux shell) يتم تنفيذها بواسطة نظام التشغيل المضيف.</p></template>
+      <template class="content-en"><p>In Code Injection, the attacker adds programming code (like PHP or Python) that is executed by the application itself. In Command Injection, the attacker adds operating system commands (like Linux shell commands) that are executed by the host OS.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-site-scripting-xss" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> البرمجة عبر المواقع (XSS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Cross Site Scripting (XSS) Attacks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هجوم يتم فيه إدخال كود برمجي خبيث (مثل JavaScript) من قبل مستخدم، ليتم عرضه وتنفيذه في متصفح مستخدم آخر يثق في الموقع.</p></template>
+    <template class="content-en"><p>An attack where malicious script code (like JavaScript) input by one user is output to and executed in the browser of another user who trusts the site.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحدث هجمات XSS عندما يتم إخراج المدخلات من مستخدم واحد لاحقاً لمستخدم آخر. تستغل هذه الهجمات الافتراض بأن جميع المحتويات الواردة من موقع واحد موثوق بها بالتساوي.</p><p>تُرى هذه الثغرة بشكل شائع في تطبيقات الويب المبرمجة (مثل سجلات الزوار، الويكي، المدونات). تتضمن الثغرة تضمين برنامج نصي (مثل JavaScript أو ActiveX) في محتوى HTML.</p><p><b>ثغرة الانعكاس (XSS Reflection):</b> تتضمن تضمين كود خبيث داخل البيانات المقدمة إلى الموقع، والتي يتم عرضها لاحقاً للمستخدمين الآخرين. قد يحتاج الكود النصي إلى الوصول إلى البيانات المرتبطة بصفحات أخرى (مثل ملفات تعريف الارتباط - Cookies).</p></template>
+    <template class="content-en"><p>XSS attacks occur where input from one user is later output to another user. They exploit the assumption that all content originating from one site is equally trusted by the browser.</p><p>Commonly seen in scripted web apps (guestbooks, wikis, blogs). The vulnerability involves the inclusion of script (e.g., JavaScript, ActiveX) in HTML content.</p><p><b>XSS Reflection Vulnerability:</b> Involves including malicious code inside data supplied to a site, which is subsequently displayed to other users. The script code may access data associated with other pages, such as stealing session cookies.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تفرض المتصفحات فحوصات أمنية (Same-Origin Policy) وتقيد الوصول إلى البيانات للصفحات التي تنشأ من نفس الموقع. يتجاوز XSS هذا القيد لأن الكود الخبيث يبدو وكأنه قادم من الموقع الموثوق نفسه.</p><p>للدفاع ضد XSS، يجب التحقق من صحة البيانات المقدمة (Input Validation) والأهم من ذلك، ترميز المخرجات (Output Encoding) بحيث يتم عرض الأكواد كنص عادي بدلاً من تنفيذها كبرنامج نصي.</p><p>يجب على المطورين معالجة كل من المدخلات والمخرجات، والتعامل مع الترميزات المختلفة (Encodings) التي قد يستخدمها المهاجمون لتجاوز الفلاتر.</p></template>
+    <template class="content-en"><p>Browsers impose security checks (like the Same-Origin Policy) and restrict data access to pages originating from the same site. XSS bypasses this because the malicious script appears to originate from the trusted site itself.</p><p>To defend against XSS, developers must perform Input Validation and, crucially, Output Encoding (escaping characters like <code>&lt;</code> to <code>&amp;lt;</code>) so the browser renders the payload as text rather than executing it as a script.</p><p>Attacks target both input and output handling, and defenders must account for various alternate encodings attackers use to obfuscate their payloads and bypass simple filters.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A flow diagram showing a typical XSS attack. 1. 'Attacker' inserts malicious unfiltered code into 'Your Web Page' (Application). 2. 'Victim' (Regular User) visits the web page. 3. The malicious code is returned with the web page to the Victim. 4. The script executes in the Victim's browser, and the Attacker gains control over user's data (e.g., steals cookies) via the injected exploit. Use distinct icons for Attacker, Server, and Victim. Style: educational, dark background #0d1117, accent colors #ff4444 (attacker flow) and #44ff44 (normal flow), viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Arrow Markers -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-neutral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Cross-Site Scripting (XSS) Attack Flow</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مسار هجوم البرمجة عبر المواقع (XSS)</text>
+
+    <!-- ==================== PATHS ==================== -->
+    
+    <!-- Path 1: Attacker -> Server (Malicious Injection) -->
+    <path d="M 170 390 C 170 200, 200 125, 310 125" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+    
+    <!-- Path 2: Victim -> Server (Normal Request) -->
+    <path d="M 590 390 C 590 280, 500 250, 440 190" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-neutral)" />
+    
+    <!-- Path 3: Server -> Victim (Malicious Response) -->
+    <path d="M 480 125 C 630 125, 630 250, 630 380" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+    
+    <!-- Path 4: Victim -> Attacker (Data Theft) -->
+    <path d="M 550 445 L 260 445" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-brand)" />
+
+
+    <!-- ==================== PAYLOAD BOXES ==================== -->
+    
+    <!-- Payload 1 -->
+    <rect x="210" y="165" width="70" height="24" rx="4" fill="var(--brand-500)" />
+    <text x="245" y="182" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">&lt;script&gt;</text>
+
+    <!-- Payload 3 -->
+    <rect x="570" y="165" width="120" height="24" rx="4" fill="var(--brand-500)" />
+    <text x="630" y="182" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">html + &lt;script&gt;</text>
+
+    <!-- Payload 4 -->
+    <rect x="345" y="460" width="120" height="24" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="405" y="476" text-anchor="middle" font-family="monospace" font-size="12" font-weight="bold" fill="var(--brand-ink)">document.cookie</text>
+
+
+    <!-- ==================== LABELS & BADGES ==================== -->
+    
+    <!-- Step 1 -->
+    <circle cx="250" cy="230" r="12" fill="var(--brand-500)" />
+    <text x="250" y="234" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+    <text x="250" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Inject malicious script</text>
+    <text x="250" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حقن سكربت خبيث</text>
+
+    <!-- Step 2 -->
+    <circle cx="480" cy="290" r="12" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+    <text x="480" y="294" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--text-primary)">2</text>
+    <text x="480" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Victim requests page</text>
+    <text x="480" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الضحية يطلب الصفحة</text>
+
+    <!-- Step 3 -->
+    <circle cx="690" cy="270" r="12" fill="var(--brand-500)" />
+    <text x="690" y="274" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">3</text>
+    <text x="690" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Server returns page + script</text>
+    <text x="690" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الخادم يرجع الصفحة والسكربت</text>
+
+    <!-- Step 4 -->
+    <circle cx="405" cy="405" r="12" fill="var(--brand-500)" />
+    <text x="405" y="409" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">4</text>
+    <text x="405" y="428" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Script executes, steals data</text>
+    <text x="405" y="428" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">السكربت يُنفذ ويسرق البيانات</text>
+
+
+    <!-- ==================== NODES ==================== -->
+    
+    <!-- Server Node -->
+    <rect x="320" y="70" width="160" height="110" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <rect x="380" y="85" width="40" height="10" rx="2" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2" />
+    <rect x="380" y="100" width="40" height="10" rx="2" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2" />
+    <rect x="380" y="115" width="40" height="10" rx="2" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2" />
+    <text x="400" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Web Application</text>
+    <text x="400" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تطبيق الويب</text>
+    <text x="400" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Vulnerable Server</text>
+    <text x="400" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">خادم غير محمي</text>
+
+    <!-- Attacker Node -->
+    <rect x="90" y="390" width="160" height="110" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <rect x="145" y="425" width="50" height="6" rx="2" fill="var(--text-secondary)" />
+    <rect x="150" y="405" width="40" height="20" rx="2" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2" />
+    <circle cx="170" cy="415" r="3" fill="var(--brand-500)" />
+    <path d="M 165 415 L 175 415 M 167 412 L 173 418 M 167 418 L 173 412" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="170" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Attacker</text>
+    <text x="170" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المهاجم</text>
+    <text x="170" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Malicious Actor</text>
+    <text x="170" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">جهة خبيثة</text>
+
+    <!-- Victim Node -->
+    <rect x="550" y="390" width="160" height="110" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <rect x="605" y="405" width="50" height="30" rx="3" fill="var(--bg-surface)" stroke="var(--text-secondary)" stroke-width="2" />
+    <path d="M 605 413 L 655 413" stroke="var(--text-secondary)" stroke-width="2" />
+    <circle cx="630" cy="422" r="4" fill="var(--text-secondary)" />
+    <path d="M 620 432 C 620 425, 640 425, 640 432" fill="var(--text-secondary)" />
+    <text x="630" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Victim</text>
+    <text x="630" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الضحية</text>
+    <text x="630" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Regular User</text>
+    <text x="630" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">مستخدم عادي</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر ترميز المخرجات (Output Encoding) دفاعاً أكثر فعالية ضد XSS من تصفية المدخلات (Input Filtering)؟</template>
+      <template class="content-en">Why is Output Encoding a more effective defense against XSS than Input Filtering?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تصفية المدخلات يمكن تجاوزها غالباً باستخدام ترميزات بديلة (مثل Hex أو Unicode)، بينما يضمن ترميز المخرجات تحويل أي أحرف خطرة (مثل < و >) إلى كيانات HTML آمنة قبل عرضها في المتصفح، مما يمنع تنفيذها ككود.</p></template>
+      <template class="content-en"><p>Because input filtering can often be bypassed using alternate encodings (like Hex or Unicode), whereas output encoding ensures that any dangerous characters (like < and >) are converted into safe HTML entities right before being rendered in the browser, preventing execution.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="input-validation-fuzzing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التحقق من المدخلات واختبار التشويش (Fuzzing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Input Validation &amp; Fuzzing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التأكد من أن البيانات المدخلة تتطابق مع التنسيق المتوقع (باستخدام التعبيرات العادية)، واختبار متانة البرنامج عن طريق إغراقه ببيانات عشوائية (Fuzzing).</p></template>
+    <template class="content-en"><p>Ensuring input data matches expected formats (using regular expressions), and testing program robustness by flooding it with random data (Fuzzing).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التحقق من بناء جملة المدخلات:</b> لضمان تلبية البيانات للافتراضات (مثل: هل هي قابلة للطباعة، HTML، بريد إلكتروني). يجب المقارنة بما هو 'معروف أنه مقبول' (القائمة البيضاء) بدلاً من 'المعروف أنه خطير' (القائمة السوداء). تُستخدم التعبيرات العادية (Regular Expressions) بشكل شائع لوصف المدخلات المسموح بها.</p><p><b>الترميزات البديلة (Alternate Encodings):</b> قد يكون للنص طرق ترميز متعددة (مثل Unicode أو UTF-8). يجب توحيد المدخلات (Canonicalize) إلى تمثيل قياسي واحد قبل التحقق منها لمنع تجاوز الفلاتر.</p><p><b>التحقق من المدخلات الرقمية:</b> يجب تفسير النص بشكل صحيح ومعالجته باستمرار. مقارنة الأرقام الموقعة (Signed) بغير الموقعة (Unsigned) يمكن أن تسبب مشاكل (رقم موجب كبير غير موقع قد يُقرأ كرقم سالب موقع)، مما قد يُستخدم لإحباط فحوصات تجاوز سعة المخزن المؤقت.</p><p><b><span class="smart-term" data-term-en="Fuzzing" data-ar="اختبار التشويش" data-en-def="An automated software testing technique that involves providing invalid, unexpected, or random data as inputs to a computer program.">اختبار التشويش<span class="smart-term-tooltip"></span></span> (Input Fuzzing):</b> طريقة اختبار قوية تستخدم مجموعة كبيرة من المدخلات العشوائية للتحقق مما إذا كان البرنامج يتعامل بشكل صحيح مع المدخلات غير الطبيعية.</p></template>
+    <template class="content-en"><p><b>Validating Input Syntax:</b> Ensures input data meets assumptions (e.g., is it printable, HTML, email). Compare to what is 'known acceptable' (allowlisting) rather than 'known dangerous' (blocklisting). Regular expressions are commonly used to describe allowable input patterns.</p><p><b>Alternate Encodings:</b> Text may have multiple encodings (e.g., Unicode, UTF-8). Input must be canonicalized (translated to a single, standard representation) before checking to prevent attackers from bypassing filters using redundant variants (e.g., <code>%2F</code> for <code>/</code>).</p><p><b>Validating Numeric Input:</b> Must correctly interpret text form and process consistently. Comparing signed to unsigned integers can cause issues (e.g., a large positive unsigned integer is interpreted as a negative signed integer), which can thwart buffer overflow length checks.</p><p><b>Input <span class="smart-term" data-term-en="Fuzzing" data-ar="اختبار التشويش" data-en-def="An automated software testing technique that involves providing invalid, unexpected, or random data as inputs to a computer program.">Fuzzing<span class="smart-term-tooltip"></span></span>:</b> A powerful testing method using a large range of randomly generated inputs to test whether a program correctly handles abnormal inputs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Canonicalization" data-ar="التوحيد القياسي" data-en-def="The process of converting data that has more than one possible representation into a standard, normal, or canonical form.">التوحيد القياسي<span class="smart-term-tooltip"></span></span> (Canonicalization) خطوة حاسمة غالباً ما يتم تجاهلها.</p><p>إذا قام المطور بحظر السلسلة <code>../</code> لمنع تجاوز المسار، يمكن للمهاجم إرسال <code>%2E%2E%2F</code>.</p><p>إذا لم يتم توحيد المدخلات أولاً، سيفشل الفلتر.</p><p>في التحقق الرقمي، تحدث ثغرات خطيرة عندما يتم استخدام متغير <code>signed int</code> للتحقق من الحد الأقصى للطول، ثم يتم تمريره إلى دالة تتوقع <code>unsigned int</code> (مثل <code>memcpy</code>)، مما يؤدي إلى نسخ كمية هائلة من البيانات.</p><p>يساعد اختبار التشويش (Fuzzing) في اكتشاف الأخطاء التي لا يتوقعها المبرمجون، وهو أداة أساسية في كل من الموثوقية (Reliability) والأمن.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Canonicalization" data-ar="التوحيد القياسي" data-en-def="The process of converting data that has more than one possible representation into a standard, normal, or canonical form.">Canonicalization<span class="smart-term-tooltip"></span></span> is a critical, often overlooked step. If a developer blocks the string <code>../</code> to prevent path traversal, an attacker might send <code>%2E%2E%2F</code>. If the input isn't canonicalized first, the blocklist filter fails.</p><p>In numeric validation, severe vulnerabilities occur when a <code>signed int</code> is used for a maximum length check (allowing a negative number to pass a <code>< MAX</code> check), but is then passed to a memory copy function expecting a <code>size_t</code> (unsigned), resulting in a massive buffer overflow.</p><p>Fuzzing is free of assumptions and helps discover edge cases that programmers didn't anticipate, making it essential for both software reliability and security.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفضل استخدام 'القائمة البيضاء' (Allowlisting) على 'القائمة السوداء' (Blocklisting) عند التحقق من المدخلات؟</template>
+      <template class="content-en">Why is 'Allowlisting' preferred over 'Blocklisting' when validating inputs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن القائمة السوداء تحاول حظر المدخلات 'السيئة المعروفة'، وهو أمر مستحيل تقريباً لأن المهاجمين يبتكرون باستمرار طرقاً جديدة وتشفيرات بديلة. القائمة البيضاء تقبل فقط المدخلات 'الجيدة المعروفة' وترفض كل شيء آخر، مما يجعلها أكثر أماناً.</p></template>
+      <template class="content-en"><p>Because blocklisting tries to ban 'known bad' inputs, which is nearly impossible as attackers constantly invent new bypasses and encodings. Allowlisting only accepts 'known good' inputs and rejects everything else, making it fundamentally more secure.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="memory-management-race-conditions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> إدارة الذاكرة وحالات السباق</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Memory Management &amp; Race Conditions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أخطاء تنشأ من الإدارة اليدوية للذاكرة (مثل تسرب الذاكرة) أو من وصول عمليات متعددة إلى بيانات مشتركة في نفس الوقت دون مزامنة (<span class="smart-term" data-term-en="Race Condition" data-ar="حالة السباق" data-en-def="A flaw that occurs when the timing or ordering of events affects a program&#x27;s correctness, often in multi-threaded or multi-process environments.">حالة السباق<span class="smart-term-tooltip"></span></span>).</p></template>
+    <template class="content-en"><p>Errors arising from manual memory management (like memory leaks) or from multiple processes accessing shared data simultaneously without synchronization (Race Conditions).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الاستخدام الصحيح للذاكرة:</b> تخصيص الذاكرة الديناميكية يُستخدم لمعالجة البيانات غير المعروفة (يتم تخصيصها عند الحاجة، وتحريرها عند الانتهاء). الفشل في تحريرها يؤدي إلى '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">تسرب الذاكرة<span class="smart-term-tooltip"></span></span>' (Memory Leak). في اللغات القديمة (C/C++)، يضمن المبرمج التخصيص والتحرير الصحيحين، بينما تتعامل اللغات الحديثة مع ذلك تلقائياً.</p><p><b>حالات السباق في الذاكرة المشتركة (Race Conditions):</b> تحدث عندما تصل خيوط/عمليات متعددة إلى بيانات أو ذاكرة مشتركة. يؤدي ذلك إلى تلف أو فقدان التغييرات بسبب التداخل ما لم تتم مزامنة الوصول. يجب استخدام أساسيات المزامنة المناسبة (Synchronization Primitives)، مع الانتباه لمشكلة 'الجمود' (Deadlock).</p><p><b>الملفات المؤقتة الآمنة:</b> تستخدم العديد من البرامج ملفات مؤقتة في منطقة نظام مشتركة. يجب أن تكون فريدة ولا يصل إليها الآخرون. استخدام معرف العملية (Process ID) لإنشاء الاسم يجعله فريداً ولكنه 'يمكن التنبؤ به'، مما يسمح للمهاجم بتخمينه وإنشاء ملفه الخاص قبل البرنامج. يجب استخدام أسماء عشوائية وأذونات صحيحة.</p></template>
+    <template class="content-en"><p><b>Correct Use of Memory:</b> Dynamic memory allocation is used to manipulate unknown data (allocated upon need, released when done). Incorrect release causes a '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">Memory Leak<span class="smart-term-tooltip"></span></span>'. In older languages (C/C++), the programmer ensures correct allocation and release, whereas modern languages handle this automatically.</p><p><b><span class="smart-term" data-term-en="Race Condition" data-ar="حالة السباق" data-en-def="A flaw that occurs when the timing or ordering of events affects a program&#x27;s correctness, often in multi-threaded or multi-process environments.">Race Condition<span class="smart-term-tooltip"></span></span>s in Shared Memory:</b> Occur when multiple threads/processes access shared data/memory. This leads to corruption or loss of changes due to overlapping accesses unless access is synchronized. Suitable synchronization primitives must be used, though this introduces the risk of access deadlocks.</p><p><b>Safe Temporary Files:</b> Many programs use temporary files in a shared system area. They must be unique and not accessed by others. Creating a name using the Process ID is unique but predictable. An attacker might guess it and attempt to create their own file between the program checking and creating it. Secure temp files need random names and correct permissions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حالات السباق غالباً ما تظهر كثغرات من نوع TOCTOU (Time of Check to Time of Use). يتحقق البرنامج من حالة معينة (مثل: هل الملف موجود؟)، ولكن قبل أن يستخدم الملف، يقوم المهاجم بتغيير الحالة (مثل استبدال الملف برابط رمزي - Symlink).</p><p>تسرب الذاكرة (Memory Leaks) قد لا يؤدي مباشرة إلى تنفيذ كود خبيث، ولكنه يُستخدم في هجمات حجب الخدمة (DoS) لاستنفاد موارد النظام وإسقاط التطبيق.</p><p>آليات قفل الملفات (File Locking) تختلف بين أنظمة التشغيل، واستخدام القفل الاستشاري (Advisory Lock) يعني أن البرامج الأخرى يجب أن تتعاون وتتحقق من القفل، وإلا يمكنها تجاهله.</p></template>
+    <template class="content-en"><p>Race conditions often manifest as TOCTOU (Time of Check to Time of Use) vulnerabilities. A program checks a condition (e.g., does this file exist?), but before it uses the file, an attacker alters the state (e.g., replaces the file with a symlink to a sensitive system file).</p><p>Memory leaks might not directly lead to arbitrary code execution, but they are frequently exploited in Denial of Service (DoS) attacks to exhaust system resources and crash the application.</p><p>File locking mechanisms vary between OSs. Using an 'Advisory Lock' means other programs must cooperatively check for the lock; malicious programs can simply ignore advisory locks and access the file anyway.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استخدام معرف العملية (PID) لإنشاء أسماء الملفات المؤقتة ممارسة أمنية سيئة؟</template>
+      <template class="content-en">Why is using the Process ID (PID) to generate temporary file names a bad security practice?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن معرفات العمليات (PIDs) يمكن التنبؤ بها بسهولة. يمكن للمهاجم تخمين اسم الملف المؤقت الذي سيقوم البرنامج بإنشائه، وإنشاء ملف خبيث بنفس الاسم مسبقاً (هجوم Symlink)، مما يخدع البرنامج للكتابة فوق ملفات النظام الحساسة.</p></template>
+      <template class="content-en"><p>Because PIDs are easily predictable. An attacker can guess the name of the temporary file the program will create and pre-create a malicious file or symlink with that exact name, tricking the program into overwriting sensitive system files.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="os-interaction-least-privilege" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> التفاعل مع نظام التشغيل وأقل الصلاحيات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> OS Interaction &amp; Least Privilege</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تأمين كيفية تفاعل البرنامج مع نظام التشغيل (مثل متغيرات البيئة) وتطبيق مبدأ 'أقل الصلاحيات' لتقليل الضرر في حال اختراق البرنامج.</p></template>
+    <template class="content-en"><p>Securing how a program interacts with the OS (e.g., environment variables) and applying the principle of 'Least Privilege' to minimize damage if the program is compromised.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التفاعل مع نظام التشغيل:</b> تنفذ البرامج تحت سيطرة نظام التشغيل الذي يتوسط الوصول إلى الموارد. يبني نظام التشغيل بيئة التنفيذ باستخدام متغيرات البيئة (Environment Variables) والوسائط.</p><p><b>متغيرات البيئة:</b> مجموعة من القيم النصية الموروثة من العملية الأم (مثل PATH، LD_LIBRARY_PATH). يمكن أن تؤثر على سلوك العملية وهي مصدر آخر للمدخلات غير الموثوقة. يستخدمها المهاجمون لمحاولة <span class="smart-term" data-term-en="Privilege Escalation" data-ar="تصعيد الصلاحيات" data-en-def="The act of exploiting a bug, design flaw, or configuration oversight in an OS or software application to gain elevated access to resources that are normally protected.">تصعيد الصلاحيات<span class="smart-term-tooltip"></span></span>.</p><p><b>البرامج المترجمة الضعيفة:</b> إذا استدعى البرنامج برامج أخرى، فقد يكون عرضة للتلاعب بمتغير PATH (يجب إعادة تعيينه إلى قيم آمنة). إذا تم ربطه ديناميكياً، فقد يكون عرضة للتلاعب بـ LD_LIBRARY_PATH (يجب الربط الثابت للبرامج ذات الامتيازات).</p><p><b>استخدام أقل الصلاحيات (Least Privilege):</b> يجب تشغيل البرامج بأقل امتياز مطلوب لإكمال وظيفتها. استغلال العيوب قد يمنح المهاجم امتيازات أكبر (تصعيد الامتيازات). التصميم الجيد يقسم البرامج المعقدة إلى وحدات أصغر بالامتيازات المطلوبة فقط.</p></template>
+    <template class="content-en"><p><b>Interaction with OS:</b> Programs execute under OS control, which mediates access to resources. The OS constructs the execution environment with environment variables and arguments.</p><p><b>Environment Variables:</b> A set of string values inherited from the parent process (e.g., PATH, LD_LIBRARY_PATH). They can affect process behavior and are another source of untrusted input. Attackers use them to try to escalate privileges.</p><p><b>Vulnerable Compiled Programs:</b> If a program invokes other programs, it can be vulnerable to PATH variable manipulation (must reset to safe values). If dynamically linked, it may be vulnerable to LD_LIBRARY_PATH manipulation (privileged programs should be statically linked or prevent use of this variable).</p><p><b>Use of Least Privilege:</b> Run programs with the absolute least privilege needed to complete their function. Exploiting flaws gives the attacker the program's privileges (<span class="smart-term" data-term-en="Privilege Escalation" data-ar="تصعيد الصلاحيات" data-en-def="The act of exploiting a bug, design flaw, or configuration oversight in an OS or software application to gain elevated access to resources that are normally protected.">privilege escalation<span class="smart-term-tooltip"></span></span>). Good design partitions complex programs into smaller modules with only the needed privileges.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>متغير PATH يخبر النظام بأماكن البحث عن البرامج التنفيذية. إذا قام برنامج ذو صلاحيات عالية (Root) باستدعاء أمر مثل <code>ls</code> دون تحديد المسار الكامل (<code>/bin/ls</code>)، يمكن للمهاجم تعديل PATH ليشير إلى مجلد يحتوي على برنامج خبيث يسمى <code>ls</code>، وسيتم تنفيذه بصلاحيات Root.</p><p>متغير LD_LIBRARY_PATH يحدد مسارات البحث عن المكتبات الديناميكية. يمكن للمهاجم استخدامه لإجبار البرنامج على تحميل مكتبة خبيثة بدلاً من المكتبة الشرعية للنظام.</p><p>تقسيم الامتيازات (Privilege Separation) هو تطبيق عملي ل<span class="smart-term" data-term-en="Principle of Least Privilege" data-ar="مبدأ أقل الصلاحيات" data-en-def="The practice of limiting access rights for users, accounts, and computing processes to only those resources absolutely required to perform their routine, legitimate activities.">مبدأ أقل الصلاحيات<span class="smart-term-tooltip"></span></span>، حيث يتم فصل الكود الذي يتطلب صلاحيات الجذر (مثل فتح منفذ شبكة) عن الكود الذي يعالج بيانات المستخدم غير الموثوقة.</p></template>
+    <template class="content-en"><p>The PATH variable tells the OS where to look for executables. If a privileged program calls a command like <code>ls</code> without an absolute path (<code>/bin/ls</code>), an attacker can alter PATH to point to a directory containing a malicious script named <code>ls</code>, which then executes with root privileges.</p><p>LD_LIBRARY_PATH specifies directories to search for dynamic libraries. Attackers can manipulate this to force a privileged program to load a malicious shared library instead of the legitimate system library.</p><p>Privilege Separation is a practical application of Least Privilege, where code requiring root access (e.g., binding to a low network port) is strictly separated into a different process from the code that parses untrusted user input.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن للمبرمج منع هجمات التلاعب بمتغير PATH عند استدعاء برامج خارجية؟</template>
+      <template class="content-en">How can a programmer prevent PATH variable manipulation attacks when invoking external programs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب على المبرمج دائماً استخدام المسارات المطلقة (Absolute Paths) للبرامج (مثل '/usr/bin/ls' بدلاً من 'ls')، أو مسح/إعادة تعيين متغير PATH إلى قيمة آمنة ومعروفة داخل البرنامج قبل استدعاء أي برامج خارجية.</p></template>
+      <template class="content-en"><p>The programmer should always use absolute paths for executables (e.g., '/usr/bin/ls' instead of 'ls'), or explicitly clear/reset the PATH environment variable to a known safe value within the program before invoking any external programs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أنكم تبنون قلعة؛ تجاوز سعة المخزن المؤقت هو كمن يسكب الماء بقوة حتى يفيض الخندق ويدمر الجدران الداخلية. لقد رأينا كيف استغلت دودة موريس هذا الخطأ البسيط في لغة C للسيطرة على الأنظمة. تذكروا دائماً: المكدس (Stack) يحتوي على 'عنوان العودة'، وهو الهدف الذهبي للمهاجمين لتوجيه البرنامج نحو كودهم الخبيث (Shellcode). لحسن الحظ، لدينا دروع مثل Stackguard و ASLR، لكن المهاجمين أذكياء، فابتكروا هجمات Return-to-libc لتجاوزها. الجزء الثاني من رحلتنا يركز على 'البرمجة الدفاعية'. القاعدة الذهبية هنا: لا تثق بأي مدخلات! سواء كان حقن SQL، أو XSS، أو التلاعب بمتغير PATH، كلها تنبع من افتراضات خاطئة حول سلامة البيانات. للامتحان، ركزوا جيداً على الفرق بين دفاعات وقت الترجمة ووقت التشغيل، وافهموا لماذا يعتبر التوحيد القياسي (Canonicalization) والقائمة البيضاء (Allowlisting) أفضل أصدقائكم في التحقق من المدخلات. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this critical module. Imagine building a fortress; a buffer overflow is like pouring water so forcefully that it overflows the moat and destroys the inner walls. We saw how the Morris Worm exploited this simple C language flaw to take over systems. Always remember: the Stack contains the 'Return Address', the golden target for attackers to redirect the program to their malicious 'Shellcode'. Fortunately, we have shields like Stackguard and ASLR, but attackers are smart, inventing Return-to-libc to bypass them. The second part of our journey focuses on 'Defensive Programming'. The golden rule: Trust NO input! Whether it's SQL Injection, XSS, or PATH manipulation, they all stem from false assumptions about data safety. For the exam, focus heavily on the difference between compile-time and run-time defenses, and understand why Canonicalization and Allowlisting are your best friends in input validation. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر لغات C و C++ عرضة لتجاوز سعة المخزن المؤقت بينما Java ليست كذلك؟</template>
+          <template class="content-en">Why are C and C++ vulnerable to buffer overflows while Java is not?</template>
+          <span class="content-target">لماذا تعتبر لغات C و C++ عرضة لتجاوز سعة المخزن المؤقت بينما Java ليست كذلك؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن C/C++ تسمح بالوصول المباشر إلى الذاكرة ولا تقوم بالتحقق التلقائي من حدود المصفوفات (Bounds Checking) من أجل الأداء. Java لغة ذات كتابة قوية تدير الذاكرة تلقائياً وتتحقق من الحدود.</template>
+          <template class="content-en">Because C/C++ allow direct memory access and do not perform automatic bounds checking for performance reasons. Java is a strongly typed language that manages memory automatically and enforces bounds checking.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل تقنية Stackguard؟</template>
+          <template class="content-en">How does Stackguard work?</template>
+          <span class="content-target">كيف تعمل تقنية Stackguard؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تضيف كوداً أثناء الترجمة يضع قيمة عشوائية (Canary) بين المتغيرات المحلية وعنوان العودة. قبل أن تعود الدالة، تتحقق مما إذا كانت هذه القيمة قد تغيرت. إذا تغيرت، فهذا يعني حدوث تجاوز، ويتم إيقاف البرنامج.</template>
+          <template class="content-en">It adds compile-time code that places a random value (canary) between local variables and the return address. Before the function returns, it checks if this value has changed. If it has, an overflow occurred, and the program halts.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف من هجوم تجاوز سعة الكومة (Heap Overflow) بما أنه لا يوجد عنوان عودة هناك؟</template>
+          <template class="content-en">What is the target of a Heap Overflow attack since there is no return address there?</template>
+          <span class="content-target">ما هو الهدف من هجوم تجاوز سعة الكومة (Heap Overflow) بما أنه لا يوجد عنوان عودة هناك؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يستهدف المهاجمون مؤشرات الدوال (Function Pointers) المخزنة في الكومة، أو يتلاعبون بهياكل بيانات إدارة الذاكرة (مثل الكتل المستخدمة في malloc/free) للسيطرة على التنفيذ.</template>
+          <template class="content-en">Attackers target function pointers stored in the heap, or manipulate memory management data structures (like the blocks used in malloc/free) to gain control of execution.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين جودة البرمجيات وأمن البرمجيات؟</template>
+          <template class="content-en">What is the difference between software quality and software security?</template>
+          <span class="content-target">ما هو الفرق بين جودة البرمجيات وأمن البرمجيات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الجودة تتعامل مع الأخطاء العشوائية الناتجة عن الاستخدام العادي. الأمن يتعامل مع المهاجمين الذين يبحثون بنشاط عن مدخلات شاذة وغير محتملة لاستغلال الأخطاء عمداً.</template>
+          <template class="content-en">Quality deals with random bugs resulting from normal use. Security deals with attackers actively seeking anomalous, highly unlikely inputs to intentionally exploit bugs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمنع التوحيد القياسي (Canonicalization) تجاوز الفلاتر؟</template>
+          <template class="content-en">How does Canonicalization prevent filter bypass?</template>
+          <span class="content-target">كيف يمنع التوحيد القياسي (Canonicalization) تجاوز الفلاتر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المهاجمون يستخدمون ترميزات مختلفة (مثل %2F بدلاً من /). التوحيد القياسي يحول جميع المدخلات إلى شكلها الأساسي الموحد قبل تطبيق قواعد التحقق، مما يمنع المدخلات الخبيثة المخفية من المرور.</template>
+          <template class="content-en">Attackers use different encodings (like %2F instead of /). Canonicalization converts all input into its standard, base form before validation rules are applied, preventing hidden malicious inputs from slipping through.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو اختبار التشويش (Fuzzing) ولماذا هو مهم؟</template>
+          <template class="content-en">What is Fuzzing and why is it important?</template>
+          <span class="content-target">ما هو اختبار التشويش (Fuzzing) ولماذا هو مهم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو إرسال كميات هائلة من البيانات العشوائية أو المشوهة إلى البرنامج لاختبار متانته. هو مهم لأنه يكتشف الأخطاء وحالات الحافة (Edge Cases) التي لم يتوقعها المبرمجون أثناء الاختبارات العادية.</template>
+          <template class="content-en">It is sending massive amounts of random or malformed data to a program to test its robustness. It's important because it discovers bugs and edge cases that programmers didn't anticipate during normal testing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحدث حالة السباق (Race Condition) في الملفات المؤقتة؟</template>
+          <template class="content-en">How does a Race Condition occur in temporary files?</template>
+          <span class="content-target">كيف تحدث حالة السباق (Race Condition) في الملفات المؤقتة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا استخدم البرنامج اسماً يمكن التنبؤ به (مثل PID)، يمكن للمهاجم إنشاء ملف خبيث بنفس الاسم في الفترة الزمنية بين تحقق البرنامج من عدم وجود الملف وبين إنشائه الفعلي (ثغرة TOCTOU).</template>
+          <template class="content-en">If a program uses a predictable name (like PID), an attacker can create a malicious file with that name in the time window between the program checking if the file exists and actually creating it (TOCTOU vulnerability).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو مبدأ أقل الصلاحيات (Least Privilege)؟</template>
+          <template class="content-en">What is the principle of Least Privilege?</template>
+          <span class="content-target">ما هو مبدأ أقل الصلاحيات (Least Privilege)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو إعطاء البرنامج أو المستخدم الحد الأدنى المطلق من الصلاحيات اللازمة لأداء وظيفته. هذا يحد من الضرر الذي يمكن للمهاجم إحداثه إذا تمكن من اختراق البرنامج.</template>
+          <template class="content-en">It is giving a program or user the absolute minimum privileges necessary to perform its function. This limits the damage an attacker can do if they manage to compromise the program.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم استغلال متغير البيئة PATH؟</template>
+          <template class="content-en">How is the PATH environment variable exploited?</template>
+          <span class="content-target">كيف يتم استغلال متغير البيئة PATH؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا استدعى برنامج ذو صلاحيات عالية أمراً دون تحديد مساره الكامل، يمكن للمهاجم تغيير PATH ليشير إلى مجلد يحتوي على برنامج خبيث بنفس اسم الأمر، ليتم تنفيذه بصلاحيات عالية.</template>
+          <template class="content-en">If a highly privileged program calls a command without specifying its full path, an attacker can change PATH to point to a directory containing a malicious program with the same command name, executing it with high privileges.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الدفاع الأساسي ضد هجمات البرمجة عبر المواقع (XSS)؟</template>
+          <template class="content-en">What is the primary defense against Cross Site Scripting (XSS) attacks?</template>
+          <span class="content-target">ما هو الدفاع الأساسي ضد هجمات البرمجة عبر المواقع (XSS)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الدفاع الأساسي هو 'ترميز المخرجات' (Output Encoding)، حيث يتم تحويل الأحرف الخاصة (مثل < و >) إلى كيانات HTML آمنة قبل عرضها، مما يمنع المتصفح من تنفيذها ككود برمجي.</template>
+          <template class="content-en">The primary defense is 'Output Encoding', where special characters (like < and >) are converted into safe HTML entities before being displayed, preventing the browser from executing them as script code.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو تجاوز سعة المخزن المؤقت (Buffer Overflow)؟",
+      "en": "What is a Buffer Overflow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة يتم فيها وضع بيانات في المخزن المؤقت أكثر من سعته، مما يؤدي إلى الكتابة فوق المعلومات المجاورة في الذاكرة.",
+        "en": "A condition where more input is placed into a buffer than its allocated capacity, overwriting adjacent memory."
+      },
+      "example": {
+        "ar": "دودة موريس (1988) استخدمت هذه الثغرة في خدمة 'fingerd'.",
+        "en": "The Morris Worm (1988) used this exploit in 'fingerd'."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو كود الصدفة (Shellcode)؟",
+      "en": "What is Shellcode?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كود آلة يوفره المهاجم، يُحفظ غالباً في المخزن المؤقت الذي تم تجاوزه، ويُستخدم لنقل التحكم إلى مترجم الأوامر (Shell).",
+        "en": "Machine code supplied by an attacker, often saved in the overflowed buffer, traditionally used to transfer control to a shell interpreter."
+      },
+      "example": {
+        "ar": "استخدام مشروع Metasploit لإنشاء Shellcode خاص بنظام التشغيل.",
+        "en": "Using the Metasploit Project to generate OS-specific shellcode."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الهدف الرئيسي في هجوم تجاوز سعة المكدس (Stack Overflow)؟",
+      "en": "What is the primary target in a Stack Overflow attack?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكتابة فوق 'عنوان العودة' (Return Address) المحفوظ في إطار المكدس لتوجيه التنفيذ إلى كود المهاجم.",
+        "en": "Overwriting the 'Return Address' saved in the stack frame to redirect execution to the attacker's code."
+      },
+      "example": {
+        "ar": "إدخال سلسلة نصية طويلة جداً في متغير محلي تتجاوز حدوده لتصل إلى عنوان العودة.",
+        "en": "Inputting a very long string into a local variable that exceeds its bounds to reach the return address."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي تقنية Stackguard؟",
+      "en": "What is Stackguard?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دفاع في وقت الترجمة يضيف كوداً للتحقق من المكدس بحثاً عن علامات الفساد (Canaries) قبل العودة من الدالة.",
+        "en": "A compile-time defense that adds code to check the stack for corruption signs (canaries) before a function returns."
+      },
+      "example": {
+        "ar": "وضع قيمة عشوائية قبل عنوان العودة، وإذا تغيرت، يتم إيقاف البرنامج.",
+        "en": "Placing a random value before the return address; if it changes, the program halts."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي تقنية ASLR؟",
+      "en": "What is ASLR (Address Space Randomization)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دفاع في وقت التشغيل يتلاعب بمواقع هياكل البيانات الرئيسية (مثل المكدس والكومة والمكتبات) بشكل عشوائي في الذاكرة.",
+        "en": "A run-time defense that randomly manipulates the location of key data structures (like stack, heap, libraries) in memory."
+      },
+      "example": {
+        "ar": "منع المهاجم من استخدام عناوين ذاكرة ثابتة (Hardcoded) في كود الاستغلال الخاص به.",
+        "en": "Preventing an attacker from using hardcoded memory addresses in their exploit code."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو تجاوز سعة الكومة (Heap Overflow)؟",
+      "en": "What is a Heap Overflow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هجوم يستهدف المخازن المؤقتة في الذاكرة المخصصة ديناميكياً، وغالباً ما يستهدف مؤشرات الدوال أو هياكل إدارة الذاكرة لعدم وجود عنوان عودة.",
+        "en": "An attack targeting buffers in dynamically allocated memory, often exploiting function pointers or memory management structures since there is no return address."
+      },
+      "example": {
+        "ar": "تجاوز مخزن مؤقت تم إنشاؤه باستخدام دالة malloc() في لغة C.",
+        "en": "Overflowing a buffer created using the malloc() function in C."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو هجوم العودة إلى استدعاء النظام (Return-to-libc)؟",
+      "en": "What is a Return to System Call (Return-to-libc) attack?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير من تجاوز المكدس يستبدل عنوان العودة بدالة مكتبة قياسية (مثل system) لتجاوز حماية المكدس غير القابل للتنفيذ.",
+        "en": "A stack overflow variant that replaces the return address with a standard library function (like system) to bypass non-executable stack defenses."
+      },
+      "example": {
+        "ar": "توجيه البرنامج لتنفيذ system(\"/bin/sh\") بدلاً من تنفيذ كود محقون.",
+        "en": "Redirecting the program to execute system(\"/bin/sh\") instead of executing injected code."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي البرمجة الدفاعية (Defensive Programming)؟",
+      "en": "What is Defensive Programming?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصميم البرامج لضمان استمرار عملها رغم الاستخدام غير المتوقع، بناءً على مبدأ 'لا تفترض شيئاً، وتحقق من كل الأخطاء المحتملة'.",
+        "en": "Designing software to ensure continued function despite unforeseen usage, based on the principle 'assume nothing, check all potential errors'."
+      },
+      "example": {
+        "ar": "التحقق دائماً من طول المدخلات قبل نسخها إلى مخزن مؤقت.",
+        "en": "Always checking the length of input before copying it into a buffer."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو حقن الأوامر (Command Injection)؟",
+      "en": "What is Command Injection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عيب يتعلق بمعالجة المدخلات غير الصالحة حيث يتم تمرير بيانات المستخدم كمعلمة لبرنامج مساعد، مما يؤثر على تدفق التنفيذ.",
+        "en": "A flaw relating to invalid input handling where user data is passed as a parameter to a helper program, influencing the flow of execution."
+      },
+      "example": {
+        "ar": "إضافة '; rm -rf /' إلى حقل إدخال يتم تمريره إلى دالة system().",
+        "en": "Appending '; rm -rf /' to an input field that is passed to a system() function."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي ثغرة البرمجة عبر المواقع (XSS)؟",
+      "en": "What is Cross Site Scripting (XSS)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هجوم يتم فيه إخراج مدخلات من مستخدم واحد لاحقاً لمستخدم آخر، متضمناً كوداً خبيثاً (مثل JavaScript) يتم تنفيذه في المتصفح.",
+        "en": "An attack where input from one user is later output to another user, including malicious code (like JavaScript) that executes in the browser."
+      },
+      "example": {
+        "ar": "ترك تعليق في مدونة يحتوي على كود يسرق ملفات تعريف الارتباط (Cookies) للزوار الآخرين.",
+        "en": "Leaving a blog comment containing code that steals the cookies of other visitors."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "لماذا يعتبر التوحيد القياسي (Canonicalization) مهماً قبل التحقق من المدخلات؟",
+      "en": "Why is Canonicalization important before input validation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن النصوص قد يكون لها ترميزات بديلة متعددة (مثل UTF-8). التوحيد يترجمها إلى تمثيل قياسي واحد لمنع تجاوز الفلاتر.",
+        "en": "Because text may have multiple alternate encodings (like UTF-8). Canonicalization translates it to a single, standard representation to prevent filter bypass."
+      },
+      "example": {
+        "ar": "تحويل '%2F' إلى '/' قبل التحقق مما إذا كان المسار مسموحاً به.",
+        "en": "Converting '%2F' to '/' before checking if a path is allowed."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو اختبار التشويش (Input Fuzzing)؟",
+      "en": "What is Input Fuzzing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة اختبار قوية تستخدم مجموعة كبيرة من المدخلات العشوائية للتحقق مما إذا كان البرنامج يتعامل بشكل صحيح مع المدخلات غير الطبيعية.",
+        "en": "A powerful testing method using a large range of randomly generated inputs to test whether a program correctly handles abnormal inputs."
+      },
+      "example": {
+        "ar": "إرسال آلاف السلاسل النصية العشوائية الطويلة جداً إلى حقل إدخال لاكتشاف ثغرات الانهيار.",
+        "en": "Sending thousands of extremely long, random strings to an input field to discover crash vulnerabilities."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي حالة السباق (Race Condition)؟",
+      "en": "What is a Race Condition?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مشكلة تحدث عندما تصل خيوط أو عمليات متعددة إلى بيانات مشتركة في نفس الوقت دون مزامنة، مما يؤدي إلى تلف البيانات.",
+        "en": "An issue occurring when multiple threads or processes access shared data simultaneously without synchronization, leading to data corruption."
+      },
+      "example": {
+        "ar": "عمليتان تحاولان الكتابة في نفس الملف المؤقت في نفس اللحظة.",
+        "en": "Two processes attempting to write to the same temporary file at the exact same moment."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو مبدأ أقل الصلاحيات (Least Privilege)؟",
+      "en": "What is the Principle of Least Privilege?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تشغيل البرامج بأقل مستوى من الامتيازات المطلوبة لإكمال وظيفتها، لتقليل الضرر في حال استغلال ثغرة.",
+        "en": "Running programs with the absolute minimum privileges needed to complete their function, to minimize damage if a flaw is exploited."
+      },
+      "example": {
+        "ar": "تشغيل خادم الويب كمستخدم عادي بدلاً من مستخدم الجذر (Root).",
+        "en": "Running a web server as a standard user rather than the Root user."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يمكن للمهاجم استغلال متغير البيئة PATH؟",
+      "en": "How can an attacker exploit the PATH environment variable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إذا استدعى برنامج ذو امتيازات برنامجاً آخر دون مسار مطلق، يمكن للمهاجم تعديل PATH لتنفيذ برنامج خبيث بنفس الاسم.",
+        "en": "If a privileged program invokes another program without an absolute path, an attacker can alter PATH to execute a malicious program with the same name."
+      },
+      "example": {
+        "ar": "تغيير PATH ليشير إلى مجلد المهاجم الذي يحتوي على سكربت خبيث يسمى 'ls'.",
+        "en": "Changing PATH to point to the attacker's directory containing a malicious script named 'ls'."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو الهدف الأساسي للمهاجم عند استغلال ثغرة تجاوز سعة المكدس (Stack Overflow)؟",
+      "en": "What is the primary target of an attacker when exploiting a Stack Overflow vulnerability?"
+    },
+    "options": {
+      "ar": [
+        "الكتابة فوق المتغيرات العامة (Global Variables)",
+        "الكتابة فوق عنوان العودة (Return Address)",
+        "تعديل متغيرات البيئة (Environment Variables)",
+        "تجاوز سعة الكومة (Heap Allocation)"
+      ],
+      "en": [
+        "Overwriting Global Variables",
+        "Overwriting the Return Address",
+        "Modifying Environment Variables",
+        "Overflowing Heap Allocation"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في هجوم تجاوز سعة المكدس، يهدف المهاجم إلى الكتابة فوق عنوان العودة المحفوظ في إطار المكدس لتوجيه تدفق تنفيذ البرنامج إلى الكود الخبيث الخاص به (Shellcode).",
+      "en": "In a stack overflow attack, the attacker aims to overwrite the return address saved in the stack frame to redirect the program's execution flow to their malicious code (shellcode)."
+    },
+    "hint": {
+      "ar": "فكر في ما يتحكم في المكان الذي يذهب إليه البرنامج بعد انتهاء الدالة.",
+      "en": "Think about what controls where the program goes after a function finishes."
+    },
+    "difficulty": "easy",
+    "conceptId": "stack-buffer-overflow-shellcode"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من التقنيات التالية تعتبر دفاعاً في وقت التشغيل (Run-Time Defense) ضد تجاوز سعة المخزن المؤقت؟",
+      "en": "Which of the following techniques is considered a Run-Time Defense against buffer overflows?"
+    },
+    "options": {
+      "ar": [
+        "استخدام لغات برمجة عالية المستوى",
+        "عشوائية مساحة العناوين (ASLR)",
+        "استخدام مكتبات آمنة",
+        "مراجعة الكود الآمن"
+      ],
+      "en": [
+        "Using high-level programming languages",
+        "Address Space Randomization (ASLR)",
+        "Using safe libraries",
+        "Safe code review"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ASLR هي تقنية دفاع في وقت التشغيل تقوم بترتيب مواقع مناطق البيانات الرئيسية بشكل عشوائي في الذاكرة، مما يصعب على المهاجمين التنبؤ بالعناوين المستهدفة.",
+      "en": "ASLR is a run-time defense technique that randomly arranges the positions of key data areas in memory, making it difficult for attackers to predict target addresses."
+    },
+    "hint": {
+      "ar": "ابحث عن التقنية التي تعمل أثناء تنفيذ البرنامج لتغيير تخطيط الذاكرة.",
+      "en": "Look for the technique that operates during program execution to alter memory layout."
+    },
+    "difficulty": "medium",
+    "conceptId": "buffer-overflow-defenses"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض من هجوم 'العودة إلى استدعاء النظام' (Return-to-libc)؟",
+      "en": "What is the purpose of a 'Return to System Call' (Return-to-libc) attack?"
+    },
+    "options": {
+      "ar": [
+        "تجاوز حماية المكدس غير القابل للتنفيذ (NX Bit)",
+        "إحداث تسرب في الذاكرة (Memory Leak)",
+        "تجاوز عشوائية مساحة العناوين (ASLR)",
+        "الكتابة فوق الكومة (Heap)"
+      ],
+      "en": [
+        "To bypass Non-Executable stack protections (NX Bit)",
+        "To cause a Memory Leak",
+        "To bypass Address Space Randomization (ASLR)",
+        "To overwrite the Heap"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "يُستخدم هجوم Return-to-libc لتجاوز دفاعات المكدس غير القابل للتنفيذ عن طريق توجيه عنوان العودة إلى دالة مكتبية موجودة بالفعل في الذاكرة القابلة للتنفيذ (مثل system) بدلاً من محاولة تنفيذ كود جديد على المكدس.",
+      "en": "A Return-to-libc attack is used to bypass non-executable stack defenses by pointing the return address to a library function already present in executable memory (like system) instead of trying to execute new code on the stack."
+    },
+    "hint": {
+      "ar": "إذا لم تتمكن من تنفيذ الكود الخاص بك على المكدس، فماذا ستستخدم بدلاً من ذلك؟",
+      "en": "If you cannot execute your own code on the stack, what would you use instead?"
+    },
+    "difficulty": "hard",
+    "conceptId": "other-overflow-attacks"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين جودة البرمجيات وأمن البرمجيات؟",
+      "en": "What is the main difference between Software Quality and Software Security?"
+    },
+    "options": {
+      "ar": [
+        "الجودة تهتم بالأخطاء المقصودة، والأمن يهتم بالأخطاء العشوائية.",
+        "الجودة تهتم بالفشل العشوائي، والأمن يهتم بالمدخلات المستهدفة لاستغلال الأخطاء.",
+        "لا يوجد فرق، كلاهما يركز على نفس أنواع الاختبارات.",
+        "الأمن يركز فقط على أداء البرنامج وسرعته."
+      ],
+      "en": [
+        "Quality concerns intentional bugs, Security concerns random bugs.",
+        "Quality concerns random failure, Security concerns targeted inputs to exploit bugs.",
+        "There is no difference, both focus on the same types of tests.",
+        "Security focuses only on program performance and speed."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "جودة البرمجيات تتعامل مع الفشل العرضي الناتج عن مدخلات غير متوقعة، بينما يركز أمن البرمجيات على المهاجمين الذين يختارون عمداً مدخلات غير محتملة لاستهداف واستغلال أخطاء محددة في الكود.",
+      "en": "Software quality deals with accidental failure from unanticipated input, whereas software security focuses on attackers who deliberately choose highly unlikely inputs to target and exploit specific bugs in the code."
+    },
+    "hint": {
+      "ar": "فكر في نية المستخدم: هل هو مستخدم عادي يرتكب خطأ، أم مهاجم يبحث عن ثغرة؟",
+      "en": "Think about the intent of the user: is it a normal user making a mistake, or an attacker looking for a flaw?"
+    },
+    "difficulty": "medium",
+    "conceptId": "software-security-defensive-programming"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من الهجمات التالية يستغل الافتراض بأن جميع المحتويات الواردة من موقع ويب موثوق بها بالتساوي من قبل المتصفح؟",
+      "en": "Which of the following attacks exploits the assumption that all content originating from a website is equally trusted by the browser?"
+    },
+    "options": {
+      "ar": [
+        "حقن SQL (SQL Injection)",
+        "تجاوز سعة الكومة (Heap Overflow)",
+        "البرمجة عبر المواقع (Cross Site Scripting - XSS)",
+        "حقن الأوامر (Command Injection)"
+      ],
+      "en": [
+        "SQL Injection",
+        "Heap Overflow",
+        "Cross Site Scripting (XSS)",
+        "Command Injection"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هجمات XSS تستغل ثقة المتصفح في الموقع. يقوم المهاجم بحقن كود خبيث في الموقع، وعندما يزور مستخدم آخر الموقع، يقوم متصفحه بتنفيذ الكود لأنه يعتقد أنه جزء شرعي من الموقع الموثوق.",
+      "en": "XSS attacks exploit the browser's trust in a site. An attacker injects malicious code into the site, and when another user visits, their browser executes the code because it believes it is a legitimate part of the trusted site."
+    },
+    "hint": {
+      "ar": "هذا الهجوم يتضمن إدخالاً من مستخدم واحد يتم إخراجه لمستخدم آخر.",
+      "en": "This attack involves input from one user being output to another user."
+    },
+    "difficulty": "easy",
+    "conceptId": "cross-site-scripting-xss"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "لماذا يعتبر التوحيد القياسي (Canonicalization) خطوة ضرورية قبل التحقق من صحة المدخلات؟",
+      "en": "Why is Canonicalization a necessary step before input validation?"
+    },
+    "options": {
+      "ar": [
+        "لتحويل النص إلى كود آلة (Machine Code).",
+        "لترجمة المدخلات إلى تمثيل قياسي واحد لمنع تجاوز الفلاتر باستخدام ترميزات بديلة.",
+        "لتشفير البيانات قبل تخزينها في قاعدة البيانات.",
+        "لزيادة سرعة معالجة التعبيرات العادية (Regex)."
+      ],
+      "en": [
+        "To convert text into Machine Code.",
+        "To translate input to a single standard representation to prevent filter bypass using alternate encodings.",
+        "To encrypt data before storing it in the database.",
+        "To increase the processing speed of Regular Expressions (Regex)."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يستخدم المهاجمون ترميزات بديلة (مثل UTF-8 أو Hex) لإخفاء المدخلات الخبيثة وتجاوز فلاتر الأمان. التوحيد القياسي يضمن تحويل جميع المدخلات إلى شكلها الأساسي قبل فحصها.",
+      "en": "Attackers use alternate encodings (like UTF-8 or Hex) to obfuscate malicious input and bypass security filters. Canonicalization ensures all input is converted to its base form before it is inspected."
+    },
+    "hint": {
+      "ar": "كيف يمكن للمهاجم كتابة '/' بطريقة مختلفة لتجاوز فلتر يمنع حرف '/'؟",
+      "en": "How could an attacker write '/' differently to bypass a filter that blocks the '/' character?"
+    },
+    "difficulty": "medium",
+    "conceptId": "input-validation-fuzzing"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي أفضل طريقة لمنع هجمات حقن SQL؟",
+      "en": "What is the best way to prevent SQL Injection attacks?"
+    },
+    "options": {
+      "ar": [
+        "استخدام القائمة السوداء (Blocklisting) لحظر كلمات مثل SELECT و DROP.",
+        "تشفير قاعدة البيانات بالكامل.",
+        "استخدام الاستعلامات ذات المعلمات (Parameterized Queries) أو العبارات المحضرة.",
+        "إخفاء رسائل الخطأ الخاصة بقاعدة البيانات."
+      ],
+      "en": [
+        "Using Blocklisting to ban words like SELECT and DROP.",
+        "Encrypting the entire database.",
+        "Using Parameterized Queries or Prepared Statements.",
+        "Hiding database error messages."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الاستعلامات ذات المعلمات تفصل بشكل صارم بين كود SQL والبيانات المدخلة من قبل المستخدم، مما يضمن عدم تفسير المدخلات أبداً كأوامر قابلة للتنفيذ، وهو الدفاع الأكثر فعالية ضد حقن SQL.",
+      "en": "Parameterized queries strictly separate the SQL code from the user-supplied data, ensuring that input is never interpreted as executable commands, making it the most effective defense against SQL injection."
+    },
+    "hint": {
+      "ar": "ابحث عن التقنية التي تفصل بين 'البيانات' و 'التحكم'.",
+      "en": "Look for the technique that separates 'data' from 'control'."
+    },
+    "difficulty": "medium",
+    "conceptId": "handling-input-injection-attacks"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي المشكلة الأمنية التي يمكن أن تحدث عند استخدام معرف العملية (PID) لإنشاء أسماء ملفات مؤقتة؟",
+      "en": "What security issue can occur when using the Process ID (PID) to generate temporary file names?"
+    },
+    "options": {
+      "ar": [
+        "تسرب الذاكرة (Memory Leak).",
+        "تجاوز سعة الكومة (Heap Overflow).",
+        "حالة السباق (Race Condition) بسبب إمكانية التنبؤ بالاسم.",
+        "حقن الأوامر (Command Injection)."
+      ],
+      "en": [
+        "Memory Leak.",
+        "Heap Overflow.",
+        "Race Condition due to name predictability.",
+        "Command Injection."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "معرفات العمليات (PIDs) يمكن التنبؤ بها. يمكن للمهاجم تخمين اسم الملف المؤقت وإنشائه مسبقاً (هجوم Symlink)، مما يؤدي إلى حالة سباق حيث يكتب البرنامج في الملف الخاطئ.",
+      "en": "PIDs are predictable. An attacker can guess the temporary file name and pre-create it (Symlink attack), leading to a race condition where the program writes to the wrong file."
+    },
+    "hint": {
+      "ar": "إذا كان بإمكان المهاجم تخمين اسم الملف قبل إنشائه، فماذا يمكنه أن يفعل؟",
+      "en": "If an attacker can guess the file name before it's created, what could they do?"
+    },
+    "difficulty": "hard",
+    "conceptId": "memory-management-race-conditions"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو مبدأ 'أقل الصلاحيات' (Least Privilege)؟",
+      "en": "What is the principle of 'Least Privilege'?"
+    },
+    "options": {
+      "ar": [
+        "منح المستخدمين صلاحيات كاملة لتسهيل عملهم.",
+        "تشغيل البرامج بأقل مستوى من الامتيازات المطلوبة لإكمال وظيفتها.",
+        "تشفير جميع الملفات بكلمات مرور ضعيفة.",
+        "السماح لجميع البرامج بالوصول إلى متغيرات البيئة."
+      ],
+      "en": [
+        "Granting users full privileges to facilitate their work.",
+        "Running programs with the absolute minimum privileges needed to complete their function.",
+        "Encrypting all files with weak passwords.",
+        "Allowing all programs to access environment variables."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ينص مبدأ أقل الصلاحيات على أنه يجب منح العمليات والمستخدمين فقط الامتيازات الضرورية لأداء مهامهم المشروعة، مما يقلل من الضرر المحتمل إذا تم اختراق البرنامج.",
+      "en": "The principle of least privilege states that processes and users should only be granted the privileges necessary to perform their legitimate tasks, minimizing potential damage if the program is compromised."
+    },
+    "hint": {
+      "ar": "الاسم يشرح نفسه: إعطاء الحد الأدنى.",
+      "en": "The name is self-explanatory: giving the minimum."
+    },
+    "difficulty": "easy",
+    "conceptId": "os-interaction-least-privilege"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف يمكن للمهاجم استغلال متغير البيئة PATH؟",
+      "en": "How can an attacker exploit the PATH environment variable?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق إحداث تجاوز سعة في المكدس.",
+        "عن طريق تغيير مسار البحث لتنفيذ برنامج خبيث بدلاً من برنامج النظام الشرعي.",
+        "عن طريق حقن كود SQL في متغير PATH.",
+        "عن طريق التسبب في تسرب للذاكرة."
+      ],
+      "en": [
+        "By causing a stack buffer overflow.",
+        "By altering the search path to execute a malicious program instead of a legitimate system program.",
+        "By injecting SQL code into the PATH variable.",
+        "By causing a memory leak."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا استدعى برنامج أمرًا دون مسار مطلق، فإنه يبحث في المجلدات المدرجة في PATH. يمكن للمهاجم تعديل PATH ليشير أولاً إلى مجلد يحتوي على نسخته الخبيثة من الأمر.",
+      "en": "If a program calls a command without an absolute path, it searches the directories listed in PATH. An attacker can modify PATH to point first to a directory containing their malicious version of the command."
+    },
+    "hint": {
+      "ar": "ماذا يفعل النظام عندما تكتب أمراً مثل 'ls'؟ أين يبحث عنه؟",
+      "en": "What does the system do when you type a command like 'ls'? Where does it look for it?"
+    },
+    "difficulty": "medium",
+    "conceptId": "os-interaction-least-privilege"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن جعل المكدس غير قابل للتنفيذ (NX Bit) يمنع جميع هجمات تجاوز سعة المخزن المؤقت. هذا فخ! المهاجمون يستخدمون تقنية Return-to-libc أو ROP لتجاوز هذه الحماية عن طريق إعادة استخدام الأكواد الموجودة مسبقاً.</template>
+    <template class="content-en">Believing that making the stack non-executable (NX Bit) stops all buffer overflow attacks. This is a trap! Attackers use Return-to-libc or ROP techniques to bypass this protection by reusing existing code.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">البرمجة الدفاعية تعني 'لا تفترض شيئاً'. تعامل مع جميع المدخلات (سواء من المستخدم، أو الشبكة، أو حتى متغيرات البيئة) على أنها خبيثة حتى يثبت العكس.</template>
+    <template class="content-en">Defensive programming means 'assume nothing'. Treat all input (whether from the user, the network, or even environment variables) as malicious until proven otherwise.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مقارنة الأرقام الموقعة (Signed) بغير الموقعة (Unsigned) هي ثغرة خفية. يمكن للمهاجم إدخال رقم سالب لتجاوز فحص الحد الأقصى للطول (لأن السالب أقل من الحد الأقصى)، ولكن عند استخدامه كطول في دالة النسخ، يتحول إلى رقم موجب ضخم، مما يسبب تجاوز السعة.</template>
+    <template class="content-en">Comparing signed to unsigned numbers is a hidden vulnerability. An attacker can input a negative number to pass a maximum length check (since negative < max), but when used as a length in a copy function, it's interpreted as a massive positive number, causing an overflow.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام القائمة السوداء (Blocklisting) لتصفية المدخلات. المهاجمون يجدون دائماً طرقاً جديدة (مثل الترميزات البديلة) لتجاوز القوائم السوداء. استخدم دائماً القائمة البيضاء (Allowlisting) مع التوحيد القياسي (Canonicalization).</template>
+    <template class="content-en">Using Blocklisting to filter inputs. Attackers always find new ways (like alternate encodings) to bypass blocklists. Always use Allowlisting combined with Canonicalization.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">السبب الجذري لهجمات الحقن (Injection) هو فشل النظام في التمييز بين 'البيانات' و 'التعليمات/الأوامر'.</template>
+    <template class="content-en">The root cause of injection attacks is the system's failure to distinguish between 'data' and 'instructions/commands'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

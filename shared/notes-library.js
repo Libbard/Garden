@@ -35,6 +35,7 @@
       js('notes-input.js', function () { return !!window.GardenInkInput; }),
       js('paint-gl.js', function () { return !!window.GardenPaintGL; }),
       js('coloring.js', function () { return !!window.GardenColoring; })])
+      .then(function (r) { setTimeout(function () { try { if (GardenColoring.warm) GardenColoring.warm(); } catch (e) {} }, 0); return r; })
       .catch(function (e) { loading = null; throw e; });
     return loading;
   }
@@ -70,8 +71,27 @@
   function saveLayer(st) {
     var S = window.GardenNotesStore;
     if (!S || !S.putImage) return Promise.resolve(null);
-    return st.paintBlob().then(function (b) { return b ? S.putImage(b, { name: 'mirsam-layer.webp' }) : null; })
-      .then(function (rid) { return rid ? Object.assign(st.project(), { pr: 'byte-local:' + rid }) : null; }, function () { return null; });
+    var pjP = st.exportProject ? st.exportProject().then(function (b) { return S.putImage(b, { name: 'drawing.mirsam' }); }).catch(function () { return null; }) : Promise.resolve(null);
+    var lyP = st.paintBlob().then(function (b) { return b ? S.putImage(b, { name: 'mirsam-layer.webp' }) : null; }).catch(function () { return null; });
+    return Promise.all([lyP, pjP]).then(function (r) {
+      if (!r[0] && !r[1]) return null;
+      var ms = st.project();
+      if (r[0]) ms.pr = 'byte-local:' + r[0];
+      if (r[1]) ms.pj = 'byte-local:' + r[1];
+      return ms;
+    });
+  }
+  function saveMine(st) {
+    var app = window.GardenNotesApp;
+    if (!app || !app.saveDrawing || !st.S) { toast(T('افتحِ الملاحظاتِ ليُحفظَ الرسمُ في حسابك.', 'Open your notes to save the drawing to your account.')); return Promise.resolve(false); }
+    if (st.S.wet) st.S.dryNow();
+    var t = st.title || T('رسمتي', 'My drawing');
+    return Promise.all([st.toBlob('image/webp', .92), saveLayer(st)]).then(function (r) {
+      return dims(r[0]).then(function (d) {
+        return app.saveDrawing(r[0], { title: t, ms: r[1], iar: d ? Math.round(d.w / d.h * 1000) / 1000 : 0, inw: d ? Math.min(d.w, 900) : 0 });
+      });
+    }).then(function () { st.changed = 0; toast(T('حُفظت في «رسوماتي» — تجدها في ملاحظاتك وعلى كلِّ أجهزتك.', 'Saved to “My drawings” — find it in your notes on every device.')); return true; },
+      function () { toast(T('تعذّر الحفظ. حاولْ مرّةً أخرى.', 'Could not save. Try again.')); return false; });
   }
 
   function studio(item, mode, edit) {
@@ -95,14 +115,21 @@
     var st = GardenColoring.create($('.nlib-body'), {
       insertLabel: edit ? ['احفظْ في الصفحة', 'Save to page'] : null,
       onClose: function () { ask(); },
-      onInsert: function () { doInsert(); }
+      onInsert: function () { doInsert(); },
+      onSaveMine: function (s) { return saveMine(s); },
+      onOpenFile: function (pj) {
+        var go = function () { st.load({ project: pj, title: pj.head.title }).then(function () { st.changed = 0; }); };
+        if (st.isDirty && st.isDirty()) { pendingOpen = go; $('.nlib-guard').hidden = false; $('.nlib-g-stay').focus(); } else go();
+      }
     });
+    var pendingOpen = null;
     live = st;
     var name = (en() ? item.en : item.ar) || item.title || '';
     var ready = mode === 'lesson'
       ? GardenLibrary.svg(item).then(function (svg) { return st.lesson({ svg: svg, title: name }); })
+      : item.project ? st.load({ project: item.project, title: name })
       : st.load({ lineUrl: item.line, refUrl: item.color, paintUrl: item.paintUrl || null, W: item.W, H: item.H, paper: item.paper, id: item.id, title: name });
-    ready.then(function () { if (st.item) st.item.id = item.id; }, function () { toast(T('تعذّر فتحُ الرسم. تحقّقْ من الاتصال.', 'Could not open the drawing. Check your connection.')); });
+    ready.then(function () { if (st.item && item.id) st.item.id = item.id; }, function () { toast(T('تعذّر فتحُ الرسم. تحقّقْ من الاتصال.', 'Could not open the drawing. Check your connection.')); });
     function close(fromPop) {
       if (done) return; done = true;
       if (live === st) live = null;
@@ -119,7 +146,7 @@
       var layerP = saveLayer(st);
       st.toBlob('image/webp', .92).then(function (blob) {
         return layerP.then(function (ms) {
-          if (ms) { ms.it = item.id || ms.it; ms.ln = item.line || ms.ln; ms.cr = item.color || ms.cr; }
+          if (ms) { ms.it = ms.it || item.id || ''; ms.ln = ms.ln || item.line || ''; ms.cr = ms.cr || item.color || ''; }
           if (edit) return edit.onSave(blob, ms).then(function (ok) { return ok !== false; });
           return insert(blob, .6, name, ms);
         });
@@ -142,8 +169,8 @@
     }
     window.addEventListener('popstate', onPop);
     $('.nlib-g-ins').addEventListener('click', function () { $('.nlib-guard').hidden = true; doInsert(); });
-    $('.nlib-g-drop').addEventListener('click', function () { close(); });
-    $('.nlib-g-stay').addEventListener('click', function () { $('.nlib-guard').hidden = true; });
+    $('.nlib-g-drop').addEventListener('click', function () { var go = pendingOpen; pendingOpen = null; if (go) { $('.nlib-guard').hidden = true; go(); } else close(); });
+    $('.nlib-g-stay').addEventListener('click', function () { pendingOpen = null; $('.nlib-guard').hidden = true; });
     d.addEventListener('cancel', function (e) {
       e.preventDefault();
       if (st.orig) { st.setOrig(false); return; }
@@ -159,6 +186,7 @@
     return ready.then(function () {
       GardenLibrary.open({
         kind: 'sticker',
+        onSelect: function (item) { if (item.line && window.GardenColoring && GardenColoring.precompute) GardenColoring.precompute(item); },
         onPick: function (item, how) {
           if (how === 'sticker') return fetchBlob(item.sticker).then(function (b) { return insert(b, .2, '', null, true); });
           if (how === 'color-done') return fetchBlob(item.color).then(function (b) { return insert(b, .6, (en() ? item.en : item.ar) || '', { v: 1, it: item.id, ln: item.line, cr: item.color, done: 1 }); });
@@ -168,6 +196,11 @@
     }, function () { toast(T('تعذّر تحميلُ المرسم. تحقّقْ من الاتصال.', 'Could not load the studio. Check your connection.')); });
   }
 
+  function projectOf(ms) {
+    var S = window.GardenNotesStore, ref = ms && ms.pj;
+    if (!ref || !/^byte-local:[0-9a-f]{24}$/.test(ref) || !S || !S.getImage) return Promise.resolve(null);
+    return S.getImage(ref.slice(11)).then(function (r) { return r && r.blob ? GardenColoring.readProject(r.blob) : null; }).catch(function () { return null; });
+  }
   function layerUrl(ms) {
     var S = window.GardenNotesStore, ref = ms && ms.pr;
     if (!ref || !/^byte-local:[0-9a-f]{24}$/.test(ref) || !S || !S.imageUrl) return Promise.resolve(null);
@@ -177,16 +210,23 @@
   function edit(ms, opts) {
     opts = opts || {};
     return deps().then(function () {
-      return layerUrl(ms).then(function (u) {
+      return projectOf(ms).then(function (pj) {
+        if (pj) { var sp = studio({ project: pj, title: opts.title || pj.head.title || '', id: ms.it, line: ms.ln, color: ms.cr }, 'color', { onSave: opts.onSave }); return sp; }
+        return layerUrl(ms).then(function (u) {
         var item = { id: ms.it, line: ms.ln, color: ms.cr, paintUrl: ms.done ? null : u, W: ms.W, H: ms.H, paper: ms.pp, title: opts.title || '' };
         var st = studio(item, 'color', { onSave: opts.onSave });
         if (ms.done && ms.cr) st.opts.onRef = function (s) { if (s.refImg && s.S) { s.S.loadPaint(s.refImg); s.kick(); } };
         return st;
+        });
       });
     }, function () { toast(T('تعذّر تحميلُ المرسم. تحقّقْ من الاتصال.', 'Could not load the studio. Check your connection.')); });
   }
 
   function color(item, how) { return deps().then(function () { return studio(item, how === 'lesson' ? 'lesson' : 'color'); }); }
+  function openFile(file) {
+    return deps().then(function () { return GardenColoring.readProject(file); }).then(function (pj) { return studio({ project: pj, title: pj.head.title }, 'color'); },
+      function () { toast(T('هذا ليس ملفَّ مرسم.', 'This is not a studio file.')); return null; });
+  }
 
   var warmed = false;
   function warm(e) {
@@ -198,5 +238,5 @@
   document.addEventListener('touchstart', warm, { passive: true });
   document.addEventListener('focusin', warm);
 
-  window.GardenNotesLibrary = { open: open, deps: deps, edit: edit, color: color, current: function () { return live; } };
+  window.GardenNotesLibrary = { open: open, deps: deps, edit: edit, color: color, openFile: openFile, current: function () { return live; } };
 })();

@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="4" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تدريب النماذج والانحدار اللوجستي · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#linear-regression-normal-equation" class="toc-link" data-bilingual>
+        <template class="content-ar">الانحدار الخطي والمعادلة العادية</template>
+        <template class="content-en">Linear Regression and Normal Equation</template>
+        <span class="content-target">الانحدار الخطي والمعادلة العادية</span>
+      </a>
+      <a href="#gradient-descent-variants" class="toc-link" data-bilingual>
+        <template class="content-ar">متغيرات الانحدار التدريجي</template>
+        <template class="content-en">Gradient Descent Variants</template>
+        <span class="content-target">متغيرات الانحدار التدريجي</span>
+      </a>
+      <a href="#learning-curves" class="toc-link" data-bilingual>
+        <template class="content-ar">منحنيات التعلم</template>
+        <template class="content-en">Learning Curves</template>
+        <span class="content-target">منحنيات التعلم</span>
+      </a>
+      <a href="#regularized-linear-models" class="toc-link" data-bilingual>
+        <template class="content-ar">النماذج الخطية المنظمة (Regularization)</template>
+        <template class="content-en">Regularized Linear Models</template>
+        <span class="content-target">النماذج الخطية المنظمة (Regularization)</span>
+      </a>
+      <a href="#logistic-regression" class="toc-link" data-bilingual>
+        <template class="content-ar">الانحدار اللوجستي للتصنيف الثنائي</template>
+        <template class="content-en">Logistic Regression for Binary Classification</template>
+        <span class="content-target">الانحدار اللوجستي للتصنيف الثنائي</span>
+      </a>
+      <a href="#performance-metrics" class="toc-link" data-bilingual>
+        <template class="content-ar">مقاييس أداء التصنيف الثنائي</template>
+        <template class="content-en">Binary Classification Performance Metrics</template>
+        <span class="content-target">مقاييس أداء التصنيف الثنائي</span>
+      </a>
+      <a href="#grid-search" class="toc-link" data-bilingual>
+        <template class="content-ar">البحث الشبكي لضبط المعلمات الفائقة</template>
+        <template class="content-en">Grid Search for Hyperparameter Tuning</template>
+        <span class="content-target">البحث الشبكي لضبط المعلمات الفائقة</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تدريب النماذج والانحدار اللوجستي</h1>
+      <p class="hero-description">تغطي هذه الوحدة تدريب النماذج الخطية، خوارزميات الانحدار التدريجي، منحنيات التعلم، التنظيم (Regularization)، والانحدار اللوجستي للتصنيف الثنائي مع مقاييس الأداء والبحث الشبكي (Grid Search).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Training Models and Logistic Regression</h1>
+      <p class="hero-description">This module covers training linear models, gradient descent algorithms, learning curves, regularization, and logistic regression for binary classification along with performance metrics and grid search.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">الانحدار الخطي</span>
+      <span class="tag">الانحدار اللوجستي</span>
+      <span class="tag">التنظيم</span>
+      <span class="tag">مقاييس الأداء</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Linear Regression</span>
+      <span class="tag">Logistic Regression</span>
+      <span class="tag">Regularization</span>
+      <span class="tag">Performance Metrics</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>صياغة مشكلة من العالم الحقيقي كمهمة تصنيف ثنائي.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ نموذج انحدار لوجستي باستخدام scikit-learn وتقييم أدائه باستخدام مقاييس مثل الدقة، الضبط، الاستدعاء، ودرجة F1.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح العلاقة بين الانحدار الخطي والانحدار اللوجستي، وكيف ينمذج الانحدار اللوجستي الاحتمالات.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Formulate a real-world problem as a binary classification task.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement a logistic regression model using scikit-learn and evaluate its performance using metrics like accuracy, precision, recall, and F1 score.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the relationship between linear regression and logistic regression, and how logistic regression models probabilities.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="linear-regression-normal-equation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الانحدار الخطي والمعادلة العادية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Linear Regression and Normal Equation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار الخطي يتنبأ بقيمة بناءً على مجموع مرجح للميزات زائد حد التحيز. المعادلة العادية هي طريقة رياضية مباشرة لإيجاد الأوزان المثلى.</p></template>
+    <template class="content-en"><p>Linear Regression predicts a value based on a weighted sum of features plus a bias term. The Normal Equation is a direct mathematical method to find the optimal weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ينمذج الانحدار الخطي التنبؤات كمجموع مرجح للميزات بالإضافة إلى حد التحيز (Bias term).</p><p>يمكن التعبير عنه بالصيغة الموجهة (Vectorized Form) باستخدام ضرب المصفوفات لزيادة كفاءة الحساب.</p><p><span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">المعادلة العادية<span class="smart-term-tooltip"></span></span> (Normal Equation) توفر طريقة مباشرة لحساب قيم المعلمات المثلى التي تقلل دالة التكلفة (متوسط الخطأ التربيعي MSE). خطوات استخدامها تتضمن</p><ol><li>إضافة عمود من الآحاد لمصفوفة الميزات لحساب التحيز،</li><li>ثم استخدام مكتبة NumPy لحساب المعكوس والضرب النقطي.</li></ol></template>
+    <template class="content-en"><p>Linear Regression models predictions as a weighted sum of features plus a bias term. It uses vectorized form and matrix operations for efficient computation.</p><p>The <span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">Normal Equation<span class="smart-term-tooltip"></span></span> provides a direct method to compute the optimal parameter values that minimize the cost function (Mean Squared Error). Steps to use it include adding a column of ones to the feature matrix to account for the bias term, and using NumPy to calculate the inverse and dot product.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>رغم أن المعادلة العادية تعطي حلاً دقيقاً، إلا أن تعقيدها الحسابي يمثل مشكلة. تعتمد على حساب معكوس المصفوفة، مما يجعلها بطيئة جداً عندما يكون عدد الميزات (n) كبيراً جداً (مثلاً 100,000).</p><p>كبديل، يتم استخدام تحليل القيمة المفردة (SVD) الذي يمتلك تعقيداً حسابياً $O(n^2)$ وهو أكثر كفاءة من المعادلة العادية، ولكنه لا يزال بطيئاً للمجموعات الضخمة جداً. وقت التنبؤ خطي بالنسبة لعدد العينات وعدد الميزات.</p></template>
+    <template class="content-en"><p>While the Normal Equation gives an exact solution, its computational complexity is a bottleneck. It relies on matrix inversion, making it very slow when the number of features (n) is very large (e.g., 100,000).</p><p>Alternatively, Singular Value Decomposition (SVD) is used, which has a complexity of $O(n^2)$ and is more efficient than the Normal Equation, but still slow for very large feature sets. Prediction time is linear with respect to both the number of instances and features.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>المعادلة العادية حيث X هي مصفوفة الميزات و y هو متجه القيم المستهدفة.</strong></template>
+      <template class="content-en"><strong>The Normal Equation where X is the feature matrix and y is the target vector.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\theta = (X^T X)^{-1} X^T y$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام خوارزمية الانحدار التدريجي (Gradient Descent) بدلاً من المعادلة العادية؟</template>
+      <template class="content-en">When would you prefer using Gradient Descent over the Normal Equation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون عدد الميزات (n) كبيراً جداً، حيث تصبح المعادلة العادية بطيئة جداً بسبب حساب معكوس المصفوفة.</p></template>
+      <template class="content-en"><p>When the number of features (n) is very large, as the Normal Equation becomes computationally too expensive due to matrix inversion.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="gradient-descent-variants" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> متغيرات الانحدار التدريجي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Gradient Descent Variants</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار التدريجي هو خوارزمية تحسين تكرارية. له ثلاثة أنواع رئيسية تختلف في كمية البيانات المستخدمة في كل خطوة تحديث.</p></template>
+    <template class="content-en"><p>Gradient Descent is an iterative optimization algorithm. It has three main variants differing in the amount of data used for each update step.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك ثلاثة متغيرات رئيسية للانحدار التدريجي:</p><ol><li><b>Batch Gradient Descent:</b> يستخدم مجموعة التدريب بأكملها في كل تكرار. تعقيده لكل تكرار هو $O(mn)$.</li><li><b>Stochastic Gradient Descent (SGD):</b> يستخدم عينة تدريب واحدة فقط لكل تكرار. تعقيده لكل تكرار هو $O(n)$.</li><li><b>Mini-Batch Gradient Descent:</b> يستخدم دفعات صغيرة من عينات التدريب لكل تكرار. تعقيده هو $O(bn)$ حيث b هو حجم الدفعة.</li></ol></template>
+    <template class="content-en"><p>There are three main variants of Gradient Descent:</p><ol><li><b>Batch Gradient Descent:</b> Uses the entire training set in each iteration. Complexity per iteration is $O(mn)$.</li><li><b><span class="smart-term" data-term-en="Stochastic Gradient Descent" data-ar="الانحدار التدريجي العشوائي" data-en-def="A variant of gradient descent that updates parameters using only a single training instance at a time.">Stochastic Gradient Descent<span class="smart-term-tooltip"></span></span> (SGD):</b> Uses one training example per iteration. Complexity per iteration is $O(n)$.</li><li><b>Mini-Batch Gradient Descent:</b> Uses small batches of training examples per iteration. Complexity per iteration is $O(bn)$ where b is the batch size.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُفضل استخدام Gradient Descent للبيانات الكبيرة والميزات الكثيرة مقارنة بالمعادلة العادية. ومع ذلك، يتطلب ضبطاً دقيقاً للمعلمات الفائقة (مثل معدل التعلم) ولا يضمن دائماً الوصول للحل الدقيق (خاصة SGD الذي يتذبذب حول الحد الأدنى).</p></template>
+    <template class="content-en"><p>Gradient Descent is preferred for large datasets and large feature sets compared to the Normal Equation. However, it requires careful tuning of hyperparameters (like learning rate) and is not always exact (especially SGD, which bounces around the minimum).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قد يكون Mini-Batch GD أفضل توازن بين Batch و SGD؟</template>
+      <template class="content-en">Why might Mini-Batch GD be the best compromise between Batch and SGD?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يستفيد من تحسينات الأجهزة (مثل مصفوفات GPU) لتسريع الحسابات مقارنة بـ SGD، ويوفر تحديثات أكثر استقراراً، بينما يستهلك ذاكرة أقل من Batch GD.</p></template>
+      <template class="content-en"><p>It leverages hardware optimizations (like GPU matrix operations) for speed compared to SGD, provides more stable updates, while consuming less memory than Batch GD.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="learning-curves" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> منحنيات التعلم</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Learning Curves</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>منحنيات التعلم هي أدوات بصرية لتشخيص ما إذا كان النموذج يعاني من نقص التخصيص (Underfitting) أو فرط التخصيص (Overfitting).</p></template>
+    <template class="content-en"><p>Learning curves are visual tools to diagnose whether a model is suffering from underfitting or overfitting.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تساعد منحنيات التعلم في اكتشاف مشكلتين شائعتين:</p><ol><li><b><span class="smart-term" data-term-en="Underfitting" data-ar="نقص التخصيص" data-en-def="When a model performs poorly on both training and validation sets.">نقص التخصيص<span class="smart-term-tooltip"></span></span> (Underfitting):</b> أخطاء التدريب والتحقق كلاهما مرتفع. يميل كلا المنحنيين إلى الاستقرار مبكراً. زيادة حجم بيانات التدريب لن تساعد كثيراً.</li><li><b><span class="smart-term" data-term-en="Overfitting" data-ar="فرط التخصيص" data-en-def="When a model performs well on training data but poorly on new, unseen data.">فرط التخصيص<span class="smart-term-tooltip"></span></span> (Overfitting):</b> خطأ التدريب منخفض، لكن خطأ التحقق مرتفع. توجد فجوة كبيرة بين المنحنيين. زيادة حجم بيانات التدريب قد تساعد في تقارب المنحنيين.</li></ol><p>في حالة التوافق الجيد (Good Fit)، يكون كلا الخطأين منخفضين ومتقاربين.</p></template>
+    <template class="content-en"><p>Learning curves help spot two common issues:</p><ol><li><b><span class="smart-term" data-term-en="Underfitting" data-ar="نقص التخصيص" data-en-def="When a model performs poorly on both training and validation sets.">Underfitting<span class="smart-term-tooltip"></span></span>:</b> Training and validation errors are both high. Both curves tend to plateau early. Increasing training set size won't help much.</li><li><b><span class="smart-term" data-term-en="Overfitting" data-ar="فرط التخصيص" data-en-def="When a model performs well on training data but poorly on new, unseen data.">Overfitting<span class="smart-term-tooltip"></span></span>:</b> Training error is low, but validation error is high. There's a significant gap between the two curves. Increasing training set size might help.</li></ol><p>In a Good Fit, both errors are low and relatively close together.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من خلال النظر إلى الفجوة بين منحنيات التدريب والتحقق، يمكنك قياس ما إذا كان نموذجك معقداً جداً أو بسيطاً جداً. الفجوة الكبيرة تعني أن النموذج يحفظ بيانات التدريب ولا يعمم جيداً (Overfitting)، بينما الأخطاء المرتفعة المتقاربة تعني أن النموذج لا يستطيع التقاط النمط الأساسي (Underfitting).</p></template>
+    <template class="content-en"><p>By looking at the gap between the training and validation curves, you can gauge whether your model is too complex or too simple. A large gap means the model memorizes training data and fails to generalize (Overfitting), while high converging errors mean the model cannot capture the underlying pattern (Underfitting).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a line chart showing three subplots for Learning Curves: Underfitting, Overfitting, and Good Fit. X-axis is 'Training set size', Y-axis is 'Error'. Plot two lines in each: 'Training Error' (blue) and 'Validation Error' (red). Underfitting: both lines high and flat. Overfitting: blue line very low, red line high, large gap. Good Fit: both lines low and converging. Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for axes -->
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)"/>
+    </marker>
+    
+    <!-- Arrowheads for the gap indicator -->
+    <marker id="gap-arrow-start" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 10 1 L 0 5 L 10 9 z" fill="var(--text-secondary)"/>
+    </marker>
+    <marker id="gap-arrow-end" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-secondary)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Main Title -->
+  <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">Learning Curves</text>
+  <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold">منحنيات التعلم</text>
+
+  <!-- Legend -->
+  <line x1="265" y1="80" x2="305" y2="80" stroke="var(--brand-500)" stroke-width="3"/>
+  <text x="365" y="85" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Training Error</text>
+  <text x="365" y="85" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">خطأ التدريب</text>
+
+  <line x1="445" y1="80" x2="485" y2="80" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="6,6"/>
+  <text x="545" y="85" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Validation Error</text>
+  <text x="545" y="85" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">خطأ التحقق</text>
+
+  <!-- Global Axis Labels -->
+  <text x="400" y="395" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Training set size</text>
+  <text x="400" y="395" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">حجم مجموعة التدريب</text>
+
+  <text x="20" y="235" transform="rotate(-90 20 235)" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Error</text>
+  <text x="20" y="235" transform="rotate(-90 20 235)" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">الخطأ</text>
+
+  <!-- ========================================== -->
+  <!-- PLOT 1: UNDERFITTING                       -->
+  <!-- ========================================== -->
+  
+  <!-- Subplot Title -->
+  <text x="150" y="120" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Underfitting</text>
+  <text x="150" y="120" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">نقص التخصيص</text>
+
+  <!-- Grid Line -->
+  <line x1="50" y1="240" x2="250" y2="240" stroke="var(--bg-elevated)" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <!-- Axes -->
+  <path d="M 50 340 L 50 135" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+  <path d="M 50 340 L 255 340" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+
+  <!-- Curves -->
+  <path d="M 50 340 C 70 340, 100 170, 150 170 L 250 165" fill="none" stroke="var(--brand-500)" stroke-width="3"/>
+  <path d="M 50 140 C 70 140, 100 160, 150 160 L 250 155" fill="none" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="6,6"/>
+
+  <!-- Annotation -->
+  <rect x="100" y="200" width="100" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="150" y="218" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">High Bias</text>
+  <text x="150" y="218" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">انحياز عالٍ</text>
+
+
+  <!-- ========================================== -->
+  <!-- PLOT 2: OVERFITTING                        -->
+  <!-- ========================================== -->
+
+  <!-- Subplot Title -->
+  <text x="400" y="120" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Overfitting</text>
+  <text x="400" y="120" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">فرط التخصيص</text>
+
+  <!-- Grid Line -->
+  <line x1="300" y1="240" x2="500" y2="240" stroke="var(--bg-elevated)" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <!-- Axes -->
+  <path d="M 300 340 L 300 135" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+  <path d="M 300 340 L 505 340" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+
+  <!-- Curves -->
+  <path d="M 300 340 C 320 340, 350 320, 400 320 L 500 315" fill="none" stroke="var(--brand-500)" stroke-width="3"/>
+  <path d="M 300 140 C 320 140, 350 180, 400 180 L 500 175" fill="none" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="6,6"/>
+
+  <!-- Gap Indicator -->
+  <line x1="460" y1="185" x2="460" y2="310" stroke="var(--text-secondary)" stroke-width="2" marker-start="url(#gap-arrow-start)" marker-end="url(#gap-arrow-end)"/>
+  <text x="485" y="252" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Gap</text>
+  <text x="485" y="252" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">فجوة</text>
+
+  <!-- Annotation -->
+  <rect x="330" y="220" width="100" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="380" y="238" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">High Variance</text>
+  <text x="380" y="238" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">تباين عالٍ</text>
+
+
+  <!-- ========================================== -->
+  <!-- PLOT 3: GOOD FIT                           -->
+  <!-- ========================================== -->
+
+  <!-- Subplot Title -->
+  <text x="650" y="120" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Good Fit</text>
+  <text x="650" y="120" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">ملاءمة جيدة</text>
+
+  <!-- Grid Line -->
+  <line x1="550" y1="240" x2="750" y2="240" stroke="var(--bg-elevated)" stroke-width="2" stroke-dasharray="4,4"/>
+
+  <!-- Axes -->
+  <path d="M 550 340 L 550 135" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+  <path d="M 550 340 L 755 340" fill="none" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)"/>
+
+  <!-- Curves -->
+  <path d="M 550 340 C 570 340, 600 260, 650 260 L 750 255" fill="none" stroke="var(--brand-500)" stroke-width="3"/>
+  <path d="M 550 140 C 570 140, 600 250, 650 250 L 750 245" fill="none" stroke="var(--text-secondary)" stroke-width="3" stroke-dasharray="6,6"/>
+
+  <!-- Annotation -->
+  <rect x="600" y="200" width="100" height="26" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  <text x="650" y="218" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Optimal</text>
+  <text x="650" y="218" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">مثالي</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان نموذجك يعاني من نقص التخصيص، هل إضافة المزيد من بيانات التدريب سيحل المشكلة؟</template>
+      <template class="content-en">If your model is underfitting, will adding more training data solve the problem?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، إضافة المزيد من البيانات لن يساعد كثيراً. تحتاج إلى استخدام نموذج أكثر تعقيداً أو إضافة ميزات جديدة.</p></template>
+      <template class="content-en"><p>No, adding more data won't help much. You need to use a more complex model or add better features.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="regularized-linear-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> النماذج الخطية المنظمة (Regularization)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Regularized Linear Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التنظيم (Regularization) يضيف عقوبة لتعقيد النموذج لمنع فرط التخصيص (Overfitting).</p></template>
+    <template class="content-en"><p>Regularization adds a penalty to the model's complexity to prevent overfitting.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم تقنيات التنظيم لضمان تعميم النموذج جيداً على البيانات الجديدة. تشمل التقنيات:</p><ol><li><b>انحدار ريدج (Ridge - L2):</b> يضيف عقوبة تساوي مجموع مربعات المعاملات. يقلص المعاملات نحو الصفر، لكن لا يجعلها صفراً تماماً. مفيد عندما تساهم العديد من الميزات في التنبؤ.</li><li><b><span class="smart-term" data-term-en="Lasso Regression" data-ar="انحدار لاسو" data-en-def="L1 regularization that can shrink coefficients to exactly zero, performing feature selection.">انحدار لاسو<span class="smart-term-tooltip"></span></span> (Lasso - L1):</b> يضيف عقوبة تساوي مجموع القيم المطلقة للمعاملات. يمكنه تقليص بعض المعاملات إلى الصفر تماماً، مما يؤدي فعلياً إلى اختيار الميزات (نموذج متناثر Sparse).</li><li><b>الشبكة المرنة (Elastic Net):</b> يجمع بين تنظيم L1 و L2، ويتم التحكم فيه بواسطة معلمة خلط r. مفيد عند وجود ميزات مترابطة.</li><li><b><span class="smart-term" data-term-en="Early Stopping" data-ar="التوقف المبكر" data-en-def="Stopping the training process when the validation error reaches its minimum.">التوقف المبكر<span class="smart-term-tooltip"></span></span> (Early Stopping):</b> يوقف التدريب عندما يتوقف خطأ التحقق عن التحسن.</li></ol></template>
+    <template class="content-en"><p>Regularization techniques ensure the model generalizes well to new data. Techniques include:</p><ol><li><b>Ridge Regression (L2):</b> Adds a penalty equal to the sum of the squares of the coefficients. Shrinks coefficients towards zero, but never exactly zero. Useful when many features contribute.</li><li><b><span class="smart-term" data-term-en="Lasso Regression" data-ar="انحدار لاسو" data-en-def="L1 regularization that can shrink coefficients to exactly zero, performing feature selection.">Lasso Regression<span class="smart-term-tooltip"></span></span> (L1):</b> Adds a penalty equal to the sum of the absolute values of the coefficients. Can shrink some coefficients to exactly zero, performing feature selection (sparse model).</li><li><b>Elastic Net:</b> Combines both L1 and L2 regularization, controlled by a mixing parameter r. Useful for correlated features.</li><li><b><span class="smart-term" data-term-en="Early Stopping" data-ar="التوقف المبكر" data-en-def="Stopping the training process when the validation error reaches its minimum.">Early Stopping<span class="smart-term-tooltip"></span></span>:</b> Stops training when validation error stops improving.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين L1 و L2 هو شكل منطقة العقوبة. L1 يؤدي إلى حلول متناثرة (Sparse) لأن العقوبة تأخذ شكل معين (Diamond) يتقاطع مع خطوط الكنتور لدالة التكلفة عند المحاور. بينما L2 يأخذ شكل دائري يقلص الأوزان بالتساوي.</p><p>التوقف المبكر هو شكل مختلف تماماً من التنظيم، حيث لا يغير دالة التكلفة بل يتدخل في عملية التحسين التكرارية (مثل Gradient Descent) ليوقفها قبل أن يبدأ النموذج في حفظ الضوضاء.</p></template>
+    <template class="content-en"><p>The fundamental difference between L1 and L2 is the shape of the penalty region. L1 leads to sparse solutions because its diamond-shaped penalty intersects the cost function contours at the axes. L2 has a circular shape that shrinks weights smoothly.</p><p>Early stopping is a completely different form of regularization; it doesn't alter the cost function but intervenes in the iterative optimization process (like Gradient Descent) to halt it before the model starts memorizing noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة التكلفة لانحدار ريدج (L2 Regularization).</strong></template>
+      <template class="content-en"><strong>Cost function for Ridge Regression (L2 Regularization).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$J(\theta) = MSE(\theta) + \alpha \sum_{i=1}^{n} \theta_i^2$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.linear_model import Ridge
+ridge_reg = Ridge(alpha=1, solver="cholesky")
+ridge_reg.fit(X, y)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.linear_model import Lasso
+lasso_reg = Lasso(alpha=0.1)
+lasso_reg.fit(X, y)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.linear_model import ElasticNet
+elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5)
+elastic_net.fit(X, y)</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Normal Equation</th><th>SVD</th><th>Gradient Descent</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حجم مجموعة البيانات المناسب</template>
+          <template class="content-en">Suitable Dataset Size</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">صغيرة إلى متوسطة</template>
+          <template class="content-en">Small to medium</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسطة</template>
+          <template class="content-en">Medium</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كبيرة جداً</template>
+          <template class="content-en">Large</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع الميزات الكثيرة</template>
+          <template class="content-en">Handling Large Feature Sets</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير فعال</template>
+          <template class="content-en">Inefficient</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بطيء</template>
+          <template class="content-en">Slow</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ممتاز</template>
+          <template class="content-en">Excellent</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Ridge (L2)</th><th>Lasso (L1)</th><th>Elastic Net</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع العقوبة</template>
+          <template class="content-en">Penalty Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مجموع المربعات</template>
+          <template class="content-en">Sum of squares</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مجموع القيم المطلقة</template>
+          <template class="content-en">Sum of absolute values</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مزيج من L1 و L2</template>
+          <template class="content-en">Combination of L1 and L2</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">اختيار الميزات (Feature Selection)</template>
+          <template class="content-en">Feature Selection</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يصفر المعاملات</template>
+          <template class="content-en">Never exactly zero</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يصفر المعاملات (نموذج متناثر)</template>
+          <template class="content-en">Shrinks to zero (Sparse)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يصفر بعض المعاملات</template>
+          <template class="content-en">Shrinks some to zero</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام Lasso بدلاً من Ridge؟</template>
+      <template class="content-en">When would you prefer using Lasso over Ridge?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تشك في أن عدداً قليلاً فقط من الميزات هو المهم فعلياً، حيث يقوم Lasso بإلغاء الميزات غير المهمة بجعل أوزانها صفراً.</p></template>
+      <template class="content-en"><p>When you suspect that only a few features are actually useful, as Lasso will eliminate useless features by setting their weights to zero.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="logistic-regression" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الانحدار اللوجستي للتصنيف الثنائي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Logistic Regression for Binary Classification</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار اللوجستي هو خوارزمية تصنيف تُستخدم للتنبؤ باحتمالية انتماء عينة إلى فئة معينة (مثل 0 أو 1).</p></template>
+    <template class="content-en"><p>Logistic Regression is a classification algorithm used to predict the probability that an instance belongs to a given class (e.g., 0 or 1).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في التصنيف الثنائي، نهتم بالتنبؤ بواحدة من نتيجتين محتملتين.</p><p>الانحدار اللوجستي هو طريقة إحصائية (نوع من النماذج الخطية المعممة GLM) تنمذج احتمالية النتيجة الثنائية.</p><p>على عكس الانحدار الخطي الذي يعطي قيماً مستمرة، يستخدم الانحدار اللوجستي الدالة اللوجستية (Sigmoid) لتحويل المخرجات لتكون بين 0 و 1.</p><p>يتم استخدام دالة Logit لربط احتمالية النتيجة الإيجابية بالمتغيرات التفسيرية.</p><p>يتم تحويل المخرجات إلى احتمالية، ثم تُقارن بعتبة (Threshold) (مثلاً 0.5) لتحديد تسمية الفئة (Class label).</p></template>
+    <template class="content-en"><p>In binary classification, we predict one of two possible outcomes.</p><p>Logistic Regression is a statistical method (a type of Generalized Linear Model - GLM) that models the probability of a binary outcome.</p><p>Unlike linear regression which outputs continuous values, logistic regression uses the logistic (sigmoid) function to transform the output to be between 0 and 1.</p><p>The <span class="smart-term" data-term-en="Logit Function" data-ar="دالة اللوجيت" data-en-def="The inverse of the sigmoidal logistic function, representing the log-odds.">logit function<span class="smart-term-tooltip"></span></span> is used to link the probability of the positive outcome to the explanatory variables.</p><p>The output is converted to a probability and compared to a threshold (e.g., 0.5) to decide the class label.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يفترض الانحدار الخطي أن التغيير الثابت في المتغير التفسيري $x$ يؤدي إلى تغيير ثابت في $y$. هذا يعمل جيداً للنتائج المستمرة ولكن ليس للاحتمالات المقيدة بالنطاق [0,1]. لذلك نستخدم دالة Sigmoid.</p><p>معادلة دالة Logit هي: $logit(p) = \log(\frac{p}{1-p})$، وهي تمثل التركيبة الخطية للميزات: $\beta_0 + \beta_1 x_1 + ... + \beta_n x_n$.</p></template>
+    <template class="content-en"><p>Linear regression assumes a constant change in explanatory variable $x$ leads to a constant change in $y$. This works for continuous outcomes but not for probabilities constrained to [0,1]. Hence, the <span class="smart-term" data-term-en="Sigmoid Function" data-ar="الدالة السينية (Sigmoid)" data-en-def="A mathematical function having a characteristic &#x27;S&#x27;-shaped curve, mapping values to [0,1].">Sigmoid function<span class="smart-term-tooltip"></span></span> is used.</p><p>The logit function equation is: $logit(p) = \log(\frac{p}{1-p})$, which equals the linear combination: $\beta_0 + \beta_1 x_1 + ... + \beta_n x_n$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الدالة اللوجستية (Sigmoid) التي تحول أي قيمة حقيقية إلى قيمة بين 0 و 1.</strong></template>
+      <template class="content-en"><strong>The Logistic (Sigmoid) function which maps any real value into the range [0, 1].</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\sigma(z) = \frac{1}{1 + e^{-z}}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم الانحدار الخطي العادي لحل مشاكل التصنيف؟</template>
+      <template class="content-en">Why don't we use standard Linear Regression for classification problems?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الانحدار الخطي يمكن أن ينتج قيماً أقل من 0 أو أكبر من 1، وهو ما لا يتوافق مع مفهوم الاحتمالات المطلوب في التصنيف.</p></template>
+      <template class="content-en"><p>Because linear regression can output values less than 0 or greater than 1, which does not make sense for probabilities required in classification.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="performance-metrics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مقاييس أداء التصنيف الثنائي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Binary Classification Performance Metrics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لتقييم المصنفات الثنائية، نستخدم مقاييس تتجاوز الدقة البسيطة، مثل مصفوفة الارتباك، الضبط، الاستدعاء، درجة F1، ومنحنى ROC.</p></template>
+    <template class="content-en"><p>To evaluate binary classifiers, we use metrics beyond simple accuracy, such as Confusion Matrix, Precision, Recall, F1 Score, and <span class="smart-term" data-term-en="ROC AUC" data-ar="المساحة تحت منحنى خصائص تشغيل المستقبل" data-en-def="A single value summarizing the ROC curve, representing the classifier&#x27;s ability to distinguish classes.">ROC AUC<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المقاييس الرئيسية تشمل:</p><ol><li><b><span class="smart-term" data-term-en="Confusion Matrix" data-ar="مصفوفة الارتباك" data-en-def="A table used to describe the performance of a classification model.">مصفوفة الارتباك<span class="smart-term-tooltip"></span></span> (Confusion Matrix):</b> تلخص الأداء بإظهار الإيجابيات الحقيقية (TP)، السلبيات الحقيقية (TN)، الإيجابيات الخاطئة (FP)، والسلبيات الخاطئة (FN).</li><li><b>الدقة (Accuracy):</b> نسبة التنبؤات الصحيحة الكلية. قد تكون مضللة إذا كانت الفئات غير متوازنة.</li><li><b>الضبط (Precision):</b> نسبة التنبؤات الإيجابية التي كانت صحيحة فعلياً $TP / (TP + FP)$. الضبط العالي يعني إيجابيات خاطئة أقل.</li><li><b>الاستدعاء (Recall):</b> نسبة الإيجابيات الفعلية التي تم تحديدها بشكل صحيح $TP / (TP + FN)$. الاستدعاء العالي يعني سلبيات خاطئة أقل.</li><li><b>درجة F1 (F1 Score):</b> المتوسط التوافقي للضبط والاستدعاء. يوازن بينهما ومفيد للبيانات غير المتوازنة.</li><li><b>منحنى ROC و AUC:</b> يرسم معدل الإيجابية الحقيقية (Recall) مقابل معدل الإيجابية الخاطئة. AUC (المساحة تحت المنحنى) تلخص الأداء بقيمة بين 0.5 (تخمين عشوائي) و 1 (تصنيف مثالي).</li></ol></template>
+    <template class="content-en"><p>Key metrics include:</p><ol><li><b><span class="smart-term" data-term-en="Confusion Matrix" data-ar="مصفوفة الارتباك" data-en-def="A table used to describe the performance of a classification model.">Confusion Matrix<span class="smart-term-tooltip"></span></span>:</b> Summarizes performance showing True Positives (TP), True Negatives (TN), False Positives (FP), and False Negatives (FN).</li><li><b>Accuracy:</b> Fraction of correct predictions. May not be informative if classes are imbalanced.</li><li><b>Precision:</b> Fraction of positive predictions that are actually correct $TP / (TP + FP)$. High precision indicates fewer false positives.</li><li><b>Recall:</b> Fraction of actual positives correctly identified $TP / (TP + FN)$. High recall indicates fewer false negatives.</li><li><b>F1 Score:</b> Harmonic mean of Precision and Recall. Balances the two and is useful for imbalanced data.</li><li><b>ROC Curve and AUC:</b> Plots True Positive Rate (Recall) against False Positive Rate. AUC summarizes the curve into a single value from 0.5 (random) to 1 (perfect).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هناك دائماً مقايضة (Trade-off) بين الضبط والاستدعاء. زيادة أحدهما تؤدي عادة إلى تقليل الآخر. يعتمد اختيار المقياس الأهم على المشكلة؛ فمثلاً في الكشف عن السرطان، الاستدعاء العالي أهم (لتقليل السلبيات الخاطئة)، بينما في تصفية البريد المزعج، الضبط العالي أهم (لتقليل الإيجابيات الخاطئة).</p></template>
+    <template class="content-en"><p>There is always a Precision/Recall trade-off. Increasing one usually reduces the other. The choice depends on the problem; e.g., in cancer detection, high recall is crucial (minimize false negatives), while in spam filtering, high precision is preferred (minimize false positives).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة درجة F1 (المتوسط التوافقي).</strong></template>
+      <template class="content-en"><strong>F1 Score equation (Harmonic mean).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$F1 = 2 \times \frac{Precision \times Recall}{Precision + Recall}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+y_pred = [0, 1, 0, 0]
+y_true = [1, 1, 1, 1]
+print('Accuracy:', accuracy_score(y_true, y_pred))
+print('Precision:', precision_score(y_true, y_pred))
+print('Recall:', recall_score(y_true, y_pred))
+print('F1 Score:', f1_score(y_true, y_pred))</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم درجة F1 بدلاً من المتوسط الحسابي العادي للضبط والاستدعاء؟</template>
+      <template class="content-en">Why do we use the F1 score (harmonic mean) instead of a simple arithmetic mean of precision and recall?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المتوسط التوافقي يعطي وزناً أكبر للقيم المنخفضة. وبالتالي، لن يحصل المصنف على درجة F1 عالية إلا إذا كان كل من الضبط والاستدعاء مرتفعين.</p></template>
+      <template class="content-en"><p>The harmonic mean gives much more weight to low values. As a result, the classifier will only get a high F1 score if both recall and precision are high.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="grid-search" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> البحث الشبكي لضبط المعلمات الفائقة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Grid Search for Hyperparameter Tuning</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>البحث الشبكي (Grid Search) هو تقنية للبحث الشامل عن أفضل مجموعة من المعلمات الفائقة (Hyperparameters) للنموذج.</p></template>
+    <template class="content-en"><p>Grid search is a technique used to find the optimal values for hyperparameters by exhaustively searching through a predefined set of values.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Hyperparameters" data-ar="المعلمات الفائقة" data-en-def="Settings used to control the training process of a machine learning model, set before training.">المعلمات الفائقة<span class="smart-term-tooltip"></span></span> هي إعدادات تتحكم في عملية التدريب (مثل معدل التعلم، نوع التنظيم) ويتم تعيينها قبل بدء التدريب.</p><p>يقوم <span class="smart-term" data-term-en="Grid Search" data-ar="البحث الشبكي" data-en-def="A method for tuning hyperparameters by evaluating a model for every combination of specified values.">البحث الشبكي<span class="smart-term-tooltip"></span></span> بتقييم النموذج لكل مجموعة ممكنة (الجداء الديكارتي Cartesian Product) من قيم المعلمات الفائقة المحددة للعثور على النموذج الأفضل أداءً.</p><p>يمكن أن يكون مكلفاً حسابياً، خاصة مع زيادة عدد المعلمات، ولكنه يدعم المعالجة المتوازية (Parallelization) لتحسين الكفاءة.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Hyperparameters" data-ar="المعلمات الفائقة" data-en-def="Settings used to control the training process of a machine learning model, set before training.">Hyperparameters<span class="smart-term-tooltip"></span></span> are settings used to control the training process and are set before training begins.</p><p><span class="smart-term" data-term-en="Grid Search" data-ar="البحث الشبكي" data-en-def="A method for tuning hyperparameters by evaluating a model for every combination of specified values.">Grid search<span class="smart-term-tooltip"></span></span> evaluates a model for every combination (Cartesian Product) of specified hyperparameter values to find the best-performing model.</p><p>It can be computationally expensive as the number of parameters increases, but it can be parallelized to improve efficiency.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في تطبيق عملي مثل مصنف البريد المزعج (SMS Spam Classifier)، يمكن استخدام <code>GridSearchCV</code> من <code>scikit-learn</code> لضبط معلمات استخراج الميزات (<code>TfidfVectorizer</code>) ومعلمات النموذج (<code>LogisticRegression</code>) في نفس الوقت باستخدام خط أنابيب (<code>Pipeline</code>).</p></template>
+    <template class="content-en"><p>In a practical scenario like an SMS Spam Classifier, <code>GridSearchCV</code> from <code>scikit-learn</code> can be used to tune feature extraction parameters (<code>TfidfVectorizer</code>) and model parameters (<code>LogisticRegression</code>) simultaneously using a <code>Pipeline</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+parameters = {'clf__penalty': ('l1', 'l2'), 'clf__C': (0.01, 0.1, 1, 10)}
+grid_search = GridSearchCV(pipeline, parameters, cv=3)
+grid_search.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي للبحث الشبكي (Grid Search) وكيف يمكن التخفيف منه؟</template>
+      <template class="content-en">What is the main drawback of Grid Search and how can it be mitigated?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>العيب الرئيسي هو التكلفة الحسابية العالية جداً عند وجود العديد من المعلمات. يمكن التخفيف من ذلك باستخدام البحث العشوائي (Randomized Search) أو المعالجة المتوازية.</p></template>
+      <template class="content-en"><p>The main drawback is the high computational cost when there are many hyperparameters. This can be mitigated by using Randomized Search or parallel processing.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. لقد انتقلنا من مجرد رسم خطوط مستقيمة (الانحدار الخطي) إلى اتخاذ قرارات حاسمة (الانحدار اللوجستي). في الامتحان، ركزوا بشدة على فهم 'لماذا' نستخدم تقنية معينة. لماذا نلجأ للانحدار التدريجي (Gradient Descent)؟ لأن المعادلة العادية تنهار مع البيانات الضخمة. لماذا نستخدم التنظيم (L1/L2)؟ لمنع النموذج من حفظ البيانات (Overfitting). تذكروا دائماً أن الانحدار اللوجستي، رغم اسمه، هو خوارزمية تصنيف تستخدم دالة Sigmoid لتحويل الأرقام إلى احتمالات. وأخيراً، لا تنخدعوا بمقياس الدقة (Accuracy) في البيانات غير المتوازنة؛ مصفوفة الارتباك ودرجة F1 هما أصدقاؤكم الحقيقيون هنا. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome to this pivotal module. We've moved from just drawing straight lines (Linear Regression) to making critical decisions (Logistic Regression). For the exam, focus heavily on the 'why'. Why use Gradient Descent? Because the Normal Equation chokes on massive datasets. Why use Regularization (L1/L2)? To stop the model from memorizing data (Overfitting). Always remember that Logistic Regression, despite its name, is a classification algorithm that uses the Sigmoid function to turn numbers into probabilities. Finally, don't be fooled by Accuracy on imbalanced datasets; the Confusion Matrix and F1 Score are your true friends here. Good luck studying!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم المعادلة العادية ومتى أستخدم الانحدار التدريجي؟</template>
+          <template class="content-en">When should I use the Normal Equation vs. Gradient Descent?</template>
+          <span class="content-target">متى يجب أن أستخدم المعادلة العادية ومتى أستخدم الانحدار التدريجي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم المعادلة العادية للبيانات الصغيرة إلى المتوسطة لأنها تعطي حلاً دقيقاً ومباشراً. استخدم الانحدار التدريجي عندما يكون لديك عدد كبير جداً من الميزات (مثلاً > 100,000) لأن المعادلة العادية ستكون بطيئة جداً في حساب معكوس المصفوفة.</template>
+          <template class="content-en">Use the Normal Equation for small to medium datasets as it gives an exact, direct solution. Use Gradient Descent when you have a very large number of features (e.g., > 100,000) because the Normal Equation becomes too slow computing the matrix inverse.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين L1 (Lasso) و L2 (Ridge)؟</template>
+          <template class="content-en">What is the main difference between L1 (Lasso) and L2 (Ridge) regularization?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين L1 (Lasso) و L2 (Ridge)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">L2 يقلص جميع الأوزان نحو الصفر ولكن لا يجعلها صفراً أبداً. L1 يمكنه تقليص أوزان الميزات غير المهمة إلى الصفر تماماً، مما يجعله مفيداً لاختيار الميزات (Feature Selection) وإنتاج نماذج متناثرة.</template>
+          <template class="content-en">L2 shrinks all weights towards zero but never exactly to zero. L1 can shrink weights of unimportant features exactly to zero, making it useful for feature selection and producing sparse models.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم الانحدار الخطي للتصنيف؟</template>
+          <template class="content-en">Why don't we use Linear Regression for classification?</template>
+          <span class="content-target">لماذا لا نستخدم الانحدار الخطي للتصنيف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الانحدار الخطي يمكن أن يتنبأ بقيم سالبة أو قيم أكبر من 1، وهو ما لا معنى له عند التحدث عن الاحتمالات. الانحدار اللوجستي يحل هذا باستخدام دالة Sigmoid لضغط المخرجات بين 0 و 1.</template>
+          <template class="content-en">Because Linear Regression can predict negative values or values greater than 1, which makes no sense for probabilities. Logistic Regression solves this using the Sigmoid function to squash outputs between 0 and 1.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف أعرف من منحنيات التعلم أن نموذجي يعاني من فرط التخصيص (Overfitting)؟</template>
+          <template class="content-en">How do I know from learning curves that my model is overfitting?</template>
+          <span class="content-target">كيف أعرف من منحنيات التعلم أن نموذجي يعاني من فرط التخصيص (Overfitting)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سترى خطأ تدريب منخفض جداً، ولكن خطأ تحقق مرتفع، مع وجود فجوة كبيرة وواضحة بين المنحنيين.</template>
+          <template class="content-en">You will see a very low training error, but a high validation error, with a large, distinct gap between the two curves.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مصفوفة الارتباك (Confusion Matrix)؟</template>
+          <template class="content-en">What is a Confusion Matrix?</template>
+          <span class="content-target">ما هي مصفوفة الارتباك (Confusion Matrix)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي جدول يلخص أداء المصنف، يوضح عدد التنبؤات الصحيحة (TP, TN) والخاطئة (FP, FN) لكل فئة، مما يعطي صورة أوضح من مجرد نسبة الدقة.</template>
+          <template class="content-en">It's a table summarizing a classifier's performance, showing the number of correct (TP, TN) and incorrect (FP, FN) predictions for each class, giving a clearer picture than just accuracy.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يكون الاستدعاء (Recall) أهم من الضبط (Precision)؟</template>
+          <template class="content-en">When is Recall more important than Precision?</template>
+          <span class="content-target">متى يكون الاستدعاء (Recall) أهم من الضبط (Precision)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما تكون تكلفة السلبيات الخاطئة (False Negatives) عالية جداً. مثال: تشخيص مرض خطير؛ من الأفضل إخضاع مريض سليم لفحوصات إضافية (FP) على أن تفوت مريضاً مصاباً (FN).</template>
+          <template class="content-en">When the cost of False Negatives is very high. Example: diagnosing a severe disease; it's better to subject a healthy person to more tests (FP) than to miss a sick person (FN).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التوقف المبكر (Early Stopping)؟</template>
+          <template class="content-en">What is Early Stopping?</template>
+          <span class="content-target">ما هو التوقف المبكر (Early Stopping)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تقنية تنظيم بسيطة وفعالة جداً، حيث نراقب خطأ التحقق أثناء التدريب، ونوقف التدريب فوراً عندما يبدأ هذا الخطأ في الارتفاع (مما يعني بدء فرط التخصيص).</template>
+          <template class="content-en">It's a simple and highly effective regularization technique where we monitor the validation error during training and stop training immediately when this error starts to rise (indicating the start of overfitting).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني قيمة AUC في منحنى ROC؟</template>
+          <template class="content-en">What does the AUC value in an ROC curve mean?</template>
+          <span class="content-target">ماذا تعني قيمة AUC في منحنى ROC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">AUC (المساحة تحت المنحنى) تلخص أداء النموذج في التمييز بين الفئات. القيمة 1 تعني تصنيفاً مثالياً، والقيمة 0.5 تعني أن النموذج لا يختلف عن التخمين العشوائي.</template>
+          <template class="content-en">AUC (Area Under the Curve) summarizes the model's ability to distinguish between classes. A value of 1 means perfect classification, and 0.5 means the model is no better than random guessing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو البحث الشبكي (Grid Search) ولماذا نستخدمه؟</template>
+          <template class="content-en">What is Grid Search and why do we use it?</template>
+          <span class="content-target">ما هو البحث الشبكي (Grid Search) ولماذا نستخدمه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو طريقة لتجربة مجموعات مختلفة من المعلمات الفائقة (مثل معدل التعلم، نوع التنظيم) بشكل منهجي للعثور على التركيبة التي تعطي أفضل أداء للنموذج.</template>
+          <template class="content-en">It is a method to systematically try different combinations of hyperparameters (like learning rate, regularization type) to find the combination that yields the best model performance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين المعلمات (Parameters) والمعلمات الفائقة (Hyperparameters)؟</template>
+          <template class="content-en">What is the difference between Parameters and Hyperparameters?</template>
+          <span class="content-target">ما هو الفرق بين المعلمات (Parameters) والمعلمات الفائقة (Hyperparameters)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المعلمات (مثل الأوزان) يتعلمها النموذج بنفسه من البيانات أثناء التدريب. المعلمات الفائقة (مثل معدل التعلم) يحددها المبرمج قبل بدء التدريب للتحكم في كيفية تعلم النموذج.</template>
+          <template class="content-en">Parameters (like weights) are learned by the model itself from the data during training. Hyperparameters (like learning rate) are set by the programmer before training begins to control how the model learns.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "المعادلة العادية (Normal Equation)",
+      "en": "Normal Equation"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة رياضية مباشرة لحساب المعلمات المثلى التي تقلل دالة التكلفة في الانحدار الخطي.",
+        "en": "A direct mathematical method to compute the optimal parameter values that minimize the cost function in linear regression."
+      },
+      "example": {
+        "ar": "استخدام مصفوفة الميزات X لحساب الأوزان مباشرة دون تكرار.",
+        "en": "Using the feature matrix X to calculate weights directly without iteration."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الانحدار التدريجي للدفعات (Batch Gradient Descent)",
+      "en": "Batch Gradient Descent"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير من الانحدار التدريجي يستخدم مجموعة التدريب بأكملها في كل تكرار لتحديث الأوزان.",
+        "en": "A variant of gradient descent that uses the entire training set in each iteration to update weights."
+      },
+      "example": {
+        "ar": "حساب التدرج على 10,000 عينة قبل أخذ خطوة واحدة.",
+        "en": "Calculating the gradient over 10,000 samples before taking a single step."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الانحدار التدريجي العشوائي (Stochastic Gradient Descent)",
+      "en": "Stochastic Gradient Descent (SGD)"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير يستخدم عينة تدريب واحدة فقط في كل تكرار، مما يجعله سريعاً ولكنه متذبذب.",
+        "en": "A variant that uses only one training example per iteration, making it fast but erratic."
+      },
+      "example": {
+        "ar": "تحديث الأوزان بعد كل صف بيانات يتم قراءته.",
+        "en": "Updating weights after every single data row read."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "الانحدار متعدد الحدود (Polynomial Regression)",
+      "en": "Polynomial Regression"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لتركيب نموذج خطي على بيانات غير خطية عن طريق إضافة مصطلحات متعددة الحدود كميزات جديدة.",
+        "en": "A technique to fit a linear model to nonlinear data by adding polynomial terms as new features."
+      },
+      "example": {
+        "ar": "إضافة ميزة \\(x^2\\) لنمذجة علاقة منحنية.",
+        "en": "Adding an \\(x^2\\) feature to model a curved relationship."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "نقص التخصيص (Underfitting)",
+      "en": "Underfitting"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة يكون فيها أداء النموذج سيئاً على كل من بيانات التدريب والتحقق.",
+        "en": "A condition where the model performs poorly on both training and validation sets."
+      },
+      "example": {
+        "ar": "استخدام خط مستقيم لنمذجة بيانات على شكل حرف U.",
+        "en": "Using a straight line to model U-shaped data."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "فرط التخصيص (Overfitting)",
+      "en": "Overfitting"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة يؤدي فيها النموذج بشكل ممتاز على بيانات التدريب ولكن بشكل سيء على البيانات الجديدة.",
+        "en": "A condition where the model performs well on training data but poorly on new data."
+      },
+      "example": {
+        "ar": "نموذج يحفظ الضوضاء في بيانات التدريب بدلاً من النمط العام.",
+        "en": "A model memorizing noise in the training data instead of the general pattern."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "انحدار ريدج (Ridge Regression - L2)",
+      "en": "Ridge Regression (L2)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تنظيم تضيف عقوبة تساوي مجموع مربعات المعاملات لمنع فرط التخصيص.",
+        "en": "A regularization technique adding a penalty equal to the sum of squared coefficients to prevent overfitting."
+      },
+      "example": {
+        "ar": "تقليص الأوزان الكبيرة دون جعلها صفراً.",
+        "en": "Shrinking large weights without making them exactly zero."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "انحدار لاسو (Lasso Regression - L1)",
+      "en": "Lasso Regression (L1)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تنظيم تضيف عقوبة تساوي مجموع القيم المطلقة للمعاملات، مما يؤدي إلى اختيار الميزات.",
+        "en": "A regularization technique adding a penalty equal to the sum of absolute coefficients, leading to feature selection."
+      },
+      "example": {
+        "ar": "إسقاط الميزات غير المهمة بجعل أوزانها صفراً.",
+        "en": "Dropping unimportant features by setting their weights to zero."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الشبكة المرنة (Elastic Net)",
+      "en": "Elastic Net"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج يجمع بين تنظيم L1 و L2، مفيد عند وجود ميزات مترابطة.",
+        "en": "A model combining L1 and L2 regularization, useful when features are correlated."
+      },
+      "example": {
+        "ar": "استخدام معلمة خلط r للتحكم في نسبة L1 إلى L2.",
+        "en": "Using a mixing parameter r to control the ratio of L1 to L2."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "التوقف المبكر (Early Stopping)",
+      "en": "Early Stopping"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تنظيم توقف التدريب عندما يبدأ خطأ التحقق في الارتفاع.",
+        "en": "A regularization technique that stops training when the validation error starts to rise."
+      },
+      "example": {
+        "ar": "إيقاف حلقة التدريب عند التكرار 50 بدلاً من 100 لأن الأداء بدأ يتدهور.",
+        "en": "Halting the training loop at epoch 50 instead of 100 because performance started degrading."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "الانحدار اللوجستي (Logistic Regression)",
+      "en": "Logistic Regression"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة إحصائية تنمذج احتمالية نتيجة ثنائية بناءً على متغيرات التنبؤ.",
+        "en": "A statistical method that models the probability of a binary outcome based on predictor variables."
+      },
+      "example": {
+        "ar": "التنبؤ بما إذا كان البريد الإلكتروني مزعجاً (1) أم لا (0).",
+        "en": "Predicting whether an email is spam (1) or not (0)."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "الدالة السينية (Sigmoid Function)",
+      "en": "Sigmoid Function"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تحول أي قيمة حقيقية إلى قيمة بين 0 و 1، تستخدم في الانحدار اللوجستي.",
+        "en": "A function that transforms any real value to a value between 0 and 1, used in logistic regression."
+      },
+      "example": {
+        "ar": "تحويل المخرج الخطي 2.5 إلى احتمالية 0.92.",
+        "en": "Converting a linear output of 2.5 into a probability of 0.92."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "مصفوفة الارتباك (Confusion Matrix)",
+      "en": "Confusion Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول يلخص أداء نموذج التصنيف بإظهار التنبؤات الصحيحة والخاطئة لكل فئة.",
+        "en": "A table summarizing classification performance by showing correct and incorrect predictions for each class."
+      },
+      "example": {
+        "ar": "جدول 2x2 يوضح TP, TN, FP, FN.",
+        "en": "A 2x2 table showing TP, TN, FP, FN."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الضبط (Precision)",
+      "en": "Precision"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة التنبؤات الإيجابية التي كانت صحيحة فعلياً (TP / (TP + FP)).",
+        "en": "The fraction of positive predictions that are actually correct (TP / (TP + FP))."
+      },
+      "example": {
+        "ar": "من بين 10 رسائل صُنفت كمزعجة، 9 كانت مزعجة فعلاً (الضبط = 90%).",
+        "en": "Out of 10 emails classified as spam, 9 were actually spam (Precision = 90%)."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "الاستدعاء (Recall)",
+      "en": "Recall"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة الإيجابيات الفعلية التي تم تحديدها بشكل صحيح (TP / (TP + FN)).",
+        "en": "The fraction of actual positives that are correctly identified (TP / (TP + FN))."
+      },
+      "example": {
+        "ar": "من بين 10 رسائل مزعجة في صندوق الوارد، اكتشف النموذج 8 (الاستدعاء = 80%).",
+        "en": "Out of 10 actual spam emails, the model caught 8 (Recall = 80%)."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "درجة F1 (F1 Score)",
+      "en": "F1 Score"
+    },
+    "back": {
+      "definition": {
+        "ar": "المتوسط التوافقي للضبط والاستدعاء، يوازن بينهما.",
+        "en": "The harmonic mean of Precision and Recall, balancing the two."
+      },
+      "example": {
+        "ar": "مقياس مفضل عندما تكون الفئات غير متوازنة بشدة.",
+        "en": "A preferred metric when classes are highly imbalanced."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "البحث الشبكي (Grid Search)",
+      "en": "Grid Search"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية للعثور على القيم المثلى للمعلمات الفائقة عن طريق البحث الشامل في مجموعة محددة مسبقاً.",
+        "en": "A technique to find optimal hyperparameter values by exhaustively searching through a predefined set."
+      },
+      "example": {
+        "ar": "تجربة كل تركيبة ممكنة من معدل التعلم وحجم الدفعة.",
+        "en": "Trying every possible combination of learning rate and batch size."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من خوارزميات الانحدار التدريجي التالية تستخدم عينة تدريب واحدة فقط في كل تكرار؟",
+      "en": "Which of the following Gradient Descent variants uses only one training example per iteration?"
+    },
+    "options": {
+      "ar": [
+        "Batch Gradient Descent",
+        "Mini-Batch Gradient Descent",
+        "Stochastic Gradient Descent (SGD)",
+        "Normal Equation"
+      ],
+      "en": [
+        "Batch Gradient Descent",
+        "Mini-Batch Gradient Descent",
+        "Stochastic Gradient Descent (SGD)",
+        "Normal Equation"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يستخدم SGD عينة واحدة فقط، مما يجعله سريعاً جداً ولكنه يتسبب في تذبذب دالة التكلفة.",
+      "en": "SGD uses only one example, making it very fast but causing the cost function to bounce around."
+    },
+    "hint": {
+      "ar": "كلمة 'Stochastic' تعني عشوائي، حيث يختار عينة عشوائية واحدة.",
+      "en": "The word 'Stochastic' implies randomness, picking one random sample."
+    },
+    "difficulty": "easy",
+    "conceptId": "gradient-descent-variants"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية في استخدام المعادلة العادية (Normal Equation) لمجموعات البيانات ذات الميزات الكثيرة جداً؟",
+      "en": "What is the main limitation of using the Normal Equation for datasets with a very large number of features?"
+    },
+    "options": {
+      "ar": [
+        "لا يمكنها إيجاد الحد الأدنى العالمي.",
+        "تتطلب ضبط معدل التعلم.",
+        "غير فعالة حسابياً بسبب حساب معكوس المصفوفة.",
+        "تؤدي دائماً إلى فرط التخصيص."
+      ],
+      "en": [
+        "It cannot find the global minimum.",
+        "It requires tuning the learning rate.",
+        "It is computationally inefficient due to matrix inversion.",
+        "It always leads to overfitting."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تعقيد حساب معكوس المصفوفة يجعل المعادلة العادية بطيئة جداً عندما يكون عدد الميزات كبيراً (مثلاً 100,000).",
+      "en": "The complexity of matrix inversion makes the Normal Equation very slow when the number of features is large (e.g., 100,000)."
+    },
+    "hint": {
+      "ar": "تذكر العملية الرياضية المعقدة المطلوبة في المعادلة.",
+      "en": "Remember the complex mathematical operation required in the equation."
+    },
+    "difficulty": "medium",
+    "conceptId": "linear-regression-normal-equation"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ماذا يشير وجود فجوة كبيرة بين منحنى خطأ التدريب ومنحنى خطأ التحقق؟",
+      "en": "What does a significant gap between the training error curve and the validation error curve indicate?"
+    },
+    "options": {
+      "ar": [
+        "نقص التخصيص (Underfitting)",
+        "فرط التخصيص (Overfitting)",
+        "توافق جيد (Good Fit)",
+        "معدل تعلم مرتفع جداً"
+      ],
+      "en": [
+        "Underfitting",
+        "Overfitting",
+        "Good Fit",
+        "Learning rate is too high"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الفجوة الكبيرة تعني أن النموذج يؤدي بشكل جيد على بيانات التدريب ولكن بشكل سيء على بيانات التحقق، وهو تعريف فرط التخصيص.",
+      "en": "A large gap means the model performs well on training data but poorly on validation data, which is the definition of overfitting."
+    },
+    "hint": {
+      "ar": "النموذج يحفظ البيانات ولا يعمم.",
+      "en": "The model is memorizing, not generalizing."
+    },
+    "difficulty": "medium",
+    "conceptId": "learning-curves"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي تقنية تنظيم (Regularization) يمكن أن تقلص بعض المعاملات إلى الصفر تماماً، مما يؤدي إلى اختيار الميزات؟",
+      "en": "Which regularization technique can shrink some coefficients to exactly zero, effectively performing feature selection?"
+    },
+    "options": {
+      "ar": [
+        "Ridge Regression (L2)",
+        "Lasso Regression (L1)",
+        "Early Stopping",
+        "Polynomial Regression"
+      ],
+      "en": [
+        "Ridge Regression (L2)",
+        "Lasso Regression (L1)",
+        "Early Stopping",
+        "Polynomial Regression"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يضيف Lasso (L1) عقوبة القيمة المطلقة، مما يؤدي إلى نماذج متناثرة (Sparse) حيث يتم تعيين أوزان الميزات غير المهمة إلى الصفر.",
+      "en": "Lasso (L1) adds an absolute value penalty, leading to sparse models where unimportant feature weights are set to zero."
+    },
+    "hint": {
+      "ar": "تذكر L1 مقابل L2.",
+      "en": "Remember L1 vs L2."
+    },
+    "difficulty": "medium",
+    "conceptId": "regularized-linear-models"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الدالة المستخدمة في الانحدار اللوجستي لتحويل المخرجات لتكون بين 0 و 1؟",
+      "en": "What function is used in Logistic Regression to transform the output to be between 0 and 1?"
+    },
+    "options": {
+      "ar": [
+        "دالة ReLU",
+        "دالة Logit",
+        "الدالة السينية (Sigmoid)",
+        "دالة الظل الزائدي (Tanh)"
+      ],
+      "en": [
+        "ReLU function",
+        "Logit function",
+        "Sigmoid function",
+        "Tanh function"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تأخذ الدالة السينية (Sigmoid) أي قيمة حقيقية وتحولها إلى قيمة بين 0 و 1، مما يمثل الاحتمالية.",
+      "en": "The Sigmoid function takes any real value and maps it to a value between 0 and 1, representing a probability."
+    },
+    "hint": {
+      "ar": "شكلها يشبه حرف S.",
+      "en": "It has an S-shaped curve."
+    },
+    "difficulty": "easy",
+    "conceptId": "logistic-regression"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف يتم حساب الضبط (Precision)؟",
+      "en": "How is Precision calculated?"
+    },
+    "options": {
+      "ar": [
+        "TP / (TP + FN)",
+        "TP / (TP + FP)",
+        "(TP + TN) / Total",
+        "TN / (TN + FP)"
+      ],
+      "en": [
+        "TP / (TP + FN)",
+        "TP / (TP + FP)",
+        "(TP + TN) / Total",
+        "TN / (TN + FP)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الضبط هو نسبة التنبؤات الإيجابية التي كانت صحيحة فعلياً، ويحسب بقسمة الإيجابيات الحقيقية على مجموع الإيجابيات الحقيقية والخاطئة.",
+      "en": "Precision is the fraction of positive predictions that are actually correct, calculated as True Positives divided by (True Positives + False Positives)."
+    },
+    "hint": {
+      "ar": "يركز على جودة التنبؤات الإيجابية.",
+      "en": "Focuses on the quality of positive predictions."
+    },
+    "difficulty": "medium",
+    "conceptId": "performance-metrics"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي مقياس هو الأفضل للاستخدام عندما تكون الفئات غير متوازنة بشدة وتريد التوازن بين الضبط والاستدعاء؟",
+      "en": "Which metric is best to use when classes are highly imbalanced and you want a balance between Precision and Recall?"
+    },
+    "options": {
+      "ar": [
+        "الدقة (Accuracy)",
+        "درجة F1 (F1 Score)",
+        "معدل الإيجابية الخاطئة (FPR)",
+        "مصفوفة الارتباك فقط"
+      ],
+      "en": [
+        "Accuracy",
+        "F1 Score",
+        "False Positive Rate (FPR)",
+        "Confusion Matrix only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "درجة F1 هي المتوسط التوافقي للضبط والاستدعاء، وهي تعطي تقييماً أفضل من الدقة العادية في حالة البيانات غير المتوازنة.",
+      "en": "The F1 Score is the harmonic mean of Precision and Recall, providing a better evaluation than simple accuracy for imbalanced data."
+    },
+    "hint": {
+      "ar": "المتوسط التوافقي.",
+      "en": "Harmonic mean."
+    },
+    "difficulty": "medium",
+    "conceptId": "performance-metrics"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو الغرض من البحث الشبكي (Grid Search)؟",
+      "en": "What is the purpose of Grid Search?"
+    },
+    "options": {
+      "ar": [
+        "تنظيف البيانات المفقودة.",
+        "إيجاد القيم المثلى للمعلمات الفائقة (Hyperparameters).",
+        "تحويل الميزات الفئوية إلى أرقام.",
+        "تقليل أبعاد البيانات."
+      ],
+      "en": [
+        "Cleaning missing data.",
+        "Finding the optimal values for hyperparameters.",
+        "Converting categorical features to numbers.",
+        "Reducing data dimensionality."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يقوم البحث الشبكي بتقييم النموذج عبر مجموعات مختلفة من المعلمات الفائقة للعثور على أفضل أداء.",
+      "en": "Grid Search evaluates the model across different combinations of hyperparameters to find the best performance."
+    },
+    "hint": {
+      "ar": "يبحث في 'شبكة' من الإعدادات.",
+      "en": "It searches through a 'grid' of settings."
+    },
+    "difficulty": "easy",
+    "conceptId": "grid-search"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ماذا يمثل المحور السيني (X-axis) والمحور الصادي (Y-axis) في منحنى ROC؟",
+      "en": "What do the X-axis and Y-axis represent in an ROC curve?"
+    },
+    "options": {
+      "ar": [
+        "X: الضبط، Y: الاستدعاء",
+        "X: معدل الإيجابية الخاطئة (FPR)، Y: معدل الإيجابية الحقيقية (TPR)",
+        "X: حجم التدريب، Y: الخطأ",
+        "X: الإيجابيات الحقيقية، Y: السلبيات الحقيقية"
+      ],
+      "en": [
+        "X: Precision, Y: Recall",
+        "X: False Positive Rate (FPR), Y: True Positive Rate (TPR)",
+        "X: Training size, Y: Error",
+        "X: True Positives, Y: True Negatives"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يرسم منحنى ROC معدل الإيجابية الحقيقية (TPR أو Recall) مقابل معدل الإيجابية الخاطئة (FPR).",
+      "en": "The ROC curve plots the True Positive Rate (TPR or Recall) against the False Positive Rate (FPR)."
+    },
+    "hint": {
+      "ar": "يقارن بين التنبؤات الصحيحة الإيجابية والإنذارات الكاذبة.",
+      "en": "Compares correct positive predictions vs false alarms."
+    },
+    "difficulty": "hard",
+    "conceptId": "performance-metrics"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "متى يتوقف التدريب عند استخدام تقنية 'التوقف المبكر' (Early Stopping)؟",
+      "en": "When does training stop when using the 'Early Stopping' technique?"
+    },
+    "options": {
+      "ar": [
+        "عندما يصل خطأ التدريب إلى الصفر.",
+        "عندما يتوقف خطأ التحقق (Validation error) عن التحسن.",
+        "بعد عدد ثابت من التكرارات (مثلاً 1000).",
+        "عندما تصبح جميع الأوزان صفراً."
+      ],
+      "en": [
+        "When training error reaches zero.",
+        "When validation error stops improving.",
+        "After a fixed number of epochs (e.g., 1000).",
+        "When all weights become zero."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوقف المبكر يراقب خطأ التحقق، ويوقف التدريب بمجرد أن يبدأ هذا الخطأ في الارتفاع، مما يمنع فرط التخصيص.",
+      "en": "Early stopping monitors the validation error and halts training as soon as this error starts to rise, preventing overfitting."
+    },
+    "hint": {
+      "ar": "يراقب أداء النموذج على بيانات لم يتدرب عليها.",
+      "en": "Monitors performance on unseen data."
+    },
+    "difficulty": "medium",
+    "conceptId": "regularized-linear-models"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الانحدار اللوجستي يستخدم للتنبؤ بقيم مستمرة (Regression) بسبب اسمه. الحقيقة أنه خوارزمية تصنيف (Classification).</template>
+    <template class="content-en">Thinking Logistic Regression is used for predicting continuous values because of its name. It is actually a classification algorithm.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفجوة في منحنيات التعلم: فجوة كبيرة بين خطأ التدريب (المنخفض) وخطأ التحقق (المرتفع) هي المؤشر الكلاسيكي لفرط التخصيص (Overfitting).</template>
+    <template class="content-en">Learning Curves Gap: A large gap between a low training error and a high validation error is the classic indicator of overfitting.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">انحدار Lasso (L1) لا يقلل الأوزان فحسب، بل يمكنه جعلها صفراً تماماً. هذا يجعله أداة ممتازة لاختيار الميزات (Feature Selection) المدمجة.</template>
+    <template class="content-en">Lasso (L1) regression doesn't just shrink weights; it can force them to exactly zero. This makes it an excellent built-in feature selection tool.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتماد على الدقة (Accuracy) فقط لتقييم نموذجك. إذا كانت بياناتك غير متوازنة (مثلاً 99% سليم، 1% مريض)، فإن نموذجاً يتنبأ دائماً بـ 'سليم' سيحقق دقة 99% ولكنه عديم الفائدة. استخدم F1 Score بدلاً من ذلك.</template>
+    <template class="content-en">Relying solely on Accuracy to evaluate your model. If data is imbalanced (e.g., 99% healthy, 1% sick), a model always predicting 'healthy' gets 99% accuracy but is useless. Use F1 Score instead.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المقايضة بين الضبط والاستدعاء (Precision/Recall Trade-off): لا يمكنك عادةً تحسين أحدهما دون الإضرار بالآخر. اختر بناءً على تكلفة الخطأ في مشكلتك المحددة.</template>
+    <template class="content-en">Precision/Recall Trade-off: You usually cannot improve one without hurting the other. Choose based on the cost of errors in your specific problem.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

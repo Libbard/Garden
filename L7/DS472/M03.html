@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS472" data-module="3" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المعالجة المسبقة للبيانات (الجزء الثاني) · DS472 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS472" data-page-title-en="DS472">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=DS472"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#data-reduction-strategies" class="toc-link" data-bilingual>
+        <template class="content-ar">استراتيجيات تقليل البيانات</template>
+        <template class="content-en">Data Reduction Strategies</template>
+        <span class="content-target">استراتيجيات تقليل البيانات</span>
+      </a>
+      <a href="#wavelet-transform" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل المويجات (Wavelet Transform)</template>
+        <template class="content-en">Wavelet Transform</template>
+        <span class="content-target">تحويل المويجات (Wavelet Transform)</span>
+      </a>
+      <a href="#principal-component-analysis" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل المكونات الرئيسية (PCA)</template>
+        <template class="content-en">Principal Component Analysis (PCA)</template>
+        <span class="content-target">تحليل المكونات الرئيسية (PCA)</span>
+      </a>
+      <a href="#attribute-subset-selection" class="toc-link" data-bilingual>
+        <template class="content-ar">اختيار مجموعة فرعية من السمات وإنشائها</template>
+        <template class="content-en">Attribute Subset Selection &amp; Creation</template>
+        <span class="content-target">اختيار مجموعة فرعية من السمات وإنشائها</span>
+      </a>
+      <a href="#numerosity-reduction-parametric" class="toc-link" data-bilingual>
+        <template class="content-ar">تقليل العدد: الطرق البارامترية (الانحدار)</template>
+        <template class="content-en">Numerosity Reduction: Parametric Methods (Regression)</template>
+        <span class="content-target">تقليل العدد: الطرق البارامترية (الانحدار)</span>
+      </a>
+      <a href="#numerosity-reduction-non-parametric" class="toc-link" data-bilingual>
+        <template class="content-ar">تقليل العدد: الطرق غير البارامترية (أخذ العينات والتجميع)</template>
+        <template class="content-en">Numerosity Reduction: Non-parametric Methods (Sampling &amp; Clustering)</template>
+        <span class="content-target">تقليل العدد: الطرق غير البارامترية (أخذ العينات والتجميع)</span>
+      </a>
+      <a href="#data-normalization" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل البيانات: التطبيع (Normalization)</template>
+        <template class="content-en">Data Transformation: Normalization</template>
+        <span class="content-target">تحويل البيانات: التطبيع (Normalization)</span>
+      </a>
+      <a href="#data-discretization" class="toc-link" data-bilingual>
+        <template class="content-ar">تكتم البيانات (Discretization)</template>
+        <template class="content-en">Data Discretization</template>
+        <span class="content-target">تكتم البيانات (Discretization)</span>
+      </a>
+      <a href="#concept-hierarchy-generation" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء التسلسل الهرمي للمفاهيم</template>
+        <template class="content-en">Concept Hierarchy Generation</template>
+        <span class="content-target">إنشاء التسلسل الهرمي للمفاهيم</span>
+      </a>
+      <a href="#similarity-dissimilarity-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات قياس التشابه والاختلاف</template>
+        <template class="content-en">Measuring Data Similarity and Dissimilarity Basics</template>
+        <span class="content-target">أساسيات قياس التشابه والاختلاف</span>
+      </a>
+      <a href="#proximity-nominal-binary" class="toc-link" data-bilingual>
+        <template class="content-ar">مقياس التقارب للسمات الاسمية والثنائية</template>
+        <template class="content-en">Proximity Measure for Nominal &amp; Binary Attributes</template>
+        <span class="content-target">مقياس التقارب للسمات الاسمية والثنائية</span>
+      </a>
+      <a href="#distance-numeric-minkowski" class="toc-link" data-bilingual>
+        <template class="content-ar">المسافة للبيانات الرقمية: مسافة مينكوفسكي</template>
+        <template class="content-en">Distance on Numeric Data: Minkowski Distance</template>
+        <span class="content-target">المسافة للبيانات الرقمية: مسافة مينكوفسكي</span>
+      </a>
+      <a href="#proximity-ordinal-mixed" class="toc-link" data-bilingual>
+        <template class="content-ar">التقارب للمتغيرات الترتيبية والمختلطة</template>
+        <template class="content-en">Proximity for Ordinal &amp; Mixed Variables</template>
+        <span class="content-target">التقارب للمتغيرات الترتيبية والمختلطة</span>
+      </a>
+      <a href="#cosine-similarity" class="toc-link" data-bilingual>
+        <template class="content-ar">تشابه جيب التمام (Cosine Similarity)</template>
+        <template class="content-en">Cosine Similarity</template>
+        <span class="content-target">تشابه جيب التمام (Cosine Similarity)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · DS472
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المعالجة المسبقة للبيانات (الجزء الثاني)</h1>
+      <p class="hero-description">تغطي هذه الوحدة استراتيجيات تقليل البيانات (تقليل الأبعاد والعدد)، وتحويل البيانات (التطبيع والتكتم)، ومقاييس التشابه والاختلاف بين البيانات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Data Preprocessing (Part 2)</h1>
+      <p class="hero-description">This module covers data reduction strategies (dimensionality and numerosity reduction), data transformation (normalization and discretization), and data similarity and dissimilarity measures.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تقليل البيانات</span>
+      <span class="tag">تحويل البيانات</span>
+      <span class="tag">التطبيع</span>
+      <span class="tag">التكتم</span>
+      <span class="tag">مقاييس التشابه</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Data Reduction</span>
+      <span class="tag">Data Transformation</span>
+      <span class="tag">Normalization</span>
+      <span class="tag">Discretization</span>
+      <span class="tag">Similarity Measures</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف تقنيات تقليل وتحويل البيانات المختلفة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح الأساس المنطقي لتقليل البيانات وتحويلها.</span></li>
+      <li><span class="obj-icon">✦</span><span>توظيف تقنيات تقليل وتحويل البيانات في سياقات عملية.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام عدة أنواع من مقاييس التشابه والاختلاف.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe various data reduction and transformations techniques.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the rationale for data reduction and transformation.</span></li>
+      <li><span class="obj-icon">✦</span><span>Employ data reduction and transformation techniques.</span></li>
+      <li><span class="obj-icon">✦</span><span>Employ several types of similarity measures.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="data-reduction-strategies" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> استراتيجيات تقليل البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Data Reduction Strategies</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل حجم البيانات مع الحفاظ على نفس النتائج التحليلية تقريباً، لتسريع عملية التنقيب.</p></template>
+    <template class="content-en"><p>Obtaining a reduced representation of the dataset that is much smaller in volume but produces almost the same analytical results.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قواعد البيانات ومستودعات البيانات قد تخزن تيرابايتات من البيانات. قد يستغرق تحليل البيانات المعقدة وقتاً طويلاً جداً للتشغيل على مجموعة البيانات الكاملة. لذلك نلجأ لتقليل البيانات.</p><p>تنقسم استراتيجيات تقليل البيانات إلى قسمين رئيسيين:</p><ul><li><b>تقليل الأبعاد (Dimensionality Reduction):</b> إزالة السمات غير المهمة (مثل تحويلات المويجات، تحليل المكونات الرئيسية PCA، واختيار مجموعة فرعية من الميزات).</li><li><b>تقليل العدد (Numerosity Reduction):</b> تقليل حجم البيانات باختيار أشكال بديلة أصغر (مثل الانحدار، النماذج اللوغاريتمية الخطية، المدرجات التكرارية، التجميع، وأخذ العينات).</li></ul><p>كما يشمل ضغط البيانات (فقدان/بدون فقدان).</p></template>
+    <template class="content-en"><p>Databases and data warehouses may store terabytes of data. Complex data analysis may take a very long time to run on the complete data set. Hence, data reduction is essential.</p><p>Data reduction strategies are mainly divided into:</p><ul><li><b>Dimensionality reduction:</b> Removing unimportant attributes (e.g., Wavelet transforms, Principal Components Analysis (PCA), Feature subset selection).</li><li><b>Numerosity reduction:</b> Choosing alternative, smaller forms of data representation (e.g., Regression and Log-Linear Models, Histograms, clustering, sampling).</li></ul><p>It also includes data compression (lossy/lossless).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى تقليل الأبعاد تحديداً؟ بسبب ما يسمى بـ '<span class="smart-term" data-term-en="Curse of Dimensionality" data-ar="لعنة الأبعاد" data-en-def="The phenomenon where data becomes sparse and distance metrics lose meaning as the number of features increases.">لعنة الأبعاد<span class="smart-term-tooltip"></span></span>' (Curse of Dimensionality). عندما تزداد الأبعاد، تصبح البيانات متناثرة بشكل متزايد، وتصبح الكثافة والمسافة بين النقاط (وهي حاسمة للتجميع وتحليل القيم المتطرفة) أقل معنى.</p><p>يساعد تقليل الأبعاد في التخلص من الميزات غير ذات الصلة، وتقليل الضوضاء، وتقليل الوقت والمساحة المطلوبة، ويسمح بتصور أسهل للبيانات.</p></template>
+    <template class="content-en"><p>Why do we specifically need dimensionality reduction? Because of the '<span class="smart-term" data-term-en="Curse of Dimensionality" data-ar="لعنة الأبعاد" data-en-def="The phenomenon where data becomes sparse and distance metrics lose meaning as the number of features increases.">Curse of Dimensionality<span class="smart-term-tooltip"></span></span>'. When dimensionality increases, data becomes increasingly sparse. Density and distance between points, which is critical to clustering and outlier analysis, becomes less meaningful.</p><p>Dimensionality reduction helps avoid this curse, eliminates irrelevant features, reduces noise, reduces time/space required, and allows easier visualization.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن أن يؤدي تقليل البيانات إلى نتائج تحليلية خاطئة؟</template>
+      <template class="content-en">Can data reduction lead to incorrect analytical results?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، إذا تم استخدام تقنيات تقليل فقدانية (Lossy) بشكل مفرط أو تم حذف سمات مهمة، فقد تفقد البيانات معلومات حاسمة مما يؤدي إلى نماذج غير دقيقة.</p></template>
+      <template class="content-en"><p>Yes, if lossy reduction techniques are overused or important attributes are discarded, the data may lose critical information, leading to inaccurate models.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="wavelet-transform" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تحويل المويجات (Wavelet Transform)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Wavelet Transform</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أداة رياضية تحلل الإشارة إلى نطاقات ترددية فرعية مختلفة، وتستخدم لضغط البيانات وإزالة القيم المتطرفة.</p></template>
+    <template class="content-en"><p>A mathematical tool that decomposes a signal into different frequency sub-bands, used for data compression and outlier removal.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحويل المويجات المتقطع (DWT) يستخدم لمعالجة الإشارات الخطية وتحليل الدقة المتعددة. يتم تحويل البيانات للحفاظ على المسافة النسبية بين الكائنات عند مستويات دقة مختلفة.</p><p><b>طريقة العمل:</b></p><ol><li>يجب أن يكون طول البيانات المدخلة (L) قوة صحيحة للرقم 2 (إذا لم يكن كذلك، يتم حشوه بالأصفار).</li><li>يحتوي كل تحويل على وظيفتين: التنعيم (المجموع أو المتوسط المرجح) والفرق المرجح الثاني.</li><li>يتم تطبيقه على أزواج من البيانات، مما ينتج عنه مجموعتين من البيانات بطول L/2.</li><li>يتم تطبيق الوظيفتين بشكل متكرر حتى الوصول إلى الطول المطلوب.</li></ol><p>مثال: المصفوفة S = [2, 2, 0, 2, 3, 5, 4, 4] يمكن تحويلها إلى S^ = [23/4, -11/4, 1/2, 0, 0, -1, -1, 0]. للضغط، يمكن استبدال العديد من معاملات التفاصيل الصغيرة بالأصفار، والاحتفاظ بالمعاملات المهمة فقط.</p></template>
+    <template class="content-en"><p>Discrete Wavelet Transform (DWT) is used for linear signal processing and multi-resolution analysis. Data are transformed to preserve relative distance between objects at different levels of resolution.</p><p><b>Method:</b></p><ol><li>Length, L, of input data must be an integer power of 2 (if NOT, padding with 0’s).</li><li>Each transform has 2 functions: smoothing (Sum or Wt. avg.) & 2nd Wt. difference.</li><li>Applies to pairs of data, resulting in two sets of data of length L/2.</li><li>Applies two functions recursively, until it reaches the desired length.</li></ol><p>Example: S = [2, 2, 0, 2, 3, 5, 4, 4] can be transformed to S^ = [23/4, -11/4, 1/2, 0, 0, -1, -1, 0]. For compression, many small detail coefficients can be replaced by 0’s, and only the significant coefficients are retained.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم تحويل المويجات؟ لأنه يستخدم مرشحات على شكل قبعة (hat-shape filters) تؤكد على المناطق التي تتجمع فيها النقاط وتقمع المعلومات الأضعف في حدودها.</p><p>هذا يجعله فعالاً جداً في إزالة القيم المتطرفة (Outliers) وغير حساس للضوضاء أو ترتيب الإدخال. كما أنه فعال حسابياً بتعقيد O(N)، ولكنه ينطبق فقط على البيانات ذات الأبعاد المنخفضة.</p></template>
+    <template class="content-en"><p>Why use Wavelet Transform? It uses hat-shape filters that emphasize regions where points cluster and suppress weaker information in their boundaries.</p><p>This makes it highly effective for outlier removal and insensitive to noise or input order. It is also computationally efficient with O(N) complexity, though it is only applicable to low-dimensional data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a hierarchical decomposition structure (error tree) for Haar Wavelet Coefficients. Show a binary tree starting from root 2.75, branching to 0.5 and 0. The leaves should be the original frequency distribution: 2, 2, 0, 2, 3, 5, 4, 4. Show the + and - signs on the branches indicating the smoothing and difference operations. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">Haar Wavelet Hierarchical Decomposition</text>
+  <text x="400" y="30" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold">التحليل الهرمي لمويجات هار</text>
+
+  <!-- Edges (Lines) -->
+  <g stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow)">
+    <!-- L0 to L1 -->
+    <line x1="400" y1="78" x2="200" y2="142" />
+    <line x1="400" y1="78" x2="600" y2="142" />
+    
+    <!-- L1 to L2 -->
+    <line x1="200" y1="178" x2="100" y2="242" />
+    <line x1="200" y1="178" x2="300" y2="242" />
+    <line x1="600" y1="178" x2="500" y2="242" />
+    <line x1="600" y1="178" x2="700" y2="242" />
+    
+    <!-- L2 to L3 -->
+    <line x1="100" y1="278" x2="50" y2="342" />
+    <line x1="100" y1="278" x2="150" y2="342" />
+    <line x1="300" y1="278" x2="250" y2="342" />
+    <line x1="300" y1="278" x2="350" y2="342" />
+    <line x1="500" y1="278" x2="450" y2="342" />
+    <line x1="500" y1="278" x2="550" y2="342" />
+    <line x1="700" y1="278" x2="650" y2="342" />
+    <line x1="700" y1="278" x2="750" y2="342" />
+  </g>
+
+  <!-- Edge Labels (Detail Coefficients) -->
+  <g fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" text-anchor="middle" stroke="var(--bg-surface)" stroke-width="4" paint-order="stroke fill">
+    <!-- L0 to L1 -->
+    <text x="300" y="115">+ (-1.25)</text>
+    <text x="500" y="115">- (-1.25)</text>
+    
+    <!-- L1 to L2 -->
+    <text x="150" y="215">+ 0.5</text>
+    <text x="250" y="215">- 0.5</text>
+    <text x="550" y="215">+ 0</text>
+    <text x="650" y="215">- 0</text>
+    
+    <!-- L2 to L3 -->
+    <text x="75" y="315">+ 0</text>
+    <text x="125" y="315">- 0</text>
+    <text x="275" y="315">+ (-1)</text>
+    <text x="325" y="315">- (-1)</text>
+    <text x="475" y="315">+ (-1)</text>
+    <text x="525" y="315">- (-1)</text>
+    <text x="675" y="315">+ 0</text>
+    <text x="725" y="315">- 0</text>
+  </g>
+
+  <!-- Nodes -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">
+    
+    <!-- Level 0 (Root) -->
+    <rect x="375" y="42" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="66" fill="var(--text-primary)">2.75</text>
+
+    <!-- Level 1 -->
+    <rect x="175" y="142" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="200" y="166" fill="var(--text-primary)">1.5</text>
+    
+    <rect x="575" y="142" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="600" y="166" fill="var(--text-primary)">4</text>
+
+    <!-- Level 2 -->
+    <rect x="75" y="242" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="100" y="266" fill="var(--text-primary)">2</text>
+    
+    <rect x="275" y="242" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="300" y="266" fill="var(--text-primary)">1</text>
+    
+    <rect x="475" y="242" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="500" y="266" fill="var(--text-primary)">4</text>
+    
+    <rect x="675" y="242" width="50" height="36" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="700" y="266" fill="var(--text-primary)">4</text>
+
+    <!-- Level 3 (Leaves - Original Data) -->
+    <rect x="25" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="50" y="366" fill="var(--on-brand-lo)">2</text>
+    
+    <rect x="125" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="150" y="366" fill="var(--on-brand-lo)">2</text>
+    
+    <rect x="225" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="250" y="366" fill="var(--on-brand-lo)">0</text>
+    
+    <rect x="325" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="350" y="366" fill="var(--on-brand-lo)">2</text>
+    
+    <rect x="425" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="450" y="366" fill="var(--on-brand-lo)">3</text>
+    
+    <rect x="525" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="550" y="366" fill="var(--on-brand-lo)">5</text>
+    
+    <rect x="625" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="650" y="366" fill="var(--on-brand-lo)">4</text>
+    
+    <rect x="725" y="342" width="50" height="36" rx="8" fill="var(--brand-500)" />
+    <text x="750" y="366" fill="var(--on-brand-lo)">4</text>
+  </g>
+
+  <!-- Legend -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">
+    <!-- Averages -->
+    <rect x="115" y="410" width="20" height="20" rx="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="145" y="425" class="gsvg-en" fill="var(--text-secondary)">Averages (Smoothing)</text>
+    <text x="145" y="425" class="gsvg-ar" fill="var(--text-secondary)">المتوسطات (التمهيد)</text>
+    
+    <!-- Leaves -->
+    <rect x="315" y="410" width="20" height="20" rx="4" fill="var(--brand-500)" />
+    <text x="345" y="425" class="gsvg-en" fill="var(--text-secondary)">Original Data (Leaves)</text>
+    <text x="345" y="425" class="gsvg-ar" fill="var(--text-secondary)">البيانات الأصلية (الأوراق)</text>
+    
+    <!-- Details -->
+    <text x="515" y="425" fill="var(--brand-ink)" font-weight="bold">± d</text>
+    <text x="545" y="425" class="gsvg-en" fill="var(--text-secondary)">Detail Coefficients (Difference)</text>
+    <text x="545" y="425" class="gsvg-ar" fill="var(--text-secondary)">معاملات التفاصيل (الفرق)</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يجب أن يكون طول البيانات المدخلة في تحويل المويجات قوة للرقم 2؟</template>
+      <template class="content-en">Why must the input data length in Wavelet Transform be a power of 2?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الخوارزمية تعتمد على تقسيم البيانات إلى أزواج (النصف) بشكل متكرر في كل خطوة. إذا لم يكن الطول قوة للرقم 2، فلن نتمكن من الاستمرار في التقسيم بالتساوي حتى نصل إلى عنصر واحد.</p></template>
+      <template class="content-en"><p>Because the algorithm relies on recursively dividing the data into pairs (halving it) at each step. If the length is not a power of 2, we cannot continue dividing evenly until we reach a single element.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="principal-component-analysis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تحليل المكونات الرئيسية (PCA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Principal Component Analysis (PCA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية لتقليل الأبعاد تبحث عن إسقاط يلتقط أكبر قدر من التباين في البيانات.</p></template>
+    <template class="content-en"><p>A dimensionality reduction technique that finds a projection capturing the largest amount of variation in data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في تحليل المكونات الرئيسية (PCA)، يتم إسقاط البيانات الأصلية على مساحة أصغر بكثير، مما يؤدي إلى تقليل الأبعاد.</p><p>نقوم بإيجاد المتجهات الذاتية (eigenvectors) لمصفوفة التغاير (covariance matrix)، وهذه المتجهات الذاتية تحدد المساحة الجديدة. المتجه الذي يمتلك أكبر قيمة ذاتية يمثل المكون الرئيسي الأول (الذي يلتقط أكبر تباين).</p></template>
+    <template class="content-en"><p>In Principal Component Analysis (PCA), the original data are projected onto a much smaller space, resulting in dimensionality reduction.</p><p>We find the <span class="smart-term" data-term-en="Eigenvector" data-ar="المتجه الذاتي" data-en-def="A non-zero vector that changes at most by a scalar factor when a linear transformation is applied to it.">eigenvector<span class="smart-term-tooltip"></span></span>s of the covariance matrix, and these eigenvectors define the new space.</p><p>The vector with the highest eigenvalue represents the first principal component (capturing the most variance).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعمل PCA بشكل أفضل عندما تكون البيانات رقمية ومترابطة خطياً. لا يعمل بشكل جيد مع البيانات الفئوية أو العلاقات غير الخطية المعقدة.</p><p>من عيوبه أن المكونات الجديدة الناتجة تكون عبارة عن تركيبات خطية من الميزات الأصلية، مما يجعل تفسيرها (Interpretability) صعباً مقارنة باختيار الميزات الفرعية.</p></template>
+    <template class="content-en"><p>PCA works best when data is numeric and linearly correlated. It does not work well with categorical data or highly complex non-linear relationships.</p><p>A drawback is that the new components are linear combinations of the original features, making them hard to interpret compared to simple feature subset selection.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A 2D scatter plot showing data points forming an elliptical shape extending diagonally upwards. Draw two axes: x1 (horizontal) and x2 (vertical). Draw a new axis 'e' (a dashed line) passing through the longest dimension of the elliptical cluster, representing the first principal component. Style: educational, dark background #0d1117, accent color #ff7b72, viewBox 0 0 600 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowheads for axes -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Subtle Grid -->
+    <g stroke="var(--border-color)" stroke-width="1" opacity="0.4">
+        <line x1="120" y1="340" x2="750" y2="340" />
+        <line x1="120" y1="280" x2="750" y2="280" />
+        <line x1="120" y1="220" x2="750" y2="220" />
+        <line x1="120" y1="160" x2="750" y2="160" />
+        <line x1="120" y1="100" x2="750" y2="100" />
+        
+        <line x1="220" y1="400" x2="220" y2="100" />
+        <line x1="320" y1="400" x2="320" y2="100" />
+        <line x1="420" y1="400" x2="420" y2="100" />
+        <line x1="520" y1="400" x2="520" y2="100" />
+        <line x1="620" y1="400" x2="620" y2="100" />
+        <line x1="720" y1="400" x2="720" y2="100" />
+    </g>
+
+    <!-- Covariance Ellipse -->
+    <ellipse cx="400" cy="250" rx="240" ry="60" transform="rotate(-26.565 400 250)" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="6,4" />
+
+    <!-- Original Axes (x1, x2) -->
+    <path d="M 120 400 L 750 400" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 120 400 L 120 90" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Labels -->
+    <text x="680" y="385" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">x₁ (Feature 1)</text>
+    <text x="680" y="385" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">x₁ (الميزة 1)</text>
+    
+    <text x="180" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">x₂ (Feature 2)</text>
+    <text x="180" y="85" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">x₂ (الميزة 2)</text>
+
+    <!-- Data Points (Scatter Plot) -->
+    <g fill="var(--brand-500)" opacity="0.6">
+        <circle cx="210" cy="345" r="4" />
+        <circle cx="230" cy="335" r="4" />
+        <circle cx="240" cy="345" r="4" />
+        <circle cx="250" cy="325" r="4" />
+        <circle cx="260" cy="310" r="4" />
+        <circle cx="270" cy="330" r="4" />
+        <circle cx="280" cy="300" r="4" />
+        <circle cx="290" cy="315" r="4" />
+        <circle cx="310" cy="305" r="4" />
+        <circle cx="320" cy="280" r="4" />
+        <circle cx="330" cy="295" r="4" />
+        <circle cx="340" cy="270" r="4" />
+        <circle cx="350" cy="285" r="4" />
+        <circle cx="360" cy="260" r="4" />
+        <circle cx="370" cy="275" r="4" />
+        <circle cx="380" cy="250" r="4" />
+        <circle cx="390" cy="265" r="4" />
+        <circle cx="400" cy="240" r="4" />
+        <circle cx="410" cy="255" r="4" />
+        <circle cx="430" cy="245" r="4" />
+        <circle cx="440" cy="220" r="4" />
+        <circle cx="450" cy="235" r="4" />
+        <circle cx="460" cy="210" r="4" />
+        <circle cx="470" cy="225" r="4" />
+        <circle cx="490" cy="215" r="4" />
+        <circle cx="500" cy="190" r="4" />
+        <circle cx="510" cy="205" r="4" />
+        <circle cx="520" cy="180" r="4" />
+        <circle cx="530" cy="195" r="4" />
+        <circle cx="540" cy="170" r="4" />
+        <circle cx="550" cy="185" r="4" />
+        <circle cx="560" cy="160" r="4" />
+        <circle cx="570" cy="175" r="4" />
+        <circle cx="580" cy="150" r="4" />
+        <circle cx="590" cy="165" r="4" />
+        <circle cx="600" cy="140" r="4" />
+        
+        <!-- Spread points -->
+        <circle cx="255" cy="335" r="4" />
+        <circle cx="285" cy="320" r="4" />
+        <circle cx="315" cy="295" r="4" />
+        <circle cx="345" cy="275" r="4" />
+        <circle cx="375" cy="255" r="4" />
+        <circle cx="405" cy="235" r="4" />
+        <circle cx="435" cy="215" r="4" />
+        <circle cx="465" cy="195" r="4" />
+        <circle cx="495" cy="175" r="4" />
+        <circle cx="525" cy="155" r="4" />
+        <circle cx="555" cy="165" r="4" />
+        
+        <!-- Dense center points -->
+        <circle cx="365" cy="265" r="4" />
+        <circle cx="385" cy="260" r="4" />
+        <circle cx="395" cy="250" r="4" />
+        <circle cx="415" cy="245" r="4" />
+        <circle cx="425" cy="235" r="4" />
+        <circle cx="445" cy="225" r="4" />
+        <circle cx="370" cy="255" r="4" />
+        <circle cx="390" cy="245" r="4" />
+        <circle cx="410" cy="235" r="4" />
+        <circle cx="430" cy="225" r="4" />
+    </g>
+
+    <!-- Principal Components (e1, e2) -->
+    <!-- e1: Passes through (400, 250), slope -0.5 -->
+    <path d="M 160 370 L 640 130" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="8,4" marker-end="url(#arrow-brand)" />
+    
+    <!-- e2: Passes through (400, 250), slope 2.0 -->
+    <path d="M 360 170 L 440 330" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-brand)" />
+
+    <!-- Labels for Principal Components -->
+    <text x="650" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">e₁ (1st Principal Component)</text>
+    <text x="650" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">e₁ (المكون الرئيسي الأول)</text>
+    
+    <text x="450" y="360" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">e₂ (2nd PC)</text>
+    <text x="450" y="360" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">e₂ (المكون الثاني)</text>
+
+    <!-- Projection Demonstration -->
+    <g stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="3,3">
+        <line x1="300" y1="260" x2="316" y2="292" />
+        <line x1="480" y1="170" x2="496" y2="202" />
+        <line x1="420" y1="280" x2="404" y2="248" />
+    </g>
+    <g fill="var(--brand-ink)">
+        <circle cx="316" cy="292" r="3" />
+        <circle cx="496" cy="202" r="3" />
+        <circle cx="404" cy="248" r="3" />
+    </g>
+    <g fill="var(--text-primary)">
+        <circle cx="300" cy="260" r="4" />
+        <circle cx="480" cy="170" r="4" />
+        <circle cx="420" cy="280" r="4" />
+    </g>
+    
+    <text x="530" y="180" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Projection</text>
+    <text x="530" y="180" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">إسقاط</text>
+
+    <!-- Title and Subtitle -->
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Principal Component Analysis (PCA)</text>
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">تحليل المكونات الرئيسية (PCA)</text>
+    
+    <text x="400" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Projecting data onto a new lower-dimensional space that maximizes variance</text>
+    <text x="400" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">إسقاط البيانات على مساحة جديدة ذات أبعاد أقل تزيد من التباين</text>
+
+    <!-- Callout Box 1: e1 Variance -->
+    <g transform="translate(220, 140)">
+        <rect x="-110" y="-30" width="220" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="-10" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">
+            <tspan x="0" dy="0">First principal component (e₁)</tspan>
+            <tspan x="0" dy="18">captures maximum variance</tspan>
+        </text>
+        <text x="0" y="-10" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">
+            <tspan x="0" dy="0">المكون الرئيسي الأول (e₁)</tspan>
+            <tspan x="0" dy="18">يلتقط التباين الأقصى للبيانات</tspan>
+        </text>
+    </g>
+    <path d="M 220 170 L 220 250 L 275 305" fill="none" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" />
+
+    <!-- Callout Box 2: e2 Orthogonal -->
+    <g transform="translate(600, 320)">
+        <rect x="-110" y="-30" width="220" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="-10" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">
+            <tspan x="0" dy="0">Second principal component (e₂)</tspan>
+            <tspan x="0" dy="18">is orthogonal to e₁</tspan>
+        </text>
+        <text x="0" y="-10" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">
+            <tspan x="0" dy="0">المكون الرئيسي الثاني (e₂)</tspan>
+            <tspan x="0" dy="18">متعامد مع المكون الأول</tspan>
+        </text>
+    </g>
+    <path d="M 490 320 L 455 320" fill="none" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" />
+
+    <!-- Educational Math Box -->
+    <g transform="translate(650, 220)">
+        <rect x="-110" y="-40" width="220" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="0" y="-15" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Eigenvector Equation</text>
+        <text x="0" y="-15" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">معادلة المتجه الذاتي</text>
+        
+        <text x="0" y="10" font-family="monospace" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">C v = λ v</text>
+        
+        <text x="0" y="30" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">C = Covariance Matrix</text>
+        <text x="0" y="30" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">C = مصفوفة التباين</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق الرئيسي بين PCA واختيار مجموعة فرعية من السمات؟</template>
+      <template class="content-en">What is the main difference between PCA and Attribute Subset Selection?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>اختيار السمات يحتفظ بالسمات الأصلية كما هي (يحذف بعضها فقط)، بينما PCA ينشئ سمات جديدة تماماً (مكونات) هي عبارة عن مزيج رياضي من السمات الأصلية.</p></template>
+      <template class="content-en"><p>Attribute selection keeps the original attributes as they are (just dropping some), while PCA creates entirely new attributes (components) that are mathematical combinations of the original ones.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="attribute-subset-selection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> اختيار مجموعة فرعية من السمات وإنشائها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Attribute Subset Selection &amp; Creation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل الأبعاد عن طريق إزالة السمات المكررة أو غير ذات الصلة، أو إنشاء سمات جديدة أكثر فائدة.</p></template>
+    <template class="content-en"><p>Reducing dimensionality by removing redundant or irrelevant attributes, or creating new, more useful ones.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>طريقة أخرى لتقليل أبعاد البيانات هي التخلص من:</p><ul><li><b>السمات المكررة (Redundant):</b> التي تكرر معظم أو كل المعلومات الموجودة في سمة أخرى (مثل سعر الشراء ومبلغ ضريبة المبيعات).</li><li><b>السمات غير ذات الصلة (Irrelevant):</b> التي لا تحتوي على معلومات مفيدة لمهمة التنقيب (مثل رقم هوية الطالب عند التنبؤ بالمعدل التراكمي).</li></ul><p>بما أن هناك $2^d$ مجموعة ممكنة لـ $d$ من السمات، نستخدم طرق بحث إرشادية (Heuristic Search):</p><ol><li>اختيار أفضل ميزة خطوة بخطوة (Step-wise forward selection).</li><li>إزالة أسوأ ميزة خطوة بخطوة (Step-wise backward elimination).</li><li>الجمع بين الاختيار والإزالة.</li></ol><p><b>إنشاء السمات (Feature Generation):</b> إنشاء سمات جديدة تلتقط المعلومات المهمة بشكل أكثر فعالية، من خلال استخراج السمات (خاص بالمجال)، أو تعيين البيانات لمساحة جديدة، أو بناء السمات (دمج الميزات أو التكتم).</p></template>
+    <template class="content-en"><p>Another way to reduce dimensionality is to eliminate:</p><ul><li><b>Redundant attributes:</b> Duplicate much or all of the information contained in one or more other attributes (e.g., purchase price and sales tax paid).</li><li><b>Irrelevant attributes:</b> Contain no information useful for the data mining task (e.g., student ID for predicting GPA).</li></ul><p>Since there are $2^d$ possible combinations for $d$ attributes, we use <span class="smart-term" data-term-en="Heuristic Search" data-ar="البحث الإرشادي" data-en-def="A search technique that employs a practical method not guaranteed to be optimal, but sufficient for reaching an immediate goal.">heuristic search<span class="smart-term-tooltip"></span></span> methods:</p><ol><li>Best step-wise feature selection (forward).</li><li>Step-wise attribute elimination (backward).</li><li>Best combined selection and elimination.</li></ol><p><b>Attribute Creation (Feature Generation):</b> Create new attributes that capture important information more effectively via attribute extraction (domain-specific), mapping to a new space, or attribute construction (combining features, discretization).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>البحث الشامل عن أفضل مجموعة فرعية من السمات هو مشكلة NP-Hard، لذلك نعتمد على الخوارزميات الجشعة (Greedy Algorithms) مثل الاختيار الأمامي أو الحذف الخلفي، والتي تجد حلاً جيداً محلياً ولكن لا تضمن الحل الأمثل عالمياً.</p></template>
+    <template class="content-en"><p>Exhaustive search for the best attribute subset is an NP-Hard problem, which is why we rely on greedy algorithms like forward selection or backward elimination. They find a locally good solution but do not guarantee the global optimum.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نقوم بتجربة كل التجميعات الممكنة للسمات لاختيار الأفضل؟</template>
+      <template class="content-en">Why don't we just try all possible combinations of attributes to select the best one?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن عدد التجميعات ينمو بشكل أسي \((2^d)\). إذا كان لدينا 100 سمة، فسيكون هناك \(2^{100}\) مجموعة، وهو رقم ضخم جداً يستحيل حسابه في وقت معقول.</p></template>
+      <template class="content-en"><p>Because the number of combinations grows exponentially \((2^d)\). If we have 100 attributes, there are \(2^{100}\) combinations, which is computationally impossible to evaluate in a reasonable time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="numerosity-reduction-parametric" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقليل العدد: الطرق البارامترية (الانحدار)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Numerosity Reduction: Parametric Methods (Regression)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل حجم البيانات بافتراض أنها تناسب نموذجاً رياضياً، ثم تخزين معلمات النموذج فقط والتخلص من البيانات الفعلية.</p></template>
+    <template class="content-en"><p>Reducing data volume by assuming the data fits a mathematical model, storing only the model parameters, and discarding the actual data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الطرق البارامترية تفترض أن البيانات تناسب نموذجاً معيناً. نقوم بتقدير معلمات النموذج، وتخزين المعلمات فقط، والتخلص من البيانات (باستثناء القيم المتطرفة المحتملة).</p><ul><li><b>الانحدار الخطي (Linear Regression):</b> نمذجة البيانات لتناسب خطاً مستقيماً ($Y = wX + b$). يتم تقدير المعاملين $w$ و $b$ باستخدام <span class="smart-term" data-term-en="Least Squares Method" data-ar="طريقة المربعات الصغرى" data-en-def="A standard approach in regression analysis to approximate the solution by minimizing the sum of the squares of the residuals.">طريقة المربعات الصغرى<span class="smart-term-tooltip"></span></span> (least-square method).</li><li><b>الانحدار المتعدد (Multiple Regression):</b> يسمح بنمذجة متغير الاستجابة $Y$ كدالة خطية لمتجه ميزات متعدد الأبعاد ($Y = b_0 + b_1X_1 + b_2X_2$).</li><li><b>النماذج اللوغاريتمية الخطية (Log-linear models):</b> تقريب التوزيعات الاحتمالية المنفصلة متعددة الأبعاد. تقدر احتمالية كل نقطة في مساحة متعددة الأبعاد بناءً على مجموعة فرعية أصغر من المجموعات الأبعاد.</li></ul></template>
+    <template class="content-en"><p>Parametric methods assume the data fits some model. We estimate model parameters, store only the parameters, and discard the data (except possible outliers).</p><ul><li><b>Linear regression:</b> Data modeled to fit a straight line ($Y = wX + b$). Two coefficients, $w$ and $b$, are estimated using the least-square method.</li><li><b>Multiple regression:</b> Allows a response variable $Y$ to be modeled as a linear function of a multidimensional feature vector ($Y = b_0 + b_1X_1 + b_2X_2$).</li><li><b>Log-linear models:</b> Approximate discrete multidimensional probability distributions. Estimate the probability of each point in a multi-dimensional space based on a smaller subset of dimensional combinations.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر هذه الطريقة ممتازة لضغط البيانات لأننا نستبدل آلاف أو ملايين السجلات بمعادلة رياضية بسيطة. ومع ذلك، فإنها تفقد التفاصيل الدقيقة للبيانات الأصلية (Lossy)، وتفترض مسبقاً أن البيانات تتبع توزيعاً أو علاقة خطية، وهو ما قد لا يكون صحيحاً دائماً.</p></template>
+    <template class="content-en"><p>This method is excellent for data compression because we replace thousands or millions of records with a simple mathematical equation. However, it is a lossy compression and assumes a priori that the data follows a specific distribution or linear relationship, which might not always be true.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانحدار الخطي البسيط</strong></template>
+      <template class="content-en"><strong>Simple Linear Regression Equation</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Y = wX + b$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A 2D scatter plot showing data points and a line of best fit passing through them. The equation 'y = x + 1' is displayed next to the line. The axes are labeled X1 and Y1. Show a specific point projected onto the line to illustrate the 'best fit' concept. Style: educational, dark background #0d1117, accent color #79c0ff, viewBox 0 0 600 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Standard Arrow -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-primary)" />
+        </marker>
+        <!-- Brand Colored Arrow -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Brand Ink Arrow for Labels -->
+        <marker id="arrow-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-ink)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Parametric Numerosity Reduction: Linear Regression</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تقليل العدد المعلمي: الانحدار الخطي</text>
+
+    <!-- Grid Lines -->
+    <line x1="120" y1="310" x2="730" y2="310" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="120" y1="240" x2="730" y2="240" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="120" y1="170" x2="730" y2="170" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="120" y1="100" x2="730" y2="100" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Axes -->
+    <line x1="120" y1="380" x2="120" y2="80" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="120" y1="380" x2="750" y2="380" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axes Labels -->
+    <text x="740" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">X1 (Feature)</text>
+    <text x="740" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">X1 (الميزة)</text>
+
+    <text x="70" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Y1 (Response)</text>
+    <text x="70" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">Y1 (الاستجابة)</text>
+
+    <!-- Residual Lines (Projections) -->
+    <line x1="200" y1="360" x2="200" y2="325" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <line x1="280" y1="250" x2="280" y2="285" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <line x1="360" y1="290" x2="360" y2="245" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <line x1="440" y1="180" x2="440" y2="205" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <line x1="520" y1="200" x2="520" y2="165" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <line x1="600" y1="100" x2="600" y2="125" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+
+    <!-- Line of Best Fit -->
+    <line x1="140" y1="355" x2="660" y2="95" stroke="var(--brand-500)" stroke-width="4" />
+
+    <!-- Data Points -->
+    <circle cx="200" cy="360" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="280" cy="250" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="440" cy="180" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="520" cy="200" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="600" cy="100" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Highlighted Point for Projection -->
+    <circle cx="360" cy="290" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+    <!-- Residual Annotation -->
+    <text x="440" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Error (Residual)</text>
+    <text x="440" y="272" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الخطأ (الباقي)</text>
+    <line x1="385" y1="267" x2="368" y2="267" stroke="var(--brand-ink)" stroke-width="2" marker-end="url(#arrow-ink)" />
+
+    <!-- Equation Box -->
+    <rect x="360" y="60" width="200" height="60" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="460" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Model: Y = wX + b</text>
+    <text x="460" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">النموذج: Y = wX + b</text>
+    <text x="460" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">(e.g., y = x + 1)</text>
+    <text x="460" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">(مثال: y = x + 1)</text>
+    <line x1="460" y1="120" x2="460" y2="185" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+    <!-- Info Box (Numerosity Reduction Concept) -->
+    <rect x="510" y="220" width="260" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="640" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Data Reduction Steps</text>
+    <text x="640" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خطوات تقليل البيانات</text>
+    
+    <line x1="530" y1="260" x2="750" y2="260" stroke="var(--border-color)" stroke-width="1" />
+
+    <text x="640" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">1. Estimate parameters (w, b)</text>
+    <text x="640" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">1. تقدير المعلمات (w, b)</text>
+
+    <text x="640" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">2. Store parameters only</text>
+    <text x="640" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">2. تخزين المعلمات فقط</text>
+
+    <text x="640" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">3. Discard original data</text>
+    <text x="640" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">3. التخلص من البيانات الأصلية</text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Parametric Methods</th><th>Non-parametric Methods</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الافتراضات المسبقة</template>
+          <template class="content-en">Prior Assumptions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يفترض أن البيانات تناسب نموذجاً رياضياً معيناً</template>
+          <template class="content-en">Assumes data fits a specific mathematical model</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يفترض أي نماذج مسبقة</template>
+          <template class="content-en">Does not assume any prior models</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أمثلة</template>
+          <template class="content-en">Examples</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الانحدار، النماذج اللوغاريتمية الخطية</template>
+          <template class="content-en">Regression, Log-linear models</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">المدرجات التكرارية، التجميع، أخذ العينات</template>
+          <template class="content-en">Histograms, Clustering, Sampling</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون استخدام الانحدار لتقليل البيانات فكرة سيئة؟</template>
+      <template class="content-en">When is using regression for data reduction a bad idea?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تكون البيانات عشوائية تماماً ولا تتبع أي نمط أو اتجاه واضح، فإن النموذج الرياضي سيكون ضعيفاً جداً في تمثيل البيانات، مما يؤدي إلى فقدان هائل للمعلومات.</p></template>
+      <template class="content-en"><p>When the data is completely random and does not follow any clear pattern or trend, the mathematical model will be very poor at representing the data, leading to massive information loss.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="numerosity-reduction-non-parametric" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تقليل العدد: الطرق غير البارامترية (أخذ العينات والتجميع)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Numerosity Reduction: Non-parametric Methods (Sampling &amp; Clustering)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقليل البيانات دون افتراض نموذج رياضي مسبق، باستخدام تقنيات مثل المدرجات التكرارية، التجميع، وأخذ العينات.</p></template>
+    <template class="content-en"><p>Reducing data without assuming a prior mathematical model, using techniques like histograms, clustering, and sampling.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الطرق غير البارامترية لا تفترض نماذج. العائلات الرئيسية تشمل:</p><ul><li><b>تحليل المدرج التكراري (Histogram Analysis):</b> تقسيم البيانات إلى دلاء (buckets) وتخزين المتوسط (أو المجموع) لكل دلو. قواعد التقسيم: عرض متساوٍ (equal-width) أو تكرار متساوٍ (equal-frequency).</li><li><b>التجميع (Clustering):</b> تقسيم مجموعة البيانات إلى مجموعات بناءً على التشابه، وتخزين تمثيل المجموعة (مثل المركز والقطر) فقط. فعال إذا كانت البيانات متجمعة بطبيعتها.</li><li><b>أخذ العينات (Sampling):</b> الحصول على عينة صغيرة $s$ لتمثيل مجموعة البيانات بأكملها $N$. يسمح لخوارزمية التنقيب بالعمل بتعقيد أقل من الخطي.<ul><li><b>عينة عشوائية بسيطة بدون إرجاع (SRSWOR):</b> بمجرد اختيار كائن، يتم إزالته من المجتمع.</li><li><b>عينة عشوائية بسيطة مع إرجاع (SRSWR):</b> الكائن المختار لا يتم إزالته.</li><li><b><span class="smart-term" data-term-en="Stratified Sampling" data-ar="أخذ العينات الطبقية" data-en-def="A method of sampling that involves the division of a population into smaller sub-groups known as strata, ensuring proportional representation.">أخذ العينات الطبقية<span class="smart-term-tooltip"></span></span> (Stratified sampling):</b> تقسيم مجموعة البيانات، وسحب عينات من كل قسم بشكل متناسب. مفيد جداً مع البيانات المنحرفة (skewed data).</li></ul></li></ul></template>
+    <template class="content-en"><p>Non-parametric methods do not assume models. Major families include:</p><ul><li><b>Histogram Analysis:</b> Divide data into buckets and store average (sum) for each bucket. Partitioning rules: Equal-width or Equal-frequency (equal-depth).</li><li><b>Clustering:</b> Partition data set into clusters based on similarity, and store cluster representation (e.g., centroid and diameter) only. Effective if data is clustered.</li><li><b>Sampling:</b> Obtaining a small sample $s$ to represent the whole data set $N$. Allows a mining algorithm to run in sub-linear complexity.<ul><li><b>Simple random sampling without replacement (SRSWOR):</b> Once an object is selected, it is removed from the population.</li><li><b>Simple random sampling with replacement (SRSWR):</b> A selected object is not removed.</li><li><b><span class="smart-term" data-term-en="Stratified Sampling" data-ar="أخذ العينات الطبقية" data-en-def="A method of sampling that involves the division of a population into smaller sub-groups known as strata, ensuring proportional representation.">Stratified sampling<span class="smart-term-tooltip"></span></span>:</b> Partition the data set, and draw samples from each partition proportionally. Used in conjunction with skewed data.</li></ul></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>أخذ العينات العشوائية البسيطة قد يكون أداؤه ضعيفاً جداً في وجود انحراف (Skewness) في البيانات، حيث قد تفوت العينة الفئات النادرة تماماً. هنا تبرز أهمية أخذ العينات الطبقية الذي يضمن تمثيل جميع الفئات بنسبها الصحيحة.</p><p>ملاحظة هامة: أخذ العينات قد لا يقلل من عمليات الإدخال/الإخراج لقاعدة البيانات (I/Os) إذا كانت تقرأ صفحة تلو الأخرى.</p></template>
+    <template class="content-en"><p>Simple random sampling may have very poor performance in the presence of skew, as the sample might completely miss rare classes. This is where stratified sampling shines, ensuring all classes are represented proportionally.</p><p>Important note: Sampling may not reduce database I/Os if the database reads data a page at a time.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Visual representation of Stratified Sampling. Show a 'Raw Data' box containing three distinct, naturally formed clusters of dots (e.g., blue, green, pink dots). Next to it, show a 'Stratified Sample' box where a few dots from EACH of the three clusters are selected, maintaining the proportional representation of the original groups. Style: educational, dark background #0d1117, accent colors #79c0ff, #7ee787, #ff7b72, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Stratified Sampling</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أخذ العينات الطبقية</text>
+
+    <!-- ================= POPULATION SECTION ================= -->
+    <rect x="40" y="80" width="300" height="290" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    
+    <text x="190" y="110" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Original Population (N=30)</text>
+    <text x="190" y="110" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المجتمع الأصلي (N=30)</text>
+
+    <!-- Stratum 1 -->
+    <text x="190" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Stratum 1 (50%)</text>
+    <text x="190" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الطبقة 1 (50%)</text>
+    <rect x="60" y="140" width="260" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <!-- 15 Circles -->
+    <circle cx="80" cy="155" r="6" fill="var(--brand-500)"/>
+    <circle cx="110" cy="175" r="6" fill="var(--brand-500)"/>
+    <circle cx="140" cy="150" r="6" fill="var(--brand-500)"/>
+    <circle cx="170" cy="180" r="6" fill="var(--brand-500)"/>
+    <circle cx="200" cy="155" r="6" fill="var(--brand-500)"/>
+    <circle cx="230" cy="175" r="6" fill="var(--brand-500)"/>
+    <circle cx="260" cy="150" r="6" fill="var(--brand-500)"/>
+    <circle cx="290" cy="180" r="6" fill="var(--brand-500)"/>
+    <circle cx="95" cy="165" r="6" fill="var(--brand-500)"/>
+    <circle cx="125" cy="155" r="6" fill="var(--brand-500)"/>
+    <circle cx="155" cy="170" r="6" fill="var(--brand-500)"/>
+    <circle cx="185" cy="160" r="6" fill="var(--brand-500)"/>
+    <circle cx="215" cy="170" r="6" fill="var(--brand-500)"/>
+    <circle cx="245" cy="160" r="6" fill="var(--brand-500)"/>
+    <circle cx="275" cy="165" r="6" fill="var(--brand-500)"/>
+
+    <!-- Stratum 2 -->
+    <text x="190" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Stratum 2 (33%)</text>
+    <text x="190" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الطبقة 2 (33%)</text>
+    <rect x="60" y="220" width="260" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <!-- 10 Squares -->
+    <rect x="84" y="229" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="124" y="249" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="164" y="224" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="204" y="254" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="244" y="229" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="284" y="249" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="104" y="239" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="144" y="229" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="184" y="244" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="224" y="239" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+
+    <!-- Stratum 3 -->
+    <text x="190" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Stratum 3 (17%)</text>
+    <text x="190" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الطبقة 3 (17%)</text>
+    <rect x="60" y="300" width="260" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)"/>
+    <!-- 5 Triangles -->
+    <polygon points="0,-7 7,5 -7,5" transform="translate(100, 325)" fill="var(--brand-500)" opacity="0.5"/>
+    <polygon points="0,-7 7,5 -7,5" transform="translate(150, 315)" fill="var(--brand-500)" opacity="0.5"/>
+    <polygon points="0,-7 7,5 -7,5" transform="translate(200, 335)" fill="var(--brand-500)" opacity="0.5"/>
+    <polygon points="0,-7 7,5 -7,5" transform="translate(250, 320)" fill="var(--brand-500)" opacity="0.5"/>
+    <polygon points="0,-7 7,5 -7,5" transform="translate(290, 330)" fill="var(--brand-500)" opacity="0.5"/>
+
+    <text x="190" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Population is divided into homogeneous subgroups</text>
+    <text x="190" y="390" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">يتم تقسيم المجتمع إلى مجموعات فرعية متجانسة</text>
+
+
+    <!-- ================= ARROWS & PROCESS ================= -->
+    <path d="M 320 165 C 430 165, 430 185, 535 185" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 320 245 C 430 245, 430 235, 535 235" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M 320 325 C 430 325, 430 285, 535 285" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="365" y="215" width="140" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="435" y="240" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Proportional Draw</text>
+    <text x="435" y="240" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">سحب عشوائي نسبي</text>
+
+
+    <!-- ================= SAMPLE SECTION ================= -->
+    <rect x="540" y="120" width="220" height="210" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    
+    <text x="650" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Stratified Sample (s=6)</text>
+    <text x="650" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">عينة طبقية (s=6)</text>
+
+    <!-- Sample Mini Stratum 1 -->
+    <rect x="560" y="165" width="180" height="40" rx="4" fill="none" stroke="var(--border-color)" stroke-dasharray="3 3"/>
+    <circle cx="610" cy="185" r="6" fill="var(--brand-500)"/>
+    <circle cx="650" cy="185" r="6" fill="var(--brand-500)"/>
+    <circle cx="690" cy="185" r="6" fill="var(--brand-500)"/>
+
+    <!-- Sample Mini Stratum 2 -->
+    <rect x="560" y="215" width="180" height="40" rx="4" fill="none" stroke="var(--border-color)" stroke-dasharray="3 3"/>
+    <rect x="624" y="229" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+    <rect x="664" y="229" width="12" height="12" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2.5" rx="2"/>
+
+    <!-- Sample Mini Stratum 3 -->
+    <rect x="560" y="265" width="180" height="40" rx="4" fill="none" stroke="var(--border-color)" stroke-dasharray="3 3"/>
+    <polygon points="0,-7 7,5 -7,5" transform="translate(650, 285)" fill="var(--brand-500)" opacity="0.5"/>
+
+    <text x="650" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Sample maintains the exact 3:2:1 ratio</text>
+    <text x="650" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">تحافظ العينة على النسبة الدقيقة 3:2:1</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك مجموعة بيانات تحتوي على 99% معاملات طبيعية و 1% معاملات احتيالية، أي نوع من أخذ العينات ستستخدم ولماذا؟</template>
+      <template class="content-en">If you have a dataset with 99% normal transactions and 1% fraudulent ones, which sampling method would you use and why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستخدم أخذ العينات الطبقية (Stratified Sampling). العينة العشوائية البسيطة قد لا تلتقط أي معاملات احتيالية بسبب ندرتها، بينما العينة الطبقية تضمن تمثيل نسبة الـ 1% في العينة النهائية.</p></template>
+      <template class="content-en"><p>I would use Stratified Sampling. A simple random sample might miss the fraudulent transactions entirely due to their rarity, whereas stratified sampling ensures the 1% proportion is represented in the final sample.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-normalization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تحويل البيانات: التطبيع (Normalization)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Data Transformation: Normalization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تغيير مقياس القيم لتقع ضمن نطاق أصغر ومحدد (مثل 0 إلى 1) لمنع السمات ذات القيم الكبيرة من الهيمنة على التحليل.</p></template>
+    <template class="content-en"><p>Scaling values to fall within a smaller, specified range (e.g., 0 to 1) to prevent attributes with large ranges from dominating the analysis.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التطبيع هو جزء من تحويل البيانات. الطرق الرئيسية تشمل:</p><ol><li><b>تطبيع الحد الأدنى والأقصى (Min-max normalization):</b> يحول البيانات الأصلية إلى نطاق جديد $[new\_min_A, new\_max_A]$.<br>مثال: دخل يتراوح بين 12,000$ و 98,000$ تم تطبيعه إلى [0.0, 1.0]. قيمة 73,000$ تصبح: $\frac{73600 - 12000}{98000 - 12000}(1.0 - 0) + 0 = 0.716$</li><li><b>تطبيع النتيجة المعيارية (Z-score normalization):</b> يستخدم المتوسط ($\mu$) والانحراف المعياري ($\sigma$). مفيد عندما يكون الحد الأدنى والأقصى الفعليين غير معروفين، أو عند وجود قيم متطرفة تهيمن على تطبيع min-max.<br>مثال: $\mu = 54000, \sigma = 16000$. قيمة 73,600 تصبح: $\frac{73600 - 54000}{16000} = 1.225$</li><li><b>التطبيع بالقياس العشري (Decimal scaling):</b> تحريك الفاصلة العشرية. $v' = \frac{v}{10^j}$ حيث $j$ هو أصغر عدد صحيح يجعل الحد الأقصى للقيمة المطلقة أقل من 1.<br>مثال: 72.57 تصبح $72.57 / 10^2 = 0.7257$</li></ol></template>
+    <template class="content-en"><p>Normalization is a key data transformation method. Main techniques include:</p><ol><li><b>Min-max normalization:</b> Scales original dataset to $[new\_min_A, new\_max_A]$.<br>Ex: Income range $12,000 to $98,000 normalized to [0.0, 1.0]. $73,000 is mapped to: $\(\frac{73600 - 12000}{98000 - 12000}(1.0 - 0)\) + 0 = 0.716$</li><li><b>Z-score normalization:</b> Uses mean ($\mu$) and standard deviation ($\sigma$). Useful when actual min/max are unknown, or when outliers dominate min-max normalization.<br>Ex: $\mu = 54000, \sigma = 16000$. 73,600 becomes: $\frac{73600 - 54000}{16000} = 1.225$</li><li><b>Normalization by decimal scaling:</b> Moves the decimal point. $v' = \frac{v}{10^j}$ where $j$ is the smallest integer such that $Max(|v'|) < 1$.<br>Ex: 72.57 becomes $72.57 / 10^2 = 0.7257$</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تطبيع Min-Max حساس جداً للقيم المتطرفة (Outliers). إذا كان هناك قيمة متطرفة ضخمة، فإن جميع القيم الطبيعية ستنضغط في نطاق ضيق جداً بالقرب من الصفر.</p><p>لحل هذه المشكلة، نستخدم Z-score. ولجعل Z-score أكثر قوة (Robust) ضد القيم المتطرفة، يمكننا استخدام '<span class="smart-term" data-term-en="Mean Absolute Deviation" data-ar="متوسط الانحراف المطلق" data-en-def="The average of the absolute differences between each data point and the mean, more robust to outliers than standard deviation.">متوسط الانحراف المطلق<span class="smart-term-tooltip"></span></span>' (Mean Absolute Deviation) بدلاً من الانحراف المعياري القياسي في المقام.</p></template>
+    <template class="content-en"><p>Min-Max normalization is highly sensitive to outliers. A single massive outlier will compress all normal values into a tiny range near zero.</p><p>To solve this, we use Z-score. To make Z-score even more robust against outliers, we can use the '<span class="smart-term" data-term-en="Mean Absolute Deviation" data-ar="متوسط الانحراف المطلق" data-en-def="The average of the absolute differences between each data point and the mean, more robust to outliers than standard deviation.">Mean Absolute Deviation<span class="smart-term-tooltip"></span></span>' instead of the standard deviation in the denominator.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تطبيع Z-score</strong></template>
+      <template class="content-en"><strong>Z-score normalization formula</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$v' = \frac{v - \mu_A}{\sigma_A}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت بياناتك تحتوي على قيم سالبة وموجبة، هل يمكنك استخدام تطبيع Min-Max لتحويلها إلى النطاق [0, 1]؟</template>
+      <template class="content-en">If your data contains both negative and positive values, can you use Min-Max normalization to scale it to the [0, 1] range?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، تطبيع Min-Max يعمل بغض النظر عن إشارة البيانات الأصلية. سيتم تعيين أصغر قيمة (حتى لو كانت سالبة) إلى 0، وأكبر قيمة إلى 1.</p></template>
+      <template class="content-en"><p>Yes, Min-Max normalization works regardless of the original data's sign. The smallest value (even if negative) will map to 0, and the largest to 1.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-discretization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> تكتم البيانات (Discretization)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Data Discretization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقسيم نطاق سمة مستمرة (أرقام) إلى فترات (intervals) واستبدال القيم الفعلية بتسميات هذه الفترات.</p></template>
+    <template class="content-en"><p>Dividing the range of a continuous attribute into intervals and replacing actual data values with interval labels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التكتم يقلل من حجم البيانات ويجهزها لمزيد من التحليل (مثل التصنيف). الطرق النموذجية تشمل:</p><ol><li><b>التجميع في صناديق (Binning):</b> تقسيم من أعلى لأسفل، غير خاضع للإشراف.<ul><li><b>عرض متساوٍ (Equal-width):</b> يقسم النطاق إلى N فترات متساوية الحجم. $W = (B - A)/N$. عرضة للتأثر بالقيم المتطرفة.</li><li><b>عمق متساوٍ (Equal-depth/frequency):</b> يقسم النطاق بحيث يحتوي كل صندوق على نفس عدد العينات تقريباً. يتعامل مع البيانات المنحرفة بشكل أفضل.</li></ul></li><li><b>تحليل المدرج التكراري:</b> من أعلى لأسفل، غير خاضع للإشراف.</li><li><b>تحليل التجميع (Clustering):</b> غير خاضع للإشراف، يؤدي لنتائج أفضل من التجميع البسيط في صناديق.</li><li><b>تحليل شجرة القرار:</b> خاضع للإشراف (يستخدم تسميات الفئات والإنتروبيا لتحديد نقاط التقسيم).</li><li><b>تحليل الارتباط (Chi-merge):</b> خاضع للإشراف، دمج من أسفل لأعلى للفترات المتجاورة ذات التوزيعات المتشابهة للفئات (قيم $\chi^2$ منخفضة).</li></ol><p><b>مثال على Binning:</b><br>البيانات المفرزة: 4, 8, 9, 15, 21, 21, 24, 25, 26, 28, 29, 34<br>تقسيم لعمق متساوٍ (3 صناديق):<br>Bin 1: 4, 8, 9, 15<br>Bin 2: 21, 21, 24, 25<br>Bin 3: 26, 28, 29, 34<br>التنعيم بمتوسط الصندوق لـ Bin 1 يصبح: 9, 9, 9, 9.</p></template>
+    <template class="content-en"><p>Discretization reduces data size and prepares it for further analysis (e.g., classification). Typical methods include:</p><ol><li><b>Binning:</b> Top-down split, unsupervised.<ul><li><b>Equal-width:</b> Divides range into N intervals of equal size. $W = (B - A)/N$. Outliers may dominate.</li><li><b>Equal-depth (frequency):</b> Divides range so each interval contains approximately the same number of samples. Handles skewed data well.</li></ul></li><li><b>Histogram analysis:</b> Top-down split, unsupervised.</li><li><b>Clustering analysis:</b> Unsupervised, leads to better results than simple binning.</li><li><b>Decision-tree analysis:</b> Supervised (uses class labels and entropy to determine split points).</li><li><b>Correlation analysis (<span class="smart-term" data-term-en="Chi-merge" data-ar="دمج كاي" data-en-def="A supervised, bottom-up data discretization method that uses the chi-square statistic to determine if adjacent intervals should be merged.">Chi-merge<span class="smart-term-tooltip"></span></span>):</b> Supervised, bottom-up merge of neighboring intervals with similar class distributions (low $\chi^2$ values).</li></ol><p><b>Binning Example:</b><br>Sorted data: 4, 8, 9, 15, 21, 21, 24, 25, 26, 28, 29, 34<br>Equi-depth partition (3 bins):<br>Bin 1: 4, 8, 9, 15<br>Bin 2: 21, 21, 24, 25<br>Bin 3: 26, 28, 29, 34<br>Smoothing by bin means for Bin 1 becomes: 9, 9, 9, 9.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التكتم الخاضع للإشراف (Supervised) مثل شجرة القرار أو Chi-merge يتفوق دائماً على التكتم غير الخاضع للإشراف (مثل Binning) في مهام التصنيف، لأنه يأخذ في الاعتبار المتغير المستهدف (Class label) عند تحديد أين يجب قطع الفترات، مما يحافظ على القوة التمييزية للبيانات.</p></template>
+    <template class="content-en"><p>Supervised discretization (like Decision Trees or Chi-merge) almost always outperforms unsupervised discretization (like Binning) for classification tasks. This is because it considers the target variable (class label) when deciding where to split intervals, preserving the discriminative power of the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق بين التنعيم بمتوسط الصندوق والتنعيم بحدود الصندوق؟</template>
+      <template class="content-en">What is the difference between smoothing by bin means and smoothing by bin boundaries?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التنعيم بالمتوسط يستبدل كل قيمة في الصندوق بمتوسط قيم ذلك الصندوق. التنعيم بالحدود يستبدل كل قيمة بأقرب حد (أصغر أو أكبر قيمة في الصندوق) لتلك القيمة.</p></template>
+      <template class="content-en"><p>Smoothing by means replaces every value in the bin with the average of that bin. Smoothing by boundaries replaces every value with the closest boundary value (minimum or maximum of that bin).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="concept-hierarchy-generation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> إنشاء التسلسل الهرمي للمفاهيم</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Concept Hierarchy Generation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنظيم البيانات الفئوية (الاسمية) في مستويات هرمية (مثل: شارع < مدينة < ولاية < دولة) لتقليل التفاصيل وتسهيل التحليل.</p></template>
+    <template class="content-en"><p>Organizing nominal data into hierarchical levels (e.g., street < city < state < country) to reduce detail and facilitate analysis.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم إنشاء التسلسل الهرمي للمفاهيم للبيانات الاسمية بعدة طرق:</p><ul><li><b>تحديد صريح من قبل المستخدمين أو الخبراء:</b> على مستوى المخطط (Schema level)، مثل: شارع < مدينة < ولاية < دولة.</li><li><b>تحديد هرمية لمجموعة من القيم:</b> تجميع صريح للبيانات، مثل: {أوربانا، شامبين، شيكاغو} < إلينوي.</li><li><b>تحديد مجموعة جزئية فقط من السمات:</b> مثل تحديد أن شارع < مدينة، دون تحديد الباقي.</li><li><b>الإنشاء التلقائي:</b> بناءً على تحليل عدد القيم المميزة (distinct values) لكل سمة. السمة التي تحتوي على أكبر عدد من القيم المميزة توضع في أدنى مستوى من التسلسل الهرمي.</li></ul><p>مثال للإنشاء التلقائي: دولة (15 قيمة) -> ولاية (365 قيمة) -> مدينة (3567 قيمة) -> شارع (674,339 قيمة).</p></template>
+    <template class="content-en"><p>Concept Hierarchy Generation for nominal data is done in several ways:</p><ul><li><b>Explicit specification by users/experts:</b> At the schema level, e.g., street < city < state < country.</li><li><b>Specification for a set of values:</b> Explicit data grouping, e.g., {Urbana, Champaign, Chicago} < Illinois.</li><li><b>Specification of only a partial set of attributes:</b> e.g., only street < city, not others.</li><li><b>Automatic generation:</b> Based on the analysis of the number of distinct values per attribute. The attribute with the most distinct values is placed at the lowest level of the hierarchy.</li></ul><p>Example of automatic generation: country (15 distinct values) -> province_or_state (365) -> city (3567) -> street (674,339).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الإنشاء التلقائي بناءً على عدد القيم المميزة هو قاعدة إرشادية (Heuristic) قوية جداً، ولكنه يحتوي على استثناءات. على سبيل المثال، التسلسل الزمني: يوم من الأسبوع (7 قيم) < شهر (12 قيمة) < ربع سنة (4 قيم) < سنة. هنا القاعدة لا تنطبق بشكل مباشر ويجب التدخل لتصحيحها.</p></template>
+    <template class="content-en"><p>Automatic generation based on distinct value counts is a powerful heuristic, but it has exceptions. For example, time hierarchies: weekday (7 values) < month (12 values) < quarter (4 values) < year. Here, the rule fails and requires domain-specific intervention.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نضع السمة ذات العدد الأكبر من القيم المميزة في أسفل الهرم؟</template>
+      <template class="content-en">Why do we place the attribute with the most distinct values at the bottom of the hierarchy?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن العدد الأكبر من القيم يعني تفاصيل أكثر دقة (Granularity). الشوارع أكثر عدداً من المدن، والمدن أكثر من الدول. كلما صعدنا في الهرم، نقوم بتعميم البيانات وتقليل عدد الفئات.</p></template>
+      <template class="content-en"><p>Because a higher number of values implies finer granularity. There are more streets than cities, and more cities than countries. As we move up the hierarchy, we generalize the data and reduce the number of categories.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="similarity-dissimilarity-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> أساسيات قياس التشابه والاختلاف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Measuring Data Similarity and Dissimilarity Basics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التشابه يقيس مدى تطابق كائنين (أعلى = أكثر تشابهاً)، بينما الاختلاف (المسافة) يقيس مدى تباعدهما (أقل = أكثر تشابهاً).</p></template>
+    <template class="content-en"><p>Similarity measures how alike two objects are (higher = more alike), while dissimilarity (distance) measures how different they are (lower = more alike).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التشابه (Similarity):</b> مقياس رقمي لمدى تشابه كائني بيانات. تكون القيمة أعلى عندما تكون الكائنات أكثر تشابهاً. غالباً ما تقع في النطاق [0,1].</p><p><b>الاختلاف (Dissimilarity / Distance):</b> مقياس رقمي لمدى اختلاف كائني بيانات. تكون القيمة أقل عندما تكون الكائنات أكثر تشابهاً. الحد الأدنى للاختلاف غالباً ما يكون 0، والحد الأقصى يختلف.</p><p><b>هياكل البيانات المستخدمة:</b></p><ul><li><b>مصفوفة البيانات (Data Matrix):</b> مصفوفة ذات وضعين (Two modes) تحتوي على $n$ من نقاط البيانات مع $p$ من الأبعاد (السمات).</li><li><b>مصفوفة الاختلاف (Dissimilarity Matrix):</b> مصفوفة ذات وضع واحد (Single mode) تسجل المسافة بين كل زوج من النقاط. وهي مصفوفة مثلثة (Triangular matrix) لأن المسافة من A إلى B هي نفس المسافة من B إلى A، والمسافة من A إلى A هي 0.</li></ul></template>
+    <template class="content-en"><p><b>Similarity:</b> Numerical measure of how alike two data objects are. Value is higher when objects are more alike. Often falls in the range [0,1].</p><p><b>Dissimilarity (Distance):</b> Numerical measure of how different two data objects are. Lower when objects are more alike. Minimum dissimilarity is often 0, upper limit varies.</p><p><b>Data Structures Used:</b></p><ul><li><b>Data matrix:</b> Two modes. Contains $n$ data points with $p$ dimensions (attributes).</li><li><b>Dissimilarity matrix:</b> Single mode. Registers only the distance between pairs of points. It is a triangular matrix because distance(A,B) = distance(B,A) and distance(A,A) = 0.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التمييز بين مصفوفة البيانات ومصفوفة الاختلاف حاسم في خوارزميات التجميع (Clustering). العديد من الخوارزميات تأخذ مصفوفة الاختلاف كمدخل مباشر بدلاً من البيانات الخام، مما يوفر وقت الحساب إذا تم حساب المسافات مسبقاً.</p></template>
+    <template class="content-en"><p>The distinction between a data matrix and a dissimilarity matrix is crucial in clustering algorithms. Many algorithms take the dissimilarity matrix as direct input rather than raw data, saving computation time if distances are pre-calculated.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Show two matrices side by side. Left: Data Matrix (n rows for objects, p columns for attributes, labeled 'Two modes'). Right: Dissimilarity Matrix (a lower triangular matrix showing distances d(2,1), d(3,1), etc., with zeros on the main diagonal, labeled 'Single mode'). Style: educational, dark background #0d1117, accent color #d2a8ff, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow-end" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-start" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="475" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="24" font-weight="bold">Measuring Data Similarity &amp; Dissimilarity</text>
+    <text x="475" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="24" font-weight="bold">قياس تشابه واختلاف البيانات</text>
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDE: DATA MATRIX                     -->
+    <!-- ========================================== -->
+
+    <!-- Titles -->
+    <text x="240" y="90" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Data Matrix</text>
+    <text x="240" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">مصفوفة البيانات</text>
+    
+    <text x="240" y="112" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Two modes (Objects × Attributes)</text>
+    <text x="240" y="112" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">نمطان (كائنات × سمات)</text>
+
+    <!-- Dimension Arrows -->
+    <line x1="130" y1="140" x2="350" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <text x="240" y="130" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">p Attributes</text>
+    <text x="240" y="130" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">p من السمات</text>
+
+    <line x1="80" y1="180" x2="80" y2="340" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <g transform="translate(70, 260) rotate(-90)">
+        <text x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">n Objects</text>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">n من الكائنات</text>
+    </g>
+
+    <!-- Matrix Brackets -->
+    <path d="M 120 170 L 110 170 L 110 350 L 120 350" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+    <path d="M 360 170 L 370 170 L 370 350 L 360 350" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+
+    <!-- Educational Highlights -->
+    <!-- Row 2 Highlight (Object) -->
+    <rect x="125" y="208" width="230" height="26" fill="var(--brand-500)" opacity="0.15" rx="4" />
+    <!-- Col 2 Highlight (Attribute) -->
+    <rect x="175" y="175" width="30" height="170" fill="var(--brand-500)" opacity="0.15" rx="4" />
+    <!-- Intersection -->
+    <rect x="175" y="208" width="30" height="26" fill="var(--brand-500)" opacity="0.25" rx="4" />
+
+    <!-- Matrix Elements -->
+    <g fill="var(--text-primary)" font-size="16" text-anchor="middle" font-style="italic">
+        <!-- Row 1 -->
+        <text x="140" y="190">x<tspan dy="3" font-size="12" font-style="normal">11</tspan></text>
+        <text x="190" y="190">x<tspan dy="3" font-size="12" font-style="normal">12</tspan></text>
+        <text x="240" y="190">x<tspan dy="3" font-size="12" font-style="normal">13</tspan></text>
+        <text x="290" y="190" font-style="normal">&#8943;</text>
+        <text x="340" y="190">x<tspan dy="3" font-size="12" font-style="normal">1p</tspan></text>
+        <!-- Row 2 -->
+        <text x="140" y="225">x<tspan dy="3" font-size="12" font-style="normal">21</tspan></text>
+        <text x="190" y="225">x<tspan dy="3" font-size="12" font-style="normal">22</tspan></text>
+        <text x="240" y="225">x<tspan dy="3" font-size="12" font-style="normal">23</tspan></text>
+        <text x="290" y="225" font-style="normal">&#8943;</text>
+        <text x="340" y="225">x<tspan dy="3" font-size="12" font-style="normal">2p</tspan></text>
+        <!-- Row 3 -->
+        <text x="140" y="260">x<tspan dy="3" font-size="12" font-style="normal">31</tspan></text>
+        <text x="190" y="260">x<tspan dy="3" font-size="12" font-style="normal">32</tspan></text>
+        <text x="240" y="260">x<tspan dy="3" font-size="12" font-style="normal">33</tspan></text>
+        <text x="290" y="260" font-style="normal">&#8943;</text>
+        <text x="340" y="260">x<tspan dy="3" font-size="12" font-style="normal">3p</tspan></text>
+        <!-- Row 4 -->
+        <text x="140" y="295" font-style="normal">&#8942;</text>
+        <text x="190" y="295" font-style="normal">&#8942;</text>
+        <text x="240" y="295" font-style="normal">&#8942;</text>
+        <text x="290" y="295" font-style="normal">&#8945;</text>
+        <text x="340" y="295" font-style="normal">&#8942;</text>
+        <!-- Row 5 -->
+        <text x="140" y="330">x<tspan dy="3" font-size="12" font-style="normal">n1</tspan></text>
+        <text x="190" y="330">x<tspan dy="3" font-size="12" font-style="normal">n2</tspan></text>
+        <text x="240" y="330">x<tspan dy="3" font-size="12" font-style="normal">n3</tspan></text>
+        <text x="290" y="330" font-style="normal">&#8943;</text>
+        <text x="340" y="330">x<tspan dy="3" font-size="12" font-style="normal">np</tspan></text>
+    </g>
+
+    <!-- Annotations for Data Matrix -->
+    <line x1="375" y1="221" x2="415" y2="221" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="425" y="217" text-anchor="start" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">Object</text>
+    <text x="425" y="217" text-anchor="start" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">كائن</text>
+    <text x="425" y="235" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">(Data Point)</text>
+    <text x="425" y="235" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">(نقطة بيانات)</text>
+
+    <line x1="190" y1="355" x2="190" y2="390" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="190" y="410" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">Attribute</text>
+    <text x="190" y="410" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">سمة</text>
+    <text x="190" y="428" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">(Dimension)</text>
+    <text x="190" y="428" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">(بُعد)</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT SIDE: DISSIMILARITY MATRIX           -->
+    <!-- ========================================== -->
+
+    <!-- Titles -->
+    <text x="700" y="90" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Dissimilarity Matrix</text>
+    <text x="700" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">مصفوفة الاختلاف</text>
+    
+    <text x="700" y="112" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Single mode (Objects × Objects)</text>
+    <text x="700" y="112" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">نمط واحد (كائنات × كائنات)</text>
+
+    <!-- Dimension Arrows -->
+    <line x1="590" y1="140" x2="810" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <text x="700" y="130" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">n Objects</text>
+    <text x="700" y="130" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">n من الكائنات</text>
+
+    <line x1="540" y1="180" x2="540" y2="340" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#arrow-start)" marker-end="url(#arrow-end)" />
+    <g transform="translate(530, 260) rotate(-90)">
+        <text x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">n Objects</text>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">n من الكائنات</text>
+    </g>
+
+    <!-- Matrix Brackets -->
+    <path d="M 580 170 L 570 170 L 570 350 L 580 350" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+    <path d="M 820 170 L 830 170 L 830 350 L 820 350" fill="none" stroke="var(--text-secondary)" stroke-width="2" />
+
+    <!-- Educational Highlights -->
+    <!-- Lower Triangle Highlight -->
+    <path d="M 585 210 L 585 345 L 785 345 Z" fill="var(--brand-500)" opacity="0.1" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+    <!-- Diagonal Highlight (Zeros) -->
+    <line x1="605" y1="185" x2="810" y2="325" stroke="var(--brand-500)" stroke-width="24" stroke-linecap="round" opacity="0.15" />
+
+    <!-- Matrix Elements -->
+    <g fill="var(--text-primary)" font-size="16" text-anchor="middle">
+        <!-- Row 1 -->
+        <text x="605" y="190">0</text>
+        <!-- Row 2 -->
+        <text x="605" y="225" font-style="italic">d(2,1)</text>
+        <text x="660" y="225">0</text>
+        <!-- Row 3 -->
+        <text x="605" y="260" font-style="italic">d(3,1)</text>
+        <text x="660" y="260" font-style="italic">d(3,2)</text>
+        <text x="715" y="260">0</text>
+        <!-- Row 4 -->
+        <text x="605" y="295">&#8942;</text>
+        <text x="660" y="295">&#8942;</text>
+        <text x="715" y="295">&#8942;</text>
+        <text x="765" y="295">&#8945;</text>
+        <!-- Row 5 -->
+        <text x="605" y="330" font-style="italic">d(n,1)</text>
+        <text x="660" y="330" font-style="italic">d(n,2)</text>
+        <text x="715" y="330">&#8943;</text>
+        <text x="765" y="330">&#8943;</text>
+        <text x="810" y="330">0</text>
+    </g>
+
+    <!-- Annotations for Dissimilarity Matrix -->
+    <line x1="725" y1="245" x2="765" y2="210" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="775" y="205" text-anchor="start" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">d(A,A) = 0</text>
+    <text x="775" y="205" text-anchor="start" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">d(A,A) = 0</text>
+    <text x="775" y="223" text-anchor="start" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Distance to itself</text>
+    <text x="775" y="223" text-anchor="start" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">المسافة إلى نفسه</text>
+
+    <line x1="640" y1="310" x2="580" y2="380" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="580" y="400" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">Pairwise Distances</text>
+    <text x="580" y="400" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">المسافات الزوجية</text>
+    <text x="580" y="418" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">d(i,j) = d(j,i)</text>
+    <text x="580" y="418" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">d(i,j) = d(j,i)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا مصفوفة الاختلاف هي مصفوفة مثلثة؟</template>
+      <template class="content-en">Why is the dissimilarity matrix a triangular matrix?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المسافة متماثلة (المسافة من أ إلى ب هي نفس المسافة من ب إلى أ)، والمسافة من الكائن إلى نفسه هي صفر. لذلك، نحتاج فقط لتخزين النصف السفلي (أو العلوي) من المصفوفة لتجنب التكرار.</p></template>
+      <template class="content-en"><p>Because distance is symmetric (distance from A to B is the same as B to A), and the distance from an object to itself is zero. Therefore, we only need to store the lower (or upper) half of the matrix to avoid redundancy.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="proximity-nominal-binary" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> مقياس التقارب للسمات الاسمية والثنائية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Proximity Measure for Nominal &amp; Binary Attributes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حساب التشابه للبيانات الفئوية باستخدام نسبة التطابق، وللبيانات الثنائية باستخدام معامل جاكارد (Jaccard) الذي يتجاهل التطابقات السلبية.</p></template>
+    <template class="content-en"><p>Calculating similarity for categorical data using matching ratio, and for binary data using the Jaccard coefficient which ignores negative matches.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>السمات الاسمية (Nominal):</b> يمكن أن تأخذ حالتين أو أكثر (مثل الألوان).<br>طريقة المطابقة البسيطة: $d(i, j) = \frac{p - m}{p}$ حيث $m$ هو عدد التطابقات، و $p$ هو إجمالي عدد المتغيرات.</p><p><b>السمات الثنائية (Binary):</b> نستخدم <span class="smart-term" data-term-en="Contingency Table" data-ar="جدول التوافق" data-en-def="A matrix that displays the multivariate frequency distribution of the variables.">جدول التوافق<span class="smart-term-tooltip"></span></span> (Contingency table) الذي يحتوي على $q$ (كلاهما 1)، $r$ (الأول 1 والثاني 0)، $s$ (الأول 0 والثاني 1)، و $t$ (كلاهما 0).</p><ul><li><b>المتغيرات الثنائية المتماثلة (Symmetric):</b> كلا الحالتين (0 و 1) لهما نفس الأهمية (مثل الجنس).<br>المسافة: $d(i, j) = \frac{r + s}{q + r + s + t}$</li><li><b>المتغيرات الثنائية غير المتماثلة (Asymmetric):</b> حالة واحدة (عادة 1) أكثر أهمية من الأخرى (مثل نتيجة فحص طبي إيجابية). هنا، التطابق السلبي $t$ ليس له أهمية.<br>المسافة: $d(i, j) = \frac{r + s}{q + r + s}$</li><li><b>معامل جاكارد (Jaccard coefficient):</b> مقياس التشابه للمتغيرات غير المتماثلة.<br>$sim_{Jaccard}(i, j) = \frac{q}{q + r + s}$</li></ul></template>
+    <template class="content-en"><p><b>Nominal Attributes:</b> Can take 2 or more states (e.g., colors).<br>Simple matching method: $d(i, j) = \frac{p - m}{p}$ where $m$ is # of matches, $p$ is total # of variables.</p><p><b>Binary Attributes:</b> We use a <span class="smart-term" data-term-en="Contingency Table" data-ar="جدول التوافق" data-en-def="A matrix that displays the multivariate frequency distribution of the variables.">contingency table<span class="smart-term-tooltip"></span></span> with $q$ (both 1), $r$ (i=1, j=0), $s$ (i=0, j=1), and $t$ (both 0).</p><ul><li><b>Symmetric binary variables:</b> Both states are equally important (e.g., Gender).<br>Distance: $d(i, j) = \frac{r + s}{q + r + s + t}$</li><li><b>Asymmetric binary variables:</b> One state (usually 1) is more important (e.g., positive medical test). The negative match $t$ is not significant.<br>Distance: $d(i, j) = \frac{r + s}{q + r + s}$</li><li><b>Jaccard coefficient:</b> Similarity measure for asymmetric binary variables.<br>$sim_{Jaccard}(i, j) = \frac{q}{q + r + s}$</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السر وراء تجاهل $t$ في المتغيرات غير المتماثلة هو 'الندرة'. في السجلات الطبية، معظم الأمراض ستكون قيمتها 0 (غير مصاب) لمعظم المرضى. إذا قمنا بحساب $t$، فإن مريضين سيبدوان متشابهين جداً لمجرد أنهما لا يعانيان من 99% من الأمراض النادرة، وهذا مضلل. معامل جاكارد يركز فقط على الأمراض التي يمتلكها أحدهما على الأقل.</p></template>
+    <template class="content-en"><p>The secret behind ignoring $t$ in asymmetric variables is 'sparsity'. In medical records, most diseases will be 0 (absent) for most patients. If we count $t$, two patients would look highly similar just because they both lack 99% of rare diseases, which is misleading. Jaccard focuses only on the traits at least one of them has.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معامل جاكارد للتشابه</strong></template>
+      <template class="content-en"><strong>Jaccard similarity coefficient</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$sim_{Jaccard}(i, j) = \frac{q}{q + r + s}$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Symmetric Binary</th><th>Asymmetric Binary</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أهمية الحالات</template>
+          <template class="content-en">Importance of States</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلا الحالتين (0 و 1) لهما نفس الأهمية</template>
+          <template class="content-en">Both states (0 and 1) are equally important</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حالة واحدة (عادة 1) أكثر أهمية بكثير</template>
+          <template class="content-en">One state (usually 1) is much more important</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع التطابق السلبي (t)</template>
+          <template class="content-en">Handling Negative Matches (t)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتم تضمينه في حساب المسافة</template>
+          <template class="content-en">Included in distance calculation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتم تجاهله (كما في معامل جاكارد)</template>
+          <template class="content-en">Ignored (as in Jaccard coefficient)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان كائنان يحتويان على أصفار فقط في جميع السمات غير المتماثلة، فما هي قيمة معامل جاكارد؟</template>
+      <template class="content-en">If two objects have only zeros in all asymmetric attributes, what is the value of the Jaccard coefficient?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستكون القيمة غير معرفة (أو صفر اصطلاحاً) لأن المقام (q+r+s) سيكون صفراً. هذا منطقي لأنه لا توجد أي سمات إيجابية لمقارنتها.</p></template>
+      <template class="content-en"><p>The value would be undefined (or conventionally zero) because the denominator (q+r+s) would be zero. This makes sense as there are no positive traits to compare.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distance-numeric-minkowski" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">12</span> المسافة للبيانات الرقمية: مسافة مينكوفسكي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">12</span> Distance on Numeric Data: Minkowski Distance</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>معادلة عامة لحساب المسافة بين النقاط الرقمية، تتفرع منها مسافة مانهاتن، الإقليدية، ومسافة الحد الأقصى بناءً على قيمة الأس (h).</p></template>
+    <template class="content-en"><p>A generalized metric for calculating distance between numeric points, from which Manhattan, Euclidean, and Supremum distances are derived based on the exponent (h).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>مسافة مينكوفسكي (Minkowski distance) هي مقياس مسافة شائع للبيانات الرقمية، وتعرف أيضاً بـ L-h norm.</p><p>المعادلة: $d(i, j) = \sqrt[h]{|x_{i1} - x_{j1}|^h + |x_{i2} - x_{j2}|^h + ... + |x_{ip} - x_{jp}|^h}$</p><p><b>حالات خاصة من مسافة مينكوفسكي:</b></p><ul><li><b>$h = 1$: مسافة مانهاتن (Manhattan / City block / $L_1$ norm):</b> مجموع الفروق المطلقة. (مثل مسافة هامينج للمتجهات الثنائية).</li><li><b>$h = 2$: المسافة الإقليدية (Euclidean / $L_2$ norm):</b> المسافة المستقيمة المعتادة.</li><li><b>$h \rightarrow \infty$: مسافة الحد الأقصى (Supremum / $L_{max}$ / $L_\infty$ norm):</b> الحد الأقصى للفرق بين أي مكون (سمة) من المتجهات. $d(i, j) = \max_f |x_{if} - x_{jf}|$</li></ul><p><b>خصائص المسافة (Metric):</b> الإيجابية ($d(i,j) > 0$ و $d(i,i) = 0$)، التماثل ($d(i,j) = d(j,i)$)، و<span class="smart-term" data-term-en="Triangle Inequality" data-ar="متباينة المثلث" data-en-def="A property of a metric space stating that the distance between two points is always less than or equal to the sum of the distances through a third point.">متباينة المثلث<span class="smart-term-tooltip"></span></span> ($d(i,j) \le d(i,k) + d(k,j)$).</p></template>
+    <template class="content-en"><p>Minkowski distance is a popular distance measure for numeric data, also called L-h norm.</p><p>Formula: $d(i, j) = \sqrt[h]{|x_{i1} - x_{j1}|^h + |x_{i2} - x_{j2}|^h + ... + |x_{ip} - x_{jp}|^h}$</p><p><b>Special Cases:</b></p><ul><li><b>$h = 1$: Manhattan (city block, $L_1$ norm) distance:</b> Sum of absolute differences. (e.g., Hamming distance for binary vectors).</li><li><b>$h = 2$: Euclidean ($L_2$ norm) distance:</b> The standard straight-line distance.</li><li><b>$h \rightarrow \infty$: Supremum ($L_{max}$ norm, $L_\infty$ norm) distance:</b> The maximum difference between any component (attribute) of the vectors. $d(i, j) = \max_f |x_{if} - x_{jf}|$</li></ul><p><b>Properties of a Metric:</b> Positive definiteness, Symmetry, and <span class="smart-term" data-term-en="Triangle Inequality" data-ar="متباينة المثلث" data-en-def="A property of a metric space stating that the distance between two points is always less than or equal to the sum of the distances through a third point.">Triangle Inequality<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم مانهاتن بدلاً من الإقليدية أحياناً؟ المسافة الإقليدية تقوم بتربيع الفروق، مما يعطي وزناً هائلاً للسمات ذات الفروق الكبيرة (القيم المتطرفة). مسافة مانهاتن أكثر قوة (Robust) ضد القيم المتطرفة لأنها تأخذ الفرق المطلق فقط دون تربيع.</p></template>
+    <template class="content-en"><p>Why use Manhattan instead of Euclidean sometimes? Euclidean distance squares the differences, which gives massive weight to attributes with large differences (outliers). Manhattan distance is more robust against outliers because it only takes the absolute difference without squaring.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة مسافة مينكوفسكي العامة</strong></template>
+      <template class="content-en"><strong>General Minkowski distance formula</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$d(i, j) = \sqrt[h]{\sum_{f=1}^{p} |x_{if} - x_{jf}|^h}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في شبكة شوارع المدينة (مثل مانهاتن)، أي مقياس مسافة يمثل المسافة الفعلية التي ستقطعها سيارة الأجرة؟</template>
+      <template class="content-en">In a city street grid (like Manhattan), which distance metric represents the actual distance a taxi would travel?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مسافة مانهاتن (L1 norm)، لأن السيارة لا يمكنها التحرك في خط مستقيم قطري عبر المباني (المسافة الإقليدية)، بل يجب أن تتحرك أفقياً وعمودياً على طول الشوارع.</p></template>
+      <template class="content-en"><p>Manhattan distance (L1 norm), because a car cannot travel in a straight diagonal line through buildings (Euclidean distance); it must travel horizontally and vertically along the streets.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="proximity-ordinal-mixed" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">13</span> التقارب للمتغيرات الترتيبية والمختلطة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">13</span> Proximity for Ordinal &amp; Mixed Variables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التعامل مع البيانات الترتيبية بتحويلها إلى رتب رقمية، والتعامل مع قواعد البيانات المختلطة باستخدام صيغة مرجحة تجمع تأثيرات كل نوع.</p></template>
+    <template class="content-en"><p>Handling ordinal data by converting it to numeric ranks, and handling mixed databases using a weighted formula that combines the effects of each type.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المتغيرات الترتيبية (Ordinal):</b> الترتيب مهم (مثل الرتبة الأكاديمية). يمكن معاملتها كمتغيرات ذات مقياس فئوي (interval-scaled):</p><ol><li>استبدال القيمة $x_{if}$ برتبتها $r_{if} \in \{1, ..., M_f\}$.</li><li>تعيين النطاق إلى [0, 1] عن طريق استبدال الكائن بالمعادلة: $z_{if} = \frac{r_{if} - 1}{M_f - 1}$</li><li>حساب الاختلاف باستخدام طرق المتغيرات الرقمية (مثل الإقليدية).</li></ol><p><b>السمات من النوع المختلط (Mixed Type):</b> قاعدة البيانات قد تحتوي على سمات اسمية، ثنائية، رقمية، وترتيبية معاً. نستخدم صيغة مرجحة لدمج تأثيراتها:<br>$d(i, j) = \frac{\sum_{f=1}^{p} \delta_{ij}^{(f)} d_{ij}^{(f)}}{\sum_{f=1}^{p} \delta_{ij}^{(f)}}$</p><ul><li>إذا كانت $f$ ثنائية أو اسمية: $d_{ij}^{(f)} = 0$ إذا تطابقا، و 1 بخلاف ذلك.</li><li>إذا كانت $f$ رقمية: نستخدم المسافة المطبعة.</li><li>المؤشر $\delta_{ij}^{(f)}$ يكون 0 إذا كانت القيمة مفقودة أو إذا كانت السمة ثنائية غير متماثلة وكلا القيمتين 0.</li></ul></template>
+    <template class="content-en"><p><b>Ordinal Variables:</b> Order is important (e.g., rank). Can be treated like interval-scaled:</p><ol><li>Replace $x_{if}$ by their rank $r_{if} \in \{1, ..., M_f\}$.</li><li>Map the range onto [0, 1] by replacing the object with: $z_{if} = \frac{r_{if} - 1}{M_f - 1}$</li><li>Compute dissimilarity using methods for interval-scaled variables.</li></ol><p><b>Attributes of Mixed Type:</b> A database may contain nominal, binary, numeric, and ordinal types together. We use a weighted formula:<br>$d(i, j) = \frac{\sum_{f=1}^{p} \delta_{ij}^{(f)} d_{ij}^{(f)}}{\sum_{f=1}^{p} \delta_{ij}^{(f)}}$</p><ul><li>If $f$ is binary/nominal: $d_{ij}^{(f)} = 0$ if match, 1 otherwise.</li><li>If $f$ is numeric: use normalized distance.</li><li>Indicator $\delta_{ij}^{(f)}$ is 0 if a value is missing or if it's an asymmetric binary attribute and both values are 0.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الصيغة المرجحة للأنواع المختلطة (Gower's distance) عبقرية لأنها تحول كل سمة، بغض النظر عن نوعها الأصلي، إلى مساهمة بين 0 و 1 في المسافة الإجمالية. المتغير $\delta$ يعمل كمفتاح تشغيل/إيقاف يتجاهل السمات المفقودة أو التطابقات السلبية غير المهمة، مما يمنعها من تشويه النتيجة النهائية.</p></template>
+    <template class="content-en"><p>The weighted formula for mixed types (often related to Gower's distance) is brilliant because it converts every attribute, regardless of its original type, into a 0-to-1 contribution to the total distance. The $\delta$ variable acts as an on/off switch that ignores missing values or irrelevant negative matches, preventing them from skewing the final result.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تحويل الرتبة الترتيبية إلى مقياس [0,1]</strong></template>
+      <template class="content-en"><strong>Mapping ordinal rank to [0,1] scale</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$z_{if} = \frac{r_{if} - 1}{M_f - 1}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نطرح 1 في بسط ومقام معادلة تحويل المتغير الترتيبي؟</template>
+      <template class="content-en">Why do we subtract 1 in the numerator and denominator of the ordinal variable mapping formula?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الرتب تبدأ من 1 (وليس 0). بطرح 1، نضمن أن الرتبة الأولى (1) ستتحول إلى القيمة 0 تماماً، والرتبة الأخيرة (M) ستتحول إلى القيمة 1 تماماً، مما يملأ النطاق [0,1] بشكل صحيح.</p></template>
+      <template class="content-en"><p>Because ranks start at 1 (not 0). By subtracting 1, we ensure that the lowest rank (1) maps exactly to 0, and the highest rank (M) maps exactly to 1, properly filling the [0,1] range.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cosine-similarity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">14</span> تشابه جيب التمام (Cosine Similarity)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">14</span> Cosine Similarity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مقياس تشابه يستخدم غالباً لتحليل النصوص، يقيس الزاوية بين متجهين متجاهلاً طولهما (حجمهما).</p></template>
+    <template class="content-en"><p>A similarity measure often used for text analysis, measuring the angle between two vectors while ignoring their magnitude (length).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تمثيل المستند بآلاف السمات، كل منها يسجل تكرار كلمة معينة (متجهات تكرار المصطلحات).</p><p>يستخدم تشابه جيب التمام في استرجاع المعلومات، التصنيف البيولوجي، وغيرها.</p><p><b>المعادلة:</b></p><p>$\cos(d_1, d_2) = \frac{d_1 \cdot d_2}{||d_1|| \times ||d_2||}$</p><p>حيث $\cdot$ يشير إلى <span class="smart-term" data-term-en="Dot Product" data-ar="الضرب النقطي" data-en-def="An algebraic operation that takes two equal-length sequences of numbers and returns a single number.">الضرب النقطي<span class="smart-term-tooltip"></span></span> (dot product) للمتجهات، و $||d||$ هو طول المتجه.</p><p><b>مثال:</b></p><ul><li>$d_1 = (5, 0, 3, 0, 2, 0, 0, 2, 0, 0)$</li><li>$d_2 = (3, 0, 2, 0, 1, 1, 0, 1, 0, 1)$</li><li><strong>الضرب النقطي:</strong> $5\times3 + 3\times2 + 2\times1 + 2\times1 = 25$</li><li><strong>طول $d_1$:</strong> $\sqrt{5^2 + 3^2 + 2^2 + 2^2} = \sqrt{42} = 6.481$</li><li><strong>طول $d_2$:</strong> $\sqrt{3^2 + 2^2 + 1^2 + 1^2 + 1^2 + 1^2} = \sqrt{17} = 4.12$</li><li><strong>التشابه:</strong> $25 / (6.481 \times 4.12) = 0.94$</li></ul></template>
+    <template class="content-en"><p>A document can be represented by thousands of attributes, each recording the frequency of a particular word (term-frequency vectors).</p><p>Cosine similarity is used in information retrieval, biologic taxonomy, etc.</p><p><b>Formula:</b></p><p>$\cos(d_1, d_2) = \frac{d_1 \cdot d_2}{||d_1|| \times ||d_2||}$</p><p>where $\cdot$ indicates vector <span class="smart-term" data-term-en="Dot Product" data-ar="الضرب النقطي" data-en-def="An algebraic operation that takes two equal-length sequences of numbers and returns a single number.">dot product<span class="smart-term-tooltip"></span></span>, and $||d||$ is the length of the vector.</p><p><b>Example:</b></p><ul><li>$d_1 = (5, 0, 3, 0, 2, 0, 0, 2, 0, 0)$</li><li>$d_2 = (3, 0, 2, 0, 1, 1, 0, 1, 0, 1)$</li><li><strong>Dot product:</strong> $5\times3 + 3\times2 + 2\times1 + 2\times1 = 25$</li><li><strong>$||d_1||$:</strong> $\sqrt{5^2 + 3^2 + 2^2 + 2^2} = \sqrt{42} = 6.481$</li><li><strong>$||d_2||$:</strong> $\sqrt{3^2 + 2^2 + 1^2 + 1^2 + 1^2 + 1^2} = \sqrt{17} = 4.12$</li><li><strong>Similarity:</strong> $25 / (6.481 \times 4.12) = 0.94$</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم جيب التمام بدلاً من المسافة الإقليدية للنصوص؟ لأن المستندات قد تختلف بشكل كبير في الطول. مستند طويل جداً عن 'البيانات' ومستند قصير جداً عن 'البيانات' سيكونان متباعدين جداً بالمسافة الإقليدية (بسبب تكرار الكلمات العالي في الطويل). لكن تشابه جيب التمام يقيس الزاوية بينهما، والتي ستكون صغيرة جداً (تشابه عالي) لأنهما يشيران إلى نفس الاتجاه الدلالي بغض النظر عن الطول.</p></template>
+    <template class="content-en"><p>Why use Cosine instead of Euclidean distance for text? Because documents vary greatly in length. A very long document about 'Data' and a short tweet about 'Data' would have a huge Euclidean distance (due to high word counts in the long one). But Cosine similarity measures the angle, which would be very small (high similarity) because they point in the same semantic direction, ignoring magnitude.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تشابه جيب التمام</strong></template>
+      <template class="content-en"><strong>Cosine Similarity Formula</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\cos(d_1, d_2) = \frac{d_1 \cdot d_2}{||d_1|| ||d_2||}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي قيمة تشابه جيب التمام لمتجهين متعامدين (لا يشتركان في أي كلمات)؟</template>
+      <template class="content-en">What is the cosine similarity value for two orthogonal vectors (sharing no words)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>صفر. لأن الضرب النقطي لهما سيكون صفراً (كل مصطلح موجود في أحدهما سيكون غائباً في الآخر، لذا حاصل ضربهما دائماً صفر).</p></template>
+      <template class="content-en"><p>Zero. Because their dot product will be zero (every term present in one is absent in the other, so their product is always zero).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في الجزء الثاني من معالجة البيانات. تخيلوا أنكم تحاولون قراءة كتاب ضخم جداً قبل الامتحان بليلة؛ ستحتاجون إلى 'تقليل' حجمه دون فقدان المعنى. هذا بالضبط ما نفعله بالبيانات! نستخدم PCA أو المويجات لتقليل 'الأبعاد' (عدد الأعمدة)، ونستخدم أخذ العينات أو الانحدار لتقليل 'العدد' (عدد الصفوف). 
+
+بعد ذلك، يجب أن نتأكد من أن البيانات تتحدث نفس اللغة، وهنا يأتي دور 'التطبيع' (Normalization) مثل Min-Max و Z-score لتوحيد المقاييس. ولا ننسى 'التكتم' (Discretization) لتحويل الأرقام المعقدة إلى فئات بسيطة يسهل فهمها.
+
+أخيراً، كيف نعرف أن كائنين متشابهان؟ تعلمنا مقاييس المسافة مثل مينكوفسكي للأرقام، وجاكارد للبيانات الثنائية، وجيب التمام للنصوص. ركزوا جيداً على متى نستخدم كل مقياس، وكيف نتعامل مع القيم المتطرفة. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome back, my friends, to part two of Data Preprocessing. Imagine trying to read a massive textbook the night before an exam; you need to 'reduce' its size without losing the core meaning. That's exactly what we do with data! We use PCA or Wavelets to reduce 'dimensionality' (columns), and sampling or regression to reduce 'numerosity' (rows).
+
+Next, we must ensure our data speaks the same language, which is where 'Normalization' (like Min-Max and Z-score) comes in to unify scales. And let's not forget 'Discretization' to turn complex continuous numbers into simple, understandable categories.
+
+Finally, how do we know if two objects are alike? We learned distance metrics like Minkowski for numbers, Jaccard for binary data, and Cosine for text. Focus heavily on *when* to use each metric and how to handle outliers. Best of luck with your studies!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نلجأ لتقليل البيانات من الأساس؟</template>
+          <template class="content-en">Why do we resort to data reduction in the first place?</template>
+          <span class="content-target">لماذا نلجأ لتقليل البيانات من الأساس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن قواعد البيانات الحديثة ضخمة جداً (تيرابايتات). تشغيل خوارزميات التنقيب المعقدة على البيانات الكاملة قد يستغرق وقتاً طويلاً جداً. التقليل يسرع العملية مع الحفاظ على نفس النتائج التحليلية تقريباً.</template>
+          <template class="content-en">Because modern databases are massive (terabytes). Running complex mining algorithms on the full data can take an unacceptably long time. Reduction speeds up the process while maintaining almost the same analytical results.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الجوهري بين PCA وتحويل المويجات (Wavelet)؟</template>
+          <template class="content-en">What is the fundamental difference between PCA and Wavelet Transform?</template>
+          <span class="content-target">ما هو الفرق الجوهري بين PCA وتحويل المويجات (Wavelet)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">PCA يبحث عن متجهات تلتقط التباين الكلي للبيانات، بينما تحويل المويجات يحلل البيانات إلى ترددات مختلفة ويحتفظ بالمعاملات الأقوى، وهو ممتاز لإزالة القيم المتطرفة.</template>
+          <template class="content-en">PCA looks for vectors that capture the overall variance of the data, while Wavelet Transform decomposes data into different frequencies and keeps the strongest coefficients, making it excellent for outlier removal.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم Z-score بدلاً من Min-Max؟</template>
+          <template class="content-en">When should I use Z-score instead of Min-Max normalization?</template>
+          <span class="content-target">متى يجب أن أستخدم Z-score بدلاً من Min-Max؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم Z-score عندما لا تعرف الحد الأدنى والأقصى الفعليين للبيانات المستقبلية، أو الأهم من ذلك، عندما تحتوي بياناتك على قيم متطرفة (Outliers) ضخمة من شأنها أن تفسد مقياس Min-Max.</template>
+          <template class="content-en">Use Z-score when you don't know the actual min/max of future data, or more importantly, when your data contains massive outliers that would ruin the Min-Max scale.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل أخذ العينات الطبقية (Stratified) مشكلة البيانات المنحرفة؟</template>
+          <template class="content-en">How does Stratified sampling solve the problem of skewed data?</template>
+          <span class="content-target">كيف يحل أخذ العينات الطبقية (Stratified) مشكلة البيانات المنحرفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من السحب العشوائي الأعمى الذي قد يتجاهل الفئات النادرة، يقوم التقسيم الطبقي بتقسيم البيانات أولاً حسب الفئة، ثم يسحب عينة من كل فئة بنسبة تمثيلها الأصلية، مما يضمن عدم ضياع الأقليات.</template>
+          <template class="content-en">Instead of blind random drawing which might miss rare classes, stratified sampling first divides the data by class, then draws a sample from each class proportional to its original representation, ensuring minorities aren't lost.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي 'لعنة الأبعاد'؟</template>
+          <template class="content-en">What is the 'Curse of Dimensionality'?</template>
+          <span class="content-target">ما هي 'لعنة الأبعاد'؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي مشكلة تحدث عندما يزداد عدد السمات (الأبعاد) بشكل كبير، مما يجعل البيانات متناثرة جداً في الفضاء، وتفقد مقاييس المسافة والكثافة معناها، مما يفشل خوارزميات التجميع.</template>
+          <template class="content-en">It's a problem that occurs when the number of features (dimensions) increases drastically, making data highly sparse in space, and causing distance and density metrics to lose their meaning, which breaks clustering algorithms.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحسب المسافة بين كائنين يحتويان على أنواع بيانات مختلطة (رقمية، نصية، ثنائية)؟</template>
+          <template class="content-en">How do we calculate the distance between two objects containing mixed data types (numeric, nominal, binary)?</template>
+          <span class="content-target">كيف نحسب المسافة بين كائنين يحتويان على أنواع بيانات مختلطة (رقمية، نصية، ثنائية)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم صيغة مرجحة (مثل مسافة Gower). نقوم بحساب التشابه لكل سمة على حدة بناءً على نوعها (0 أو 1 للثنائية، مسافة مطبعة للرقمية)، ثم نجمعها ونقسمها على عدد السمات الصالحة.</template>
+          <template class="content-en">We use a weighted formula (like Gower's distance). We calculate the similarity for each attribute individually based on its type (0 or 1 for binary, normalized distance for numeric), then sum them up and divide by the number of valid attributes.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم معامل جاكارد للمتغيرات الثنائية غير المتماثلة؟</template>
+          <template class="content-en">Why do we use the Jaccard coefficient for asymmetric binary variables?</template>
+          <span class="content-target">لماذا نستخدم معامل جاكارد للمتغيرات الثنائية غير المتماثلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن المتغيرات غير المتماثلة (مثل الأمراض) تكون قيمتها 0 في معظم الأحيان. إذا حسبنا التطابقات الصفرية (t)، سيبدو الجميع متشابهين. جاكارد يتجاهل الأصفار المشتركة ويركز فقط على الحالات الإيجابية.</template>
+          <template class="content-en">Because asymmetric variables (like diseases) are 0 most of the time. If we counted zero-matches (t), everyone would look similar. Jaccard ignores shared zeros and focuses only on positive cases.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين مصفوفة البيانات ومصفوفة الاختلاف؟</template>
+          <template class="content-en">What is the difference between a data matrix and a dissimilarity matrix?</template>
+          <span class="content-target">ما الفرق بين مصفوفة البيانات ومصفوفة الاختلاف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مصفوفة البيانات تخزن القيم الفعلية للسمات لكل كائن (صفوف وأعمدة مختلفة). مصفوفة الاختلاف تخزن فقط المسافات بين الكائنات وبعضها البعض (مصفوفة مربعة مثلثة).</template>
+          <template class="content-en">A data matrix stores the actual attribute values for each object (different rows and columns). A dissimilarity matrix stores only the distances between the objects themselves (a square, triangular matrix).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل خوارزمية Chi-merge للتكتم؟</template>
+          <template class="content-en">How does the Chi-merge algorithm for discretization work?</template>
+          <span class="content-target">كيف تعمل خوارزمية Chi-merge للتكتم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي طريقة خاضعة للإشراف تبدأ بفترات صغيرة جداً، ثم تدمج الفترات المتجاورة من أسفل لأعلى إذا كان لها توزيع فئات متشابه (قيمة كاي-تربيع منخفضة)، وتتوقف عند تلبية شرط معين.</template>
+          <template class="content-en">It is a supervised method that starts with very small intervals, then merges adjacent intervals bottom-up if they have a similar class distribution (low chi-square value), stopping when a certain condition is met.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مسافة مينكوفسكي، ماذا تمثل مسافة الحد الأقصى (Supremum)؟</template>
+          <template class="content-en">In Minkowski distance, what does the Supremum distance represent?</template>
+          <span class="content-target">في مسافة مينكوفسكي، ماذا تمثل مسافة الحد الأقصى (Supremum)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحدث عندما يقترب الأس (h) من الما لا نهاية. وهي ببساطة تمثل أكبر فرق مطلق بين الكائنين في أي سمة واحدة فقط، متجاهلة باقي السمات.</template>
+          <template class="content-en">It occurs when the exponent (h) approaches infinity. It simply represents the single largest absolute difference between the two objects across any one attribute, ignoring the rest.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "لعنة الأبعاد (Curse of Dimensionality)",
+      "en": "Curse of Dimensionality"
+    },
+    "back": {
+      "definition": {
+        "ar": "ظاهرة تصبح فيها البيانات متناثرة وتفقد مقاييس المسافة معناها مع زيادة عدد السمات.",
+        "en": "Phenomenon where data becomes sparse and distance metrics lose meaning as the number of attributes increases."
+      },
+      "example": {
+        "ar": "صعوبة العثور على مجموعات (Clusters) في بيانات تحتوي على 10,000 سمة.",
+        "en": "Difficulty in finding clusters in data with 10,000 features."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "تحويل المويجات (Wavelet Transform)",
+      "en": "Wavelet Transform"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لتقليل الأبعاد تحلل الإشارة إلى نطاقات ترددية فرعية، ممتازة لإزالة القيم المتطرفة.",
+        "en": "Dimensionality reduction technique decomposing signals into frequency sub-bands, excellent for outlier removal."
+      },
+      "example": {
+        "ar": "ضغط الصور باستخدام مويجات Haar.",
+        "en": "Image compression using Haar wavelets."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "تحليل المكونات الرئيسية (PCA)",
+      "en": "Principal Component Analysis (PCA)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تجد إسقاطاً للبيانات يلتقط أكبر قدر من التباين باستخدام المتجهات الذاتية.",
+        "en": "Technique finding a data projection that captures the most variance using eigenvectors."
+      },
+      "example": {
+        "ar": "تقليل 100 سمة مترابطة إلى 5 مكونات رئيسية مستقلة.",
+        "en": "Reducing 100 correlated features into 5 independent principal components."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "أخذ العينات الطبقية (Stratified Sampling)",
+      "en": "Stratified Sampling"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم البيانات وسحب عينات من كل قسم بشكل متناسب، يستخدم للبيانات المنحرفة.",
+        "en": "Partitioning data and drawing samples proportionally from each, used for skewed data."
+      },
+      "example": {
+        "ar": "ضمان احتواء العينة على 1% من المعاملات الاحتيالية تماماً كالمجتمع الأصلي.",
+        "en": "Ensuring a sample contains 1% fraudulent transactions just like the original population."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "تطبيع الحد الأدنى والأقصى (Min-Max Normalization)",
+      "en": "Min-Max Normalization"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل البيانات خطياً لتقع ضمن نطاق محدد (مثل 0 إلى 1).",
+        "en": "Linearly transforming data to fall within a specific range (e.g., 0 to 1)."
+      },
+      "example": {
+        "ar": "تحويل الرواتب من [1000, 9000] إلى [0, 1].",
+        "en": "Scaling salaries from [1000, 9000] to [0, 1]."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "تطبيع Z-score",
+      "en": "Z-score Normalization"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيع البيانات باستخدام المتوسط والانحراف المعياري، مفيد عند وجود قيم متطرفة.",
+        "en": "Normalizing data using mean and standard deviation, useful when outliers are present."
+      },
+      "example": {
+        "ar": "قيمة Z-score تساوي 1.5 تعني أن القيمة تبعد 1.5 انحراف معياري عن المتوسط.",
+        "en": "A Z-score of 1.5 means the value is 1.5 standard deviations above the mean."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "التجميع في صناديق بعرض متساوٍ (Equal-width Binning)",
+      "en": "Equal-width Binning"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم نطاق البيانات إلى فترات متساوية الحجم.",
+        "en": "Dividing the data range into intervals of equal size."
+      },
+      "example": {
+        "ar": "تقسيم الأعمار من 0 إلى 100 إلى 10 صناديق، كل منها يغطي 10 سنوات.",
+        "en": "Dividing ages 0-100 into 10 bins, each covering 10 years."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "التجميع في صناديق بعمق متساوٍ (Equal-depth Binning)",
+      "en": "Equal-depth Binning"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم البيانات بحيث يحتوي كل صندوق على نفس عدد العينات تقريباً.",
+        "en": "Dividing data so each bin contains approximately the same number of samples."
+      },
+      "example": {
+        "ar": "وضع 1000 شخص في 10 صناديق، بحيث يحتوي كل صندوق على 100 شخص بغض النظر عن أعمارهم.",
+        "en": "Putting 1000 people into 10 bins, so each bin has exactly 100 people regardless of age range."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "معامل جاكارد (Jaccard Coefficient)",
+      "en": "Jaccard Coefficient"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس تشابه للمتغيرات الثنائية غير المتماثلة، يتجاهل التطابقات السلبية (0-0).",
+        "en": "Similarity measure for asymmetric binary variables, ignoring negative matches (0-0)."
+      },
+      "example": {
+        "ar": "مقارنة سلة مشتريات عميلين بناءً على ما اشتروه فقط، وتجاهل ملايين السلع التي لم يشتريها كلاهما.",
+        "en": "Comparing two shopping carts based only on items bought, ignoring millions of items neither bought."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "مسافة مانهاتن (Manhattan Distance)",
+      "en": "Manhattan Distance (L1 norm)"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة خاصة من مسافة مينكوفسكي (h=1)، تحسب مجموع الفروق المطلقة.",
+        "en": "Special case of Minkowski (h=1), calculates the sum of absolute differences."
+      },
+      "example": {
+        "ar": "حساب المسافة بين نقطتين في شبكة شوارع المدينة.",
+        "en": "Calculating distance between two points in a city street grid."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "مسافة الحد الأقصى (Supremum Distance)",
+      "en": "Supremum Distance (\\(L_\\max\\) norm)"
+    },
+    "back": {
+      "definition": {
+        "ar": "حالة خاصة من مينكوفسكي (h -> ما لا نهاية)، تمثل الحد الأقصى للفرق في أي سمة واحدة.",
+        "en": "Special case of Minkowski (h -> infinity), represents the maximum difference in any single attribute."
+      },
+      "example": {
+        "ar": "إذا اختلف كائنان بمقدار 5 في الطول و 100 في الوزن، فالمسافة هي 100.",
+        "en": "If two objects differ by 5 in height and 100 in weight, the distance is 100."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "تشابه جيب التمام (Cosine Similarity)",
+      "en": "Cosine Similarity"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقيس الزاوية بين متجهين متجاهلاً طولهما، ممتاز لتحليل النصوص.",
+        "en": "Measures the angle between two vectors ignoring magnitude, excellent for text analysis."
+      },
+      "example": {
+        "ar": "إيجاد التشابه بين مقال طويل وتغريدة قصيرة يستخدمان نفس المصطلحات.",
+        "en": "Finding similarity between a long article and a short tweet using the same terms."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "مصفوفة الاختلاف (Dissimilarity Matrix)",
+      "en": "Dissimilarity Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة مثلثة ذات وضع واحد تسجل المسافات بين أزواج النقاط.",
+        "en": "A single-mode triangular matrix recording distances between pairs of points."
+      },
+      "example": {
+        "ar": "جدول يوضح المسافة بالكيلومترات بين كل مدينتين.",
+        "en": "A table showing the distance in km between every pair of cities."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "التنعيم بحدود الصندوق (Smoothing by bin boundaries)",
+      "en": "Smoothing by bin boundaries"
+    },
+    "back": {
+      "definition": {
+        "ar": "استبدال كل قيمة في الصندوق بأقرب حد (أصغر أو أكبر قيمة) في ذلك الصندوق.",
+        "en": "Replacing each value in a bin with the closest boundary (min or max) of that bin."
+      },
+      "example": {
+        "ar": "الصندوق [4, 8, 9, 15] يصبح [4, 4, 4, 15].",
+        "en": "Bin [4, 8, 9, 15] becomes [4, 4, 4, 15]."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "Chi-merge",
+      "en": "Chi-merge"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تكتم خاضعة للإشراف تدمج الفترات المتجاورة ذات التوزيعات المتشابهة للفئات.",
+        "en": "Supervised discretization method merging adjacent intervals with similar class distributions."
+      },
+      "example": {
+        "ar": "دمج فئتين عمريتين إذا كان لهما نفس نسبة المصابين بالمرض.",
+        "en": "Merging two age groups if they have the same ratio of diseased patients."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من التقنيات التالية تستخدم المتجهات الذاتية (Eigenvectors) لتقليل الأبعاد؟",
+      "en": "Which of the following techniques uses eigenvectors for dimensionality reduction?"
+    },
+    "options": {
+      "ar": [
+        "تحويل المويجات (Wavelet Transform)",
+        "تحليل المكونات الرئيسية (PCA)",
+        "الانحدار الخطي (Linear Regression)",
+        "أخذ العينات الطبقية (Stratified Sampling)"
+      ],
+      "en": [
+        "Wavelet Transform",
+        "Principal Component Analysis (PCA)",
+        "Linear Regression",
+        "Stratified Sampling"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "PCA يجد المتجهات الذاتية لمصفوفة التغاير لإنشاء مساحة جديدة تلتقط أكبر تباين.",
+      "en": "PCA finds the eigenvectors of the covariance matrix to create a new space that captures the most variance."
+    },
+    "hint": {
+      "ar": "ابحث عن التقنية التي تنشئ 'مكونات' جديدة.",
+      "en": "Look for the technique that creates new 'components'."
+    },
+    "difficulty": "medium",
+    "conceptId": "principal-component-analysis"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي نوع من أخذ العينات هو الأفضل للتعامل مع البيانات المنحرفة (Skewed data)؟",
+      "en": "Which type of sampling is best for handling skewed data?"
+    },
+    "options": {
+      "ar": [
+        "عينة عشوائية بسيطة مع إرجاع",
+        "عينة عشوائية بسيطة بدون إرجاع",
+        "أخذ العينات الطبقية (Stratified sampling)",
+        "التجميع (Clustering)"
+      ],
+      "en": [
+        "Simple random sampling with replacement",
+        "Simple random sampling without replacement",
+        "Stratified sampling",
+        "Clustering"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أخذ العينات الطبقية يضمن تمثيل جميع الفئات (حتى النادرة منها) بشكل متناسب في العينة.",
+      "en": "Stratified sampling ensures all classes (even rare ones) are represented proportionally in the sample."
+    },
+    "hint": {
+      "ar": "هذه الطريقة تقسم البيانات إلى مجموعات فرعية قبل أخذ العينات.",
+      "en": "This method partitions data into sub-groups before sampling."
+    },
+    "difficulty": "easy",
+    "conceptId": "numerosity-reduction-non-parametric"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في معامل جاكارد للسمات الثنائية غير المتماثلة، أي قيمة من جدول التوافق يتم تجاهلها؟",
+      "en": "In the Jaccard coefficient for asymmetric binary attributes, which value from the contingency table is ignored?"
+    },
+    "options": {
+      "ar": [
+        "q (كلاهما 1)",
+        "r (الأول 1 والثاني 0)",
+        "s (الأول 0 والثاني 1)",
+        "t (كلاهما 0)"
+      ],
+      "en": [
+        "q (both 1)",
+        "r (first 1, second 0)",
+        "s (first 0, second 1)",
+        "t (both 0)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "يتم تجاهل t (التطابق السلبي) لأن غياب السمة في كلا الكائنين لا يعتبر دليلاً قوياً على التشابه في المتغيرات غير المتماثلة.",
+      "en": "t (negative match) is ignored because the absence of a trait in both objects is not considered strong evidence of similarity for asymmetric variables."
+    },
+    "hint": {
+      "ar": "فكر في الأمراض النادرة؛ عدم إصابة شخصين بمرض نادر لا يجعلهما متشابهين.",
+      "en": "Think of rare diseases; two people not having a rare disease doesn't make them similar."
+    },
+    "difficulty": "medium",
+    "conceptId": "proximity-nominal-binary"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي مسافة مينكوفسكي عندما تكون قيمة h = 1؟",
+      "en": "What is the Minkowski distance when h = 1?"
+    },
+    "options": {
+      "ar": [
+        "المسافة الإقليدية (Euclidean)",
+        "مسافة مانهاتن (Manhattan)",
+        "مسافة الحد الأقصى (Supremum)",
+        "مسافة جاكارد (Jaccard)"
+      ],
+      "en": [
+        "Euclidean distance",
+        "Manhattan distance",
+        "Supremum distance",
+        "Jaccard distance"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عندما h=1، تصبح المعادلة مجموع الفروق المطلقة، وهي مسافة مانهاتن.",
+      "en": "When h=1, the formula becomes the sum of absolute differences, which is the Manhattan distance."
+    },
+    "hint": {
+      "ar": "تُعرف أيضاً بمسافة كتلة المدينة (City block).",
+      "en": "Also known as City block distance."
+    },
+    "difficulty": "easy",
+    "conceptId": "distance-numeric-minkowski"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي من طرق التطبيع التالية هي الأكثر حساسية للقيم المتطرفة (Outliers)؟",
+      "en": "Which of the following normalization methods is MOST sensitive to outliers?"
+    },
+    "options": {
+      "ar": [
+        "تطبيع Z-score باستخدام الانحراف المعياري",
+        "تطبيع Z-score باستخدام متوسط الانحراف المطلق",
+        "تطبيع الحد الأدنى والأقصى (Min-max normalization)",
+        "التطبيع بالقياس العشري (Decimal scaling)"
+      ],
+      "en": [
+        "Z-score using standard deviation",
+        "Z-score using mean absolute deviation",
+        "Min-max normalization",
+        "Decimal scaling"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تطبيع Min-max يعتمد كلياً على القيمتين الصغرى والكبرى. قيمة متطرفة واحدة ستغير النطاق بأكمله وتضغط باقي البيانات.",
+      "en": "Min-max normalization relies entirely on the minimum and maximum values. A single outlier will shift the entire range and compress the rest of the data."
+    },
+    "hint": {
+      "ar": "هذه الطريقة تستخدم فقط قيمتين من مجموعة البيانات بأكملها في معادلتها.",
+      "en": "This method uses only two values from the entire dataset in its formula."
+    },
+    "difficulty": "medium",
+    "conceptId": "data-normalization"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في التجميع في صناديق (Binning)، إذا كان لدينا الصندوق [4, 8, 9, 15]، ماذا ستكون النتيجة بعد 'التنعيم بمتوسط الصندوق'؟",
+      "en": "In Binning, if we have the bin [4, 8, 9, 15], what will be the result after 'smoothing by bin means'?"
+    },
+    "options": {
+      "ar": [
+        "[4, 4, 15, 15]",
+        "[9, 9, 9, 9]",
+        "[4, 8, 9, 15]",
+        "[8, 8, 8, 8]"
+      ],
+      "en": [
+        "[4, 4, 15, 15]",
+        "[9, 9, 9, 9]",
+        "[4, 8, 9, 15]",
+        "[8, 8, 8, 8]"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المتوسط هو (4+8+9+15)/4 = 36/4 = 9. يتم استبدال كل قيمة بالمتوسط.",
+      "en": "The mean is (4+8+9+15)/4 = 36/4 = 9. Every value is replaced by the mean."
+    },
+    "hint": {
+      "ar": "احسب المتوسط الحسابي للأرقام الأربعة.",
+      "en": "Calculate the arithmetic average of the four numbers."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-discretization"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "لماذا يفضل استخدام تشابه جيب التمام (Cosine Similarity) في تحليل النصوص بدلاً من المسافة الإقليدية؟",
+      "en": "Why is Cosine Similarity preferred in text analysis over Euclidean distance?"
+    },
+    "options": {
+      "ar": [
+        "لأنه أسرع في الحساب.",
+        "لأنه يتجاهل طول المستند ويركز على الزاوية (الاتجاه الدلالي).",
+        "لأنه يتعامل مع القيم السالبة بشكل أفضل.",
+        "لأنه يتطلب مصفوفة بيانات أصغر."
+      ],
+      "en": [
+        "Because it is faster to compute.",
+        "Because it ignores document length and focuses on the angle (semantic direction).",
+        "Because it handles negative values better.",
+        "Because it requires a smaller data matrix."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المستندات تختلف في الطول. جيب التمام يقيس الزاوية بين المتجهات، مما يجعله مقياساً ممتازاً للتشابه الدلالي بغض النظر عن عدد الكلمات الإجمالي.",
+      "en": "Documents vary in length. Cosine measures the angle between vectors, making it an excellent measure of semantic similarity regardless of total word count."
+    },
+    "hint": {
+      "ar": "فكر في مستند طويل جداً وتغريدة قصيرة يتحدثان عن نفس الموضوع.",
+      "en": "Think about a very long document and a short tweet discussing the same topic."
+    },
+    "difficulty": "medium",
+    "conceptId": "cosine-similarity"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "عند الإنشاء التلقائي للتسلسل الهرمي للمفاهيم، أين توضع السمة التي تحتوي على أكبر عدد من القيم المميزة (Distinct values)؟",
+      "en": "In automatic concept hierarchy generation, where is the attribute with the most distinct values placed?"
+    },
+    "options": {
+      "ar": [
+        "في أعلى مستوى من الهرم",
+        "في أدنى مستوى من الهرم",
+        "في المنتصف",
+        "يتم استبعادها من الهرم"
+      ],
+      "en": [
+        "At the highest level of the hierarchy",
+        "At the lowest level of the hierarchy",
+        "In the middle",
+        "It is excluded from the hierarchy"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "السمة ذات القيم المميزة الأكثر (مثل الشارع) تمثل التفاصيل الدقيقة، لذا توضع في أسفل الهرم.",
+      "en": "The attribute with the most distinct values (like street) represents fine granularity, so it is placed at the bottom of the hierarchy."
+    },
+    "hint": {
+      "ar": "قارن بين عدد 'الدول' وعدد 'الشوارع'. أيهما في الأسفل؟",
+      "en": "Compare the number of 'Countries' to the number of 'Streets'. Which is at the bottom?"
+    },
+    "difficulty": "easy",
+    "conceptId": "concept-hierarchy-generation"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو التعقيد الزمني (Time Complexity) لتحويل المويجات (Wavelet Transform)؟",
+      "en": "What is the time complexity of the Wavelet Transform?"
+    },
+    "options": {
+      "ar": [
+        "O(log N)",
+        "O(N)",
+        "O(N log N)",
+        "\\(O(N^2)\\)"
+      ],
+      "en": [
+        "O(log N)",
+        "O(N)",
+        "O(N log N)",
+        "\\(O(N^2)\\)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تحويل المويجات فعال جداً وله تعقيد زمني خطي O(N).",
+      "en": "Wavelet transform is very efficient and has a linear time complexity of O(N)."
+    },
+    "hint": {
+      "ar": "إنه فعال جداً ويتناسب خطياً مع حجم البيانات.",
+      "en": "It is very efficient and scales linearly with data size."
+    },
+    "difficulty": "hard",
+    "conceptId": "wavelet-transform"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من الخصائص التالية ليست من خصائص مقياس المسافة (Metric)؟",
+      "en": "Which of the following is NOT a property of a distance metric?"
+    },
+    "options": {
+      "ar": [
+        "الإيجابية (Positive definiteness)",
+        "التماثل (Symmetry)",
+        "متباينة المثلث (Triangle Inequality)",
+        "السلبية (Negativity)"
+      ],
+      "en": [
+        "Positive definiteness",
+        "Symmetry",
+        "Triangle Inequality",
+        "Negativity"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "المسافة لا يمكن أن تكون سالبة. الخصائص الثلاث لمقياس المسافة هي الإيجابية، التماثل، ومتباينة المثلث.",
+      "en": "Distance cannot be negative. The three properties of a metric are positive definiteness, symmetry, and triangle inequality."
+    },
+    "hint": {
+      "ar": "هل يمكن أن تكون المسافة بين مدينتين أقل من الصفر؟",
+      "en": "Can the distance between two cities be less than zero?"
+    },
+    "difficulty": "easy",
+    "conceptId": "distance-numeric-minkowski"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن معامل جاكارد يستخدم المتغير 't' (التطابقات السلبية). في الواقع، جاكارد يتجاهل 't' تماماً لأنه مصمم للمتغيرات غير المتماثلة حيث غياب السمة لا يعني التشابه.</template>
+    <template class="content-en">Thinking the Jaccard coefficient uses the 't' variable (negative matches). In reality, Jaccard completely ignores 't' because it's designed for asymmetric variables where the absence of a trait doesn't imply similarity.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لجعل تطبيع Z-score أكثر مقاومة للقيم المتطرفة، استبدل الانحراف المعياري في المقام بـ 'متوسط الانحراف المطلق' (Mean Absolute Deviation).</template>
+    <template class="content-en">To make Z-score normalization more robust against outliers, replace the standard deviation in the denominator with the 'Mean Absolute Deviation'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">PCA لا يختار من بين السمات الموجودة، بل يخلق سمات جديدة (مكونات) هي عبارة عن تركيبات خطية من السمات القديمة، مصممة لالتقاط أقصى تباين.</template>
+    <template class="content-en">PCA does not select from existing attributes; it creates entirely new attributes (components) that are linear combinations of the old ones, designed to capture maximum variance.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين التجميع بعرض متساوٍ (Equal-width) وعمق متساوٍ (Equal-depth). العرض المتساوي يقسم 'نطاق القيم'، بينما العمق المتساوي يقسم 'عدد العينات'.</template>
+    <template class="content-en">Confusing Equal-width and Equal-depth binning. Equal-width divides the 'range of values', while Equal-depth divides the 'number of samples'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,2467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="11" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>القواعد الخالية من السياق والإعراب التبعي · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M10.html" data-gh-next="M12.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#constituency-and-cfgs" class="toc-link" data-bilingual>
+        <template class="content-ar">المكونات النحوية والقواعد الخالية من السياق (CFGs)</template>
+        <template class="content-en">Constituency and Context-Free Grammars (CFGs)</template>
+        <span class="content-target">المكونات النحوية والقواعد الخالية من السياق (CFGs)</span>
+      </a>
+      <a href="#cfg-as-generator" class="toc-link" data-bilingual>
+        <template class="content-ar">CFG كمولد للجمل (الاشتقاق وأشجار الإعراب)</template>
+        <template class="content-en">CFG as a Generator (Derivations &amp; Parse Trees)</template>
+        <span class="content-target">CFG كمولد للجمل (الاشتقاق وأشجار الإعراب)</span>
+      </a>
+      <a href="#cfg-as-parser-and-ambiguity" class="toc-link" data-bilingual>
+        <template class="content-ar">CFG كمعرب والغموض النحوي</template>
+        <template class="content-en">CFG as a Parser &amp; Syntactic Ambiguity</template>
+        <span class="content-target">CFG كمعرب والغموض النحوي</span>
+      </a>
+      <a href="#cky-parsing" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزمية الإعراب CKY (الكلاسيكية والعصبية)</template>
+        <template class="content-en">CKY Parsing (Classic &amp; Neural)</template>
+        <span class="content-target">خوارزمية الإعراب CKY (الكلاسيكية والعصبية)</span>
+      </a>
+      <a href="#evaluating-constituency-parsers" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم معربات المكونات (PARSEVAL و Treebanks)</template>
+        <template class="content-en">Evaluating Constituency Parsers (PARSEVAL &amp; Treebanks)</template>
+        <span class="content-target">تقييم معربات المكونات (PARSEVAL و Treebanks)</span>
+      </a>
+      <a href="#dependency-relations" class="toc-link" data-bilingual>
+        <template class="content-ar">العلاقات التبعية (Dependency Relations)</template>
+        <template class="content-en">Dependency Relations</template>
+        <span class="content-target">العلاقات التبعية (Dependency Relations)</span>
+      </a>
+      <a href="#dependency-vs-constituency" class="toc-link" data-bilingual>
+        <template class="content-ar">قواعد التبعية مقابل قواعد المكونات</template>
+        <template class="content-en">Dependency Grammars vs. Constituency Grammars</template>
+        <span class="content-target">قواعد التبعية مقابل قواعد المكونات</span>
+      </a>
+      <a href="#dependency-formalisms" class="toc-link" data-bilingual>
+        <template class="content-ar">الشكليات التبعية وبنوك الأشجار</template>
+        <template class="content-en">Dependency Formalisms &amp; Treebanks</template>
+        <span class="content-target">الشكليات التبعية وبنوك الأشجار</span>
+      </a>
+      <a href="#transition-based-parsing" class="toc-link" data-bilingual>
+        <template class="content-ar">الإعراب التبعي القائم على الانتقال (Transition-Based)</template>
+        <template class="content-en">Transition-Based Dependency Parsing</template>
+        <span class="content-target">الإعراب التبعي القائم على الانتقال (Transition-Based)</span>
+      </a>
+      <a href="#graph-based-parsing" class="toc-link" data-bilingual>
+        <template class="content-ar">الإعراب التبعي القائم على الرسم البياني (Graph-Based)</template>
+        <template class="content-en">Graph-Based Dependency Parsing</template>
+        <span class="content-target">الإعراب التبعي القائم على الرسم البياني (Graph-Based)</span>
+      </a>
+      <a href="#evaluating-dependency-parsers" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم معربات التبعية (LAS, UAS, LS)</template>
+        <template class="content-en">Evaluating Dependency Parsers</template>
+        <span class="content-target">تقييم معربات التبعية (LAS, UAS, LS)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 11</template>
+      <template class="content-en">Module 11</template>
+      <span class="content-target">الوحدة 11</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">القواعد الخالية من السياق والإعراب التبعي</h1>
+      <p class="hero-description">دراسة البنية النحوية للغات الطبيعية باستخدام القواعد الخالية من السياق (CFGs) والإعراب التبعي، بما في ذلك خوارزميات الإعراب وطرق التقييم.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Context-Free Grammars &amp; Dependency Parsing</h1>
+      <p class="hero-description">Study of the syntactic structure of natural languages using Context-Free Grammars (CFGs) and Dependency Parsing, including parsing algorithms and evaluation methods.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">القواعد الخالية من السياق</span>
+      <span class="tag">الإعراب التبعي</span>
+      <span class="tag">التحليل النحوي</span>
+      <span class="tag">خوارزمية CKY</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">CFG</span>
+      <span class="tag">Dependency Parsing</span>
+      <span class="tag">Syntactic Analysis</span>
+      <span class="tag">CKY Algorithm</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تعلم كيف تُستخدم القواعد الخالية من السياق (CFGs) لوصف البنية النحوية للغات الطبيعية.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على التعريف الرسمي لـ CFGs وكيفية توليدها لجمَل صحيحة في اللغة.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم كيفية عمل الخوارزميات لتحديد البنية النحوية للجمل (الإعراب).</span></li>
+      <li><span class="obj-icon">✦</span><span>تعلم الإعراب التبعي كتقنية بديلة للإعراب النحوي مقارنة بـ CFGs.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم كيف يمثل الإعراب التبعي البنية النحوية من خلال علاقات ثنائية غير متماثلة بين الكلمات.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على التطبيقات العملية لـ CFGs والإعراب التبعي في مهام معالجة اللغات الطبيعية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Learn how CFGs are used to describe the syntax of natural languages.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize the formal definition of CFGs and how they generate valid sentences in a language.</span></li>
+      <li><span class="obj-icon">✦</span><span>Gain a basic understanding on how algorithms work to determine the syntactic structure of sentences.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn about dependency parsing as an alternative syntactic parsing technique to CFGs.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand how dependency parsing represents grammatical structure in terms of binary asymmetric relations between words.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize the practical applications of CFGs &amp; dependency parsing in NLP tasks.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="constituency-and-cfgs" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> المكونات النحوية والقواعد الخالية من السياق (CFGs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Constituency and Context-Free Grammars (CFGs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>القواعد الخالية من السياق هي نظام رسمي لنمذجة البنية النحوية، حيث تتصرف مجموعات الكلمات كوحدات مفردة تسمى المكونات (Constituents).</p></template>
+    <template class="content-en"><p>CFGs are a formal system for modeling constituent structure, where groups of words behave as single units called constituents.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد القواعد الخالية من السياق (والتي تسمى أيضاً قواعد بنية العبارة) على فكرة أن الكلمات تتجمع لتشكل مكونات نحوية (مثل العبارة الاسمية NP). تتكون CFG من مكونين رئيسيين:</p><ul><li><b>المعجم (Lexicon):</b> يتكون من رموز طرفية (Terminal symbols) تمثل الكلمات الفعلية، ورموز غير طرفية (Non-terminal symbols) تعبر عن تجريدات مثل NP.</li><li><b>القواعد (Rules):</b> تعبر عن كيفية تجميع الرموز وترتيبها. تُصاغ القاعدة كالتالي: <code>[رمز غير طرفي واحد] -> [قائمة مرتبة من الرموز الطرفية وغير الطرفية]</code>.</li></ul><p>على سبيل المثال، القاعدة <code>NP -> Det Nominal</code> تعني أن العبارة الاسمية يمكن أن تتكون من أداة تعريف متبوعة باسم.</p></template>
+    <template class="content-en"><p>Context-Free Grammars (also called phrase-structure grammars) are based on the idea that words group together to form syntactic <span class="smart-term" data-term-en="Constituent" data-ar="المُكَوِّن" data-en-def="A group of words that behave as a single syntactic unit.">constituent<span class="smart-term-tooltip"></span></span>s (like a Noun Phrase NP). A CFG consists of two main components:</p><ul><li><b>A lexicon:</b> Consists of <span class="smart-term" data-term-en="Terminal Symbol" data-ar="الرمز الطرفي" data-en-def="Symbols that correspond to actual words in the language.">terminal symbol<span class="smart-term-tooltip"></span></span>s (actual words) and <span class="smart-term" data-term-en="Non-terminal Symbol" data-ar="الرمز غير الطرفي" data-en-def="Symbols that express abstractions over terminal symbols (e.g., NP, VP).">non-terminal symbol<span class="smart-term-tooltip"></span></span>s (abstractions like NP).</li><li><b>Rules (or productions):</b> Express how symbols can be grouped and ordered. Formulated as: <code>[single non-terminal symbol] -> [ordered list of terminals and non-terminals]</code>.</li></ul><p>For example, the rule <code>NP -> Det Nominal</code> means a Noun Phrase can be composed of a determiner followed by a Nominal.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم المكونات؟ لأنها توفر دليلاً نحوياً قوياً. على سبيل المثال، العبارة الاسمية بأكملها يمكن أن تظهر قبل الفعل، لكن الكلمات الفردية داخلها قد لا تستطيع ذلك بمفردها (مثل كلمة 'the' لا يمكن أن تسبق الفعل مباشرة كفاعل).</p><p>تسمح القواعد الخالية من السياق بالتضمين الهرمي (Hierarchical embedding)، مما يعني أنه يمكن دمج القواعد مع بعضها البعض لتمثيل تراكيب لغوية معقدة جداً وذات عمق غير محدود نظرياً.</p><p>تُستخدم هذه القواعد في تطبيقات مثل الترجمة الآلية والتدقيق النحوي، حيث أن الجملة التي لا يمكن إعرابها قد تحتوي على أخطاء نحوية.</p></template>
+    <template class="content-en"><p>Why use constituents? Because they provide strong syntactic evidence. For instance, an entire NP can appear before a verb, but individual words within it might not be able to stand alone in that position (e.g., 'the' cannot act as a subject alone).</p><p>CFGs allow for hierarchical embedding, meaning rules can be combined recursively to represent highly complex linguistic structures with theoretically infinite depth.</p><p>These grammars are crucial in applications like Machine Translation and Grammar checking, as a sentence that cannot be parsed is likely ungrammatical or hard to read.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حيث A هو رمز غير طرفي، و alpha هي سلسلة من الرموز الطرفية وغير الطرفية.</strong></template>
+      <template class="content-en"><strong>Where A is a non-terminal symbol, and alpha is a string of terminals and non-terminals.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$A \rightarrow \alpha$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن لقاعدة CFG أن تحتوي على أكثر من رمز غير طرفي واحد في الجانب الأيسر من السهم؟</template>
+      <template class="content-en">Can a CFG rule have more than one non-terminal symbol on the left side of the arrow?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، بحكم التعريف، القواعد 'الخالية من السياق' يجب أن تحتوي على رمز غير طرفي واحد فقط على الجانب الأيسر. إذا كان هناك أكثر من رمز، تصبح القواعد 'حساسة للسياق' (Context-Sensitive).</p></template>
+      <template class="content-en"><p>No, by definition, 'Context-Free' grammars must have exactly one single non-terminal symbol on the left side. If there were more, it would become a Context-Sensitive Grammar.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cfg-as-generator" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> CFG كمولد للجمل (الاشتقاق وأشجار الإعراب)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> CFG as a Generator (Derivations &amp; Parse Trees)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن استخدام CFG لتوليد جمل من خلال البدء برمز البداية (S) وتطبيق قواعد إعادة الكتابة بشكل متكرر حتى نصل إلى الكلمات الطرفية.</p></template>
+    <template class="content-en"><p>A CFG can be used to generate sentences by starting with a start symbol (S) and repeatedly applying rewrite rules until only terminal words remain.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرّف CFG لغة رسمية (Formal Language) وهي مجموعة السلاسل التي يمكن اشتقاقها من رمز البداية المخصص (غالباً S، والذي يمثل الجملة).</p><p>عملية التوليد تسمى <b><span class="smart-term" data-term-en="Derivation" data-ar="الاشتقاق" data-en-def="The sequence of rule expansions used to generate a string of words.">الاشتقاق<span class="smart-term-tooltip"></span></span> (Derivation)</b>. تُقرأ علامة السهم <code>-></code> كـ 'أعد كتابة الرمز الموجود على اليسار بسلسلة الرموز الموجودة على اليمين'.</p><p>يتم تمثيل هذا التسلسل من التوسعات النحوية بواسطة <b><span class="smart-term" data-term-en="Parse Tree" data-ar="شجرة الإعراب" data-en-def="A hierarchical tree structure representing the derivation of a sentence.">شجرة الإعراب<span class="smart-term-tooltip"></span></span> (Parse Tree)</b>. في هذه الشجرة، العقدة الأم (مثل NP) تهيمن مباشرة على العقد الأبناء (مثل Det و Nom)، وتهيمن على جميع العقد الموجودة تحتها في الشجرة.</p></template>
+    <template class="content-en"><p>A CFG defines a formal language, which is the set of strings derivable from a designated start symbol (often S, representing 'sentence').</p><p>The generation process is called a <b><span class="smart-term" data-term-en="Derivation" data-ar="الاشتقاق" data-en-def="The sequence of rule expansions used to generate a string of words.">derivation<span class="smart-term-tooltip"></span></span></b>. The arrow <code>-></code> is read as 'rewrite the symbol on the left with the string of symbols on the right'.</p><p>This sequence of rule expansions is represented by a <b><span class="smart-term" data-term-en="Parse Tree" data-ar="شجرة الإعراب" data-en-def="A hierarchical tree structure representing the derivation of a sentence.">parse tree<span class="smart-term-tooltip"></span></span></b>. In this tree, a parent node (e.g., NP) immediately dominates its child nodes (e.g., Det and Nom), and dominates all nodes below it in the tree.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الجمل التي يمكن اشتقاقها بواسطة القواعد تسمى 'جمل نحوية' (Grammatical sentences)، بينما تلك التي لا يمكن اشتقاقها تسمى 'غير نحوية' (Ungrammatical).</p><p>في التوليد العشوائي، يتم اختيار توسع عشوائي لكل رمز غير طرفي. على سبيل المثال، إذا كان لدينا <code>NP -> I | Los Angeles | a flight</code>، فإن المولد سيختار أحدها عشوائياً. هذا يوضح كيف يمكن لقواعد بسيطة أن تولد عدداً هائلاً (وربما لانهائياً) من الجمل المختلفة.</p></template>
+    <template class="content-en"><p>Sentences that can be derived by the grammar are called 'grammatical sentences', while those that cannot are 'ungrammatical sentences'.</p><p>In random generation, a random expansion is chosen for each non-terminal. For example, given <code>NP -> I | Los Angeles | a flight</code>, the generator picks one randomly. This illustrates how simple rules can generate a massive (potentially infinite) number of different sentences.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A hierarchical parse tree. Root node 'S' branches to 'NP' and 'VP'. 'NP' branches to 'Pro' (I). 'VP' branches to 'Verb' (prefer) and 'NP'. The second 'NP' branches to 'Det' (a) and 'Nom'. 'Nom' branches to 'Nom' (morning) and 'Noun' (flight). Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, clear text labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">Hierarchical Parse Tree</text>
+  <text x="400" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">شجرة الإعراب الهرمية</text>
+
+  <text x="400" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15">CFG Derivation for "I prefer a morning flight"</text>
+  <text x="400" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15">اشتقاق القواعد السياقية لجملة "أنا أفضل رحلة صباحية"</text>
+
+  <!-- Legend Box -->
+  <rect x="20" y="320" width="140" height="130" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="90" y="345" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">Legend</text>
+  <text x="90" y="345" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">مفتاح</text>
+  
+  <text x="90" y="370" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">S: Sentence</text>
+  <text x="90" y="370" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">S: جملة</text>
+  
+  <text x="90" y="390" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">NP: Noun Phrase</text>
+  <text x="90" y="390" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">NP: عبارة اسمية</text>
+  
+  <text x="90" y="410" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">VP: Verb Phrase</text>
+  <text x="90" y="410" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">VP: عبارة فعلية</text>
+  
+  <text x="90" y="430" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Nom: Nominal</text>
+  <text x="90" y="430" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">Nom: اسمي</text>
+
+  <!-- Solid Lines (Non-terminals) -->
+  <line x1="380" y1="108" x2="200" y2="132" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="380" y1="108" x2="510" y2="132" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <line x1="200" y1="168" x2="200" y2="192" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <line x1="510" y1="168" x2="410" y2="192" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="510" y1="168" x2="610" y2="192" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <line x1="610" y1="228" x2="530" y2="252" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="610" y1="228" x2="690" y2="252" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <line x1="690" y1="288" x2="630" y2="312" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="690" y1="288" x2="750" y2="312" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Dashed Lines (Lexical Insertion) -->
+  <line x1="200" y1="228" x2="200" y2="395" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+  <line x1="410" y1="228" x2="410" y2="395" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+  <line x1="530" y1="288" x2="530" y2="395" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+  <line x1="630" y1="348" x2="630" y2="395" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+  <line x1="750" y1="348" x2="750" y2="395" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow-dashed)" />
+
+  <!-- Nodes -->
+  <!-- Level 0 -->
+  <rect x="335" y="72" width="90" height="36" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="380" y="96" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-lo)" font-size="15" font-weight="600">S</text>
+  <text x="380" y="96" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-lo)" font-size="15" font-weight="600">S (جملة)</text>
+
+  <!-- Level 1 -->
+  <rect x="155" y="132" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="156" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">NP</text>
+  <text x="200" y="156" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">NP (اسمية)</text>
+
+  <rect x="465" y="132" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="510" y="156" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">VP</text>
+  <text x="510" y="156" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">VP (فعلية)</text>
+
+  <!-- Level 2 -->
+  <rect x="155" y="192" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="216" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Pro</text>
+  <text x="200" y="216" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Pro (ضمير)</text>
+
+  <rect x="365" y="192" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="410" y="216" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Verb</text>
+  <text x="410" y="216" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Verb (فعل)</text>
+
+  <rect x="565" y="192" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="610" y="216" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">NP</text>
+  <text x="610" y="216" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">NP (اسمية)</text>
+
+  <!-- Level 3 -->
+  <rect x="485" y="252" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="530" y="276" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Det</text>
+  <text x="530" y="276" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Det (محدد)</text>
+
+  <rect x="645" y="252" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="690" y="276" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Nom</text>
+  <text x="690" y="276" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Nom (اسمي)</text>
+
+  <!-- Level 4 -->
+  <rect x="585" y="312" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="630" y="336" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Nom</text>
+  <text x="630" y="336" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Nom (اسمي)</text>
+
+  <rect x="705" y="312" width="90" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="750" y="336" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Noun</text>
+  <text x="750" y="336" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">Noun (اسم)</text>
+
+  <!-- Terminals -->
+  <text x="200" y="420" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold">I</text>
+  <text x="200" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold">أنا</text>
+
+  <text x="410" y="420" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold">prefer</text>
+  <text x="410" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold">أفضل</text>
+
+  <text x="530" y="420" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold">a</text>
+  <text x="530" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold">أداة</text>
+
+  <text x="630" y="420" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold">morning</text>
+  <text x="630" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold">صباحية</text>
+
+  <text x="750" y="420" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold">flight</text>
+  <text x="750" y="420" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold">رحلة</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق بين الهيمنة (Domination) والهيمنة المباشرة (Immediate Domination) في شجرة الإعراب؟</template>
+      <template class="content-en">What is the difference between domination and immediate domination in a parse tree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الهيمنة المباشرة تعني أن العقدة هي الأب المباشر لعقدة أخرى (خطوة واحدة). الهيمنة تعني أن العقدة تقع في أي مكان أعلى في المسار المؤدي إلى العقدة الهدف (سلف).</p></template>
+      <template class="content-en"><p>Immediate domination means a node is the direct parent of another (one step away). Domination means a node is anywhere higher up on the path to the target node (an ancestor).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cfg-as-parser-and-ambiguity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> CFG كمعرب والغموض النحوي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> CFG as a Parser &amp; Syntactic Ambiguity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإعراب النحوي هو عملية تعيين سلسلة من الكلمات إلى شجرة الإعراب الخاصة بها. المشكلة الأكبر في هذه العملية هي الغموض الهيكلي (Structural Ambiguity).</p></template>
+    <template class="content-en"><p>Syntactic parsing is the problem of mapping a string of words to its parse tree. The most serious problem faced by parsers is structural ambiguity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحدث <b><span class="smart-term" data-term-en="Structural Ambiguity" data-ar="الغموض الهيكلي" data-en-def="When a grammar can assign more than one valid parse tree to a single sentence.">الغموض الهيكلي<span class="smart-term-tooltip"></span></span></b> عندما تسمح القواعد بتعيين أكثر من شجرة إعراب واحدة لنفس الجملة. هناك نوعان شائعان من الغموض:</p><ol><li><b><span class="smart-term" data-term-en="Attachment Ambiguity" data-ar="غموض الارتباط" data-en-def="Ambiguity arising when a constituent can be attached to the parse tree in multiple valid places.">غموض الارتباط<span class="smart-term-tooltip"></span></span> (Attachment ambiguity):</b> يحدث عندما يمكن ربط مكون معين بشجرة الإعراب في أكثر من مكان. مثال: <i>'I shot an elephant in my pajamas'</i> (هل الفيل يرتدي البيجاما، أم المتحدث؟).</li><li><b>غموض العطف (Coordination ambiguity):</b> يحدث عندما يتم عطف العبارات بواسطة أداة عطف، ولا يكون من الواضح نطاق العطف. مثال: <i>'old men and women'</i> (هل يشير إلى رجال كبار ونساء كبار، أم رجال كبار ونساء من أي عمر؟).</li></ol></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Structural Ambiguity" data-ar="الغموض الهيكلي" data-en-def="When a grammar can assign more than one valid parse tree to a single sentence.">Structural ambiguity<span class="smart-term-tooltip"></span></span></b> occurs when the grammar can assign more than one parse tree to a sentence. Two common kinds are:</p><ol><li><b><span class="smart-term" data-term-en="Attachment Ambiguity" data-ar="غموض الارتباط" data-en-def="Ambiguity arising when a constituent can be attached to the parse tree in multiple valid places.">Attachment ambiguity<span class="smart-term-tooltip"></span></span>:</b> A particular constituent can be attached to the parse tree at more than one place. Example: <i>'I shot an elephant in my pajamas'</i> (Is the elephant in the pajamas, or the speaker?).</li><li><b>Coordination ambiguity:</b> Phrases can be conjoined by a conjunction, and the scope is unclear. Example: <i>'old men and women'</i> (Does 'old' apply to both men and women, or just men?).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الغموض يمثل تحدياً كبيراً لأن عدد أشجار الإعراب المحتملة ينمو بشكل أسي مع طول الجملة (مشكلة تُعرف بأرقام كاتالان في بعض الهياكل). المعربات التقليدية ستستخرج جميع الأشجار الممكنة دون معرفة أيها هو المعنى المقصود.</p><p>لحل هذه المشكلة، نحتاج إلى آليات لفك الغموض (Disambiguation)، والتي تعتمد غالباً على الاحتمالات أو النماذج العصبية لتقييم أي شجرة هي الأكثر ترجيحاً بناءً على السياق الدلالي والبيانات التدريبية.</p></template>
+    <template class="content-en"><p>Ambiguity is a massive challenge because the number of possible parse trees grows exponentially with sentence length (related to Catalan numbers for certain structures). Traditional parsers will extract all possible trees without knowing which is the intended meaning.</p><p>To solve this, we need disambiguation mechanisms, which often rely on probabilities or neural models to score which tree is most likely based on semantic context and training data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Two side-by-step parse trees for the sentence 'I shot an elephant in my pajamas'. Tree 1 (left) shows 'in my pajamas' attached to the VP (modifying 'shot'). Tree 2 (right) shows 'in my pajamas' attached to the NP (modifying 'elephant'). Highlight the attachment points in different colors to emphasize the ambiguity. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 1400 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Bounding Boxes for the two trees -->
+  <rect x="20" y="10" width="670" height="530" fill="var(--bg-elevated)" rx="16" stroke="var(--border-color)" stroke-width="1"/>
+  <rect x="710" y="10" width="670" height="530" fill="var(--bg-elevated)" rx="16" stroke="var(--border-color)" stroke-width="1"/>
+
+  <!-- Titles -->
+  <text x="355" y="50" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">VP Attachment (Modifies Verb)</text>
+  <text x="355" y="50" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التعلق بالعبارة الفعلية (يعدل الفعل)</text>
+  
+  <text x="1045" y="50" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">NP Attachment (Modifies Noun)</text>
+  <text x="1045" y="50" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التعلق بالعبارة الاسمية (يعدل الاسم)</text>
+
+  <!-- ================= LEFT TREE ================= -->
+  
+  <!-- Tree Edges (Left) -->
+  <g stroke="var(--text-muted)" stroke-width="2" fill="none">
+    <path d="M 280 95 L 150 125" />
+    <path d="M 280 95 L 415 125" />
+    <path d="M 415 155 L 250 185" />
+    <path d="M 415 155 L 385 185" />
+    <path d="M 385 215 L 340 245" />
+    <path d="M 385 215 L 430 245" />
+    <path d="M 580 215 L 525 245" />
+    <path d="M 580 215 L 635 245" />
+    <path d="M 635 275 L 590 305" />
+    <path d="M 635 275 L 680 305" />
+  </g>
+
+  <!-- Highlighted Edge (Left) -->
+  <path d="M 415 155 L 580 185" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+
+  <!-- Dashed Lines to Words (Left) -->
+  <g stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+    <path d="M 150 155 L 150 440" />
+    <path d="M 250 215 L 250 440" />
+    <path d="M 340 275 L 340 440" />
+    <path d="M 430 275 L 430 440" />
+    <path d="M 525 275 L 525 440" />
+    <path d="M 590 335 L 590 440" />
+    <path d="M 680 335 L 680 440" />
+  </g>
+
+  <!-- Nodes (Left) -->
+  <g font-size="14" font-weight="bold" text-anchor="middle">
+    <!-- Normal Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2">
+      <rect x="258" y="65" width="44" height="30" rx="6" />
+      <rect x="128" y="125" width="44" height="30" rx="6" />
+      <rect x="228" y="185" width="44" height="30" rx="6" />
+      <rect x="363" y="185" width="44" height="30" rx="6" />
+      <rect x="318" y="245" width="44" height="30" rx="6" />
+      <rect x="408" y="245" width="44" height="30" rx="6" />
+      <rect x="503" y="245" width="44" height="30" rx="6" />
+      <rect x="613" y="245" width="44" height="30" rx="6" />
+      <rect x="568" y="305" width="44" height="30" rx="6" />
+      <rect x="658" y="305" width="44" height="30" rx="6" />
+    </g>
+    <g fill="var(--text-primary)">
+      <text x="280" y="85">S</text>
+      <text x="150" y="145">Pro</text>
+      <text x="250" y="205">V</text>
+      <text x="385" y="205">NP</text>
+      <text x="340" y="265">Det</text>
+      <text x="430" y="265">N</text>
+      <text x="525" y="265">P</text>
+      <text x="635" y="265">NP</text>
+      <text x="590" y="325">Det</text>
+      <text x="680" y="325">N</text>
+    </g>
+
+    <!-- Highlighted Nodes -->
+    <g fill="var(--brand-500)">
+      <rect x="393" y="125" width="44" height="30" rx="6" />
+      <rect x="558" y="185" width="44" height="30" rx="6" />
+    </g>
+    <g fill="var(--on-brand-lo)">
+      <text x="415" y="145">VP</text>
+      <text x="580" y="205">PP</text>
+    </g>
+  </g>
+
+  <!-- Words (Left) -->
+  <g font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">
+    <text x="150" y="465" class="gsvg-en">I</text>
+    <text x="150" y="465" class="gsvg-ar">أنا</text>
+    
+    <text x="250" y="465" class="gsvg-en">shot</text>
+    <text x="250" y="465" class="gsvg-ar">أطلقت</text>
+    
+    <text x="340" y="465" class="gsvg-en">an</text>
+    <text x="340" y="465" class="gsvg-ar">أداة</text>
+    
+    <text x="430" y="465" class="gsvg-en">elephant</text>
+    <text x="430" y="465" class="gsvg-ar">فيل</text>
+    
+    <text x="525" y="465" class="gsvg-en">in</text>
+    <text x="525" y="465" class="gsvg-ar">في</text>
+    
+    <text x="590" y="465" class="gsvg-en">my</text>
+    <text x="590" y="465" class="gsvg-ar">ضمير</text>
+    
+    <text x="680" y="465" class="gsvg-en">pajamas</text>
+    <text x="680" y="465" class="gsvg-ar">منامة</text>
+  </g>
+
+  <!-- Meaning (Left) -->
+  <text x="355" y="515" text-anchor="middle" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Meaning: The speaker is in their pajamas.</text>
+  <text x="355" y="515" text-anchor="middle" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">المعنى: المتحدث يرتدي المنامة.</text>
+
+
+  <!-- ================= RIGHT TREE ================= -->
+  
+  <!-- Tree Edges (Right) -->
+  <g stroke="var(--text-muted)" stroke-width="2" fill="none">
+    <path d="M 860 95 L 750 125" />
+    <path d="M 860 95 L 965 125" />
+    <path d="M 965 155 L 850 185" />
+    <path d="M 965 155 L 1080 185" />
+    <path d="M 1080 215 L 980 245" />
+    <path d="M 980 275 L 935 305" />
+    <path d="M 980 275 L 1025 305" />
+    <path d="M 1180 275 L 1125 305" />
+    <path d="M 1180 275 L 1235 305" />
+    <path d="M 1235 335 L 1190 365" />
+    <path d="M 1235 335 L 1280 365" />
+  </g>
+
+  <!-- Highlighted Edge (Right) -->
+  <path d="M 1080 215 L 1180 245" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+
+  <!-- Dashed Lines to Words (Right) -->
+  <g stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+    <path d="M 750 155 L 750 440" />
+    <path d="M 850 215 L 850 440" />
+    <path d="M 935 335 L 935 440" />
+    <path d="M 1025 335 L 1025 440" />
+    <path d="M 1125 335 L 1125 440" />
+    <path d="M 1190 395 L 1190 440" />
+    <path d="M 1280 395 L 1280 440" />
+  </g>
+
+  <!-- Nodes (Right) -->
+  <g font-size="14" font-weight="bold" text-anchor="middle">
+    <!-- Normal Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2">
+      <rect x="838" y="65" width="44" height="30" rx="6" />
+      <rect x="728" y="125" width="44" height="30" rx="6" />
+      <rect x="943" y="125" width="44" height="30" rx="6" />
+      <rect x="828" y="185" width="44" height="30" rx="6" />
+      <rect x="958" y="245" width="44" height="30" rx="6" />
+      <rect x="913" y="305" width="44" height="30" rx="6" />
+      <rect x="1003" y="305" width="44" height="30" rx="6" />
+      <rect x="1103" y="305" width="44" height="30" rx="6" />
+      <rect x="1213" y="305" width="44" height="30" rx="6" />
+      <rect x="1168" y="365" width="44" height="30" rx="6" />
+      <rect x="1258" y="365" width="44" height="30" rx="6" />
+    </g>
+    <g fill="var(--text-primary)">
+      <text x="860" y="85">S</text>
+      <text x="750" y="145">Pro</text>
+      <text x="965" y="145">VP</text>
+      <text x="850" y="205">V</text>
+      <text x="980" y="265">NP</text>
+      <text x="935" y="325">Det</text>
+      <text x="1025" y="325">N</text>
+      <text x="1125" y="325">P</text>
+      <text x="1235" y="325">NP</text>
+      <text x="1190" y="385">Det</text>
+      <text x="1280" y="385">N</text>
+    </g>
+
+    <!-- Highlighted Nodes -->
+    <g fill="var(--brand-500)">
+      <rect x="1058" y="185" width="44" height="30" rx="6" />
+      <rect x="1158" y="245" width="44" height="30" rx="6" />
+    </g>
+    <g fill="var(--on-brand-lo)">
+      <text x="1080" y="205">NP</text>
+      <text x="1180" y="265">PP</text>
+    </g>
+  </g>
+
+  <!-- Words (Right) -->
+  <g font-size="16" font-weight="bold" text-anchor="middle" fill="var(--text-primary)">
+    <text x="750" y="465" class="gsvg-en">I</text>
+    <text x="750" y="465" class="gsvg-ar">أنا</text>
+    
+    <text x="850" y="465" class="gsvg-en">shot</text>
+    <text x="850" y="465" class="gsvg-ar">أطلقت</text>
+    
+    <text x="935" y="465" class="gsvg-en">an</text>
+    <text x="935" y="465" class="gsvg-ar">أداة</text>
+    
+    <text x="1025" y="465" class="gsvg-en">elephant</text>
+    <text x="1025" y="465" class="gsvg-ar">فيل</text>
+    
+    <text x="1125" y="465" class="gsvg-en">in</text>
+    <text x="1125" y="465" class="gsvg-ar">في</text>
+    
+    <text x="1190" y="465" class="gsvg-en">my</text>
+    <text x="1190" y="465" class="gsvg-ar">ضمير</text>
+    
+    <text x="1280" y="465" class="gsvg-en">pajamas</text>
+    <text x="1280" y="465" class="gsvg-ar">منامة</text>
+  </g>
+
+  <!-- Meaning (Right) -->
+  <text x="1045" y="515" text-anchor="middle" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Meaning: The elephant is in the pajamas.</text>
+  <text x="1045" y="515" text-anchor="middle" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">المعنى: الفيل يرتدي المنامة.</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن للإنسان فك الغموض في جملة 'I shot an elephant in my pajamas' بسهولة بينما يعاني الحاسوب؟</template>
+      <template class="content-en">How can a human easily disambiguate 'I shot an elephant in my pajamas' while a computer struggles?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعتمد الإنسان على المعرفة الدلالية ومعرفة العالم الحقيقي (الفيلة لا ترتدي البيجاما). الحاسوب الذي يعتمد فقط على القواعد النحوية (CFG) يفتقر إلى هذه المعرفة الدلالية.</p></template>
+      <template class="content-en"><p>Humans rely on semantic and real-world knowledge (elephants don't wear pajamas). A computer relying solely on syntactic rules (CFG) lacks this semantic grounding.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cky-parsing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> خوارزمية الإعراب CKY (الكلاسيكية والعصبية)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> CKY Parsing (Classic &amp; Neural)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية CKY هي طريقة تعتمد على البرمجة الديناميكية لبناء أشجار الإعراب من الأسفل إلى الأعلى. النسخة العصبية منها تساعد في اختيار الشجرة الأفضل (فك الغموض).</p></template>
+    <template class="content-en"><p>CKY parsing is a dynamic-programming based method that builds parse trees bottom-up. The neural version helps in choosing the best tree (disambiguation).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الإعراب الكلاسيكي CKY:</b></p><ul><li>هو معرب مكونات يعتمد على البرمجة الديناميكية.</li><li>يجمع بشكل هرمي نطاقات (spans) أكبر فأكبر لبناء شجرة الإعراب من الأسفل إلى الأعلى (bottom-up).</li><li>يستخدم قواعد مكتوبة يدوياً لتقييد التوليفات الممكنة.</li><li><b>المشكلة:</b> ممتاز في سرد جميع أشجار الإعراب الممكنة، لكنه لا يخبرنا أيها هو الصحيح (لا يوجد فك غموض).</li></ul><p><b>الإعراب العصبي CKY:</b></p><ul><li>يستخدم تمثيلات عصبية متعلمة للنطاقات لتشفير التوليفات الممكنة.</li><li>الفكرة هي تدريب مصنف عصبي لتعيين درجة (score) لكل مكون.</li><li>يستخدم نسخة معدلة من CKY لدمج هذه الدرجات وإيجاد شجرة الإعراب ذات الدرجة الأعلى (<span class="smart-term" data-term-en="Disambiguation" data-ar="فك الغموض" data-en-def="The process of choosing the single correct parse tree from multiple possible valid trees.">فك الغموض<span class="smart-term-tooltip"></span></span>).</li></ul></template>
+    <template class="content-en"><p><b>Classic CKY parsing:</b></p><ul><li>A dynamic-programming based Constituency Parser.</li><li>Hierarchically combines larger and larger spans to build the parse-tree bottom-up.</li><li>Uses hand-written grammars to constrain possible combinations.</li><li><b>Problem:</b> Great at enumerating all possible parse trees, but doesn't tell which parse is the correct one (no <span class="smart-term" data-term-en="Disambiguation" data-ar="فك الغموض" data-en-def="The process of choosing the single correct parse tree from multiple possible valid trees.">disambiguation<span class="smart-term-tooltip"></span></span>).</li></ul><p><b>Neural CKY parsing:</b></p><ul><li>Uses learned neural representations of spans to encode possible combinations.</li><li>Trains a neural classifier to assign a score to each constituent.</li><li>Uses a modified CKY to combine these scores to find the best-scoring parse tree (disambiguation).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تتطلب <span class="smart-term" data-term-en="CKY Algorithm" data-ar="خوارزمية CKY" data-en-def="A dynamic programming algorithm for parsing context-free grammars bottom-up.">خوارزمية CKY<span class="smart-term-tooltip"></span></span> الكلاسيكية أن تكون القواعد في صيغة تشومسكي الطبيعية (Chomsky Normal Form - CNF)، حيث تنتج كل قاعدة إما رمزين غير طرفيين أو رمزاً طرفياً واحداً. هذا يضمن أن شجرة الإعراب ثنائية، مما يجعل البرمجة الديناميكية فعالة (بتعقيد زمني \(O(n^3)\)).</p><p>الامتداد العصبي يحل العيب القاتل لـ CKY الكلاسيكي. من خلال تعيين أوزان/درجات مستمرة بدلاً من قواعد ثنائية (صح/خطأ)، يحول المشكلة من مجرد 'البحث عن الأشجار الصالحة' إلى 'البحث عن الشجرة الأكثر احتمالاً'، وهو جوهر الإعراب الإحصائي الحديث.</p></template>
+    <template class="content-en"><p>Classic CKY requires the grammar to be in Chomsky Normal Form (CNF), where every rule produces either two non-terminals or one terminal. This ensures binary trees, making the dynamic programming efficient (\(O(n^3)\) time complexity).</p><p>The neural extension solves the fatal flaw of classic CKY. By assigning continuous scores instead of binary valid/invalid rules, it shifts the problem from 'finding valid trees' to 'finding the most probable tree', which is the core of modern statistical parsing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم البرمجة الديناميكية في CKY بدلاً من البحث الشامل (Exhaustive Search)؟</template>
+      <template class="content-en">Why use dynamic programming in CKY instead of exhaustive search?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>البحث الشامل سيعيد حساب نفس المكونات الفرعية مراراً وتكراراً، مما يؤدي إلى تعقيد زمني أسي. البرمجة الديناميكية تخزن الحلول الفرعية (في جدول) لضمان حساب كل مكون فرعي مرة واحدة فقط.</p></template>
+      <template class="content-en"><p>Exhaustive search would recompute the same sub-constituents repeatedly, leading to exponential time complexity. Dynamic programming stores sub-solutions (in a table) to ensure each sub-constituent is computed only once.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluating-constituency-parsers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقييم معربات المكونات (PARSEVAL و Treebanks)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Evaluating Constituency Parsers (PARSEVAL &amp; Treebanks)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تقييم المعربات بمقارنة مخرجاتها بشجرة مرجعية صحيحة (Gold Standard) باستخدام مقاييس PARSEVAL، وتُستمد هذه المراجع من بنوك الأشجار (Treebanks).</p></template>
+    <template class="content-en"><p>Parsers are evaluated by comparing their output to a gold standard reference tree using PARSEVAL metrics, derived from Treebanks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مقاييس PARSEVAL:</b> هي الأداة القياسية لتقييم المعربات التي تعين شجرة إعراب واحدة للجملة. تقيس مدى تشابه المكونات في شجرة الفرضية (مخرجات المعرب) مع المكونات في الشجرة المرجعية المصنفة يدوياً (Gold Standard).</p><p><b>بنوك الأشجار (Treebanks):</b> هي مجموعة نصوص (Corpus) حيث يتم توضيح كل جملة بشجرة إعراب. تلعب دوراً مهماً في تدريب المعربات والتحقيقات اللغوية.</p><p><b>بناء Treebanks:</b> تُصنع عادةً عن طريق تشغيل معرب آلي على كل جملة، ثم يقوم لغويون بشريون بتصحيح الإعراب الناتج يدوياً.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="PARSEVAL" data-ar="مقاييس بارسيفال" data-en-def="Standard metrics for evaluating constituency parsers by comparing hypothesis trees to gold standard trees.">PARSEVAL<span class="smart-term-tooltip"></span></span> metrics:</b> The standard tool for evaluating parsers that assign a single parse tree to a sentence. It measures how much the constituents in the hypothesis parse tree look like the constituents in a hand-labeled reference parse tree (gold standard).</p><p><b><span class="smart-term" data-term-en="Treebank" data-ar="بنك الأشجار" data-en-def="A text corpus in which each sentence has been annotated with a syntactic structure (parse tree).">Treebank<span class="smart-term-tooltip"></span></span>s:</b> A corpus in which every sentence is annotated with a parse tree. They play an important role in parsing and linguistic investigations.</p><p><b>Construction:</b> Generally made by running a parser over each sentence and then having the resulting parse hand-corrected by human linguists.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مقاييس PARSEVAL تعتمد عادة على الدقة (Precision) والاستدعاء (Recall) ومقياس F1 للمكونات. لكي يُعتبر المكون صحيحاً، يجب أن يتطابق في التسمية (مثل NP) ونطاق الكلمات الدقيق الذي يغطيه.</p><p>بنوك الأشجار لا تُستخدم فقط للتقييم، بل هي المصدر الأساسي لاستخراج القواعد النحوية ضمنياً. الجمل الموجودة في Treebank تشكل ضمناً قواعد اللغة، ويمكن استخراج احتمالات القواعد منها لتدريب النماذج الإحصائية.</p></template>
+    <template class="content-en"><p>PARSEVAL metrics typically rely on Precision, Recall, and F1-score of the constituents. For a constituent to be considered correct, it must match the label (e.g., NP) and the exact span of words it covers.</p><p>Treebanks are not just for evaluation; they are the primary source for implicitly extracting grammars. The sentences in a treebank implicitly constitute a grammar of the language, and rule probabilities can be extracted to train statistical models.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم لغويين بشريين لتصحيح مخرجات المعرب الآلي عند بناء Treebank بدلاً من الإعراب اليدوي من الصفر؟</template>
+      <template class="content-en">Why use human linguists to correct automatic parser output when building a Treebank instead of parsing from scratch?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن بناء الأشجار من الصفر بطيء جداً ومكلف. تصحيح أخطاء المعرب الآلي أسرع بكثير ويزيد من إنتاجية اللغويين.</p></template>
+      <template class="content-en"><p>Because building trees from scratch is extremely slow and expensive. Correcting an automatic parser's mistakes is much faster and increases annotator throughput.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dependency-relations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> العلاقات التبعية (Dependency Relations)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Dependency Relations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يصف الإعراب التبعي بنية الجملة من خلال علاقات ثنائية موجهة بين الكلمات، حيث يربط كل قوس بين كلمة 'رأس' (Head) وكلمة 'تابعة' (Dependent).</p></template>
+    <template class="content-en"><p>Dependency parsing describes sentence structure through directed binary relations between words, where each arc connects a 'head' to a 'dependent'.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في البنية التبعية، لا توجد مكونات عبارية (مثل NP). بدلاً من ذلك، تعتمد البنية على <b>علاقات نحوية ثنائية موجهة</b> بين الكلمات نفسها.</p><ul><li><b><span class="smart-term" data-term-en="Head" data-ar="الرأس" data-en-def="The central organizing word in a dependency relation.">الرأس<span class="smart-term-tooltip"></span></span> (Head):</b> الكلمة المركزية المنظمة.</li><li><b><span class="smart-term" data-term-en="Dependent" data-ar="التابع" data-en-def="The word that modifies or depends on the head in a dependency relation.">التابع<span class="smart-term-tooltip"></span></span> (Dependent):</b> نوع من المعدِّل (Modifier) للرأس.</li></ul><p>تُرسم العلاقات كأقواس موجهة من الرأس إلى التابع. جذر الشجرة (Root) هو رأس البنية بأكملها.</p><p>تُسمى هذه البنية <b>بنية تبعية مكتوبة (Typed dependency structure)</b> لأن التسميات (Labels) على الأقواس تُسحب من مخزون ثابت من العلاقات النحوية (مثل الفاعل NSUBJ، المفعول به OBJ).</p></template>
+    <template class="content-en"><p>In dependency structure, there are no phrasal constituents (like NP). Instead, the structure is based on <b>directed binary grammatical relations</b> between the words themselves.</p><ul><li><b>The <span class="smart-term" data-term-en="Head" data-ar="الرأس" data-en-def="The central organizing word in a dependency relation.">head<span class="smart-term-tooltip"></span></span>:</b> The central organizing word.</li><li><b>The <span class="smart-term" data-term-en="Dependent" data-ar="التابع" data-en-def="The word that modifies or depends on the head in a dependency relation.">dependent<span class="smart-term-tooltip"></span></span>:</b> A kind of modifier to the head.</li></ul><p>Relations are drawn as directed arcs from head to dependent. The root of the tree is the head of the entire structure.</p><p>It is called a <b>typed dependency structure</b> because the labels on the arcs are drawn from a fixed inventory of grammatical relations (e.g., NSUBJ for nominal subject, OBJ for direct object).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مشروع التبعيات العالمية (Universal Dependencies - UD) هو جهد مجتمعي مفتوح لتوحيد هذه العلاقات عبر أكثر من 100 لغة، ويوفر مخزوناً من 37 علاقة تبعية.</p><p>يمكن تقسيم العلاقات الأساسية إلى مجموعتين: <b>علاقات الجملة (Clausal relations)</b> التي تصف الأدوار النحوية بالنسبة للمسند (غالباً الفعل، مثل NSUBJ و OBJ)، و <b>علاقات التعديل (Modifier relations)</b> التي تصنف طرق تعديل الكلمات لرؤوسها (مثل NMOD، DET، CASE).</p></template>
+    <template class="content-en"><p>The Universal Dependencies (UD) project is an open community effort to standardize these relations across >100 languages, providing an inventory of 37 dependency relations.</p><p>The core set of relations can be broken into two sets: <b>Clausal relations</b> that describe syntactic roles with respect to a predicate (often a verb, e.g., NSUBJ, OBJ), and <b>Modifier relations</b> that categorize how words modify their heads (e.g., NMOD, DET, CASE).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A dependency parse graph for the sentence 'I prefer the morning flight through Denver'. Words are nodes. Directed arcs point from Head to Dependent. 'prefer' is the root. Arc from 'prefer' to 'I' labeled 'nsubj'. Arc from 'prefer' to 'flight' labeled 'obj'. Arc from 'flight' to 'the' labeled 'det'. Arc from 'flight' to 'morning' labeled 'compound'. Arc from 'flight' to 'Denver' labeled 'nmod'. Arc from 'Denver' to 'through' labeled 'case'. Style: clean, directed graph, curved arrows above text. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Dependency Arcs (Paths) -->
+    <!-- ROOT to prefer -->
+    <path d="M 180 40 L 180 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- prefer to I (nsubj) -->
+    <path d="M 180 310 Q 125 170 70 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- prefer to flight (obj) -->
+    <path d="M 180 310 Q 345 -90 510 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- flight to the (det) -->
+    <path d="M 510 310 Q 400 30 290 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- flight to morning (compound) -->
+    <path d="M 510 310 Q 455 170 400 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- flight to Denver (nmod) -->
+    <path d="M 510 310 Q 620 30 730 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Denver to through (case) -->
+    <path d="M 730 310 Q 675 170 620 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Relation Labels (Pills) -->
+    <!-- ROOT -->
+    <rect x="138" y="27" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="180" y="45" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">ROOT</tspan>
+        <tspan class="gsvg-ar">الجذر</tspan>
+    </text>
+
+    <!-- nsubj -->
+    <rect x="83" y="227" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="125" y="245" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">nsubj</tspan>
+        <tspan class="gsvg-ar">فاعل</tspan>
+    </text>
+
+    <!-- obj -->
+    <rect x="303" y="97" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="345" y="115" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">obj</tspan>
+        <tspan class="gsvg-ar">مفعول به</tspan>
+    </text>
+
+    <!-- det -->
+    <rect x="358" y="157" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="400" y="175" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">det</tspan>
+        <tspan class="gsvg-ar">محدد</tspan>
+    </text>
+
+    <!-- compound -->
+    <rect x="413" y="227" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="455" y="245" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">compound</tspan>
+        <tspan class="gsvg-ar">مركب</tspan>
+    </text>
+
+    <!-- nmod -->
+    <rect x="578" y="157" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="620" y="175" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">nmod</tspan>
+        <tspan class="gsvg-ar">مضاف</tspan>
+    </text>
+
+    <!-- case -->
+    <rect x="633" y="227" width="84" height="26" rx="13" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" />
+    <text x="675" y="245" text-anchor="middle" fill="var(--brand-ink)" font-size="13px" font-weight="600" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">case</tspan>
+        <tspan class="gsvg-ar">حرف جر</tspan>
+    </text>
+
+    <!-- Word Nodes -->
+    <!-- I -->
+    <rect x="30" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="70" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">I</tspan>
+        <tspan class="gsvg-ar">أنا</tspan>
+    </text>
+
+    <!-- prefer -->
+    <rect x="140" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="180" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">prefer</tspan>
+        <tspan class="gsvg-ar">أفضل</tspan>
+    </text>
+
+    <!-- the -->
+    <rect x="250" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="290" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">the</tspan>
+        <tspan class="gsvg-ar">الـ</tspan>
+    </text>
+
+    <!-- morning -->
+    <rect x="360" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">morning</tspan>
+        <tspan class="gsvg-ar">صباح</tspan>
+    </text>
+
+    <!-- flight -->
+    <rect x="470" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="510" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">flight</tspan>
+        <tspan class="gsvg-ar">رحلة</tspan>
+    </text>
+
+    <!-- through -->
+    <rect x="580" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="620" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">through</tspan>
+        <tspan class="gsvg-ar">عبر</tspan>
+    </text>
+
+    <!-- Denver -->
+    <rect x="690" y="320" width="80" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="730" y="344" text-anchor="middle" fill="var(--text-primary)" font-size="15px" font-weight="500" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <tspan class="gsvg-en">Denver</tspan>
+        <tspan class="gsvg-ar">دنفر</tspan>
+    </text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في جملة 'The fast car', ما هي الكلمة الرأس وما هي الكلمات التابعة؟</template>
+      <template class="content-en">In the phrase 'The fast car', what is the head word and what are the dependents?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الرأس هو 'car' (الاسم). الكلمات التابعة هي 'The' (محدد DET) و 'fast' (صفة AMOD)، وكلاهما يشير إلى الرأس 'car'.</p></template>
+      <template class="content-en"><p>The head is 'car' (the noun). The dependents are 'The' (determiner DET) and 'fast' (adjective AMOD), both pointing to the head 'car'.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dependency-vs-constituency" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> قواعد التبعية مقابل قواعد المكونات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Dependency Grammars vs. Constituency Grammars</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قواعد التبعية أكثر شيوعاً اليوم لأنها ترمّز العلاقات الدلالية مباشرة وتتعامل بشكل أفضل مع اللغات ذات ترتيب الكلمات الحر.</p></template>
+    <template class="content-en"><p>Dependency grammars are more common today because they directly encode semantic relationships and handle free word order languages much better.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتبر قواعد التبعية حالياً أكثر شيوعاً من قواعد المكونات في معالجة اللغات الطبيعية لميزتين رئيسيتين:</p><ol><li><b>العلاقات الدلالية المباشرة:</b> علاقات الرأس-التابع هي وكيل جيد للعلاقة الدلالية بين المسندات (الأفعال) ووسائطها. في التبعية، ترتبط الوسائط مباشرة بالفعل. في المكونات، غالباً ما تُدفن هذه المعلومات في أشجار معقدة وتكون المسافة بين الفعل ووسائطه أبعد.</li><li><b>ترتيب الكلمات الحر:</b> تتعامل التبعية بسهولة مع اللغات التي يكون فيها ترتيب الكلمات مرناً (مثل الروسية أو العربية). رابط تبعية واحد يكفي بغض النظر عن مكان الكلمة. في المكونات، يتطلب الترتيب الحر قواعد منفصلة لكل مكان محتمل في الشجرة، مما يجعلها معقدة جداً.</li></ol></template>
+    <template class="content-en"><p>Dependency grammars are currently more common than constituency grammars in NLP due to two major advantages:</p><ol><li><b>Direct Semantic Relationships:</b> Head-dependent relations are a good proxy for the semantic relationship between predicates and their arguments. In dependency, arguments link directly to the verb. In constituency, this info is often buried in complex trees.</li><li><b>Free Word Order:</b> Dependency easily handles languages with flexible word order. One link type represents the relation regardless of position. Constituency approaches would need a separate rule for each possible place in the parse tree, making it overly complex.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في اللغات ذات الترتيب الحر، يمكن للفاعل أن يسبق الفعل أو يتبعه. شجرة المكونات (CFG) تفرض ترتيباً صارماً (مثلاً S -> NP VP يفرض أن الفاعل يسبق الفعل). لنمذجة الترتيب الحر بـ CFG، سنحتاج إلى قواعد هائلة (S -> VP NP, S -> V NP PP, إلخ). الإعراب التبعي يتجاهل الترتيب الخطي ويركز فقط على 'من يرتبط بمن'، مما يجعله عالمياً وقابلاً للتطبيق على لغات متنوعة (وهو أساس مشروع Universal Dependencies).</p></template>
+    <template class="content-en"><p>In free word order languages, a subject can precede or follow the verb. CFGs enforce strict linear order (e.g., S -> NP VP enforces Subject before Verb). To model free order with CFG requires an explosion of rules. Dependency parsing abstracts away from linear order and focuses solely on 'what modifies what', making it highly universal and applicable across diverse languages (the foundation of the Universal Dependencies project).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Dependency structure</th><th>Constituency structure</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تمثيل العلاقات الدلالية</template>
+          <template class="content-en">Representation of Semantic Relationships</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">وكيل جيد للعلاقة الدلالية؛ ترتبط الوسائط مباشرة بالفعل.</template>
+          <template class="content-en">Good proxy for semantic relationship; arguments directly linked to verb.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">المعلومات غالباً ما تكون مدفونة في أشجار بنية العبارة المعقدة.</template>
+          <template class="content-en">Information is often buried in complex phrase-structure parses.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع ترتيب الكلمات الحر</template>
+          <template class="content-en">Handling Free Word Order</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قدرة عالية؛ رابط واحد يمثل العلاقة بغض النظر عن الترتيب.</template>
+          <template class="content-en">High ability; one link type represents relation regardless of order.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أكثر تعقيداً؛ يتطلب قاعدة منفصلة لكل مكان محتمل في الشجرة.</template>
+          <template class="content-en">More complex; needs a separate rule for each possible place in the tree.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر قواعد التبعية مفيدة جداً لمهام استخراج المعلومات (Information Extraction)؟</template>
+      <template class="content-en">Why are dependency grammars highly useful for Information Extraction tasks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تربط الكيانات (مثل الفاعل والمفعول به) مباشرة بالفعل الذي يمثل الحدث، مما يسهل استخراج علاقات (من فعل ماذا لمن) دون الحاجة للتنقل عبر طبقات من العبارات النحوية.</p></template>
+      <template class="content-en"><p>Because they directly link entities (like subject and object) to the action verb, making it easy to extract 'who did what to whom' relations without navigating through layers of phrasal nodes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dependency-formalisms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الشكليات التبعية وبنوك الأشجار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Dependency Formalisms &amp; Treebanks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُمثل البنية التبعية كـ 'رسم بياني موجه' (Directed Graph) يخضع لقيود صارمة لضمان تشكيل شجرة متصلة بجذر واحد.</p></template>
+    <template class="content-en"><p>A dependency structure is represented as a 'directed graph' subject to strict constraints to ensure it forms a connected tree with a single root.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تمثيل البنية التبعية كرسم بياني موجه <code>G=(V,A)</code>، حيث <code>V</code> هي مجموعة الرؤوس (الكلمات)، و <code>A</code> هي مجموعة الأقواس (أزواج مرتبة تمثل علاقة الرأس-التابع).</p><p>شجرة التبعية هي رسم بياني موجه يلبي <b>القيود التالية</b>:</p><ol><li>يوجد عقدة جذر (ROOT) واحدة معينة ليس لها أقواس واردة.</li><li>باستثناء عقدة الجذر، كل رأس (كلمة) له قوس وارد واحد بالضبط (كل كلمة لها رأس واحد فقط).</li><li>يوجد مسار فريد من عقدة الجذر إلى كل رأس في V.</li></ol><p>تضمن هذه القيود أن البنية متصلة، وكل كلمة لها رأس واحد، ويمكن الوصول لكل كلمة من الجذر.</p></template>
+    <template class="content-en"><p>A dependency structure can be represented as a <span class="smart-term" data-term-en="Directed Graph" data-ar="الرسم البياني الموجه" data-en-def="A graph where edges have a direction, used to represent dependency relations.">directed graph<span class="smart-term-tooltip"></span></span> <code>G=(V,A)</code>, where <code>V</code> is the set of vertices (words), and <code>A</code> is the set of arcs (ordered pairs representing head-dependent relations).</p><p>The dependency tree is a directed graph that satisfies the <b>following constraints</b>:</p><ol><li>There is a single designated root node that has no incoming arcs.</li><li>With the exception of the root node, each vertex has exactly one incoming arc (each word has a single head).</li><li>There is a unique path from the root node to each vertex in V.</li></ol><p>These constraints ensure the structure is connected, each word has a single head, and every word is reachable from the root.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تلعب بنوك أشجار التبعية (Dependency Treebanks) دوراً حاسماً في تدريب وتقييم المعربات. يمكن بناؤها بثلاث طرق:</p><ol><li><strong>إنشاء يدوي مباشر</strong> من قبل لغويين</li><li><strong>تصحيح يدوي</strong> لمخرجات معرب آلي</li><li><strong>ترجمة بنوك أشجار المكونات (CFG) الحالية</strong> إلى أشجار تبعية باستخدام قواعد تحويل.</li></ol><p>مشروع UD يمتلك حالياً ما يقرب من 200 بنك أشجار تبعية في أكثر من 100 لغة، مما أحدث ثورة في الإعراب متعدد اللغات.</p></template>
+    <template class="content-en"><p>Dependency Treebanks play a critical role in training and evaluating parsers. They can be constructed in three ways:</p><ol><li><strong>Direct human annotation</strong></li><li><strong>Human correction</strong> of automatic parser output</li><li><strong>Translating existing constituent-based treebanks</strong> into dependency trees using conversion rules.</li></ol><p>The UD project currently has almost 200 dependency treebanks in >100 languages, revolutionizing cross-lingual parsing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الرسم البياني الموجه حيث V هي الكلمات و A هي الأقواس.</strong></template>
+      <template class="content-en"><strong>Directed graph where V are words and A are arcs.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$G = (V, A)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا كان لكلمة قوسان واردان في شجرة التبعية؟</template>
+      <template class="content-en">What happens if a word has two incoming arcs in a dependency tree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>هذا ينتهك قيد 'الرأس الواحد' (Single Head Constraint). في شجرة التبعية الصالحة، يجب أن يكون لكل كلمة رأس نحوي واحد فقط لتجنب الغموض الهيكلي.</p></template>
+      <template class="content-en"><p>It violates the 'single head constraint'. In a valid dependency tree, each word must have exactly one syntactic head to avoid structural ambiguity.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transition-based-parsing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الإعراب التبعي القائم على الانتقال (Transition-Based)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Transition-Based Dependency Parsing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد هذا المعرب على اتخاذ قرارات محلية جشعة (Greedy) خطوة بخطوة باستخدام مكدس (Stack) ومخزن مؤقت (Buffer) ومتنبئ يسمى 'أوراكل' (Oracle).</p></template>
+    <template class="content-en"><p>This parser relies on greedy local decisions step-by-step using a stack, a buffer, and a predictor called an 'oracle'.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الإعراب القائم على الانتقال، لدينا:</p><ul><li><b>مكدس (Stack):</b> تُبنى عليه شجرة الإعراب.</li><li><b>مخزن مؤقت (Buffer):</b> يحتوي على الكلمات التي لم تُعرب بعد.</li><li><b>أوراكل (Oracle):</b> متنبئ يتخذ الإجراءات.</li></ul><p>يمر الأوراكل عبر الجملة من اليسار لليمين، ويتخذ قراراً واحداً من ثلاثة إجراءات (Transitions) في كل خطوة بناءً على أعلى عنصرين في المكدس:</p><ol><li><b>LEFTARC:</b> ينشئ علاقة (الكلمة الأولى رأس للثانية) ويزيل الكلمة الثانية من المكدس.</li><li><b>RIGHTARC:</b> ينشئ علاقة (الكلمة الثانية رأس للأولى) ويزيل الكلمة الأولى من المكدس.</li><li><b>SHIFT:</b> ينقل كلمة من المخزن المؤقت إلى المكدس.</li></ol><p>تنتهي العملية عندما يفرغ المخزن المؤقت وتبقى عقدة ROOT فقط في المكدس.</p></template>
+    <template class="content-en"><p>In transition-based parsing we have:</p><ul><li><b>A stack:</b> on which we build the parse.</li><li><b>A buffer:</b> of tokens to be parsed.</li><li><b>An <span class="smart-term" data-term-en="Oracle" data-ar="الأوراكل (المتنبئ)" data-en-def="A machine learning classifier that predicts the next transition action (Shift, LeftArc, RightArc) based on the current parser state.">oracle<span class="smart-term-tooltip"></span></span>:</b> a predictor which takes actions.</li></ul><p>The oracle walks left-to-right, making one of three transition decisions based on the top two elements of the stack:</p><ol><li><b>LEFTARC:</b> Asserts head-dependent relation (top word is head of second word); removes second word from stack.</li><li><b>RIGHTARC:</b> Asserts head-dependent relation (second word is head of top word); removes top word from stack.</li><li><b>SHIFT:</b> Removes word from buffer and pushes it onto the stack.</li></ol><p>The process ends when the buffer is empty and only the ROOT node remains on the stack.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>الكفاءة:</b> التعقيد الزمني خطي O(n) لأنه يمر عبر الجملة مرة واحدة من اليسار لليمين. هذا يجعله سريعاً جداً.</p><p><b>المشكلة:</b> الخوارزمية جشعة (Greedy). يتخذ الأوراكل خياراً واحداً ولا يتراجع أبداً (No backtracking). إذا أخطأ الأوراكل في خطوة مبكرة، سيؤدي ذلك إلى إعراب خاطئ بالكامل. كما أنه يواجه صعوبة عندما يكون الرأس بعيداً جداً عن التابع في الجملة الطويلة.</p><p><b>تدريب الأوراكل:</b> يتم تدريب الأوراكل باستخدام التعلم الآلي الخاضع للإشراف (إما مصنف ميزات كلاسيكي أو شبكة عصبية) للتنبؤ بالانتقال الصحيح بناءً على 'التكوين' (Configuration) الحالي للمكدس والمخزن.</p></template>
+    <template class="content-en"><p><b>Efficiency:</b> The complexity is linear O(n) since it makes a single left-to-right pass. This makes it extremely fast.</p><p><b>Problem:</b> It is a <span class="smart-term" data-term-en="Greedy Algorithm" data-ar="الخوارزمية الجشعة" data-en-def="An algorithm that makes the locally optimal choice at each stage with no backtracking.">greedy algorithm<span class="smart-term-tooltip"></span></span>. The oracle makes a single choice and proceeds with no backtracking. If the oracle makes a mistake early on, it leads to an incorrect parse. It also struggles when heads are very far from dependents in long sentences.</p><p><b>Training the Oracle:</b> The oracle is trained via supervised machine learning (classic feature-based or neural classifier) to predict the correct transition given the current 'configuration' of the stack and buffer.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A diagram showing the components of a Transition-Based Parser. A 'Stack' on the left showing elements [s1, s2, ... sn]. An 'Input buffer' on the top showing [w1, w2, ... wn]. A central box labeled 'Parser' containing an 'Oracle'. Arrows point from Stack and Buffer to Parser. Arrows point out from Parser labeled 'Action: LEFTARC, RIGHTARC, SHIFT' leading to a box labeled 'Dependency Relations' showing an arc between w3 and w2. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Standard Arrowhead -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arc Arrowhead -->
+        <marker id="arrow-arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transition-Based Dependency Parser</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مُعرب التبعية القائم على الانتقال</text>
+
+    <!-- ========================================== -->
+    <!-- INPUT BUFFER (Top)                         -->
+    <!-- ========================================== -->
+    <g>
+        <text x="340" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Input Buffer</text>
+        <text x="340" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مخزن الإدخال المؤقت</text>
+        
+        <!-- Buffer Cells -->
+        <g stroke="var(--border-color)" stroke-width="2" fill="var(--bg-elevated)">
+            <rect x="190" y="100" width="60" height="40" />
+            <rect x="250" y="100" width="60" height="40" />
+            <rect x="310" y="100" width="60" height="40" />
+            <rect x="370" y="100" width="60" height="40" />
+            <rect x="430" y="100" width="60" height="40" />
+        </g>
+        
+        <!-- Buffer Text -->
+        <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)" text-anchor="middle">
+            <text x="220" y="126">w₁</text>
+            <text x="280" y="126">w₂</text>
+            <text x="340" y="126">w₃</text>
+            <text x="400" y="126">...</text>
+            <text x="460" y="126">wₙ</text>
+        </g>
+
+        <!-- Arrow Buffer -> Parser -->
+        <line x1="340" y1="150" x2="340" y2="210" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- STACK (Left)                               -->
+    <!-- ========================================== -->
+    <g>
+        <text x="90" y="180" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Stack</text>
+        <text x="90" y="180" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المكدس</text>
+        
+        <!-- Stack Cells -->
+        <g stroke="var(--border-color)" stroke-width="2" fill="var(--bg-elevated)">
+            <rect x="40" y="195" width="100" height="40" />
+            <rect x="40" y="235" width="100" height="40" />
+            <rect x="40" y="275" width="100" height="40" />
+            <rect x="40" y="315" width="100" height="40" />
+        </g>
+        
+        <!-- Stack Text -->
+        <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)" text-anchor="middle">
+            <text x="90" y="221" class="gsvg-en">s₁ (top)</text>
+            <text x="90" y="221" class="gsvg-ar">s₁ (القمة)</text>
+            <text x="90" y="261">s₂</text>
+            <text x="90" y="301">...</text>
+            <text x="90" y="341">sₙ</text>
+        </g>
+
+        <!-- Arrow Stack -> Parser -->
+        <line x1="150" y1="275" x2="230" y2="275" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PARSER & ORACLE (Center)                   -->
+    <!-- ========================================== -->
+    <g>
+        <!-- Parser Box -->
+        <rect x="240" y="220" width="200" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4" />
+        <text x="340" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Parser</text>
+        <text x="340" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المُعرب</text>
+        
+        <!-- Oracle Box -->
+        <rect x="260" y="265" width="160" height="75" rx="6" fill="var(--brand-500)" />
+        <text x="340" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Oracle</text>
+        <text x="340" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">المتنبئ (Oracle)</text>
+        
+        <text x="340" y="320" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">Predicts Action</text>
+        <text x="340" y="320" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">يتوقع الإجراء</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- ACTIONS ARROW (Center to Right)            -->
+    <!-- ========================================== -->
+    <g>
+        <text x="515" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Action:</text>
+        <text x="515" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الإجراء:</text>
+        
+        <text x="515" y="270" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">LEFTARC</text>
+        <text x="515" y="288" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">RIGHTARC</text>
+        <text x="515" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">SHIFT</text>
+        
+        <line x1="450" y1="320" x2="580" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- DEPENDENCY RELATIONS (Right)               -->
+    <!-- ========================================== -->
+    <g>
+        <rect x="590" y="220" width="180" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="680" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dependency Relations</text>
+        <text x="680" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">علاقات التبعية</text>
+        
+        <!-- Words -->
+        <text x="640" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">w₂</text>
+        <text x="720" y="330" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">w₃</text>
+        
+        <!-- Arc -->
+        <path d="M 710 315 Q 680 260 650 315" fill="none" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-arc)" />
+        <text x="680" y="280" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">rel</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- LEGEND (Bottom)                            -->
+    <!-- ========================================== -->
+    <g>
+        <rect x="50" y="400" width="700" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+        
+        <!-- English Legend -->
+        <g class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+            <text x="200" y="430"><tspan font-weight="bold" fill="var(--text-primary)">LEFTARC:</tspan> s₁ → s₂</text>
+            <text x="400" y="430"><tspan font-weight="bold" fill="var(--text-primary)">RIGHTARC:</tspan> s₂ → s₁</text>
+            <text x="600" y="430"><tspan font-weight="bold" fill="var(--text-primary)">SHIFT:</tspan> w₁ → Stack</text>
+        </g>
+
+        <!-- Arabic Legend -->
+        <g class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+            <text x="200" y="430"><tspan font-weight="bold" fill="var(--text-primary)">LEFTARC:</tspan> s₁ → s₂</text>
+            <text x="400" y="430"><tspan font-weight="bold" fill="var(--text-primary)">RIGHTARC:</tspan> s₂ → s₁</text>
+            <text x="600" y="430"><tspan font-weight="bold" fill="var(--text-primary)">SHIFT:</tspan> w₁ → المكدس</text>
+        </g>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكن تطبيق LEFTARC إذا كان ROOT هو العنصر الثاني في المكدس؟</template>
+      <template class="content-en">Why can't LEFTARC be applied if ROOT is the second element on the stack?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن LEFTARC يجعل العنصر الثاني تابعاً للعنصر الأول. عقدة ROOT بحكم التعريف لا يمكن أن يكون لها أقواس واردة (لا يمكن أن تكون تابعة لأي كلمة أخرى).</p></template>
+      <template class="content-en"><p>Because LEFTARC makes the second element a dependent of the top element. The ROOT node, by definition, cannot have incoming arcs (it cannot be a dependent).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="graph-based-parsing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الإعراب التبعي القائم على الرسم البياني (Graph-Based)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Graph-Based Dependency Parsing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يبحث هذا المعرب في مساحة جميع الأشجار الممكنة للجملة ويختار الشجرة التي تمتلك أعلى درجة إجمالية (قرارات عالمية).</p></template>
+    <template class="content-en"><p>This parser searches through the space of all possible trees for a sentence and selects the tree with the highest total score (global decisions).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتجنب الطرق القائمة على الرسم البياني مشكلة القرارات الجشعة من خلال تسجيل (Scoring) أشجار كاملة (قرارات عالمية). لذلك، هي أكثر دقة من المعربات القائمة على الانتقال، خاصة في الجمل الطويلة.</p><p>لحل هذه المشكلة، تقوم الخوارزمية بخطوتين:</p><ol><li><b>تعيين درجة لكل حافة (Edge):</b> يتم استخدام خوارزمية (إما تعتمد على الميزات أو شبكة عصبية) لتقييم احتمالية وجود علاقة تبعية بين كل زوج من الكلمات.</li><li><b>إيجاد أفضل شجرة إعراب:</b> بمجرد تسجيل جميع الحواف المحتملة، تعادل المشكلة إيجاد <b><span class="smart-term" data-term-en="Maximum Spanning Tree (MST)" data-ar="شجرة الامتداد القصوى" data-en-def="A spanning tree of a weighted graph having the maximum possible sum of edge weights.">شجرة الامتداد القصوى<span class="smart-term-tooltip"></span></span> (Maximum Spanning Tree - MST)</b> فوق الرسم البياني.</li></ol></template>
+    <template class="content-en"><p>Graph-based methods avoid the greedy difficulty by scoring entire trees (global decisions). Thus, they are more accurate than transition-based parsers, especially on long sentences.</p><p>Formally, graph-based algorithms solve two problems:</p><ol><li><b>Assigning a score to each edge:</b> A feature-based or neural algorithm estimates a score for the edge between every possible pair of words.</li><li><b>Finding the best parse tree:</b> Given the scores of all potential edges, this is equivalent to finding the <b><span class="smart-term" data-term-en="Maximum Spanning Tree (MST)" data-ar="شجرة الامتداد القصوى" data-en-def="A spanning tree of a weighted graph having the maximum possible sum of edge weights.">maximum spanning tree (MST)<span class="smart-term-tooltip"></span></span></b> over the graph.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>شجرة الامتداد (Spanning Tree) فوق رسم بياني G هي شجرة فرعية تغطي جميع الرؤوس في G. أي شجرة امتداد تبدأ من ROOT هي إعراب صالح. شجرة الامتداد القصوى هي الشجرة ذات أعلى مجموع درجات للحواف.</p><p>في النهج العصبي، بدلاً من استخراج ميزات يدوية، يتم تمرير الجملة عبر مشفر (Encoder)، وتُمرر التمثيلات المشفرة للكلمتين عبر شبكة لتقدير درجة الحافة. هذا النهج العالمي يضمن عدم الوقوع في أخطاء مبكرة لا يمكن التراجع عنها، لكنه أبطأ حسابياً من النهج القائم على الانتقال.</p></template>
+    <template class="content-en"><p>A spanning tree over a graph G is a subset tree that covers all vertices in G. Any spanning tree starting from ROOT is a valid parse. The maximum spanning tree is the one with the highest total score.</p><p>In the neural approach, instead of hand-designed features, the sentence runs through an encoder, and the encoded representations of two words pass through a network to estimate the edge score. This global approach ensures no unrecoverable early mistakes, but it is computationally slower than transition-based parsing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A directed graph for the sentence 'Book that flight'. Nodes are 'root', 'Book', 'that', 'flight'. Show all possible directed edges between all nodes with arbitrary scores (e.g., root->Book: 12, Book->flight: 7, that->flight: 8). Highlight the Maximum Spanning Tree edges in a distinct color (purple) showing root->Book, Book->flight, flight->that. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Marker for non-MST edges -->
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+        <!-- Marker for MST edges -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Graph-Based Dependency Parsing (MST)</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإعراب التبعي القائم على الرسم البياني (MST)</text>
+
+    <!-- Legend -->
+    <path d="M 230 520 L 280 520" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-brand)" />
+    <text x="420" y="525" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Maximum Spanning Tree (MST) edges</text>
+    <text x="420" y="525" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">حواف شجرة الامتداد القصوى (MST)</text>
+
+    <!-- ================= NON-MST EDGES ================= -->
+    <g stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5 5" fill="none" marker-end="url(#arrow-muted)">
+        <!-- root -> that -->
+        <path d="M 400 80 L 400 327" />
+        <!-- root -> flight -->
+        <path d="M 440 80 L 648 327" />
+        
+        <!-- Book -> that -->
+        <path d="M 200 340 Q 275 310 347 340" />
+        <!-- that -> Book -->
+        <path d="M 350 360 Q 275 390 203 360" />
+        
+        <!-- that -> flight -->
+        <path d="M 450 340 Q 525 310 597 340" />
+        
+        <!-- flight -> Book -->
+        <path d="M 650 370 Q 400 550 153 370" />
+    </g>
+
+    <!-- ================= MST EDGES ================= -->
+    <g stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow-brand)">
+        <!-- root -> Book -->
+        <path d="M 360 80 L 152 327" />
+        <!-- Book -> flight -->
+        <path d="M 150 330 Q 400 170 647 330" />
+        <!-- flight -> that -->
+        <path d="M 600 360 Q 525 390 453 360" />
+    </g>
+
+    <!-- ================= SCORES (NON-MST) ================= -->
+    <g font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="central">
+        <!-- root -> that: 4 -->
+        <circle cx="400" cy="205" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="400" y="205" fill="var(--text-secondary)">4</text>
+
+        <!-- root -> flight: 3 -->
+        <circle cx="545" cy="205" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="545" y="205" fill="var(--text-secondary)">3</text>
+
+        <!-- Book -> that: 5 -->
+        <circle cx="274" cy="325" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="274" y="325" fill="var(--text-secondary)">5</text>
+
+        <!-- that -> Book: 2 -->
+        <circle cx="276" cy="375" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="276" y="375" fill="var(--text-secondary)">2</text>
+
+        <!-- that -> flight: 8 -->
+        <circle cx="524" cy="325" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="524" y="325" fill="var(--text-secondary)">8</text>
+
+        <!-- flight -> Book: 1 -->
+        <circle cx="400" cy="460" r="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+        <text x="400" y="460" fill="var(--text-secondary)">1</text>
+    </g>
+
+    <!-- ================= SCORES (MST) ================= -->
+    <g font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="central">
+        <!-- root -> Book: 12 -->
+        <circle cx="255" cy="205" r="14" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="255" y="205" fill="var(--brand-ink)">12</text>
+
+        <!-- Book -> flight: 9 -->
+        <circle cx="400" cy="250" r="14" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="400" y="250" fill="var(--brand-ink)">9</text>
+
+        <!-- flight -> that: 6 -->
+        <circle cx="526" cy="375" r="14" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+        <text x="526" y="375" fill="var(--brand-ink)">6</text>
+    </g>
+
+    <!-- ================= NODES ================= -->
+    <!-- root -->
+    <rect x="350" y="40" width="100" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="66" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">root</text>
+    <text x="400" y="66" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجذر</text>
+
+    <!-- Book -->
+    <rect x="100" y="330" width="100" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="150" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Book</text>
+    <text x="150" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">احجز</text>
+
+    <!-- that -->
+    <rect x="350" y="330" width="100" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">that</text>
+    <text x="400" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تلك</text>
+
+    <!-- flight -->
+    <rect x="600" y="330" width="100" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="650" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">flight</text>
+    <text x="650" y="356" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الرحلة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي المقايضة (Trade-off) الرئيسية بين الإعراب القائم على الانتقال والإعراب القائم على الرسم البياني؟</template>
+      <template class="content-en">What is the main trade-off between transition-based and graph-based parsing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المقايضة هي بين السرعة والدقة. القائم على الانتقال سريع جداً (خطي) لكنه أقل دقة بسبب القرارات الجشعة. القائم على الرسم البياني أبطأ لكنه أكثر دقة لأنه يتخذ قرارات عالمية.</p></template>
+      <template class="content-en"><p>The trade-off is Speed vs. Accuracy. Transition-based is very fast (linear) but less accurate due to greedy decisions. Graph-based is slower but more accurate because it makes global decisions.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluating-dependency-parsers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> تقييم معربات التبعية (LAS, UAS, LS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Evaluating Dependency Parsers</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تقييم معربات التبعية عن طريق حساب النسبة المئوية للكلمات التي تم ربطها برأسها الصحيح، مع أو بدون التسمية الصحيحة للعلاقة.</p></template>
+    <template class="content-en"><p>Dependency parsers are evaluated by calculating the percentage of words attached to their correct head, with or without the correct relation label.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قياس الأداء باستخدام 'التطابق التام' (Exact Match) للجملة بأكملها يعتبر متشائماً جداً ولا يوجه عملية التطوير بشكل جيد. بدلاً من ذلك، نستخدم مقاييس تقيم كل كلمة على حدة:</p><ul><li><b>درجة دقة الارتباط المسمى (LAS - Labeled Attachment Score):</b> النسبة المئوية للكلمات التي تم تعيينها للرأس الصحيح <b>مع</b> علاقة التبعية الصحيحة (التسمية).</li><li><b>درجة دقة الارتباط غير المسمى (UAS - Unlabeled Attachment Score):</b> النسبة المئوية للكلمات التي تم تعيينها للرأس الصحيح، <b>متجاهلاً</b> علاقة التبعية.</li><li><b>درجة دقة التسمية (LS - Label Score):</b> النسبة المئوية للكلمات ذات التسميات (العلاقات) الصحيحة، <b>متجاهلاً</b> من أين تأتي العلاقات (الرأس).</li></ul></template>
+    <template class="content-en"><p>Measuring performance using 'Exact Match' for the whole sentence is too pessimistic and not fine-grained enough. Instead, we use word-level metrics:</p><ul><li><b>Labeled Attachment Score (LAS):</b> The percentage of words correctly assigned to their head <b>along with</b> the correct dependency relation label.</li><li><b>Unlabeled Attachment Score (UAS):</b> The percentage of words correctly assigned to their head, <b>ignoring</b> the dependency relation.</li><li><b>Label Score (LS):</b> The percentage of tokens with correct labels (relations), <b>ignoring</b> where the relations are coming from (the head).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مقياس LAS هو المقياس الأكثر صرامة وشمولية لأنه يتطلب صحة كل من الهيكل (الرأس) والدلالة النحوية (التسمية). مقياس UAS مفيد لتقييم قدرة المعرب على فهم الهيكل العام للجملة حتى لو أخطأ في تصنيف نوع العلاقة الدقيق. هذه المقاييس حساسة بما يكفي لإظهار التحسينات التدريجية أثناء تطوير النماذج.</p></template>
+    <template class="content-en"><p>LAS is the most strict and comprehensive metric as it requires both structural (head) and syntactic semantic (label) correctness. UAS is useful for evaluating the parser's ability to grasp the overall structure even if it misclassifies the exact relation type. These metrics are sensitive enough to show incremental improvements during model development.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن أن تكون درجة UAS أقل من درجة LAS لنفس المعرب على نفس الجملة؟</template>
+      <template class="content-en">Can the UAS score be lower than the LAS score for the same parser on the same sentence?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، مستحيل. LAS يتطلب شرطين (رأس صحيح + تسمية صحيحة)، بينما UAS يتطلب شرطاً واحداً (رأس صحيح). لذلك، UAS ستكون دائماً أكبر من أو تساوي LAS.</p></template>
+      <template class="content-en"><p>No, impossible. LAS requires two conditions (correct head + correct label), while UAS requires only one (correct head). Therefore, UAS will always be greater than or equal to LAS.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة الحادية عشرة! اليوم نغوص في قلب البنية النحوية للغات. تخيلوا أن الجملة ليست مجرد سلسلة من الكلمات، بل هيكل هندسي دقيق. بدأنا بالقواعد الخالية من السياق (CFGs)، حيث نجمع الكلمات في 'مكونات' مثل العبارات الاسمية والفعلية. هذه الطريقة رائعة للغات الصارمة الترتيب كالإنجليزية، واستخدمنا خوارزمية CKY لبناء هذه الأشجار. لكن واجهتنا مشكلة 'الغموض' (مثل جملة الفيل والبيجاما!)، ولحلها لجأنا للشبكات العصبية لتقييم أفضل شجرة.
+
+بعد ذلك، انتقلنا إلى نهج أحدث وأكثر مرونة: 'الإعراب التبعي'. هنا، نلغي فكرة العبارات ونرسم أسهماً مباشرة بين الكلمات (من الرأس إلى التابع). هذا النهج سحري للغات ذات الترتيب الحر كالعربية! تعلمنا طريقتين لبناء هذه الأسهم: الطريقة السريعة الجشعة (Transition-based) باستخدام المكدس والأوراكل، والطريقة الدقيقة الشاملة (Graph-based) التي تبحث عن شجرة الامتداد القصوى. في الامتحان، ركزوا جيداً على الفرق بين CFG والتبعية، وكيفية عمل الأوراكل، والفرق بين مقاييس LAS و UAS. بالتوفيق!</template>
+    <template class="content-en">Welcome to Module 11! Today we dive into the heart of syntax. Imagine a sentence not as a string of words, but as a precise architectural structure. We started with Context-Free Grammars (CFGs), grouping words into 'constituents' like Noun Phrases. This is great for strict-order languages like English, and we use the CKY algorithm to build these trees. But we faced 'ambiguity' (like the elephant in pajamas!), and to solve it, we used neural networks to score the best tree.
+
+Next, we shifted to a more flexible approach: 'Dependency Parsing'. Here, we drop phrases and draw arrows directly between words (Head to Dependent). This is magic for free-word-order languages! We learned two ways to build these arrows: the fast, greedy way (Transition-based) using a stack and oracle, and the accurate, global way (Graph-based) finding the maximum spanning tree. For the exam, focus heavily on the difference between CFG and Dependency, how the Oracle works, and the difference between LAS and UAS metrics. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين الرمز الطرفي والرمز غير الطرفي في CFG؟</template>
+          <template class="content-en">What is the fundamental difference between a terminal and non-terminal symbol in CFG?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين الرمز الطرفي والرمز غير الطرفي في CFG؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الرموز الطرفية هي الكلمات الفعلية في الجملة (مثل 'the', 'book'). الرموز غير الطرفية هي فئات نحوية مجردة (مثل NP, VP) تُستخدم لتجميع الرموز الأخرى.</template>
+          <template class="content-en">Terminal symbols are the actual words in the sentence (e.g., 'the', 'book'). Non-terminal symbols are abstract syntactic categories (e.g., NP, VP) used to group other symbols.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف غموض الارتباط عن غموض العطف؟</template>
+          <template class="content-en">How does attachment ambiguity differ from coordination ambiguity?</template>
+          <span class="content-target">كيف يختلف غموض الارتباط عن غموض العطف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">غموض الارتباط يحدث عندما يمكن ربط عبارة (مثل شبه جملة) بأكثر من رأس (مثل ربطها بالفعل أو بالاسم). غموض العطف يحدث عند استخدام أدوات العطف (مثل 'و') ولا يكون واضحاً ما هي الكلمات التي يشملها العطف.</template>
+          <template class="content-en">Attachment ambiguity occurs when a phrase (like a PP) can attach to multiple heads (e.g., verb or noun). Coordination ambiguity occurs with conjunctions (like 'and') where the scope of the conjoined elements is unclear.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى الإعراب العصبي CKY إذا كان CKY الكلاسيكي يعمل؟</template>
+          <template class="content-en">Why do we need Neural CKY parsing if classic CKY works?</template>
+          <span class="content-target">لماذا نحتاج إلى الإعراب العصبي CKY إذا كان CKY الكلاسيكي يعمل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">CKY الكلاسيكي يجد *جميع* الأشجار الممكنة لكنه لا يستطيع تحديد أيها هو المعنى المقصود (لا يفك الغموض). الإعراب العصبي يعين درجات (Scores) للمكونات لاختيار الشجرة الأكثر احتمالاً.</template>
+          <template class="content-en">Classic CKY finds *all* possible trees but cannot determine which is the intended meaning (no disambiguation). Neural CKY assigns scores to constituents to pick the most probable tree.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الغرض من Treebank؟</template>
+          <template class="content-en">What is the purpose of a Treebank?</template>
+          <span class="content-target">ما هو الغرض من Treebank؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو مجموعة نصوص مشروحة يدوياً بأشجار الإعراب الصحيحة. يُستخدم كـ 'معيار ذهبي' (Gold Standard) لتدريب وتقييم خوارزميات الإعراب.</template>
+          <template class="content-en">It is a corpus manually annotated with correct parse trees. It serves as a 'gold standard' for training and evaluating parsing algorithms.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يفضل الإعراب التبعي للغات ذات ترتيب الكلمات الحر؟</template>
+          <template class="content-en">Why is dependency parsing preferred for free word order languages?</template>
+          <span class="content-target">لماذا يفضل الإعراب التبعي للغات ذات ترتيب الكلمات الحر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يركز على العلاقات المباشرة (من يعدل من) ويتجاهل الترتيب الخطي للكلمات. في CFG، تغيير الترتيب يتطلب قواعد جديدة تماماً، مما يجعلها معقدة جداً.</template>
+          <template class="content-en">Because it focuses on direct relations (what modifies what) and ignores linear word order. In CFG, changing order requires entirely new rules, making it overly complex.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي القيود الثلاثة لشجرة التبعية الصالحة؟</template>
+          <template class="content-en">What are the three constraints of a valid dependency tree?</template>
+          <span class="content-target">ما هي القيود الثلاثة لشجرة التبعية الصالحة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">1) جذر واحد ليس له أقواس واردة. 2) كل كلمة أخرى لها قوس وارد واحد بالضبط (رأس واحد). 3) يوجد مسار فريد من الجذر إلى كل كلمة.</template>
+          <template class="content-en">1) A single root with no incoming arcs. 2) Every other word has exactly one incoming arc (one head). 3) A unique path exists from the root to every word.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في الإعراب القائم على الانتقال، ما هو دور الأوراكل (Oracle)؟</template>
+          <template class="content-en">In transition-based parsing, what is the role of the Oracle?</template>
+          <span class="content-target">في الإعراب القائم على الانتقال، ما هو دور الأوراكل (Oracle)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الأوراكل هو نموذج تعلم آلي ينظر إلى الحالة الحالية للمكدس والمخزن، ويتنبأ بالإجراء الصحيح التالي (SHIFT, LEFTARC, RIGHTARC).</template>
+          <template class="content-en">The Oracle is an ML model that looks at the current state of the stack and buffer, and predicts the correct next action (SHIFT, LEFTARC, RIGHTARC).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب القاتل للإعراب القائم على الانتقال وكيف يحله الإعراب القائم على الرسم البياني؟</template>
+          <template class="content-en">What is the fatal flaw of transition-based parsing and how does graph-based parsing solve it?</template>
+          <span class="content-target">ما هو العيب القاتل للإعراب القائم على الانتقال وكيف يحله الإعراب القائم على الرسم البياني؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العيب هو 'الجشع'؛ خطأ واحد مبكر يدمر الإعراب ولا يمكن التراجع عنه. القائم على الرسم البياني يحله بتقييم الشجرة بأكملها عالمياً (إيجاد شجرة الامتداد القصوى) بدلاً من القرارات المحلية.</template>
+          <template class="content-en">The flaw is 'greediness'; one early mistake ruins the parse with no backtracking. Graph-based solves it by scoring the entire tree globally (finding the Maximum Spanning Tree) instead of local decisions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين مقياس LAS ومقياس UAS؟</template>
+          <template class="content-en">What is the difference between the LAS and UAS metrics?</template>
+          <span class="content-target">ما الفرق بين مقياس LAS ومقياس UAS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">LAS يتطلب أن يحدد المعرب الرأس الصحيح للكلمة *و* نوع العلاقة الصحيح (التسمية). UAS يتطلب فقط تحديد الرأس الصحيح، متجاهلاً التسمية.</template>
+          <template class="content-en">LAS requires the parser to identify the correct head *and* the correct relation type (label). UAS only requires identifying the correct head, ignoring the label.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يفعل إجراء SHIFT في الإعراب القائم على الانتقال؟</template>
+          <template class="content-en">What does the SHIFT action do in transition-based parsing?</template>
+          <span class="content-target">ماذا يفعل إجراء SHIFT في الإعراب القائم على الانتقال؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يأخذ الكلمة الموجودة في مقدمة المخزن المؤقت (Buffer) ويدفعها إلى أعلى المكدس (Stack) لمعالجتها في الخطوات القادمة.</template>
+          <template class="content-en">It takes the word at the front of the input buffer and pushes it onto the top of the stack to be processed in upcoming steps.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "المكون النحوي (Constituent)",
+      "en": "Syntactic Constituent"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة من الكلمات تتصرف كوحدة واحدة في الجملة.",
+        "en": "A group of words that behave as a single unit in a sentence."
+      },
+      "example": {
+        "ar": "العبارة الاسمية (NP) مثل 'the Broadway coppers'.",
+        "en": "A Noun Phrase (NP) like 'the Broadway coppers'."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "القواعد الخالية من السياق (CFG)",
+      "en": "Context-Free Grammar (CFG)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نظام رسمي لنمذجة بنية المكونات يتكون من معجم وقواعد إعادة كتابة.",
+        "en": "A formal system for modeling constituent structure consisting of a lexicon and rewrite rules."
+      },
+      "example": {
+        "ar": "NP -> Det Nominal",
+        "en": "NP -> Det Nominal"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الرمز الطرفي (Terminal Symbol)",
+      "en": "Terminal Symbol"
+    },
+    "back": {
+      "definition": {
+        "ar": "الرموز التي تتوافق مع الكلمات الفعلية في اللغة.",
+        "en": "Symbols that correspond to actual words in the language."
+      },
+      "example": {
+        "ar": "'the', 'flight', 'nightclub'",
+        "en": "'the', 'flight', 'nightclub'"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "الرمز غير الطرفي (Non-terminal Symbol)",
+      "en": "Non-terminal Symbol"
+    },
+    "back": {
+      "definition": {
+        "ar": "رموز تعبر عن تجريدات فوق الرموز الطرفية.",
+        "en": "Symbols that express abstractions over terminal symbols."
+      },
+      "example": {
+        "ar": "NP (عبارة اسمية), VP (عبارة فعلية)",
+        "en": "NP (Noun Phrase), VP (Verb Phrase)"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "الاشتقاق (Derivation)",
+      "en": "Derivation"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسلسل توسعات القواعد المستخدمة لتوليد سلسلة من الكلمات.",
+        "en": "The sequence of rule expansions used to generate a string of words."
+      },
+      "example": {
+        "ar": "S -> NP VP -> I VP -> I prefer a flight",
+        "en": "S -> NP VP -> I VP -> I prefer a flight"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "الغموض الهيكلي (Structural Ambiguity)",
+      "en": "Structural Ambiguity"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدث عندما تسمح القواعد بتعيين أكثر من شجرة إعراب واحدة لجملة ما.",
+        "en": "Occurs when the grammar can assign more than one parse tree to a sentence."
+      },
+      "example": {
+        "ar": "I shot an elephant in my pajamas.",
+        "en": "I shot an elephant in my pajamas."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "غموض الارتباط (Attachment Ambiguity)",
+      "en": "Attachment Ambiguity"
+    },
+    "back": {
+      "definition": {
+        "ar": "نوع من الغموض حيث يمكن ربط مكون معين بشجرة الإعراب في أكثر من مكان.",
+        "en": "A type of ambiguity where a constituent can be attached to the parse tree at more than one place."
+      },
+      "example": {
+        "ar": "ربط 'in my pajamas' بالفعل (shot) أو بالاسم (elephant).",
+        "en": "Attaching 'in my pajamas' to the verb (shot) or the noun (elephant)."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "غموض العطف (Coordination Ambiguity)",
+      "en": "Coordination Ambiguity"
+    },
+    "back": {
+      "definition": {
+        "ar": "غموض يحدث عند استخدام أدوات العطف ولا يكون نطاق العطف واضحاً.",
+        "en": "Ambiguity occurring when phrases are conjoined and the scope is unclear."
+      },
+      "example": {
+        "ar": "'old men and women' (هل old تشمل النساء أيضاً؟)",
+        "en": "'old men and women' (Does 'old' apply to women too?)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "خوارزمية CKY",
+      "en": "CKY Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "معرب مكونات يعتمد على البرمجة الديناميكية يبني شجرة الإعراب من الأسفل للأعلى.",
+        "en": "A dynamic-programming based constituency parser that builds the parse-tree bottom-up."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "مقاييس PARSEVAL",
+      "en": "PARSEVAL Metrics"
+    },
+    "back": {
+      "definition": {
+        "ar": "الأداة القياسية لتقييم معربات المكونات بمقارنتها بشجرة مرجعية.",
+        "en": "The standard tool for evaluating constituency parsers by comparing to a reference tree."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "بنك الأشجار (Treebank)",
+      "en": "Treebank"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة نصوص حيث يتم توضيح كل جملة بشجرة إعراب نحوية.",
+        "en": "A corpus in which every sentence is annotated with a parse tree."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "الإعراب التبعي (Dependency Parsing)",
+      "en": "Dependency Parsing"
+    },
+    "back": {
+      "definition": {
+        "ar": "يصف البنية النحوية من خلال علاقات ثنائية موجهة بين الكلمات (رأس وتابع).",
+        "en": "Describes syntactic structure in terms of directed binary relations between words (head and dependent)."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "الرأس (Head)",
+      "en": "Head"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكلمة المركزية المنظمة في علاقة التبعية.",
+        "en": "The central organizing word in a dependency relation."
+      },
+      "example": {
+        "ar": "في 'morning flight', الرأس هو 'flight'.",
+        "en": "In 'morning flight', the head is 'flight'."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "التابع (Dependent)",
+      "en": "Dependent"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكلمة التي تعدل الرأس في علاقة التبعية.",
+        "en": "A kind of modifier to the head in a dependency relation."
+      },
+      "example": {
+        "ar": "في 'morning flight', التابع هو 'morning'.",
+        "en": "In 'morning flight', the dependent is 'morning'."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "الإعراب القائم على الانتقال (Transition-Based Parsing)",
+      "en": "Transition-Based Parsing"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة إعراب تبعي تعتمد على قرارات محلية جشعة باستخدام مكدس ومخزن وأوراكل.",
+        "en": "A dependency parsing method relying on greedy local decisions using a stack, buffer, and oracle."
+      },
+      "example": {
+        "ar": "استخدام عمليات SHIFT و LEFTARC و RIGHTARC.",
+        "en": "Using SHIFT, LEFTARC, and RIGHTARC operations."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "الأوراكل (Oracle)",
+      "en": "Oracle"
+    },
+    "back": {
+      "definition": {
+        "ar": "متنبئ (مصنف تعلم آلي) يختار الانتقال المناسب في الإعراب القائم على الانتقال.",
+        "en": "A predictor (ML classifier) that selects the appropriate transition in transition-based parsing."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "الإعراب القائم على الرسم البياني (Graph-Based Parsing)",
+      "en": "Graph-Based Parsing"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة إعراب تبعي تسجل أشجاراً كاملة لتجنب الأخطاء الجشعة، وتبحث عن شجرة الامتداد القصوى.",
+        "en": "A dependency parsing method that scores entire trees to avoid greedy mistakes, finding the maximum spanning tree."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "شجرة الامتداد القصوى (MST)",
+      "en": "Maximum Spanning Tree (MST)"
+    },
+    "back": {
+      "definition": {
+        "ar": "الشجرة الفرعية التي تغطي جميع الرؤوس في الرسم البياني وتمتلك أعلى مجموع درجات للحواف.",
+        "en": "The subset tree covering all vertices in a graph with the highest total edge score."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "LAS (درجة الارتباط المسمى)",
+      "en": "LAS (Labeled Attachment Score)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة الكلمات التي تم تعيينها للرأس الصحيح مع علاقة التبعية الصحيحة.",
+        "en": "Percentage of words correctly assigned to their head along with the correct dependency relation."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "UAS (درجة الارتباط غير المسمى)",
+      "en": "UAS (Unlabeled Attachment Score)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة الكلمات التي تم تعيينها للرأس الصحيح، متجاهلاً علاقة التبعية.",
+        "en": "Percentage of words correctly assigned to their head, ignoring the dependency relation."
+      },
+      "example": {
+        "ar": "[EXAMPLE_NEEDED]",
+        "en": "[EXAMPLE_NEEDED]"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "مما تتكون القواعد الخالية من السياق (CFG) بشكل أساسي؟",
+      "en": "What does a Context-Free Grammar (CFG) primarily consist of?"
+    },
+    "options": {
+      "ar": [
+        "مكدس ومخزن مؤقت",
+        "معجم وقواعد إعادة كتابة",
+        "رؤوس وتوابع",
+        "أشجار امتداد قصوى"
+      ],
+      "en": [
+        "A stack and a buffer",
+        "A lexicon and rewrite rules",
+        "Heads and dependents",
+        "Maximum spanning trees"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتكون CFG من معجم (يحتوي على رموز طرفية وغير طرفية) وقواعد تحدد كيفية تجميع هذه الرموز.",
+      "en": "A CFG consists of a lexicon (terminal and non-terminal symbols) and rules that define how they are grouped."
+    },
+    "hint": {
+      "ar": "تذكر المكونين الأساسيين لتعريف أي لغة رسمية.",
+      "en": "Remember the two core components to define a formal language."
+    },
+    "difficulty": "easy",
+    "conceptId": "constituency-and-cfgs"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي نوع من الغموض يمثله المثال 'I shot an elephant in my pajamas'؟",
+      "en": "What kind of ambiguity is represented by the example 'I shot an elephant in my pajamas'?"
+    },
+    "options": {
+      "ar": [
+        "غموض معجمي",
+        "غموض العطف",
+        "غموض الارتباط",
+        "غموض دلالي"
+      ],
+      "en": [
+        "Lexical ambiguity",
+        "Coordination ambiguity",
+        "Attachment ambiguity",
+        "Semantic ambiguity"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هذا غموض ارتباط (Attachment ambiguity) لأن العبارة 'in my pajamas' يمكن ربطها بالفعل (shot) أو بالاسم (elephant).",
+      "en": "This is attachment ambiguity because the phrase 'in my pajamas' can be attached to the verb (shot) or the noun (elephant)."
+    },
+    "hint": {
+      "ar": "أين نربط العبارة في الشجرة؟",
+      "en": "Where do we attach the phrase in the tree?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cfg-as-parser-and-ambiguity"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية في خوارزمية الإعراب CKY الكلاسيكية؟",
+      "en": "What is the main problem with the classic CKY parsing algorithm?"
+    },
+    "options": {
+      "ar": [
+        "بطيئة جداً (تعقيد أسي)",
+        "لا يمكنها التعامل مع الرموز الطرفية",
+        "لا تخبرنا أي شجرة إعراب هي الصحيحة (لا تفك الغموض)",
+        "تتطلب ترتيب كلمات حر"
+      ],
+      "en": [
+        "It is too slow (exponential complexity)",
+        "It cannot handle terminal symbols",
+        "It doesn't tell which parse is the correct one (no disambiguation)",
+        "It requires free word order"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "CKY الكلاسيكية ممتازة في سرد جميع الأشجار الممكنة، لكنها لا تملك آلية لتقييمها واختيار الشجرة الصحيحة (فك الغموض).",
+      "en": "Classic CKY is great at enumerating all possible trees, but lacks a mechanism to score them and pick the correct one (disambiguation)."
+    },
+    "hint": {
+      "ar": "ماذا تفعل عندما تجد 10 أشجار صحيحة لنفس الجملة؟",
+      "en": "What does it do when it finds 10 valid trees for the same sentence?"
+    },
+    "difficulty": "medium",
+    "conceptId": "cky-parsing"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الـ Treebank؟",
+      "en": "What is a Treebank?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية لفك الغموض",
+        "مجموعة نصوص مشروحة بأشجار إعراب",
+        "نوع من القواعد الخالية من السياق",
+        "مقياس لتقييم المعربات"
+      ],
+      "en": [
+        "An algorithm for disambiguation",
+        "A corpus annotated with parse trees",
+        "A type of context-free grammar",
+        "A metric for evaluating parsers"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بنك الأشجار (Treebank) هو مجموعة نصوص (Corpus) حيث تم توضيح كل جملة بشجرة الإعراب النحوية الخاصة بها.",
+      "en": "A Treebank is a text corpus where every sentence is annotated with its syntactic parse tree."
+    },
+    "hint": {
+      "ar": "فكر في 'بنك' للبيانات النحوية.",
+      "en": "Think of a 'bank' of syntactic data."
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluating-constituency-parsers"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في الإعراب التبعي، ماذا نطلق على الكلمة المركزية المنظمة؟",
+      "en": "In dependency parsing, what do we call the central organizing word?"
+    },
+    "options": {
+      "ar": [
+        "التابع (Dependent)",
+        "الجذر (Root)",
+        "الرأس (Head)",
+        "المكون (Constituent)"
+      ],
+      "en": [
+        "Dependent",
+        "Root",
+        "Head",
+        "Constituent"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الكلمة المركزية تسمى الرأس (Head)، والكلمات التي تعدلها تسمى التوابع (Dependents).",
+      "en": "The central word is called the Head, and the words modifying it are Dependents."
+    },
+    "hint": {
+      "ar": "إنها تقود العلاقة.",
+      "en": "It leads the relationship."
+    },
+    "difficulty": "easy",
+    "conceptId": "dependency-relations"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "لماذا تعتبر قواعد التبعية أفضل من قواعد المكونات للغات ذات ترتيب الكلمات الحر؟",
+      "en": "Why are dependency grammars better than constituency grammars for languages with free word order?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تستخدم خوارزمية CKY",
+        "لأنها تتطلب قواعد أقل بكثير لتمثيل نفس العلاقات",
+        "لأنها لا تستخدم الرموز الطرفية",
+        "لأنها تعتمد على البرمجة الديناميكية"
+      ],
+      "en": [
+        "Because they use the CKY algorithm",
+        "Because they require far fewer rules to represent the same relations",
+        "Because they don't use terminal symbols",
+        "Because they rely on dynamic programming"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في قواعد المكونات، يتطلب الترتيب الحر قواعد منفصلة لكل مكان محتمل. في التبعية، رابط واحد يمثل العلاقة بغض النظر عن الترتيب الخطي.",
+      "en": "In constituency, free order requires a separate rule for each possible place. In dependency, one link represents the relation regardless of linear order."
+    },
+    "hint": {
+      "ar": "كيف تتعامل CFG مع تغيير ترتيب الفاعل والفعل؟",
+      "en": "How does CFG handle swapping the subject and verb?"
+    },
+    "difficulty": "medium",
+    "conceptId": "dependency-vs-constituency"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي من الإجراءات التالية ليس من إجراءات الإعراب القائم على الانتقال؟",
+      "en": "Which of the following is NOT an action in transition-based parsing?"
+    },
+    "options": {
+      "ar": [
+        "SHIFT",
+        "LEFTARC",
+        "RIGHTARC",
+        "REDUCE"
+      ],
+      "en": [
+        "SHIFT",
+        "LEFTARC",
+        "RIGHTARC",
+        "REDUCE"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الإجراءات الثلاثة الممكنة في الإعراب القائم على الانتقال المذكورة هي SHIFT و LEFTARC و RIGHTARC.",
+      "en": "The three possible transition operators mentioned are SHIFT, LEFTARC, and RIGHTARC."
+    },
+    "hint": {
+      "ar": "تذكر الإجراءات التي تتعامل مع الأقواس والمخزن.",
+      "en": "Remember the actions dealing with arcs and the buffer."
+    },
+    "difficulty": "easy",
+    "conceptId": "transition-based-parsing"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو العيب الرئيسي للإعراب القائم على الانتقال؟",
+      "en": "What is the main drawback of transition-based parsing?"
+    },
+    "options": {
+      "ar": [
+        "بطيء جداً",
+        "يتخذ قرارات جشعة ولا يمكنه التراجع عن الأخطاء",
+        "يتطلب مساحة ذاكرة هائلة",
+        "لا يمكنه استخدام التعلم الآلي"
+      ],
+      "en": [
+        "It is very slow",
+        "It makes greedy decisions and cannot backtrack from mistakes",
+        "It requires massive memory space",
+        "It cannot use machine learning"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخوارزمية جشعة؛ إذا اتخذ الأوراكل قراراً خاطئاً مبكراً، فلا توجد فرصة للتراجع، مما يؤدي إلى إعراب خاطئ.",
+      "en": "The algorithm is greedy; if the oracle makes a wrong choice early, there is no backtracking, leading to an incorrect parse."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا أخطأت في الخطوة الأولى؟",
+      "en": "What happens if you make a mistake on step 1?"
+    },
+    "difficulty": "medium",
+    "conceptId": "transition-based-parsing"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "كيف يحل الإعراب القائم على الرسم البياني مشكلة القرارات الجشعة؟",
+      "en": "How does graph-based parsing solve the problem of greedy decisions?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام مكدس أكبر",
+        "بتسجيل أشجار كاملة واتخاذ قرارات عالمية (MST)",
+        "باستخدام خوارزمية CKY",
+        "بتجاهل الكلمات البعيدة"
+      ],
+      "en": [
+        "By using a larger stack",
+        "By scoring entire trees and making global decisions (MST)",
+        "By using the CKY algorithm",
+        "By ignoring distant words"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يقوم بتسجيل جميع الحواف المحتملة ثم يبحث عن شجرة الامتداد القصوى (MST) التي تمثل أفضل شجرة إجمالية، مما يتجنب الأخطاء المحلية.",
+      "en": "It scores all potential edges and then finds the Maximum Spanning Tree (MST) which represents the best overall tree, avoiding local mistakes."
+    },
+    "hint": {
+      "ar": "إنه ينظر إلى الصورة الكبيرة.",
+      "en": "It looks at the big picture."
+    },
+    "difficulty": "medium",
+    "conceptId": "graph-based-parsing"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما الذي يقيسه مقياس UAS في تقييم الإعراب التبعي؟",
+      "en": "What does the UAS metric measure in dependency parsing evaluation?"
+    },
+    "options": {
+      "ar": [
+        "الرأس الصحيح والتسمية الصحيحة",
+        "التسمية الصحيحة فقط",
+        "الرأس الصحيح فقط، متجاهلاً التسمية",
+        "التطابق التام للجملة بأكملها"
+      ],
+      "en": [
+        "Correct head and correct label",
+        "Correct label only",
+        "Correct head only, ignoring the label",
+        "Exact match of the whole sentence"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "UAS (Unlabeled Attachment Score) يقيس نسبة الكلمات التي تم ربطها بالرأس الصحيح، دون الاهتمام بنوع العلاقة (التسمية).",
+      "en": "UAS (Unlabeled Attachment Score) measures the percentage of words attached to the correct head, ignoring the relation type (label)."
+    },
+    "hint": {
+      "ar": "Unlabeled تعني 'بدون تسمية'.",
+      "en": "Unlabeled means 'without label'."
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluating-dependency-parsers"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن خوارزمية CKY الكلاسيكية تقوم بفك الغموض. الحقيقة: CKY الكلاسيكية تستخرج *جميع* أشجار الإعراب الممكنة فقط. لفك الغموض واختيار الشجرة الأفضل، نحتاج إلى الامتداد العصبي (Neural CKY).</template>
+    <template class="content-en">Thinking classic CKY performs disambiguation. Fact: Classic CKY only enumerates *all* possible parse trees. To disambiguate and pick the best tree, we need the neural extension (Neural CKY).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري: قواعد المكونات (CFG) تركز على تجميع الكلمات في عبارات (Phrases)، بينما قواعد التبعية تركز على العلاقات الثنائية المباشرة بين الكلمات (رأس وتابع) متجاهلة العبارات تماماً.</template>
+    <template class="content-en">The core difference: Constituency grammars (CFG) focus on grouping words into phrases, while dependency grammars focus on direct binary relations between words (head and dependent), ignoring phrases entirely.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في الإعراب القائم على الانتقال، لا يمكن تطبيق عملية LEFTARC إذا كان العنصر الثاني في المكدس هو ROOT. السبب؟ ROOT لا يمكن أن يكون تابعاً لأي كلمة أخرى.</template>
+    <template class="content-en">In transition-based parsing, LEFTARC cannot be applied if the second element on the stack is ROOT. Why? ROOT can never be a dependent of any other word.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين مقاييس التقييم: PARSEVAL يُستخدم لتقييم معربات المكونات (CFG)، بينما LAS و UAS يُستخدمان لتقييم معربات التبعية.</template>
+    <template class="content-en">Confusing evaluation metrics: PARSEVAL is used to evaluate constituency parsers (CFG), whereas LAS and UAS are used to evaluate dependency parsers.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M10.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M12.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

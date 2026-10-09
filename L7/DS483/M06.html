@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الشبكات العصبية · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#neural-units-and-activation" class="toc-link" data-bilingual>
+        <template class="content-ar">الوحدات العصبية ودوال التنشيط</template>
+        <template class="content-en">Neural Units and Activation Functions</template>
+        <span class="content-target">الوحدات العصبية ودوال التنشيط</span>
+      </a>
+      <a href="#the-xor-problem" class="toc-link" data-bilingual>
+        <template class="content-ar">مشكلة XOR</template>
+        <template class="content-en">The XOR Problem</template>
+        <span class="content-target">مشكلة XOR</span>
+      </a>
+      <a href="#feedforward-neural-networks" class="toc-link" data-bilingual>
+        <template class="content-ar">الشبكات العصبية ذات التغذية الأمامية</template>
+        <template class="content-en">Feedforward Neural Networks</template>
+        <span class="content-target">الشبكات العصبية ذات التغذية الأمامية</span>
+      </a>
+      <a href="#training-neural-networks" class="toc-link" data-bilingual>
+        <template class="content-ar">تدريب الشبكات العصبية</template>
+        <template class="content-en">Training Neural Networks</template>
+        <span class="content-target">تدريب الشبكات العصبية</span>
+      </a>
+      <a href="#feedforward-neural-language-modeling" class="toc-link" data-bilingual>
+        <template class="content-ar">نمذجة اللغة العصبية ذات التغذية الأمامية</template>
+        <template class="content-en">Feedforward Neural Language Modeling</template>
+        <span class="content-target">نمذجة اللغة العصبية ذات التغذية الأمامية</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الشبكات العصبية</h1>
+      <p class="hero-description">مقدمة في الشبكات العصبية، تشمل الوحدات الحسابية، مشكلة XOR، شبكات التغذية الأمامية، تدريب الشبكات باستخدام الانتشار العكسي، ونمذجة اللغة العصبية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Neural Networks</h1>
+      <p class="hero-description">Introduction to Neural Networks, covering computational units, the XOR problem, feedforward networks, training with backpropagation, and neural language modeling.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الشبكات العصبية</span>
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">الانتشار العكسي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Neural Networks</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">NLP</span>
+      <span class="tag">Backpropagation</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف مفهوم الوحدات الحسابية ومشكلة XOR.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف الشبكات العصبية ذات التغذية الأمامية.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعرف على نمذجة اللغة باستخدام الشبكات العصبية ذات التغذية الأمامية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية تدريب نموذج اللغة العصبي.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe the concept of Units and XOR problem.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe Feedforward Neural Networks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Recognize Feedforward Neural Language Modeling.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain Training the neural language model.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="neural-units-and-activation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الوحدات العصبية ودوال التنشيط</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Neural Units and Activation Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الوحدة العصبية هي لبنة البناء الأساسية في الشبكة العصبية، حيث تأخذ مجموعاً مرجحاً للمدخلات مع تحيز (Bias)، وتمرره عبر دالة تنشيط غير خطية.</p></template>
+    <template class="content-en"><p>A neural unit is the basic building block of a neural network, taking a weighted sum of inputs plus a bias, and passing it through a non-linear activation function.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون الشبكة العصبية من وحدات حسابية مفردة. تقوم كل وحدة بأخذ مجموعة من الأرقام الحقيقية كمدخلات، وتجري عليها عملية حسابية لإنتاج مخرج.</p><p>تتضمن هذه العملية خطوتين رئيسيتين:</p><ol><li><b>المجموع المرجح (Weighted Sum):</b> ضرب كل مدخل في وزنه الخاص، ثم جمعها مع إضافة قيمة <span class="smart-term" data-term-en="Bias" data-ar="التحيز" data-en-def="An additional constant term added to the weighted sum in a neural unit to shift the activation function.">التحيز<span class="smart-term-tooltip"></span></span> (Bias).</li><li><b>دالة التنشيط (Activation Function):</b> تمرير المجموع المرجح عبر دالة غير خطية لتحديد المخرج النهائي.</li></ol><p>أشهر دوال التنشيط هي:</p><ul><li><b>Sigmoid:</b> تحول المخرجات إلى نطاق بين (0, 1)، مفيدة للتعامل مع القيم المتطرفة، لكنها غير شائعة الاستخدام عملياً حالياً.</li><li><b>Tanh:</b> مشابهة لـ Sigmoid ولكن نطاقها بين (-1, +1)، وغالباً ما تكون أفضل منها.</li><li><b>ReLU (Rectified Linear Unit):</b> الدالة الأكثر شيوعاً، وتأخذ القيمة القصوى بين الصفر والمدخل <code>max(z, 0)</code>.</li></ul></template>
+    <template class="content-en"><p>The building block of a neural network is a single computational unit. A unit takes a set of real-valued numbers as input, performs some computation on them, and produces an output.</p><p>This computation involves two main steps:</p><ol><li><b>Weighted Sum:</b> Taking a weighted sum of its inputs, with one additional term called a <span class="smart-term" data-term-en="Bias" data-ar="التحيز" data-en-def="An additional constant term added to the weighted sum in a neural unit to shift the activation function.">bias<span class="smart-term-tooltip"></span></span> term.</li><li><b>Activation Function:</b> Passing the weighted sum through a non-linear activation function.</li></ol><p>Common activation functions include:</p><ul><li><b>Sigmoid:</b> Maps the output into the range (0,1), useful for squashing outliers, but not commonly used in practice anymore.</li><li><b>Tanh:</b> A variant of the sigmoid that ranges from -1 to +1, almost always better than sigmoid.</li><li><b><span class="smart-term" data-term-en="ReLU" data-ar="الوحدة الخطية المصححة" data-en-def="An activation function defined as the positive part of its argument: max(0, z).">ReLU<span class="smart-term-tooltip"></span></span> (Rectified Linear Unit):</b> The most commonly used activation function, defined as <code>max(z, 0)</code>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر دوال التنشيط غير الخطية ضرورية لأنها تسمح للشبكة العصبية بتعلم تمثيلات معقدة. بدونها، ستكون الشبكة العصبية متعددة الطبقات مجرد نموذج انحدار خطي كبير، بغض النظر عن عدد الطبقات.</p><p>على سبيل المثال، إذا كان لدينا مدخلات <code>x = [0.5, 0.6, 0.1]</code> وأوزان <code>w = [0.2, 0.3, 0.9]</code> وتحيز <code>b = 0.5</code>، فإن المجموع المرجح هو 0.87. بتمريره عبر دالة Sigmoid، نحصل على مخرج تقريبي يساوي 0.70.</p></template>
+    <template class="content-en"><p>Non-linear activation functions are crucial because they allow the neural network to learn complex, non-linear representations. Without them, a multi-layer neural network would mathematically collapse into a single linear regression model, regardless of the number of layers.</p><p>For example, suppose a unit has inputs <code>x = [0.5, 0.6, 0.1]</code>, weights <code>w = [0.2, 0.3, 0.9]</code>, and bias <code>b = 0.5</code>. The weighted sum is 0.87. Passing this through a Sigmoid function yields approximately 0.70.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الوحدة العصبية باستخدام دالة التنشيط Sigmoid.</strong></template>
+      <template class="content-en"><strong>Equation of a neural unit using the Sigmoid activation function.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$y = \sigma(w \cdot x + b) = \frac{1}{1 + e^{-(w \cdot x + b)}}$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A diagram of a single artificial neuron. On the left, three input nodes labeled x1, x2, x3 with arrows pointing to a central large circle. The arrows are labeled with weights w1, w2, w3. Another arrow labeled 'bias b (+1)' points to the central circle. Inside the central circle, split it horizontally: the bottom half shows a summation symbol (Σ) representing the weighted sum 'z', and the top half shows a step/curve icon representing the non-linear activation function (σ). An output arrow points up from the circle labeled 'y' and 'a'. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="40" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-en">Artificial Neuron Model</text>
+  <text x="760" y="40" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="end" class="gsvg-ar">نموذج العصبون الاصطناعي</text>
+
+  <!-- Inputs Grouping Box -->
+  <rect x="110" y="70" width="100" height="290" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4 4"/>
+  <text x="160" y="60" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Inputs</text>
+  <text x="160" y="60" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">المدخلات</text>
+
+  <!-- Weights Label -->
+  <text x="260" y="100" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Weights</text>
+  <text x="260" y="100" font-size="14" font-weight="bold" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">الأوزان</text>
+
+  <!-- Input Arrows -->
+  <line x1="183" y1="129" x2="322" y2="182" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="185" y1="220" x2="315" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="183" y1="311" x2="322" y2="258" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Weight Labels -->
+  <text x="245" y="145" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">w<tspan dy="4" font-size="12">1</tspan></text>
+  <text x="250" y="210" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">w<tspan dy="4" font-size="12">2</tspan></text>
+  <text x="245" y="305" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">w<tspan dy="4" font-size="12">3</tspan></text>
+
+  <!-- Input Nodes -->
+  <circle cx="160" cy="120" r="25" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="160" y="125" font-size="18" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="14">1</tspan></text>
+
+  <circle cx="160" cy="220" r="25" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="160" y="225" font-size="18" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="14">2</tspan></text>
+
+  <circle cx="160" cy="320" r="25" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="160" y="325" font-size="18" fill="var(--text-primary)" text-anchor="middle">x<tspan dy="4" font-size="14">3</tspan></text>
+
+  <!-- Bias Arrow & Node -->
+  <line x1="420" y1="345" x2="420" y2="325" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="435" y="340" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="start" class="gsvg-en">b</text>
+  <text x="405" y="340" font-size="16" font-weight="bold" fill="var(--brand-ink)" text-anchor="end" class="gsvg-ar">b</text>
+
+  <circle cx="420" cy="370" r="25" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="420" y="376" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">+1</text>
+  
+  <text x="455" y="375" font-size="15" fill="var(--text-secondary)" text-anchor="start" class="gsvg-en">Bias input</text>
+  <text x="385" y="375" font-size="15" fill="var(--text-secondary)" text-anchor="end" class="gsvg-ar">مدخل التحيز</text>
+
+  <!-- Output Arrow -->
+  <line x1="420" y1="120" x2="420" y2="45" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+  
+  <text x="435" y="75" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-en">Output (y)</text>
+  <text x="435" y="95" font-size="14" fill="var(--text-secondary)" text-anchor="start" class="gsvg-en">a = σ(z)</text>
+  
+  <text x="405" y="75" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="end" class="gsvg-ar">المخرجات (y)</text>
+  <text x="405" y="95" font-size="14" fill="var(--text-secondary)" text-anchor="end" class="gsvg-ar">a = σ(z)</text>
+
+  <!-- Central Neuron -->
+  <circle cx="420" cy="220" r="100" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3"/>
+  <line x1="320" y1="220" x2="520" y2="220" stroke="var(--brand-500)" stroke-width="3"/>
+
+  <!-- Neuron Bottom Half: Weighted Sum -->
+  <text x="420" y="270" font-size="44" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="middle">Σ</text>
+  <text x="420" y="300" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">z = Σ w<tspan dy="3" font-size="11">i</tspan><tspan dy="-3"> x</tspan><tspan dy="3" font-size="11">i</tspan><tspan dy="-3"> + b</tspan></text>
+  <text x="420" y="300" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">z = Σ w<tspan dy="3" font-size="11">i</tspan><tspan dy="-3"> x</tspan><tspan dy="3" font-size="11">i</tspan><tspan dy="-3"> + b</tspan></text>
+
+  <!-- Neuron Top Half: Activation Function -->
+  <path d="M 370 165 L 470 165" stroke="var(--text-muted)" stroke-width="1.5"/>
+  <path d="M 420 205 L 420 125" stroke="var(--text-muted)" stroke-width="1.5"/>
+  <path d="M 380 190 C 410 190, 430 140, 460 140" stroke="var(--brand-500)" stroke-width="3" fill="none"/>
+
+  <!-- Pointers and Labels for Neuron Halves -->
+  <!-- Top Half Pointer -->
+  <path d="M 490 165 L 540 165" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <text x="550" y="170" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-en">Activation Function (σ)</text>
+  <text x="550" y="170" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-ar">دالة التنشيط (σ)</text>
+
+  <!-- Bottom Half Pointer -->
+  <path d="M 490 275 L 540 275" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <text x="550" y="280" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-en">Weighted Sum (z)</text>
+  <text x="550" y="280" font-size="15" font-weight="bold" fill="var(--text-primary)" text-anchor="start" class="gsvg-ar">المجموع الموزون (z)</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Sigmoid</th><th>Tanh</th><th>ReLU</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نطاق المخرجات (Output Range)</template>
+          <template class="content-en">Output Range</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">(0, 1)</template>
+          <template class="content-en">(0, 1)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">(-1, +1)</template>
+          <template class="content-en">(-1, +1)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">[0, ∞)</template>
+          <template class="content-en">[0, ∞)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاستخدام الشائع (Common Usage)</template>
+          <template class="content-en">Common Usage</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير شائع عملياً للطبقات المخفية</template>
+          <template class="content-en">Not commonly used in practice for hidden layers</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">أفضل من Sigmoid</template>
+          <template class="content-en">Almost always better than Sigmoid</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الأكثر شيوعاً</template>
+          <template class="content-en">Most commonly used</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر دالة ReLU أكثر شيوعاً من Sigmoid في الشبكات العميقة الحديثة؟</template>
+      <template class="content-en">Why is the ReLU function more commonly used than Sigmoid in modern deep networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن دالة Sigmoid تعاني من مشكلة تلاشي التدرج (Vanishing Gradient) حيث تصبح مشتقتها قريبة جداً من الصفر عند القيم الكبيرة أو الصغيرة جداً، مما يبطئ التعلم. بينما ReLU تحافظ على تدرج ثابت (1) للقيم الموجبة.</p></template>
+      <template class="content-en"><p>Because the Sigmoid function suffers from the vanishing gradient problem, where its derivative approaches zero for very large or small values, slowing down learning. ReLU maintains a constant gradient of 1 for positive values.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="the-xor-problem" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مشكلة XOR</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> The XOR Problem</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مشكلة XOR توضح أن البيرسيبترون (Perceptron) البسيط لا يمكنه حساب الوظائف المنطقية التي لا يمكن فصلها خطياً، مما يستدعي استخدام شبكات متعددة الطبقات.</p></template>
+    <template class="content-en"><p>The XOR problem demonstrates that a simple perceptron cannot compute logical functions that are not linearly separable, necessitating the use of multi-layer networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في وقت مبكر من تاريخ الشبكات العصبية، تم إدراك أن قوة هذه الشبكات تأتي من دمج الوحدات في شبكات أكبر. <span class="smart-term" data-term-en="Perceptron" data-ar="البيرسيبترون" data-en-def="A simple neural unit with binary output and no non-linear activation function.">البيرسيبترون<span class="smart-term-tooltip"></span></span> (Perceptron) هو وحدة عصبية بسيطة جداً بمخرج ثنائي (0 أو 1) وبدون دالة تنشيط غير خطية.</p><p>عند محاولة حساب الوظائف المنطقية الأساسية (AND, OR, XOR):</p><ul><li>يمكن للبيرسيبترون حساب <b>AND</b> و <b>OR</b> لأنه يمكن رسم خط مستقيم (حد قرار - Decision Boundary) يفصل بين المخرجات 0 و 1.</li><li>لا يمكن للبيرسيبترون حساب <b>XOR</b> لأن المخرجات الإيجابية والسلبية تتقاطع بطريقة لا يمكن فصلها بخط مستقيم واحد (ليست قابلة للفصل خطياً).</li></ul><p><b>الحل:</b> يمكن حساب XOR بواسطة شبكة من الوحدات ذات طبقات (Layered Network). تقوم الطبقة المخفية (Hidden Layer) بتشكيل تمثيل جديد للمدخلات، مما يطوي الفضاء ويجعل البيانات قابلة للفصل خطياً في الفضاء الجديد.</p></template>
+    <template class="content-en"><p>Early in the history of neural networks, it was realized that their power comes from combining units into larger networks. A <span class="smart-term" data-term-en="Perceptron" data-ar="البيرسيبترون" data-en-def="A simple neural unit with binary output and no non-linear activation function.">Perceptron<span class="smart-term-tooltip"></span></span> is a very simple neural unit with a binary output and no non-linear activation function.</p><p>When computing elementary logical functions (AND, OR, XOR):</p><ul><li>A perceptron can compute <b>AND</b> and <b>OR</b> because a single straight line (decision boundary) can separate the 0 outputs from the 1 outputs.</li><li>A perceptron cannot compute <b>XOR</b> because the positive and negative cases are arranged such that no single straight line can separate them (it is not <span class="smart-term" data-term-en="Linearly Separable" data-ar="قابل للفصل خطياً" data-en-def="A property of a dataset where classes can be separated by a single straight line or hyperplane.">linearly separable<span class="smart-term-tooltip"></span></span>).</li></ul><p><b>The Solution:</b> XOR can be calculated by a layered network of units. The hidden layer forms a new representation of the input, essentially transforming the space so that the data becomes linearly separable in the new hidden space.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حد القرار (Decision Boundary) في فضاء ثنائي الأبعاد هو خط، وفي الأبعاد الأعلى يصبح مستوى فائق (Hyperplane). الفكرة هي فصل الفضاء إلى فئتين.</p><p>في حل شبكة XOR، يتم استخدام طبقة مخفية تحتوي على وحدتي ReLU. تقوم هذه الطبقة المخفية بتحويل نقاط الإدخال الأصلية (x1, x2) إلى فضاء جديد (h1, h2). في هذا الفضاء الجديد، تنهار النقطة [0,1] مع النقطة [1,0]، مما يجعل من الممكن فصل حالات XOR الإيجابية والسلبية خطياً بواسطة طبقة المخرجات.</p></template>
+    <template class="content-en"><p>A decision boundary in two-dimensional space is a line, and with more inputs, it becomes a hyperplane. The goal is to separate the space into two categories.</p><p>In the neural network solution for XOR, a hidden layer with two ReLU units is used. This hidden layer transforms the original input points (x1, x2) into a new space (h1, h2). In this new representation, the input point [0, 1] collapses with the input point [1, 0], making it possible for the final output layer to linearly separate the positive and negative cases of XOR.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة المخرج للبيرسيبترون البسيط.</strong></template>
+      <template class="content-en"><strong>Output equation for a simple perceptron.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$y = \begin{cases} 0, &amp; \text{if } w \cdot x + b \le 0 \\ 1, &amp; \text{if } w \cdot x + b &gt; 0 \end{cases}$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Three 2D coordinate graphs side-by-side showing logical functions AND, OR, and XOR. X-axis is x1, Y-axis is x2. Points at (0,0), (0,1), (1,0), and (1,1). Filled blue circles represent output 1, empty white circles represent output 0. Graph 1 (AND): only (1,1) is filled, a red dashed line separates it from the rest. Graph 2 (OR): (0,1), (1,0), (1,1) are filled, a red dashed line separates them from (0,0). Graph 3 (XOR): (0,1) and (1,0) are filled, (0,0) and (1,1) are empty. A red question mark indicates no single straight line can separate the filled from empty circles. Style: educational, dark background #0d1117, accent color #ff4444, viewBox 0 0 900 300. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 900 380" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--border-color)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Linear Separability &amp; The XOR Problem</text>
+  <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">القابلية للفصل الخطي ومشكلة XOR</text>
+
+  <!-- ========================================== -->
+  <!-- PANEL 1: AND FUNCTION                      -->
+  <!-- ========================================== -->
+  <g transform="translate(70, 100)">
+    <!-- Panel Title -->
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">AND Function</text>
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">دالة AND</text>
+
+    <!-- Grid Lines -->
+    <line x1="140" y1="140" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="40" y1="40" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Axes -->
+    <line x1="20" y1="140" x2="180" y2="140" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="40" y1="160" x2="40" y2="0" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Labels -->
+    <text x="180" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₁</text>
+    <text x="25" y="10" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₂</text>
+    <text x="25" y="155" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">0</text>
+    <text x="140" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+    <text x="25" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+
+    <!-- Decision Boundary -->
+    <line x1="70" y1="10" x2="170" y2="110" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8,4" />
+
+    <!-- Points -->
+    <!-- (0,0) -->
+    <circle cx="40" cy="140" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- (1,0) -->
+    <circle cx="140" cy="140" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- (0,1) -->
+    <circle cx="40" cy="40" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- (1,1) -->
+    <circle cx="140" cy="40" r="10" fill="var(--brand-500)" />
+
+    <!-- Subtitle -->
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Linearly Separable</text>
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">قابلة للفصل الخطي</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- PANEL 2: OR FUNCTION                       -->
+  <!-- ========================================== -->
+  <g transform="translate(350, 100)">
+    <!-- Panel Title -->
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">OR Function</text>
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">دالة OR</text>
+
+    <!-- Grid Lines -->
+    <line x1="140" y1="140" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="40" y1="40" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Axes -->
+    <line x1="20" y1="140" x2="180" y2="140" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="40" y1="160" x2="40" y2="0" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Labels -->
+    <text x="180" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₁</text>
+    <text x="25" y="10" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₂</text>
+    <text x="25" y="155" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">0</text>
+    <text x="140" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+    <text x="25" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+
+    <!-- Decision Boundary -->
+    <line x1="10" y1="70" x2="110" y2="170" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8,4" />
+
+    <!-- Points -->
+    <!-- (0,0) -->
+    <circle cx="40" cy="140" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- (1,0) -->
+    <circle cx="140" cy="140" r="10" fill="var(--brand-500)" />
+    <!-- (0,1) -->
+    <circle cx="40" cy="40" r="10" fill="var(--brand-500)" />
+    <!-- (1,1) -->
+    <circle cx="140" cy="40" r="10" fill="var(--brand-500)" />
+
+    <!-- Subtitle -->
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Linearly Separable</text>
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">قابلة للفصل الخطي</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- PANEL 3: XOR FUNCTION                      -->
+  <!-- ========================================== -->
+  <g transform="translate(630, 100)">
+    <!-- Panel Title -->
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">XOR Function</text>
+    <text x="100" y="-20" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">دالة XOR</text>
+
+    <!-- Grid Lines -->
+    <line x1="140" y1="140" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+    <line x1="40" y1="40" x2="140" y2="40" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+    <!-- Axes -->
+    <line x1="20" y1="140" x2="180" y2="140" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="40" y1="160" x2="40" y2="0" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Labels -->
+    <text x="180" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₁</text>
+    <text x="25" y="10" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">x₂</text>
+    <text x="25" y="155" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">0</text>
+    <text x="140" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+    <text x="25" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">1</text>
+
+    <!-- The XOR Problem Indicator (Red Question Mark) -->
+    <text x="90" y="118" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="80" font-weight="bold" fill="var(--brand-500)" opacity="0.5">?</text>
+
+    <!-- Points -->
+    <!-- (0,0) -->
+    <circle cx="40" cy="140" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <!-- (1,0) -->
+    <circle cx="140" cy="140" r="10" fill="var(--brand-500)" />
+    <!-- (0,1) -->
+    <circle cx="40" cy="40" r="10" fill="var(--brand-500)" />
+    <!-- (1,1) -->
+    <circle cx="140" cy="40" r="10" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+
+    <!-- Subtitle -->
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Not Linearly Separable</text>
+    <text x="100" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">غير قابلة للفصل الخطي</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LEGEND                                     -->
+  <!-- ========================================== -->
+  <g transform="translate(0, 350)">
+    <!-- Output 1 -->
+    <circle cx="210" cy="-5" r="8" fill="var(--brand-500)" />
+    <text x="255" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Output 1</text>
+    <text x="255" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المخرجات 1</text>
+
+    <!-- Output 0 -->
+    <circle cx="350" cy="-5" r="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+    <text x="395" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Output 0</text>
+    <text x="395" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المخرجات 0</text>
+
+    <!-- Decision Boundary -->
+    <line x1="490" y1="-5" x2="530" y2="-5" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="6,3" />
+    <text x="600" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Decision Boundary</text>
+    <text x="600" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">حد الفصل</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا 3 مدخلات بدلاً من 2، كيف سيبدو حد القرار؟</template>
+      <template class="content-en">If we had 3 inputs instead of 2, what would the decision boundary look like?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيصبح حد القرار مستوى (Plane) في فضاء ثلاثي الأبعاد، بدلاً من خط مستقيم.</p></template>
+      <template class="content-en"><p>The decision boundary would become a 2D plane in a 3D space, rather than a 1D line.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feedforward-neural-networks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الشبكات العصبية ذات التغذية الأمامية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Feedforward Neural Networks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>شبكة التغذية الأمامية هي شبكة متعددة الطبقات تتدفق فيها المعلومات في اتجاه واحد من المدخلات إلى المخرجات دون وجود أي دورات (Cycles).</p></template>
+    <template class="content-en"><p>A feedforward network is a multilayer network in which information flows in one direction from input to output, with no cycles.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون شبكات التغذية الأمامية البسيطة من ثلاثة أنواع من العقد (Nodes):</p><ol><li><b>وحدات الإدخال (Input units):</b> تستقبل البيانات الأولية.</li><li><b>الوحدات المخفية (Hidden units):</b> تقوم بالمعالجة واستخراج الميزات.</li><li><b>وحدات الإخراج (Output units):</b> تقدم النتيجة النهائية.</li></ol><p>في البنية القياسية، تكون كل طبقة <b><span class="smart-term" data-term-en="Fully-connected" data-ar="متصلة بالكامل" data-en-def="An architecture where every node in one layer is connected to every node in the next layer.">متصلة بالكامل<span class="smart-term-tooltip"></span></span> (Fully-connected)</b>، مما يعني أن كل وحدة في طبقة معينة تأخذ كمدخلات مخرجات جميع الوحدات في الطبقة السابقة، ويوجد رابط بين كل زوج من الوحدات من طبقتين متجاورتين.</p><p><b><span class="smart-term" data-term-en="Normalizing" data-ar="التطبيع" data-en-def="Converting a vector of real values into a probability distribution where values sum to 1.">التطبيع<span class="smart-term-tooltip"></span></span> (Normalizing):</b> في طبقة المخرجات، غالباً ما يتم تحويل متجه القيم الحقيقية إلى متجه يمثل توزيعاً احتمالياً (جميع الأرقام تقع بين 0 و 1 ومجموعها يساوي 1) باستخدام دوال مثل Softmax.</p></template>
+    <template class="content-en"><p>Simple feedforward networks have three kinds of nodes:</p><ol><li><b>Input units:</b> Receive the initial data.</li><li><b>Hidden units:</b> Perform intermediate computations and feature extraction.</li><li><b>Output units:</b> Produce the final result.</li></ol><p>In the standard architecture, each layer is <b><span class="smart-term" data-term-en="Fully-connected" data-ar="متصلة بالكامل" data-en-def="An architecture where every node in one layer is connected to every node in the next layer.">fully-connected<span class="smart-term-tooltip"></span></span></b>. This means that each unit in each layer takes as input the outputs from all the units in the previous layer, and there is a link between every pair of units from two adjacent layers.</p><p><b><span class="smart-term" data-term-en="Normalizing" data-ar="التطبيع" data-en-def="Converting a vector of real values into a probability distribution where values sum to 1.">Normalizing<span class="smart-term-tooltip"></span></span>:</b> At the output layer, a vector of real values is often converted into a vector that encodes a probability distribution (all numbers lie between 0 and 1 and sum to 1).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عدم وجود دورات (No cycles) هو ما يميز شبكات التغذية الأمامية عن الشبكات العصبية المتكررة (RNNs). هذا التصميم يجعل الحسابات مباشرة وسهلة التتبع رياضياً عبر تمريرة أمامية (Forward Pass) واحدة.</p><p>التطبيع في النهاية ضروري لمهام التصنيف (Classification) في معالجة اللغات الطبيعية (NLP)، حيث نحتاج إلى معرفة احتمالية انتماء المدخل إلى فئة معينة (مثلاً: إيجابي أم سلبي).</p></template>
+    <template class="content-en"><p>The absence of cycles is what distinguishes feedforward networks from Recurrent Neural Networks (RNNs). This design makes the computation straightforward and easily traceable mathematically via a single forward pass.</p><p>Normalizing at the end is essential for classification tasks in NLP, where we need to know the probability of an input belonging to a specific class (e.g., positive vs. negative sentiment).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A diagram of a fully-connected feedforward neural network. Leftmost column: 'input layer' with 3 circles. Middle columns: 'hidden layer 1' with 4 circles, and 'hidden layer 2' with 4 circles. Rightmost column: 'output layer' with 1 circle. Every circle in a layer is connected by a line to every circle in the subsequent layer. Arrows indicate flow from left to right. Style: educational, dark background #0d1117, nodes in light gray, connections in subtle blue, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Marker for fully connected lines (offset to not overlap target circles) -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="32" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="var(--brand-400)"/>
+        </marker>
+        <!-- Marker for simple input/output lines -->
+        <marker id="arrow-simple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1.5 L 10 5 L 0 8.5 z" fill="var(--brand-400)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Feature Extraction Background Box -->
+    <rect x="240" y="60" width="320" height="310" rx="16" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-400)" stroke-dasharray="8 4" stroke-width="1"/>
+    <text x="400" y="80" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Feature Extraction</text>
+    <text x="400" y="80" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">استخراج الميزات</text>
+
+    <!-- Connections (Lines) -->
+    <g stroke="var(--brand-400)" stroke-width="1.2" stroke-opacity="0.4" marker-end="url(#arrow)">
+        <!-- Input to Hidden 1 -->
+        <line x1="100" y1="140" x2="300" y2="100"/>
+        <line x1="100" y1="140" x2="300" y2="180"/>
+        <line x1="100" y1="140" x2="300" y2="260"/>
+        <line x1="100" y1="140" x2="300" y2="340"/>
+
+        <line x1="100" y1="220" x2="300" y2="100"/>
+        <line x1="100" y1="220" x2="300" y2="180"/>
+        <line x1="100" y1="220" x2="300" y2="260"/>
+        <line x1="100" y1="220" x2="300" y2="340"/>
+
+        <line x1="100" y1="300" x2="300" y2="100"/>
+        <line x1="100" y1="300" x2="300" y2="180"/>
+        <line x1="100" y1="300" x2="300" y2="260"/>
+        <line x1="100" y1="300" x2="300" y2="340"/>
+
+        <!-- Hidden 1 to Hidden 2 -->
+        <line x1="300" y1="100" x2="500" y2="100"/>
+        <line x1="300" y1="100" x2="500" y2="180"/>
+        <line x1="300" y1="100" x2="500" y2="260"/>
+        <line x1="300" y1="100" x2="500" y2="340"/>
+
+        <line x1="300" y1="180" x2="500" y2="100"/>
+        <line x1="300" y1="180" x2="500" y2="180"/>
+        <line x1="300" y1="180" x2="500" y2="260"/>
+        <line x1="300" y1="180" x2="500" y2="340"/>
+
+        <line x1="300" y1="260" x2="500" y2="100"/>
+        <line x1="300" y1="260" x2="500" y2="180"/>
+        <line x1="300" y1="260" x2="500" y2="260"/>
+        <line x1="300" y1="260" x2="500" y2="340"/>
+
+        <line x1="300" y1="340" x2="500" y2="100"/>
+        <line x1="300" y1="340" x2="500" y2="180"/>
+        <line x1="300" y1="340" x2="500" y2="260"/>
+        <line x1="300" y1="340" x2="500" y2="340"/>
+
+        <!-- Hidden 2 to Output -->
+        <line x1="500" y1="100" x2="700" y2="220"/>
+        <line x1="500" y1="180" x2="700" y2="220"/>
+        <line x1="500" y1="260" x2="700" y2="220"/>
+        <line x1="500" y1="340" x2="700" y2="220"/>
+    </g>
+
+    <!-- Input / Output Flow Arrows -->
+    <g stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-simple)">
+        <line x1="40" y1="140" x2="75" y2="140"/>
+        <line x1="40" y1="220" x2="75" y2="220"/>
+        <line x1="40" y1="300" x2="75" y2="300"/>
+        <line x1="725" y1="220" x2="760" y2="220"/>
+    </g>
+
+    <!-- Nodes -->
+    <!-- Input Layer Nodes -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        <circle cx="100" cy="140" r="20"/>
+        <circle cx="100" cy="220" r="20"/>
+        <circle cx="100" cy="300" r="20"/>
+    </g>
+
+    <!-- Hidden Layer 1 Nodes -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        <circle cx="300" cy="100" r="20"/>
+        <circle cx="300" cy="180" r="20"/>
+        <circle cx="300" cy="260" r="20"/>
+        <circle cx="300" cy="340" r="20"/>
+    </g>
+
+    <!-- Hidden Layer 2 Nodes -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        <circle cx="500" cy="100" r="20"/>
+        <circle cx="500" cy="180" r="20"/>
+        <circle cx="500" cy="260" r="20"/>
+        <circle cx="500" cy="340" r="20"/>
+    </g>
+
+    <!-- Output Layer Node (Highlighted) -->
+    <g fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2">
+        <circle cx="700" cy="220" r="20"/>
+    </g>
+
+    <!-- Node Labels -->
+    <g font-size="14" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="100" y="145">x₁</text>
+        <text x="100" y="225">x₂</text>
+        <text x="100" y="305">x₃</text>
+    </g>
+    <g font-size="16" fill="var(--on-brand-lo)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="700" y="226">y</text>
+    </g>
+
+    <!-- Layer Titles -->
+    <g font-size="16" font-weight="600" fill="var(--text-primary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="100" y="40" class="gsvg-en">Input Layer</text>
+        <text x="100" y="40" class="gsvg-ar">طبقة الإدخال</text>
+
+        <text x="300" y="40" class="gsvg-en">Hidden Layer 1</text>
+        <text x="300" y="40" class="gsvg-ar">الطبقة المخفية 1</text>
+
+        <text x="500" y="40" class="gsvg-en">Hidden Layer 2</text>
+        <text x="500" y="40" class="gsvg-ar">الطبقة المخفية 2</text>
+
+        <text x="700" y="40" class="gsvg-en">Output Layer</text>
+        <text x="700" y="40" class="gsvg-ar">طبقة الإخراج</text>
+    </g>
+
+    <!-- Flow Annotations -->
+    <g font-size="13" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="35" y="224" text-anchor="end" class="gsvg-en">Data</text>
+        <text x="35" y="224" text-anchor="end" class="gsvg-ar">البيانات</text>
+
+        <text x="765" y="224" text-anchor="start" class="gsvg-en">Result</text>
+        <text x="765" y="224" text-anchor="start" class="gsvg-ar">النتيجة</text>
+        
+        <text x="700" y="260" text-anchor="middle" class="gsvg-en">Prediction / Probability</text>
+        <text x="700" y="260" text-anchor="middle" class="gsvg-ar">التنبؤ / الاحتمال</text>
+    </g>
+
+    <!-- Bottom Explanation -->
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <text x="400" y="390" class="gsvg-en">Fully-connected: Each unit receives inputs from all units in the previous layer</text>
+        <text x="400" y="390" class="gsvg-ar">متصلة بالكامل: تتلقى كل عقدة مدخلات من جميع العقد في الطبقة السابقة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا لم تكن الطبقات متصلة بالكامل؟</template>
+      <template class="content-en">What happens if the layers are not fully connected?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستقل عدد المعلمات (الأوزان) التي يجب تعلمها، مما قد يقلل من خطر التجهيز الزائد (Overfitting) ويسرع التدريب، ولكنه قد يحد من قدرة الشبكة على تعلم العلاقات المعقدة بين جميع الميزات. (مثل الشبكات الالتفافية CNNs التي تستخدم اتصالات محلية).</p></template>
+      <template class="content-en"><p>The number of parameters (weights) to learn decreases, which can reduce overfitting and speed up training, but it might limit the network's capacity to learn complex relationships across all features. (e.g., CNNs use local connections).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="training-neural-networks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تدريب الشبكات العصبية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Training Neural Networks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تدريب الشبكات العصبية باستخدام التعلم الخاضع للإشراف، حيث نقوم بتقليل دالة الخسارة (Loss Function) باستخدام خوارزمية الانحدار التدريجي (Gradient Descent) والانتشار العكسي (Backpropagation).</p></template>
+    <template class="content-en"><p>Neural networks are trained using supervised learning, minimizing a loss function via Gradient Descent and Backpropagation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>شبكة التغذية الأمامية هي مثال على التعلم الآلي الخاضع للإشراف (Supervised Learning)، حيث نعرف المخرج الصحيح <code>y</code> لكل ملاحظة <code>x</code>.</p><p>خطوات التدريب:</p><ol><li><b>دالة الخسارة (Loss Function):</b> نحتاج إلى دالة تقيس المسافة بين مخرج النظام والمخرج الصحيح. من الشائع استخدام دالة <b>الإنتروبيا المتقاطعة (Cross-entropy loss)</b>، وهي ببساطة اللوغاريتم السالب للاحتمال الناتج للفئة الصحيحة (Negative log likelihood).</li><li><b>التحسين (Optimization):</b> للعثور على المعلمات (الأوزان) التي تقلل من دالة الخسارة هذه، نستخدم خوارزمية <b>الانحدار التدريجي (Gradient Descent)</b>.</li><li><b>حساب التدرج (Computing the Gradient):</b> يتطلب الانحدار التدريجي معرفة تدرج دالة الخسارة (المشتقة الجزئية لكل معلمة). يتم حساب ذلك باستخدام خوارزمية <b><span class="smart-term" data-term-en="Backpropagation" data-ar="الانتشار العكسي" data-en-def="An algorithm used to calculate the gradient of the loss function with respect to the weights in a neural network.">الانتشار العكسي<span class="smart-term-tooltip"></span></span> (Backpropagation)</b>.</li></ol><p>يعتمد الانتشار العكسي على مفهوم <b>الرسوم البيانية الحسابية (Computation Graphs)</b>، حيث يتم تقسيم التعبير الرياضي إلى عمليات منفصلة، تُمثل كل منها كعقدة في رسم بياني، مما يسهل تطبيق قاعدة السلسلة (Chain Rule) في التفاضل.</p></template>
+    <template class="content-en"><p>A feedforward neural net is an instance of supervised machine learning in which we know the correct output <code>y</code> for each observation <code>x</code>.</p><p>Training steps:</p><ol><li><b>Loss Function:</b> We need a function that models the distance between the system output and the gold output. It’s common to use the <b><span class="smart-term" data-term-en="Cross-entropy loss" data-ar="خسارة الإنتروبيا المتقاطعة" data-en-def="A loss function that measures the performance of a classification model whose output is a probability value between 0 and 1.">cross-entropy loss<span class="smart-term-tooltip"></span></span></b> (also called negative log likelihood loss).</li><li><b>Optimization:</b> To find the parameters that minimize this loss function, we use the <b>gradient descent</b> optimization algorithm.</li><li><b>Computing the Gradient:</b> Gradient descent requires knowing the gradient of the loss function (the partial derivative with respect to each parameter). The solution to computing this gradient is an algorithm called error <b><span class="smart-term" data-term-en="Backpropagation" data-ar="الانتشار العكسي" data-en-def="An algorithm used to calculate the gradient of the loss function with respect to the weights in a neural network.">backpropagation<span class="smart-term-tooltip"></span></span></b>.</li></ol><p>Backpropagation depends on the notion of <b><span class="smart-term" data-term-en="Computation Graph" data-ar="الرسم البياني الحسابي" data-en-def="A representation of a mathematical expression where operations are nodes, used to facilitate forward and backward passes.">computation graph<span class="smart-term-tooltip"></span></span>s</b>. A computation graph breaks down a mathematical expression into separate operations, modeled as nodes, making it easy to apply backward differentiation (the chain rule).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>إذا تم استخدام الشبكة العصبية كمصنف ثنائي (Binary Classifier) مع دالة Sigmoid في الطبقة النهائية، فإن دالة الخسارة (Cross-entropy) تكون مطابقة تماماً لدالة الخسارة المستخدمة في الانحدار اللوجستي (Logistic Regression).</p><p>في <span class="smart-term" data-term-en="Computation Graph" data-ar="الرسم البياني الحسابي" data-en-def="A representation of a mathematical expression where operations are nodes, used to facilitate forward and backward passes.">الرسم البياني الحسابي<span class="smart-term-tooltip"></span></span>، التمريرة الأمامية (Forward Pass) تحسب قيمة الدالة، بينما التمريرة الخلفية (Backward Pass) تحسب المشتقات الجزئية من المخرج النهائي رجوعاً إلى المدخلات.</p></template>
+    <template class="content-en"><p>If the neural network is being used as a binary classifier, with the sigmoid at the final layer, the cross-entropy loss function is the exact same as the logistic regression loss.</p><p>In a computation graph, the forward pass computes the actual value of the function, while the backward pass computes the partial derivatives from the final output back to the inputs using the chain rule.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A computation graph for the equation L(a,b,c) = c(a + 2b). Nodes are circles. Node 'a' and Node 'b' point to intermediate nodes. Node 'b' points to node 'd' (operation: d=2b). Nodes 'a' and 'd' point to node 'e' (operation: e=a+d). Nodes 'c' and 'e' point to final node 'L' (operation: L=c*e). A green arrow labeled 'forward pass' points from left to right. Style: educational, dark background #0d1117, nodes in cyan, text in white, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Marker for edges pointing to nodes (refX=49 leaves a 4px gap before a r=35 node) -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="49" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Marker for the forward pass arrow -->
+        <marker id="arrow-forward" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Forward Pass Annotation -->
+    <g class="forward-pass">
+        <line x1="250" y1="40" x2="550" y2="40" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow-forward)" />
+        <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Forward Pass</text>
+        <text x="400" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">المسار الأمامي</text>
+    </g>
+
+    <!-- Equation Display -->
+    <g>
+        <text x="760" y="45" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="end" class="gsvg-en">L(a,b,c) = c(a + 2b)</text>
+        <text x="760" y="45" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="end" class="gsvg-ar">L(a,b,c) = c(a + 2b)</text>
+    </g>
+
+    <!-- Edges (Lines) -->
+    <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)">
+        <!-- b to d -->
+        <line x1="120" y1="240" x2="320" y2="240" />
+        <!-- a to e -->
+        <line x1="120" y1="120" x2="520" y2="180" />
+        <!-- d to e -->
+        <line x1="320" y1="240" x2="520" y2="180" />
+        <!-- c to L -->
+        <line x1="120" y1="360" x2="720" y2="270" />
+        <!-- e to L -->
+        <line x1="520" y1="180" x2="720" y2="270" />
+    </g>
+
+    <!-- Edge Labels (Values flowing through the graph) -->
+    <g font-size="15" font-style="italic" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle">
+        <text x="220" y="230">b</text>
+        <text x="310" y="140">a</text>
+        <text x="410" y="200">d</text>
+        <text x="410" y="305">c</text>
+        <text x="620" y="215">e</text>
+    </g>
+
+    <!-- Nodes -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3">
+        <!-- Inputs -->
+        <circle cx="120" cy="120" r="35" />
+        <circle cx="120" cy="240" r="35" />
+        <circle cx="120" cy="360" r="35" />
+        <!-- Intermediates -->
+        <circle cx="320" cy="240" r="35" />
+        <circle cx="520" cy="180" r="35" />
+        <!-- Output -->
+        <circle cx="720" cy="270" r="35" />
+    </g>
+
+    <!-- Node Inner Text (Variables) -->
+    <g font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="central">
+        <text x="120" y="120">a</text>
+        <text x="120" y="240">b</text>
+        <text x="120" y="360">c</text>
+        <text x="320" y="240">d</text>
+        <text x="520" y="180">e</text>
+        <text x="720" y="270">L</text>
+    </g>
+
+    <!-- Operation & Column Labels -->
+    <g font-size="15" fill="var(--text-secondary)" text-anchor="middle">
+        <!-- Input Column Label -->
+        <text x="120" y="65" font-size="16" font-weight="bold" class="gsvg-en">Inputs</text>
+        <text x="120" y="65" font-size="16" font-weight="bold" class="gsvg-ar">المدخلات</text>
+
+        <!-- Output Column Label -->
+        <text x="720" y="215" font-size="16" font-weight="bold" class="gsvg-en">Output (Loss)</text>
+        <text x="720" y="215" font-size="16" font-weight="bold" class="gsvg-ar">المخرج (الخسارة)</text>
+
+        <!-- Node d Operation -->
+        <text x="320" y="190" font-family="monospace" class="gsvg-en">d = 2b</text>
+        <text x="320" y="190" font-family="monospace" class="gsvg-ar">d = 2b</text>
+
+        <!-- Node e Operation -->
+        <text x="520" y="130" font-family="monospace" class="gsvg-en">e = a + d</text>
+        <text x="520" y="130" font-family="monospace" class="gsvg-ar">e = a + d</text>
+
+        <!-- Node L Operation -->
+        <text x="720" y="330" font-family="monospace" class="gsvg-en">L = c × e</text>
+        <text x="720" y="330" font-family="monospace" class="gsvg-ar">L = c × e</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم اللوغاريتم السالب في دالة الخسارة بدلاً من الاحتمال المباشر؟</template>
+      <template class="content-en">Why do we use the negative log in the loss function instead of the direct probability?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن ضرب الاحتمالات الصغيرة جداً يؤدي إلى مشاكل في الدقة العددية (Underflow) في الحواسيب. أخذ اللوغاريتم يحول الضرب إلى جمع، والإشارة السالبة تحول مشكلة تعظيم الاحتمال إلى مشكلة تقليل الخسارة.</p></template>
+      <template class="content-en"><p>Because multiplying very small probabilities leads to numerical underflow in computers. Taking the log turns multiplication into addition, and the negative sign turns a probability maximization problem into a loss minimization problem.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feedforward-neural-language-modeling" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> نمذجة اللغة العصبية ذات التغذية الأمامية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Feedforward Neural Language Modeling</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تستخدم نماذج اللغة العصبية <span class="smart-term" data-term-en="Word Embeddings" data-ar="تضمين الكلمات" data-en-def="Dense vector representations of words that capture semantic meanings.">تضمين الكلمات<span class="smart-term-tooltip"></span></span> (Embeddings) لتمثيل السياق بدلاً من هوية الكلمة الدقيقة، مما يمنحها قدرة أفضل على التعميم مقارنة بنماذج N-gram، رغم أنها أبطأ في التدريب.</p></template>
+    <template class="content-en"><p>Neural language models use <span class="smart-term" data-term-en="Word Embeddings" data-ar="تضمين الكلمات" data-en-def="Dense vector representations of words that capture semantic meanings.">word embeddings<span class="smart-term-tooltip"></span></span> to represent context rather than exact word identity, giving them better generalization than n-gram models, though they are slower to train.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتمتع نماذج اللغة العصبية بالعديد من المزايا مقارنة بنماذج اللغة القائمة على N-gram. الميزة الرئيسية هي أنها تمثل الكلمات في السياق السابق بواسطة <b>تضميناتها (Embeddings)</b>، بدلاً من مجرد هويتها اللفظية كما هو مستخدم في نماذج N-gram.</p><p>ومع ذلك، فإن نماذج اللغة العصبية:</p><ul><li>أكثر تعقيداً بكثير.</li><li>أبطأ وتحتاج إلى طاقة أكبر للتدريب.</li><li>أقل قابلية للتفسير (Less interpretable) من نماذج N-gram.</li></ul><p>لذلك، بالنسبة لبعض المهام الصغيرة، لا يزال نموذج N-gram هو الأداة المناسبة.</p><p><b>التدريب الذاتي (Self-training):</b> في نمذجة اللغة، نأخذ مجموعة من النصوص (Corpus) كمواد تدريبية، وفي كل خطوة زمنية <code>t</code> نطلب من النموذج التنبؤ بالكلمة التالية. في البداية يكون أداؤه سيئاً، ولكن بما أننا نعرف الإجابة الصحيحة (الكلمة التالية في النص)، يمكننا تدريبه بسهولة ليصبح أفضل في التنبؤ.</p><p><b><span class="smart-term" data-term-en="Freezing" data-ar="التجميد" data-en-def="Using pre-trained embeddings (like word2vec) and keeping their weights constant during the training of a new model.">التجميد<span class="smart-term-tooltip"></span></span> (Freezing):</b> يعني استخدام خوارزمية تدريب مسبق مثل <code>word2vec</code> لحساب مصفوفة التضمين الأولية، ثم إبقائها ثابتة أثناء تدريب الشبكة.</p></template>
+    <template class="content-en"><p>Neural language models have many advantages over n-gram language models. The main advantage is that they represent words in the prior context by their <b>embeddings</b>, rather than just by their word identity as used in n-gram models.</p><p>However, neural net language models are:</p><ul><li>Much more complex.</li><li>Slower and need more energy to train.</li><li>Less interpretable than n-gram models.</li></ul><p>Therefore, for some smaller tasks, an n-gram language model is still the right tool.</p><p><b>Self-training:</b> In language modeling, we take a corpus of text as training material and at each time step <code>t</code> ask the model to predict the next word. At first, it does poorly, but since we know the correct answer (the actual next word in the corpus), we can easily train it to be better.</p><p><b><span class="smart-term" data-term-en="Freezing" data-ar="التجميد" data-en-def="Using pre-trained embeddings (like word2vec) and keeping their weights constant during the training of a new model.">Freezing<span class="smart-term-tooltip"></span></span>:</b> Means we use word2vec or some other pretraining algorithm to compute the initial embedding matrix and keep it fixed.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام التضمينات (Embeddings) يحل مشكلة التناثر (Sparsity) الموجودة في نماذج N-gram. إذا رأى النموذج العصبي كلمة "سيارة" في التدريب، يمكنه تعميم المعرفة على كلمة "مركبة" لأن تضميناتهما متقاربة في الفضاء المتجهي، بينما يعتبر نموذج N-gram كل كلمة كياناً مستقلاً تماماً.</p><p>التدريب الذاتي هنا هو شكل من أشكال التعلم الخاضع للإشراف الذاتي (Self-supervised learning)، حيث يتم استخراج التسميات (Labels) تلقائياً من البيانات نفسها دون تدخل بشري.</p></template>
+    <template class="content-en"><p>Using embeddings solves the sparsity problem inherent in n-gram models. If a neural model sees the word 'car' during training, it can generalize that knowledge to 'vehicle' because their embeddings are close in vector space. An n-gram model treats them as completely distinct entities.</p><p>The self-training described here is a form of self-supervised learning, where the labels (the next words) are automatically extracted from the sequential data itself without human annotation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Neural Language Models</th><th>N-gram Models</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تمثيل الكلمات</template>
+          <template class="content-en">Word Representation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تضمينات (Embeddings)</template>
+          <template class="content-en">Embeddings</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">هوية الكلمة الدقيقة</template>
+          <template class="content-en">Exact word identity</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">سرعة التدريب واستهلاك الطاقة</template>
+          <template class="content-en">Training Speed &amp; Energy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أبطأ وتستهلك طاقة أكبر</template>
+          <template class="content-en">Slower, needs more energy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أسرع وأقل استهلاكاً</template>
+          <template class="content-en">Faster, less energy</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قابلية التفسير</template>
+          <template class="content-en">Interpretability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أقل قابلية للتفسير</template>
+          <template class="content-en">Less interpretable</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية</template>
+          <template class="content-en">High</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام نموذج N-gram بدلاً من نموذج لغة عصبي؟</template>
+      <template class="content-en">When would you prefer to use an N-gram model over a neural language model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تكون الموارد الحسابية محدودة، أو عندما تكون مجموعة البيانات صغيرة جداً، أو عندما تكون قابلية التفسير (معرفة سبب التنبؤ بالضبط) أمراً بالغ الأهمية.</p></template>
+      <template class="content-en"><p>When computational resources are limited, the dataset is very small, or strict interpretability (knowing exactly why a prediction was made) is crucial.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. إذا كنتم تستعدون للامتحان، فهذا هو جوهر ما تحتاجون لمعرفته: الشبكات العصبية تبدأ بوحدة بسيطة تأخذ مجموعاً مرجحاً وتمرره عبر دالة تنشيط (تذكروا ReLU جيداً!). لماذا نحتاج دوال التنشيط والطبقات المخفية؟ تذكروا مشكلة XOR؛ بدونها، شبكتنا مجرد خط مستقيم غبي لا يمكنه حل المشاكل المعقدة. 
+
+عندما نربط هذه الوحدات، نحصل على شبكة تغذية أمامية. كيف تتعلم هذه الشبكة؟ هنا يأتي دور 'الانتشار العكسي' الذي يحسب التدرجات، و'الانحدار التدريجي' الذي يضبط الأوزان لتقليل 'دالة الخسارة' (الإنتروبيا المتقاطعة هي صديقتكم هنا). 
+
+أخيراً، عندما نطبق هذا على اللغة، نستخدم 'تضمين الكلمات' بدلاً من الكلمات المجردة، مما يعطي نماذجنا قدرة خارقة على فهم السياق، رغم أنها تصبح أبطأ وأكثر تعقيداً من نماذج N-gram القديمة. ركزوا على فهم 'لماذا' نستخدم كل تقنية، وليس فقط 'كيف' تعمل. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this pivotal module. If you're cramming for the exam, here is the core of what you need to know: Neural networks start with a simple unit that takes a weighted sum and passes it through an activation function (remember ReLU!). Why do we need activation functions and hidden layers? Remember the XOR problem; without them, our network is just a dumb straight line unable to solve complex problems.
+
+When we connect these units, we get a feedforward network. How does it learn? Enter 'Backpropagation' to compute gradients, and 'Gradient Descent' to adjust weights to minimize the 'Loss Function' (Cross-entropy is your friend here).
+
+Finally, when we apply this to language, we use 'Word Embeddings' instead of bare words, giving our models a superpower to understand context, even though they become slower and more complex than old N-gram models. Focus on understanding 'why' we use each technique, not just 'how' it works. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم دالة التنشيط الخطية في الطبقات المخفية؟</template>
+          <template class="content-en">Why don't we use a linear activation function in hidden layers?</template>
+          <span class="content-target">لماذا لا نستخدم دالة التنشيط الخطية في الطبقات المخفية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن تركيب دوال خطية متعددة ينتج دالة خطية واحدة. بدون دالة تنشيط غير خطية، ستفقد الشبكة العصبية العميقة قدرتها على تعلم الأنماط المعقدة وستتصرف كنموذج انحدار خطي بسيط.</template>
+          <template class="content-en">Because the composition of multiple linear functions is just another linear function. Without a non-linear activation function, a deep neural network would lose its ability to learn complex patterns and would behave just like a simple linear regression model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين البيرسيبترون والوحدة العصبية الحديثة؟</template>
+          <template class="content-en">What is the main difference between a Perceptron and a modern neural unit?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين البيرسيبترون والوحدة العصبية الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">البيرسيبترون يمتلك مخرجاً ثنائياً (0 أو 1) ولا يستخدم دالة تنشيط غير خطية مستمرة (يستخدم دالة عتبة قاسية)، بينما الوحدة الحديثة تستخدم دوال تنشيط مستمرة وقابلة للاشتقاق مثل ReLU أو Sigmoid.</template>
+          <template class="content-en">A perceptron has a strict binary output (0 or 1) and does not use a continuous non-linear activation function (it uses a hard step function), whereas a modern unit uses continuous, differentiable activation functions like ReLU or Sigmoid.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل الانتشار العكسي (Backpropagation) مشكلة تحديث الأوزان في الطبقات المخفية؟</template>
+          <template class="content-en">How does Backpropagation solve the problem of updating weights in hidden layers?</template>
+          <span class="content-target">كيف يحل الانتشار العكسي (Backpropagation) مشكلة تحديث الأوزان في الطبقات المخفية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نظراً لأننا لا نملك 'إجابات صحيحة' للطبقات المخفية، يستخدم الانتشار العكسي قاعدة السلسلة (Chain Rule) لحساب مدى مساهمة كل وزن في الطبقة المخفية في الخطأ النهائي، مما يسمح بتحديثها.</template>
+          <template class="content-en">Since we don't have 'ground truth' answers for hidden layers, backpropagation uses the chain rule of calculus to calculate how much each weight in the hidden layer contributed to the final output error, allowing them to be updated.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي ميزة استخدام تضمين الكلمات (Embeddings) في نماذج اللغة العصبية؟</template>
+          <template class="content-en">What is the advantage of using Word Embeddings in neural language models?</template>
+          <span class="content-target">ما هي ميزة استخدام تضمين الكلمات (Embeddings) في نماذج اللغة العصبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التضمينات تمثل الكلمات كمتجهات كثيفة تلتقط التشابه الدلالي. هذا يسمح للنموذج بالتعميم؛ فإذا تعلم شيئاً عن 'قطة'، يمكنه تطبيق نفس المعرفة على 'كلب' لأنهما متقاربان في فضاء التضمين.</template>
+          <template class="content-en">Embeddings represent words as dense vectors that capture semantic similarity. This allows the model to generalize; if it learns something about 'cat', it can apply similar knowledge to 'dog' because they are close in the embedding space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا نقصد بـ 'التدريب الذاتي' (Self-training) في نماذج اللغة؟</template>
+          <template class="content-en">What do we mean by 'Self-training' in language models?</template>
+          <span class="content-target">ماذا نقصد بـ 'التدريب الذاتي' (Self-training) في نماذج اللغة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تدريب النموذج على التنبؤ بالكلمة التالية في نص موجود مسبقاً. لا نحتاج إلى إنسان لتصنيف البيانات، لأن الكلمة التالية الحقيقية في النص تعمل كـ 'التسمية الصحيحة' (Label) للتدريب.</template>
+          <template class="content-en">It means training the model to predict the next word in an existing text corpus. We don't need a human to label the data, because the actual next word in the text serves as the 'ground truth label' for training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل دالة ReLU على Sigmoid في الشبكات العميقة؟</template>
+          <template class="content-en">Why do we prefer the ReLU function over Sigmoid in deep networks?</template>
+          <span class="content-target">لماذا نفضل دالة ReLU على Sigmoid في الشبكات العميقة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">دالة Sigmoid تضغط القيم الكبيرة والصغيرة جداً، مما يجعل مشتقتها قريبة من الصفر (مشكلة تلاشي التدرج)، مما يوقف التعلم. ReLU تحافظ على مشتقة ثابتة (1) للقيم الموجبة، مما يسرع التدريب.</template>
+          <template class="content-en">The Sigmoid function squashes very large and small values, making its derivative close to zero (vanishing gradient problem), which halts learning. ReLU maintains a constant derivative (1) for positive values, speeding up training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور 'التطبيع' (Normalizing) في طبقة الإخراج؟</template>
+          <template class="content-en">What is the role of 'Normalizing' at the output layer?</template>
+          <span class="content-target">ما هو دور 'التطبيع' (Normalizing) في طبقة الإخراج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحول القيم الخام (Logits) التي تنتجها الشبكة إلى توزيع احتمالي صالح (قيم بين 0 و 1 مجموعها 1)، مما يسهل تفسير المخرجات كاحتمالات للفئات المختلفة.</template>
+          <template class="content-en">It converts the raw scores (logits) produced by the network into a valid probability distribution (values between 0 and 1 that sum to 1), making it easy to interpret the outputs as probabilities for different classes.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أختار نموذج N-gram بدلاً من نموذج لغة عصبي؟</template>
+          <template class="content-en">When should I choose an N-gram model over a neural language model?</template>
+          <span class="content-target">متى يجب أن أختار نموذج N-gram بدلاً من نموذج لغة عصبي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">اختر N-gram إذا كانت مجموعة البيانات صغيرة جداً، أو إذا كانت الموارد الحسابية (CPU/GPU) محدودة، أو إذا كنت بحاجة إلى نظام قابل للتفسير بالكامل حيث يمكنك تتبع سبب كل تنبؤ بدقة.</template>
+          <template class="content-en">Choose N-gram if your dataset is very small, if computational resources (CPU/GPU) are strictly limited, or if you need a fully interpretable system where you can trace exactly why every prediction was made.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الرسم البياني الحسابي (Computation Graph) ولماذا هو مهم؟</template>
+          <template class="content-en">What is a Computation Graph and why is it important?</template>
+          <span class="content-target">ما هو الرسم البياني الحسابي (Computation Graph) ولماذا هو مهم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تمثيل مرئي للعمليات الرياضية كعقد في رسم بياني. أهميته تكمن في أنه يجعل عملية حساب المشتقات المعقدة (الانتشار العكسي) عملية منهجية وبسيطة برمجياً باستخدام قاعدة السلسلة.</template>
+          <template class="content-en">It is a visual representation of mathematical operations as nodes in a graph. Its importance lies in making the calculation of complex derivatives (backpropagation) a systematic and programmatically simple process using the chain rule.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني 'تجميد' (Freezing) التضمينات أثناء التدريب؟</template>
+          <template class="content-en">What does 'freezing' embeddings mean during training?</template>
+          <span class="content-target">ماذا يعني 'تجميد' (Freezing) التضمينات أثناء التدريب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني أننا نستخدم أوزان تضمين تم تدريبها مسبقاً (مثل word2vec) ونمنع خوارزمية الانحدار التدريجي من تحديث هذه الأوزان أثناء تدريب شبكتنا الحالية، مما يوفر الوقت والموارد.</template>
+          <template class="content-en">It means we use pre-trained embedding weights (like word2vec) and prevent the gradient descent algorithm from updating these weights during the training of our current network, saving time and resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الوحدة العصبية (Neural Unit)؟",
+      "en": "What is a Neural Unit?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لبنة البناء الأساسية للشبكة العصبية، تأخذ مجموعاً مرجحاً للمدخلات مع تحيز، وتنتج مخرجاً عبر دالة تنشيط.",
+        "en": "The building block of a neural network that takes a weighted sum of inputs with a bias, and produces an output via an activation function."
+      },
+      "example": {
+        "ar": "البيرسيبترون هو نوع بسيط من الوحدات العصبية.",
+        "en": "A perceptron is a simple type of neural unit."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو دور التحيز (Bias) في الوحدة العصبية؟",
+      "en": "What is the role of Bias in a neural unit?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصطلح إضافي يُجمع مع المجموع المرجح للمدخلات قبل تمريره لدالة التنشيط.",
+        "en": "An additional term added to the weighted sum of inputs before passing it to the activation function."
+      },
+      "example": {
+        "ar": "z = (w * x) + b",
+        "en": "z = (w * x) + b"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي دالة Sigmoid؟",
+      "en": "What is the Sigmoid function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تنشيط غير خطية تحول المخرجات إلى نطاق بين (0, 1).",
+        "en": "A non-linear activation function that maps the output into the range (0,1)."
+      },
+      "example": {
+        "ar": "تُستخدم غالباً في الانحدار اللوجستي.",
+        "en": "Often used in logistic regression."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي دالة Tanh؟",
+      "en": "What is the Tanh function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير من دالة Sigmoid يتراوح نطاقه من -1 إلى +1.",
+        "en": "A variant of the sigmoid function that ranges from -1 to +1."
+      },
+      "example": {
+        "ar": "تعتبر دائماً أفضل من Sigmoid في الممارسة العملية.",
+        "en": "Almost always better than sigmoid in practice."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي دالة ReLU؟",
+      "en": "What is the ReLU function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوحدة الخطية المصححة، وهي دالة التنشيط الأكثر شيوعاً، وتُعرّف بـ max(z, 0).",
+        "en": "Rectified Linear Unit, the most commonly used activation function, defined as max(z, 0)."
+      },
+      "example": {
+        "ar": "إذا كان المدخل -5، المخرج 0. إذا كان المدخل 5، المخرج 5.",
+        "en": "If input is -5, output is 0. If input is 5, output is 5."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو البيرسيبترون (Perceptron)؟",
+      "en": "What is a Perceptron?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وحدة عصبية بسيطة جداً لها مخرج ثنائي ولا تحتوي على دالة تنشيط غير خطية.",
+        "en": "A very simple neural unit that has a binary output and does not have a non-linear activation function."
+      },
+      "example": {
+        "ar": "يمكنه حساب AND و OR، لكن لا يمكنه حساب XOR.",
+        "en": "Can compute AND and OR, but cannot compute XOR."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي مشكلة XOR؟",
+      "en": "What is the XOR problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حقيقة أن البيرسيبترون المفرد لا يمكنه حساب دالة XOR لأنها غير قابلة للفصل خطياً.",
+        "en": "The fact that a single perceptron cannot compute the XOR function because it is not linearly separable."
+      },
+      "example": {
+        "ar": "تتطلب حلاً باستخدام شبكة ذات طبقات مخفية.",
+        "en": "Requires a solution using a layered network with hidden units."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو حد القرار (Decision Boundary)؟",
+      "en": "What is a Decision Boundary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خط أو مستوى فائق يفصل الفضاء إلى فئات مختلفة بناءً على المخرجات.",
+        "en": "A line or hyperplane that separates the space into different categories based on outputs."
+      },
+      "example": {
+        "ar": "في فضاء ثنائي الأبعاد، هو خط يفصل بين المخرجات 0 و 1.",
+        "en": "In 2D space, it's a line separating 0 outputs from 1 outputs."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف تحل الشبكات العصبية مشكلة XOR؟",
+      "en": "How do neural networks solve the XOR problem?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام طبقة مخفية تشكل تمثيلاً جديداً للمدخلات يجعلها قابلة للفصل خطياً.",
+        "en": "By using a hidden layer that forms a new representation of the input, making it linearly separable."
+      },
+      "example": {
+        "ar": "طي النقطة [0,1] مع [1,0] في الفضاء المخفي.",
+        "en": "Collapsing point [0,1] with [1,0] in the hidden space."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي شبكة التغذية الأمامية (Feedforward Network)؟",
+      "en": "What is a Feedforward Network?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة متعددة الطبقات تتصل فيها الوحدات بدون أي دورات (No cycles).",
+        "en": "A multilayer network in which the units are connected with no cycles."
+      },
+      "example": {
+        "ar": "تتكون من طبقة إدخال، طبقات مخفية، وطبقة إخراج.",
+        "en": "Consists of input layer, hidden layers, and output layer."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ماذا يعني مصطلح \"متصلة بالكامل\" (Fully-connected)؟",
+      "en": "What does 'Fully-connected' mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بنية تأخذ فيها كل وحدة في طبقة ما مخرجات جميع الوحدات في الطبقة السابقة كمدخلات.",
+        "en": "An architecture where each unit in a layer takes as input the outputs from all units in the previous layer."
+      },
+      "example": {
+        "ar": "يوجد رابط بين كل زوج من الوحدات من طبقتين متجاورتين.",
+        "en": "There is a link between every pair of units from two adjacent layers."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو التطبيع (Normalizing) في الشبكات العصبية؟",
+      "en": "What is Normalizing in neural networks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل متجه من القيم الحقيقية إلى توزيع احتمالي (قيم بين 0 و 1 ومجموعها 1).",
+        "en": "Converting a vector of real values into a probability distribution (values between 0 and 1 that sum to 1)."
+      },
+      "example": {
+        "ar": "استخدام دالة Softmax في طبقة الإخراج.",
+        "en": "Using the Softmax function at the output layer."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي دالة الخسارة (Loss Function) المستخدمة غالباً في التصنيف؟",
+      "en": "What is the common Loss Function used for classification?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خسارة الإنتروبيا المتقاطعة (Cross-entropy loss)، وهي اللوغاريتم السالب للاحتمال الناتج.",
+        "en": "Cross-entropy loss, which is the negative log of the output probability."
+      },
+      "example": {
+        "ar": "نفس الدالة المستخدمة في الانحدار اللوجستي.",
+        "en": "The same function used in logistic regression."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الانتشار العكسي (Backpropagation)؟",
+      "en": "What is Backpropagation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية لحساب تدرج دالة الخسارة بالنسبة لكل معلمة في الشبكة.",
+        "en": "An algorithm to compute the gradient of the loss function with respect to each parameter in the network."
+      },
+      "example": {
+        "ar": "تعتمد على التفاضل العكسي والرسوم البيانية الحسابية.",
+        "en": "Relies on backward differentiation and computation graphs."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الرسم البياني الحسابي (Computation Graph)؟",
+      "en": "What is a Computation Graph?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل لعملية حساب تعبير رياضي، حيث تُمثل كل عملية كعقدة في رسم بياني.",
+        "en": "A representation of computing a mathematical expression, where each operation is modeled as a node in a graph."
+      },
+      "example": {
+        "ar": "يُسهل تطبيق قاعدة السلسلة في الانتشار العكسي.",
+        "en": "Facilitates applying the chain rule in backpropagation."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "كيف تمثل نماذج اللغة العصبية الكلمات؟",
+      "en": "How do neural language models represent words?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بواسطة تضميناتها (Embeddings) بدلاً من هويتها اللفظية الدقيقة.",
+        "en": "By their embeddings rather than just by their exact word identity."
+      },
+      "example": {
+        "ar": "هذا يعطيها ميزة على نماذج N-gram في التعميم.",
+        "en": "This gives them an advantage over n-gram models in generalization."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هو التدريب الذاتي (Self-training) في نماذج اللغة؟",
+      "en": "What is Self-training in language models?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أخذ نص وتدريب النموذج على التنبؤ بالكلمة التالية في كل خطوة زمنية.",
+        "en": "Taking a corpus and asking the model to predict the next word at each time step."
+      },
+      "example": {
+        "ar": "النموذج يصحح نفسه لأن الإجابة الصحيحة موجودة بالفعل في النص.",
+        "en": "The model corrects itself because the correct answer is already in the text."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ماذا يعني التجميد (Freezing) في سياق التضمينات؟",
+      "en": "What does Freezing mean in the context of embeddings?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام خوارزمية تدريب مسبق (مثل word2vec) لحساب مصفوفة التضمين الأولية وإبقائها ثابتة.",
+        "en": "Using a pretraining algorithm (like word2vec) to compute the initial embedding matrix and keeping it fixed."
+      },
+      "example": {
+        "ar": "يقلل من عدد المعلمات التي يجب تدريبها في الشبكة الرئيسية.",
+        "en": "Reduces the number of parameters to train in the main network."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية هي الأكثر شيوعاً في الاستخدام العملي حالياً؟",
+      "en": "Which of the following activation functions is currently the most commonly used in practice?"
+    },
+    "options": {
+      "ar": [
+        "Sigmoid",
+        "Tanh",
+        "ReLU",
+        "Perceptron"
+      ],
+      "en": [
+        "Sigmoid",
+        "Tanh",
+        "ReLU",
+        "Perceptron"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تعتبر دالة ReLU (الوحدة الخطية المصححة) الأكثر شيوعاً في الشبكات العصبية الحديثة.",
+      "en": "ReLU (Rectified Linear Unit) is the most commonly used activation function in modern neural networks."
+    },
+    "hint": {
+      "ar": "تأخذ هذه الدالة القيمة القصوى بين الصفر والمدخل.",
+      "en": "This function takes the maximum between zero and the input."
+    },
+    "difficulty": "easy",
+    "conceptId": "neural-units-and-activation"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "لماذا لا يمكن للبيرسيبترون المفرد حل مشكلة XOR؟",
+      "en": "Why can't a single perceptron solve the XOR problem?"
+    },
+    "options": {
+      "ar": [
+        "لأنه لا يحتوي على تحيز (Bias).",
+        "لأن دالة XOR ليست قابلة للفصل خطياً.",
+        "لأن المخرجات ليست ثنائية.",
+        "لأنه يستخدم دالة Sigmoid."
+      ],
+      "en": [
+        "Because it lacks a bias term.",
+        "Because the XOR function is not linearly separable.",
+        "Because the outputs are not binary.",
+        "Because it uses the Sigmoid function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البيرسيبترون يرسم خطاً مستقيماً واحداً كحد قرار، وحالات XOR الإيجابية والسلبية لا يمكن فصلها بخط مستقيم واحد.",
+      "en": "A perceptron draws a single straight line as a decision boundary, and the positive and negative cases of XOR cannot be separated by a single straight line."
+    },
+    "hint": {
+      "ar": "فكر في شكل النقاط على الرسم البياني وهل يمكن رسم خط واحد يفصل بينها.",
+      "en": "Think about the shape of the points on the graph and whether a single line can separate them."
+    },
+    "difficulty": "medium",
+    "conceptId": "the-xor-problem"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض من الطبقة المخفية في حل مشكلة XOR؟",
+      "en": "What is the purpose of the hidden layer in solving the XOR problem?"
+    },
+    "options": {
+      "ar": [
+        "زيادة سرعة التدريب.",
+        "تحويل المدخلات إلى تمثيل جديد قابل للفصل خطياً.",
+        "تطبيع المخرجات إلى احتمالات.",
+        "تقليل دالة الخسارة مباشرة."
+      ],
+      "en": [
+        "To increase training speed.",
+        "To transform inputs into a new linearly separable representation.",
+        "To normalize outputs into probabilities.",
+        "To directly reduce the loss function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الطبقة المخفية تقوم بطي الفضاء بحيث تصبح النقاط التي لم تكن قابلة للفصل خطياً، قابلة للفصل في الفضاء الجديد.",
+      "en": "The hidden layer folds the space so that points that were not linearly separable become separable in the new representation."
+    },
+    "hint": {
+      "ar": "ماذا يحدث للنقطتين [0,1] و [1,0] في الفضاء المخفي؟",
+      "en": "What happens to points [0,1] and [1,0] in the hidden space?"
+    },
+    "difficulty": "medium",
+    "conceptId": "the-xor-problem"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في شبكة التغذية الأمامية، ماذا يعني أن تكون الطبقة 'متصلة بالكامل' (Fully-connected)؟",
+      "en": "In a feedforward network, what does it mean for a layer to be 'fully-connected'?"
+    },
+    "options": {
+      "ar": [
+        "كل وحدة متصلة بنفسها.",
+        "كل وحدة تأخذ مدخلات من جميع الوحدات في الطبقة السابقة.",
+        "الشبكة تحتوي على دورات (Cycles) بين جميع العقد.",
+        "جميع الأوزان متساوية."
+      ],
+      "en": [
+        "Every unit is connected to itself.",
+        "Each unit takes inputs from all units in the previous layer.",
+        "The network contains cycles between all nodes.",
+        "All weights are equal."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الاتصال الكامل يعني وجود رابط بين كل زوج من الوحدات من طبقتين متجاورتين.",
+      "en": "Fully-connected means there is a link between every pair of units from two adjacent layers."
+    },
+    "hint": {
+      "ar": "فكر في العلاقة بين الطبقة الحالية والطبقة التي تسبقها.",
+      "en": "Think about the relationship between the current layer and the preceding one."
+    },
+    "difficulty": "easy",
+    "conceptId": "feedforward-neural-networks"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي دالة الخسارة الشائعة الاستخدام في الشبكات العصبية لمهام التصنيف؟",
+      "en": "What is the common loss function used in neural networks for classification tasks?"
+    },
+    "options": {
+      "ar": [
+        "متوسط الخطأ التربيعي (MSE)",
+        "خسارة الإنتروبيا المتقاطعة (Cross-entropy loss)",
+        "دالة ReLU",
+        "الانحدار التدريجي"
+      ],
+      "en": [
+        "Mean Squared Error (MSE)",
+        "Cross-entropy loss",
+        "ReLU function",
+        "Gradient Descent"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خسارة الإنتروبيا المتقاطعة (أو اللوغاريتم السالب للاحتمال) هي الدالة القياسية لمهام التصنيف.",
+      "en": "Cross-entropy loss (or negative log likelihood) is the standard function for classification tasks."
+    },
+    "hint": {
+      "ar": "هي نفس الدالة المستخدمة في الانحدار اللوجستي.",
+      "en": "It is the same function used in logistic regression."
+    },
+    "difficulty": "easy",
+    "conceptId": "training-neural-networks"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الغرض من خوارزمية الانتشار العكسي (Backpropagation)؟",
+      "en": "What is the purpose of the Backpropagation algorithm?"
+    },
+    "options": {
+      "ar": [
+        "حساب المخرج النهائي للشبكة.",
+        "تطبيع المخرجات إلى توزيع احتمالي.",
+        "حساب تدرج دالة الخسارة بالنسبة لكل معلمة.",
+        "تحويل الكلمات إلى تضمينات (Embeddings)."
+      ],
+      "en": [
+        "To compute the final output of the network.",
+        "To normalize outputs into a probability distribution.",
+        "To compute the gradient of the loss function with respect to each parameter.",
+        "To convert words into embeddings."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الانتشار العكسي يحسب المشتقات الجزئية (التدرج) التي يحتاجها الانحدار التدريجي لتحديث الأوزان.",
+      "en": "Backpropagation computes the partial derivatives (gradient) needed by gradient descent to update the weights."
+    },
+    "hint": {
+      "ar": "تتعلق بكيفية معرفة الشبكة لمقدار الخطأ الذي ساهمت به كل عقدة.",
+      "en": "It relates to how the network knows how much error each node contributed."
+    },
+    "difficulty": "medium",
+    "conceptId": "training-neural-networks"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف تمثل نماذج اللغة العصبية الكلمات في السياق مقارنة بنماذج N-gram؟",
+      "en": "How do neural language models represent words in context compared to N-gram models?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام هويتها اللفظية الدقيقة فقط.",
+        "باستخدام تضمينات الكلمات (Word Embeddings).",
+        "باستخدام دوال التنشيط الخطية.",
+        "باستخدام الرسوم البيانية الحسابية."
+      ],
+      "en": [
+        "Using only their exact word identity.",
+        "Using Word Embeddings.",
+        "Using linear activation functions.",
+        "Using computation graphs."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الميزة الرئيسية لنماذج اللغة العصبية هي استخدام التضمينات التي تلتقط المعنى الدلالي للكلمات.",
+      "en": "The main advantage of neural language models is using embeddings that capture the semantic meaning of words."
+    },
+    "hint": {
+      "ar": "هذه الطريقة تسمح للنموذج بالتعميم على كلمات لم يرها معاً من قبل.",
+      "en": "This method allows the model to generalize to words it hasn't seen together before."
+    },
+    "difficulty": "easy",
+    "conceptId": "feedforward-neural-language-modeling"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من التالي يُعد عيباً في نماذج اللغة العصبية مقارنة بنماذج N-gram؟",
+      "en": "Which of the following is a disadvantage of neural language models compared to N-gram models?"
+    },
+    "options": {
+      "ar": [
+        "أنها لا تستطيع استخدام السياق السابق.",
+        "أنها أبطأ وتحتاج إلى طاقة أكبر للتدريب.",
+        "أنها تعاني من مشكلة التناثر (Sparsity) بشكل أكبر.",
+        "أنها تستخدم البيرسيبترون المفرد فقط."
+      ],
+      "en": [
+        "They cannot use prior context.",
+        "They are slower and need more energy to train.",
+        "They suffer more from the sparsity problem.",
+        "They only use single perceptrons."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "النماذج العصبية معقدة حسابياً، مما يجعلها أبطأ وأكثر استهلاكاً للطاقة من نماذج N-gram البسيطة.",
+      "en": "Neural models are computationally complex, making them slower and more energy-intensive than simple N-gram models."
+    },
+    "hint": {
+      "ar": "فكر في التكلفة الحسابية للشبكات العميقة.",
+      "en": "Think about the computational cost of deep networks."
+    },
+    "difficulty": "medium",
+    "conceptId": "feedforward-neural-language-modeling"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو 'التجميد' (Freezing) في سياق تدريب نماذج اللغة العصبية؟",
+      "en": "What is 'Freezing' in the context of training neural language models?"
+    },
+    "options": {
+      "ar": [
+        "إيقاف التدريب مبكراً لمنع التجهيز الزائد.",
+        "استخدام مصفوفة تضمين أولية (مثل word2vec) وإبقائها ثابتة دون تحديث.",
+        "تجميد دالة التنشيط لتصبح خطية.",
+        "تثبيت المخرجات عند قيمة 0 أو 1."
+      ],
+      "en": [
+        "Stopping training early to prevent overfitting.",
+        "Using an initial embedding matrix (like word2vec) and keeping it fixed without updating.",
+        "Freezing the activation function to become linear.",
+        "Fixing the outputs at 0 or 1."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التجميد يعني الاعتماد على التضمينات المدربة مسبقاً وعدم تغيير أوزانها أثناء تدريب الشبكة الحالية.",
+      "en": "Freezing means relying on pre-trained embeddings and not changing their weights during the training of the current network."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بكيفية التعامل مع الأوزان الأولية للتضمينات.",
+      "en": "It relates to how the initial weights of the embeddings are handled."
+    },
+    "difficulty": "medium",
+    "conceptId": "feedforward-neural-language-modeling"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو النطاق الذي تحول إليه دالة التنشيط Sigmoid المخرجات؟",
+      "en": "What range does the Sigmoid activation function map the outputs to?"
+    },
+    "options": {
+      "ar": [
+        "من -1 إلى +1",
+        "من 0 إلى ما لا نهاية",
+        "من 0 إلى 1",
+        "من -ما لا نهاية إلى +ما لا نهاية"
+      ],
+      "en": [
+        "From -1 to +1",
+        "From 0 to infinity",
+        "From 0 to 1",
+        "From -infinity to +infinity"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة Sigmoid تضغط القيم لتكون بين 0 و 1، مما يجعلها مفيدة لتمثيل الاحتمالات.",
+      "en": "The Sigmoid function squashes values to be between 0 and 1, making it useful for representing probabilities."
+    },
+    "hint": {
+      "ar": "تذكر استخدامها في الانحدار اللوجستي.",
+      "en": "Remember its use in logistic regression."
+    },
+    "difficulty": "easy",
+    "conceptId": "neural-units-and-activation"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من الخلط بين دالة التنشيط ودالة الخسارة. دالة التنشيط (مثل ReLU) تُطبق داخل الوحدة العصبية لإضافة اللاخطية، بينما دالة الخسارة (مثل Cross-entropy) تُحسب في النهاية لتقييم أداء الشبكة ككل.</template>
+    <template class="content-en">Do not confuse the activation function with the loss function. The activation function (e.g., ReLU) is applied inside the neural unit to add non-linearity, while the loss function (e.g., Cross-entropy) is calculated at the end to evaluate the network's overall performance.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">السبب الجوهري لوجود الطبقات المخفية هو تحويل فضاء البيانات. إذا كانت البيانات غير قابلة للفصل خطياً (مثل XOR)، تقوم الطبقة المخفية بإعادة تشكيل هذا الفضاء حتى تتمكن طبقة الإخراج من فصله بخط مستقيم.</template>
+    <template class="content-en">The fundamental reason for hidden layers is space transformation. If data is not linearly separable (like XOR), the hidden layer reshapes this space so the output layer can separate it with a straight line.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الانتشار العكسي (Backpropagation) ليس سحراً، بل هو مجرد تطبيق ذكي لقاعدة السلسلة (Chain Rule) في التفاضل، يتم تنفيذه بكفاءة باستخدام الرسوم البيانية الحسابية لتجنب تكرار الحسابات.</template>
+    <template class="content-en">Backpropagation is not magic; it is simply a clever application of the Chain Rule from calculus, executed efficiently using computation graphs to avoid redundant calculations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن النماذج العصبية دائماً أفضل من نماذج N-gram. هذا فخ! في المهام الصغيرة أو عندما تكون الموارد محدودة وقابلية التفسير مطلوبة، يظل نموذج N-gram هو الخيار الأفضل.</template>
+    <template class="content-en">You might think neural models are always better than N-gram models. This is a trap! For small tasks, limited resources, or when strict interpretability is required, an N-gram model remains the better choice.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

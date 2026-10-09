@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT363" data-module="4" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة شبكات SNMPv1: نماذج التنظيم والمعلومات · IT363 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT363" data-page-title-en="IT363">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=IT363"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#snmp-standards-and-documents" class="toc-link" data-bilingual>
+        <template class="content-ar">معايير ووثائق SNMP</template>
+        <template class="content-en">SNMP Standards and Documents</template>
+        <span class="content-target">معايير ووثائق SNMP</span>
+      </a>
+      <a href="#organization-models" class="toc-link" data-bilingual>
+        <template class="content-ar">نماذج التنظيم (Organization Models)</template>
+        <template class="content-en">Organization Models</template>
+        <span class="content-target">نماذج التنظيم (Organization Models)</span>
+      </a>
+      <a href="#information-model-and-smi" class="toc-link" data-bilingual>
+        <template class="content-ar">نموذج المعلومات وهيكل معلومات الإدارة (SMI)</template>
+        <template class="content-en">Information Model and SMI</template>
+        <span class="content-target">نموذج المعلومات وهيكل معلومات الإدارة (SMI)</span>
+      </a>
+      <a href="#object-naming-and-oid" class="toc-link" data-bilingual>
+        <template class="content-ar">تسمية الكائنات ومعرف الكائن (OID)</template>
+        <template class="content-en">Object Naming and OID</template>
+        <span class="content-target">تسمية الكائنات ومعرف الكائن (OID)</span>
+      </a>
+      <a href="#smi-data-types" class="toc-link" data-bilingual>
+        <template class="content-ar">أنواع بيانات SMI</template>
+        <template class="content-en">SMI Data Types</template>
+        <span class="content-target">أنواع بيانات SMI</span>
+      </a>
+      <a href="#structured-data-types-macros" class="toc-link" data-bilingual>
+        <template class="content-ar">أنواع البيانات المهيكلة (الجداول والقوائم)</template>
+        <template class="content-en">Structured Data Types (Tables and Lists)</template>
+        <span class="content-target">أنواع البيانات المهيكلة (الجداول والقوائم)</span>
+      </a>
+      <a href="#mib-ii-groups" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعات MIB-II</template>
+        <template class="content-en">MIB-II Groups</template>
+        <span class="content-target">مجموعات MIB-II</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · IT363
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">إدارة شبكات SNMPv1: نماذج التنظيم والمعلومات</h1>
+      <p class="hero-description">دراسة تفصيلية لمعايير SNMPv1، نماذج التنظيم (ثنائية وثلاثية الطبقات)، هيكل معلومات الإدارة (SMI)، وأنواع البيانات وقاعدة معلومات الإدارة (MIB).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">SNMPv1 Network Management: Organization and Information Models</h1>
+      <p class="hero-description">Detailed study of SNMPv1 standards, organization models (2-tier and 3-tier), Structure of Management Information (SMI), data types, and the Management Information Base (MIB).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">إدارة الشبكات</span>
+      <span class="tag">SNMPv1</span>
+      <span class="tag">SMI</span>
+      <span class="tag">MIB</span>
+      <span class="tag">نماذج التنظيم</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Management</span>
+      <span class="tag">SNMPv1</span>
+      <span class="tag">SMI</span>
+      <span class="tag">MIB</span>
+      <span class="tag">Organization Models</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم معيار IETF SNMP وتطوره التاريخي.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين نماذج التنظيم ثنائية وثلاثية الطبقات (RMON والخادم الوكيل).</span></li>
+      <li><span class="obj-icon">✦</span><span>استيعاب هيكل معلومات الإدارة (SMI) وأنواع البيانات الأساسية والمشتقة.</span></li>
+      <li><span class="obj-icon">✦</span><span>التفريق بين نوع الكائن (Object Type) ومثيل الكائن (Object Instance).</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل هيكل قاعدة معلومات الإدارة (MIB) والمجموعات الأساسية فيها (System, Interfaces, IP, TCP, UDP).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the IETF SNMP standard and its historical evolution.</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between 2-tier and 3-tier organization models (RMON and Proxy Server).</span></li>
+      <li><span class="obj-icon">✦</span><span>Comprehend the Structure of Management Information (SMI) and primitive/defined data types.</span></li>
+      <li><span class="obj-icon">✦</span><span>Distinguish between Object Type and Object Instance.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze the Management Information Base (MIB) structure and its core groups (System, Interfaces, IP, TCP, UDP).</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="snmp-standards-and-documents" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> معايير ووثائق SNMP</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> SNMP Standards and Documents</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مجموعة المعايير التي تحدد كيفية إدارة الشبكات، وتوثق عبر سلسلة طلب التعليقات (RFC).</p></template>
+    <template class="content-en"><p>The set of standards defining network management, documented via Request for Comments (RFCs).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدأت إدارة الشبكات في السبعينيات مع شبكة ARPANET باستخدام بروتوكول ICMP. لاحقاً، طورت <span class="smart-term" data-term-en="IETF" data-ar="فرقة عمل هندسة الإنترنت" data-en-def="Internet Engineering Task Force, the body that develops and promotes voluntary Internet standards.">فرقة عمل هندسة الإنترنت<span class="smart-term-tooltip"></span></span> (IETF) بروتوكول SNMP:</p><ul><li><b>1990:</b> إصدار SNMPv1</li><li><b>1995:</b> إصدار SNMPv2</li><li><b>1998:</b> إصدار SNMPv3</li></ul><p>تُنشر وثائق الإنترنت بصيغ مختلفة أهمها:</p><ol><li><b>RFC (Request for Comments):</b> <span class="smart-term" data-term-en="RFC" data-ar="طلب التعليقات" data-en-def="Request for Comments, a formal document from the IETF that is the result of committee drafting and subsequent review by interested parties.">طلب التعليقات<span class="smart-term-tooltip"></span></span>، وهي الوثائق الأساسية.</li><li><b>STD:</b> معيار إنترنت معتمد (Internet Standard).</li><li><b>FYI:</b> لمعلوماتك (For Your Information).</li></ol></template>
+    <template class="content-en"><p>Network management began in the 1970s with ARPANET using ICMP. Later, the Internet Engineering Task Force (<span class="smart-term" data-term-en="IETF" data-ar="فرقة عمل هندسة الإنترنت" data-en-def="Internet Engineering Task Force, the body that develops and promotes voluntary Internet standards.">IETF<span class="smart-term-tooltip"></span></span>) developed SNMP:</p><ul><li><b>1990:</b> SNMPv1 released</li><li><b>1995:</b> SNMPv2 released</li><li><b>1998:</b> SNMPv3 released</li></ul><p>Internet documents are published in various formats, most notably:</p><ol><li><b><span class="smart-term" data-term-en="RFC" data-ar="طلب التعليقات" data-en-def="Request for Comments, a formal document from the IETF that is the result of committee drafting and subsequent review by interested parties.">RFC<span class="smart-term-tooltip"></span></span> (Request for Comments):</b> The primary documents.</li><li><b>STD:</b> IETF Internet Standard.</li><li><b>FYI:</b> For Your Information.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم إنشاء سلسلة فرعية من RFCs لتوثيق النظرات العامة والمواضيع التمهيدية، بينما تم إنشاء السلسلة الفرعية STD لتحديد تلك الـ RFCs التي تحدد بالفعل معياراً للإنترنت.</p><p>تطور الوثائق (كما في RFC 1065 لـ SMI و RFC 1066 لـ MIB I) يوضح كيف تم بناء المعايير بشكل هرمي وتحديثها تدريجياً لتلبي احتياجات الأمان والتعقيد المتزايد في الشبكات.</p></template>
+    <template class="content-en"><p>RFC subseries were created to document overviews and introductory topics, while the STD RFC subseries were created to identify those RFCs that do in fact specify an Internet standard.</p><p>The evolution of documents (like RFC 1065 for SMI and RFC 1066 for MIB I) shows how standards were built hierarchically and updated incrementally to meet the growing security and complexity needs of networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a hierarchical tree diagram showing SNMP Document Evolution. Top node: 'SNMP Management Documents'. Branches to 'SMI (RFC 1065, STD 16)', 'MIB I (RFC 1066)', and 'SNMPv1 (RFC 1067, STD 15)'. Show further evolution to SMIv2, MIB II (RFC 1213), and SNMPv2. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 500, clear text labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Top Node -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- CONNECTIONS (PATHS)                        -->
+  <!-- ========================================== -->
+  
+  <!-- Top Node to Level 2 -->
+  <path d="M 400 90 v 30 H 150 v 36" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 90 v 66" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 90 v 30 H 650 v 36" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Level 2 to Level 3 -->
+  <path d="M 150 225 v 61" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 225 v 61" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 650 225 v 61" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Level 3 to Level 4 -->
+  <path d="M 650 355 v 61" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- ========================================== -->
+  <!-- EVOLUTION LABELS ON ARROWS                 -->
+  <!-- ========================================== -->
+  
+  <!-- SMI to SMIv2 -->
+  <rect x="105" y="247" width="90" height="22" fill="var(--bg-surface)" rx="4" />
+  <text x="150" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)">Evolves to</text>
+  <text x="150" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)">يتطور إلى</text>
+
+  <!-- MIB I to MIB II -->
+  <rect x="355" y="247" width="90" height="22" fill="var(--bg-surface)" rx="4" />
+  <text x="400" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)">Evolves to</text>
+  <text x="400" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)">يتطور إلى</text>
+
+  <!-- SNMPv1 to SNMPv2 -->
+  <rect x="605" y="247" width="90" height="22" fill="var(--bg-surface)" rx="4" />
+  <text x="650" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)">Evolves to</text>
+  <text x="650" y="262" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)">يتطور إلى</text>
+
+  <!-- SNMPv2 to SNMPv3 -->
+  <rect x="605" y="377" width="90" height="22" fill="var(--bg-surface)" rx="4" />
+  <text x="650" y="392" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)">Evolves to</text>
+  <text x="650" y="392" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)">يتطور إلى</text>
+
+
+  <!-- ========================================== -->
+  <!-- NODES                                      -->
+  <!-- ========================================== -->
+
+  <!-- Top Node: SNMP Management Documents -->
+  <rect x="250" y="30" width="300" height="60" rx="8" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="400" y="66" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)">SNMP Management Documents</text>
+  <text x="400" y="66" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)">وثائق إدارة SNMP</text>
+
+  <!-- Level 2: SMI -->
+  <rect x="50" y="160" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="150" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">SMI</text>
+  <text x="150" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">SMI</text>
+  <text x="150" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">RFC 1065, STD 16</text>
+  <text x="150" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">RFC 1065, STD 16</text>
+
+  <!-- Level 2: MIB I -->
+  <rect x="300" y="160" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="400" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">MIB I</text>
+  <text x="400" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">MIB I</text>
+  <text x="400" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">RFC 1066</text>
+  <text x="400" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">RFC 1066</text>
+
+  <!-- Level 2: SNMPv1 -->
+  <rect x="550" y="160" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="650" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">SNMPv1</text>
+  <text x="650" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">SNMPv1</text>
+  <text x="650" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">RFC 1067, STD 15</text>
+  <text x="650" y="212" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">RFC 1067, STD 15</text>
+
+  <!-- Level 3: SMIv2 -->
+  <rect x="50" y="290" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="150" y="328" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">SMIv2</text>
+  <text x="150" y="328" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">SMIv2</text>
+
+  <!-- Level 3: MIB II -->
+  <rect x="300" y="290" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="400" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">MIB II</text>
+  <text x="400" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">MIB II</text>
+  <text x="400" y="342" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">RFC 1213</text>
+  <text x="400" y="342" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">RFC 1213</text>
+
+  <!-- Level 3: SNMPv2 -->
+  <rect x="550" y="290" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="650" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">SNMPv2</text>
+  <text x="650" y="320" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">SNMPv2</text>
+  <text x="650" y="342" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">Released 1995</text>
+  <text x="650" y="342" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">إصدار 1995</text>
+
+  <!-- Level 4: SNMPv3 -->
+  <rect x="550" y="420" width="200" height="65" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="650" y="450" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">SNMPv3</text>
+  <text x="650" y="450" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">SNMPv3</text>
+  <text x="650" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">Released 1998</text>
+  <text x="650" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">إصدار 1998</text>
+
+  <!-- ========================================== -->
+  <!-- LEGEND                                     -->
+  <!-- ========================================== -->
+  <rect x="50" y="405" width="280" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  
+  <text x="190" y="430" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)">Document Types</text>
+  <text x="190" y="430" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)">أنواع الوثائق</text>
+  
+  <text x="190" y="452" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">RFC: Request for Comments</text>
+  <text x="190" y="452" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">RFC: طلب التعليقات</text>
+  
+  <text x="190" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)">STD: Internet Standard</text>
+  <text x="190" y="472" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)">STD: معيار الإنترنت</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم الاحتفاظ بالمعايير القديمة (مثل SNMPv1) كـ RFCs حتى بعد إصدار نسخ أحدث (مثل SNMPv3)؟</template>
+      <template class="content-en">Why are older standards (like SNMPv1) kept as RFCs even after newer versions (like SNMPv3) are released?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان التوافقية مع الأجهزة القديمة (Backward Compatibility) ولتوثيق التطور التاريخي للبروتوكول، حيث لا تزال العديد من الأجهزة البسيطة تستخدم SNMPv1.</p></template>
+      <template class="content-en"><p>To ensure backward compatibility with legacy devices and document the historical evolution of the protocol, as many simple devices still rely on SNMPv1.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="organization-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> نماذج التنظيم (Organization Models)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Organization Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحدد العلاقة المعمارية بين عناصر الشبكة، الوكلاء (Agents)، والمديرين (Managers).</p></template>
+    <template class="content-en"><p>Defines the architectural relationship between network elements, agents, and managers.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ينقسم نموذج التنظيم في SNMP إلى نوعين رئيسيين:</p><ol><li><b>نموذج الطبقتين (Two-Tier Model):</b> يتكون من عملية وكيل الشبكة (Agent) التي تقيم في الكائن المدار، وعملية مدير الشبكة (Manager) التي تقيم في نظام إدارة الشبكة (NMS). أي مضيف يمكنه الاستعلام عن وكيل يُعتبر مديراً. يمكن لمديرين متعددين التفاعل مع وكيل واحد.</li><li><b>نموذج الثلاث طبقات (Three-Tier Model):</b> يضيف طبقة وسيطة، وله شكلان:<ul><li><b>RMON (<span class="smart-term" data-term-en="RMON" data-ar="المراقبة عن بعد" data-en-def="Remote Monitoring; a standard monitoring specification that enables various network monitors and console systems to exchange network-monitoring data.">المراقبة عن بعد<span class="smart-term-tooltip"></span></span>):</b> يعمل مسبار RMON كوكيل ومدير في نفس الوقت. يجمع البيانات من الكائنات المدارة، يحللها، يخزنها، ثم يرسل الإحصائيات للمدير الرئيسي.</li><li><b><span class="smart-term" data-term-en="Proxy Server" data-ar="الخادم الوكيل" data-en-def="An intermediary server that translates non-SNMP data into SNMP-compatible formats for management.">الخادم الوكيل<span class="smart-term-tooltip"></span></span> (Proxy Server):</b> يُستخدم لإدارة عناصر شبكة لا تدعم SNMP. يقوم الخادم الوكيل بتحويل البيانات غير المتوافقة مع SNMP إلى كائنات ورسائل متوافقة مع SNMP.</li></ul></li></ol></template>
+    <template class="content-en"><p>The organization model in SNMP is divided into two main types:</p><ol><li><b>Two-Tier Model:</b> Consists of a network agent process residing in the managed object, and a network manager process residing in the NMS. Any host that could query an agent is a manager. Multiple managers can interact with one agent.</li><li><b>Three-Tier Model:</b> Adds an intermediate layer, taking two forms:<ul><li><b><span class="smart-term" data-term-en="RMON" data-ar="المراقبة عن بعد" data-en-def="Remote Monitoring; a standard monitoring specification that enables various network monitors and console systems to exchange network-monitoring data.">RMON<span class="smart-term-tooltip"></span></span> (Remote Monitoring):</b> The RMON probe acts as both an agent and a manager. It gathers data from Managed Objects (MO), analyzes it, stores it, and communicates statistics to the manager.</li><li><b><span class="smart-term" data-term-en="Proxy Server" data-ar="الخادم الوكيل" data-en-def="An intermediary server that translates non-SNMP data into SNMP-compatible formats for management.">Proxy Server<span class="smart-term-tooltip"></span></span>:</b> Used to manage network elements that do not have an SNMP agent. The proxy server converts non-SNMP data from non-SNMP objects into SNMP-compatible objects and messages.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نموذج الخادم الوكيل (Proxy) ضروري جداً في البيئات غير المتجانسة حيث توجد أجهزة قديمة أو أجهزة تستخدم بروتوكولات خاصة بالشركات المصنعة. يقوم الوكيل بعملية ترجمة (Translation) للبروتوكول.</p><p>أما نموذج RMON، فهو يقلل من حركة المرور (Traffic) على الشبكة الأساسية، لأن المسبار (Probe) يقوم بالتحليل محلياً ولا يرسل للمدير سوى الملخصات والإحصائيات الهامة، بدلاً من إرسال كل حزمة بيانات.</p></template>
+    <template class="content-en"><p>The Proxy Server model is crucial in heterogeneous environments with legacy devices or proprietary protocols. The proxy performs protocol translation.</p><p>The RMON model significantly reduces traffic on the backbone network because the probe performs local analysis and only sends summaries and critical statistics to the manager, rather than forwarding every data packet.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create a side-by-side diagram. Left side: 'Two-Tier Model' showing 'SNMP Manager' connected directly to 'SNMP Agent' inside a 'Network Element'. Right side: 'Three-Tier Proxy Model' showing 'SNMP Manager' connected to 'Proxy Server', which is then connected to 'Non-SNMP Managed Objects'. Use distinct shapes for Managers (rectangles) and Managed Objects (clouds). Style: educational, dark background #0d1117, accent colors #10b981 and #f59e0b, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Gradient for Manager Nodes -->
+        <linearGradient id="managerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Center Divider -->
+    <line x1="400" y1="30" x2="400" y2="370" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+    <!-- ========================================== -->
+    <!-- LEFT SIDE: TWO-TIER MODEL                  -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="200" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Two-Tier Model</text>
+    <text x="200" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نموذج الطبقتين</text>
+
+    <!-- SNMP Manager -->
+    <rect x="120" y="70" width="160" height="50" rx="8" fill="url(#managerGrad)"/>
+    <text x="200" y="101" text-anchor="middle" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">SNMP Manager</text>
+    <text x="200" y="101" text-anchor="middle" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">مدير SNMP</text>
+
+    <!-- Network Element (Container) -->
+    <rect x="90" y="210" width="220" height="130" rx="12" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="200" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Network Element</text>
+    <text x="200" y="235" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">عنصر الشبكة</text>
+
+    <!-- Arrow: Manager to Agent -->
+    <line x1="200" y1="120" x2="200" y2="250" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="255" y="180" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">SNMP Messages</text>
+    <text x="255" y="180" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">رسائل SNMP</text>
+
+    <!-- SNMP Agent -->
+    <rect x="120" y="260" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="200" y="291" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">SNMP Agent</text>
+    <text x="200" y="291" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">وكيل SNMP</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT SIDE: THREE-TIER PROXY MODEL         -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="600" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Three-Tier Proxy Model</text>
+    <text x="600" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نموذج الوكيل ثلاثي الطبقات</text>
+
+    <!-- SNMP Manager -->
+    <rect x="520" y="70" width="160" height="50" rx="8" fill="url(#managerGrad)"/>
+    <text x="600" y="101" text-anchor="middle" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">SNMP Manager</text>
+    <text x="600" y="101" text-anchor="middle" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">مدير SNMP</text>
+
+    <!-- Arrow: Manager to Proxy -->
+    <line x1="600" y1="120" x2="600" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="665" y="150" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">SNMP Messages</text>
+    <text x="665" y="150" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">رسائل SNMP</text>
+
+    <!-- Proxy Server -->
+    <rect x="520" y="180" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="600" y="211" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Proxy Server</text>
+    <text x="600" y="211" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">خادم الوكيل (Proxy)</text>
+
+    <!-- Arrow: Proxy to Non-SNMP Objects -->
+    <line x1="600" y1="230" x2="600" y2="280" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="665" y="260" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Proprietary Data</text>
+    <text x="665" y="260" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">بيانات خاصة</text>
+
+    <!-- Non-SNMP Managed Objects (Cloud Shape) -->
+    <g transform="translate(600, 330)">
+        <path d="M -80,35 A 30,30 0 0,1 -80,-10 A 45,45 0 0,1 5,-40 A 45,45 0 0,1 80,-10 A 30,30 0 0,1 80,35 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="0" y="-3" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Non-SNMP</text>
+        <text x="0" y="17" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Managed Objects</text>
+        <text x="0" y="-3" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">كائنات غير مدعومة</text>
+        <text x="0" y="17" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">بـ SNMP</text>
+    </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Two-Tier Model</th><th>Three-Tier RMON</th><th>Three-Tier Proxy</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المكونات الأساسية</template>
+          <template class="content-en">Core Components</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدير (Manager) ووكيل (Agent)</template>
+          <template class="content-en">Manager and Agent</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدير، مسبار RMON (وكيل ومدير)، وكيل</template>
+          <template class="content-en">Manager, RMON Probe (Agent &amp; Manager), Agent</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدير، خادم وكيل (Proxy)، كائنات غير SNMP</template>
+          <template class="content-en">Manager, Proxy Server, Non-SNMP Objects</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك النطاق الترددي للشبكة</template>
+          <template class="content-en">Network Bandwidth Consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي (استعلام مباشر مستمر)</template>
+          <template class="content-en">High (Continuous direct polling)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (المسبار يحلل محلياً ويرسل ملخصات)</template>
+          <template class="content-en">Low (Probe analyzes locally, sends summaries)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسط</template>
+          <template class="content-en">Medium</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دعم الأجهزة القديمة (Non-SNMP)</template>
+          <template class="content-en">Legacy (Non-SNMP) Support</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير مدعوم</template>
+          <template class="content-en">Not supported</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير مدعوم بشكل مباشر</template>
+          <template class="content-en">Not directly supported</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مدعوم (الوكيل يترجم البروتوكولات)</template>
+          <template class="content-en">Supported (Proxy translates protocols)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في أي سيناريو تفضل استخدام RMON بدلاً من الاستعلام المباشر (Polling) من المدير؟</template>
+      <template class="content-en">In what scenario would you prefer using RMON instead of direct polling from the manager?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في الشبكات الموزعة جغرافياً أو ذات النطاق الترددي المحدود، حيث يقلل RMON من استهلاك النطاق الترددي عن طريق معالجة البيانات محلياً وإرسال التنبيهات فقط عند الضرورة.</p></template>
+      <template class="content-en"><p>In geographically distributed networks or those with limited bandwidth, as RMON reduces bandwidth consumption by processing data locally and sending alerts only when necessary.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="information-model-and-smi" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> نموذج المعلومات وهيكل معلومات الإدارة (SMI)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Information Model and SMI</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحدد SMI القواعد النحوية (Syntax) لكيفية تعريف الكائنات المدارة باستخدام لغة ASN.1.</p></template>
+    <template class="content-en"><p>SMI defines the syntax rules for how managed objects are defined using the ASN.1 language.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نموذج المعلومات يعتمد على:</p><ul><li><b>SMI (<span class="smart-term" data-term-en="SMI" data-ar="هيكل معلومات الإدارة" data-en-def="Structure of Management Information; defines the rules for describing management information.">هيكل معلومات الإدارة<span class="smart-term-tooltip"></span></span>):</b> مُعرّف في RFC 1155. يستخدم صيغة ASN.1 لتعريف الكائنات.</li><li><b>MIB (قاعدة معلومات الإدارة):</b> مُعرّفة في RFC 1213. هي قاعدة البيانات الافتراضية التي تحتوي على الكائنات المدارة.</li></ul><p><b>الكائن المدار (Managed Object):</b> له خمس معلمات أساسية:</p><ol><li><b>الاسم النصي (Textual Name):</b> مثل <code>sysDescr</code>.</li><li><b>الصيغة (Syntax):</b> نوع البيانات، مثل <code>OCTET STRING</code>.</li><li><b>التعريف (Definition):</b> وصف نصي لما يمثله الكائن.</li><li><b>الوصول (Access):</b> صلاحيات القراءة/الكتابة (مثل <code>read-only</code>).</li><li><b>الحالة (Status):</b> إلزامي أو اختياري (مثل <code>mandatory</code>).</li></ol></template>
+    <template class="content-en"><p>The Information Model relies on:</p><ul><li><b><span class="smart-term" data-term-en="SMI" data-ar="هيكل معلومات الإدارة" data-en-def="Structure of Management Information; defines the rules for describing management information.">SMI<span class="smart-term-tooltip"></span></span> (Structure of Management Information):</b> Defined in RFC 1155. Uses <span class="smart-term" data-term-en="ASN.1" data-ar="صيغة النحو المجردة رقم 1" data-en-def="Abstract Syntax Notation One; a standard interface description language for defining data structures.">ASN.1<span class="smart-term-tooltip"></span></span> syntax to define objects.</li><li><b>MIB (Management Information Base):</b> Defined in RFC 1213. It is the virtual database containing the managed objects.</li></ul><p><b>Managed Object Structure:</b> A managed object has five parameters:</p><ol><li><b>Textual Name:</b> e.g., <code>sysDescr</code>.</li><li><b>Syntax:</b> Data type, e.g., <code>OCTET STRING</code>.</li><li><b>Definition:</b> A textual description of what the entity represents.</li><li><b>Access:</b> Read/write permissions (e.g., <code>read-only</code>).</li><li><b>Status:</b> Mandatory or optional (e.g., <code>mandatory</code>).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يجب التمييز بوضوح بين <b>نوع الكائن (Object Type)</b> و <b>مثيل الكائن (Object Instance)</b>. نوع الكائن ونوع البيانات هما مترادفان ويمثلان التعريف المجرد (مثل تعريف فئة في البرمجة). معرف الكائن (OID) يشير إلى نوع البيانات، وليس المثيل.</p><p>المثيل (Instance) هو القيمة الفعلية الموجودة في جهاز معين (مثل عنوان IP محدد لموزع 3Com). جميع أجهزة 3Com من نفس الإصدار لها نفس المعرف (Identifier)، ولكن يتم تمييزها بواسطة عنوان IP الخاص بها (المثيل).</p></template>
+    <template class="content-en"><p>A clear distinction must be made between <b>Object Type</b> and <b>Object Instance</b>. Object type and data type are synonymous and represent the abstract definition (like a class in programming). The Object Identifier (OID) is the data type, not the instance.</p><p>The Instance is the actual value residing in a specific device (e.g., a specific IP address of a 3Com hub). All 3Com hubs of the same version have identical identifiers; they are distinguished by their IP address (the instance).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Create a hierarchy diagram for 'Managed Object'. Top box: 'Object'. Branches down to 'Object Type' and 'Object Instance'. 'Object Type' branches down to three boxes: 'Name: OBJECT IDENTIFIER', 'Syntax: ASN.1', and 'Encoding: BER'. 'Object Instance' branches down to multiple stacked boxes labeled 'Object Instance 1', 'Object Instance 2', 'Object Instance 3'. Style: educational, dark background #0d1117, accent color #8b5cf6, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Connections -->
+    <g fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)">
+        <!-- Object to Object Type -->
+        <path d="M 400 90 L 400 107 Q 400 115 392 115 L 258 115 Q 250 115 250 123 L 250 135" />
+        <!-- Object to Object Instance -->
+        <path d="M 400 90 L 400 107 Q 400 115 408 115 L 542 115 Q 550 115 550 123 L 550 135" />
+    </g>
+
+    <g fill="none" stroke="var(--brand-400)" stroke-width="2">
+        <!-- Object Type Vertical Branch -->
+        <path d="M 250 190 L 250 202 Q 250 210 242 210 L 128 210 Q 120 210 120 218 L 120 380" />
+        <!-- Object Instance Vertical Branch -->
+        <path d="M 550 190 L 550 202 Q 550 210 542 210 L 428 210 Q 420 210 420 218 L 420 380" />
+    </g>
+
+    <g fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)">
+        <!-- Object Type Horizontal Arrows -->
+        <path d="M 120 260 L 145 260" />
+        <path d="M 120 320 L 145 320" />
+        <path d="M 120 380 L 145 380" />
+        
+        <!-- Object Instance Horizontal Arrows -->
+        <path d="M 420 260 L 445 260" />
+        <path d="M 420 320 L 445 320" />
+        <path d="M 420 380 L 445 380" />
+    </g>
+
+    <!-- Nodes -->
+    <g filter="url(#shadow)">
+        <!-- Top Node -->
+        <rect x="320" y="40" width="160" height="50" rx="8" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <!-- Level 1 Nodes -->
+        <rect x="150" y="140" width="200" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <rect x="450" y="140" width="200" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    </g>
+
+    <!-- Level 2 Nodes -->
+    <g fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1">
+        <!-- Object Type Children -->
+        <rect x="150" y="240" width="200" height="40" rx="6" />
+        <rect x="150" y="300" width="200" height="40" rx="6" />
+        <rect x="150" y="360" width="200" height="40" rx="6" />
+        
+        <!-- Object Instance Children -->
+        <rect x="450" y="240" width="200" height="40" rx="6" />
+        <rect x="450" y="300" width="200" height="40" rx="6" />
+        <rect x="450" y="360" width="200" height="40" rx="6" />
+    </g>
+
+    <!-- Text Elements -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle" dominant-baseline="middle">
+        <!-- Top Node Text -->
+        <text x="400" y="65" class="gsvg-en" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">Object</text>
+        <text x="400" y="65" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">الكائن</text>
+
+        <!-- Level 1 Nodes Text -->
+        <text x="250" y="165" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">Object Type</text>
+        <text x="250" y="165" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">نوع الكائن</text>
+        
+        <text x="550" y="165" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">Object Instance</text>
+        <text x="550" y="165" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">نسخة الكائن</text>
+
+        <!-- Level 2 Nodes Text (Left) -->
+        <text x="250" y="260" class="gsvg-en" fill="var(--text-primary)" font-size="14">Name: OBJECT IDENTIFIER</text>
+        <text x="250" y="260" class="gsvg-ar" fill="var(--text-primary)" font-size="14">الاسم: OBJECT IDENTIFIER</text>
+        
+        <text x="250" y="320" class="gsvg-en" fill="var(--text-primary)" font-size="14">Syntax: ASN.1</text>
+        <text x="250" y="320" class="gsvg-ar" fill="var(--text-primary)" font-size="14">الصيغة: ASN.1</text>
+        
+        <text x="250" y="380" class="gsvg-en" fill="var(--text-primary)" font-size="14">Encoding: BER</text>
+        <text x="250" y="380" class="gsvg-ar" fill="var(--text-primary)" font-size="14">الترميز: BER</text>
+
+        <!-- Level 2 Nodes Text (Right) -->
+        <text x="550" y="260" class="gsvg-en" fill="var(--text-primary)" font-size="14">Object Instance 1</text>
+        <text x="550" y="260" class="gsvg-ar" fill="var(--text-primary)" font-size="14">نسخة الكائن 1</text>
+        
+        <text x="550" y="320" class="gsvg-en" fill="var(--text-primary)" font-size="14">Object Instance 2</text>
+        <text x="550" y="320" class="gsvg-ar" fill="var(--text-primary)" font-size="14">نسخة الكائن 2</text>
+        
+        <text x="550" y="380" class="gsvg-en" fill="var(--text-primary)" font-size="14">Object Instance 3</text>
+        <text x="550" y="380" class="gsvg-ar" fill="var(--text-primary)" font-size="14">نسخة الكائن 3</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك 5 أجهزة توجيه (Routers) من نفس الطراز، هل سيكون لها نفس نوع الكائن (Object Type) أم نفس مثيل الكائن (Object Instance) لـ sysDescr؟</template>
+      <template class="content-en">If you have 5 routers of the same model, will they have the same Object Type or the same Object Instance for sysDescr?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيكون لها نفس نوع الكائن (Object Type) ونفس المعرف (OID)، ولكن كل جهاز توجيه سيمثل مثيلاً (Instance) مستقلاً بحد ذاته.</p></template>
+      <template class="content-en"><p>They will have the same Object Type and OID, but each router will represent its own independent Object Instance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="object-naming-and-oid" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تسمية الكائنات ومعرف الكائن (OID)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Object Naming and OID</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تعريف كل كائن بشكل فريد باستخدام واصف (Descriptor) ومعرف كائن (OBJECT IDENTIFIER) يمثل مساره في شجرة MIB.</p></template>
+    <template class="content-en"><p>Every object is uniquely defined by a Descriptor and an OBJECT IDENTIFIER (OID) representing its path in the MIB tree.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم تعريف الاسم بشكل فريد بواسطة:</p><ul><li><b>الواصف (DESCRIPTOR):</b> اسم نصي يسهل قراءته.</li><li><b><span class="smart-term" data-term-en="OID" data-ar="معرف الكائن" data-en-def="Object Identifier; a sequence of integers that uniquely identifies a managed object in the MIB hierarchy.">معرف الكائن<span class="smart-term-tooltip"></span></span> (OBJECT IDENTIFIER):</b> سلسلة من الأرقام تمثل العقد في شجرة MIB.</li></ul><p>أمثلة على تنسيقات مختلفة لتعريف OID لعقدة الإنترنت:</p><ul><li><code>internet OBJECT IDENTIFIER ::= {iso org(3) dod(6) 1 }</code></li><li><code>internet OBJECT IDENTIFIER ::= {1 3 6 1}</code></li></ul><p><b>العقد الفرعية للإنترنت (Internet Subnodes):</b></p><ol><li><code>directory (1)</code></li><li><code>mgmt (2)</code> - تحتوي على <code>mib-2</code>.</li><li><code>experimental (3)</code></li><li><code>private (4)</code> - مخصصة لمعدات الشركات المصنعة (Vendors).</li></ol></template>
+    <template class="content-en"><p>A name is uniquely defined by:</p><ul><li><b>DESCRIPTOR:</b> A human-readable textual name.</li><li><b>OBJECT IDENTIFIER:</b> A sequence of numbers representing nodes in the MIB tree.</li></ul><p>Examples of different formats for declaring the Internet <span class="smart-term" data-term-en="OID" data-ar="معرف الكائن" data-en-def="Object Identifier; a sequence of integers that uniquely identifies a managed object in the MIB hierarchy.">OID<span class="smart-term-tooltip"></span></span>:</p><ul><li><code>internet OBJECT IDENTIFIER ::= {iso org(3) dod(6) 1 }</code></li><li><code>internet OBJECT IDENTIFIER ::= {1 3 6 1}</code></li></ul><p><b>Internet Subnodes:</b></p><ol><li><code>directory (1)</code></li><li><code>mgmt (2)</code> - Contains <code>mib-2</code>.</li><li><code>experimental (3)</code></li><li><code>private (4)</code> - Intended for vendor equipment.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العقدة <code>private (4)</code> تتفرع إلى <code>enterprises (1)</code>، ومن خلالها تقوم <span class="smart-term" data-term-en="IANA" data-ar="هيئة أرقام الإنترنت المخصصة" data-en-def="Internet Assigned Numbers Authority; the organization responsible for assigning enterprise numbers in the private MIB branch.">هيئة أرقام الإنترنت المخصصة<span class="smart-term-tooltip"></span></span> (IANA) بتعيين معرفات فريدة لكل شركة تجارية (مثل Cisco(9)، HP(11)، 3Com(43)).</p><p>هذا التصميم الهرمي يمنع تضارب الأسماء بين الشركات ويسمح بتوسيع MIB بشكل لا نهائي.</p></template>
+    <template class="content-en"><p>The <code>private (4)</code> node branches into <code>enterprises (1)</code>, under which the Internet Assigned Numbers Authority (<span class="smart-term" data-term-en="IANA" data-ar="هيئة أرقام الإنترنت المخصصة" data-en-def="Internet Assigned Numbers Authority; the organization responsible for assigning enterprise numbers in the private MIB branch.">IANA<span class="smart-term-tooltip"></span></span>) assigns unique identifiers to commercial vendors (e.g., Cisco(9), HP(11), 3Com(43)).</p><p>This hierarchical design prevents naming collisions between vendors and allows infinite expansion of the MIB.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Create a tree diagram showing the Internet Subnodes. Root node: 'Internet {1 3 6 1}'. Branches to four child nodes: 'directory (1)', 'mgmt (2)', 'experimental (3)', and 'private (4)'. From 'private (4)', branch to 'enterprises (1)'. From 'enterprises (1)', branch to 'cisco (9)', 'hp (11)', '3Com (43)', and 'Cabletron (52)'. Style: educational, dark background #0d1117, accent color #ec4899, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Root Node -->
+    <linearGradient id="rootGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Diagram Title -->
+  <text class="gsvg-en" x="400" y="35" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Internet OID Subnodes</text>
+  <text class="gsvg-ar" x="400" y="35" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">عقد OID الفرعية للإنترنت</text>
+
+  <!-- Connecting Lines (Paths) -->
+  <g fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round">
+    <!-- Root to Level 1 -->
+    <path d="M 350 125 L 350 150 L 110 150 L 110 180" marker-end="url(#arrow)" />
+    <path d="M 350 125 L 350 150 L 270 150 L 270 180" marker-end="url(#arrow)" />
+    <path d="M 350 125 L 350 150 L 430 150 L 430 180" marker-end="url(#arrow)" />
+    <path d="M 350 125 L 350 150 L 590 150 L 590 180" marker-end="url(#arrow)" />
+    
+    <!-- Level 1 (private) to Level 2 (enterprises) -->
+    <path d="M 590 220 L 590 280" marker-end="url(#arrow)" />
+    
+    <!-- Level 2 (enterprises) to Level 3 -->
+    <path d="M 590 320 L 590 360 L 440 360 L 440 400" marker-end="url(#arrow)" />
+    <path d="M 590 320 L 590 360 L 540 360 L 540 400" marker-end="url(#arrow)" />
+    <path d="M 590 320 L 590 360 L 640 360 L 640 400" marker-end="url(#arrow)" />
+    <path d="M 590 320 L 590 360 L 740 360 L 740 400" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- Nodes -->
+  <!-- Root Node -->
+  <rect x="260" y="75" width="180" height="50" rx="8" fill="url(#rootGrad)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="350" y="106" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle">Internet {1 3 6 1}</text>
+  <text class="gsvg-ar" x="350" y="106" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle">الإنترنت {1 3 6 1}</text>
+
+  <!-- Level 1 Nodes -->
+  <rect x="50" y="180" width="120" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="110" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">directory (1)</text>
+  <text class="gsvg-ar" x="110" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">الدليل (1)</text>
+
+  <rect x="210" y="180" width="120" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="270" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">mgmt (2)</text>
+  <text class="gsvg-ar" x="270" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">الإدارة (2)</text>
+
+  <rect x="360" y="180" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="430" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">experimental (3)</text>
+  <text class="gsvg-ar" x="430" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">تجريبي (3)</text>
+
+  <rect x="530" y="180" width="120" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="590" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">private (4)</text>
+  <text class="gsvg-ar" x="590" y="206" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">خاص (4)</text>
+
+  <!-- Level 2 Node -->
+  <rect x="520" y="280" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="590" y="306" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">enterprises (1)</text>
+  <text class="gsvg-ar" x="590" y="306" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">الشركات (1)</text>
+
+  <!-- Level 3 Nodes -->
+  <rect x="395" y="400" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="440" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">cisco (9)</text>
+  <text class="gsvg-ar" x="440" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">سيسكو (9)</text>
+
+  <rect x="495" y="400" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="540" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">hp (11)</text>
+  <text class="gsvg-ar" x="540" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">إتش بي (11)</text>
+
+  <rect x="595" y="400" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="640" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">3Com (43)</text>
+  <text class="gsvg-ar" x="640" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">ثري كوم (43)</text>
+
+  <rect x="685" y="400" width="110" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text class="gsvg-en" x="740" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">Cabletron (52)</text>
+  <text class="gsvg-ar" x="740" y="426" font-size="15" font-weight="600" fill="var(--text-primary)" text-anchor="middle">كابلترون (52)</text>
+
+  <!-- Educational Annotations -->
+  <text class="gsvg-en" x="270" y="240" font-size="13" fill="var(--text-muted)" text-anchor="middle">Contains mib-2</text>
+  <text class="gsvg-ar" x="270" y="240" font-size="13" fill="var(--text-muted)" text-anchor="middle">يحتوي على mib-2</text>
+
+  <text class="gsvg-en" x="680" y="245" font-size="13" fill="var(--text-muted)" text-anchor="middle">For vendor equipment</text>
+  <text class="gsvg-ar" x="680" y="245" font-size="13" fill="var(--text-muted)" text-anchor="middle">لمعدات الموردين</text>
+
+  <!-- Info Box for OID Formats -->
+  <rect x="40" y="350" width="320" height="90" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-dasharray="4 4" />
+  
+  <text class="gsvg-en" x="200" y="375" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">Internet OID Formats</text>
+  <text class="gsvg-ar" x="200" y="375" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">صيغ OID للإنترنت</text>
+  
+  <text class="gsvg-en" x="200" y="400" font-size="13" fill="var(--brand-ink)" text-anchor="middle">internet OBJECT IDENTIFIER ::= {1 3 6 1}</text>
+  <text class="gsvg-ar" x="200" y="400" font-size="13" fill="var(--brand-ink)" text-anchor="middle">internet OBJECT IDENTIFIER ::= {1 3 6 1}</text>
+  
+  <text class="gsvg-en" x="200" y="420" font-size="13" fill="var(--brand-ink)" text-anchor="middle">{iso org(3) dod(6) 1}</text>
+  <text class="gsvg-ar" x="200" y="420" font-size="13" fill="var(--brand-ink)" text-anchor="middle">{iso org(3) dod(6) 1}</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى فرع 'private' في شجرة MIB بدلاً من وضع كل شيء تحت 'mgmt'؟</template>
+      <template class="content-en">Why do we need a 'private' branch in the MIB tree instead of putting everything under 'mgmt'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>فرع 'mgmt' مخصص للمعايير القياسية المتفق عليها عالمياً (Standard MIBs)، بينما فرع 'private' يسمح للشركات المصنعة بإضافة ميزات وكائنات خاصة بأجهزتهم دون الحاجة لانتظار موافقة IETF.</p></template>
+      <template class="content-en"><p>The 'mgmt' branch is reserved for universally agreed-upon standards (Standard MIBs), while the 'private' branch allows vendors to add proprietary features and objects for their specific devices without waiting for IETF approval.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="smi-data-types" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> أنواع بيانات SMI</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> SMI Data Types</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنقسم أنواع البيانات في SNMP إلى أنواع أساسية (Primitive) وأنواع معرفة/تطبيقية (Defined/Application) مبنية عليها.</p></template>
+    <template class="content-en"><p>Data types in SNMP are divided into Primitive types and Defined/Application types built upon them.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الأنواع الأساسية (Primitive Types):</b></p><ul><li><b>INTEGER:</b> أرقام صحيحة. حالة خاصة منها هي <code>Enumerated INTEGER</code> (مثل <code>noError(0)</code>).</li><li><b>OCTET STRING:</b> بيانات نصية وثنائية بحجم 8 بت. يمكن تحديد طولها (ثابت أو نطاق).</li><li><b>OBJECT IDENTIFIER:</b> موقع الكائن في MIB.</li><li><b>NULL:</b> عنصر نائب (Placeholder)، يُستخدم في رسائل <code>get-request</code> حيث تكون حقول القيمة فارغة.</li></ul><p><b>الأنواع المعرفة (Defined/Application Types):</b></p><ul><li><b>IpAddress:</b> عنوان IP بالنظام العشري المنقط.</li><li><b>Counter:</b> عدد صحيح غير سالب، يزداد باستمرار، ويلتف (Wrap-around) عند الحد الأقصى (\(2^{32} - 1\)).</li><li><b>Gauge:</b> عدد صحيح غير سالب، يمكن أن يزداد أو ينقص، وله حد أقصى (Capped).</li><li><b>TimeTicks:</b> عدد صحيح غير سالب يقاس بأجزاء من مائة من الثانية.</li><li><b>Opaque:</b> لتمرير بيانات عشوائية (Double wrapped OCTET STRING).</li></ul></template>
+    <template class="content-en"><p><b>Primitive Types:</b></p><ul><li><b>INTEGER:</b> Whole numbers. A special case is <code>Enumerated INTEGER</code> (e.g., <code>noError(0)</code>).</li><li><b>OCTET STRING:</b> 8-bit binary and textual data. Subtypes can specify fixed length or range.</li><li><b>OBJECT IDENTIFIER:</b> Object position in MIB.</li><li><b>NULL:</b> Placeholder, used in <code>get-request</code> messages for value fields.</li></ul><p><b>Defined/Application Types:</b></p><ul><li><b>IpAddress:</b> Dotted decimal IP address.</li><li><b><span class="smart-term" data-term-en="Counter" data-ar="العداد" data-en-def="A defined data type that represents a non-negative integer that monotonically increases until it reaches a maximum value, then wraps around to zero.">Counter<span class="smart-term-tooltip"></span></span>:</b> Wrap-around, non-negative integer, monotonically increasing, \(\max 2^{32} - 1\).</li><li><b><span class="smart-term" data-term-en="Gauge" data-ar="المقياس" data-en-def="A defined data type that represents a non-negative integer that may increase or decrease, but latches at a maximum value rather than wrapping around.">Gauge<span class="smart-term-tooltip"></span></span>:</b> Capped, non-negative integer, can increase or decrease.</li><li><b>TimeTicks:</b> Non-negative integer in hundredths of a second units.</li><li><b>Opaque:</b> Application-wide arbitrary ASN.1 syntax (Double wrapped OCTET STRING).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في نوع البيانات <code>Enumerated INTEGER</code>، كعرف قياسي (Convention)، لا يُسمح باستخدام القيمة صفر (0) في رسائل الاستجابة للإشارة إلى خطأ، بل تُستخدم <code>noError(0)</code> لتعني عدم وجود خطأ.</p><p>الفرق الجوهري بين <code>Counter</code> و <code>Gauge</code> هو سلوك الحد الأقصى: <span class="smart-term" data-term-en="Counter" data-ar="العداد" data-en-def="A defined data type that represents a non-negative integer that monotonically increases until it reaches a maximum value, then wraps around to zero.">العداد<span class="smart-term-tooltip"></span></span> (Counter) يعود للصفر عند تجاوزه الحد الأقصى (Wrap-around)، مما يجعله مناسباً لعد الحزم. بينما <span class="smart-term" data-term-en="Gauge" data-ar="المقياس" data-en-def="A defined data type that represents a non-negative integer that may increase or decrease, but latches at a maximum value rather than wrapping around.">المقياس<span class="smart-term-tooltip"></span></span> (Gauge) يتوقف عند الحد الأقصى (Capped) ولا يعود للصفر، مما يجعله مناسباً لقياس عرض النطاق الترددي الحالي أو درجة الحرارة.</p></template>
+    <template class="content-en"><p>In the <code>Enumerated INTEGER</code> data type, by convention, the value zero is NOT permitted in the response message to indicate an error; <code>noError(0)</code> means no error occurred.</p><p>The fundamental difference between <code>Counter</code> and <code>Gauge</code> is their maximum limit behavior: A Counter wraps around to zero when it exceeds its max, making it ideal for counting packets. A Gauge caps at its maximum and does not wrap around, making it suitable for measuring current bandwidth or temperature.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Counter</th><th>Gauge</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">اتجاه التغيير</template>
+          <template class="content-en">Direction of Change</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يزداد فقط (Monotonically increasing)</template>
+          <template class="content-en">Monotonically increasing only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يزداد وينقص</template>
+          <template class="content-en">Can increase or decrease</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">سلوك الحد الأقصى</template>
+          <template class="content-en">Maximum Limit Behavior</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يلتف ويعود للصفر (Wrap-around)</template>
+          <template class="content-en">Wraps around to zero</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتوقف عند الحد الأقصى (Capped)</template>
+          <template class="content-en">Capped at maximum value</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالة الاستخدام المثلى</template>
+          <template class="content-en">Ideal Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عد الحزم أو الأخطاء التراكمية</template>
+          <template class="content-en">Counting packets or cumulative errors</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قياس الاستهلاك الحالي (مثل عرض النطاق)</template>
+          <template class="content-en">Measuring current usage (e.g., bandwidth)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت تتبع عدد الأخطاء في واجهة الشبكة، هل تستخدم Counter أم Gauge؟ ولماذا؟</template>
+      <template class="content-en">If you want to track the number of errors on a network interface, would you use a Counter or a Gauge? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نستخدم Counter، لأن عدد الأخطاء يتزايد باستمرار ولا ينقص أبداً، وعند وصوله للحد الأقصى سيلتف ويبدأ من الصفر مرة أخرى.</p></template>
+      <template class="content-en"><p>We use a Counter, because the number of errors monotonically increases and never decreases. When it reaches the maximum, it will wrap around and start from zero.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="structured-data-types-macros" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> أنواع البيانات المهيكلة (الجداول والقوائم)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Structured Data Types (Tables and Lists)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم SNMP الماكرو SEQUENCE لإنشاء قوائم (صفوف)، و SEQUENCE OF لإنشاء جداول تتكون من هذه القوائم.</p></template>
+    <template class="content-en"><p>SNMP uses the SEQUENCE macro to create lists (rows), and SEQUENCE OF to create tables composed of these lists.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الكائنات المجمعة (Aggregate Objects) أو الكائنات الجدولية تُمثل باستخدام الجداول:</p><ul><li><b>SEQUENCE:</b> صانع القوائم (List maker). يُعرّف صفاً واحداً يحتوي على عدة كائنات عمودية (Columnar objects).<br>مثال: <code>SEQUENCE { ipAdEntAddr IpAddress, ipAdEntIfIndex INTEGER, ... }</code></li><li><b>SEQUENCE OF:</b> صانع الجداول. يُعرّف جدولاً يتكون من إدخالات (Entries) من نوع SEQUENCE.<br>مثال: <code>SEQUENCE OF IpAddrEntry</code></li></ul><p><b>التمثيل الجدولي:</b></p><ol><li><b>الجدول (TABLE T) والإدخال (ENTRY E):</b> هي كائنات منطقية تحدد التجميع ولا يمكن الوصول إليها مباشرة (not-accessible).</li><li><b>الكائنات العمودية (Columnar Objects):</b> تمثل السمات (Attributes) وهي التي يمكن الوصول إليها وقراءتها.</li></ol></template>
+    <template class="content-en"><p>Aggregate Objects or tabular objects are represented using tables:</p><ul><li><b><span class="smart-term" data-term-en="SEQUENCE" data-ar="تسلسل (صانع القوائم)" data-en-def="An ASN.1 macro used in SNMP to define a list of objects, effectively representing a single row in a table.">SEQUENCE<span class="smart-term-tooltip"></span></span>:</b> List maker. Defines a single row containing multiple columnar objects.<br>Example: <code>SEQUENCE { ipAdEntAddr IpAddress, ipAdEntIfIndex INTEGER, ... }</code></li><li><b><span class="smart-term" data-term-en="SEQUENCE OF" data-ar="تسلسل من (صانع الجداول)" data-en-def="An ASN.1 macro used in SNMP to define a table consisting of zero or more entries of a specific SEQUENCE type.">SEQUENCE OF<span class="smart-term-tooltip"></span></span>:</b> Table maker. Defines a table consisting of entries of a SEQUENCE type.<br>Example: <code>SEQUENCE OF IpAddrEntry</code></li></ul><p><b>Tabular Representation:</b></p><ol><li><b>TABLE T and ENTRY E:</b> These are logical objects that define grouping and are not directly accessible (not-accessible).</li><li><b>Columnar Objects:</b> These represent the attributes and are the actual accessible objects.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ملاحظة هامة جداً في تصميم جداول SNMP: التعيين الرقمي للعمود والصف يكون <b>معكوساً</b> عما اعتدنا عليه في المصفوفات الرياضية (صف-عمود). في SNMP، يتم تحديد العمود أولاً ثم الصف (المثيل).</p><p>مثال: المعرف <code>4.3</code> يشير إلى <b>المثيل الثالث (الصف 3)</b> من <b>الكائن العمودي الرابع (العمود 4)</b>.</p><p>هذا التصميم يسهل استرجاع عمود كامل من البيانات عبر الشبكة باستخدام عمليات مثل <code>GetNext</code>.</p><p>ملاحظة: أنواع <code>SET</code> و <code>SET OF</code> الموجودة في لغة ASN.1 الأصلية غير مضمنة في SNMP لتبسيط البروتوكول.</p></template>
+    <template class="content-en"><p>A critical note in SNMP table design: The numeric designation for column-row is <b>reverse</b> of what we are used to in mathematical matrices (row-column). In SNMP, the column is specified first, then the row (instance).</p><p>Example: The identifier <code>4.3</code> indicates the <b>third instance (row 3)</b> of the <b>fourth columnar object (column 4)</b>.</p><p>This design facilitates retrieving an entire column of data across the network using operations like <code>GetNext</code>.</p><p>Note: The <code>SET</code> and <code>SET OF</code> types, which exist in standard ASN.1, are NOT included in SNMP to keep the protocol simple.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: Create a diagram showing Tabular Representation of Aggregate Object. Top box: 'TABLE T'. Arrow down to 'ENTRY E'. Arrow down branching into 5 boxes in a row: 'COLUMNAR OBJECT 1', 'COLUMNAR OBJECT 2', 'COLUMNAR OBJECT 3', 'COLUMNAR OBJECT 4', 'COLUMNAR OBJECT 5'. Below this, show a grid illustrating the reverse column-row notation: e.g., T.E.1.1, T.E.2.1, T.E.3.1, T.E.4.1, T.E.5.1 for the first row. Style: educational, dark background #0d1117, accent color #14b8a6, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="colGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="425" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Tabular Representation of Aggregate Object</text>
+    <text x="425" y="35" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">التمثيل الجدولي للكائنات المجمعة</text>
+
+    <!-- Logical Grouping Note -->
+    <text x="680" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-style="italic" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Not Accessible (Logical)</text>
+    <text x="680" y="125" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-style="italic" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">غير قابلة للوصول (منطقي)</text>
+    <path d="M 560 60 L 580 60 L 580 180 L 560 180" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+
+    <!-- Accessible Objects Note -->
+    <text x="110" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Accessible Objects</text>
+    <text x="110" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-style="italic" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">كائنات قابلة للوصول</text>
+
+    <!-- TABLE T -->
+    <rect x="305" y="60" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="425" y="86" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">TABLE T (SEQUENCE OF)</text>
+    <text x="425" y="86" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الجدول T (SEQUENCE OF)</text>
+
+    <!-- Arrow T to E -->
+    <line x1="425" y1="100" x2="425" y2="136" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- ENTRY E -->
+    <rect x="305" y="140" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="425" y="166" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">ENTRY E (SEQUENCE)</text>
+    <text x="425" y="166" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المدخل E (SEQUENCE)</text>
+
+    <!-- Arrows E to Columns -->
+    <path d="M 425 180 L 425 210" stroke="var(--brand-500)" stroke-width="2" />
+    <line x1="165" y1="210" x2="685" y2="210" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <line x1="165" y1="210" x2="165" y2="236" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="295" y1="210" x2="295" y2="236" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="425" y1="210" x2="425" y2="236" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="555" y1="210" x2="555" y2="236" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="685" y1="210" x2="685" y2="236" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- COLUMNAR OBJECTS -->
+    <rect x="110" y="240" width="110" height="40" rx="6" fill="url(#colGrad)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="165" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">COLUMN 1</text>
+    <text x="165" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">العمود 1</text>
+
+    <rect x="240" y="240" width="110" height="40" rx="6" fill="url(#colGrad)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="295" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">COLUMN 2</text>
+    <text x="295" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">العمود 2</text>
+
+    <rect x="370" y="240" width="110" height="40" rx="6" fill="url(#colGrad)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="425" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">COLUMN 3</text>
+    <text x="425" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">العمود 3</text>
+
+    <rect x="500" y="240" width="110" height="40" rx="6" fill="url(#colGrad)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="555" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">COLUMN 4</text>
+    <text x="555" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">العمود 4</text>
+
+    <rect x="630" y="240" width="110" height="40" rx="6" fill="url(#colGrad)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="685" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">COLUMN 5</text>
+    <text x="685" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">العمود 5</text>
+
+    <!-- Grid Notation Label -->
+    <text x="425" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Reverse Column-Row Notation (Table . Entry . Column . Row)</text>
+    <text x="425" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">صيغة العمود-الصف العكسية (الجدول . المدخل . العمود . الصف)</text>
+
+    <!-- Grid Backgrounds -->
+    <rect x="20" y="320" width="80" height="150" fill="var(--bg-elevated)" rx="4" />
+    
+    <!-- Grid Lines -->
+    <rect x="20" y="320" width="730" height="150" fill="none" stroke="var(--border-color)" stroke-width="2" rx="4" />
+    <line x1="20" y1="370" x2="750" y2="370" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="20" y1="420" x2="750" y2="420" stroke="var(--border-color)" stroke-width="1" />
+    
+    <line x1="100" y1="320" x2="100" y2="470" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="230" y1="320" x2="230" y2="470" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="360" y1="320" x2="360" y2="470" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="490" y1="320" x2="490" y2="470" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="620" y1="320" x2="620" y2="470" stroke="var(--border-color)" stroke-width="1" />
+
+    <!-- Grid Row Labels -->
+    <text x="60" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Row 1</text>
+    <text x="60" y="350" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الصف 1</text>
+    
+    <text x="60" y="400" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Row 2</text>
+    <text x="60" y="400" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الصف 2</text>
+    
+    <text x="60" y="450" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Row 3</text>
+    <text x="60" y="450" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الصف 3</text>
+
+    <!-- Row 1 Cells -->
+    <text x="165" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.1.1</text>
+    <text x="165" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.1.1</text>
+    
+    <text x="295" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.2.1</text>
+    <text x="295" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.2.1</text>
+    
+    <text x="425" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.3.1</text>
+    <text x="425" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.3.1</text>
+    
+    <text x="555" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.4.1</text>
+    <text x="555" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.4.1</text>
+    
+    <text x="685" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.5.1</text>
+    <text x="685" y="350" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.5.1</text>
+
+    <!-- Row 2 Cells -->
+    <text x="165" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.1.2</text>
+    <text x="165" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.1.2</text>
+    
+    <text x="295" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.2.2</text>
+    <text x="295" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.2.2</text>
+    
+    <text x="425" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.3.2</text>
+    <text x="425" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.3.2</text>
+    
+    <text x="555" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.4.2</text>
+    <text x="555" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.4.2</text>
+    
+    <text x="685" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.5.2</text>
+    <text x="685" y="400" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.5.2</text>
+
+    <!-- Row 3 Cells -->
+    <text x="165" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.1.3</text>
+    <text x="165" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.1.3</text>
+    
+    <text x="295" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.2.3</text>
+    <text x="295" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.2.3</text>
+    
+    <text x="425" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.3.3</text>
+    <text x="425" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.3.3</text>
+    
+    <text x="555" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.4.3</text>
+    <text x="555" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.4.3</text>
+    
+    <text x="685" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">T.E.5.3</text>
+    <text x="685" y="450" font-family="monospace, system-ui, sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">T.E.5.3</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في جدول واجهات الشبكة، إذا أردت الوصول إلى سرعة الواجهة (العمود 5) للواجهة رقم 2 (الصف 2)، كيف سيكون شكل المعرف الرقمي الأخير؟</template>
+      <template class="content-en">In a network interfaces table, if you want to access the speed (Column 5) of interface number 2 (Row 2), what would the final numeric identifier look like?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيكون 5.2 (العمود 5، ثم المثيل/الصف 2).</p></template>
+      <template class="content-en"><p>It would be 5.2 (Column 5, then Instance/Row 2).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="mib-ii-groups" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> مجموعات MIB-II</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> MIB-II Groups</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحتوي MIB-II (RFC 1213) على مجموعات من الكائنات ذات الصلة التي تصف حالة النظام، الواجهات، وبروتوكولات الشبكة (IP, ICMP, TCP, UDP).</p></template>
+    <template class="content-en"><p>MIB-II (RFC 1213) contains groups of related objects describing system status, interfaces, and network protocols (IP, ICMP, TCP, UDP).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعد MIB-II مجموعة شاملة (Superset) لـ MIB-I. يتم تجميع الكائنات ذات الصلة في مجموعات (Groups). أهم المجموعات:</p><ol><li><b>System Group (1):</b> تنفيذها إلزامي. تحتوي على معلومات النظام الأساسية مثل <code>sysDescr</code> (وصف النظام)، <code>sysUpTime</code> (وقت التشغيل)، و <code>sysContact</code>.</li><li><b>Interfaces Group (2):</b> تحتوي على جدول <code>ifTable</code> الذي يصف واجهات الشبكة (مثل <code>ifSpeed</code>، <code>ifInOctets</code>).</li><li><b>IP Group (4):</b> تحتوي على كائنات التوجيه (<code>ipForwarding</code>)، وجدول عناوين IP (<code>ipAddrTable</code>)، وجدول التوجيه (<code>ipRouteTable</code>).</li><li><b>ICMP Group (5):</b> تحتوي على كائنات مرتبطة بأوامر ping (مثل <code>icmpOutEchos</code>) و traceroute (مثل <code>icmpInTimeExcs</code>).</li><li><b>TCP Group (6):</b> بروتوكول النقل الموجه للاتصال. يحتوي على جدول واحد <code>tcpConnTable</code>.</li><li><b>UDP Group (7):</b> بروتوكول النقل عديم الاتصال. يحتوي على جدول واحد <code>udpTable</code>.</li></ol></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="MIB-II" data-ar="قاعدة معلومات الإدارة الإصدار الثاني" data-en-def="The standard database of managed objects for TCP/IP-based internets, defined in RFC 1213.">MIB-II<span class="smart-term-tooltip"></span></span> is a superset of MIB-I. Related objects are grouped into object groups. Key groups include:</p><ol><li><b>System Group (1):</b> Mandatory implementation. Contains basic system info like <code>sysDescr</code> (description), <code>sysUpTime</code>, and <code>sysContact</code>.</li><li><b>Interfaces Group (2):</b> Contains the <code>ifTable</code> describing network interfaces (e.g., <code>ifSpeed</code>, <code>ifInOctets</code>).</li><li><b>IP Group (4):</b> Contains routing objects (<code>ipForwarding</code>), IP address table (<code>ipAddrTable</code>), and routing table (<code>ipRouteTable</code>).</li><li><b>ICMP Group (5):</b> Contains objects associated with ping (e.g., <code>icmpOutEchos</code>) and traceroute (e.g., <code>icmpInTimeExcs</code>).</li><li><b>TCP Group (6):</b> Connection-oriented transport protocol group. Has one table: <code>tcpConnTable</code>.</li><li><b>UDP Group (7):</b> Connectionless transport protocol group. Has one table: <code>udpTable</code>.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مجموعة النظام (System Group) هي الأكثر وصولاً (Most accessed) لأن نظام إدارة الشبكة (NMS) يحتاج إلى الاستعلام عنها فور اكتشاف جهاز جديد (Discovery) لمعرفة نوعه ومدة تشغيله باستخدام رسالة <code>Get-request</code>.</p><p>في مجموعة IP، الكائن <code>ipForwarding</code> يحدد دور الجهاز في الشبكة:</p><ul><li><strong>إذا كانت قيمته (1)</strong> فهو يعمل كبوابة/موجه (Gateway/Router)،</li><li><strong>وإذا كانت (2)</strong> فهو مضيف عادي (Host).</li></ul></template>
+    <template class="content-en"><p>The System Group is the most accessed managed object group because the NMS must query it immediately after discovering a node to obtain information on the system (using <code>Get-request</code>).</p><p>In the IP group, the <code>ipForwarding</code> object determines the device's role:</p><ul><li><strong>a value of (1)</strong> means it acts as a Gateway/Router,</li><li><strong>while (2)</strong> means it does not forward packets (Host).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: Create a tree diagram for 'Internet MIB-II Group'. Root node: 'mib-2 (1)'. Branches to: 'system (1)', 'interfaces (2)', 'at (3)', 'ip (4)', 'icmp (5)', 'tcp (6)', 'udp (7)', 'egp (8)', 'cmot (9)', 'transmission (10)', 'snmp (11)'. Style: educational, dark background #0d1117, accent color #f97316, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 850" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="500" y="40" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" class="gsvg-en">Internet MIB-II Object Groups</text>
+    <text x="500" y="40" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" class="gsvg-ar">مجموعات كائنات قاعدة معلومات الإدارة الثانية (MIB-II)</text>
+
+    <!-- Root Node -->
+    <rect x="40" y="415" width="140" height="50" rx="8" fill="var(--brand-500)" />
+    <text x="110" y="446" text-anchor="middle" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-weight="bold" font-size="18" class="gsvg-en">mib-2 (1)</text>
+    <text x="110" y="446" text-anchor="middle" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-weight="bold" font-size="18" class="gsvg-ar">mib-2 (1)</text>
+
+    <!-- Node 1: system -->
+    <path d="M 180 440 C 230 440, 230 90, 272 90" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="70" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="96" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">system (1)</text>
+    <text x="400" y="96" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">النظام (1) - system</text>
+
+    <line x1="520" y1="90" x2="612" y2="90" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="70" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="95" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">sysDescr, sysUpTime, sysContact</text>
+    <text x="790" y="95" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">وصف النظام، وقت التشغيل، جهة الاتصال</text>
+
+    <!-- Node 2: interfaces -->
+    <path d="M 180 440 C 230 440, 230 160, 272 160" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="140" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="166" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">interfaces (2)</text>
+    <text x="400" y="166" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">الواجهات (2) - interfaces</text>
+
+    <line x1="520" y1="160" x2="612" y2="160" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="140" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="165" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">ifTable (ifSpeed, ifInOctets)</text>
+    <text x="790" y="165" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">جدول الواجهات (السرعة، البيانات المستلمة)</text>
+
+    <!-- Node 3: at -->
+    <path d="M 180 440 C 230 440, 230 230, 272 230" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="210" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="236" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">at (3)</text>
+    <text x="400" y="236" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">ترجمة العناوين (3) - at</text>
+
+    <!-- Node 4: ip -->
+    <path d="M 180 440 C 230 440, 230 300, 272 300" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="280" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="306" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">ip (4)</text>
+    <text x="400" y="306" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">بروتوكول الإنترنت (4) - ip</text>
+
+    <line x1="520" y1="300" x2="612" y2="300" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="280" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="305" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">ipForwarding, ipAddrTable, ipRouteTable</text>
+    <text x="790" y="305" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">التوجيه، جدول العناوين، جدول التوجيه</text>
+
+    <!-- Node 5: icmp -->
+    <path d="M 180 440 C 230 440, 230 370, 272 370" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="350" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="376" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">icmp (5)</text>
+    <text x="400" y="376" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">رسائل التحكم (5) - icmp</text>
+
+    <line x1="520" y1="370" x2="612" y2="370" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="350" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="375" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">icmpOutEchos, icmpInTimeExcs</text>
+    <text x="790" y="375" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">رسائل صدى ICMP، تجاوز الوقت</text>
+
+    <!-- Node 6: tcp -->
+    <path d="M 180 440 C 230 440, 230 440, 272 440" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="420" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="446" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">tcp (6)</text>
+    <text x="400" y="446" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">بروتوكول التحكم بالنقل (6) - tcp</text>
+
+    <line x1="520" y1="440" x2="612" y2="440" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="420" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="445" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">tcpConnTable (Connections)</text>
+    <text x="790" y="445" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">جدول اتصالات TCP</text>
+
+    <!-- Node 7: udp -->
+    <path d="M 180 440 C 230 440, 230 510, 272 510" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="490" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="516" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">udp (7)</text>
+    <text x="400" y="516" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">بروتوكول بيانات المستخدم (7) - udp</text>
+
+    <line x1="520" y1="510" x2="612" y2="510" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-dashed)" />
+    <rect x="620" y="490" width="340" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="1.5" />
+    <text x="790" y="515" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-en">udpTable (Listeners)</text>
+    <text x="790" y="515" text-anchor="middle" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" class="gsvg-ar">جدول منافذ UDP</text>
+
+    <!-- Node 8: egp -->
+    <path d="M 180 440 C 230 440, 230 580, 272 580" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="560" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="586" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">egp (8)</text>
+    <text x="400" y="586" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">بروتوكول البوابة الخارجية (8) - egp</text>
+
+    <!-- Node 9: cmot -->
+    <path d="M 180 440 C 230 440, 230 650, 272 650" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="630" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="656" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">cmot (9)</text>
+    <text x="400" y="656" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">إدارة الشبكات (9) - cmot</text>
+
+    <!-- Node 10: transmission -->
+    <path d="M 180 440 C 230 440, 230 720, 272 720" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="700" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="726" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">transmission (10)</text>
+    <text x="400" y="726" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">الإرسال (10) - transmission</text>
+
+    <!-- Node 11: snmp -->
+    <path d="M 180 440 C 230 440, 230 790, 272 790" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="280" y="770" width="240" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="796" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-en">snmp (11)</text>
+    <text x="400" y="796" text-anchor="middle" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" class="gsvg-ar">بروتوكول إدارة الشبكات (11) - snmp</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت معرفة ما إذا كان الجهاز الذي تديره يعمل كموجه (Router) أم كجهاز طرفي، أي كائن في MIB-II ستستعلم عنه؟</template>
+      <template class="content-en">If you want to know whether the managed device is acting as a router or an end host, which MIB-II object would you query?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سأستعلم عن الكائن ipForwarding في مجموعة IP.</p></template>
+      <template class="content-en"><p>I would query the ipForwarding object in the IP group.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي الشبكات المستقبلين. في هذه الوحدة، ننتقل من الجانب المادي للشبكات إلى الجانب المنطقي والإداري. تخيل أنك تدير مدينة ضخمة؛ بروتوكول SNMP هو لغتك للتواصل مع كل مبنى (جهاز) في هذه المدينة. لقد درسنا كيف تطورت هذه اللغة عبر وثائق RFC، وكيف يمكننا تنظيم الإدارة إما مباشرة (طبقتين) أو عبر وسطاء مثل RMON و Proxy (ثلاث طبقات). السر الحقيقي يكمن في فهم SMI و MIB؛ فهما القاموس الذي يحدد كيف نسمي الأشياء (OIDs) وكيف نهيكلها (جداول وقوائم). ركزوا جيداً على الفرق بين نوع الكائن ومثيله، وتذكروا دائماً الخدعة في ترتيب الأعمدة والصفوف في جداول SNMP. هذه المفاهيم هي حجر الأساس لأي نظام إدارة شبكات حديث.</template>
+    <template class="content-en">Welcome, future network engineers. In this module, we transition from the physical aspect of networks to the logical and managerial side. Imagine managing a massive city; the SNMP protocol is your language to communicate with every building (device) in this city. We studied how this language evolved through RFC documents, and how we can organize management either directly (2-tier) or via intermediaries like RMON and Proxy (3-tier). The real secret lies in understanding SMI and MIB; they are the dictionary that defines how we name things (OIDs) and how we structure them (tables and lists). Pay close attention to the difference between Object Type and Instance, and always remember the trick in the column-row ordering of SNMP tables. These concepts are the cornerstone of any modern network management system.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الخادم الوكيل (Proxy) في إدارة الشبكات؟</template>
+          <template class="content-en">Why do we use a Proxy Server in network management?</template>
+          <span class="content-target">لماذا نستخدم الخادم الوكيل (Proxy) في إدارة الشبكات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمه كجسر أو مترجم لإدارة الأجهزة التي لا تدعم بروتوكول SNMP (مثل الأجهزة القديمة)، حيث يحول بياناتها إلى صيغة يفهمها مدير SNMP.</template>
+          <template class="content-en">We use it as a bridge or translator to manage devices that do not support the SNMP protocol (like legacy devices), converting their data into a format the SNMP manager understands.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين Counter و Gauge؟</template>
+          <template class="content-en">What is the fundamental difference between Counter and Gauge?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين Counter و Gauge؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الـ Counter يزداد فقط وعندما يصل للحد الأقصى يعود للصفر (Wrap-around)، بينما الـ Gauge يمكن أن يزداد أو ينقص ويتوقف عند الحد الأقصى (Capped) ولا يعود للصفر.</template>
+          <template class="content-en">A Counter only increases and wraps around to zero when it reaches its maximum, whereas a Gauge can increase or decrease and is capped at its maximum (does not wrap around).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يمثل المعرف {1 3 6 1}؟</template>
+          <template class="content-en">What does the identifier {1 3 6 1} represent?</template>
+          <span class="content-target">ماذا يمثل المعرف {1 3 6 1}؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمثل عقدة الإنترنت (internet) في شجرة MIB، وهو اختصار لـ iso(1) org(3) dod(6) internet(1).</template>
+          <template class="content-en">It represents the 'internet' node in the MIB tree, which stands for iso(1) org(3) dod(6) internet(1).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تمثيل الجداول في SNMP؟</template>
+          <template class="content-en">How are tables represented in SNMP?</template>
+          <span class="content-target">كيف يتم تمثيل الجداول في SNMP؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام الماكرو SEQUENCE لإنشاء صف (قائمة من الكائنات العمودية)، والماكرو SEQUENCE OF لإنشاء جدول يتكون من هذه الصفوف.</template>
+          <template class="content-en">Using the SEQUENCE macro to create a row (a list of columnar objects), and the SEQUENCE OF macro to create a table consisting of these rows.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في جدول SNMP، ماذا يعني المعرف 3.4؟</template>
+          <template class="content-en">In an SNMP table, what does the identifier 3.4 mean?</template>
+          <span class="content-target">في جدول SNMP، ماذا يعني المعرف 3.4؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني العمود رقم 3، الصف (المثيل) رقم 4. الترتيب معكوس في SNMP.</template>
+          <template class="content-en">It means Column number 3, Row (Instance) number 4. The order is reversed in SNMP.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أهمية العقدة private (4) في MIB؟</template>
+          <template class="content-en">What is the importance of the private (4) node in the MIB?</template>
+          <span class="content-target">ما هي أهمية العقدة private (4) في MIB؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تسمح للشركات المصنعة (Vendors) بإضافة كائنات إدارة خاصة بأجهزتهم دون التعارض مع المعايير القياسية.</template>
+          <template class="content-en">It allows vendors to add proprietary management objects for their devices without conflicting with standard definitions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الكائن الذي يجب على مدير الشبكة الاستعلام عنه أولاً عند اكتشاف جهاز جديد؟</template>
+          <template class="content-en">Which object should the network manager query first upon discovering a new device?</template>
+          <span class="content-target">ما هو الكائن الذي يجب على مدير الشبكة الاستعلام عنه أولاً عند اكتشاف جهاز جديد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كائنات مجموعة النظام (System Group) مثل sysDescr لمعرفة نوع الجهاز وتفاصيله الأساسية.</template>
+          <template class="content-en">Objects in the System Group, such as sysDescr, to know the device type and its basic details.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين نوع الكائن (Object Type) ومثيله (Instance)؟</template>
+          <template class="content-en">What is the difference between an Object Type and its Instance?</template>
+          <span class="content-target">ما الفرق بين نوع الكائن (Object Type) ومثيله (Instance)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">النوع هو التعريف العام في MIB (مثل 'عنوان IP')، بينما المثيل هو القيمة الحقيقية في جهاز محدد (مثل '192.168.1.5').</template>
+          <template class="content-en">The Type is the general definition in the MIB (e.g., 'IP Address'), while the Instance is the actual value in a specific device (e.g., '192.168.1.5').</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم SET OF في SNMP؟</template>
+          <template class="content-en">Why don't we use SET OF in SNMP?</template>
+          <span class="content-target">لماذا لا نستخدم SET OF في SNMP؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تم استبعاده من SNMP للحفاظ على بساطة البروتوكول، ويُكتفى بـ SEQUENCE OF لإنشاء الجداول.</template>
+          <template class="content-en">It was excluded from SNMP to keep the protocol simple; SEQUENCE OF is sufficient for creating tables.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة مسبار RMON؟</template>
+          <template class="content-en">What is the function of an RMON probe?</template>
+          <span class="content-target">ما هي وظيفة مسبار RMON؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعمل كوكيل ومدير في نفس الوقت؛ يجمع البيانات من الشبكة، يحللها محلياً، ويرسل الإحصائيات المهمة فقط للمدير الرئيسي لتقليل الضغط على الشبكة.</template>
+          <template class="content-en">It acts as both an agent and a manager; it collects data from the network, analyzes it locally, and sends only important statistics to the main manager to reduce network load.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو العام الذي تم فيه إصدار معيار SNMPv1؟",
+      "en": "In what year was the SNMPv1 standard released?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1990",
+        "en": "1990"
+      },
+      "example": {
+        "ar": "تم تطويره بواسطة IETF.",
+        "en": "Developed by the IETF."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ماذا يعني اختصار RFC؟",
+      "en": "What does the acronym RFC stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طلب التعليقات (Request for Comments).",
+        "en": "Request for Comments."
+      },
+      "example": {
+        "ar": "RFC 1155 يحدد SMI.",
+        "en": "RFC 1155 defines SMI."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي المكونات الأساسية لنموذج التنظيم ثنائي الطبقات (Two-Tier Model)؟",
+      "en": "What are the core components of the Two-Tier Organization Model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مدير الشبكة (Manager) ووكيل الشبكة (Agent).",
+        "en": "Network Manager and Network Agent."
+      },
+      "example": {
+        "ar": "NMS يستعلم مباشرة من جهاز التوجيه.",
+        "en": "NMS querying a router directly."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو دور الخادم الوكيل (Proxy Server) في نموذج الثلاث طبقات؟",
+      "en": "What is the role of a Proxy Server in the Three-Tier model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل البيانات غير المتوافقة مع SNMP إلى كائنات ورسائل متوافقة مع SNMP.",
+        "en": "Converts non-SNMP data into SNMP-compatible objects and messages."
+      },
+      "example": {
+        "ar": "إدارة أجهزة قديمة لا تدعم SNMP.",
+        "en": "Managing legacy devices that lack SNMP support."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الفرق بين نوع الكائن (Object Type) ومثيل الكائن (Object Instance)؟",
+      "en": "What is the difference between Object Type and Object Instance?"
+    },
+    "back": {
+      "definition": {
+        "ar": "النوع هو التعريف المجرد (OID)، بينما المثيل هو القيمة الفعلية في جهاز معين.",
+        "en": "Type is the abstract definition (OID), while Instance is the actual value in a specific device."
+      },
+      "example": {
+        "ar": "النوع: عنوان IP. المثيل: 192.168.1.1",
+        "en": "Type: IP Address. Instance: 192.168.1.1"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو معرف الكائن (OID) لعقدة الإنترنت (internet)؟",
+      "en": "What is the Object Identifier (OID) for the 'internet' node?"
+    },
+    "back": {
+      "definition": {
+        "ar": "{1 3 6 1}",
+        "en": "{1 3 6 1}"
+      },
+      "example": {
+        "ar": "iso(1) org(3) dod(6) internet(1)",
+        "en": "iso(1) org(3) dod(6) internet(1)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "أي عقدة فرعية تحت الإنترنت مخصصة لمعدات الشركات المصنعة (Vendors)؟",
+      "en": "Which subnode under 'internet' is intended for vendor equipment?"
+    },
+    "back": {
+      "definition": {
+        "ar": "private (4)",
+        "en": "private (4)"
+      },
+      "example": {
+        "ar": "تتفرع إلى enterprises(1) ثم أرقام الشركات مثل Cisco(9).",
+        "en": "Branches to enterprises(1) then vendor numbers like Cisco(9)."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "اذكر ثلاثة من أنواع البيانات الأساسية (Primitive Data Types) في SMI.",
+      "en": "Name three Primitive Data Types in SMI."
+    },
+    "back": {
+      "definition": {
+        "ar": "INTEGER, OCTET STRING, OBJECT IDENTIFIER, NULL",
+        "en": "INTEGER, OCTET STRING, OBJECT IDENTIFIER, NULL"
+      },
+      "example": {
+        "ar": "NULL يُستخدم كعنصر نائب في رسائل get-request.",
+        "en": "NULL is used as a placeholder in get-request messages."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو نوع البيانات الذي يمثل عدداً صحيحاً يزداد باستمرار ويلتف (Wraps around) عند الحد الأقصى؟",
+      "en": "Which data type represents a monotonically increasing integer that wraps around at its maximum?"
+    },
+    "back": {
+      "definition": {
+        "ar": "Counter",
+        "en": "Counter"
+      },
+      "example": {
+        "ar": "الحد الأقصى هو \\(2^{32} - 1\\).",
+        "en": "Maximum is \\(2^{32} - 1\\)."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو نوع البيانات الذي يمثل عدداً صحيحاً يمكن أن يزداد أو ينقص ويتوقف عند الحد الأقصى (Capped)؟",
+      "en": "Which data type represents an integer that can increase or decrease and is capped at its maximum?"
+    },
+    "back": {
+      "definition": {
+        "ar": "Gauge",
+        "en": "Gauge"
+      },
+      "example": {
+        "ar": "يُستخدم لقياس عرض النطاق الترددي الحالي.",
+        "en": "Used to measure current bandwidth."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو الماكرو المستخدم لإنشاء قائمة (صف) في SNMP؟",
+      "en": "Which macro is used to create a list (row) in SNMP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "SEQUENCE",
+        "en": "SEQUENCE"
+      },
+      "example": {
+        "ar": "يجمع عدة كائنات عمودية معاً.",
+        "en": "Groups multiple columnar objects together."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الماكرو المستخدم لإنشاء جدول في SNMP؟",
+      "en": "Which macro is used to create a table in SNMP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "SEQUENCE OF",
+        "en": "SEQUENCE OF"
+      },
+      "example": {
+        "ar": "يُعرّف جدولاً يتكون من إدخالات SEQUENCE.",
+        "en": "Defines a table consisting of SEQUENCE entries."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "في التمثيل الجدولي لـ SNMP، كيف يتم ترتيب التعيين الرقمي (Numeric designation)؟",
+      "en": "In SNMP tabular representation, how is the numeric designation ordered?"
+    },
+    "back": {
+      "definition": {
+        "ar": "العمود أولاً ثم الصف (معكوس).",
+        "en": "Column first, then row (reversed)."
+      },
+      "example": {
+        "ar": "4.3 تعني العمود 4، الصف 3.",
+        "en": "4.3 means Column 4, Row 3."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "أي مجموعة في MIB-II تحتوي على الكائن sysUpTime؟",
+      "en": "Which MIB-II group contains the sysUpTime object?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة النظام (System Group).",
+        "en": "System Group."
+      },
+      "example": {
+        "ar": "وهي المجموعة الأكثر وصولاً من قبل NMS.",
+        "en": "It is the most accessed group by the NMS."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي الكائنات المرتبطة بأمر ping في مجموعة ICMP؟",
+      "en": "What objects are associated with the ping command in the ICMP group?"
+    },
+    "back": {
+      "definition": {
+        "ar": "icmpOutEchos و icmpInEchoReps",
+        "en": "icmpOutEchos and icmpInEchoReps"
+      },
+      "example": {
+        "ar": "تُستخدم لتتبع رسائل الصدى المرسلة والمستقبلة.",
+        "en": "Used to track sent and received echo messages."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الوثائق التالية تحدد هيكل معلومات الإدارة (SMI) في SNMPv1؟",
+      "en": "Which of the following documents defines the Structure of Management Information (SMI) in SNMPv1?"
+    },
+    "options": {
+      "ar": [
+        "RFC 1213",
+        "RFC 1155",
+        "RFC 1157",
+        "RFC 1066"
+      ],
+      "en": [
+        "RFC 1213",
+        "RFC 1155",
+        "RFC 1157",
+        "RFC 1066"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "RFC 1155 هو المعيار الذي يحدد SMI، بينما RFC 1213 يحدد MIB-II.",
+      "en": "RFC 1155 defines SMI, while RFC 1213 defines MIB-II."
+    },
+    "hint": {
+      "ar": "تذكر الرقم 1155 للـ SMI.",
+      "en": "Remember the number 1155 for SMI."
+    },
+    "difficulty": "medium",
+    "conceptId": "information-model-and-smi"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في نموذج التنظيم ثلاثي الطبقات، ما هو المكون الذي يجمع البيانات ويحللها محلياً قبل إرسال الإحصائيات للمدير؟",
+      "en": "In the three-tier organization model, which component gathers data and analyzes it locally before sending statistics to the manager?"
+    },
+    "options": {
+      "ar": [
+        "الخادم الوكيل (Proxy Server)",
+        "وكيل الشبكة (Network Agent)",
+        "مسبار المراقبة عن بعد (RMON Probe)",
+        "قاعدة معلومات الإدارة (MIB)"
+      ],
+      "en": [
+        "Proxy Server",
+        "Network Agent",
+        "RMON Probe",
+        "MIB"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مسبار RMON يعمل كوكيل ومدير في نفس الوقت، حيث يحلل البيانات محلياً لتقليل حركة مرور الشبكة.",
+      "en": "The RMON probe acts as both an agent and a manager, analyzing data locally to reduce network traffic."
+    },
+    "hint": {
+      "ar": "اختصاره يعني المراقبة عن بعد.",
+      "en": "Its acronym stands for Remote Monitoring."
+    },
+    "difficulty": "medium",
+    "conceptId": "organization-models"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو معرف الكائن (OID) الصحيح لعقدة الإنترنت؟",
+      "en": "What is the correct Object Identifier (OID) for the internet node?"
+    },
+    "options": {
+      "ar": [
+        "{1 3 6 1}",
+        "{1 2 3 4}",
+        "{iso org dod 1}",
+        "{1 3 6 2}"
+      ],
+      "en": [
+        "{1 3 6 1}",
+        "{1 2 3 4}",
+        "{iso org dod 1}",
+        "{1 3 6 2}"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "المعرف الصحيح هو {1 3 6 1} والذي يمثل iso(1) org(3) dod(6) internet(1).",
+      "en": "The correct OID is {1 3 6 1} which represents iso(1) org(3) dod(6) internet(1)."
+    },
+    "hint": {
+      "ar": "يبدأ بـ 1 3 6.",
+      "en": "Starts with 1 3 6."
+    },
+    "difficulty": "easy",
+    "conceptId": "object-naming-and-oid"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي نوع من البيانات يُستخدم لتمثيل قيمة تزداد باستمرار وتعود للصفر (Wrap-around) عند وصولها للحد الأقصى؟",
+      "en": "Which data type is used to represent a value that monotonically increases and wraps around to zero when it reaches its maximum?"
+    },
+    "options": {
+      "ar": [
+        "Gauge",
+        "TimeTicks",
+        "Counter",
+        "INTEGER"
+      ],
+      "en": [
+        "Gauge",
+        "TimeTicks",
+        "Counter",
+        "INTEGER"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "العداد (Counter) هو الذي يلتف ويعود للصفر، بينما المقياس (Gauge) يتوقف عند الحد الأقصى.",
+      "en": "Counter wraps around to zero, whereas Gauge is capped at its maximum."
+    },
+    "hint": {
+      "ar": "فكر في عداد المسافات في السيارة.",
+      "en": "Think of a car's odometer."
+    },
+    "difficulty": "medium",
+    "conceptId": "smi-data-types"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في الجداول (Tabular Representation) في SNMP، ماذا يعني المعرف الرقمي 5.2؟",
+      "en": "In SNMP Tabular Representation, what does the numeric designation 5.2 mean?"
+    },
+    "options": {
+      "ar": [
+        "الصف 5، العمود 2",
+        "العمود 5، الصف 2",
+        "الجدول 5، الإدخال 2",
+        "المثيل 5، الكائن 2"
+      ],
+      "en": [
+        "Row 5, Column 2",
+        "Column 5, Row 2",
+        "Table 5, Entry 2",
+        "Instance 5, Object 2"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في SNMP، التعيين الرقمي يكون معكوساً: العمود أولاً ثم الصف (المثيل). لذا 5.2 تعني العمود 5، الصف 2.",
+      "en": "In SNMP, the numeric designation is reversed: Column first, then Row (Instance). So 5.2 means Column 5, Row 2."
+    },
+    "hint": {
+      "ar": "تذكر أن الترتيب معكوس مقارنة بالمصفوفات الرياضية.",
+      "en": "Remember the order is reversed compared to mathematical matrices."
+    },
+    "difficulty": "hard",
+    "conceptId": "structured-data-types-macros"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي عقدة فرعية في شجرة MIB مخصصة للشركات المصنعة (Vendors) لتعريف كائناتهم الخاصة؟",
+      "en": "Which subnode in the MIB tree is intended for vendors to define their proprietary objects?"
+    },
+    "options": {
+      "ar": [
+        "mgmt (2)",
+        "directory (1)",
+        "experimental (3)",
+        "private (4)"
+      ],
+      "en": [
+        "mgmt (2)",
+        "directory (1)",
+        "experimental (3)",
+        "private (4)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "العقدة private (4) وتحديداً فرع enterprises مخصصة للشركات المصنعة.",
+      "en": "The private (4) node, specifically the enterprises branch, is intended for vendors."
+    },
+    "hint": {
+      "ar": "إنها ليست عامة أو قياسية.",
+      "en": "It is not public or standard."
+    },
+    "difficulty": "easy",
+    "conceptId": "object-naming-and-oid"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي القيمة التي لا يُسمح باستخدامها كعرف (Convention) في رسائل الاستجابة للإشارة إلى خطأ في نوع البيانات Enumerated INTEGER؟",
+      "en": "What value is NOT permitted by convention in response messages to indicate an error in the Enumerated INTEGER data type?"
+    },
+    "options": {
+      "ar": [
+        "1",
+        "5",
+        "0",
+        "16"
+      ],
+      "en": [
+        "1",
+        "5",
+        "0",
+        "16"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "القيمة 0 مخصصة لـ noError، لذا لا يمكن استخدامها للإشارة إلى وجود خطأ.",
+      "en": "The value 0 is reserved for noError, so it cannot be used to indicate an error."
+    },
+    "hint": {
+      "ar": "الرقم الذي يعني 'لا شيء'.",
+      "en": "The number that means 'nothing'."
+    },
+    "difficulty": "medium",
+    "conceptId": "smi-data-types"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي مجموعة في MIB-II تحتوي على الكائنات المرتبطة بأمر traceroute؟",
+      "en": "Which MIB-II group contains the objects associated with the traceroute command?"
+    },
+    "options": {
+      "ar": [
+        "IP Group",
+        "ICMP Group",
+        "TCP Group",
+        "System Group"
+      ],
+      "en": [
+        "IP Group",
+        "ICMP Group",
+        "TCP Group",
+        "System Group"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مجموعة ICMP تحتوي على كائنات مثل icmpInTimeExcs التي تُستخدم في عملية traceroute.",
+      "en": "The ICMP group contains objects like icmpInTimeExcs which are used in the traceroute process."
+    },
+    "hint": {
+      "ar": "البروتوكول المسؤول عن رسائل التحكم والأخطاء.",
+      "en": "The protocol responsible for control and error messages."
+    },
+    "difficulty": "medium",
+    "conceptId": "mib-ii-groups"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو الماكرو المستخدم في ASN.1 لإنشاء جدول (Table) في SNMP؟",
+      "en": "Which ASN.1 macro is used to create a table in SNMP?"
+    },
+    "options": {
+      "ar": [
+        "SEQUENCE",
+        "SET OF",
+        "SEQUENCE OF",
+        "TABLE"
+      ],
+      "en": [
+        "SEQUENCE",
+        "SET OF",
+        "SEQUENCE OF",
+        "TABLE"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "SEQUENCE OF يُستخدم لإنشاء جدول يتكون من إدخالات SEQUENCE. (SET OF غير مدعوم في SNMP).",
+      "en": "SEQUENCE OF is used to create a table consisting of SEQUENCE entries. (SET OF is not supported in SNMP)."
+    },
+    "hint": {
+      "ar": "يتكون من كلمتين.",
+      "en": "Consists of two words."
+    },
+    "difficulty": "medium",
+    "conceptId": "structured-data-types-macros"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "إذا كان لديك جهازي توجيه من نفس الطراز، كيف يميز نظام إدارة الشبكة (NMS) بينهما؟",
+      "en": "If you have two routers of the same model, how does the NMS distinguish between them?"
+    },
+    "options": {
+      "ar": [
+        "بواسطة نوع الكائن (Object Type)",
+        "بواسطة مثيل الكائن (Object Instance) مثل عنوان IP",
+        "بواسطة معرف الكائن (OID) الأساسي",
+        "بواسطة مجموعة النظام (System Group)"
+      ],
+      "en": [
+        "By Object Type",
+        "By Object Instance (e.g., IP address)",
+        "By the base OID",
+        "By the System Group"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الأجهزة من نفس الطراز لها نفس نوع الكائن (OID)، ولكن يتم التمييز بينها بواسطة المثيل (Instance) الذي غالباً ما يكون عنوان IP.",
+      "en": "Devices of the same model have the same Object Type (OID), but are distinguished by their Instance, which is often the IP address."
+    },
+    "hint": {
+      "ar": "النوع هو التعريف، ولكن ماذا يمثل الجهاز الفعلي؟",
+      "en": "Type is the definition, but what represents the actual device?"
+    },
+    "difficulty": "medium",
+    "conceptId": "information-model-and-smi"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين نوع الكائن (Object Type) ومثيل الكائن (Object Instance). تذكر: OID يحدد 'النوع' (مثل تعريف المتغير في البرمجة)، بينما 'المثيل' هو القيمة الفعلية الموجودة في جهاز معين (مثل عنوان IP).</template>
+    <template class="content-en">Confusing Object Type with Object Instance. Remember: OID defines the 'Type' (like a variable declaration in programming), while the 'Instance' is the actual value residing in a specific device (like an IP address).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في جداول SNMP، الترتيب الرقمي للصفوف والأعمدة معكوس! 4.3 تعني العمود 4، الصف 3. هذا مصمم خصيصاً لتسهيل قراءة عمود كامل من البيانات عبر الشبكة.</template>
+    <template class="content-en">In SNMP tables, the numeric ordering for rows and columns is reversed! 4.3 means Column 4, Row 3. This is specifically designed to make it easier to read an entire column of data across the network.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نموذج الخادم الوكيل (Proxy Server) هو الحل السحري لإدارة الأجهزة القديمة (Legacy) التي لا تفهم بروتوكول SNMP، حيث يقوم الوكيل بدور المترجم.</template>
+    <template class="content-en">The Proxy Server model is the magic solution for managing legacy devices that do not understand the SNMP protocol, as the proxy acts as a translator.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن القيمة 0 في Enumerated INTEGER يمكن أن تعني خطأ. كعرف قياسي في SNMP، القيمة 0 محجوزة دائماً لـ noError.</template>
+    <template class="content-en">Believing that the value 0 in an Enumerated INTEGER can mean an error. By standard convention in SNMP, the value 0 is always reserved for noError.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التنقل في البيانات الضخمة باستخدام القواميس (الجزء الثاني) · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#deleting-dictionary-items" class="toc-link" data-bilingual>
+        <template class="content-ar">حذف عناصر القاموس</template>
+        <template class="content-en">Deleting Dictionary Items</template>
+        <span class="content-target">حذف عناصر القاموس</span>
+      </a>
+      <a href="#multi-key-dictionaries" class="toc-link" data-bilingual>
+        <template class="content-ar">القواميس متعددة المفاتيح</template>
+        <template class="content-en">Multi-Key Dictionaries</template>
+        <span class="content-target">القواميس متعددة المفاتيح</span>
+      </a>
+      <a href="#fromkeys-method" class="toc-link" data-bilingual>
+        <template class="content-ar">طريقة fromkeys</template>
+        <template class="content-en">The fromkeys() Method</template>
+        <span class="content-target">طريقة fromkeys</span>
+      </a>
+      <a href="#nesting-dictionaries" class="toc-link" data-bilingual>
+        <template class="content-ar">تداخل القواميس (قاموس القواميس)</template>
+        <template class="content-en">Nesting Dictionaries</template>
+        <span class="content-target">تداخل القواميس (قاموس القواميس)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التنقل في البيانات الضخمة باستخدام القواميس (الجزء الثاني)</h1>
+      <p class="hero-description">يغطي هذا الوحدة طرق حذف العناصر من القواميس، استخدام القواميس متعددة المفاتيح، إنشاء القواميس باستخدام fromkeys، وتداخل القواميس (قواميس داخل قواميس).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Cruising Massive Data with Dictionaries (Part 2)</h1>
+      <p class="hero-description">This module covers deleting dictionary items, using multi-key dictionaries, creating dictionaries with fromkeys, and nesting dictionaries.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بايثون</span>
+      <span class="tag">هياكل البيانات</span>
+      <span class="tag">القواميس</span>
+      <span class="tag">البيانات الضخمة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Python</span>
+      <span class="tag">Data Structures</span>
+      <span class="tag">Dictionaries</span>
+      <span class="tag">Massive Data</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>حذف العناصر من القاموس باستخدام طرق مختلفة مثل del و clear و pop.</span></li>
+      <li><span class="obj-icon">✦</span><span>إنشاء واستخدام القواميس متعددة المفاتيح لتخزين بيانات معقدة.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام القوائم كقيم داخل القواميس للتعامل مع سمات متعددة.</span></li>
+      <li><span class="obj-icon">✦</span><span>بناء قواميس متداخلة (قاموس داخل قاموس) لتنظيم مجموعات البيانات الكبيرة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Delete items in a dictionary using various methods like del, clear, and pop.</span></li>
+      <li><span class="obj-icon">✦</span><span>Create and use multi-key dictionaries to store complex data.</span></li>
+      <li><span class="obj-icon">✦</span><span>Utilize lists as values within dictionaries to handle multiple attributes.</span></li>
+      <li><span class="obj-icon">✦</span><span>Construct nested dictionaries (dictionary of dictionaries) to organize large datasets.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="deleting-dictionary-items" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> حذف عناصر القاموس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Deleting Dictionary Items</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك إزالة البيانات من القواميس باستخدام الكلمة المفتاحية <code>del</code> أو دوال مثل <code>clear()</code> و <code>pop()</code>، تماماً مثل التخلص من ملفات معينة أو مسح درج بالكامل.</p></template>
+    <template class="content-en"><p>You can remove data from dictionaries using the <code>del</code> keyword or methods like <code>clear()</code> and <code>pop()</code>, much like throwing away specific files or emptying a whole drawer.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك عدة طرق لإزالة البيانات من القواميس في بايثون:</p><ul><li><b><span class="smart-term" data-term-en="del keyword" data-ar="الكلمة المفتاحية del" data-en-def="A Python keyword used to delete objects, including specific dictionary items or entire dictionaries.">الكلمة المفتاحية del<span class="smart-term-tooltip"></span></span>:</b> تزيل عنصراً بناءً على مفتاحه. الصيغة: <code>del dictionaryname[key]</code>. إذا نسيت تحديد المفتاح واستخدمت <code>del dictionaryname</code> فقط، فسيتم حذف القاموس بأكمله من الذاكرة، وستؤدي محاولة طباعته لاحقاً إلى خطأ <code>NameError</code>.</li><li><b>طريقة clear():</b> تزيل جميع أزواج (المفتاح-القيمة) دون حذف القاموس نفسه. الصيغة: <code>dictionaryname.clear()</code>. يصبح القاموس فارغاً <code>{}</code>.</li><li><b>طريقة pop():</b> تزيل عنصراً وتفعل شيئين: تحذف المفتاح المحدد، وتُرجع قيمته بحيث يمكن تخزينها في متغير.</li><li><b>طريقة popitem():</b> هي تنويع على طريقة pop، وتستخدم الصيغة <code>dictionaryname.popitem()</code> لإزالة وإرجاع زوج (مفتاح، قيمة).</li></ul></template>
+    <template class="content-en"><p>There are several ways to remove data from data dictionaries in Python:</p><ul><li><b><span class="smart-term" data-term-en="del keyword" data-ar="الكلمة المفتاحية del" data-en-def="A Python keyword used to delete objects, including specific dictionary items or entire dictionaries.">del keyword<span class="smart-term-tooltip"></span></span>:</b> Removes an item based on its key. Syntax: <code>del dictionaryname[key]</code>. If you specify only the dictionary name (e.g., <code>del people</code>), the entire dictionary is deleted, and trying to print it will cause a <code>NameError</code>.</li><li><b><span class="smart-term" data-term-en="clear()" data-ar="دالة clear()" data-en-def="A dictionary method that removes all items, leaving an empty dictionary.">clear()<span class="smart-term-tooltip"></span></span> method:</b> Removes all key-value pairs without deleting the entire dictionary object. Syntax: <code>dictionaryname.clear()</code>. The dictionary becomes empty <code>{}</code>.</li><li><b><span class="smart-term" data-term-en="pop()" data-ar="دالة pop()" data-en-def="A method that removes a specified key and returns its corresponding value.">pop()<span class="smart-term-tooltip"></span></span> method:</b> Removes an item and does two things: it removes the specified key, and it returns the value of the popped key so it can be stored in a variable.</li><li><b>popitem() method:</b> A variation on pop() that uses the syntax <code>dictionaryname.popitem()</code> to remove and return a key-value pair.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين <code>del</code> و <code>clear()</code> يكمن في إدارة الذاكرة. <code>del</code> تدمر الكائن المرجعي بالكامل إذا لم يُحدد مفتاح، مما يحرر الذاكرة ولكنه يكسر أي كود يحاول الوصول للمتغير لاحقاً. بينما <code>clear()</code> تحافظ على الكائن في الذاكرة كقاموس فارغ، مما يجعله آمناً لإعادة الاستخدام في الحلقات التكرارية.</p><p>طريقة <code>pop()</code> مفيدة جداً في الخوارزميات التي تتطلب معالجة البيانات واستهلاكها في نفس الوقت، مثل طوابير المهام، حيث تحتاج إلى استرجاع القيمة وحذفها من القاموس في خطوة واحدة لتجنب التكرار.</p></template>
+    <template class="content-en"><p>The fundamental difference between <code>del</code> and <code>clear()</code> lies in memory management and object lifecycle. <code>del</code> destroys the variable reference entirely if no key is specified, freeing memory but breaking subsequent code that calls it. <code>clear()</code> keeps the object alive as an empty dictionary, making it safe for reuse.</p><p>The <code>pop()</code> method is highly useful in algorithms that consume data as they process it (like task queues), where you need to retrieve a value and ensure it's removed from the dictionary in a single atomic-like step to prevent duplicate processing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>people = {'htanaka': 'Haru Tanaka', 'zmin': 'Zhang Min'}
+
+# Using del
+del people['zmin']
+
+# Using clear
+people.clear() # people is now {}
+
+# Using pop
+people = {'htanaka': 'Haru Tanaka', 'zmin': 'Zhang Min'}
+adios = people.pop('zmin')
+print(adios) # Outputs: Zhang Min</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا حاولت استخدام <code>pop()</code> على مفتاح غير موجود في القاموس؟ وكيف يمكنك تجنب هذا الخطأ؟</template>
+      <template class="content-en">What happens if you try to use <code>pop()</code> on a key that doesn't exist in the dictionary? How can you prevent this error?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيؤدي ذلك إلى خطأ KeyError. لتجنب ذلك، يمكنك تمرير قيمة افتراضية كمعامل ثاني لدالة pop، مثل <code>dict.pop(key, default_value)</code>.</p></template>
+      <template class="content-en"><p>It will raise a KeyError. To prevent this, you can pass a default value as a second argument to pop, like <code>dict.pop(key, default_value)</code>.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multi-key-dictionaries" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> القواميس متعددة المفاتيح</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Multi-Key Dictionaries</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ال<span class="smart-term" data-term-en="Multi-Key Dictionary" data-ar="قاموس متعدد المفاتيح" data-en-def="A dictionary that stores multiple attributes (keys) for a single conceptual entity.">قاموس متعدد المفاتيح<span class="smart-term-tooltip"></span></span> هو قاموس يحتوي على أزواج متعددة من (المفتاح-القيمة) لوصف كيان واحد بشكل شامل، مثل بطاقة هوية تحتوي على الاسم، وتاريخ الميلاد، والوظيفة.</p></template>
+    <template class="content-en"><p>A <span class="smart-term" data-term-en="Multi-Key Dictionary" data-ar="قاموس متعدد المفاتيح" data-en-def="A dictionary that stores multiple attributes (keys) for a single conceptual entity.">multi-key dictionary<span class="smart-term-tooltip"></span></span> contains multiple key-value pairs to comprehensively describe a single entity, much like an ID card holding a name, DOB, and job title.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ليس من غير المألوف أن يحتوي القاموس على أزواج متعددة من (المفتاح-القيمة) لعنصر بيانات واحد. على سبيل المثال، بدلاً من تخزين اسم الموظف فقط، قد ترغب في معرفة سنة التعيين، وتاريخ الميلاد، وما إذا كان قد تم إصدار حاسوب محمول له.</p><p>علاوة على ذلك، لا يجب أن تكون القيمة لخاصية معينة قيمة مفردة. يمكن أن تكون القيمة قائمة (List)، أو صف (Tuple)، أو مجموعة (Set). على سبيل المثال، إذا كان المنتج عبارة عن نظارات شمسية، يمكنك إضافة مفتاح <code>models</code> وتخزين النماذج المتاحة كقائمة: <code>['Black', 'Tortoise']</code>.</p><p>لعرض هذه البيانات، يمكنك استخدام صيغة <code>dictionaryname[key]</code> البسيطة، أو استخدام الحلقات التكرارية (Loops) وسلاسل f-strings لتنسيق البيانات بشكل أنيق.</p></template>
+    <template class="content-en"><p>It’s not unusual for a dictionary to have multiple key-value pairs for one item of data. For example, instead of just knowing a person's name, you might want to know the year hired, date of birth, and whether they have a company laptop.</p><p>Furthermore, the value for a property doesn't have to be a single value; it can be a list, tuple, or set. For example, for a sunglasses product, you could add a <code>models</code> key and list the items as a comma-separated list in square brackets: <code>['Black', 'Tortoise']</code>.</p><p>To display this data, you can use the simple <code>dictionaryname[key]</code> syntax, or get fancier by using loops and <span class="smart-term" data-term-en="f-string" data-ar="سلسلة f-string" data-en-def="A literal string prefixed with &#x27;f&#x27; in Python, allowing embedded expressions inside curly braces for formatting.">f-string<span class="smart-term-tooltip"></span></span>s to format the output neatly.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام هياكل بيانات معقدة كقيم داخل القاموس (مثل القوائم) يفتح الباب لتمثيل بيانات تشبه مستندات JSON، وهو المعيار الأساسي في واجهات برمجة التطبيقات (APIs) الحديثة وقواعد بيانات NoSQL.</p><p>عند استخدام القوائم كقيم، يجب الانتباه إلى أن القوائم قابلة للتعديل (Mutable). إذا قمت بتعديل القائمة المستخرجة من القاموس، فإنك تعدل البيانات الأصلية داخل القاموس مباشرة، لأن المتغير يشير إلى نفس الكائن في الذاكرة.</p></template>
+    <template class="content-en"><p>Using complex data structures like lists as dictionary values opens the door to representing JSON-like documents, which is the standard for modern APIs and NoSQL databases.</p><p>When using lists as values, it's crucial to remember that lists are mutable. If you extract the list from the dictionary and modify it, you are modifying the original data inside the dictionary, because the variable points to the same object in memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>product = {
+    'name': 'Ray-Ban Wayfarer Sunglasses',
+    'unit_price': 112.99,
+    'taxable': True,
+    'in_stock': 10,
+    'models': ['Black', 'Tortoise']
+}
+
+print('Name: ', product['name'])
+print('Price: ', f"${product['unit_price']:.2f}")
+print('Models:')
+for model in product['models']:
+    print(" " * 10 + model)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a conceptual diagram showing a single dictionary object named 'product'. Inside the object, show multiple key-value pairs connected by arrows. Keys: 'name' (string), 'unit_price' (float), 'models' (list). For the 'models' key, show an arrow pointing to a distinct List object containing 'Black' and 'Tortoise'. Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Highlighted Reference Node -->
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- DICTIONARY OBJECT                          -->
+  <!-- ========================================== -->
+  <rect x="40" y="40" width="380" height="340" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Dictionary Title -->
+  <text x="230" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dictionary: product</text>
+  <text x="230" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">القاموس: product</text>
+
+  <!-- Column Headers -->
+  <text x="130" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Keys</text>
+  <text x="130" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">المفاتيح</text>
+
+  <text x="325" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Values</text>
+  <text x="325" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">القيم</text>
+
+  <!-- Row 1: name -->
+  <rect x="70" y="140" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="130" y="166" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">"name"</text>
+
+  <path d="M 190 160 L 250 160" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 2" />
+
+  <rect x="260" y="140" width="130" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="325" y="166" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">"Sunglasses"</text>
+  
+  <text x="325" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">type: str</text>
+  <text x="325" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">النوع: str</text>
+
+  <!-- Row 2: unit_price -->
+  <rect x="70" y="220" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="130" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">"unit_price"</text>
+
+  <path d="M 190 240 L 250 240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 2" />
+
+  <rect x="260" y="220" width="130" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="325" y="246" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">150.00</text>
+
+  <text x="325" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">type: float</text>
+  <text x="325" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">النوع: float</text>
+
+  <!-- Row 3: models -->
+  <rect x="70" y="300" width="120" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="130" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">"models"</text>
+
+  <path d="M 190 320 L 250 320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="4 2" />
+
+  <rect x="260" y="300" width="130" height="40" rx="6" fill="url(#brandGrad)" />
+  <text x="325" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">List Reference</text>
+  <text x="325" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">مرجع القائمة</text>
+
+  <text x="325" y="355" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">type: list</text>
+  <text x="325" y="355" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">النوع: list</text>
+
+  <!-- ========================================== -->
+  <!-- CONNECTION ARROW                           -->
+  <!-- ========================================== -->
+  <path d="M 390 320 L 480 320" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <!-- ========================================== -->
+  <!-- LIST OBJECT                                -->
+  <!-- ========================================== -->
+  <rect x="490" y="240" width="280" height="140" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" />
+
+  <!-- List Title -->
+  <text x="630" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">List Object</text>
+  <text x="630" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">كائن القائمة</text>
+
+  <!-- List Element 0 -->
+  <rect x="515" y="300" width="105" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="567.5" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">"Black"</text>
+  
+  <text x="567.5" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Index 0</text>
+  <text x="567.5" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">الفهرس 0</text>
+
+  <!-- List Element 1 -->
+  <rect x="640" y="300" width="105" height="40" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="692.5" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">"Tortoise"</text>
+  
+  <text x="692.5" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">Index 1</text>
+  <text x="692.5" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">الفهرس 1</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل استخدام القواميس لتمثيل منتج بدلاً من استخدام قائمة (List) تحتوي على خصائص المنتج بالترتيب؟</template>
+      <template class="content-en">Why do we prefer using dictionaries to represent a product instead of a list containing the product's properties in order?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>القواميس توفر وصولاً بالاسم (المفتاح) مما يجعل الكود مقروءاً وواضحاً (مثل product['price'])، بينما القوائم تتطلب تذكر الفهرس الرقمي (مثل product[1]) وهو عرضة للخطأ وصعب الصيانة.</p></template>
+      <template class="content-en"><p>Dictionaries provide named access (keys), making the code readable and self-documenting (e.g., product['price']), whereas lists require remembering numeric indices (e.g., product[1]), which is error-prone and hard to maintain.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="fromkeys-method" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> طريقة fromkeys</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> The fromkeys() Method</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم دالة <code>fromkeys()</code> لإنشاء قاموس جديد بسرعة باستخدام مفاتيح مأخوذة من تسلسل (مثل قائمة)، وتعيين قيمة افتراضية موحدة لجميع هذه المفاتيح.</p></template>
+    <template class="content-en"><p>The <code>fromkeys()</code> method is used to quickly create a new dictionary using keys from an iterable (like a list), assigning a uniform default value to all of them.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>توفر قواميس البيانات في بايثون طريقة تسمى <code>fromkeys()</code>. الصيغة الأساسية هي:</p><p><code>newdictionaryname = dict.fromkeys(iterable[, value])</code></p><ul><li><b>newdictionaryname:</b> الاسم الذي تريد إطلاقه على القاموس الجديد.</li><li><b>iterable:</b> أي كائن يمكن التكرار عليه (مثل قائمة بسيطة) سيتم استخدام عناصره كمفاتيح.</li><li><b>value:</b> جزء اختياري. إذا تم حذفه، يحصل كل مفتاح في القاموس على القيمة <code>None</code>، وهي طريقة بايثون للقول بأنه لم يتم تعيين قيمة لهذا المفتاح بعد.</li></ul></template>
+    <template class="content-en"><p>Data dictionaries in Python offer a method named <code>fromkeys()</code>. The syntax is:</p><p><code>newdictionaryname = dict.fromkeys(iterable[, value])</code></p><ul><li><b>newdictionaryname:</b> Whatever you want to name the new dictionary.</li><li><b><span class="smart-term" data-term-en="Iterable" data-ar="كائن قابل للتكرار" data-en-def="An object capable of returning its members one at a time, such as a list, tuple, or string.">iterable<span class="smart-term-tooltip"></span></span>:</b> Any iterable (meaning something the code can loop through, like a simple list) whose items will become the keys.</li><li><b>value:</b> This part is optional. If omitted, each key in the dictionary gets a value of <code>None</code>, which is Python's way of saying no value has been assigned to this key yet.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر <code>fromkeys()</code> مفيدة جداً عند تهيئة قاموس لتتبع حالة مجموعة معروفة من العناصر (مثلاً، تتبع حضور قائمة من الطلاب، حيث يتم تعيين القيمة الافتراضية إلى False).</p><p>يجب الحذر عند استخدام كائنات قابلة للتعديل (مثل القوائم <code>[]</code>) كقيمة افتراضية في <code>fromkeys()</code>. لأن بايثون ستقوم بتعيين <i>نفس المرجع</i> لجميع المفاتيح. إذا قمت بتعديل القائمة لأحد المفاتيح، ستتغير لجميع المفاتيح الأخرى!</p></template>
+    <template class="content-en"><p><code>fromkeys()</code> is highly useful when initializing a dictionary to track the state of a known set of items (e.g., tracking attendance for a list of students, setting the default value to False).</p><p>A major trap with <code>fromkeys()</code> occurs when using a mutable object (like an empty list <code>[]</code>) as the default value. Python assigns the <i>exact same reference</i> to all keys. Modifying the list for one key will modify it for all keys!</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>keys = ['a', 'b', 'c']
+# Without value (defaults to None)
+dict1 = dict.fromkeys(keys)
+print(dict1) # {'a': None, 'b': None, 'c': None}
+
+# With a specific value
+dict2 = dict.fromkeys(keys, 0)
+print(dict2) # {'a': 0, 'b': 0, 'c': 0}</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>del dict[key]</th><th>dict.clear()</th><th>dict.pop(key)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">النتيجة على القاموس</template>
+          <template class="content-en">Effect on Dictionary</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يحذف العنصر المحدد فقط</template>
+          <template class="content-en">Deletes specific item only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يفرغ القاموس بالكامل (يصبح {})</template>
+          <template class="content-en">Empties entire dict (becomes {})</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يحذف العنصر المحدد فقط</template>
+          <template class="content-en">Deletes specific item only</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القيمة المرجعة</template>
+          <template class="content-en">Return Value</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يرجع شيء</template>
+          <template class="content-en">Returns nothing</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يرجع شيء</template>
+          <template class="content-en">Returns nothing</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يرجع قيمة المفتاح المحذوف</template>
+          <template class="content-en">Returns the value of deleted key</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تُستدعى دالة <code>fromkeys()</code> باستخدام <code>dict.fromkeys()</code> بدلاً من استدعائها على كائن قاموس موجود مسبقاً؟</template>
+      <template class="content-en">Why is <code>fromkeys()</code> called using <code>dict.fromkeys()</code> instead of being called on an already existing dictionary object?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها دالة صنف (Class Method) وظيفتها إنشاء كائن قاموس جديد وإرجاعه، وليس تعديل قاموس موجود.</p></template>
+      <template class="content-en"><p>Because it is a Class Method whose purpose is to instantiate and return a completely new dictionary object, rather than modifying an existing one.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="nesting-dictionaries" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تداخل القواميس (قاموس القواميس)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Nesting Dictionaries</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تداخل القواميس يعني وضع قاموس كقيمة داخل قاموس آخر، مما يشبه وجود مجلدات رئيسية تحتوي بداخلها على مجلدات فرعية لتنظيم البيانات المعقدة.</p></template>
+    <template class="content-en"><p>Nesting dictionaries means placing a dictionary as a value inside another dictionary, similar to having main folders that contain subfolders to organize complex data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>إذا كان لديك مجموعة من القواميس، يمكنك تجميعها في قاموس واحد كبير (قاموس حاوي) لتتمكن من المرور عليها برمجياً دون الحاجة للوصول لكل قاموس باسمه الفردي.</p><p>الصيغة الأساسية هي جعل كل قاموس عبارة عن زوج (مفتاح-قيمة) في القاموس الحاوي:</p><p><code>containingdictionaryname = { key: {dictionary}, key: {dictionary} }</code></p><ul><li><b>containingdictionaryname:</b> اسم القاموس الشامل.</li><li><b>key:</b> يجب أن يكون كل مفتاح فريداً (Unique)، مثل رقم UPC أو SKU للمنتج، أو اسم المستخدم.</li><li><b>{dictionary}:</b> أزواج المفتاح والقيمة الخاصة بالعنصر الفردي محاطة بأقواس معقوفة.</li></ul><p>باستخدام مزيج من سلاسل f-strings وحلقات التكرار، يمكنك جعل بايثون تعرض هذه البيانات المتداخلة في تنسيق جدولي أنيق.</p></template>
+    <template class="content-en"><p>If you define a bunch of dictionaries, you can loop through the whole collection without specifically accessing each dictionary by name by making each dictionary a key-value pair in some containing dictionary.</p><p>The syntax for a dictionary of dictionaries is:</p><p><code>containingdictionaryname = { key: {dictionary}, key: {dictionary} }</code></p><ul><li><b>containingdictionaryname:</b> The name assigned to the dictionary as a whole.</li><li><b>key:</b> Each key value must be unique, such as the UPC or SKU for a product, or a username.</li><li><b>{dictionary}:</b> Enclose all the key-value pairs for that one dictionary item in curly braces.</li></ul><p>Using a combination of f-strings and some loops, you can get Python to display data from nested dictionaries in a neat, tabular format.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر القواميس المتداخلة الأساس لبناء قواعد البيانات في الذاكرة (In-memory databases) داخل بايثون.</p><p>المفتاح الخارجي يعمل كـ Primary Key (مفتاح أساسي) يضمن عدم التكرار وسرعة الوصول (O(1)).</p><p>عند التكرار عبر <span class="smart-term" data-term-en="Nested Dictionary" data-ar="قاموس متداخل" data-en-def="A dictionary that contains other dictionaries as its values.">قاموس متداخل<span class="smart-term-tooltip"></span></span>، غالباً ما نستخدم <code>dict.items()</code> للحصول على المفتاح الخارجي (مثل المعرف) والقاموس الداخلي (البيانات) في نفس الوقت، مما يسهل استخراج الحقول الفرعية لطباعتها في جداول.</p></template>
+    <template class="content-en"><p>Nested dictionaries form the basis of in-memory databases in Python.</p><p>The outer key acts as a Primary Key, ensuring uniqueness and providing O(1) fast access to the inner record.</p><p>When iterating over a <span class="smart-term" data-term-en="Nested Dictionary" data-ar="قاموس متداخل" data-en-def="A dictionary that contains other dictionaries as its values.">nested dictionary<span class="smart-term-tooltip"></span></span>, it is common practice to use <code>dict.items()</code> to unpack both the outer key (e.g., the ID) and the inner dictionary (the data) simultaneously, making it easy to extract sub-fields for tabular printing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>products = {
+    'RB00111': {'name': 'Ray-Ban', 'price': 112.98},
+    'DWC0317': {'name': 'Drone', 'price': 72.95}
+}
+
+# Looping through nested dictionary
+for prod_id, details in products.items():
+    print(f"ID: {prod_id} | Name: {details['name']} | Price: ${details['price']}")</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show a hierarchical tree structure representing a nested dictionary. Top node: 'products' (containing dictionary). Branches down to unique keys: 'RB00111' and 'DWC0317'. From 'RB00111', branch down to its inner dictionary keys: 'name' -> 'Ray-Ban', 'price' -> 112.98. Do the same for 'DWC0317'. Style: educational, dark background #0d1117, accent color #2ea043, viewBox 0 0 800 500, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Connection Paths (Root to Level 1) -->
+  <path d="M 400 90 C 400 130, 200 130, 200 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 400 90 C 400 130, 600 130, 600 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Connection Paths (Level 1 to Level 2) -->
+  <path d="M 200 230 C 200 270, 115 270, 115 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 200 230 C 200 270, 285 270, 285 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 600 230 C 600 270, 515 270, 515 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 600 230 C 600 270, 685 270, 685 315" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Dashed Grouping Boxes for Inner Dictionaries -->
+  <rect x="25" y="300" width="350" height="90" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+  <rect x="425" y="300" width="350" height="90" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- Annotations -->
+  <text x="400" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Containing Dictionary</text>
+  <text x="400" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">القاموس الحاوي</text>
+
+  <text x="400" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Unique Keys</text>
+  <text x="400" y="160" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مفاتيح فريدة</text>
+
+  <text x="400" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Inner Dictionaries</text>
+  <text x="400" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قواميس داخلية</text>
+
+  <!-- Root Node -->
+  <rect x="320" y="40" width="160" height="50" rx="8" fill="url(#brandGrad)" />
+  <text x="400" y="71" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">products</text>
+  <text x="400" y="71" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">products</text>
+
+  <!-- Level 1 Nodes (Unique Keys) -->
+  <rect x="120" y="180" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="200" y="211" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">'RB00111'</text>
+  <text x="200" y="211" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">'RB00111'</text>
+
+  <rect x="520" y="180" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="600" y="211" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">'DWC0317'</text>
+  <text x="600" y="211" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">'DWC0317'</text>
+
+  <!-- Level 2 Nodes (Inner Dictionary Key-Values) -->
+  <!-- Branch 1 -->
+  <rect x="45" y="320" width="140" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="115" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">'name': 'Ray-Ban'</text>
+  <text x="115" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">'name': 'Ray-Ban'</text>
+
+  <rect x="215" y="320" width="140" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="285" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">'price': 112.98</text>
+  <text x="285" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">'price': 112.98</text>
+
+  <!-- Branch 2 -->
+  <rect x="445" y="320" width="140" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="515" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">'name': 'Drone'</text>
+  <text x="515" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">'name': 'Drone'</text>
+
+  <rect x="615" y="320" width="140" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="685" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">'price': 72.99</text>
+  <text x="685" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">'price': 72.99</text>
+
+  <!-- Code Snippet Box -->
+  <rect x="100" y="420" width="600" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="400" y="450" text-anchor="middle" font-family="monospace, system-ui, sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">products = { 'RB00111': {'name': 'Ray-Ban', 'price': 112.98}, ... }</text>
+  <text x="400" y="450" text-anchor="middle" font-family="monospace, system-ui, sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">products = { 'RB00111': {'name': 'Ray-Ban', 'price': 112.98}, ... }</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي المشكلة التي قد تواجهها إذا استخدمت اسم العميل كمفتاح خارجي في قاموس متداخل لتخزين بيانات العملاء؟</template>
+      <template class="content-en">What problem might you face if you use a customer's name as the outer key in a nested dictionary to store customer data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الأسماء ليست فريدة دائماً. إذا كان هناك عميلان بنفس الاسم، فإن إضافة العميل الثاني ستؤدي إلى الكتابة فوق بيانات العميل الأول. يجب استخدام معرف فريد مثل رقم العميل.</p></template>
+      <template class="content-en"><p>Names are not always unique. If two customers have the same name, adding the second customer will overwrite the first customer's data. A unique identifier like a Customer ID should be used.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء البيانات! في هذه الوحدة، ننتقل من الأساسيات إلى الاحتراف في التعامل مع القواميس. تخيلوا القاموس كخزانة ملفات ضخمة. تعلمنا كيف نمزق ملفاً معيناً (del)، أو نفرغ الخزانة بالكامل مع الاحتفاظ بها (clear)، أو نسحب ملفاً لنقرأه ثم نتخلص منه (pop). الأهم من ذلك، رأينا كيف يمكن لملف واحد أن يحتوي على مجلدات فرعية وقوائم (القواميس متعددة المفاتيح والمتداخلة). في الامتحان، ركزوا جيداً على الفرق بين del و clear، وتأكدوا من فهمكم لكيفية الوصول إلى البيانات داخل قاموس متداخل باستخدام الأقواس المربعة المتتالية. دالة fromkeys قد تبدو غامضة، لكن تذكروا فقط أنها أداة سريعة لإنشاء قاموس بقيم افتراضية موحدة. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome, data friends! In this module, we move from basics to mastery in handling dictionaries. Imagine a dictionary as a massive file cabinet. We learned how to shred a specific file (del), empty the entire cabinet while keeping it (clear), or pull a file out to read it before discarding it (pop). Most importantly, we saw how a single file can contain subfolders and lists (multi-key and nested dictionaries). For the exam, focus heavily on the difference between del and clear, and ensure you understand how to access data inside a nested dictionary using chained square brackets. The fromkeys method might seem mysterious, but just remember it as a quick tool to initialize a dictionary with uniform default values. Good luck with your studies!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين <code>del</code> و <code>clear()</code>؟</template>
+          <template class="content-en">What is the main difference between <code>del</code> and <code>clear()</code>?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين <code>del</code> و <code>clear()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><code>del</code> (بدون تحديد مفتاح) تحذف كائن القاموس بالكامل من الذاكرة. <code>clear()</code> تزيل المحتويات فقط وتترك قاموساً فارغاً <code>{}</code>.</template>
+          <template class="content-en"><code>del</code> (without specifying a key) deletes the entire dictionary object from memory. <code>clear()</code> only removes the contents, leaving an empty dictionary <code>{}</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم <code>pop()</code> بدلاً من <code>del</code>؟</template>
+          <template class="content-en">When should I use <code>pop()</code> instead of <code>del</code>?</template>
+          <span class="content-target">متى يجب أن أستخدم <code>pop()</code> بدلاً من <code>del</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم <code>pop()</code> عندما تحتاج إلى استخدام القيمة المحذوفة (مثلاً لتخزينها أو طباعتها) في نفس وقت حذفها.</template>
+          <template class="content-en">Use <code>pop()</code> when you need to use the deleted value (e.g., to store or print it) at the same time you delete it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا استخدمت <code>del</code> على قاموس ثم حاولت طباعته؟</template>
+          <template class="content-en">What happens if I use <code>del</code> on a dictionary and then try to print it?</template>
+          <span class="content-target">ماذا يحدث إذا استخدمت <code>del</code> على قاموس ثم حاولت طباعته؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ستحصل على خطأ NameError لأن المتغير لم يعد موجوداً في الذاكرة.</template>
+          <template class="content-en">You will get a NameError because the variable no longer exists in memory.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن أن يحتوي القاموس على قائمة كقيمة؟</template>
+          <template class="content-en">Can a dictionary contain a list as a value?</template>
+          <span class="content-target">هل يمكن أن يحتوي القاموس على قائمة كقيمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم بالتأكيد. هذا ما نسميه قاموس متعدد المفاتيح، وهو مفيد جداً لتخزين سمات متعددة مثل قائمة بألوان منتج معين.</template>
+          <template class="content-en">Yes, absolutely. This is what we call a multi-key dictionary, and it's very useful for storing multiple attributes like a list of colors for a specific product.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة دالة <code>fromkeys()</code>؟</template>
+          <template class="content-en">What is the function of the <code>fromkeys()</code> method?</template>
+          <span class="content-target">ما هي وظيفة دالة <code>fromkeys()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم لإنشاء قاموس جديد بسرعة، حيث تأخذ مفاتيحها من كائن قابل للتكرار (مثل قائمة) وتعين لها جميعاً قيمة افتراضية واحدة.</template>
+          <template class="content-en">It is used to quickly create a new dictionary, taking its keys from an iterable (like a list) and assigning them all a single default value.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا لو لم أمرر قيمة لدالة <code>fromkeys()</code>؟</template>
+          <template class="content-en">What if I don't pass a value to the <code>fromkeys()</code> method?</template>
+          <span class="content-target">ماذا لو لم أمرر قيمة لدالة <code>fromkeys()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ستقوم بايثون تلقائياً بتعيين القيمة <code>None</code> لجميع المفاتيح.</template>
+          <template class="content-en">Python will automatically assign the value <code>None</code> to all keys.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو القاموس المتداخل (Nested Dictionary)؟</template>
+          <template class="content-en">What is a Nested Dictionary?</template>
+          <span class="content-target">ما هو القاموس المتداخل (Nested Dictionary)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو قاموس يحتوي على قواميس أخرى كقيم له. يُستخدم لتنظيم البيانات الهرمية أو المعقدة.</template>
+          <template class="content-en">It is a dictionary that contains other dictionaries as its values. It is used to organize hierarchical or complex data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى مفاتيح فريدة في القواميس المتداخلة؟</template>
+          <template class="content-en">Why do we need unique keys in nested dictionaries?</template>
+          <span class="content-target">لماذا نحتاج إلى مفاتيح فريدة في القواميس المتداخلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن القاموس لا يسمح بتكرار المفاتيح. إذا استخدمت مفتاحاً موجوداً مسبقاً، فسيتم مسح البيانات القديمة واستبدالها بالجديدة.</template>
+          <template class="content-en">Because a dictionary does not allow duplicate keys. If you use an already existing key, the old data will be overwritten by the new data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنني طباعة عناصر قائمة موجودة داخل قاموس بشكل جميل؟</template>
+          <template class="content-en">How can I beautifully print items of a list that is inside a dictionary?</template>
+          <span class="content-target">كيف يمكنني طباعة عناصر قائمة موجودة داخل قاموس بشكل جميل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يمكنك استخدام حلقة <code>for</code> للمرور عبر القائمة (مثلاً <code>for item in dict['key']:</code>) وطباعة كل عنصر باستخدام سلاسل f-strings.</template>
+          <template class="content-en">You can use a <code>for</code> loop to iterate through the list (e.g., <code>for item in dict['key']:</code>) and print each item using f-strings.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي دالة <code>popitem()</code>؟</template>
+          <template class="content-en">What is the <code>popitem()</code> method?</template>
+          <span class="content-target">ما هي دالة <code>popitem()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي دالة تزيل وتُرجع زوج (مفتاح، قيمة) من القاموس. لا تأخذ أي معاملات.</template>
+          <template class="content-en">It is a method that removes and returns a key-value pair from the dictionary. It takes no arguments.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الكلمة المفتاحية المستخدمة لحذف عنصر من قاموس بناءً على مفتاحه؟",
+      "en": "What keyword is used to remove an item from a dictionary based on its key?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الكلمة المفتاحية del",
+        "en": "The del keyword"
+      },
+      "example": {
+        "ar": "del people['zmin']",
+        "en": "del people['zmin']"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ماذا يحدث إذا استخدمت <code>del</code> مع اسم القاموس فقط دون تحديد مفتاح؟",
+      "en": "What happens if you use <code>del</code> with only the dictionary name and no key?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم حذف القاموس بأكمله من الذاكرة.",
+        "en": "The entire dictionary is deleted from memory."
+      },
+      "example": {
+        "ar": "del people",
+        "en": "del people"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الخطأ الذي يظهر إذا حاولت طباعة قاموس بعد حذفه بالكامل باستخدام <code>del</code>؟",
+      "en": "What error occurs if you try to print a dictionary after deleting it entirely with <code>del</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خطأ NameError (الاسم غير معرف).",
+        "en": "NameError (name is not defined)."
+      },
+      "example": {
+        "ar": "NameError: name 'people' is not defined",
+        "en": "NameError: name 'people' is not defined"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي الدالة التي تزيل جميع أزواج المفتاح-القيمة دون حذف القاموس نفسه؟",
+      "en": "Which method removes all key-value pairs without deleting the dictionary itself?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة clear()",
+        "en": "The clear() method"
+      },
+      "example": {
+        "ar": "people.clear()",
+        "en": "people.clear()"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هما الشيئان اللذان تفعلهما دالة <code>pop()</code> عند استخدامها على قاموس؟",
+      "en": "What two things does the <code>pop()</code> method do when used on a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحذف المفتاح المحدد، وتُرجع قيمته.",
+        "en": "It removes the specified key and returns its value."
+      },
+      "example": {
+        "ar": "val = dict.pop('key')",
+        "en": "val = dict.pop('key')"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي الدالة التي تزيل وتُرجع زوج (مفتاح، قيمة) من القاموس؟",
+      "en": "Which method removes and returns a key-value pair from the dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة popitem()",
+        "en": "The popitem() method"
+      },
+      "example": {
+        "ar": "item = dict.popitem()",
+        "en": "item = dict.popitem()"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "هل يمكن أن تكون قيمة القاموس عبارة عن قائمة (List)؟",
+      "en": "Can a dictionary value be a list?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نعم، يمكن أن تكون القيمة قائمة، أو صف، أو مجموعة.",
+        "en": "Yes, the value can be a list, tuple, or set."
+      },
+      "example": {
+        "ar": "'models': ['Black', 'Tortoise']",
+        "en": "'models': ['Black', 'Tortoise']"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي الدالة المستخدمة لإنشاء قاموس جديد من تسلسل (Iterable)؟",
+      "en": "What method is used to create a new dictionary from an iterable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة fromkeys()",
+        "en": "The fromkeys() method"
+      },
+      "example": {
+        "ar": "dict.fromkeys(iterable)",
+        "en": "dict.fromkeys(iterable)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي القيمة الافتراضية التي تعينها <code>fromkeys()</code> للمفاتيح إذا لم يتم توفير قيمة؟",
+      "en": "What is the default value assigned by <code>fromkeys()</code> to the keys if no value is provided?"
+    },
+    "back": {
+      "definition": {
+        "ar": "القيمة None",
+        "en": "The value None"
+      },
+      "example": {
+        "ar": "dict.fromkeys(['a', 'b']) -> {'a': None, 'b': None}",
+        "en": "dict.fromkeys(['a', 'b']) -> {'a': None, 'b': None}"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو الشرط الأساسي للمفاتيح في القاموس المتداخل (قاموس القواميس)؟",
+      "en": "What is the primary requirement for keys in a nested dictionary (dictionary of dictionaries)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن يكون كل مفتاح فريداً (Unique).",
+        "en": "Each key must be unique."
+      },
+      "example": {
+        "ar": "مثل استخدام رقم SKU أو UPC كمعرف.",
+        "en": "Like using an SKU or UPC as an identifier."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "كيف تصل إلى قيمة مفتاح معين داخل قاموس؟",
+      "en": "How do you access the value of a specific key inside a dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام صيغة الأقواس المربعة واسم المفتاح.",
+        "en": "Using square bracket syntax with the key name."
+      },
+      "example": {
+        "ar": "dictionaryname[key]",
+        "en": "dictionaryname[key]"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي الميزة التي توفرها سلاسل f-strings عند طباعة القواميس؟",
+      "en": "What advantage do f-strings provide when printing dictionaries?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسمح بتنسيق البيانات وإدراج قيم القاموس مباشرة داخل النص بسهولة.",
+        "en": "They allow easy formatting and embedding of dictionary values directly inside the text."
+      },
+      "example": {
+        "ar": "f\"Price: ${product['price']:.2f}\"",
+        "en": "f\"Price: ${product['price']:.2f}\""
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو القاموس متعدد المفاتيح (Multi-Key Dictionary)؟",
+      "en": "What is a Multi-Key Dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاموس يحتوي على أزواج متعددة من المفتاح والقيمة لوصف عنصر بيانات واحد.",
+        "en": "A dictionary that has multiple key-value pairs for one item of data."
+      },
+      "example": {
+        "ar": "قاموس موظف يحتوي على الاسم، وتاريخ الميلاد، وسنة التعيين.",
+        "en": "An employee dict with name, dob, and year_hired."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الـ Iterable في سياق دالة <code>fromkeys()</code>؟",
+      "en": "What is an Iterable in the context of the <code>fromkeys()</code> method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أي كائن يمكن للكود التكرار عليه (المرور عبر عناصره)، مثل القائمة.",
+        "en": "Anything the code can loop through, like a list."
+      },
+      "example": {
+        "ar": "قائمة من الأسماء: ['Ali', 'Sara']",
+        "en": "A list of names: ['Ali', 'Sara']"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يمكنك طباعة عناصر قائمة موجودة كقيمة داخل قاموس في أسطر منفصلة؟",
+      "en": "How can you print items of a list that is a value inside a dictionary on separate lines?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام حلقة تكرارية (for loop) للمرور عبر القائمة.",
+        "en": "By using a for loop to iterate through the list."
+      },
+      "example": {
+        "ar": "for model in product['models']: print(model)",
+        "en": "for model in product['models']: print(model)"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الطرق التالية تحذف القاموس بأكمله من الذاكرة؟",
+      "en": "Which of the following methods deletes the entire dictionary from memory?"
+    },
+    "options": {
+      "ar": [
+        "dictionary.clear()",
+        "del dictionary",
+        "dictionary.pop()",
+        "dictionary.delete()"
+      ],
+      "en": [
+        "dictionary.clear()",
+        "del dictionary",
+        "dictionary.pop()",
+        "dictionary.delete()"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "استخدام del مع اسم القاموس فقط (بدون مفتاح) يحذف الكائن بالكامل من الذاكرة.",
+      "en": "Using del with only the dictionary name (no key) deletes the entire object from memory."
+    },
+    "hint": {
+      "ar": "تذكر الكلمة المفتاحية التي تسبب خطأ NameError إذا حاولت الطباعة بعدها.",
+      "en": "Remember the keyword that causes a NameError if you try to print afterwards."
+    },
+    "difficulty": "easy",
+    "conceptId": "deleting-dictionary-items"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ماذا تُرجع الدالة <code>pop()</code> عند استخدامها على قاموس؟",
+      "en": "What does the <code>pop()</code> method return when used on a dictionary?"
+    },
+    "options": {
+      "ar": [
+        "القاموس بعد التعديل",
+        "القيمة المرتبطة بالمفتاح المحذوف",
+        "المفتاح المحذوف فقط",
+        "لا تُرجع شيئاً (None)"
+      ],
+      "en": [
+        "The modified dictionary",
+        "The value associated with the popped key",
+        "The popped key only",
+        "Returns nothing (None)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة pop() تزيل المفتاح وتُرجع قيمته بحيث يمكن تخزينها في متغير.",
+      "en": "The pop() method removes the key and returns its value so it can be stored in a variable."
+    },
+    "hint": {
+      "ar": "يمكنك تخزين نتيجتها في متغير.",
+      "en": "You can store its result in a variable."
+    },
+    "difficulty": "medium",
+    "conceptId": "deleting-dictionary-items"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي النتيجة المتوقعة للكود التالي: <code>dict.fromkeys(['a', 'b'])</code>؟",
+      "en": "What is the expected output of the following code: <code>dict.fromkeys(['a', 'b'])</code>?"
+    },
+    "options": {
+      "ar": [
+        "{'a': '', 'b': ''}",
+        "{'a': 0, 'b': 0}",
+        "{'a': None, 'b': None}",
+        "خطأ (Error)"
+      ],
+      "en": [
+        "{'a': '', 'b': ''}",
+        "{'a': 0, 'b': 0}",
+        "{'a': None, 'b': None}",
+        "Error"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إذا لم يتم توفير قيمة ثانية لدالة fromkeys، فإنها تعين القيمة الافتراضية None لجميع المفاتيح.",
+      "en": "If no second argument is provided to fromkeys, it assigns the default value None to all keys."
+    },
+    "hint": {
+      "ar": "ما هي الكلمة التي تستخدمها بايثون للتعبير عن 'لا توجد قيمة'؟",
+      "en": "What word does Python use to express 'no value'?"
+    },
+    "difficulty": "medium",
+    "conceptId": "fromkeys-method"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من الهياكل التالية يمكن استخدامه كقيمة داخل قاموس؟",
+      "en": "Which of the following structures can be used as a value inside a dictionary?"
+    },
+    "options": {
+      "ar": [
+        "قائمة (List) فقط",
+        "سلسلة نصية (String) فقط",
+        "قاموس آخر (Dictionary) فقط",
+        "جميع ما سبق"
+      ],
+      "en": [
+        "List only",
+        "String only",
+        "Another Dictionary only",
+        "All of the above"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "قيم القاموس مرنة جداً ويمكن أن تكون أي نوع من البيانات، بما في ذلك القوائم، السلاسل النصية، أو حتى قواميس أخرى.",
+      "en": "Dictionary values are highly flexible and can be any data type, including lists, strings, or even other dictionaries."
+    },
+    "hint": {
+      "ar": "القيم في القاموس لا تخضع لقيود صارمة مثل المفاتيح.",
+      "en": "Values in a dictionary are not strictly restricted like keys."
+    },
+    "difficulty": "easy",
+    "conceptId": "multi-key-dictionaries"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الشرط الأساسي للمفاتيح في القاموس الحاوي (عند تداخل القواميس)؟",
+      "en": "What is the primary requirement for keys in a containing dictionary (when nesting dictionaries)?"
+    },
+    "options": {
+      "ar": [
+        "يجب أن تكون أرقاماً صحيحة",
+        "يجب أن تكون فريدة (Unique)",
+        "يجب أن تكون سلاسل نصية قصيرة",
+        "يجب أن تكون مرتبة أبجدياً"
+      ],
+      "en": [
+        "They must be integers",
+        "They must be unique",
+        "They must be short strings",
+        "They must be sorted alphabetically"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب أن يكون كل مفتاح فريداً (مثل رقم الهوية أو SKU) لضمان عدم الكتابة فوق البيانات.",
+      "en": "Each key must be unique (like an ID or SKU) to ensure data is not overwritten."
+    },
+    "hint": {
+      "ar": "فكر في كيفية تمييز المنتجات عن بعضها البعض.",
+      "en": "Think about how products are distinguished from one another."
+    },
+    "difficulty": "medium",
+    "conceptId": "nesting-dictionaries"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي الدالة التي تفرغ القاموس ولكن تتركه ككائن فارغ <code>{}</code> في الذاكرة؟",
+      "en": "Which method empties the dictionary but leaves it as an empty object <code>{}</code> in memory?"
+    },
+    "options": {
+      "ar": [
+        "del",
+        "remove()",
+        "clear()",
+        "empty()"
+      ],
+      "en": [
+        "del",
+        "remove()",
+        "clear()",
+        "empty()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة clear() تزيل جميع البيانات من القاموس دون حذف القاموس نفسه.",
+      "en": "The clear() method removes all data from the dictionary without deleting the dictionary itself."
+    },
+    "hint": {
+      "ar": "اسم الدالة يعني 'مسح' أو 'تنظيف'.",
+      "en": "The method name means to 'clean' or 'wipe'."
+    },
+    "difficulty": "easy",
+    "conceptId": "deleting-dictionary-items"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يمكنك الوصول إلى قيمة 'price' لمنتج معرف بـ 'SKU123' في قاموس متداخل يسمى 'inventory'؟",
+      "en": "How can you access the 'price' value of a product identified by 'SKU123' in a nested dictionary named 'inventory'?"
+    },
+    "options": {
+      "ar": [
+        "inventory['SKU123', 'price']",
+        "inventory['SKU123']['price']",
+        "inventory.SKU123.price",
+        "inventory['price']['SKU123']"
+      ],
+      "en": [
+        "inventory['SKU123', 'price']",
+        "inventory['SKU123']['price']",
+        "inventory.SKU123.price",
+        "inventory['price']['SKU123']"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "للوصول إلى قاموس متداخل، نستخدم الأقواس المربعة المتتالية: أولاً للمفتاح الخارجي، ثم للمفتاح الداخلي.",
+      "en": "To access a nested dictionary, we use chained square brackets: first for the outer key, then for the inner key."
+    },
+    "hint": {
+      "ar": "استخدم قوسين مربعين متتاليين.",
+      "en": "Use two consecutive square brackets."
+    },
+    "difficulty": "hard",
+    "conceptId": "nesting-dictionaries"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الصيغة الصحيحة لاستخدام دالة <code>popitem()</code>؟",
+      "en": "What is the correct syntax for using the <code>popitem()</code> method?"
+    },
+    "options": {
+      "ar": [
+        "dictionaryname.popitem(key)",
+        "popitem(dictionaryname)",
+        "dictionaryname.popitem()",
+        "dictionaryname[key].popitem()"
+      ],
+      "en": [
+        "dictionaryname.popitem(key)",
+        "popitem(dictionaryname)",
+        "dictionaryname.popitem()",
+        "dictionaryname[key].popitem()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة popitem() لا تأخذ أي معاملات (arguments) وتزيل وتُرجع زوج (مفتاح، قيمة).",
+      "en": "The popitem() method takes no arguments and removes and returns a key-value pair."
+    },
+    "hint": {
+      "ar": "لا تحتاج إلى تمرير مفتاح لهذه الدالة.",
+      "en": "You don't need to pass a key to this method."
+    },
+    "difficulty": "medium",
+    "conceptId": "deleting-dictionary-items"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في الكود <code>dict.fromkeys(iterable, value)</code>، ما هو نوع البيانات الذي يجب أن يكون عليه <code>iterable</code>؟",
+      "en": "In the code <code>dict.fromkeys(iterable, value)</code>, what data type must <code>iterable</code> be?"
+    },
+    "options": {
+      "ar": [
+        "رقم صحيح (Integer)",
+        "قيمة منطقية (Boolean)",
+        "أي كائن يمكن التكرار عليه (مثل قائمة)",
+        "قاموس فقط"
+      ],
+      "en": [
+        "Integer",
+        "Boolean",
+        "Any iterable object (like a list)",
+        "Dictionary only"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعامل الأول يجب أن يكون كائناً قابلاً للتكرار (Iterable) مثل قائمة أو صف، حيث ستصبح عناصره مفاتيح للقاموس الجديد.",
+      "en": "The first argument must be an iterable object like a list or tuple, whose elements will become the keys of the new dictionary."
+    },
+    "hint": {
+      "ar": "فكر في شيء يمكن استخدامه في حلقة for.",
+      "en": "Think of something that can be used in a for loop."
+    },
+    "difficulty": "medium",
+    "conceptId": "fromkeys-method"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "لماذا نستخدم سلاسل f-strings مع القواميس؟",
+      "en": "Why do we use f-strings with dictionaries?"
+    },
+    "options": {
+      "ar": [
+        "لحذف البيانات من القاموس",
+        "لتنسيق وعرض البيانات بشكل أنيق ومقروء",
+        "لإنشاء مفاتيح جديدة",
+        "لتحويل القاموس إلى قائمة"
+      ],
+      "en": [
+        "To delete data from the dictionary",
+        "To format and display data neatly and readably",
+        "To create new keys",
+        "To convert the dictionary to a list"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "سلاسل f-strings تُستخدم لتنسيق النصوص وإدراج قيم المتغيرات (بما في ذلك قيم القاموس) بسهولة لطباعتها بشكل منظم.",
+      "en": "f-strings are used to format text and easily embed variable values (including dictionary values) for organized printing."
+    },
+    "hint": {
+      "ar": "تتعلق بالطباعة (print).",
+      "en": "It relates to printing."
+    },
+    "difficulty": "easy",
+    "conceptId": "multi-key-dictionaries"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر عند استخدام <code>del</code>. إذا كتبت <code>del my_dict</code> بدلاً من <code>del my_dict['key']</code>، فسيتم مسح القاموس بأكمله من الذاكرة، وأي محاولة لاستخدامه لاحقاً ستؤدي إلى انهيار البرنامج بخطأ NameError.</template>
+    <template class="content-en">Beware when using <code>del</code>. If you write <code>del my_dict</code> instead of <code>del my_dict['key']</code>, the entire dictionary is wiped from memory, and any subsequent attempt to use it will crash the program with a NameError.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">دالة <code>pop()</code> لا تقوم فقط بالحذف! إنها 'تلتقط' القيمة أثناء حذفها وتُرجعها لك. هذا مفيد جداً إذا كنت تريد نقل عنصر من قاموس إلى آخر في خطوة واحدة.</template>
+    <template class="content-en">The <code>pop()</code> method doesn't just delete! It 'catches' the value as it deletes it and returns it to you. This is highly useful if you want to move an item from one dictionary to another in a single step.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المرونة القصوى للقواميس تكمن في قيمها. بينما يجب أن تكون المفاتيح بسيطة وغير قابلة للتعديل (مثل النصوص والأرقام)، يمكن أن تكون القيم أي شيء: قوائم، قواميس أخرى، أو حتى دوال. هذا ما يجعل القواميس مثالية لتمثيل البيانات المعقدة.</template>
+    <template class="content-en">The ultimate flexibility of dictionaries lies in their values. While keys must be simple and immutable (like strings and numbers), values can be anything: lists, other dictionaries, or even functions. This makes dictionaries perfect for representing complex data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند استخدام <code>clear()</code>، لا يتم حذف المتغير، بل يصبح قاموساً فارغاً <code>{}</code>. هذا يختلف تماماً عن <code>del</code> التي تدمر المتغير تماماً.</template>
+    <template class="content-en">When using <code>clear()</code>, the variable is not deleted; it becomes an empty dictionary <code>{}</code>. This is completely different from <code>del</code>, which destroys the variable entirely.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="7" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>البرمجة باستخدام الفئات (Classes) · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#mastering-classes-and-objects" class="toc-link" data-bilingual>
+        <template class="content-ar">إتقان الفئات والكائنات</template>
+        <template class="content-en">Mastering Classes and Objects</template>
+        <span class="content-target">إتقان الفئات والكائنات</span>
+      </a>
+      <a href="#creating-classes-and-instances" class="toc-link" data-bilingual>
+        <template class="content-ar">إنشاء الفئات والكائنات</template>
+        <template class="content-en">Creating a Class and an Instance</template>
+        <span class="content-target">إنشاء الفئات والكائنات</span>
+      </a>
+      <a href="#object-attributes-and-defaults" class="toc-link" data-bilingual>
+        <template class="content-ar">سمات الكائن والقيم الافتراضية</template>
+        <template class="content-en">Object Attributes and Default Values</template>
+        <span class="content-target">سمات الكائن والقيم الافتراضية</span>
+      </a>
+      <a href="#class-methods-and-parameters" class="toc-link" data-bilingual>
+        <template class="content-ar">طرق الفئة وتمرير المعلمات</template>
+        <template class="content-en">Class Methods and Passing Parameters</template>
+        <span class="content-target">طرق الفئة وتمرير المعلمات</span>
+      </a>
+      <a href="#class-variables" class="toc-link" data-bilingual>
+        <template class="content-ar">متغيرات الفئة</template>
+        <template class="content-en">Class Variables</template>
+        <span class="content-target">متغيرات الفئة</span>
+      </a>
+      <a href="#class-methods-and-static-methods" class="toc-link" data-bilingual>
+        <template class="content-ar">طرق الفئة والطرق الثابتة</template>
+        <template class="content-en">Class Methods and Static Methods</template>
+        <span class="content-target">طرق الفئة والطرق الثابتة</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 7</template>
+      <template class="content-en">Module 7</template>
+      <span class="content-target">الوحدة 7</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">البرمجة باستخدام الفئات (Classes)</h1>
+      <p class="hero-description">مقدمة شاملة للبرمجة كائنية التوجه (OOP) في بايثون، تغطي الفئات، الكائنات، السمات، الطرق، والمتغيرات على مستوى الفئة والكائن.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Doing Python with Class</h1>
+      <p class="hero-description">A comprehensive introduction to Object-Oriented Programming (OOP) in Python, covering classes, objects, attributes, methods, and class/instance level variables.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">البرمجة كائنية التوجه</span>
+      <span class="tag">الفئات</span>
+      <span class="tag">الكائنات</span>
+      <span class="tag">بايثون</span>
+      <span class="tag">الطرق</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">OOP</span>
+      <span class="tag">Classes</span>
+      <span class="tag">Objects</span>
+      <span class="tag">Python</span>
+      <span class="tag">Methods</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>إتقان مفاهيم الفئات والكائنات في بايثون.</span></li>
+      <li><span class="obj-icon">✦</span><span>إنشاء فئة (Class) واستنساخ كائن (Instance) منها.</span></li>
+      <li><span class="obj-icon">✦</span><span>تعريف السمات (Attributes) بقيم افتراضية.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم كيفية تمرير المعلمات إلى الطرق واستدعاء طريقة الفئة باستخدام اسم الفئة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Mastering Classes and Objects.</span></li>
+      <li><span class="obj-icon">✦</span><span>Creating a class and an Instance from a Class.</span></li>
+      <li><span class="obj-icon">✦</span><span>Defining attributes with default values.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understanding Passing parameters to methods and Calling a class method by class name.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="mastering-classes-and-objects" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> إتقان الفئات والكائنات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Mastering Classes and Objects</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الفئة هي المخطط الهندسي (المصنع)، والكائن هو المنتج النهائي (السيارة) الذي يتم إنشاؤه من هذا المخطط.</p></template>
+    <template class="content-en"><p>A class is the blueprint (factory), and an object is the final product (car) created from that blueprint.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتبر بايثون لغة برمجة كائنية التوجه (OOP). يعتمد هذا المفهوم على نمذجة الأشياء في العالم الحقيقي بحيث يكون لكل كائن سمات (Attributes) وخصائص تجعله فريداً.</p><p>المفاهيم الأساسية:</p><ol><li><b><span class="smart-term" data-term-en="Class" data-ar="الفئة" data-en-def="A blueprint or factory from which individual objects are created.">الفئة<span class="smart-term-tooltip"></span></span> (Class):</b> قطعة من الكود يمكنك من خلالها إنشاء كائن فريد. فكر فيها كمصنع أو مخطط.</li><li><b>الكائن/النسخة (Instance/Object):</b> وحدة واحدة من البيانات والكود تم إنشاؤها من الفئة. تغيير كائن واحد لا يؤثر على الكائنات الأخرى أو على الفئة نفسها.</li><li><b>السمة (Attribute):</b> خاصية للكائن تحتوي على معلومات عنه (مثل <code>member.username</code>).</li><li><b>الطريقة (Method):</b> دالة بايثون مرتبطة بالفئة تحدد إجراءً يمكن للكائن القيام به.</li></ol></template>
+    <template class="content-en"><p>Python is an object-oriented programming language (OOP). The concept stems from modeling real-world objects where each object has certain attributes and characteristics that make it unique.</p><p>Core Concepts:</p><ol><li><b><span class="smart-term" data-term-en="Class" data-ar="الفئة" data-en-def="A blueprint or factory from which individual objects are created.">Class<span class="smart-term-tooltip"></span></span>:</b> A piece of code from which you can generate a unique object. Think of it as a blueprint or factory.</li><li><b><span class="smart-term" data-term-en="Instance" data-ar="النسخة / الكائن" data-en-def="One unit of data plus code generated from a class.">Instance<span class="smart-term-tooltip"></span></span>/Object:</b> One unit of data plus code generated from a class. Changing one object has no effect on other objects or the class.</li><li><b>Attribute:</b> A characteristic of an object that contains information about it (e.g., <code>member.username</code>).</li><li><b>Method:</b> A Python function associated with the class that defines an action the object can perform.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تسمح لك الفئات بتقسيم الكود والبيانات إلى أجزاء مستقلة (Compartmentalize)، مما يسهل إدارة المشاريع البرمجية الكبيرة.</p><p>على عكس البرمجة الإجرائية التي تفصل بين البيانات والدوال، تقوم البرمجة كائنية التوجه بتغليف البيانات (السمات) والسلوكيات (الطرق) معاً داخل كيان واحد (الكائن).</p></template>
+    <template class="content-en"><p>Classes allow you to compartmentalize code and data, making large software projects easier to manage.</p><p>Unlike procedural programming which separates data and functions, OOP encapsulates data (attributes) and behaviors (methods) together within a single entity (the object).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A diagram showing a 'Car class' box acting as a factory. Inside the box, list Attributes (.year, .make, .model, .color, .doors) and Methods (.go(), .stop(), .turn(), .heat(), .park()). Arrows point from this class box to three different distinct car objects (e.g., a sedan, a van, a beetle) illustrating instantiation. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Classes and Objects (Instantiation)</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الفئات والكائنات (إنشاء الكائنات)</text>
+
+    <!-- ========================================== -->
+    <!-- CLASS BOX (THE BLUEPRINT / FACTORY)        -->
+    <!-- ========================================== -->
+    <rect x="40" y="80" width="300" height="380" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Class Box Header -->
+    <path d="M 40 92 A 12 12 0 0 1 52 80 L 328 80 A 12 12 0 0 1 340 92 L 340 130 L 40 130 Z" fill="var(--brand-500)" />
+    <text x="190" y="112" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Car Class (Blueprint)</text>
+    <text x="190" y="112" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">فئة السيارة (مخطط)</text>
+
+    <!-- Attributes Column -->
+    <text x="115" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Attributes</text>
+    <text x="115" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">السمات</text>
+
+    <text x="115" y="200" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.year</text>
+    <text x="115" y="200" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.year</text>
+
+    <text x="115" y="235" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.make</text>
+    <text x="115" y="235" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.make</text>
+
+    <text x="115" y="270" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.model</text>
+    <text x="115" y="270" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.model</text>
+
+    <text x="115" y="305" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.color</text>
+    <text x="115" y="305" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.color</text>
+
+    <text x="115" y="340" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.doors</text>
+    <text x="115" y="340" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.doors</text>
+
+    <!-- Methods Column -->
+    <text x="265" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Methods</text>
+    <text x="265" y="165" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الطرق</text>
+
+    <text x="265" y="200" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.go()</text>
+    <text x="265" y="200" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.go()</text>
+
+    <text x="265" y="235" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.stop()</text>
+    <text x="265" y="235" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.stop()</text>
+
+    <text x="265" y="270" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.turn()</text>
+    <text x="265" y="270" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.turn()</text>
+
+    <text x="265" y="305" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.heat()</text>
+    <text x="265" y="305" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.heat()</text>
+
+    <text x="265" y="340" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">.park()</text>
+    <text x="265" y="340" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">.park()</text>
+
+    <!-- Divider Line inside Class Box -->
+    <line x1="190" y1="150" x2="190" y2="440" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+
+    <!-- ========================================== -->
+    <!-- ARROWS (INSTANTIATION)                     -->
+    <!-- ========================================== -->
+    <path d="M 340 270 C 420 270, 420 135, 508 135" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <path d="M 340 270 L 508 270" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <path d="M 340 270 C 420 270, 420 405, 508 405" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+    <!-- Instantiation Label -->
+    <rect x="375" y="255" width="110" height="30" rx="15" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1" />
+    <text x="430" y="275" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Instantiation</text>
+    <text x="430" y="275" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">إنشاء كائن</text>
+
+    <!-- ========================================== -->
+    <!-- OBJECT 1: SEDAN                            -->
+    <!-- ========================================== -->
+    <rect x="520" y="80" width="240" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="640" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Instance 1: Sedan</text>
+    <text x="640" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الكائن 1: سيارة سيدان</text>
+    <line x1="520" y1="115" x2="760" y2="115" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="640" y="140" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">year: <tspan fill="var(--brand-ink)">2022</tspan></text>
+    <text x="640" y="140" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">year: <tspan fill="var(--brand-ink)">2022</tspan></text>
+    
+    <text x="640" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">make: <tspan fill="var(--brand-ink)">"Toyota"</tspan></text>
+    <text x="640" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">make: <tspan fill="var(--brand-ink)">"Toyota"</tspan></text>
+    
+    <text x="640" y="180" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">model: <tspan fill="var(--brand-ink)">"Camry"</tspan></text>
+    <text x="640" y="180" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">model: <tspan fill="var(--brand-ink)">"Camry"</tspan></text>
+
+    <!-- ========================================== -->
+    <!-- OBJECT 2: VAN                              -->
+    <!-- ========================================== -->
+    <rect x="520" y="215" width="240" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="640" y="240" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Instance 2: Van</text>
+    <text x="640" y="240" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الكائن 2: شاحنة</text>
+    <line x1="520" y1="250" x2="760" y2="250" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="640" y="275" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">year: <tspan fill="var(--brand-ink)">2019</tspan></text>
+    <text x="640" y="275" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">year: <tspan fill="var(--brand-ink)">2019</tspan></text>
+    
+    <text x="640" y="295" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">make: <tspan fill="var(--brand-ink)">"Ford"</tspan></text>
+    <text x="640" y="295" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">make: <tspan fill="var(--brand-ink)">"Ford"</tspan></text>
+    
+    <text x="640" y="315" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">model: <tspan fill="var(--brand-ink)">"Transit"</tspan></text>
+    <text x="640" y="315" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">model: <tspan fill="var(--brand-ink)">"Transit"</tspan></text>
+
+    <!-- ========================================== -->
+    <!-- OBJECT 3: BEETLE                           -->
+    <!-- ========================================== -->
+    <rect x="520" y="350" width="240" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="640" y="375" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Instance 3: Beetle</text>
+    <text x="640" y="375" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الكائن 3: خنفساء</text>
+    <line x1="520" y1="385" x2="760" y2="385" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="640" y="410" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">year: <tspan fill="var(--brand-ink)">1970</tspan></text>
+    <text x="640" y="410" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">year: <tspan fill="var(--brand-ink)">1970</tspan></text>
+    
+    <text x="640" y="430" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">make: <tspan fill="var(--brand-ink)">"VW"</tspan></text>
+    <text x="640" y="430" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">make: <tspan fill="var(--brand-ink)">"VW"</tspan></text>
+    
+    <text x="640" y="450" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">model: <tspan fill="var(--brand-ink)">"Beetle"</tspan></text>
+    <text x="640" y="450" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">model: <tspan fill="var(--brand-ink)">"Beetle"</tspan></text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Instance Method</th><th>Class Method</th><th>Static Method</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المعلمة الأولى</template>
+          <template class="content-en">First Parameter</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">self</template>
+          <template class="content-en">self</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">cls</template>
+          <template class="content-en">cls</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يوجد (None)</template>
+          <template class="content-en">None</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المزخرف (Decorator)</template>
+          <template class="content-en">Decorator</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يحتاج</template>
+          <template class="content-en">None needed</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">@classmethod</template>
+          <template class="content-en">@classmethod</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">@staticmethod</template>
+          <template class="content-en">@staticmethod</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بتغيير لون سيارة واحدة (كائن)، هل يتغير لون جميع السيارات الأخرى المصنوعة من نفس الفئة؟ ولماذا؟</template>
+      <template class="content-en">If you change the color of one car (object), does the color of all other cars made from the same class change? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن كل سيارة بعد إنشائها تصبح كائناً مستقلاً (Independent Object). تغيير كائن واحد لا يؤثر على الكائنات الأخرى.</p></template>
+      <template class="content-en"><p>No, because after each car is created, it is an independent object. Changing one car has no effect on the other cars.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="creating-classes-and-instances" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> إنشاء الفئات والكائنات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Creating a Class and an Instance</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدم الكلمة المفتاحية <code>class</code> لتعريف الفئة، والدالة <code>__init__</code> لتهيئة الكائن عند إنشائه.</p></template>
+    <template class="content-en"><p>Use the <code>class</code> keyword to define the class, and the <code>__init__</code> method to initialize the object upon creation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لإنشاء فئة، نستخدم الكلمة المفتاحية <code>class</code> متبوعة باسم الفئة (يُفضل أن يبدأ بحرف كبير) ونقطتين رأسيتين.</p><p>إذا أردت إنشاء فئة فارغة مؤقتاً لتجنب الأخطاء، يمكنك استخدام الكلمة المفتاحية <code>pass</code>.</p><p>لمنح الفئة القدرة على إنشاء كائنات، نضيف طريقة التهيئة <code>__init__</code>. هذه الطريقة تُستدعى تلقائياً عند إنشاء كائن جديد.</p><p>المعلمة الأولى في <code>__init__</code> هي دائماً <code>self</code>، والتي تشير إلى الكائن الذي يتم إنشاؤه في تلك اللحظة.</p><p>لإنشاء كائن (استنساخ)، نستخدم بناء الجملة: <code>instance_name = ClassName('arg1', 'arg2')</code>.</p></template>
+    <template class="content-en"><p>To create a class, use the keyword <code>class</code> followed by the class name (customarily starting with an uppercase letter) and a colon.</p><p>If you want to create an empty class temporarily without getting an error, use the <code>pass</code> keyword.</p><p>To grant the class the capability to create instances, you give it an <code>__init__</code> method (short for initialize). This method is called automatically when a new object is created.</p><p>The first parameter in <code>__init__</code> is always <code>self</code>, which refers to the specific object being created at that moment.</p><p>To create an instance, use the syntax: <code>instance_name = ClassName('arg1', 'arg2')</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الكلمة <code>self</code> ليست كلمة محجوزة في بايثون، بل هي مجرد اصطلاح (Convention). يمكنك نظرياً استخدام أي اسم آخر، ولكن استخدام <code>self</code> يعتبر أفضل ممارسة (Best Practice) لتوضيح الكود.</p><p>عند استدعاء <code>Member('Rambo', 'Rocco')</code>، تقوم بايثون بإنشاء كائن فارغ في الذاكرة، ثم تمرره كمعلمة أولى (self) إلى الدالة <code>__init__</code> مع باقي المعلمات.</p></template>
+    <template class="content-en"><p>The word <code>self</code> is not a strict keyword in Python; it's a convention. You could theoretically use any name, but using <code>self</code> is considered a best practice because it is explanatory and customary.</p><p>When you call <code>Member('Rambo', 'Rocco')</code>, Python creates an empty object in memory, then passes it as the first argument (<span class="smart-term" data-term-en="self" data-ar="الذات (الكائن الحالي)" data-en-def="A variable name used to refer to the object being created or manipulated at the moment.">self<span class="smart-term-tooltip"></span></span>) to the <code>__init__</code> method along with the other arguments.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Member:
+    """ Create a new member. """
+    def __init__(self, uname, fname):
+        self.username = uname
+        self.fullname = fname
+
+# Creating an instance
+new_guy = Member('Rambo', 'Rocco Moe')
+print(type(new_guy))</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا قمت بتشغيل كود يحتوي على تعريف فئة ينتهي بنقطتين رأسيتين دون كتابة أي كود بداخلها؟ وكيف تحل هذه المشكلة؟</template>
+      <template class="content-en">What happens if you run code with a class definition ending in a colon but no code inside it? How do you fix it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحدث خطأ (Error). لحل المشكلة، نستخدم الكلمة المفتاحية pass لإخبار بايثون بتجاوز الفئة مؤقتاً.</p></template>
+      <template class="content-en"><p>You will get an error. To fix it, use the 'pass' keyword to tell Python to skip it temporarily without throwing an error.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="object-attributes-and-defaults" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> سمات الكائن والقيم الافتراضية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Object Attributes and Default Values</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>السمات هي متغيرات مرتبطة بالكائن. يمكنك تعيين قيم افتراضية لها لا تتطلب تمريرها عند إنشاء الكائن.</p></template>
+    <template class="content-en"><p>Attributes are variables attached to an object. You can assign them default values that don't require passing arguments during creation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بمجرد أن يكون لديك كائن فارغ (عبر <code>self</code>)، يمكنك البدء في إعطائه سمات وتخزين القيم فيها باستخدام الصيغة: <code>self.attributename = value</code>.</p><p>على عكس الصفوف (Tuples) التي تعتبر غير قابلة للتغيير (Immutable)، يمكنك تغيير قيمة أي سمة في الكائن في أي وقت باستخدام: <code>objectname.attributename = new_value</code>.</p><p>لا يجب عليك تمرير قيمة لكل سمة عند إنشاء الكائن. يمكنك تعيين قيم افتراضية داخل <code>__init__</code>. على سبيل المثال، تعيين تاريخ الانضمام لتاريخ اليوم، أو حالة الحساب إلى نشط (True).</p></template>
+    <template class="content-en"><p>Once you have a new, empty object (via <code>self</code>), you can start giving it attributes and populate them using the syntax: <code>self.attributename = value</code>.</p><p>Unlike Tuples which are <span class="smart-term" data-term-en="Immutable" data-ar="غير قابل للتغيير" data-en-def="An object whose state cannot be modified after it is created (e.g., Tuples). Class instances in Python are generally mutable.">immutable<span class="smart-term-tooltip"></span></span>, you can change the value of any object attribute at any time using: <code>objectname.attributename = new_value</code>.</p><p>You don’t have to pass in the value of every attribute for a new object. You can set default values inside <code>__init__</code>. For example, setting a join date to today's date, or an account status to True.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>القيم الافتراضية مفيدة جداً لتقليل عدد المعلمات المطلوبة عند استنساخ الكائن، مما يجعل واجهة برمجة التطبيقات (API) الخاصة بالفئة أنظف وأسهل في الاستخدام.</p><p>يمكن أن تكون القيمة الافتراضية قيمة ثابتة (مثل True/False) أو قيمة محسوبة ديناميكياً (مثل <code>dt.date.today()</code>).</p></template>
+    <template class="content-en"><p>Default values are highly useful for reducing the number of required parameters during instantiation, making the class API cleaner and easier to use.</p><p>A default value can be a static literal (like True/False) or a dynamically calculated value (like <code>dt.date.today()</code>).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import datetime as dt
+
+class Member:
+    def __init__(self, username, fullname):
+        self.username = username
+        self.fullname = fullname
+        # Default values
+        self.date_joined = dt.date.today()
+        self.is_active = True
+
+newmember = Member('jdoe', 'John Doe')
+# Changing an attribute value
+newmember.is_active = False</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم self.is_active = True بدلاً من تمرير is_active كمعلمة في دالة __init__؟</template>
+      <template class="content-en">Why use self.is_active = True instead of passing is_active as a parameter in the __init__ method?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأننا نفترض أن كل عضو جديد سيكون نشطاً افتراضياً عند التسجيل، مما يبسط عملية إنشاء الكائن دون الحاجة لتمرير هذه المعلومة في كل مرة.</p></template>
+      <template class="content-en"><p>Because we assume every new member is active by default upon registration, simplifying object creation without needing to pass this information every time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="class-methods-and-parameters" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> طرق الفئة وتمرير المعلمات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Class Methods and Passing Parameters</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الطرق (Methods) هي دوال داخل الفئة تمثل سلوك الكائن، وتأخذ دائماً <code>self</code> كمعلمة أولى.</p></template>
+    <template class="content-en"><p>Methods are functions inside a class representing object behavior, and they always take <code>self</code> as their first parameter.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكنك تعريف طرق (Methods) خاصة بك لأي كائن، والتي تمثل السلوكيات (Behaviors) بدلاً من الحقائق (Attributes). الطريقة هي ببساطة دالة مرتبطة بفئة معينة.</p><p>لتعريف طريقة، نستخدم الصيغة: <code>def methodname(self, param1, param2):</code>.</p><p>يتم تمييز أسماء الطرق عن أسماء السمات بوجود الأقواس <code>()</code> عند الاستدعاء.</p><p>يمكنك تمرير البيانات إلى الطرق بنفس طريقة الدوال العادية، ولكن تذكر أن <code>self</code> هو دائماً المعلمة الأولى، ولا تقوم بتمرير بيانات يدوياً إلى <code>self</code> عند الاستدعاء.</p><p>يمكن استدعاء الطريقة بطريقتين:</p><ol><li>عبر الكائن: <code>specificobject.method()</code></li><li>عبر اسم الفئة: <code>Classname.method(specificobject)</code></li></ol></template>
+    <template class="content-en"><p>You can define your own <span class="smart-term" data-term-en="Method" data-ar="الطريقة / الدالة المرتبطة" data-en-def="A Python function associated with a class that defines an action an object can perform.">method<span class="smart-term-tooltip"></span></span>s for any object, which are more like behaviors than facts about the object. A method is really just a function associated with a particular class.</p><p>To define a method, use the syntax: <code>def methodname(self, param1, param2):</code>.</p><p>Method names are distinguished from attribute names by the pair of parentheses <code>()</code> that follow the name when called.</p><p>You can pass data into methods in the same way you do functions, but keep in mind that <code>self</code> is always the first parameter, and you never manually pass data to the <code>self</code> parameter.</p><p>A method can be called in two ways:</p><ol><li>Via the object: <code>specificobject.method()</code></li><li>Via the class name: <code>Classname.method(specificobject)</code></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عندما تكتب <code>obj.method(arg)</code>، تقوم بايثون خلف الكواليس بتحويلها إلى <code>ClassName.method(obj, arg)</code>. هذا يفسر لماذا يجب أن تكون <code>self</code> هي المعلمة الأولى في تعريف الطريقة.</p><p>استدعاء الطريقة عبر اسم الفئة (الطريقة الثانية) يمكن أن يجعل الكود أسهل للفهم في بعض السياقات المتقدمة، لكن الاستدعاء عبر الكائن هو الأكثر شيوعاً.</p></template>
+    <template class="content-en"><p>When you write <code>obj.method(arg)</code>, Python behind the scenes translates it to <code>ClassName.method(obj, arg)</code>. This explains why <code>self</code> must be the first parameter in the method definition.</p><p>Calling a method via the class name (the second way) can make code easier to understand in certain advanced contexts, but calling via the object is the most common approach.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Member:
+    def __init__(self, username, fullname):
+        self.username = username
+        self.fullname = fullname
+        self.is_active = True
+
+    # Method with parameters
+    def activate(self, yesno):
+        """ True for active, False to make inactive """
+        self.is_active = yesno
+
+new_guy = Member('Rambo', 'Rocco Moe')
+new_guy.activate(False) # self is passed automatically
+# Alternative way to call:
+# Member.activate(new_guy, False)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت الدالة تأخذ معلمتين (self, yesno)، كم عدد المعلمات التي تمررها عند استدعاء الدالة عبر الكائن؟</template>
+      <template class="content-en">If a method takes two parameters (self, yesno), how many arguments do you pass when calling the method via the object?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تمرر معلمة واحدة فقط (yesno)، لأن بايثون تمرر الكائن نفسه تلقائياً كمعلمة أولى (self).</p></template>
+      <template class="content-en"><p>You pass only one argument (yesno), because Python automatically passes the object itself as the first argument (self).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="class-variables" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> متغيرات الفئة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Class Variables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>متغيرات الفئة هي متغيرات مشتركة بين جميع الكائنات المستنسخة من الفئة، وتُعرّف خارج أي طريقة.</p></template>
+    <template class="content-en"><p>Class variables are shared among all instances of a class and are defined outside of any method.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>حتى الآن رأينا أمثلة على السمات (Attributes) التي تسمى أحياناً متغيرات الكائن (Instance Variables)، لأنها تحتوي على معلومات تختلف من كائن لآخر.</p><p>النوع الآخر هو <b><span class="smart-term" data-term-en="Class Variable" data-ar="متغير الفئة" data-en-def="A variable defined inside a class but outside any method, shared by all instances of that class.">متغير الفئة<span class="smart-term-tooltip"></span></span> (Class Variable)</b>، والذي ينطبق على جميع الكائنات الجديدة التي يتم إنشاؤها من الفئة.</p><p>متغيرات الفئة لا ترتبط بـ <code>self</code> لأن <code>self</code> يشير إلى كائن محدد، بينما متغير الفئة يتبع الفئة ككل.</p><p>لتعريف متغير فئة، نضعه مباشرة تحت تعريف الفئة وقبل دالة <code>__init__</code> باستخدام الصيغة: <code>variablename = value</code>.</p></template>
+    <template class="content-en"><p>So far you’ve seen examples of attributes, sometimes called <span class="smart-term" data-term-en="Instance Variable" data-ar="متغير الكائن" data-en-def="A variable defined inside a method (usually __init__) using self, unique to each instance.">instance variable<span class="smart-term-tooltip"></span></span>s, because they contain information that varies from one instance to another.</p><p>Another type is a <b><span class="smart-term" data-term-en="Class Variable" data-ar="متغير الفئة" data-en-def="A variable defined inside a class but outside any method, shared by all instances of that class.">class variable<span class="smart-term-tooltip"></span></span></b>, which is applied to all instances of the class.</p><p>Class variables inside a class don’t have any tie-in to <code>self</code> because the <code>self</code> keyword refers to a specific object, whereas a class variable belongs to the class as a whole.</p><p>To define a class variable, place it above the <code>__init__</code> line using the standard syntax: <code>variablename = value</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُستخدم متغيرات الفئة عادةً لتخزين الثوابت أو الإعدادات الافتراضية التي يجب أن تشترك فيها جميع الكائنات (مثل <code>free_days = 90</code>).</p><p>يمكن الوصول إلى متغير الفئة إما عبر اسم الفئة <code>Member.free_days</code> أو عبر الكائن <code>self.free_days</code>. ومع ذلك، إذا قمت بتعديل <code>self.free_days</code>، فسيتم إنشاء متغير كائن جديد يغطي (Shadows) متغير الفئة لهذا الكائن المحدد فقط.</p></template>
+    <template class="content-en"><p>Class variables are typically used to store constants or default settings that all objects should share (e.g., <code>free_days = 90</code>).</p><p>You can access a class variable via the class name <code>Member.free_days</code> or via the instance <code>self.free_days</code>. However, if you modify <code>self.free_days</code>, it creates a new instance variable that shadows the class variable for that specific object only.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Member:
+    # Class variable
+    free_days = 90
+
+    def __init__(self, username, fullname):
+        self.username = username
+        self.fullname = fullname
+
+# Accessing class variable
+print(Member.free_days) # Output: 90</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Instance Variable</th><th>Class Variable</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">النطاق (Scope)</template>
+          <template class="content-en">Scope</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">خاص بكل كائن (فريد)</template>
+          <template class="content-en">Specific to each object (unique)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مشترك بين جميع الكائنات</template>
+          <template class="content-en">Shared across all objects</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مكان التعريف</template>
+          <template class="content-en">Definition Location</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">داخل الطرق (عادة __init__) باستخدام self</template>
+          <template class="content-en">Inside methods (usually __init__) using self</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مباشرة داخل الفئة، خارج الطرق</template>
+          <template class="content-en">Directly inside the class, outside methods</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق الرئيسي بين متغير الفئة ومتغير الكائن؟</template>
+      <template class="content-en">What is the main difference between a class variable and an instance variable?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>متغير الفئة مشترك بين جميع الكائنات، بينما متغير الكائن فريد لكل كائن على حدة.</p></template>
+      <template class="content-en"><p>A class variable is shared among all instances, whereas an instance variable is unique to each individual object.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="class-methods-and-static-methods" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> طرق الفئة والطرق الثابتة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Class Methods and Static Methods</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طرق الفئة (<code>@classmethod</code>) تتعامل مع الفئة ككل وتأخذ <code>cls</code>، بينما الطرق الثابتة (<code>@staticmethod</code>) لا ترتبط بالفئة أو الكائن وتعمل كدوال عادية.</p></template>
+    <template class="content-en"><p>Class methods (<code>@classmethod</code>) deal with the class as a whole and take <code>cls</code>, while static methods (<code>@staticmethod</code>) are independent of class/instance state and act like regular functions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>طرق الفئة (Class Methods):</b> هي طرق مرتبطة بالفئة ككل وليس بكائنات محددة. لتعريفها، نستخدم <span class="smart-term" data-term-en="Decorator" data-ar="المزخرف" data-en-def="A syntax (starting with @) that alters or extends the functionality of the method or function it is applied to.">المزخرف<span class="smart-term-tooltip"></span></span> (Decorator) <code>@classmethod</code> قبل تعريف الدالة. المعلمة الأولى تكون <code>cls</code> بدلاً من <code>self</code>. تُستخدم عادةً لتعديل متغيرات الفئة.</p><p><b>الطرق الثابتة (Static Methods):</b> هي دوال عامة توضع داخل الفئة لغرض التنظيم فقط. لتعريفها، نستخدم المزخرف <code>@staticmethod</code>. لا تأخذ <code>self</code> ولا <code>cls</code> كمعلمات، لأنها غير مرتبطة ببيانات الفئة أو الكائن.</p><p>المزخرف (Decorator) هو شيء يغير أو يوسع وظيفة الكود الذي يطبق عليه (يبدأ برمز <code>@</code>).</p></template>
+    <template class="content-en"><ul><li><b>Class Methods:</b> Methods associated with the class as a whole, not specific instances. To define one, use the <code>@classmethod</code> <span class="smart-term" data-term-en="Decorator" data-ar="المزخرف" data-en-def="A syntax (starting with @) that alters or extends the functionality of the method or function it is applied to.">decorator<span class="smart-term-tooltip"></span></span>. The first parameter is <code>cls</code> instead of <code>self</code>. They are often used to modify class variables.</li><li><b>Static Methods:</b> Generic functions placed inside a class for organizational purposes. Defined using the <code>@staticmethod</code> decorator. They take neither <code>self</code> nor <code>cls</code> because they aren't strictly tied to class or instance state.</li></ul><p>A decorator (starting with <code>@</code>) is generally something that alters or extends the functionality of that to which it is applied.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>cls</code> في طرق الفئة يسمح للطريقة بالوصول إلى متغيرات الفئة وتعديلها (مثل <code>cls.free_days = days</code>)، مما يؤثر على جميع الكائنات المستقبلية.</p><p>الطرق الثابتة مفيدة للدوال المساعدة (Utility Functions) التي تقوم بعمليات حسابية أو تنسيق (مثل جلب الوقت الحالي) ولا تحتاج لمعرفة أي شيء عن حالة الكائن أو الفئة.</p></template>
+    <template class="content-en"><p>Using <code>cls</code> in class methods allows the method to access and modify class variables (e.g., <code>cls.free_days = days</code>), affecting all future instances.</p><p>Static methods are useful for utility functions that perform calculations or formatting (like getting the current time) and don't need to know anything about the object's or class's state.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import datetime as dt
+
+class Member:
+    free_days = 0
+
+    @classmethod
+    def setfreedays(cls, days):
+        cls.free_days = days
+
+    @staticmethod
+    def currenttime():
+        now = dt.datetime.now()
+        return f"{now:%I:%M %p}"
+
+# Calling class method
+Member.setfreedays(30)
+
+# Calling static method
+print(Member.currenttime())</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يجب عليك استخدام @staticmethod بدلاً من دالة عادية خارج الفئة؟</template>
+      <template class="content-en">When should you use a @staticmethod instead of a regular function outside the class?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نستخدمها عندما تكون الدالة مرتبطة منطقياً بمجال الفئة (Namespace) وتستخدم كأداة مساعدة لها، مما يحافظ على تنظيم الكود.</p></template>
+      <template class="content-en"><p>You use it when the function is logically related to the class's namespace and serves as a utility for it, keeping the code organized.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في عالم البرمجة كائنية التوجه (OOP). هذا الأسبوع هو نقطة تحول في طريقة تفكيركم البرمجية. بدلاً من كتابة دوال متناثرة، سنتعلم كيف نجمع البيانات (السمات) والسلوكيات (الطرق) داخل كيان واحد نسميه 'الكائن'. تخيلوا الفئة (Class) كمصنع سيارات، والكائن (Instance) هو السيارة التي تخرج من هذا المصنع. للامتحان، ركزوا بشدة على فهم دور <code>__init__</code> وكيف أن <code>self</code> يمثل الكائن الحالي. لا تخلطوا بين متغيرات الفئة (المشتركة للجميع) ومتغيرات الكائن (الخاصة بكل نسخة). وتذكروا جيداً متى نستخدم <code>@classmethod</code> (عندما نحتاج <code>cls</code>) ومتى نستخدم <code>@staticmethod</code> (عندما لا نحتاج أياً منهما). هذه المفاهيم هي أساس بناء أنظمة برمجية ضخمة وقابلة للصيانة.</template>
+    <template class="content-en">Welcome to the world of Object-Oriented Programming (OOP). This week marks a shift in how you think about code. Instead of scattered functions, we encapsulate data (attributes) and behaviors (methods) into a single entity called an 'object'. Think of a Class as a car factory, and an Instance as the actual car. For the exam, focus heavily on the role of <code>__init__</code> and how <code>self</code> represents the current object. Do not confuse class variables (shared by all) with instance variables (unique to each). Remember when to use <code>@classmethod</code> (needs <code>cls</code>) versus <code>@staticmethod</code> (needs neither). These concepts are the foundation for building large, maintainable software systems.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الفئات (Classes) بدلاً من الدوال العادية؟</template>
+          <template class="content-en">Why use Classes instead of regular functions?</template>
+          <span class="content-target">لماذا نستخدم الفئات (Classes) بدلاً من الدوال العادية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الفئات تسمح لنا بتغليف (Compartmentalize) الكود والبيانات معاً، مما يجعل نمذجة الأشياء الحقيقية أسهل ويجعل الكود أكثر تنظيماً وقابلية لإعادة الاستخدام في المشاريع الكبيرة.</template>
+          <template class="content-en">Classes allow us to compartmentalize code and data together, making it easier to model real-world things and keeping code organized and reusable in large projects.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين الفئة (Class) والكائن (Object)؟</template>
+          <template class="content-en">What is the difference between a Class and an Object?</template>
+          <span class="content-target">ما هو الفرق بين الفئة (Class) والكائن (Object)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الفئة هي المخطط أو القالب (مثل تصميم هندسي لسيارة)، بينما الكائن هو النسخة الفعلية المصنوعة من هذا المخطط (السيارة الحقيقية التي يمكنك قيادتها).</template>
+          <template class="content-en">A class is the blueprint or template (like a car design), while an object is the actual instance created from that blueprint (the physical car you can drive).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة الدالة <code>__init__</code>؟</template>
+          <template class="content-en">What is the purpose of the <code>__init__</code> method?</template>
+          <span class="content-target">ما هي وظيفة الدالة <code>__init__</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي دالة التهيئة التي تُستدعى تلقائياً عند إنشاء كائن جديد. نستخدمها لتعريف السمات الأولية للكائن وإعطائها قيماً.</template>
+          <template class="content-en">It is the initialization method called automatically when a new object is created. We use it to define the object's initial attributes and assign them values.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يجب علي دائماً استخدام كلمة <code>self</code>؟</template>
+          <template class="content-en">Do I always have to use the word <code>self</code>?</template>
+          <span class="content-target">هل يجب علي دائماً استخدام كلمة <code>self</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">برمجياً لا، يمكنك استخدام أي اسم. لكن عملياً نعم، يجب استخدامها لأنها العرف القياسي في بايثون، وتغييرها سيجعل الكود صعب الفهم للمبرمجين الآخرين.</template>
+          <template class="content-en">Programmatically no, you can use any name. But practically yes, you should use it because it's the standard Python convention, and changing it makes code hard to read for others.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنني تغيير قيمة سمة بعد إنشاء الكائن؟</template>
+          <template class="content-en">How can I change an attribute's value after creating the object?</template>
+          <span class="content-target">كيف يمكنني تغيير قيمة سمة بعد إنشاء الكائن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">ببساطة استخدم اسم الكائن متبوعاً بنقطة ثم اسم السمة، وقم بتعيين القيمة الجديدة: <code>my_object.attribute = new_value</code>.</template>
+          <template class="content-en">Simply use the object name followed by a dot and the attribute name, and assign the new value: <code>my_object.attribute = new_value</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى أستخدم متغير الفئة (Class Variable) بدلاً من متغير الكائن؟</template>
+          <template class="content-en">When should I use a Class Variable instead of an instance variable?</template>
+          <span class="content-target">متى أستخدم متغير الفئة (Class Variable) بدلاً من متغير الكائن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم متغير الفئة عندما تريد قيمة مشتركة وثابتة لجميع الكائنات (مثل عدد الأيام المجانية الافتراضية). استخدم متغير الكائن للبيانات التي تختلف من كائن لآخر (مثل اسم المستخدم).</template>
+          <template class="content-en">Use a class variable when you want a shared, constant value for all objects (like default free days). Use an instance variable for data that varies per object (like a username).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو المزخرف (Decorator)؟</template>
+          <template class="content-en">What is a Decorator?</template>
+          <span class="content-target">ما هو المزخرف (Decorator)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو كود يبدأ بـ <code>@</code> يوضع قبل تعريف الدالة لتعديل أو توسيع سلوكها، مثل تحويل دالة عادية إلى طريقة فئة باستخدام <code>@classmethod</code>.</template>
+          <template class="content-en">It is code starting with <code>@</code> placed before a function definition to modify or extend its behavior, like turning a regular method into a class method using <code>@classmethod</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم <code>@classmethod</code>؟</template>
+          <template class="content-en">When do we use <code>@classmethod</code>?</template>
+          <span class="content-target">متى نستخدم <code>@classmethod</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمه عندما نحتاج إلى طريقة تتعامل مع الفئة نفسها (عبر <code>cls</code>) بدلاً من كائن محدد، مثل دالة تقوم بتعديل متغير فئة يؤثر على جميع الكائنات.</template>
+          <template class="content-en">We use it when we need a method that operates on the class itself (via <code>cls</code>) rather than a specific object, such as a function that modifies a class variable affecting all instances.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم <code>@staticmethod</code>؟</template>
+          <template class="content-en">When do we use <code>@staticmethod</code>?</template>
+          <span class="content-target">متى نستخدم <code>@staticmethod</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمه للدوال التي لا تحتاج للوصول إلى بيانات الكائن (<code>self</code>) أو بيانات الفئة (<code>cls</code>)، ولكننا نضعها داخل الفئة لأنها مرتبطة بها منطقياً (مثل دالة مساعدة لحساب الوقت).</template>
+          <template class="content-en">We use it for functions that don't need access to object data (<code>self</code>) or class data (<code>cls</code>), but we place them inside the class because they are logically related to it (like a utility function to calculate time).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن استدعاء طريقة الكائن باستخدام اسم الفئة؟</template>
+          <template class="content-en">Can an instance method be called using the class name?</template>
+          <span class="content-target">هل يمكن استدعاء طريقة الكائن باستخدام اسم الفئة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يمكنك كتابة <code>ClassName.method(object_name)</code>. هذا يعادل تماماً كتابة <code>object_name.method()</code>.</template>
+          <template class="content-en">Yes, you can write <code>ClassName.method(object_name)</code>. This is exactly equivalent to writing <code>object_name.method()</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الفئة (Class) في بايثون؟",
+      "en": "What is a Class in Python?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قطعة من الكود تعمل كمخطط أو مصنع لإنشاء كائنات فريدة.",
+        "en": "A piece of code that acts as a blueprint or factory to generate unique objects."
+      },
+      "example": {
+        "ar": "فئة 'سيارة' تصنع سيارات مختلفة.",
+        "en": "A 'Car' class that makes different cars."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الكائن (Object/Instance)؟",
+      "en": "What is an Object/Instance?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وحدة واحدة من البيانات والكود تم إنشاؤها كنسخة من فئة معينة.",
+        "en": "One unit of data plus code generated as an instance of a class."
+      },
+      "example": {
+        "ar": "سيارة معينة بلون أحمر تم إنشاؤها من فئة السيارة.",
+        "en": "A specific red car created from the Car class."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي السمة (Attribute)؟",
+      "en": "What is an Attribute?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خاصية للكائن تحتوي على معلومات عنه (متغير داخل الكائن).",
+        "en": "A characteristic of an object that contains information about it (a variable inside an object)."
+      },
+      "example": {
+        "ar": "member.username",
+        "en": "member.username"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي الطريقة (Method)؟",
+      "en": "What is a Method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة بايثون مرتبطة بالفئة تحدد إجراءً يمكن للكائن القيام به.",
+        "en": "A Python function associated with the class that defines an action an object can perform."
+      },
+      "example": {
+        "ar": "car.stop()",
+        "en": "car.stop()"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي وظيفة الكلمة المفتاحية <code>pass</code> في الفئات؟",
+      "en": "What is the function of the <code>pass</code> keyword in classes?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لتجنب الأخطاء عند إنشاء فئة فارغة لم يتم كتابة كودها بعد.",
+        "en": "Used to avoid errors when creating an empty class that hasn't been coded yet."
+      },
+      "example": {
+        "ar": "class Member:\n    pass",
+        "en": "class Member:\n    pass"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي دالة <code>__init__</code>؟",
+      "en": "What is the <code>__init__</code> method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة التهيئة المدمجة في بايثون، تُستدعى تلقائياً عند إنشاء كائن جديد من الفئة.",
+        "en": "The built-in initialization method in Python, called automatically when a new object is created from the class."
+      },
+      "example": {
+        "ar": "def __init__(self, name):",
+        "en": "def __init__(self, name):"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "إلى ماذا يشير المتغير <code>self</code>؟",
+      "en": "What does the <code>self</code> variable refer to?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى الكائن المحدد الذي يتم إنشاؤه أو التعامل معه في تلك اللحظة.",
+        "en": "It refers to the specific object being created or manipulated at that moment."
+      },
+      "example": {
+        "ar": "self.username = uname",
+        "en": "self.username = uname"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "كيف تقوم بإنشاء كائن (استنساخ) من فئة تسمى <code>Member</code>؟",
+      "en": "How do you create an instance from a class named <code>Member</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق كتابة اسم الفئة متبوعاً بأقواس تحتوي على المعلمات المطلوبة.",
+        "en": "By writing the class name followed by parentheses containing the required parameters."
+      },
+      "example": {
+        "ar": "new_guy = Member('Rambo', 'Rocco')",
+        "en": "new_guy = Member('Rambo', 'Rocco')"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "هل سمات الكائن قابلة للتغيير (Mutable)؟",
+      "en": "Are object attributes mutable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نعم، على عكس الصفوف (Tuples)، يمكنك تغيير قيمة أي سمة في أي وقت.",
+        "en": "Yes, unlike Tuples, you can change the value of any attribute at any time."
+      },
+      "example": {
+        "ar": "new_guy.username = 'Princess'",
+        "en": "new_guy.username = 'Princess'"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف تعين قيمة افتراضية لسمة داخل الفئة؟",
+      "en": "How do you assign a default value to an attribute inside a class?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بتعيين القيمة مباشرة للسمة داخل دالة <code>__init__</code> دون الحاجة لتمريرها كمعلمة.",
+        "en": "By assigning the value directly to the attribute inside the <code>__init__</code> method without passing it as a parameter."
+      },
+      "example": {
+        "ar": "self.is_active = True",
+        "en": "self.is_active = True"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو متغير الفئة (Class Variable)؟",
+      "en": "What is a Class Variable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير يُعرّف داخل الفئة وخارج الطرق، وينطبق على جميع الكائنات المستنسخة من الفئة.",
+        "en": "A variable defined inside the class and outside methods, applied to all instances of the class."
+      },
+      "example": {
+        "ar": "free_days = 90 (مكتوبة تحت تعريف الفئة مباشرة)",
+        "en": "free_days = 90 (written directly under class definition)"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو المزخرف (Decorator)؟",
+      "en": "What is a Decorator?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شيء يغير أو يوسع وظيفة الكود الذي يطبق عليه، ويبدأ برمز @.",
+        "en": "Something that alters or extends the functionality of that to which it is applied, starting with an @ symbol."
+      },
+      "example": {
+        "ar": "@classmethod",
+        "en": "@classmethod"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي طريقة الفئة (Class Method)؟",
+      "en": "What is a Class Method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة مرتبطة بالفئة ككل، تُعرّف باستخدام <code>@classmethod</code> وتأخذ <code>cls</code> كمعلمة أولى.",
+        "en": "A method associated with the class as a whole, defined using <code>@classmethod</code> and taking <code>cls</code> as its first parameter."
+      },
+      "example": {
+        "ar": "def setfreedays(cls, days):",
+        "en": "def setfreedays(cls, days):"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "إلى ماذا يشير المتغير <code>cls</code>؟",
+      "en": "What does the <code>cls</code> variable refer to?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى الفئة نفسها، ويُستخدم كمعلمة أولى في طرق الفئة (Class Methods).",
+        "en": "It refers to the class itself, used as the first parameter in Class Methods."
+      },
+      "example": {
+        "ar": "cls.free_days = days",
+        "en": "cls.free_days = days"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي الطريقة الثابتة (Static Method)؟",
+      "en": "What is a Static Method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة عامة داخل الفئة لا تأخذ <code>self</code> أو <code>cls</code>، وتُعرّف باستخدام <code>@staticmethod</code>.",
+        "en": "A generic function inside a class that takes neither <code>self</code> nor <code>cls</code>, defined using <code>@staticmethod</code>."
+      },
+      "example": {
+        "ar": "@staticmethod\ndef currenttime():",
+        "en": "@staticmethod\ndef currenttime():"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "كيف تستدعي طريقة كائن باستخدام اسم الفئة؟",
+      "en": "How do you call an instance method using the class name?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بكتابة اسم الفئة، ثم النقطة، ثم اسم الطريقة، وتمرير الكائن كمعلمة داخل الأقواس.",
+        "en": "By writing the class name, a dot, the method name, and passing the specific object inside the parentheses."
+      },
+      "example": {
+        "ar": "Member.activate(new_guy)",
+        "en": "Member.activate(new_guy)"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل المخطط الهندسي الذي تُنشأ منه الكائنات؟",
+      "en": "Which of the following represents the blueprint from which objects are generated?"
+    },
+    "options": {
+      "ar": [
+        "الطريقة (Method)",
+        "السمة (Attribute)",
+        "الفئة (Class)",
+        "النسخة (Instance)"
+      ],
+      "en": [
+        "Method",
+        "Attribute",
+        "Class",
+        "Instance"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الفئة هي المخطط أو المصنع الذي يتم من خلاله إنشاء كائنات فردية.",
+      "en": "A class is the blueprint or factory from which individual objects are created."
+    },
+    "hint": {
+      "ar": "فكر في مصنع السيارات.",
+      "en": "Think of a car factory."
+    },
+    "difficulty": "easy",
+    "conceptId": "mastering-classes-and-objects"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي الكلمة المفتاحية المستخدمة لإنشاء فئة فارغة دون التسبب في خطأ برمجي؟",
+      "en": "What keyword is used to create an empty class without causing a syntax error?"
+    },
+    "options": {
+      "ar": [
+        "skip",
+        "pass",
+        "continue",
+        "empty"
+      ],
+      "en": [
+        "skip",
+        "pass",
+        "continue",
+        "empty"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الكلمة المفتاحية pass تخبر بايثون بتجاوز الكتلة البرمجية مؤقتاً لتجنب الأخطاء.",
+      "en": "The pass keyword tells Python to temporarily skip the block to avoid errors."
+    },
+    "hint": {
+      "ar": "تعني 'مرور' بالإنجليزية.",
+      "en": "It means to let it go by."
+    },
+    "difficulty": "easy",
+    "conceptId": "creating-classes-and-instances"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الاسم الصحيح لدالة التهيئة في بايثون؟",
+      "en": "What is the correct name for the initialization method in Python?"
+    },
+    "options": {
+      "ar": [
+        "__init__",
+        "init()",
+        "__initialize__",
+        "start()"
+      ],
+      "en": [
+        "__init__",
+        "init()",
+        "__initialize__",
+        "start()"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "دالة التهيئة يجب أن تُسمى __init__ (شرطتان سفليتان قبل وبعد init).",
+      "en": "The initialization method must be named __init__ (two underscores before and after init)."
+    },
+    "hint": {
+      "ar": "تحتوي على شرطتين سفليتين في البداية والنهاية.",
+      "en": "It has double underscores at the beginning and end."
+    },
+    "difficulty": "medium",
+    "conceptId": "creating-classes-and-instances"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "إلى ماذا تشير الكلمة <code>self</code> داخل طرق الفئة؟",
+      "en": "What does the word <code>self</code> refer to inside class methods?"
+    },
+    "options": {
+      "ar": [
+        "الفئة نفسها",
+        "الكائن المحدد الذي يتم إنشاؤه أو التعامل معه",
+        "متغير عام",
+        "دالة التهيئة"
+      ],
+      "en": [
+        "The class itself",
+        "The specific object being created or manipulated",
+        "A global variable",
+        "The initialization method"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "self تشير دائماً إلى الكائن (Instance) الحالي.",
+      "en": "self always refers to the current object (instance)."
+    },
+    "hint": {
+      "ar": "إنها تمثل 'الذات' للكائن.",
+      "en": "It represents the 'self' of the object."
+    },
+    "difficulty": "medium",
+    "conceptId": "creating-classes-and-instances"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف يمكنك تغيير قيمة سمة (Attribute) لكائن تم إنشاؤه مسبقاً؟",
+      "en": "How can you change the value of an attribute for an already created object?"
+    },
+    "options": {
+      "ar": [
+        "لا يمكن تغييرها لأنها غير قابلة للتغيير (Immutable)",
+        "باستخدام الصيغة: objectname.attributename = new_value",
+        "باستدعاء دالة __init__ مرة أخرى",
+        "باستخدام الكلمة المفتاحية pass"
+      ],
+      "en": [
+        "It cannot be changed because it is immutable",
+        "Using the syntax: objectname.attributename = new_value",
+        "By calling the __init__ method again",
+        "Using the pass keyword"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الكائنات في بايثون قابلة للتغيير، ويمكنك تحديث سماتها مباشرة باستخدام النقطة.",
+      "en": "Objects in Python are mutable, and you can update their attributes directly using dot notation."
+    },
+    "hint": {
+      "ar": "استخدم النقطة للوصول للسمة ثم علامة التساوي.",
+      "en": "Use dot notation followed by an equals sign."
+    },
+    "difficulty": "easy",
+    "conceptId": "object-attributes-and-defaults"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "إذا كانت الدالة <code>def activate(self, yesno):</code> موجودة داخل فئة، كيف تستدعيها لكائن يسمى <code>user</code>؟",
+      "en": "If the method <code>def activate(self, yesno):</code> is inside a class, how do you call it for an object named <code>user</code>?"
+    },
+    "options": {
+      "ar": [
+        "user.activate(self, True)",
+        "activate(user, True)",
+        "user.activate(True)",
+        "user.activate()"
+      ],
+      "en": [
+        "user.activate(self, True)",
+        "activate(user, True)",
+        "user.activate(True)",
+        "user.activate()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "لا تمرر self يدوياً عند الاستدعاء عبر الكائن، بايثون تفعل ذلك تلقائياً. تمرر فقط المعلمة yesno.",
+      "en": "You don't pass self manually when calling via the object; Python does it automatically. You only pass the yesno parameter."
+    },
+    "hint": {
+      "ar": "تجاهل self عند الاستدعاء.",
+      "en": "Ignore self when calling."
+    },
+    "difficulty": "medium",
+    "conceptId": "class-methods-and-parameters"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أين يتم تعريف متغير الفئة (Class Variable)؟",
+      "en": "Where is a Class Variable defined?"
+    },
+    "options": {
+      "ar": [
+        "داخل دالة __init__",
+        "خارج الفئة تماماً",
+        "داخل الفئة، ولكن خارج أي طريقة (Method)",
+        "داخل أي طريقة باستخدام self"
+      ],
+      "en": [
+        "Inside the __init__ method",
+        "Completely outside the class",
+        "Inside the class, but outside any method",
+        "Inside any method using self"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "متغيرات الفئة تُعرّف مباشرة تحت تعريف الفئة وقبل أي طرق.",
+      "en": "Class variables are defined directly under the class definition and before any methods."
+    },
+    "hint": {
+      "ar": "إنها تنتمي للفئة ككل، وليس لكائن محدد.",
+      "en": "It belongs to the class as a whole, not a specific object."
+    },
+    "difficulty": "medium",
+    "conceptId": "class-variables"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو المزخرف (Decorator) المستخدم لتعريف طريقة تتعامل مع الفئة ككل؟",
+      "en": "What decorator is used to define a method that deals with the class as a whole?"
+    },
+    "options": {
+      "ar": [
+        "@staticmethod",
+        "@classmethod",
+        "@class",
+        "@method"
+      ],
+      "en": [
+        "@staticmethod",
+        "@classmethod",
+        "@class",
+        "@method"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المزخرف @classmethod يُستخدم لتعريف طرق الفئة التي تأخذ cls كمعلمة أولى.",
+      "en": "The @classmethod decorator is used to define class methods that take cls as their first parameter."
+    },
+    "hint": {
+      "ar": "يحتوي على كلمة class.",
+      "en": "It contains the word class."
+    },
+    "difficulty": "easy",
+    "conceptId": "class-methods-and-static-methods"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي المعلمة الأولى الافتراضية في طريقة الفئة (Class Method)؟",
+      "en": "What is the default first parameter in a Class Method?"
+    },
+    "options": {
+      "ar": [
+        "self",
+        "class",
+        "cls",
+        "لا يوجد معلمة افتراضية"
+      ],
+      "en": [
+        "self",
+        "class",
+        "cls",
+        "No default parameter"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طرق الفئة تأخذ cls (اختصار لـ class) كمعلمة أولى بدلاً من self.",
+      "en": "Class methods take cls (short for class) as their first parameter instead of self."
+    },
+    "hint": {
+      "ar": "اختصار لكلمة class.",
+      "en": "Short for class."
+    },
+    "difficulty": "medium",
+    "conceptId": "class-methods-and-static-methods"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من الطرق التالية لا تأخذ <code>self</code> ولا <code>cls</code> كمعلمات؟",
+      "en": "Which of the following methods takes neither <code>self</code> nor <code>cls</code> as parameters?"
+    },
+    "options": {
+      "ar": [
+        "طريقة الكائن (Instance Method)",
+        "طريقة الفئة (Class Method)",
+        "الطريقة الثابتة (Static Method)",
+        "دالة التهيئة (__init__)"
+      ],
+      "en": [
+        "Instance Method",
+        "Class Method",
+        "Static Method",
+        "Initialization Method (__init__)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الطرق الثابتة (@staticmethod) تعمل كدوال عادية داخل الفئة ولا ترتبط بحالة الكائن أو الفئة.",
+      "en": "Static methods (@staticmethod) act as regular functions inside the class and are not tied to object or class state."
+    },
+    "hint": {
+      "ar": "إنها 'ثابتة' ولا تتغير بناءً على الكائن.",
+      "en": "It is 'static' and doesn't change based on the object."
+    },
+    "difficulty": "hard",
+    "conceptId": "class-methods-and-static-methods"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تمرير <code>self</code> كمعلمة أولى عند تعريف طريقة (Method) داخل الفئة. سيؤدي هذا إلى خطأ عند استدعاء الطريقة لأن بايثون تمرر الكائن تلقائياً.</template>
+    <template class="content-en">Forgetting to pass <code>self</code> as the first parameter when defining a method inside a class. This will cause a TypeError when calling the method because Python automatically passes the object.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تمرير قيمة لـ <code>self</code> يدوياً عند استدعاء الطريقة عبر الكائن (مثل <code>obj.method(self, arg)</code>). لا تفعل ذلك، بايثون تتولى أمر <code>self</code>.</template>
+    <template class="content-en">Manually passing a value for <code>self</code> when calling a method via the object (e.g., <code>obj.method(self, arg)</code>). Don't do this; Python handles <code>self</code> for you.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الكلمة <code>self</code> ليست كلمة محجوزة في بايثون. يمكنك تسميتها <code>this</code> أو <code>me</code>، لكن استخدام <code>self</code> هو العرف القياسي الذي يتوقعه جميع مبرمجي بايثون.</template>
+    <template class="content-en">The word <code>self</code> is not a reserved keyword in Python. You could name it <code>this</code> or <code>me</code>, but using <code>self</code> is the standard convention expected by all Python programmers.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين متغير الفئة ومتغير الكائن: متغير الفئة يشارك نفس القيمة في الذاكرة لجميع الكائنات، بينما متغير الكائن يمتلك مساحة ذاكرة مستقلة لكل كائن.</template>
+    <template class="content-en">The fundamental difference between a class variable and an instance variable: a class variable shares the same memory value across all objects, while an instance variable has independent memory space for each object.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عمل مسافة بادئة (Indentation) لكود إنشاء الكائن بحيث يصبح داخل الفئة. تأكد من أن كود الاختبار وإنشاء الكائنات موجود خارج نطاق الفئة (بدون مسافة بادئة).</template>
+    <template class="content-en">Indenting the object creation code so it falls inside the class block. Make sure your testing and instantiation code is un-indented and outside the class scope.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

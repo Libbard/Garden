@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT484" data-module="3" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التحكم في الوصول للوسط (MAC) في الشبكات اللاسلكية · IT484 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT484" data-page-title-en="IT484">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=IT484"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#mac-wsn-energy-sources" class="toc-link" data-bilingual>
+        <template class="content-ar">استهلاك الطاقة في بروتوكولات MAC لشبكات الاستشعار</template>
+        <template class="content-en">Energy Consumption Sources in WSN MAC</template>
+        <span class="content-target">استهلاك الطاقة في بروتوكولات MAC لشبكات الاستشعار</span>
+      </a>
+      <a href="#s-mac-protocol" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول S-MAC (Sensor MAC)</template>
+        <template class="content-en">S-MAC (Sensor MAC) Protocol</template>
+        <span class="content-target">بروتوكول S-MAC (Sensor MAC)</span>
+      </a>
+      <a href="#l-mac-protocol" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول L-MAC (Lightweight MAC)</template>
+        <template class="content-en">L-MAC (Lightweight MAC) Protocol</template>
+        <span class="content-target">بروتوكول L-MAC (Lightweight MAC)</span>
+      </a>
+      <a href="#hidden-exposed-terminal" class="toc-link" data-bilingual>
+        <template class="content-ar">مشكلة العقدة المخفية والمكشوفة</template>
+        <template class="content-en">Hidden and Exposed Terminal Problems</template>
+        <span class="content-target">مشكلة العقدة المخفية والمكشوفة</span>
+      </a>
+      <a href="#q-mac-protocol" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول Q-MAC (QoS-aware MAC)</template>
+        <template class="content-en">Q-MAC (QoS-aware MAC) Protocol</template>
+        <span class="content-target">بروتوكول Q-MAC (QoS-aware MAC)</span>
+      </a>
+      <a href="#mobile-wsn-mac" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول MAC للشبكات اللاسلكية المتنقلة</template>
+        <template class="content-en">MAC Approach for Mobile WSNs</template>
+        <span class="content-target">بروتوكول MAC للشبكات اللاسلكية المتنقلة</span>
+      </a>
+      <a href="#pmac-tmac-protocols" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكولات PMAC و T-MAC (دورات العمل المتغيرة)</template>
+        <template class="content-en">PMAC and T-MAC Protocols (Variable Duty Cycles)</template>
+        <span class="content-target">بروتوكولات PMAC و T-MAC (دورات العمل المتغيرة)</span>
+      </a>
+      <a href="#bmac-protocol" class="toc-link" data-bilingual>
+        <template class="content-ar">بروتوكول BMAC (Berkeley MAC)</template>
+        <template class="content-en">BMAC (Berkeley MAC) Protocol</template>
+        <span class="content-target">بروتوكول BMAC (Berkeley MAC)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · IT484
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التحكم في الوصول للوسط (MAC) في الشبكات اللاسلكية</h1>
+      <p class="hero-description">دراسة بروتوكولات طبقة التحكم في الوصول للوسط (MAC) في شبكات الاستشعار اللاسلكية، مع التركيز على كفاءة استهلاك الطاقة، وتجنب التصادم، والمشاكل الشائعة مثل العقدة المخفية والمكشوفة.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Medium Access Control (MAC) in Wireless Networks</h1>
+      <p class="hero-description">Study of MAC layer protocols in WSNs, focusing on energy efficiency, collision avoidance, and common issues like hidden and exposed terminal problems.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">شبكات الاستشعار اللاسلكية</span>
+      <span class="tag">بروتوكولات MAC</span>
+      <span class="tag">كفاءة الطاقة</span>
+      <span class="tag">تجنب التصادم</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">WSN</span>
+      <span class="tag">MAC Protocols</span>
+      <span class="tag">Energy Efficiency</span>
+      <span class="tag">Collision Avoidance</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>مناقشة التحكم في الوصول للوسط (MAC) في الشبكات اللاسلكية.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف مختلف بروتوكولات طبقة MAC في شبكات الاستشعار اللاسلكية وأدائها.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم قضايا وتحديات MAC المختلفة في شبكات الاستشعار اللاسلكية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Discuss the medium access control (MAC) in wireless networks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the various MAC layer protocols in WSNs and their performances.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand various MAC issues in WSNs.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="mac-wsn-energy-sources" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> استهلاك الطاقة في بروتوكولات MAC لشبكات الاستشعار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Energy Consumption Sources in WSN MAC</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الهدف الأساسي لبروتوكولات MAC في شبكات الاستشعار هو توفير الطاقة، حيث يعتبر الاستماع الخامل (Idle Listening) أكبر مصدر لهدر الطاقة.</p></template>
+    <template class="content-en"><p>The primary goal of MAC in WSNs is energy saving, with idle listening being the largest source of energy waste.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في شبكات الاستشعار اللاسلكية (WSN)، الهدف الأساسي لطبقة MAC هو توفير الطاقة. العوامل الرئيسية التي تستهلك الطاقة هي أجهزة الإرسال والاستقبال ونطاق الإرسال المقيد. تشمل مصادر استهلاك الطاقة ما يلي:</p><ul><li><b>نقل البيانات الإضافية (Overhead):</b> استهلاك الطاقة بسبب تبادل بيانات التحكم بناءً على حجم الحزمة.</li><li><b><span class="smart-term" data-term-en="Idle Listening" data-ar="الاستماع الخامل" data-en-def="Keeping the radio turned on to receive possible traffic that is not sent, wasting significant energy.">الاستماع الخامل<span class="smart-term-tooltip"></span></span> (Idle listening):</b> يستهلك 50% إلى 100% من الطاقة بسبب استماع العقدة للوسط بشكل دوري تحسباً لوجود بيانات.</li><li><b>تحديد الموقع (Localization):</b> تُستهلك الطاقة عندما تحدد العقد إحداثيات موقعها أثناء الحركة.</li><li><b>الشبكات ذاتية التكوين (Auto configurable networks):</b> تُستنزف الطاقة عند إعادة تنظيم العقد لنفسها بسبب فشل بعض العقد.</li><li><b>الوظيفة التعاونية (Collaborative function):</b> جمع البيانات وتجميعها من عقد مختلفة يستهلك الطاقة.</li></ul></template>
+    <template class="content-en"><p>In WSNs, the primary goal of the MAC layer is energy saving. Factors consuming energy include transceiver devices and restricted transmission ranges. Sources of energy consumption include:</p><ul><li><b>Transmission of overhead:</b> Energy used due to the exchange of control data based on packet size.</li><li><b><span class="smart-term" data-term-en="Idle Listening" data-ar="الاستماع الخامل" data-en-def="Keeping the radio turned on to receive possible traffic that is not sent, wasting significant energy.">Idle listening<span class="smart-term-tooltip"></span></span>:</b> Consumes 50% - 100% of energy due to listening to the channel periodically when no data is being sent.</li><li><b>Localization:</b> Energy consumed when nodes identify their placement coordinates during mobility.</li><li><b>Auto configurable networks:</b> Energy exhausted when nodes self-organize due to node failures.</li><li><b>Collaborative function:</b> Data collection and aggregation from different nodes.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على عكس الشبكات السلكية (مثل Ethernet التي تستخدم CSMA/CD) حيث تكون الإنتاجية والعدالة هي الأهم، تضع شبكات الاستشعار اللاسلكية كفاءة الطاقة كأولوية قصوى لأن العقد تعمل بالبطاريات.</p><p>الاستماع الخامل هو المشكلة الأكبر لأن جهاز الاستقبال يظل قيد التشغيل يستهلك طاقة تعادل تقريباً طاقة الاستقبال الفعلي، حتى عندما لا تكون هناك رسائل موجهة إليه.</p><p>لحل هذه المشكلة، تعتمد معظم بروتوكولات MAC المصممة لشبكات الاستشعار على آليات النوم والاستيقاظ الدوري (Duty Cycling).</p></template>
+    <template class="content-en"><p>Unlike wired networks (like Ethernet using CSMA/CD) where throughput and fairness are paramount, WSNs prioritize energy efficiency above all else because nodes are battery-powered.</p><p>Idle listening is the most significant issue because the transceiver remains on, consuming almost as much power as active receiving, even when the channel is empty.</p><p>To combat this, most WSN MAC protocols introduce duty cycling, forcing nodes to sleep periodically to conserve battery life.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم بروتوكول CSMA/CD الخاص بشبكات الإيثرنت في شبكات الاستشعار اللاسلكية؟</template>
+      <template class="content-en">Why can't we use the CSMA/CD protocol from Ethernet in Wireless Sensor Networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن CSMA/CD مصمم للشبكات السلكية ذات الكثافة المنخفضة ولا يضع استهلاك الطاقة في الاعتبار، بينما شبكات الاستشعار تعتمد على البطاريات وتتطلب بروتوكولات تركز على كفاءة الطاقة وتجنب الاستماع الخامل.</p></template>
+      <template class="content-en"><p>CSMA/CD is designed for wired, low-density networks and does not prioritize energy conservation. WSNs are battery-powered and require protocols that focus on energy efficiency and minimizing idle listening.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="s-mac-protocol" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> بروتوكول S-MAC (Sensor MAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> S-MAC (Sensor MAC) Protocol</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول S-MAC يقلل استهلاك الطاقة عن طريق إجبار العقد على النوم والاستيقاظ في دورات زمنية ثابتة ومتزامنة.</p></template>
+    <template class="content-en"><p>S-MAC reduces energy consumption by forcing nodes to sleep and wake up in fixed, synchronized duty cycles.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكول S-MAC هو بروتوكول موفر للطاقة يهدف إلى تقليل استهلاك الطاقة من مصادر متعددة: التصادم، بيانات التحكم الإضافية، <span class="smart-term" data-term-en="Overhearing" data-ar="الاستماع للغير" data-en-def="When a node keeps listening to data packets that are not intended for itself, wasting energy.">الاستماع للغير<span class="smart-term-tooltip"></span></span> (Overhearing)، والاستماع الخامل.</p><p>يعتمد البروتوكول على الآليات التالية:</p><ol><li><b>الاستماع والنوم الدوري:</b> يتم تقسيم الوقت إلى دورات (مثلاً دورة مدتها ثانية واحدة: نصف ثانية استماع ونصف ثانية نوم)، مما يقلل دورة العمل (Duty Cycle) بنسبة 50% ويوفر الطاقة.</li><li><b>تزامن الجداول:</b> تتبادل العقد جداول نومها واستيقاظها عن طريق بث حزم SYNC لجيرانها للحفاظ على التزامن.</li><li><b>تجنب التصادم والاستماع للغير:</b> يستخدم آلية RTS/CTS (طلب إرسال/تأكيد إرسال) المستعارة من بروتوكول IEEE 802.11.</li></ol></template>
+    <template class="content-en"><p>S-MAC is an energy-efficient protocol designed to reduce energy consumption from collisions, control packet overhead, <span class="smart-term" data-term-en="Overhearing" data-ar="الاستماع للغير" data-en-def="When a node keeps listening to data packets that are not intended for itself, wasting energy.">overhearing<span class="smart-term-tooltip"></span></span>, and idle listening.</p><p>The protocol relies on the following mechanisms:</p><ol><li><b>Periodic listening and sleep:</b> Time is divided into cycles (e.g., a 1-second cycle: 0.5s listen, 0.5s sleep), leading to a 50% reduction in the duty cycle and energy savings.</li><li><b>Schedule synchronization:</b> Nodes exchange their schedules by broadcasting <span class="smart-term" data-term-en="SYNC Packet" data-ar="حزمة التزامن" data-en-def="A control packet used in S-MAC to broadcast and synchronize sleep/wake schedules among neighboring nodes.">SYNC packet<span class="smart-term-tooltip"></span></span>s to neighbors to maintain synchronization.</li><li><b>Collision and overhearing avoidance:</b> It uses the RTS/CTS (Request to Send / Clear to Send) mechanism from the IEEE 802.11 protocol.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التحدي الأكبر في S-MAC هو الحفاظ على التزامن. إذا كانت عقدتان متجاورتان تمتلكان جداول مختلفة (بسبب انتمائهما لمجموعات تزامن مختلفة)، فيجب على العقدة التي تقع على الحدود أن تستيقظ لكلا الجدولين، مما يزيد من استهلاكها للطاقة.</p><p>كما أن دورة العمل الثابتة (Fixed Duty Cycle) تعني أن العقدة قد تستيقظ ولا تجد بيانات، أو قد تنام بينما هناك بيانات كثيرة تنتظر الإرسال، مما يقلل من كفاءة الشبكة في حالات الحمل المتغير.</p></template>
+    <template class="content-en"><p>The biggest challenge in S-MAC is maintaining synchronization. If two neighboring nodes have different schedules (border nodes between virtual clusters), they must wake up for both schedules, increasing their active time and energy consumption.</p><p>Furthermore, the fixed duty cycle means a node might wake up to an empty channel (wasting energy) or sleep when there is a burst of traffic (increasing latency), making it less adaptable to variable traffic loads.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A timeline diagram showing the S-MAC duty cycle. A horizontal axis representing Time. Above the axis, a repeating pattern of blocks labeled 'Listen' and 'Sleep'. The 'Listen' block is further divided into 'for SYNC' and 'for RTS'. Show a sender node sending a SYNC packet during the 'for SYNC' period, and another sender sending an RTS packet during the 'for RTS' period. Style: educational, dark background #0d1117, accent color #4CAF50, viewBox 0 0 800 300, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for packet transmissions -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for timeline axis -->
+        <marker id="arrow-text" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">S-MAC Duty Cycle Timeline</text>
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المخطط الزمني لدورة عمل S-MAC</text>
+
+    <!-- Sender Nodes -->
+    <!-- Node A (SYNC Sender) -->
+    <rect x="90" y="60" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="140" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Node A</text>
+    <text x="140" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">العقدة أ</text>
+
+    <!-- Node B (RTS Sender) -->
+    <rect x="190" y="60" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="240" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Node B</text>
+    <text x="240" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">العقدة ب</text>
+
+    <!-- Packet Transmission Arrows -->
+    <line x1="140" y1="100" x2="140" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+    <line x1="240" y1="100" x2="240" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+    <!-- Packet Labels -->
+    <text x="90" y="140" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">SYNC Packet</text>
+    <text x="90" y="140" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حزمة SYNC</text>
+
+    <text x="295" y="140" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">RTS Packet</text>
+    <text x="295" y="140" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حزمة RTS</text>
+
+    <!-- Duty Cycle Blocks - Cycle 1 -->
+    <!-- for SYNC Block -->
+    <rect x="100" y="180" width="80" height="60" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="140" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">for SYNC</text>
+    <text x="140" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">لـ SYNC</text>
+
+    <!-- for RTS Block -->
+    <rect x="180" y="180" width="120" height="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="240" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">for RTS</text>
+    <text x="240" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">لـ RTS</text>
+
+    <!-- Sleep Block -->
+    <rect x="300" y="180" width="200" height="60" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="400" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Sleep</text>
+    <text x="400" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">نوم</text>
+
+    <!-- Duty Cycle Blocks - Cycle 2 -->
+    <!-- for SYNC Block -->
+    <rect x="500" y="180" width="80" height="60" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="540" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">for SYNC</text>
+    <text x="540" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">لـ SYNC</text>
+
+    <!-- for RTS Block -->
+    <rect x="580" y="180" width="120" height="60" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="1" />
+    <text x="640" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">for RTS</text>
+    <text x="640" y="215" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">لـ RTS</text>
+
+    <!-- Sleep Block (Partial) -->
+    <rect x="700" y="180" width="80" height="60" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="740" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Sleep</text>
+    <text x="740" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">نوم</text>
+
+    <!-- Timeline Axis -->
+    <line x1="50" y1="240" x2="780" y2="240" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-text)" />
+    
+    <!-- Axis Ticks -->
+    <path d="M 100,240 v 6 M 180,240 v 6 M 300,240 v 6 M 500,240 v 6 M 580,240 v 6 M 700,240 v 6" stroke="var(--text-primary)" stroke-width="2" fill="none" />
+
+    <!-- Time Label -->
+    <text x="770" y="225" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Time</text>
+    <text x="770" y="225" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الوقت</text>
+
+    <!-- Brackets and Labels for Cycle 1 -->
+    <!-- Listen Bracket -->
+    <path d="M 100,245 v 5 q 0,5 5,5 h 90 q 5,0 5,5 q 0,-5 5,-5 h 90 q 5,0 5,-5 v -5" stroke="var(--text-secondary)" stroke-width="2" fill="none" />
+    <text x="200" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Listen</text>
+    <text x="200" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">استماع</text>
+
+    <!-- Sleep Bracket -->
+    <path d="M 300,245 v 5 q 0,5 5,5 h 90 q 5,0 5,5 q 0,-5 5,-5 h 90 q 5,0 5,-5 v -5" stroke="var(--text-secondary)" stroke-width="2" fill="none" />
+    <text x="400" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sleep</text>
+    <text x="400" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نوم</text>
+
+    <!-- Frame Bracket -->
+    <path d="M 100,300 v 5 q 0,5 5,5 h 190 q 5,0 5,5 q 0,-5 5,-5 h 190 q 5,0 5,-5 v -5" stroke="var(--brand-400)" stroke-width="2" fill="none" />
+    <text x="300" y="335" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Schedule Frame (Cycle)</text>
+    <text x="300" y="335" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">إطار الجدول (دورة)</text>
+
+    <!-- Brackets and Labels for Cycle 2 -->
+    <!-- Listen Bracket -->
+    <path d="M 500,245 v 5 q 0,5 5,5 h 90 q 5,0 5,5 q 0,-5 5,-5 h 90 q 5,0 5,-5 v -5" stroke="var(--text-secondary)" stroke-width="2" fill="none" />
+    <text x="600" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Listen</text>
+    <text x="600" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">استماع</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي لاستخدام دورة عمل ثابتة (Fixed Duty Cycle) في بروتوكول S-MAC؟</template>
+      <template class="content-en">What is the main drawback of using a fixed duty cycle in the S-MAC protocol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عدم القدرة على التكيف مع التغيرات في حجم حركة المرور؛ ففي أوقات الازدحام يزداد التأخير، وفي أوقات الخمول تُهدر الطاقة في الاستيقاظ دون داعٍ.</p></template>
+      <template class="content-en"><p>Inability to adapt to traffic variations; during high traffic, latency increases, and during low traffic, energy is wasted waking up unnecessarily.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="l-mac-protocol" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> بروتوكول L-MAC (Lightweight MAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> L-MAC (Lightweight MAC) Protocol</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول L-MAC هو بروتوكول خفيف الوزن يعتمد على تقسيم الوقت إلى فترات (TDMA) لمنع التصادمات تماماً وتوفير الطاقة.</p></template>
+    <template class="content-en"><p>L-MAC is a lightweight protocol that uses TDMA (Time Division Multiple Access) to divide time into slots, completely avoiding collisions and saving energy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكول L-MAC يهدف إلى تقليل العبء على الطبقة الفيزيائية وتقليل حالات تبديل جهاز الإرسال والاستقبال. خصائصه تشمل:</p><ul><li>يفترض وجود قناة اتصال واحدة لجهاز الإرسال والاستقبال.</li><li>يحتوي على ثلاث حالات تشغيل: الاستقبال، الإرسال، والاستعداد (Standby). وضع الإرسال يستهلك طاقة أكبر من وضع الاستقبال.</li><li>يتم تقسيم الوقت إلى فترات زمنية متساوية (Slots).</li><li>تأخذ البوابات (Gateways) المبادرة وتبدأ في التحكم في الفترات الزمنية، ثم تتزامن العقد المجاورة وتختار فترات زمنية عشوائية.</li><li>يحتوي حقل التحكم على بيانات محددة مثل: حجم حقل الهوية (2 بايت)، رقم الفترة الحالية (1 بايت)، الفترات المحجوزة (4 بايت)، المسافة للبوابة (1 بايت)، التصادم في الفترة (1 بايت)، حجم هوية الوجهة (2 بايت)، وحجم البيانات (1 بايت).</li></ul></template>
+    <template class="content-en"><p>L-MAC aims to minimize overhead at the physical layer and decrease transceiver switch states. Its characteristics include:</p><ul><li>The transceiver is assumed to have a single channel.</li><li>It has three states of operation: receive, transmit, and standby. Transmission uses more energy than receiving.</li><li>Time is divided into equal slots (<span class="smart-term" data-term-en="TDMA" data-ar="الوصول المتعدد بتقسيم الزمن" data-en-def="Time Division Multiple Access; a channel access method that divides the signal into different time slots.">TDMA<span class="smart-term-tooltip"></span></span> approach).</li><li>Gateways take the initiative to control slots. Immediate one-hop neighbors synchronize, and recently synchronized nodes pick random time slots.</li><li>The control field is divided into parts: Identification field size (2 bytes), Present slot number (1 byte), Taken slots (4 bytes), Distance to gateway (1 byte), Collision in slot (1 byte), Destination ID size (2 bytes), and Data size (1 byte). Total size is 12 bytes.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نظراً لأن L-MAC يعتمد على تقسيم الوقت (TDMA)، فإنه يقضي تماماً على مشكلة التنافس (Contention) على القناة. هذا يعني أن العقد لا تضيع طاقتها في إعادة إرسال الرسائل المفقودة أو التالفة بسبب التصادمات.</p><p>ومع ذلك، فإن التحدي في بروتوكولات TDMA مثل L-MAC هو تعقيد إعداد الشبكة الأولي وتخصيص الفترات الزمنية (Slot allocation) بشكل ديناميكي عند انضمام عقد جديدة أو تحركها.</p></template>
+    <template class="content-en"><p>Because L-MAC is TDMA-based, it completely eliminates channel contention. Since there are no contentions, nodes do not waste their energy retransmitting lost or damaged messages caused by collisions.</p><p>However, the inherent challenge with TDMA protocols like L-MAC is the complexity of the initial network setup and the dynamic allocation of time slots when new nodes join or existing nodes move/fail.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يساهم L-MAC في توفير الطاقة مقارنة ببروتوكولات التنافس (Contention-based)؟</template>
+      <template class="content-en">How does L-MAC contribute to energy saving compared to contention-based protocols?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال تخصيص فترات زمنية محددة لكل عقدة، يمنع L-MAC التصادمات تماماً، مما يلغي الحاجة لاستهلاك الطاقة في إعادة إرسال الحزم التالفة.</p></template>
+      <template class="content-en"><p>By allocating specific time slots to each node, L-MAC completely prevents collisions, eliminating the need to consume energy retransmitting corrupted packets.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hidden-exposed-terminal" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مشكلة العقدة المخفية والمكشوفة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Hidden and Exposed Terminal Problems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>العقدة المخفية تسبب تصادماً عند المستقبل لأن المرسِلين لا يسمعان بعضهما، بينما العقدة المكشوفة تمنع إرسالاً آمناً لأن المرسل يظن أن القناة مشغولة.</p></template>
+    <template class="content-en"><p>A hidden terminal causes collisions at the receiver because transmitters can't hear each other. An exposed terminal prevents safe transmission because the transmitter falsely thinks the channel is busy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مشكلة العقدة المخفية (Hidden Terminal Problem):</b> تحدث عندما ترغب أكثر من عقدة إرسال في إرسال بيانات إلى نفس المستقبل، بحيث يكون المستقبل في نطاق كلا المرسلين، لكن المرسلين ليسا في النطاق المباشر لبعضهما البعض. إذا تم استخدام آلية DATA-ACK فقط، سيحدث تصادم عند المستقبل. لتجنب ذلك، تُستخدم آلية RTS-CTS (طلب إرسال - تأكيد إرسال).</p><p><b>مشكلة العقدة المكشوفة (Exposed Terminal Problem):</b> تحدث عندما يتم منع عقدة إرسال من الإرسال إلى مستقبلها لأنها تسمع إرسالاً من عقدة مجاورة (في مجموعة أخرى)، على الرغم من أن هذا الإرسال لن يتداخل مع مستقبلها الفعلي. لحل هذه المشكلة، يتم استخدام جدولة ديناميكية مدركة للجيران (NAD - Neighbour-aware dynamic scheduling).</p></template>
+    <template class="content-en"><p><b>Hidden Terminal Problem:</b> Occurs when more than one transmitting node wants to send data to the same receiver. The receiver is in the range of both transmitters, but the transmitters are not in direct range of each other. If just a DATA-ACK mechanism is used, it results in a collision at the receiver. To avoid this, the RTS-CTS (Request-to-send - Clear-to-send) mechanism is used.</p><p><b>Exposed Terminal Problem:</b> Happens when a transmitter is averted from transmitting because it overhears a neighboring transmission, even though its own receiver is out of range of that interference. This is addressed by Neighbour-aware dynamic (NAD) scheduling.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>آلية RTS/CTS تحل مشكلة العقدة المخفية كالتالي:</p><ol><li>يرسل المرسل حزمة RTS للمستقبل.</li><li>يرد المستقبل بحزمة CTS للمرسل الأول فقط.</li><li><strong>العقد الأخرى التي تسمع الـ CTS</strong> تعرف أن المستقبل مشغول فتصمت، بينما <strong>العقد التي تسمع RTS فقط</strong> (ولا تسمع CTS) تعرف أنها عقد مكشوفة ويمكنها الإرسال لمستقبل آخر بأمان.</li></ol><p>ومع ذلك، فإن حزم RTS/CTS تضيف عبئاً إضافياً (Overhead) يستهلك طاقة، لذا في الشبكات ذات الحزم الصغيرة جداً، قد يكون استخدامها غير فعال.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="RTS/CTS" data-ar="طلب إرسال / تأكيد إرسال" data-en-def="Request to Send / Clear to Send; a handshaking mechanism used to avoid collisions from hidden nodes.">RTS/CTS<span class="smart-term-tooltip"></span></span> mechanism solves the hidden terminal problem: The sender transmits an RTS. The receiver replies with a CTS. Any node hearing the CTS knows the receiver is busy and stays silent. A node hearing only the RTS (but not the CTS) knows it is an exposed terminal and can safely transmit to a different receiver.</p><p>However, RTS/CTS packets introduce control overhead. In WSNs where data payloads are very small, the energy cost of sending RTS/CTS might outweigh the cost of occasional collisions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Two side-by-side diagrams. Left diagram (Hidden Terminal): Three nodes A, B, C represented as triangles. A and C are transmitters, B is the receiver in the middle. Draw overlapping circles/ranges showing A reaches B, C reaches B, but A and C do not overlap. Right diagram (Exposed Terminal): Four nodes S1, R1, S2, R2. S1 is transmitting to R1. S2 wants to transmit to R2. S1 and S2 are in range of each other, but R1 and R2 are far apart. Show S2 being blocked by S1's transmission. Style: educational, dark background #0d1117, accent colors #4CAF50 and #F44336, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Active Arrow Marker -->
+        <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Muted/Blocked Arrow Marker -->
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Center Divider -->
+    <line x1="400" y1="60" x2="400" y2="360" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="6,6" />
+
+    <!-- ========================================== -->
+    <!-- LEFT DIAGRAM: HIDDEN TERMINAL PROBLEM      -->
+    <!-- ========================================== -->
+
+    <!-- Titles -->
+    <text class="gsvg-en" x="200" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">Hidden Terminal Problem</text>
+    <text class="gsvg-ar" x="200" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">مشكلة المحطة المخفية</text>
+
+    <!-- Transmission Ranges -->
+    <!-- Node A Range -->
+    <circle cx="100" cy="220" r="125" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="6,6" />
+    <!-- Node C Range -->
+    <circle cx="300" cy="220" r="125" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="6,6" />
+
+    <!-- Transmission Arrows -->
+    <line x1="120" y1="220" x2="175" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-active)" />
+    <line x1="280" y1="220" x2="225" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-active)" />
+
+    <!-- Nodes (Triangles) -->
+    <!-- Node A -->
+    <g transform="translate(100, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+    <!-- Node B -->
+    <g transform="translate(200, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+    <!-- Node C -->
+    <g transform="translate(300, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+
+    <!-- Collision Indicator -->
+    <path d="M 200 170 L 205 180 L 215 178 L 208 186 L 212 196 L 200 190 L 188 196 L 192 186 L 185 178 L 195 180 Z" fill="var(--brand-500)" />
+    <text class="gsvg-en" x="200" y="160" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)">Collision!</text>
+    <text class="gsvg-ar" x="200" y="160" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)">تصادم!</text>
+
+    <!-- Node Labels -->
+    <text class="gsvg-en" x="100" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">Node A</text>
+    <text class="gsvg-ar" x="100" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة A</text>
+    <text class="gsvg-en" x="100" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(Hidden)</text>
+    <text class="gsvg-ar" x="100" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(مخفية)</text>
+
+    <text class="gsvg-en" x="200" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">Node B</text>
+    <text class="gsvg-ar" x="200" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة B</text>
+    <text class="gsvg-en" x="200" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(Receiver)</text>
+    <text class="gsvg-ar" x="200" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(مستقبل)</text>
+
+    <text class="gsvg-en" x="300" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">Node C</text>
+    <text class="gsvg-ar" x="300" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة C</text>
+    <text class="gsvg-en" x="300" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(Hidden)</text>
+    <text class="gsvg-ar" x="300" y="278" text-anchor="middle" font-size="13" fill="var(--text-secondary)">(مخفية)</text>
+
+    <!-- Explanation Text -->
+    <text class="gsvg-en" x="200" y="340" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A and C cannot hear each other,</text>
+    <text class="gsvg-ar" x="200" y="340" text-anchor="middle" font-size="14" fill="var(--text-secondary)">A و C لا يمكنهما سماع بعضهما،</text>
+    <text class="gsvg-en" x="200" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)">causing a collision at B.</text>
+    <text class="gsvg-ar" x="200" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)">مما يسبب تصادماً عند B.</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT DIAGRAM: EXPOSED TERMINAL PROBLEM    -->
+    <!-- ========================================== -->
+
+    <!-- Titles -->
+    <text class="gsvg-en" x="600" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">Exposed Terminal Problem</text>
+    <text class="gsvg-ar" x="600" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">مشكلة المحطة المكشوفة</text>
+
+    <!-- Transmission Ranges -->
+    <!-- Node S1 Range -->
+    <circle cx="540" cy="220" r="130" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="6,6" />
+    <!-- Node S2 Range -->
+    <circle cx="660" cy="220" r="130" fill="var(--brand-500)" fill-opacity="0.05" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="6,6" />
+
+    <!-- Transmission Arrows -->
+    <!-- S1 to R1 (Active) -->
+    <line x1="520" y1="220" x2="485" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-active)" />
+    <!-- S2 to R2 (Blocked) -->
+    <line x1="680" y1="220" x2="715" y2="220" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-muted)" />
+    
+    <!-- Overhearing Curve -->
+    <path d="M 550 200 Q 600 160 650 200" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow-active)" />
+    <text class="gsvg-en" x="600" y="175" text-anchor="middle" font-size="13" fill="var(--brand-ink)">Overhears S1</text>
+    <text class="gsvg-ar" x="600" y="175" text-anchor="middle" font-size="13" fill="var(--brand-ink)">تسمع S1</text>
+
+    <!-- Blocked X Icon -->
+    <g transform="translate(697, 220)">
+        <line x1="-6" y1="-6" x2="6" y2="6" stroke="var(--text-muted)" stroke-width="2" />
+        <line x1="6" y1="-6" x2="-6" y2="6" stroke="var(--text-muted)" stroke-width="2" />
+    </g>
+
+    <!-- Nodes (Triangles) -->
+    <!-- Node R1 -->
+    <g transform="translate(460, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+    <!-- Node S1 -->
+    <g transform="translate(540, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+    <!-- Node S2 -->
+    <g transform="translate(660, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+    <!-- Node R2 -->
+    <g transform="translate(740, 220)">
+        <polygon points="0,-15 15,15 -15,15" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="0" cy="-15" r="3" fill="var(--brand-500)" />
+    </g>
+
+    <!-- Node Labels -->
+    <text class="gsvg-en" x="460" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">R1</text>
+    <text class="gsvg-ar" x="460" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">R1</text>
+
+    <text class="gsvg-en" x="540" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">S1</text>
+    <text class="gsvg-ar" x="540" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">S1</text>
+
+    <text class="gsvg-en" x="660" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">S2</text>
+    <text class="gsvg-ar" x="660" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">S2</text>
+
+    <text class="gsvg-en" x="740" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">R2</text>
+    <text class="gsvg-ar" x="740" y="260" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)">R2</text>
+
+    <!-- Action Labels -->
+    <text class="gsvg-en" x="502" y="210" text-anchor="middle" font-size="13" fill="var(--brand-ink)">Active</text>
+    <text class="gsvg-ar" x="502" y="210" text-anchor="middle" font-size="13" fill="var(--brand-ink)">نشط</text>
+
+    <text class="gsvg-en" x="697" y="210" text-anchor="middle" font-size="13" fill="var(--text-muted)">Blocked</text>
+    <text class="gsvg-ar" x="697" y="210" text-anchor="middle" font-size="13" fill="var(--text-muted)">محظور</text>
+
+    <!-- Explanation Text -->
+    <text class="gsvg-en" x="600" y="340" text-anchor="middle" font-size="14" fill="var(--text-secondary)">S2 overhears S1 and defers,</text>
+    <text class="gsvg-ar" x="600" y="340" text-anchor="middle" font-size="14" fill="var(--text-secondary)">S2 تسمع S1 وتؤجل الإرسال،</text>
+    <text class="gsvg-en" x="600" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)">even though R2 is clear.</text>
+    <text class="gsvg-ar" x="600" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)">رغم أن R2 متاح للاستقبال.</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تعتبر مشكلة العقدة المكشوفة خطيرة مثل مشكلة العقدة المخفية؟</template>
+      <template class="content-en">Why is the exposed terminal problem not considered as critical as the hidden terminal problem?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>العقدة المخفية تؤدي إلى فقدان البيانات (تصادم) مما يتطلب إعادة إرسال واستهلاك طاقة، بينما العقدة المكشوفة تؤدي فقط إلى تأخير الإرسال (انخفاض الإنتاجية) دون التسبب في تصادم البيانات.</p></template>
+      <template class="content-en"><p>The hidden terminal causes actual data collisions and packet loss (requiring energy-expensive retransmissions), whereas the exposed terminal only causes unnecessary delay/reduced throughput without corrupting data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="q-mac-protocol" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> بروتوكول Q-MAC (QoS-aware MAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Q-MAC (QoS-aware MAC) Protocol</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول Q-MAC يركز على جودة الخدمة (QoS) من خلال إعطاء أولوية للحزم بناءً على أهميتها باستخدام طوابير متعددة.</p></template>
+    <template class="content-en"><p>Q-MAC focuses on Quality of Service (QoS) by prioritizing packets based on their criticality using multiple queues.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكول Q-MAC (الوصول للوسط المدرك ل<span class="smart-term" data-term-en="QoS" data-ar="جودة الخدمة" data-en-def="Quality of Service; the description or measurement of the overall performance of a service, prioritizing critical data.">جودة الخدمة<span class="smart-term-tooltip"></span></span> والموفر للطاقة) يهتم بجوانب جودة الخدمة (QoS) في الشبكة، وهو ضروري لكفاءة الطاقة وموثوقية الإرسال. يتكون من نوعين من الجدولة:</p><ul><li><b>الجدولة داخل العقدة (Intra-node scheduling):</b> تستخدم بنية طوابير متعددة (Multi-queuing) تعمل بنظام (FIFO). يتم ترتيب الحزم المستقبلة وتخزينها في طوابير مختلفة بناءً على أهميتها (Criticality). طبقة التطبيق هي من يحدد أولوية الحزمة.</li><li><b>الجدولة بين العقد (Inter-node scheduling):</b> تدير جدولة إرسال البيانات بين العقد المتنافسة على نفس القناة. تستخدم بروتوكولات مثل PC-MACAW (الذي يصف الإطار كدورة RTS-CTS-DATA-ACK مع مسافات بينية FS) وبروتوكول LPRA.</li></ul></template>
+    <template class="content-en"><p>The Q-MAC (Energy-efficient <span class="smart-term" data-term-en="QoS" data-ar="جودة الخدمة" data-en-def="Quality of Service; the description or measurement of the overall performance of a service, prioritizing critical data.">QoS<span class="smart-term-tooltip"></span></span>-aware medium access) protocol pays attention to the QoS aspects of the network, essential for energy efficiency and transmission dependability. It consists of two scheduling types:</p><ul><li><b>Intra-node scheduling:</b> Utilizes a multi-queuing architecture with multiple <span class="smart-term" data-term-en="FIFO" data-ar="الداخل أولاً يخرج أولاً" data-en-def="First In First Out; a method for organizing the manipulation of a data structure where the oldest entry is processed first.">FIFO<span class="smart-term-tooltip"></span></span> queues. Received packets are ordered and stored in different queues based on their criticality. The application layer allocates priority to the packets.</li><li><b>Inter-node scheduling:</b> Manages data transmission between various nodes competing for the same channel. It employs protocols like PC-MACAW (where each frame is an RTS-CTS-DATA-ACK cycle with frame spaces) and LPRA (loosely prioritized random access).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في شبكات الاستشعار، ليست كل البيانات متساوية الأهمية. مثلاً، إنذار حريق يجب أن يصل أسرع من قراءة دورية لدرجة الحرارة. Q-MAC يحل هذه المشكلة من خلال الجدولة داخل العقدة.</p><p>استخدام PC-MACAW في الجدولة بين العقد يضمن عدم ضياع الحزم ذات الأولوية العالية بسبب التصادمات، حيث يوفر آلية حجز قناة قوية، وإن كانت تستهلك بعض الطاقة الإضافية في حزم التحكم.</p></template>
+    <template class="content-en"><p>In WSNs, not all data is equally important. For example, a fire alarm packet must be delivered faster than a routine temperature reading. Q-MAC addresses this via intra-node multi-queuing.</p><p>Using PC-MACAW for inter-node scheduling ensures that high-priority packets are not lost to collisions, providing a robust channel reservation mechanism, albeit at the cost of some control packet overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A diagram showing the frame format in PC-MACAW protocol. A horizontal bar representing a Frame. Inside the frame, show small blocks for RTS, CTS, DATA, and ACK. Show small gaps between them labeled as 'Frame Space (FS)'. Style: educational, dark background #0d1117, accent color #2196F3, viewBox 0 0 800 200, English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 280" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="time-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+    <linearGradient id="dataGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">PC-MACAW Frame Format</text>
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تنسيق إطار PC-MACAW</text>
+
+  <!-- Cycle Bracket -->
+  <path d="M 60 80 L 60 70 L 720 70 L 720 80" fill="none" stroke="var(--brand-400)" stroke-width="2" />
+  <text x="390" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">One PC-MACAW Frame Cycle</text>
+  <text x="390" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">دورة إطار PC-MACAW واحدة</text>
+
+  <!-- Blocks -->
+  
+  <!-- RTS -->
+  <rect x="60" y="100" width="100" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="110" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">RTS</text>
+  <!-- Right Arrow (Sender to Receiver) -->
+  <path d="M -12 0 L 12 0 M 6 -4 L 12 0 L 6 4" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(110, 146)"/>
+
+  <!-- FS 1 -->
+  <text x="180" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)">FS</text>
+
+  <!-- CTS -->
+  <rect x="200" y="100" width="100" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="250" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">CTS</text>
+  <!-- Left Arrow (Receiver to Sender) -->
+  <path d="M 12 0 L -12 0 M -6 -4 L -12 0 L -6 4" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(250, 146)"/>
+
+  <!-- FS 2 -->
+  <text x="320" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)">FS</text>
+
+  <!-- DATA -->
+  <rect x="340" y="100" width="240" height="60" rx="6" fill="url(#dataGrad)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="460" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">DATA</text>
+  <text x="460" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">البيانات</text>
+  <!-- Right Arrow (Sender to Receiver) -->
+  <path d="M -12 0 L 12 0 M 6 -4 L 12 0 L 6 4" stroke="var(--on-brand-hi)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(460, 146)"/>
+
+  <!-- FS 3 -->
+  <text x="600" y="136" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)">FS</text>
+
+  <!-- ACK -->
+  <rect x="620" y="100" width="100" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="670" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">ACK</text>
+  <!-- Left Arrow (Receiver to Sender) -->
+  <path d="M 12 0 L -12 0 M -6 -4 L -12 0 L -6 4" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(670, 146)"/>
+
+  <!-- Time Axis -->
+  <line x1="40" y1="200" x2="750" y2="200" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#time-arrow)" />
+  <text x="740" y="188" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-muted)" class="gsvg-en">Time</text>
+  <text x="740" y="188" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-muted)" class="gsvg-ar">الوقت</text>
+
+  <!-- Legend -->
+  <text x="400" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">FS = Frame Space (Idle time between transmissions)</text>
+  <text x="400" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">FS = مسافة الإطار (وقت الخمول بين الإرسالات)</text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>S-MAC</th><th>T-MAC</th><th>L-MAC</th><th>BMAC</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دورة العمل (Duty Cycle)</template>
+          <template class="content-en">Duty Cycle</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ثابتة</template>
+          <template class="content-en">Fixed</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متغيرة (تتكيف مع المرور)</template>
+          <template class="content-en">Variable (Adapts to traffic)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">فترات زمنية (TDMA)</template>
+          <template class="content-en">Time Slots (TDMA)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أخذ عينات التمهيد (LPL)</template>
+          <template class="content-en">Preamble Sampling (LPL)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تجنب التصادم</template>
+          <template class="content-en">Collision Avoidance</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">RTS/CTS</template>
+          <template class="content-en">RTS/CTS</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">RTS/CTS</template>
+          <template class="content-en">RTS/CTS</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بدون تصادم (TDMA)</template>
+          <template class="content-en">Collision-free (TDMA)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">CCA (تقييم القناة)</template>
+          <template class="content-en">CCA (Clear Channel Assessment)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">من المسؤول عن تحديد أولوية الحزم في بروتوكول Q-MAC؟</template>
+      <template class="content-en">Who is responsible for determining the priority of packets in the Q-MAC protocol?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>طبقة التطبيق (Application Layer) هي التي تخصص الأولوية للحزم بناءً على أهمية محتوى الحزمة.</p></template>
+      <template class="content-en"><p>The application layer allocates priority to the packets based on the significance of the packet's contents.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="mobile-wsn-mac" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> بروتوكول MAC للشبكات اللاسلكية المتنقلة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> MAC Approach for Mobile WSNs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في الشبكات المتنقلة، يتسبب تأثير دوبلر في فقدان البيانات، ويتم حله بتغيير حجم الإطار ديناميكياً باستخدام مرشح كالمان.</p></template>
+    <template class="content-en"><p>In mobile networks, the Doppler effect causes data loss, which is mitigated by dynamically changing the frame size using an extended Kalman filter.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما تكون العقد في شبكات الاستشعار اللاسلكية في حالة حركة (Mobile WSNs)، تظهر مشكلة تُعرف باسم تأثير/إزاحة دوبلر (Doppler effect/shift)، مما يؤدي إلى فقدان البيانات.</p><ul><li>الضوضاء في القنوات اللاسلكية تؤدي أيضاً إلى انخفاض نسبة الإشارة إلى الضوضاء (SNR).</li><li>إعادة الإرسال الناتجة عن هذه الخسائر تؤدي إلى استنزاف كمية كبيرة من الطاقة.</li><li>لحل هذه المشكلة، يقوم البروتوكول بتقليل <span class="smart-term" data-term-en="Doppler Effect" data-ar="تأثير دوبلر" data-en-def="The change in frequency or wavelength of a wave in relation to an observer who is moving relative to the wave source.">تأثير دوبلر<span class="smart-term-tooltip"></span></span> عن طريق تغيير طول إطار البيانات (Frame length) بشكل فعال أثناء الإرسال.</li><li>يتم استخدام مرشح يُعرف باسم <span class="smart-term" data-term-en="Kalman Filter" data-ar="مرشح كالمان" data-en-def="An algorithm that uses a series of measurements observed over time to estimate unknown variables, used here to forecast frame size.">مرشح كالمان<span class="smart-term-tooltip"></span></span> الممتد (Extended Kalman filter) للتنبؤ بحجم الإطار المناسب لكل عملية إرسال.</li></ul></template>
+    <template class="content-en"><p>When nodes in WSNs are on the move, it creates a problem called the <span class="smart-term" data-term-en="Doppler Effect" data-ar="تأثير دوبلر" data-en-def="The change in frequency or wavelength of a wave in relation to an observer who is moving relative to the wave source.">Doppler effect<span class="smart-term-tooltip"></span></span>/shift, which leads to data losses.</p><ul><li>Noise in wireless channels also leads to a low signal-to-noise ratio (SNR).</li><li>Retransmissions caused by these losses lead to the loss of a large amount of energy.</li><li>To mitigate this, the MAC approach reduces the Doppler effect by effectively changing the frame length of the data dynamically during transmission.</li><li>An extended <span class="smart-term" data-term-en="Kalman Filter" data-ar="مرشح كالمان" data-en-def="An algorithm that uses a series of measurements observed over time to estimate unknown variables, used here to forecast frame size.">Kalman filter<span class="smart-term-tooltip"></span></span> is used to forecast the optimal frame size for every transmission.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تأثير دوبلر يغير تردد الإشارة المستقبلة بسبب حركة العقدة، مما يسبب أخطاء في فك التشفير (Bit Error Rate). إذا كان الإطار طويلاً جداً، يزداد احتمال تلفه أثناء الحركة.</p><p>مرشح كالمان الممتد يعمل كخوارزمية تنبؤية تقوم بتقدير حالة القناة اللاسلكية المتغيرة باستمرار، وبناءً عليه يتم تقصير حجم الإطار إذا كانت القناة سيئة (لضمان وصوله) أو تطويله إذا كانت القناة جيدة (لزيادة الإنتاجية وتقليل الـ Overhead).</p></template>
+    <template class="content-en"><p>The Doppler effect shifts the frequency of the received signal due to node mobility, increasing the Bit Error Rate (BER). If a frame is too long, the probability of it being corrupted during movement is very high.</p><p>The Extended Kalman Filter acts as a predictive algorithm that estimates the rapidly changing wireless channel state. Based on this, it shortens the frame size when channel conditions are poor (to ensure delivery) and lengthens it when conditions are good (to maximize throughput and minimize overhead).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تغيير حجم الإطار حلاً فعالاً لمشكلة تأثير دوبلر في الشبكات المتنقلة؟</template>
+      <template class="content-en">Why is changing the frame size an effective solution to the Doppler effect problem in mobile networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الإطارات القصيرة لها احتمالية أقل للتعرض للأخطاء أثناء التغيرات السريعة في جودة القناة الناتجة عن الحركة، مما يقلل من الحاجة لإعادة الإرسال ويوفر الطاقة.</p></template>
+      <template class="content-en"><p>Because shorter frames have a lower probability of encountering errors during rapid channel quality fluctuations caused by mobility, reducing the need for retransmissions and saving energy.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pmac-tmac-protocols" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> بروتوكولات PMAC و T-MAC (دورات العمل المتغيرة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> PMAC and T-MAC Protocols (Variable Duty Cycles)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>على عكس S-MAC ذو الدورة الثابتة، تستخدم بروتوكولات T-MAC و PMAC دورات عمل متغيرة تتكيف مع حجم حركة المرور لتوفير المزيد من الطاقة.</p></template>
+    <template class="content-en"><p>Unlike the fixed-cycle S-MAC, T-MAC and PMAC use variable duty cycles that adapt to traffic load to save more energy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكولات T-MAC و PMAC تعالج مشكلة إهدار الطاقة في بروتوكول S-MAC (الذي يستخدم دورة عمل ثابتة) في أوقات انعدام حركة المرور.</p><ul><li><b>بروتوكول T-MAC (Timeout-MAC):</b> يقدم فكرة <span class="smart-term" data-term-en="Variable Duty Cycle" data-ar="دورة العمل المتغيرة" data-en-def="A mechanism where the active listening time of a node changes dynamically based on network traffic.">دورة العمل المتغيرة<span class="smart-term-tooltip"></span></span>. تستيقظ العقدة بانتظام، وتبدأ في الاستقبال والإرسال. إذا لم يحدث أي حدث تنشيط (مثل انتهاء مؤقت، وصول بيانات، أو استشعار اتصال) لفترة معينة، تعود العقدة للنوم فوراً. هذا يظهر زيادة هائلة في الأداء مقارنة بـ S-MAC.</li><li><b>بروتوكول PMAC (Pattern MAC):</b> بدلاً من دورات النوم والاستيقاظ المحددة مسبقاً، يتم تحديد دورات عمل العقد بشكل ديناميكي بناءً على حالة حركة المرور. يوفر توفيراً للطاقة في حالات الحمل المنخفض، ويعزز الإنتاجية في حالات الحمل العالي.</li></ul></template>
+    <template class="content-en"><p>T-MAC and PMAC address the energy waste of S-MAC (which uses a fixed duty cycle) during no-traffic situations.</p><ul><li><b>T-MAC (Timeout-MAC):</b> Introduces a <span class="smart-term" data-term-en="Variable Duty Cycle" data-ar="دورة العمل المتغيرة" data-en-def="A mechanism where the active listening time of a node changes dynamically based on network traffic.">variable duty cycle<span class="smart-term-tooltip"></span></span>. A node awakens regularly and begins receiving/transmitting. If no activation event occurs (e.g., timer notice, data delivery, perceiving communication), it returns to sleep early. This demonstrates an enormous performance increase over S-MAC.</li><li><b>PMAC (Pattern MAC):</b> Instead of pre-set sleep-wake cycles, the duty cycles are found out dynamically based on traffic status. It offers power savings during low-load situations and enhances throughput during high-load situations.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مشكلة T-MAC الرئيسية هي مشكلة النوم المبكر (Early Sleeping Problem)، حيث قد تنام العقدة مبكراً إذا لم تسمع أي نشاط، مما قد يؤدي إلى تفويت رسائل من عقدة أخرى كانت تنتظر انتهاء إرسال جاري (عقدة مكشوفة).</p><p>بروتوكول PMAC يحل هذه المشاكل من خلال تبادل أنماط (Patterns) تعبر عن نية العقدة في الإرسال أو الاستقبال في الفترات القادمة، مما يسمح للشبكة بالتكيف بشكل استباقي مع التغيرات في الحمل.</p></template>
+    <template class="content-en"><p>A major issue with T-MAC is the 'Early Sleeping Problem', where a node might go to sleep early if it doesn't hear activity, potentially missing messages from a node that was waiting for an ongoing transmission to finish (an exposed node).</p><p>PMAC addresses these nuances by having nodes exchange bit patterns representing their intended sleep/wake schedules for upcoming slots, allowing the network to proactively adapt to traffic bursts or lulls.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A comparative timeline diagram showing three protocols under a no-traffic situation. Top timeline (S-MAC): Fixed square waves showing regular Listen and Sleep periods. Middle timeline (T-MAC): Short spikes of 'Awake' followed by long 'Sleep' periods, showing the node goes back to sleep quickly when there is no traffic. Bottom timeline (PMAC): A flat line labeled 'Sleep' with small tick marks, showing the node stays asleep entirely when it dynamically determines there is no traffic. Style: educational, dark background #0d1117, accent colors #4CAF50, #FFC107, #2196F3, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for callouts -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+        
+        <!-- Arrowhead for axis -->
+        <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--border-color)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">MAC Protocols: No-Traffic Duty Cycles</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بروتوكولات MAC: دورات العمل في حالة عدم وجود حركة مرور</text>
+
+    <!-- Cycle Boundary Grid Lines -->
+    <line x1="160" y1="60" x2="160" y2="430" stroke="var(--border-color)" stroke-dasharray="5,5" stroke-width="1.5" />
+    <line x1="400" y1="60" x2="400" y2="430" stroke="var(--border-color)" stroke-dasharray="5,5" stroke-width="1.5" />
+    <line x1="640" y1="60" x2="640" y2="430" stroke="var(--border-color)" stroke-dasharray="5,5" stroke-width="1.5" />
+
+    <!-- Time Axis at the bottom -->
+    <line x1="140" y1="430" x2="770" y2="430" stroke="var(--border-color)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="760" y="420" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" class="gsvg-en">Time</text>
+    <text x="760" y="420" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" class="gsvg-ar">الوقت</text>
+
+    <!-- ========================================== -->
+    <!-- TIMELINE 1: S-MAC (Fixed Duty Cycle)       -->
+    <!-- ========================================== -->
+    
+    <!-- Protocol Label -->
+    <text x="140" y="120" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">S-MAC (Fixed)</text>
+    <text x="140" y="120" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">S-MAC (ثابت)</text>
+
+    <!-- Shaded Awake Areas -->
+    <rect x="160" y="90" width="80" height="50" fill="var(--bg-elevated)" />
+    <rect x="400" y="90" width="80" height="50" fill="var(--bg-elevated)" />
+    <rect x="640" y="90" width="80" height="50" fill="var(--bg-elevated)" />
+
+    <!-- Signal Path -->
+    <path d="M 160 140 L 160 90 L 240 90 L 240 140 L 400 140 L 400 90 L 480 90 L 480 140 L 640 140 L 640 90 L 720 90 L 720 140 L 760 140" 
+          stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linejoin="round" />
+
+    <!-- Annotations -->
+    <!-- Listen Bracket -->
+    <path d="M 160 80 L 160 75 L 240 75 L 240 80" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+    <text x="200" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Listen</text>
+    <text x="200" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">استماع</text>
+
+    <!-- Sleep Bracket -->
+    <path d="M 240 80 L 240 75 L 400 75 L 400 80" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+    <text x="320" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Sleep</text>
+    <text x="320" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">نوم</text>
+
+
+    <!-- ========================================== -->
+    <!-- TIMELINE 2: T-MAC (Timeout-MAC)            -->
+    <!-- ========================================== -->
+    
+    <!-- Protocol Label -->
+    <text x="140" y="250" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">T-MAC (Timeout)</text>
+    <text x="140" y="250" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">T-MAC (مهلة)</text>
+
+    <!-- Shaded Awake Areas (Very short) -->
+    <rect x="160" y="220" width="20" height="50" fill="var(--bg-elevated)" />
+    <rect x="400" y="220" width="20" height="50" fill="var(--bg-elevated)" />
+    <rect x="640" y="220" width="20" height="50" fill="var(--bg-elevated)" />
+
+    <!-- Signal Path -->
+    <path d="M 160 270 L 160 220 L 180 220 L 180 270 L 400 270 L 400 220 L 420 220 L 420 270 L 640 270 L 640 220 L 660 220 L 660 270 L 760 270" 
+          stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linejoin="round" />
+
+    <!-- Annotations -->
+    <!-- Timeout Callout -->
+    <text x="240" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Timeout</text>
+    <text x="240" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">مهلة</text>
+    <path d="M 240 202 L 240 210 L 175 210" stroke="var(--text-muted)" stroke-width="1.5" fill="none" marker-end="url(#arrow)" />
+
+    <!-- Early Sleep Bracket -->
+    <path d="M 180 210 L 180 205 L 400 205 L 400 210" stroke="var(--text-muted)" stroke-width="1.5" fill="none" />
+    <text x="290" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Early Sleep</text>
+    <text x="290" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">نوم مبكر</text>
+
+
+    <!-- ========================================== -->
+    <!-- TIMELINE 3: PMAC (Pattern MAC)             -->
+    <!-- ========================================== -->
+    
+    <!-- Protocol Label -->
+    <text x="140" y="380" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">PMAC (Pattern)</text>
+    <text x="140" y="380" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">PMAC (نمط)</text>
+
+    <!-- Signal Path (Flat line) -->
+    <path d="M 160 400 L 760 400" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+    <!-- Tick marks for cycle boundaries -->
+    <line x1="160" y1="392" x2="160" y2="408" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+    <line x1="400" y1="392" x2="400" y2="408" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+    <line x1="640" y1="392" x2="640" y2="408" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+
+    <!-- Annotations -->
+    <text x="280" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Continuous Sleep (Dynamic)</text>
+    <text x="280" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">نوم مستمر (ديناميكي)</text>
+
+    <text x="400" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Cycle Boundary (No Wakeup)</text>
+    <text x="400" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">حدود الدورة (بدون استيقاظ)</text>
+    <line x1="400" y1="355" x2="400" y2="385" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow)" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في حالة عدم وجود أي حركة مرور في الشبكة، أي بروتوكول سيستهلك طاقة أقل: S-MAC أم T-MAC؟ ولماذا؟</template>
+      <template class="content-en">In a no-traffic situation, which protocol will consume less energy: S-MAC or T-MAC? And why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>T-MAC سيستهلك طاقة أقل، لأنه سيعود للنوم فوراً بعد فترة قصيرة (Timeout) لعدم وجود نشاط، بينما S-MAC سيظل مستيقظاً طوال فترة الاستماع الثابتة المحددة مسبقاً.</p></template>
+      <template class="content-en"><p>T-MAC will consume less energy because it will return to sleep immediately after a short timeout period of inactivity, whereas S-MAC will remain awake for its entire pre-set fixed listening period.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="bmac-protocol" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> بروتوكول BMAC (Berkeley MAC)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> BMAC (Berkeley MAC) Protocol</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بروتوكول BMAC هو بروتوكول بسيط وفعال يعتمد على الاستماع منخفض الطاقة (LPL) وتقييم القناة الواضحة (CCA) بدلاً من RTS/CTS.</p></template>
+    <template class="content-en"><p>BMAC is a simple, efficient protocol that relies on Low-Power Listening (LPL) and Clear Channel Assessment (CCA) instead of RTS/CTS.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بروتوكول BMAC هو بروتوكول وصول للوسط أساسي وصغير جداً، يتميز بتصميم بسيط ولكنه فعال وقابل للتهيئة. أهدافه تشمل التشغيل بطاقة منخفضة، بساطة التنفيذ، الاستخدام الأمثل للقناة، وتجنب التصادم الفعال.</p><p>لا يقدم BMAC أي تنظيم لطبقة الشبكة أو استراتيجيات تزامن، ولا يستخدم آليات الحزم المتعددة مثل RTS/CTS. بدلاً من ذلك، يستخدم:</p><ul><li><b><span class="smart-term" data-term-en="CCA" data-ar="تقييم القناة الواضحة" data-en-def="Clear Channel Assessment; a function used to determine whether the wireless medium is busy or idle before transmitting.">تقييم القناة الواضحة<span class="smart-term-tooltip"></span></span> (CCA) وتأخير الحزم (Back-offs):</b> للتحكيم في القناة وتجنب التصادم.</li><li><b><span class="smart-term" data-term-en="LPL" data-ar="الاستماع منخفض الطاقة" data-en-def="Low-Power Listening; a technique where nodes wake up briefly to sample the channel for activity before returning to sleep.">الاستماع منخفض الطاقة<span class="smart-term-tooltip"></span></span> (LPL - Low-power listening):</b> لتقليل استهلاك الطاقة.</li><li><b>أخذ عينات التمهيد (Preamble sampling):</b> لتقليل دورة العمل وتقليل الاستماع الخامل.</li><li><b>تأكيدات طبقة الربط (Link layer acknowledgements):</b> لضمان الموثوقية.</li></ul></template>
+    <template class="content-en"><p>BMAC is a very small core medium access protocol that is simple in design but highly efficient and configurable. Its goals include small power operation, simple implementation, optimal channel utilization, and effective collision avoidance.</p><p>BMAC does not offer network layer organization or synchronization strategies, nor does it use multi-packet methodologies like RTS/CTS exchange. Instead, it uses:</p><ul><li><b>Clear Channel Assessment (<span class="smart-term" data-term-en="CCA" data-ar="تقييم القناة الواضحة" data-en-def="Clear Channel Assessment; a function used to determine whether the wireless medium is busy or idle before transmitting.">CCA<span class="smart-term-tooltip"></span></span>) and packet back-offs:</b> For channel arbitration.</li><li><b>Low-Power Listening (<span class="smart-term" data-term-en="LPL" data-ar="الاستماع منخفض الطاقة" data-en-def="Low-Power Listening; a technique where nodes wake up briefly to sample the channel for activity before returning to sleep.">LPL<span class="smart-term-tooltip"></span></span>):</b> For lower power consumption.</li><li><b>Preamble sampling mechanism:</b> To minimize the duty cycle and decrease idle listening.</li><li><b>Link layer acknowledgements:</b> For reliability.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في آلية أخذ عينات التمهيد (Preamble Sampling) الخاصة بـ BMAC، يرسل المرسل إشارة تمهيد (Preamble) طويلة جداً قبل إرسال البيانات الفعلية. يجب أن يكون طول هذا التمهيد أطول من فترة نوم المستقبل.</p><p>تستيقظ العقد المستقبلة لفترة وجيزة جداً للتحقق من وجود نشاط في القناة (LPL). إذا اكتشفت التمهيد، تظل مستيقظة لاستقبال البيانات. هذا ينقل عبء استهلاك الطاقة من المستقبل (الذي ينام معظم الوقت) إلى المرسل (الذي يرسل تمهيداً طويلاً)، وهو تصميم ممتاز لشبكات الاستشعار حيث تكون حركة المرور نادرة.</p></template>
+    <template class="content-en"><p>In BMAC's Preamble Sampling mechanism, the sender transmits a very long preamble before the actual data. This preamble must be strictly longer than the receiver's sleep period.</p><p>Receiving nodes wake up very briefly to check the channel for activity (LPL). If they detect the preamble, they stay awake to receive the data. This shifts the energy burden from the receiver (which sleeps most of the time) to the sender (which sends a long preamble), an excellent design for WSNs where traffic is infrequent.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تخلى بروتوكول BMAC عن استخدام آلية RTS/CTS؟</template>
+      <template class="content-en">Why did the BMAC protocol abandon the use of the RTS/CTS mechanism?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حزم RTS/CTS تضيف عبئاً إضافياً يستهلك الطاقة، وبدلاً من ذلك اعتمد BMAC على تقييم القناة الواضحة (CCA) والاستماع منخفض الطاقة (LPL) لتحقيق بساطة التنفيذ وكفاءة الطاقة.</p></template>
+      <template class="content-en"><p>Because RTS/CTS packets add control overhead that consumes energy. Instead, BMAC relies on Clear Channel Assessment (CCA) and Low-Power Listening (LPL) to achieve implementation simplicity and energy efficiency.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي الشبكات المستقبلين. إذا كنتم تتذكرون شبكات الإيثرنت وبروتوكول CSMA/CD، فانسوها تماماً هنا! في شبكات الاستشعار اللاسلكية، نحن نتعامل مع أجهزة صغيرة تعمل ببطاريات لا يمكن استبدالها. الطاقة هنا هي العملة الأغلى. أكبر لص يسرق هذه الطاقة هو 'الاستماع الخامل' (Idle Listening). لذلك، درسنا بروتوكول S-MAC الذي أجبر العقد على النوم في دورات ثابتة. لكن ماذا لو لم تكن هناك بيانات؟ هنا جاء T-MAC و PMAC بدورات متغيرة لتنام العقدة مبكراً. وماذا عن التصادمات؟ استخدمنا RTS/CTS لحل مشكلة العقدة المخفية، لكن بروتوكولات مثل L-MAC تخلصت من التصادم تماماً باستخدام TDMA، بينما BMAC استخدم الاستماع منخفض الطاقة (LPL) لتبسيط الأمور. ركزوا في الامتحان على الفروق الجوهرية بين هذه البروتوكولات (ثابت مقابل متغير، تنافس مقابل TDMA) وكيف يعالج كل منها مشكلة استهلاك الطاقة.</template>
+    <template class="content-en">Welcome, future network engineers. If you remember Ethernet and CSMA/CD, forget them here! In WSNs, we deal with tiny devices running on irreplaceable batteries. Energy is the ultimate currency. The biggest thief of this energy is 'Idle Listening'. Therefore, we studied S-MAC, which forced nodes to sleep in fixed cycles. But what if there's no data? That's where T-MAC and PMAC came in with variable cycles to let nodes sleep early. What about collisions? We used RTS/CTS for the hidden terminal problem, but protocols like L-MAC eliminated collisions entirely using TDMA, while BMAC used Low-Power Listening (LPL) for simplicity. For the exam, focus on the core differences between these protocols (fixed vs. variable, contention vs. TDMA) and how each tackles energy consumption.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر الاستماع الخامل (Idle Listening) مشكلة كبرى في شبكات الاستشعار؟</template>
+          <template class="content-en">Why is Idle Listening considered a major problem in WSNs?</template>
+          <span class="content-target">لماذا نعتبر الاستماع الخامل (Idle Listening) مشكلة كبرى في شبكات الاستشعار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن إبقاء جهاز الاستقبال قيد التشغيل يستهلك طاقة تعادل تقريباً طاقة الاستقبال الفعلي (50-100% من الاستهلاك)، حتى عندما لا تكون هناك أي بيانات مرسلة في القناة، مما يستنزف البطارية بسرعة.</template>
+          <template class="content-en">Because keeping the receiver on consumes almost as much power as active receiving (50-100% of consumption), even when there is no data in the channel, rapidly draining the battery.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل بروتوكول S-MAC مشكلة الاستماع الخامل؟</template>
+          <template class="content-en">How does the S-MAC protocol solve the idle listening problem?</template>
+          <span class="content-target">كيف يحل بروتوكول S-MAC مشكلة الاستماع الخامل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال تطبيق دورة عمل ثابتة (Fixed Duty Cycle)، حيث يتم تقسيم الوقت إلى فترات استماع ونوم دورية، وتتزامن العقد المجاورة للنوم والاستيقاظ معاً.</template>
+          <template class="content-en">By implementing a fixed duty cycle, where time is divided into periodic listen and sleep frames, and neighboring nodes synchronize to sleep and wake up together.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين S-MAC و T-MAC؟</template>
+          <template class="content-en">What is the main difference between S-MAC and T-MAC?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين S-MAC و T-MAC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">S-MAC يستخدم دورة عمل ثابتة (يظل مستيقظاً طوال فترة الاستماع المحددة)، بينما T-MAC يستخدم دورة عمل متغيرة (يعود للنوم مبكراً إذا لم يكتشف أي نشاط خلال فترة Timeout).</template>
+          <template class="content-en">S-MAC uses a fixed duty cycle (stays awake for the entire scheduled listen period), while T-MAC uses a variable duty cycle (returns to sleep early if no activity is detected within a timeout period).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمنع بروتوكول L-MAC التصادمات؟</template>
+          <template class="content-en">How does the L-MAC protocol prevent collisions?</template>
+          <span class="content-target">كيف يمنع بروتوكول L-MAC التصادمات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعتمد L-MAC على تقنية TDMA، حيث يقسم الوقت إلى فترات زمنية (Slots) ويخصص فترة محددة لكل عقدة للإرسال، مما يلغي التنافس على القناة تماماً.</template>
+          <template class="content-en">L-MAC relies on TDMA technology, dividing time into slots and allocating a specific slot to each node for transmission, completely eliminating channel contention.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح باختصار مشكلة العقدة المخفية وكيفية حلها.</template>
+          <template class="content-en">Briefly explain the hidden terminal problem and how to solve it.</template>
+          <span class="content-target">اشرح باختصار مشكلة العقدة المخفية وكيفية حلها.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحدث عندما يرسل مرسلان لا يقعان في نطاق بعضهما البعض بيانات إلى نفس المستقبل في نفس الوقت، مما يسبب تصادماً. تُحل باستخدام آلية RTS/CTS لحجز القناة مسبقاً.</template>
+          <template class="content-en">It occurs when two senders out of range of each other send data to the same receiver simultaneously, causing a collision. It is solved using the RTS/CTS mechanism to reserve the channel beforehand.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور مرشح كالمان الممتد في بروتوكولات MAC للشبكات المتنقلة؟</template>
+          <template class="content-en">What is the role of the Extended Kalman filter in mobile WSN MAC protocols?</template>
+          <span class="content-target">ما هو دور مرشح كالمان الممتد في بروتوكولات MAC للشبكات المتنقلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يُستخدم للتنبؤ بحالة القناة اللاسلكية المتغيرة بسبب الحركة (تأثير دوبلر)، وبناءً عليه يتم تغيير حجم إطار البيانات ديناميكياً لتقليل الأخطاء وإعادة الإرسال.</template>
+          <template class="content-en">It is used to predict the changing wireless channel state due to mobility (Doppler effect), and dynamically change the data frame size accordingly to reduce errors and retransmissions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتعامل بروتوكول Q-MAC مع جودة الخدمة (QoS)؟</template>
+          <template class="content-en">How does the Q-MAC protocol handle Quality of Service (QoS)?</template>
+          <span class="content-target">كيف يتعامل بروتوكول Q-MAC مع جودة الخدمة (QoS)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يستخدم بنية طوابير متعددة (Multi-queuing) داخل العقدة، حيث يتم تصنيف الحزم وإعطاؤها أولوية بناءً على أهمية محتواها (تحددها طبقة التطبيق).</template>
+          <template class="content-en">It uses an intra-node multi-queuing architecture, where packets are categorized and prioritized based on the criticality of their content (determined by the application layer).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي آلية الاستماع منخفض الطاقة (LPL) في بروتوكول BMAC؟</template>
+          <template class="content-en">What is the Low-Power Listening (LPL) mechanism in the BMAC protocol?</template>
+          <span class="content-target">ما هي آلية الاستماع منخفض الطاقة (LPL) في بروتوكول BMAC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي آلية تستيقظ فيها العقدة لفترة قصيرة جداً لأخذ عينة من القناة (Preamble sampling). إذا وجدت نشاطاً تظل مستيقظة، وإلا تعود للنوم فوراً، مما يقلل الاستماع الخامل بشكل كبير.</template>
+          <template class="content-en">It is a mechanism where a node wakes up very briefly to sample the channel (Preamble sampling). If it detects activity, it stays awake; otherwise, it returns to sleep immediately, drastically reducing idle listening.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم RTS/CTS في بروتوكول BMAC؟</template>
+          <template class="content-en">Why don't we use RTS/CTS in the BMAC protocol?</template>
+          <span class="content-target">لماذا لا نستخدم RTS/CTS في بروتوكول BMAC؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن حزم RTS/CTS تضيف عبئاً إضافياً يستهلك الطاقة. BMAC يفضل البساطة ويعتمد على تقييم القناة الواضحة (CCA) وتأخير الحزم (Back-offs) لتجنب التصادم.</template>
+          <template class="content-en">Because RTS/CTS packets add control overhead that consumes energy. BMAC prefers simplicity and relies on Clear Channel Assessment (CCA) and packet back-offs for collision avoidance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الاستماع للغير (Overhearing) ولماذا هو ضار؟</template>
+          <template class="content-en">What is Overhearing and why is it harmful?</template>
+          <span class="content-target">ما هو الاستماع للغير (Overhearing) ولماذا هو ضار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو أن تقوم العقدة باستقبال وفك تشفير حزم بيانات مرسلة إلى عقدة أخرى. هو ضار لأنه يستهلك طاقة العقدة في معالجة بيانات لا تخصها.</template>
+          <template class="content-en">It is when a node receives and decodes data packets sent to another node. It is harmful because it consumes the node's energy processing data that doesn't belong to it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الاستماع الخامل (Idle Listening)",
+      "en": "Idle Listening"
+    },
+    "back": {
+      "definition": {
+        "ar": "بقاء جهاز الاستقبال قيد التشغيل للاستماع إلى القناة تحسباً لوجود بيانات، مما يستهلك 50-100% من الطاقة.",
+        "en": "Keeping the receiver on to listen to the channel for possible data, consuming 50-100% of energy."
+      },
+      "example": {
+        "ar": "ترك الراديو يعمل طوال الليل رغم عدم وجود أي رسائل مرسلة.",
+        "en": "Leaving the radio on all night even though no messages are being sent."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الاستماع للغير (Overhearing)",
+      "en": "Overhearing"
+    },
+    "back": {
+      "definition": {
+        "ar": "استماع العقدة لحزم بيانات غير موجهة إليها، مما يؤدي إلى هدر الطاقة.",
+        "en": "A node listening to data packets that are not intended for itself, wasting energy."
+      },
+      "example": {
+        "ar": "استماع العقدة A لمحادثة بين العقدتين B و C.",
+        "en": "Node A listening to a conversation between nodes B and C."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "بروتوكول S-MAC",
+      "en": "S-MAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول MAC يستخدم دورة عمل ثابتة (نوم واستيقاظ دوري) وآلية RTS/CTS لتوفير الطاقة.",
+        "en": "A MAC protocol that uses a fixed duty cycle (periodic sleep and listen) and RTS/CTS to save energy."
+      },
+      "example": {
+        "ar": "تنام العقدة لنصف ثانية وتستيقظ لنصف ثانية بشكل متكرر.",
+        "en": "A node sleeps for half a second and wakes up for half a second repeatedly."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "بروتوكول L-MAC",
+      "en": "L-MAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول خفيف الوزن يعتمد على تقسيم الوقت (TDMA) لمنع التصادمات تماماً.",
+        "en": "A lightweight protocol based on Time Division Multiple Access (TDMA) to completely prevent collisions."
+      },
+      "example": {
+        "ar": "كل عقدة لها فترة زمنية محددة (Slot) للإرسال لا يشاركها فيها أحد.",
+        "en": "Each node has a specific time slot for transmission that no one else shares."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مشكلة العقدة المخفية",
+      "en": "Hidden Terminal Problem"
+    },
+    "back": {
+      "definition": {
+        "ar": "مرسلان لا يسمعان بعضهما يرسلان بيانات لنفس المستقبل في نفس الوقت، مما يسبب تصادماً.",
+        "en": "Two transmitters that cannot hear each other send data to the same receiver simultaneously, causing a collision."
+      },
+      "example": {
+        "ar": "يتم حلها باستخدام آلية RTS/CTS.",
+        "en": "It is solved using the RTS/CTS mechanism."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "مشكلة العقدة المكشوفة",
+      "en": "Exposed Terminal Problem"
+    },
+    "back": {
+      "definition": {
+        "ar": "عقدة تمتنع عن الإرسال لأنها تسمع إرسالاً مجاوراً، رغم أن مستقبلها الفعلي بعيد وآمن من التداخل.",
+        "en": "A node refrains from transmitting because it overhears a neighboring transmission, even though its actual receiver is safe from interference."
+      },
+      "example": {
+        "ar": "يتم حلها باستخدام الجدولة الديناميكية المدركة للجيران (NAD).",
+        "en": "It is solved using Neighbour-aware dynamic (NAD) scheduling."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "آلية RTS/CTS",
+      "en": "RTS/CTS Mechanism"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية مصافحة (طلب إرسال / تأكيد إرسال) تستخدم لحجز القناة وتجنب مشكلة العقدة المخفية.",
+        "en": "A handshaking mechanism (Request to Send / Clear to Send) used to reserve the channel and avoid the hidden terminal problem."
+      },
+      "example": {
+        "ar": "مستعارة من بروتوكول IEEE 802.11 وتستخدم في S-MAC.",
+        "en": "Borrowed from IEEE 802.11 and used in S-MAC."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "بروتوكول Q-MAC",
+      "en": "Q-MAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول يركز على جودة الخدمة (QoS) باستخدام طوابير متعددة لترتيب الحزم حسب الأهمية.",
+        "en": "A protocol focusing on Quality of Service (QoS) using multiple queues to order packets by criticality."
+      },
+      "example": {
+        "ar": "إعطاء أولوية لحزم إنذار الحريق على حزم قراءة الحرارة العادية.",
+        "en": "Prioritizing fire alarm packets over regular temperature reading packets."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "تأثير دوبلر (في WSN)",
+      "en": "Doppler Effect (in WSN)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغير في تردد الإشارة بسبب حركة العقد، مما يؤدي إلى فقدان البيانات في الشبكات المتنقلة.",
+        "en": "A change in signal frequency due to node mobility, leading to data loss in mobile networks."
+      },
+      "example": {
+        "ar": "يتم تقليله بتغيير حجم الإطار ديناميكياً باستخدام مرشح كالمان.",
+        "en": "Mitigated by dynamically changing frame size using a Kalman filter."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "مرشح كالمان الممتد",
+      "en": "Extended Kalman Filter"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تستخدم في الشبكات المتنقلة للتنبؤ بحجم الإطار الأمثل لكل عملية إرسال بناءً على حالة القناة.",
+        "en": "An algorithm used in mobile networks to forecast the optimal frame size for every transmission based on channel state."
+      },
+      "example": {
+        "ar": "تقصير الإطار عندما تكون القناة سيئة بسبب الحركة السريعة.",
+        "en": "Shortening the frame when the channel is poor due to fast movement."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "بروتوكول T-MAC",
+      "en": "T-MAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول يستخدم دورة عمل متغيرة، حيث تعود العقدة للنوم مبكراً إذا لم تكتشف أي نشاط (Timeout).",
+        "en": "A protocol using a variable duty cycle, where a node returns to sleep early if it detects no activity (Timeout)."
+      },
+      "example": {
+        "ar": "يوفر طاقة أكثر من S-MAC في أوقات انعدام حركة المرور.",
+        "en": "Saves more energy than S-MAC during times of no traffic."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "بروتوكول PMAC",
+      "en": "PMAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول يحدد دورات العمل ديناميكياً بناءً على حالة حركة المرور (Pattern MAC).",
+        "en": "A protocol that determines duty cycles dynamically based on traffic status (Pattern MAC)."
+      },
+      "example": {
+        "ar": "يوفر الطاقة في الحمل المنخفض ويزيد الإنتاجية في الحمل العالي.",
+        "en": "Saves power in low load and increases throughput in high load."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "بروتوكول BMAC",
+      "en": "BMAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول بسيط يعتمد على الاستماع منخفض الطاقة (LPL) وتقييم القناة الواضحة (CCA) بدون RTS/CTS.",
+        "en": "A simple protocol relying on Low-Power Listening (LPL) and Clear Channel Assessment (CCA) without RTS/CTS."
+      },
+      "example": {
+        "ar": "يستخدم أخذ عينات التمهيد (Preamble sampling) لتقليل الاستماع الخامل.",
+        "en": "Uses preamble sampling to reduce idle listening."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الاستماع منخفض الطاقة (LPL)",
+      "en": "Low-Power Listening (LPL)"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية تستيقظ فيها العقدة لفترة وجيزة جداً للتحقق من وجود نشاط في القناة قبل العودة للنوم.",
+        "en": "A mechanism where a node wakes up very briefly to check the channel for activity before returning to sleep."
+      },
+      "example": {
+        "ar": "ميزة أساسية في بروتوكول BMAC.",
+        "en": "A core feature of the BMAC protocol."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "بروتوكول O-MAC",
+      "en": "O-MAC Protocol"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول إدارة طاقة يركز على المستقبل (Receiver-centric) يعتمد على التشغيل المتدرج العشوائي.",
+        "en": "A receiver-centric power management protocol based on Pseudorandom Staggered On."
+      },
+      "example": {
+        "ar": "يتطلب تزامن الوقت واكتشاف الجيران غير المتزامن.",
+        "en": "Requires time synchronization and asynchronous neighbor discovery."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو الهدف الأساسي لبروتوكولات MAC في شبكات الاستشعار اللاسلكية (WSN)؟",
+      "en": "What is the primary goal of MAC protocols in Wireless Sensor Networks (WSN)?"
+    },
+    "options": {
+      "ar": [
+        "زيادة الإنتاجية (Throughput) إلى أقصى حد",
+        "توفير الطاقة (Energy Saving)",
+        "تحقيق العدالة بين العقد (Fairness)",
+        "تقليل التأخير (Latency) فقط"
+      ],
+      "en": [
+        "Maximizing throughput",
+        "Energy Saving",
+        "Achieving fairness among nodes",
+        "Minimizing latency only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نظراً لأن عقد الاستشعار تعمل بالبطاريات، فإن توفير الطاقة هو الهدف الأساسي لجميع بروتوكولات MAC في هذه الشبكات.",
+      "en": "Since sensor nodes are battery-powered, energy saving is the primary goal of all MAC protocols in these networks."
+    },
+    "hint": {
+      "ar": "فكر في المورد الأكثر تقييداً في عقد الاستشعار.",
+      "en": "Think about the most constrained resource in sensor nodes."
+    },
+    "difficulty": "easy",
+    "conceptId": "mac-wsn-energy-sources"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من مصادر استهلاك الطاقة التالية يستهلك 50% إلى 100% من الطاقة في شبكات الاستشعار؟",
+      "en": "Which of the following sources of energy consumption consumes 50% to 100% of energy in WSNs?"
+    },
+    "options": {
+      "ar": [
+        "نقل بيانات التحكم (Overhead)",
+        "تحديد الموقع (Localization)",
+        "الاستماع الخامل (Idle listening)",
+        "الوظيفة التعاونية (Collaborative function)"
+      ],
+      "en": [
+        "Transmission of overhead",
+        "Localization",
+        "Idle listening",
+        "Collaborative function"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الاستماع الخامل يحدث عندما يظل جهاز الاستقبال قيد التشغيل للاستماع إلى القناة رغم عدم وجود بيانات، وهو أكبر مصدر لهدر الطاقة.",
+      "en": "Idle listening occurs when the receiver stays on to listen to the channel even when there is no data, making it the largest source of energy waste."
+    },
+    "hint": {
+      "ar": "يحدث عندما تنتظر العقدة شيئاً لا يأتي.",
+      "en": "It happens when a node waits for something that doesn't arrive."
+    },
+    "difficulty": "medium",
+    "conceptId": "mac-wsn-energy-sources"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي بروتوكول MAC يستخدم دورة عمل ثابتة (Fixed duty cycle) مقسمة إلى فترات استماع ونوم؟",
+      "en": "Which MAC protocol uses a fixed duty cycle divided into listen and sleep periods?"
+    },
+    "options": {
+      "ar": [
+        "T-MAC",
+        "PMAC",
+        "S-MAC",
+        "BMAC"
+      ],
+      "en": [
+        "T-MAC",
+        "PMAC",
+        "S-MAC",
+        "BMAC"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بروتوكول S-MAC يعتمد على دورة عمل ثابتة لتقليل الاستماع الخامل، حيث تتزامن العقد للنوم والاستيقاظ معاً.",
+      "en": "The S-MAC protocol relies on a fixed duty cycle to reduce idle listening, where nodes synchronize to sleep and wake up together."
+    },
+    "hint": {
+      "ar": "حرف S يرمز إلى Sensor.",
+      "en": "The letter S stands for Sensor."
+    },
+    "difficulty": "easy",
+    "conceptId": "s-mac-protocol"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كيف يمنع بروتوكول L-MAC التصادمات تماماً؟",
+      "en": "How does the L-MAC protocol completely prevent collisions?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام آلية RTS/CTS",
+        "بتقسيم الوقت إلى فترات زمنية (TDMA)",
+        "باستخدام الاستماع منخفض الطاقة (LPL)",
+        "باستخدام مرشح كالمان"
+      ],
+      "en": [
+        "Using RTS/CTS mechanism",
+        "By dividing time into slots (TDMA)",
+        "Using Low-Power Listening (LPL)",
+        "Using a Kalman filter"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بروتوكول L-MAC هو بروتوكول يعتمد على TDMA، حيث يتم تخصيص فترة زمنية محددة لكل عقدة، مما يلغي التنافس والتصادمات.",
+      "en": "L-MAC is a TDMA-based protocol where a specific time slot is allocated to each node, eliminating contention and collisions."
+    },
+    "hint": {
+      "ar": "يعتمد على تخصيص الوقت بدلاً من التنافس.",
+      "en": "It relies on time allocation rather than contention."
+    },
+    "difficulty": "medium",
+    "conceptId": "l-mac-protocol"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الآلية الشائعة المستخدمة لحل مشكلة العقدة المخفية (Hidden Terminal Problem)؟",
+      "en": "What is the common mechanism used to solve the Hidden Terminal Problem?"
+    },
+    "options": {
+      "ar": [
+        "TDMA",
+        "LPL / CCA",
+        "RTS / CTS",
+        "CSMA / CD"
+      ],
+      "en": [
+        "TDMA",
+        "LPL / CCA",
+        "RTS / CTS",
+        "CSMA / CD"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "آلية RTS/CTS (طلب إرسال/تأكيد إرسال) تحجز القناة وتُعلم العقد المخفية بأن المستقبل مشغول، مما يمنع التصادم.",
+      "en": "The RTS/CTS mechanism reserves the channel and informs hidden nodes that the receiver is busy, preventing collisions."
+    },
+    "hint": {
+      "ar": "آلية مصافحة تتكون من رسالتين قبل إرسال البيانات.",
+      "en": "A two-message handshaking mechanism before sending data."
+    },
+    "difficulty": "medium",
+    "conceptId": "hidden-exposed-terminal"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي بروتوكول يستخدم بنية طوابير متعددة (Multi-queuing) لترتيب الحزم بناءً على أهميتها (QoS)؟",
+      "en": "Which protocol uses a multi-queuing architecture to order packets based on their criticality (QoS)?"
+    },
+    "options": {
+      "ar": [
+        "BMAC",
+        "Q-MAC",
+        "O-MAC",
+        "D-MAC"
+      ],
+      "en": [
+        "BMAC",
+        "Q-MAC",
+        "O-MAC",
+        "D-MAC"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بروتوكول Q-MAC (QoS-aware MAC) يركز على جودة الخدمة ويستخدم طوابير متعددة لإعطاء الأولوية للحزم الحرجة.",
+      "en": "The Q-MAC (QoS-aware MAC) protocol focuses on Quality of Service and uses multiple queues to prioritize critical packets."
+    },
+    "hint": {
+      "ar": "الحرف الأول من اسم البروتوكول يرمز إلى Quality.",
+      "en": "The first letter of the protocol stands for Quality."
+    },
+    "difficulty": "easy",
+    "conceptId": "q-mac-protocol"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في الشبكات اللاسلكية المتنقلة، ما هي التقنية المستخدمة للتنبؤ بحجم الإطار المناسب لتقليل تأثير دوبلر؟",
+      "en": "In mobile wireless networks, what technique is used to forecast the appropriate frame size to reduce the Doppler effect?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية التوجيه AODV",
+        "مرشح كالمان الممتد (Extended Kalman filter)",
+        "تقييم القناة الواضحة (CCA)",
+        "الجدولة الديناميكية (NAD)"
+      ],
+      "en": [
+        "AODV routing algorithm",
+        "Extended Kalman filter",
+        "Clear Channel Assessment (CCA)",
+        "Neighbour-aware dynamic (NAD) scheduling"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُستخدم مرشح كالمان الممتد للتنبؤ بحالة القناة وتغيير حجم الإطار ديناميكياً لتقليل فقدان البيانات الناتج عن تأثير دوبلر.",
+      "en": "The Extended Kalman filter is used to predict channel state and dynamically change frame size to reduce data loss caused by the Doppler effect."
+    },
+    "hint": {
+      "ar": "اسمها يحتوي على كلمة 'مرشح' (Filter).",
+      "en": "Its name contains the word 'Filter'."
+    },
+    "difficulty": "hard",
+    "conceptId": "mobile-wsn-mac"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لبروتوكول T-MAC مقارنة ببروتوكول S-MAC في أوقات انعدام حركة المرور؟",
+      "en": "What is the main advantage of the T-MAC protocol compared to S-MAC during times of no traffic?"
+    },
+    "options": {
+      "ar": [
+        "يستخدم T-MAC آلية RTS/CTS أسرع",
+        "يعود T-MAC للنوم مبكراً (Timeout) مما يوفر طاقة أكبر",
+        "يستخدم T-MAC فترات زمنية (TDMA) بدلاً من التنافس",
+        "لا توجد ميزة، S-MAC أفضل دائماً"
+      ],
+      "en": [
+        "T-MAC uses a faster RTS/CTS mechanism",
+        "T-MAC returns to sleep early (Timeout), saving more energy",
+        "T-MAC uses time slots (TDMA) instead of contention",
+        "No advantage, S-MAC is always better"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بروتوكول T-MAC يستخدم دورة عمل متغيرة، حيث تعود العقدة للنوم إذا لم تكتشف أي نشاط خلال فترة زمنية محددة، مما يمنع هدر الطاقة الذي يحدث في دورة S-MAC الثابتة.",
+      "en": "T-MAC uses a variable duty cycle, returning to sleep if no activity is detected within a timeout period, preventing the energy waste seen in S-MAC's fixed cycle."
+    },
+    "hint": {
+      "ar": "حرف T يرمز إلى Timeout.",
+      "en": "The letter T stands for Timeout."
+    },
+    "difficulty": "medium",
+    "conceptId": "pmac-tmac-protocols"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من البروتوكولات التالية لا يقدم أي آلية لتبادل الحزم المتعددة مثل RTS/CTS ويعتمد بدلاً من ذلك على الاستماع منخفض الطاقة (LPL)؟",
+      "en": "Which of the following protocols does not offer any multi-packet methodology like RTS/CTS and relies instead on Low-Power Listening (LPL)?"
+    },
+    "options": {
+      "ar": [
+        "S-MAC",
+        "BMAC",
+        "Q-MAC",
+        "D-MAC"
+      ],
+      "en": [
+        "S-MAC",
+        "BMAC",
+        "Q-MAC",
+        "D-MAC"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بروتوكول BMAC هو بروتوكول بسيط يتخلى عن RTS/CTS لتقليل العبء، ويعتمد على LPL و CCA لتجنب التصادم وتوفير الطاقة.",
+      "en": "BMAC is a simple protocol that abandons RTS/CTS to reduce overhead, relying on LPL and CCA for collision avoidance and energy saving."
+    },
+    "hint": {
+      "ar": "تم تطويره في جامعة بيركلي (Berkeley).",
+      "en": "It was developed at Berkeley."
+    },
+    "difficulty": "medium",
+    "conceptId": "bmac-protocol"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي المشكلة التي تحدث عندما يتم منع عقدة من الإرسال لأنها تسمع إرسالاً مجاوراً لن يتداخل مع مستقبلها الفعلي؟",
+      "en": "What is the problem that occurs when a node is prevented from transmitting because it overhears a neighboring transmission that will not interfere with its actual receiver?"
+    },
+    "options": {
+      "ar": [
+        "مشكلة العقدة المخفية (Hidden Terminal)",
+        "مشكلة الاستماع الخامل (Idle Listening)",
+        "مشكلة العقدة المكشوفة (Exposed Terminal)",
+        "تأثير دوبلر (Doppler Effect)"
+      ],
+      "en": [
+        "Hidden Terminal Problem",
+        "Idle Listening Problem",
+        "Exposed Terminal Problem",
+        "Doppler Effect"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هذه هي مشكلة العقدة المكشوفة، حيث تظن العقدة خطأً أن القناة مشغولة بالكامل، مما يقلل من الإنتاجية الكلية للشبكة.",
+      "en": "This is the Exposed Terminal Problem, where a node falsely assumes the channel is completely busy, reducing the overall throughput of the network."
+    },
+    "hint": {
+      "ar": "العقدة 'مكشوفة' لإرسال لا يخصها.",
+      "en": "The node is 'exposed' to a transmission that doesn't concern it."
+    },
+    "difficulty": "medium",
+    "conceptId": "hidden-exposed-terminal"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن بروتوكول CSMA/CD (المستخدم في الإيثرنت) مناسب لشبكات الاستشعار. هذا فخ! شبكات الاستشعار تتطلب بروتوكولات تركز على توفير الطاقة (مثل S-MAC و BMAC) لأن العقد تعمل بالبطاريات، بينما CSMA/CD يستهلك طاقة كبيرة في الاستماع الخامل.</template>
+    <template class="content-en">Believing that CSMA/CD (used in Ethernet) is suitable for WSNs. This is a trap! WSNs require energy-centric protocols (like S-MAC and BMAC) because nodes are battery-powered, whereas CSMA/CD wastes massive energy on idle listening.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاستماع الخامل (Idle Listening) هو العدو الأول لبطارية عقدة الاستشعار، حيث يستهلك 50% إلى 100% من الطاقة. جميع بروتوكولات MAC في هذه الوحدة (S-MAC, T-MAC, BMAC) صُممت أساساً لمحاربة هذا العدو عبر آليات النوم والاستيقاظ (Duty Cycling).</template>
+    <template class="content-en">Idle Listening is the number one enemy of a sensor node's battery, consuming 50% to 100% of energy. All MAC protocols in this module (S-MAC, T-MAC, BMAC) are primarily designed to combat this enemy via Duty Cycling mechanisms.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في بروتوكول BMAC، يتم نقل عبء استهلاك الطاقة بذكاء من المستقبل إلى المرسل. المستقبل ينام معظم الوقت ويستيقظ للحظات (LPL)، بينما المرسل يضطر لإرسال إشارة تمهيد (Preamble) طويلة جداً لضمان استيقاظ المستقبل. هذا مثالي للشبكات التي يندر فيها إرسال البيانات.</template>
+    <template class="content-en">In BMAC, the energy burden is cleverly shifted from the receiver to the sender. The receiver sleeps most of the time and wakes up briefly (LPL), while the sender must transmit a very long preamble to ensure the receiver wakes up. This is ideal for networks with infrequent data transmission.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين العقدة المخفية والمكشوفة. تذكر: المخفية تسبب 'تصادماً' (فقدان بيانات) لأن المرسلين لا يريان بعضهما. المكشوفة تسبب 'تأخيراً' (انخفاض إنتاجية) لأن المرسل يرى إرسالاً لا يضره فيمتنع عن الإرسال.</template>
+    <template class="content-en">Confusing Hidden and Exposed terminals. Remember: Hidden causes 'collisions' (data loss) because senders can't see each other. Exposed causes 'delay' (reduced throughput) because a sender sees a harmless transmission and refrains from sending.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

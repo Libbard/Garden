@@ -218,13 +218,13 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الخوارزمية التسلسلية لضرب مصفوفة بحجم n x n في متجه بحجم n x 1 تتطلب n^2 من عمليات الضرب والجمع.</p><ul><li>في <strong><b>التقسيم الصفي أحادي الأبعاد (1-D Rowwise)</b></strong>، يتم تقسيم المصفوفة على n معالجات بحيث يخزن كل معالج صفاً كاملاً، ويملك كل معالج عنصراً واحداً من المتجه. يتطلب ذلك بثاً شاملاً (All-to-all broadcast) للمتجه.</li><li>في <strong><b>التقسيم ثنائي الأبعاد (2-D Partitioning)</b></strong>، تُقسم المصفوفة على n^2 معالج (كل معالج يملك عنصراً واحداً). يتم محاذاة المتجه قطرياً، ثم بثه في الأعمدة، وأخيراً جمع النتائج في الصفوف.</li></ul></template>
-    <template class="content-en"><p>The serial algorithm for multiplying an n x n matrix by an n x 1 vector requires n^2 multiplications and additions.</p><ul><li>In <strong><b>Rowwise 1-D Partitioning</b></strong>, the matrix is partitioned among n processors, each storing a complete row. The vector is distributed such that each process owns one element. This requires an all-to-all broadcast of the vector.</li><li>In <strong><b>2-D Partitioning</b></strong>, the matrix is partitioned among n^2 processors (one element per processor). The vector is aligned to the principal diagonal, broadcast along columns, and results are reduced along rows.</li></ul></template>
+    <template class="content-ar"><p>الخوارزمية التسلسلية لضرب مصفوفة بحجم n x n في متجه بحجم n x 1 تتطلب \(n^2\) من عمليات الضرب والجمع.</p><ul><li>في <strong><b>التقسيم الصفي أحادي الأبعاد (1-D Rowwise)</b></strong>، يتم تقسيم المصفوفة على n معالجات بحيث يخزن كل معالج صفاً كاملاً، ويملك كل معالج عنصراً واحداً من المتجه. يتطلب ذلك بثاً شاملاً (All-to-all broadcast) للمتجه.</li><li>في <strong><b>التقسيم ثنائي الأبعاد (2-D Partitioning)</b></strong>، تُقسم المصفوفة على \(n^2\) معالج (كل معالج يملك عنصراً واحداً). يتم محاذاة المتجه قطرياً، ثم بثه في الأعمدة، وأخيراً جمع النتائج في الصفوف.</li></ul></template>
+    <template class="content-en"><p>The serial algorithm for multiplying an n x n matrix by an n x 1 vector requires \(n^2\) multiplications and additions.</p><ul><li>In <strong><b>Rowwise 1-D Partitioning</b></strong>, the matrix is partitioned among n processors, each storing a complete row. The vector is distributed such that each process owns one element. This requires an all-to-all broadcast of the vector.</li><li>In <strong><b>2-D Partitioning</b></strong>, the matrix is partitioned among \(n^2\) processors (one element per processor). The vector is aligned to the principal diagonal, broadcast along columns, and results are reduced along rows.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>التقسيم ثنائي الأبعاد يتطلب ثلاث عمليات اتصال أساسية:</p><ul><li>اتصال واحد-إلى-واحد للمحاذاة،</li><li>بث واحد-إلى-الكل في الأعمدة،</li><li>وتقليل الكل-إلى-واحد في الصفوف.</li></ul><p>تستغرق كل عملية اتصال وقت Θ(log n)، مما يجعل الوقت المتوازي الكلي Θ(log n).</p><p>ومع ذلك، التكلفة (حاصل ضرب المعالجات في الوقت) هي Θ(n^2 log n)، وبما أن التكلفة التسلسلية هي O(n^2)، فإن هذه الخوارزمية <b>غير مثالية التكلفة (not cost-optimal)</b>.</p></template>
-    <template class="content-en"><p>The 2-D partitioning requires three basic communication operations:</p><ul><li>one-to-one communication for alignment,</li><li>one-to-all broadcast in columns,</li><li>and all-to-one reduction in rows.</li></ul><p>Each communication step takes Θ(log n) time, making the total parallel time Θ(log n).</p><p>However, the cost (process-time product) is Θ(n^2 log n). Since the serial complexity is O(n^2), this algorithm is <b>not cost-optimal</b>.</p></template>
+    <template class="content-ar"><p>التقسيم ثنائي الأبعاد يتطلب ثلاث عمليات اتصال أساسية:</p><ul><li>اتصال واحد-إلى-واحد للمحاذاة،</li><li>بث واحد-إلى-الكل في الأعمدة،</li><li>وتقليل الكل-إلى-واحد في الصفوف.</li></ul><p>تستغرق كل عملية اتصال وقت Θ(log n)، مما يجعل الوقت المتوازي الكلي Θ(log n).</p><p>ومع ذلك، التكلفة (حاصل ضرب المعالجات في الوقت) هي Θ(n^2 log n)، وبما أن التكلفة التسلسلية هي \(O(n^2)\)، فإن هذه الخوارزمية <b>غير مثالية التكلفة (not cost-optimal)</b>.</p></template>
+    <template class="content-en"><p>The 2-D partitioning requires three basic communication operations:</p><ul><li>one-to-one communication for alignment,</li><li>one-to-all broadcast in columns,</li><li>and all-to-one reduction in rows.</li></ul><p>Each communication step takes Θ(log n) time, making the total parallel time Θ(log n).</p><p>However, the cost (process-time product) is Θ(n^2 log n). Since the serial complexity is \(O(n^2)\), this algorithm is <b>not cost-optimal</b>.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -478,8 +478,8 @@
           <span class="content-target"></span>
         </td>
         <td class="td-bad" data-bilingual>
-          <template class="content-ar">p = n^2</template>
-          <template class="content-en">p = n^2</template>
+          <template class="content-ar">\(p = n^2\)</template>
+          <template class="content-en">\(p = n^2\)</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -775,15 +775,15 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>بما أن كل عملية ضرب وجمع تأخذ وقتاً ثابتاً، وعمليات التجميع والبث تأخذ وقت log n، فإن وقت التشغيل الكلي هو log n.</p><p>استخدام n^3 معالج للحصول على وقت log n يجعل الخوارزمية <b>غير مثالية التكلفة</b> (التكلفة n^3 log n مقارنة بـ n^3 تسلسلياً).</p><p>يمكن جعلها مثالية التكلفة باستخدام n^3 / log n معالج على طول اتجاه التجميع.</p></template>
-    <template class="content-en"><p>Since each add-multiply takes constant time, and accumulation and broadcast take log n time, the total runtime is log n.</p><p>Using n^3 processors to achieve log n time makes the algorithm <b>not cost-optimal</b> (cost is n^3 log n vs serial n^3).</p><p>It can be made cost-optimal by using n^3 / log n processors along the direction of accumulation.</p></template>
+    <template class="content-ar"><p>بما أن كل عملية ضرب وجمع تأخذ وقتاً ثابتاً، وعمليات التجميع والبث تأخذ وقت log n، فإن وقت التشغيل الكلي هو log n.</p><p>استخدام \(n^3\) معالج للحصول على وقت log n يجعل الخوارزمية <b>غير مثالية التكلفة</b> (التكلفة \(n^3 \log n\) مقارنة بـ \(n^3\) تسلسلياً).</p><p>يمكن جعلها مثالية التكلفة باستخدام \(n^3 / \log n\) معالج على طول اتجاه التجميع.</p></template>
+    <template class="content-en"><p>Since each add-multiply takes constant time, and accumulation and broadcast take log n time, the total runtime is log n.</p><p>Using \(n^3\) processors to achieve log n time makes the algorithm <b>not cost-optimal</b> (cost is \(n^3 \log n\) vs serial \(n^3\)).</p><p>It can be made cost-optimal by using \(n^3 / \log n\) processors along the direction of accumulation.</p></template>
     <div class="content-target"></div>
   </div>
 
   <div class="formula-block">
     <div data-bilingual>
-      <template class="content-ar"><strong>وقت التشغيل الكلي لخوارزمية DNS باستخدام n^3 معالج.</strong></template>
-      <template class="content-en"><strong>Total runtime of the DNS algorithm using n^3 processors.</strong></template>
+      <template class="content-ar"><strong>وقت التشغيل الكلي لخوارزمية DNS باستخدام \(n^3\) معالج.</strong></template>
+      <template class="content-en"><strong>Total runtime of the DNS algorithm using \(n^3\) processors.</strong></template>
       <div class="content-target"></div>
     </div>
     <div class="math-block">$$\Theta(\log n)$$</div>
@@ -967,8 +967,8 @@
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>عن طريق تقليل عدد المعالجات إلى n^3 / log n على طول اتجاه التجميع، مما يجعل التكلفة الإجمالية تتطابق مع التعقيد التسلسلي O(n^3).</p></template>
-      <template class="content-en"><p>By reducing the number of processors to n^3 / log n along the direction of accumulation, making the total cost match the serial complexity of O(n^3).</p></template>
+      <template class="content-ar"><p>عن طريق تقليل عدد المعالجات إلى \(n^3 / \log n\) على طول اتجاه التجميع، مما يجعل التكلفة الإجمالية تتطابق مع التعقيد التسلسلي \(O(n^3)\).</p></template>
+      <template class="content-en"><p>By reducing the number of processors to \(n^3 / \log n\) along the direction of accumulation, making the total cost match the serial complexity of \(O(n^3)\).</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -993,13 +993,13 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في <strong><b>التنفيذ المتداخل (Pipelined Execution)</b></strong>، يتم تنفيذ خطوات تطبيع الصف، الاتصال، والحذف بشكل غير متزامن. لا ينتظر المعالج اكتمال التكرار السابق بالكامل ليبدأ.</p><ul><li><strong><b>التقسيم الصفي 1D (Block 1D):</b></strong> يعاني من مشكلة <span class="smart-term" data-term-en="Load Imbalance" data-ar="عدم توازن الحمل" data-en-def="A situation where some processors have significantly more work to do than others, leading to idle time and inefficiency.">عدم توازن الحمل<span class="smart-term-tooltip"></span></span> (Load Imbalance) لأن المعالجات التي تنتهي من صفوفها تصبح خاملة. الوقت المتوازي حوالي n^3/p (تكلفة أعلى بـ 3/2 من التسلسلي).</li><li><strong><b>التقسيم الدائري (Cyclic Mapping):</b></strong> يحل مشكلة عدم توازن الحمل بتوزيع الصفوف بشكل دوري.</li><li><strong><b>التقسيم 2D مع التنفيذ المتداخل:</b></strong> يتحرك جبهة الحساب بخطوة واحدة في وقت ثابت. الوقت المتوازي هو O(n)، وهو مثالي التكلفة.</li></ul></template>
-    <template class="content-en"><p>In <strong><b>Pipelined Execution</b></strong>, the steps of row normalization, communication, and elimination are performed asynchronously. A processor does not wait for the entire previous iteration to complete.</p><ul><li><strong><b>Block 1D Mapping:</b></strong> Suffers from <span class="smart-term" data-term-en="Load Imbalance" data-ar="عدم توازن الحمل" data-en-def="A situation where some processors have significantly more work to do than others, leading to idle time and inefficiency.">load imbalance<span class="smart-term-tooltip"></span></span> because processors become idle once their assigned rows are fully processed. Parallel time is approx n^3/p (cost is 3/2 times sequential).</li><li><strong><b>Cyclic Mapping:</b></strong> Alleviates the load imbalance problem by distributing rows in a round-robin fashion.</li><li><strong><b>2-D Mapping with Pipelining:</b></strong> The computation front moves a single step in constant time. Parallel time is O(n), which is cost-optimal.</li></ul></template>
+    <template class="content-ar"><p>في <strong><b>التنفيذ المتداخل (Pipelined Execution)</b></strong>، يتم تنفيذ خطوات تطبيع الصف، الاتصال، والحذف بشكل غير متزامن. لا ينتظر المعالج اكتمال التكرار السابق بالكامل ليبدأ.</p><ul><li><strong><b>التقسيم الصفي 1D (Block 1D):</b></strong> يعاني من مشكلة <span class="smart-term" data-term-en="Load Imbalance" data-ar="عدم توازن الحمل" data-en-def="A situation where some processors have significantly more work to do than others, leading to idle time and inefficiency.">عدم توازن الحمل<span class="smart-term-tooltip"></span></span> (Load Imbalance) لأن المعالجات التي تنتهي من صفوفها تصبح خاملة. الوقت المتوازي حوالي \(n^3/p\) (تكلفة أعلى بـ 3/2 من التسلسلي).</li><li><strong><b>التقسيم الدائري (Cyclic Mapping):</b></strong> يحل مشكلة عدم توازن الحمل بتوزيع الصفوف بشكل دوري.</li><li><strong><b>التقسيم 2D مع التنفيذ المتداخل:</b></strong> يتحرك جبهة الحساب بخطوة واحدة في وقت ثابت. الوقت المتوازي هو O(n)، وهو مثالي التكلفة.</li></ul></template>
+    <template class="content-en"><p>In <strong><b>Pipelined Execution</b></strong>, the steps of row normalization, communication, and elimination are performed asynchronously. A processor does not wait for the entire previous iteration to complete.</p><ul><li><strong><b>Block 1D Mapping:</b></strong> Suffers from <span class="smart-term" data-term-en="Load Imbalance" data-ar="عدم توازن الحمل" data-en-def="A situation where some processors have significantly more work to do than others, leading to idle time and inefficiency.">load imbalance<span class="smart-term-tooltip"></span></span> because processors become idle once their assigned rows are fully processed. Parallel time is approx \(n^3/p\) (cost is 3/2 times sequential).</li><li><strong><b>Cyclic Mapping:</b></strong> Alleviates the load imbalance problem by distributing rows in a round-robin fashion.</li><li><strong><b>2-D Mapping with Pipelining:</b></strong> The computation front moves a single step in constant time. Parallel time is O(n), which is cost-optimal.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>في التقسيم 2D مع التنفيذ المتداخل وعندما يكون p < n، يقوم المعالج بإجراء n^2/p عملية ضرب وطرح. الوقت المتوازي الكلي يصبح (2n^2/p) * n = 2n^3/p.</p><p>هذا يعني أن عدد العمليات هو ثلاثة أضعاف العدد التسلسلي، مما يبرز تحديات الكفاءة عند تقليل عدد المعالجات.</p><p>التقسيم الدائري 2D (2-D Cyclic Mapping) يقلل من الخمول، حيث يكون أقصى فرق في الحمل بين أي معالجين هو تحديث صف وعمود واحد، مما يضيف عبئاً إضافياً مقداره Θ(n^2 √p).</p></template>
-    <template class="content-en"><p>In 2-D mapping with pipelining and p < n, a processor performs n^2/p multiplications and subtractions. The total parallel runtime becomes (2n^2/p) * n = 2n^3/p.</p><p>This is three times the serial operation count, highlighting efficiency challenges when scaling down processors.</p><p>2-D Cyclic Mapping alleviates idling. The maximum difference in computational load between any two processes is one row and one column update, contributing an overhead of Θ(n^2 √p).</p></template>
+    <template class="content-ar"><p>في التقسيم 2D مع التنفيذ المتداخل وعندما يكون p < n، يقوم المعالج بإجراء \(n^2/p\) عملية ضرب وطرح. الوقت المتوازي الكلي يصبح \((2n^2/p) \cdot  n = 2n^3/p\).</p><p>هذا يعني أن عدد العمليات هو ثلاثة أضعاف العدد التسلسلي، مما يبرز تحديات الكفاءة عند تقليل عدد المعالجات.</p><p>التقسيم الدائري 2D (2-D Cyclic Mapping) يقلل من الخمول، حيث يكون أقصى فرق في الحمل بين أي معالجين هو تحديث صف وعمود واحد، مما يضيف عبئاً إضافياً مقداره Θ(n^2 √p).</p></template>
+    <template class="content-en"><p>In 2-D mapping with pipelining and p < n, a processor performs \(n^2/p\) multiplications and subtractions. The total parallel runtime becomes \((2n^2/p) \cdot  n = 2n^3/p\).</p><p>This is three times the serial operation count, highlighting efficiency challenges when scaling down processors.</p><p>2-D Cyclic Mapping alleviates idling. The maximum difference in computational load between any two processes is one row and one column update, contributing an overhead of Θ(n^2 √p).</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -1229,13 +1229,13 @@
           <span class="content-target"></span>
         </td>
         <td class="td-bad" data-bilingual>
-          <template class="content-ar">O(n^3) في أسوأ الحالات</template>
-          <template class="content-en">O(n^3) in worst cases</template>
+          <template class="content-ar">\(O(n^3)\) في أسوأ الحالات</template>
+          <template class="content-en">\(O(n^3)\) in worst cases</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">O(n^2 p) للتقسيم 1D</template>
-          <template class="content-en">O(n^2 p) for 1-D</template>
+          <template class="content-ar">\(O(n^2 p)\) للتقسيم 1D</template>
+          <template class="content-en">\(O(n^2 p)\) for 1-D</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -1318,8 +1318,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تقوم خوارزمية التعويض الخلفي بإجراء حوالي n^2 / 2 عملية ضرب وطرح.</p><p>نظراً لأن تعقيد هذا الجزء أقل مقارنة بجزء التحليل (Factorization)، يجب تحسين توزيع البيانات لخدمة جزء التحليل أولاً.</p><p>باستخدام التقسيم الصفي 1D (Rowwise block 1-D)، يمكن تمرير قيمة المتغير المحسوبة بشكل متداخل (Pipelined back).</p><p>يتطلب كل خطوة وقتاً ثابتاً للاتصال و Θ(n/p) للحساب.</p></template>
-    <template class="content-en"><p>The back-substitution algorithm performs approximately n^2 / 2 multiplications and subtractions.</p><p>Since the complexity of this part is asymptotically lower than the factorization part, data distribution should be optimized for the factorization part.</p><p>Using a rowwise block 1-D mapping, the value of the variable solved at a step can be pipelined back.</p><p>Each step requires constant time for communication and Θ(n/p) time for computation.</p></template>
+    <template class="content-ar"><p>تقوم خوارزمية التعويض الخلفي بإجراء حوالي \(n^2 / 2\) عملية ضرب وطرح.</p><p>نظراً لأن تعقيد هذا الجزء أقل مقارنة بجزء التحليل (Factorization)، يجب تحسين توزيع البيانات لخدمة جزء التحليل أولاً.</p><p>باستخدام التقسيم الصفي 1D (Rowwise block 1-D)، يمكن تمرير قيمة المتغير المحسوبة بشكل متداخل (Pipelined back).</p><p>يتطلب كل خطوة وقتاً ثابتاً للاتصال و Θ(n/p) للحساب.</p></template>
+    <template class="content-en"><p>The back-substitution algorithm performs approximately \(n^2 / 2\) multiplications and subtractions.</p><p>Since the complexity of this part is asymptotically lower than the factorization part, data distribution should be optimized for the factorization part.</p><p>Using a rowwise block 1-D mapping, the value of the variable solved at a step can be pipelined back.</p><p>Each step requires constant time for communication and Θ(n/p) time for computation.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1344,8 +1344,8 @@
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>لأن التعقيد الزمني للتعويض الخلفي (O(n^2)) أقل بكثير من تعقيد خطوة التحليل/الحذف الغاوسي (O(n^3))، وبالتالي فإن خطوة التحليل هي التي تهيمن على وقت التنفيذ الكلي.</p></template>
-      <template class="content-en"><p>Because the time complexity of back-substitution (O(n^2)) is asymptotically lower than the factorization/Gaussian elimination step (O(n^3)), so the factorization step dominates the overall execution time.</p></template>
+      <template class="content-ar"><p>لأن التعقيد الزمني للتعويض الخلفي \((O(n^2))\) أقل بكثير من تعقيد خطوة التحليل/الحذف الغاوسي \((O(n^3))\)، وبالتالي فإن خطوة التحليل هي التي تهيمن على وقت التنفيذ الكلي.</p></template>
+      <template class="content-en"><p>Because the time complexity of back-substitution \((O(n^2))\) is asymptotically lower than the factorization/Gaussian elimination step \((O(n^3))\), so the factorization step dominates the overall execution time.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -1394,8 +1394,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأن تكلفته الإجمالية (عدد المعالجات × الوقت) هي Θ(n^2 log n)، بينما التعقيد التسلسلي هو O(n^2). وجود معامل log n يجعله غير مثالي.</template>
-          <template class="content-en">Because its total cost (processors × time) is Θ(n^2 log n), while the serial complexity is O(n^2). The presence of the log n factor makes it not cost-optimal.</template>
+          <template class="content-ar">لأن تكلفته الإجمالية (عدد المعالجات × الوقت) هي Θ(n^2 log n)، بينما التعقيد التسلسلي هو \(O(n^2)\). وجود معامل log n يجعله غير مثالي.</template>
+          <template class="content-en">Because its total cost (processors × time) is Θ(n^2 log n), while the serial complexity is \(O(n^2)\). The presence of the log n factor makes it not cost-optimal.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1530,8 +1530,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لا، لأن تعقيدها (O(n^2)) أقل بكثير من تعقيد الحذف الغاوسي (O(n^3)). لذا، فإن خطوة الحذف هي التي تحدد الأداء الكلي ومثالية التكلفة.</template>
-          <template class="content-en">No, because its complexity (O(n^2)) is asymptotically lower than Gaussian elimination (O(n^3)). Thus, the elimination step determines the overall performance and cost optimality.</template>
+          <template class="content-ar">لا، لأن تعقيدها \((O(n^2))\) أقل بكثير من تعقيد الحذف الغاوسي \((O(n^3))\). لذا، فإن خطوة الحذف هي التي تحدد الأداء الكلي ومثالية التكلفة.</template>
+          <template class="content-en">No, because its complexity \((O(n^2))\) is asymptotically lower than Gaussian elimination \((O(n^3))\). Thus, the elimination step determines the overall performance and cost optimality.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1553,12 +1553,12 @@
     },
     "back": {
       "definition": {
-        "ar": "W = n^2",
-        "en": "W = n^2"
+        "ar": "\\(W = n^2\\)",
+        "en": "\\(W = n^2\\)"
       },
       "example": {
-        "ar": "يتطلب n^2 من عمليات الضرب والجمع.",
-        "en": "Requires n^2 multiplications and additions."
+        "ar": "يتطلب \\(n^2\\) من عمليات الضرب والجمع.",
+        "en": "Requires \\(n^2\\) multiplications and additions."
       }
     }
   },
@@ -1591,8 +1591,8 @@
         "en": "No, it is not cost-optimal."
       },
       "example": {
-        "ar": "التكلفة هي Θ(n^2 log n) مقارنة بـ O(n^2) تسلسلياً.",
-        "en": "Cost is Θ(n^2 log n) compared to O(n^2) serially."
+        "ar": "التكلفة هي Θ(n^2 log n) مقارنة بـ \\(O(n^2)\\) تسلسلياً.",
+        "en": "Cost is Θ(n^2 log n) compared to \\(O(n^2)\\) serially."
       }
     }
   },
@@ -1604,8 +1604,8 @@
     },
     "back": {
       "definition": {
-        "ar": "O(n^3)",
-        "en": "O(n^3)"
+        "ar": "\\(O(n^3)\\)",
+        "en": "\\(O(n^3)\\)"
       },
       "example": {
         "ar": "ضرب مصفوفتين بحجم n x n.",
@@ -1667,8 +1667,8 @@
   {
     "id": 8,
     "front": {
-      "ar": "ما هو وقت التشغيل الكلي لخوارزمية DNS باستخدام n^3 معالج؟",
-      "en": "What is the total runtime of the DNS algorithm using n^3 processors?"
+      "ar": "ما هو وقت التشغيل الكلي لخوارزمية DNS باستخدام \\(n^3\\) معالج؟",
+      "en": "What is the total runtime of the DNS algorithm using \\(n^3\\) processors?"
     },
     "back": {
       "definition": {
@@ -1689,8 +1689,8 @@
     },
     "back": {
       "definition": {
-        "ar": "باستخدام n^3 / log n معالج.",
-        "en": "By using n^3 / log n processors."
+        "ar": "باستخدام \\(n^3 / \\log n\\) معالج.",
+        "en": "By using \\(n^3 / \\log n\\) processors."
       },
       "example": {
         "ar": "تقليل المعالجات على طول اتجاه التجميع.",
@@ -1808,8 +1808,8 @@
     },
     "back": {
       "definition": {
-        "ar": "n^2 / 2",
-        "en": "n^2 / 2"
+        "ar": "\\(n^2 / 2\\)",
+        "en": "\\(n^2 / 2\\)"
       },
       "example": {
         "ar": "أقل بكثير من تعقيد الحذف الغاوسي.",
@@ -1857,20 +1857,20 @@
       "ar": [
         "O(n)",
         "O(n log n)",
-        "O(n^2)",
-        "O(n^3)"
+        "\\(O(n^2)\\)",
+        "\\(O(n^3)\\)"
       ],
       "en": [
         "O(n)",
         "O(n log n)",
-        "O(n^2)",
-        "O(n^3)"
+        "\\(O(n^2)\\)",
+        "\\(O(n^3)\\)"
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "الخوارزمية التسلسلية تتطلب n^2 من عمليات الضرب والجمع.",
-      "en": "The serial algorithm requires n^2 multiplications and additions."
+      "ar": "الخوارزمية التسلسلية تتطلب \\(n^2\\) من عمليات الضرب والجمع.",
+      "en": "The serial algorithm requires \\(n^2\\) multiplications and additions."
     },
     "hint": {
       "ar": "فكر في عدد العناصر في المصفوفة.",
@@ -1901,8 +1901,8 @@
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "التكلفة هي Θ(n^2 log n) وهي أكبر من التعقيد التسلسلي O(n^2)، لذا فهي غير مثالية التكلفة.",
-      "en": "The cost is Θ(n^2 log n) which is greater than the serial complexity O(n^2), hence not cost-optimal."
+      "ar": "التكلفة هي Θ(n^2 log n) وهي أكبر من التعقيد التسلسلي \\(O(n^2)\\)، لذا فهي غير مثالية التكلفة.",
+      "en": "The cost is Θ(n^2 log n) which is greater than the serial complexity \\(O(n^2)\\), hence not cost-optimal."
     },
     "hint": {
       "ar": "عمليات الاتصال تضيف معامل log n.",
@@ -1946,19 +1946,19 @@
   {
     "id": 4,
     "question": {
-      "ar": "ما هو وقت التشغيل الكلي لخوارزمية DNS عند استخدام n^3 معالج؟",
-      "en": "What is the total runtime of the DNS algorithm when using n^3 processors?"
+      "ar": "ما هو وقت التشغيل الكلي لخوارزمية DNS عند استخدام \\(n^3\\) معالج؟",
+      "en": "What is the total runtime of the DNS algorithm when using \\(n^3\\) processors?"
     },
     "options": {
       "ar": [
         "O(n)",
-        "O(n^2)",
+        "\\(O(n^2)\\)",
         "O(log n)",
         "O(1)"
       ],
       "en": [
         "O(n)",
-        "O(n^2)",
+        "\\(O(n^2)\\)",
         "O(log n)",
         "O(1)"
       ]
@@ -2017,14 +2017,14 @@
       "ar": [
         "O(log n)",
         "O(n)",
-        "O(n^2)",
-        "O(n^3)"
+        "\\(O(n^2)\\)",
+        "\\(O(n^3)\\)"
       ],
       "en": [
         "O(log n)",
         "O(n)",
-        "O(n^2)",
-        "O(n^3)"
+        "\\(O(n^2)\\)",
+        "\\(O(n^3)\\)"
       ]
     },
     "correctIndex": 1,
@@ -2079,13 +2079,13 @@
     },
     "options": {
       "ar": [
-        "يزيد من التعقيد التسلسلي إلى O(n^4)",
+        "يزيد من التعقيد التسلسلي إلى \\(O(n^4)\\)",
         "يمنع استخدام التنفيذ المتداخل (Pipelining)",
         "يتطلب ذاكرة إضافية هائلة",
         "يجعل التقسيم الدائري مستحيلاً"
       ],
       "en": [
-        "Increases serial complexity to O(n^4)",
+        "Increases serial complexity to \\(O(n^4)\\)",
         "Precludes the use of pipelining",
         "Requires massive additional memory",
         "Makes cyclic mapping impossible"
@@ -2112,21 +2112,21 @@
     "options": {
       "ar": [
         "n",
-        "n^2 / 2",
-        "n^3 / 3",
+        "\\(n^2 / 2\\)",
+        "\\(n^3 / 3\\)",
         "log n"
       ],
       "en": [
         "n",
-        "n^2 / 2",
-        "n^3 / 3",
+        "\\(n^2 / 2\\)",
+        "\\(n^3 / 3\\)",
         "log n"
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "التعويض الخلفي يتعامل مع مصفوفة مثلثية، لذا فهو يتطلب حوالي n^2 / 2 عملية.",
-      "en": "Back-substitution deals with a triangular matrix, so it requires approximately n^2 / 2 operations."
+      "ar": "التعويض الخلفي يتعامل مع مصفوفة مثلثية، لذا فهو يتطلب حوالي \\(n^2 / 2\\) عملية.",
+      "en": "Back-substitution deals with a triangular matrix, so it requires approximately \\(n^2 / 2\\) operations."
     },
     "hint": {
       "ar": "نصف مساحة المصفوفة المربعة.",
@@ -2143,22 +2143,22 @@
     },
     "options": {
       "ar": [
-        "n^3 / p",
-        "2n^3 / p",
-        "n^2 / p",
+        "\\(n^3 / p\\)",
+        "\\(2n^3 / p\\)",
+        "\\(n^2 / p\\)",
         "O(n)"
       ],
       "en": [
-        "n^3 / p",
-        "2n^3 / p",
-        "n^2 / p",
+        "\\(n^3 / p\\)",
+        "\\(2n^3 / p\\)",
+        "\\(n^2 / p\\)",
         "O(n)"
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "الوقت هو (2n^2/p) * n = 2n^3/p، وهو ثلاثة أضعاف عدد العمليات التسلسلية.",
-      "en": "The time is (2n^2/p) * n = 2n^3/p, which is three times the serial operation count."
+      "ar": "الوقت هو \\((2n^2/p) \\cdot  n = 2n^3/p\\)، وهو ثلاثة أضعاف عدد العمليات التسلسلية.",
+      "en": "The time is \\((2n^2/p) \\cdot  n = 2n^3/p\\), which is three times the serial operation count."
     },
     "hint": {
       "ar": "يحتوي على المعامل 2.",
@@ -2175,8 +2175,8 @@
   <div class="vault-entry">
     <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
-      <template class="content-ar">الاعتقاد بأن التقسيم ثنائي الأبعاد (2-D) لضرب المصفوفة في المتجه هو دائماً الأفضل. في الواقع، هو غير مثالي التكلفة (Not cost-optimal) لأن تكلفته Θ(n^2 log n) مقارنة بـ O(n^2) تسلسلياً.</template>
-      <template class="content-en">Believing that 2-D partitioning for matrix-vector multiplication is always better. In reality, it is not cost-optimal because its cost is Θ(n^2 log n) compared to O(n^2) serially.</template>
+      <template class="content-ar">الاعتقاد بأن التقسيم ثنائي الأبعاد (2-D) لضرب المصفوفة في المتجه هو دائماً الأفضل. في الواقع، هو غير مثالي التكلفة (Not cost-optimal) لأن تكلفته Θ(n^2 log n) مقارنة بـ \(O(n^2)\) تسلسلياً.</template>
+      <template class="content-en">Believing that 2-D partitioning for matrix-vector multiplication is always better. In reality, it is not cost-optimal because its cost is Θ(n^2 log n) compared to \(O(n^2)\) serially.</template>
       <div class="content-target"></div>
     </div>
   </div>
@@ -2191,8 +2191,8 @@
   <div class="vault-entry">
     <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
-      <template class="content-ar">خوارزمية DNS سريعة جداً (وقت log n) ولكنها تهدر الموارد إذا استخدمت n^3 معالج. السر يكمن في تقليل المعالجات إلى n^3 / log n لجعلها مثالية التكلفة.</template>
-      <template class="content-en">The DNS algorithm is extremely fast (log n time) but wastes resources if using n^3 processors. The secret is reducing processors to n^3 / log n to make it cost-optimal.</template>
+      <template class="content-ar">خوارزمية DNS سريعة جداً (وقت log n) ولكنها تهدر الموارد إذا استخدمت \(n^3\) معالج. السر يكمن في تقليل المعالجات إلى \(n^3 / \log n\) لجعلها مثالية التكلفة.</template>
+      <template class="content-en">The DNS algorithm is extremely fast (log n time) but wastes resources if using \(n^3\) processors. The secret is reducing processors to \(n^3 / \log n\) to make it cost-optimal.</template>
       <div class="content-target"></div>
     </div>
   </div>

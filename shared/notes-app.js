@@ -4402,6 +4402,7 @@
   function runImport(file) {
     var Sz = window.GardenNotesSerialize;
     var St = window.GardenNotesStore;
+    if (file && /\.mirsam$/i.test(file.name || '') && window.GardenNotesLibrary && GardenNotesLibrary.openFile) { impMsg('', ''); GardenNotesLibrary.openFile(file); return; }
     if (!Sz || !Sz.fromJson || !file) return;
     if (file.size > IMPORT_MAX) {
       impMsg('error', tooBig(file.size, IMPORT_MAX));
@@ -4556,7 +4557,7 @@
     }
     if (FILE_IMP[kind]) { pickImport(kind); return; }
     if (!inp) return;
-    inp.accept = kind === 'md' ? '.md,.markdown,.txt,text/markdown,text/plain' : 'application/json,.json';
+    inp.accept = kind === 'md' ? '.md,.markdown,.txt,text/markdown,text/plain' : 'application/json,.json,.mirsam';
     inp.click();
   }
   /*@3.NOAJ.503*/
@@ -9496,6 +9497,30 @@
     });
   }
 
+  function drawingsFolder() {
+    var a = foldersRead();
+    for (var i = 0; i < a.length; i++) if (!a[i].p && (a[i].dr || a[i].n === 'رسوماتي' || a[i].n === 'My drawings')) return a[i].id;
+    var id = newId('f');
+    folderPut({ id: id, n: L('رسوماتي', 'My drawings'), p: '', ord: a.filter(function (f) { return !f.p; }).length + 1, updated_at: Date.now(), dr: 1 });
+    return id;
+  }
+  function saveDrawingNote(blob, o) {
+    o = o || {};
+    var St = window.GardenNotesStore, B2 = window.GardenNotesBlocks;
+    if (!St || !St.putImage || !B2) return Promise.reject(new Error('no_store'));
+    return St.putImage(blob, { name: o.name || 'mirsam.webp' }).then(function (rid) {
+      var id = newId('rn'), now = Date.now(), title = o.title || L('رسمتي', 'My drawing');
+      bornRec(id, 'rich', title, { f: drawingsFolder() });
+      var b = B2.blank('img');
+      b.url = 'byte-local:' + rid; b.alt = title; b.cap = 0; b.loc = 1;
+      if (o.iar > 0 && o.inw > 0) { b.iar = o.iar; b.inw = o.inw; }
+      if (o.ms) b.ms = o.ms;
+      var doc = { v: 1, blocks: [b, B2.blank('p')] };
+      pgvSeed(doc); doc.pg = 2;
+      return putBorn(id, doc, now).then(function () { try { reload({ keepOpen: true }); } catch (e) {} return id; });
+    });
+  }
+
   function insertShape() {
     var B2 = window.GardenNotesBlocks;
     var wmD = shapeKit.sh === 'sticker' ? 0.12 : (shapeKit.sh === 'sticky' ? 0.3 : 0.28);
@@ -12585,10 +12610,6 @@
       setAcc('list'); setPanel(true);
       setTimeout(function () { if (els.find) els.find.focus(); }, 60);
     });
-    var lk = document.getElementById('na-look');
-    if (lk) lk.addEventListener('click', function () {
-      if (window.GardenModuleTheme) GardenModuleTheme.open(lk, { scope: 'site' });
-    });
     var pv = document.getElementById('na-pdf-view');
     if (pv) pv.addEventListener('click', function () {
       if (!pdfOn()) return;
@@ -12936,6 +12957,7 @@
     reload: reload,
     open: openNote,
     create: createNote,
+    saveDrawing: saveDrawingNote,
     state: S,
     folders: foldersRead,
     /*@3.NOAJ.281*/

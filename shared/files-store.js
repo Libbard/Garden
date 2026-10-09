@@ -9,7 +9,8 @@
     'audio/x-m4a', 'audio/aac', 'audio/mpeg', 'audio/wav', 'audio/x-wav',
     'audio/3gpp', 'audio/amr', 'audio/flac', 'audio/x-caf',
     'video/mp4', 'video/webm', 'video/quicktime', 'video/x-matroska', 'video/3gpp',
-    'image/webp', 'image/jpeg', 'image/png', 'image/gif'
+    'image/webp', 'image/jpeg', 'image/png', 'image/gif',
+    'application/x-garden-mirsam'
   ];
 
   var ALIAS = {

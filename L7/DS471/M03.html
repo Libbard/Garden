@@ -1,0 +1,2038 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="3" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>هندسة الميزات والمعالجة المسبقة · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M02.html" data-gh-next="M04.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#classification-and-mnist" class="toc-link" data-bilingual>
+        <template class="content-ar">التصنيف ومجموعة بيانات MNIST</template>
+        <template class="content-en">Classification and MNIST Dataset</template>
+        <span class="content-target">التصنيف ومجموعة بيانات MNIST</span>
+      </a>
+      <a href="#performance-measures" class="toc-link" data-bilingual>
+        <template class="content-ar">مقاييس الأداء</template>
+        <template class="content-en">Performance Measures</template>
+        <span class="content-target">مقاييس الأداء</span>
+      </a>
+      <a href="#cross-validation" class="toc-link" data-bilingual>
+        <template class="content-ar">التحقق المتقاطع</template>
+        <template class="content-en">Cross-Validation</template>
+        <span class="content-target">التحقق المتقاطع</span>
+      </a>
+      <a href="#confusion-matrix-and-error-analysis" class="toc-link" data-bilingual>
+        <template class="content-ar">مصفوفة الارتباك وتحليل الأخطاء</template>
+        <template class="content-en">Confusion Matrix and Error Analysis</template>
+        <span class="content-target">مصفوفة الارتباك وتحليل الأخطاء</span>
+      </a>
+      <a href="#feature-extraction-categorical" class="toc-link" data-bilingual>
+        <template class="content-ar">استخراج الميزات من المتغيرات الفئوية</template>
+        <template class="content-en">Feature Extraction from Categorical Variables</template>
+        <span class="content-target">استخراج الميزات من المتغيرات الفئوية</span>
+      </a>
+      <a href="#feature-extraction-text" class="toc-link" data-bilingual>
+        <template class="content-ar">استخراج الميزات من النصوص (حقيبة الكلمات)</template>
+        <template class="content-en">Feature Extraction from Text (Bag-of-Words)</template>
+        <span class="content-target">استخراج الميزات من النصوص (حقيبة الكلمات)</span>
+      </a>
+      <a href="#feature-extraction-images" class="toc-link" data-bilingual>
+        <template class="content-ar">استخراج الميزات من الصور</template>
+        <template class="content-en">Extracting Features from Images</template>
+        <span class="content-target">استخراج الميزات من الصور</span>
+      </a>
+      <a href="#data-standardization" class="toc-link" data-bilingual>
+        <template class="content-ar">التوحيد القياسي للبيانات</template>
+        <template class="content-en">Data Standardization</template>
+        <span class="content-target">التوحيد القياسي للبيانات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 3</template>
+      <template class="content-en">Module 3</template>
+      <span class="content-target">الوحدة 3</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">هندسة الميزات والمعالجة المسبقة</h1>
+      <p class="hero-description">تغطي هذه الوحدة التصنيف، مقاييس الأداء، تحليل الأخطاء، واستخراج الميزات من المتغيرات الفئوية، النصوص، والصور، بالإضافة إلى التوحيد القياسي للبيانات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Feature Engineering and Preprocessing</h1>
+      <p class="hero-description">This module covers classification, performance measures, error analysis, feature extraction from categorical variables, text, and images, as well as data standardization.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التصنيف</span>
+      <span class="tag">مقاييس الأداء</span>
+      <span class="tag">استخراج الميزات</span>
+      <span class="tag">معالجة النصوص</span>
+      <span class="tag">معالجة الصور</span>
+      <span class="tag">التوحيد القياسي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Classification</span>
+      <span class="tag">Performance Measures</span>
+      <span class="tag">Feature Extraction</span>
+      <span class="tag">Text Processing</span>
+      <span class="tag">Image Processing</span>
+      <span class="tag">Data Standardization</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>تحديد الميزات ذات الصلة لمشكلة تعلم آلي معينة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات للتعامل مع المتغيرات الفئوية، والبيانات النصية، وبيانات الصور.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ تقنيات التوحيد القياسي والتطبيع للبيانات لتحسين أداء النموذج.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Identify relevant features for a given machine learning problem.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply techniques for handling categorical variables, text data, and image data.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement data standardization and normalization techniques to improve model performance.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="classification-and-mnist" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> التصنيف ومجموعة بيانات MNIST</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Classification and MNIST Dataset</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التصنيف هو مهمة تعلم آلي تتضمن تصنيف البيانات إلى فئات محددة مسبقاً بناءً على ميزاتها. تخيلها كعملية فرز رسائل البريد إلى صناديق مختلفة بناءً على الرمز البريدي.</p></template>
+    <template class="content-en"><p>Classification is a machine learning task that involves categorizing data into predefined classes based on their features. Think of it like sorting mail into different bins based on the zip code.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الهدف من التصنيف هو التنبؤ بتسميات الفئات الفئوية للحالات الجديدة بعد التدريب على مجموعة بيانات ذات تسميات فئات معروفة. يتيح ذلك عمليات اتخاذ القرار الآلية ويقلل من الجهد البشري.</p><p>مجموعة بيانات MNIST هي مجموعة شهيرة تتكون من 70,000 صورة صغيرة لأرقام مكتوبة بخط اليد (من 0 إلى 9). كل صورة بحجم 28×28 بكسل، مما ينتج عنه 784 ميزة (تمثل شدة كل بكسل من 0 إلى 255).</p><p>يمكننا تبسيط المشكلة لإنشاء <b>مصنف ثنائي (Binary Classifier)</b>، مثل "مكتشف الرقم 5"، والذي يميز فقط بين فئتين: 5 و ليس-5.</p></template>
+    <template class="content-en"><p>The goal of classification is to predict the categorical class labels of new instances after being trained on a dataset with known class labels. This enables automated decision-making and reduces human effort.</p><p>The MNIST dataset is a famous set of 70,000 small images of handwritten digits (0-9). Each image is 28x28 pixels, resulting in 784 features (representing each pixel's intensity from 0 to 255).</p><p>We can simplify the problem to create a <b><span class="smart-term" data-term-en="Binary Classifier" data-ar="المصنف الثنائي" data-en-def="A classifier capable of distinguishing between just two classes.">binary classifier<span class="smart-term-tooltip"></span></span></b>, such as a "5-detector", which distinguishes between just two classes: 5 and not-5.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُستخدم مصنف SGD (Stochastic Gradient Descent) غالباً لهذه المهام لأنه يتعامل مع مجموعات البيانات الكبيرة بكفاءة. يعالج مثيلات التدريب بشكل مستقل، واحداً تلو الآخر، مما يجعله مناسباً جداً للتعلم عبر الإنترنت (online learning).</p><p>يعتمد مصنف SGD على العشوائية أثناء التدريب. للحصول على نتائج قابلة للتكرار، يجب تعيين المعلمة <code>random_state</code>.</p><p>تُرجع مجموعات البيانات المحملة بواسطة Scikit-Learn عادةً بنية قاموس تحتوي على مفاتيح مثل <code>data</code> (الميزات)، <code>target</code> (التسميات)، و <code>DESCR</code> (وصف مجموعة البيانات).</p></template>
+    <template class="content-en"><p>The SGDClassifier (Stochastic Gradient Descent) is often used for these tasks because it handles very large datasets efficiently. It deals with training instances independently, one at a time, making it well-suited for online learning.</p><p>The SGDClassifier relies on randomness during training. For reproducible results, the <code>random_state</code> parameter must be set.</p><p>Datasets loaded by Scikit-Learn generally return a dictionary structure containing keys like <code>data</code> (features), <code>target</code> (labels), and <code>DESCR</code> (dataset description).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.datasets import fetch_openml
+mnist = fetch_openml('mnist_784', version=1)
+X, y = mnist["data"], mnist["target"]
+
+# Binary classifier target vectors
+y_train_5 = (y_train == 5)
+y_test_5 = (y_test == 5)
+
+from sklearn.linear_model import SGDClassifier
+sgd_clf = SGDClassifier(random_state=42)
+sgd_clf.fit(X_train, y_train_5)</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>SIFT</th><th>SURF</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">سرعة الحساب</template>
+          <template class="content-en">Computation Speed</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أبطأ</template>
+          <template class="content-en">Slower</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أسرع (مسرع)</template>
+          <template class="content-en">Faster (Speeded-Up)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تحويل مشكلة تصنيف متعددة الفئات (مثل الأرقام من 0 إلى 9) إلى مشكلة تصنيف ثنائي (مثل 5 أو ليس 5) خطوة أولى مفيدة؟</template>
+      <template class="content-en">Why is converting a multi-class classification problem (like digits 0-9) into a binary classification problem (like 5 or not 5) a useful first step?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يسمح بتبسيط المشكلة لتقييم النماذج الأساسية وفهم مقاييس الأداء (مثل الدقة والاستدعاء) بشكل أوضح قبل التعامل مع تعقيدات التصنيف متعدد الفئات.</p></template>
+      <template class="content-en"><p>It simplifies the problem to evaluate baseline models and understand performance metrics (like precision and recall) more clearly before dealing with the complexities of multi-class classification.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="performance-measures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مقاييس الأداء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Performance Measures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقييم المصنف أصعب من تقييم نموذج الانحدار. نستخدم مقاييس مثل الدقة (Accuracy)، الإحكام (Precision)، الاستدعاء (Recall)، ودرجة F1 لتقييم الأداء بشكل شامل.</p></template>
+    <template class="content-en"><p>Evaluating a classifier is trickier than evaluating a regressor. We use metrics like Accuracy, Precision, Recall, and F1 score to comprehensively assess performance.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتضمن المقاييس الأساسية ما يلي:</p><ul><li><b>الدقة (Accuracy):</b> نسبة الحالات المصنفة بشكل صحيح من إجمالي الحالات.</li><li><b>الإحكام (Precision):</b> نسبة التنبؤات الإيجابية الصحيحة من بين جميع التنبؤات الإيجابية التي قام بها النموذج.</li><li><b><span class="smart-term" data-term-en="Recall" data-ar="الاستدعاء" data-en-def="Proportion of actual positives that are correctly identified.">الاستدعاء<span class="smart-term-tooltip"></span></span> (Recall / Sensitivity):</b> نسبة التنبؤات الإيجابية الصحيحة من بين جميع الحالات الإيجابية الفعلية في البيانات.</li><li><b>درجة F1 (F1 Score):</b> المتوسط التوافقي للإحكام والاستدعاء، يوفر مقياساً واحداً يوازن بينهما.</li></ul><p>منحنى ROC (خصائص تشغيل المستقبل) يوضح المفاضلة بين معدل الإيجابية الحقيقية (TPR أو الاستدعاء) ومعدل الإيجابية الخاطئة (FPR) عبر عتبات قرار مختلفة.</p></template>
+    <template class="content-en"><p>Key metrics include:</p><ul><li><b>Accuracy:</b> Proportion of correctly classified instances out of the total instances.</li><li><b><span class="smart-term" data-term-en="Precision" data-ar="الإحكام / الدقة" data-en-def="Proportion of positive predictions that are actually correct.">Precision<span class="smart-term-tooltip"></span></span>:</b> Proportion of true positive predictions among all positive predictions made by the model.</li><li><b><span class="smart-term" data-term-en="Recall" data-ar="الاستدعاء" data-en-def="Proportion of actual positives that are correctly identified.">Recall<span class="smart-term-tooltip"></span></span> (Sensitivity):</b> Proportion of true positive predictions among all actual positive instances in the data.</li><li><b>F1 Score:</b> The harmonic mean of precision and recall, providing a single metric that balances both.</li></ul><p>The ROC (Receiver Operating Characteristic) curve illustrates the trade-off between the true positive rate (TPR/Recall) and the false positive rate (FPR) across different decision thresholds.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>غالباً ما يكون هناك علاقة عكسية بين الإحكام والاستدعاء؛ فزيادة أحدهما قد تقلل الآخر. تتم إدارة هذه المفاضلة عن طريق تعديل عتبة القرار للنموذج.</p><p>يكون <b>الإحكام</b> حاسماً عندما تكون تكلفة الإيجابية الخاطئة عالية (مثال: اكتشاف البريد العشوائي، حيث لا تريد تصنيف بريد شرعي كعشوائي).</p><p>يكون <b>الاستدعاء</b> حاسماً عندما تكون تكلفة السلبية الخاطئة عالية (مثال: اكتشاف الأمراض، حيث لا تريد تشخيص مريض مريض على أنه سليم).</p></template>
+    <template class="content-en"><p>Precision and recall often have an inverse relationship; increasing one may decrease the other. This trade-off is managed by adjusting the decision threshold of the model.</p><p><b>Precision</b> is crucial when the cost of a false positive is high (e.g., in spam detection, where marking a legitimate email as spam is bad).</p><p><b>Recall</b> is crucial when the cost of a false negative is high (e.g., in disease detection, where diagnosing a sick patient as healthy is dangerous).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات حساب الإحكام، الاستدعاء (معدل الإيجابية الحقيقية)، ومعدل الإيجابية الخاطئة.</strong></template>
+      <template class="content-en"><strong>Formulas for calculating Precision, Recall (True Positive Rate), and False Positive Rate.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall (TPR)} = \frac{TP}{TP + FN}, \quad \text{FPR} = \frac{FP}{FP + TN}$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A line chart showing an ROC curve. X-axis labeled 'False Positive Rate (FPR)', Y-axis labeled 'True Positive Rate (TPR) / Recall'. A diagonal dashed line representing a random classifier. A curved solid line bowing towards the top left corner representing a good classifier. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead for axes -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-primary)" />
+    </marker>
+    
+    <!-- Gradient for Area Under Curve (AUC) -->
+    <linearGradient id="auc-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Grid Lines -->
+  <path d="M250 70 L250 320 M350 70 L350 320 M450 70 L450 320 M550 70 L550 320 M650 70 L650 320 M150 270 L650 270 M150 220 L650 220 M150 170 L650 170 M150 120 L650 120 M150 70 L650 70" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" opacity="0.6"/>
+
+  <!-- AUC Area -->
+  <path d="M 150 320 C 150 120, 250 70, 650 70 L 650 320 Z" fill="url(#auc-grad)"/>
+
+  <!-- Random Classifier Curve (Diagonal) -->
+  <line x1="150" y1="320" x2="650" y2="70" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8 8"/>
+  
+  <!-- Good Classifier Curve (ROC) -->
+  <path d="M 150 320 C 150 120, 250 70, 650 70" fill="none" stroke="var(--brand-500)" stroke-width="4"/>
+
+  <!-- Axes -->
+  <line x1="150" y1="320" x2="680" y2="320" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="150" y1="320" x2="150" y2="40" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Perfect Classification Point -->
+  <circle cx="150" cy="70" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3"/>
+
+  <!-- Axis Ticks Text -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" text-anchor="middle">
+    <!-- X Axis -->
+    <text x="150" y="340">0.0</text>
+    <text x="250" y="340">0.2</text>
+    <text x="350" y="340">0.4</text>
+    <text x="450" y="340">0.6</text>
+    <text x="550" y="340">0.8</text>
+    <text x="650" y="340">1.0</text>
+    <!-- Y Axis -->
+    <text x="130" y="274">0.2</text>
+    <text x="130" y="224">0.4</text>
+    <text x="130" y="174">0.6</text>
+    <text x="130" y="124">0.8</text>
+    <text x="130" y="74">1.0</text>
+  </g>
+
+  <!-- Labels -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <!-- Title -->
+    <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">ROC Curve (Receiver Operating Characteristic)</text>
+    <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">منحنى ROC (خصائص تشغيل المستقبل)</text>
+
+    <!-- X Axis Label -->
+    <text x="400" y="375" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">False Positive Rate (FPR)</text>
+    <text x="400" y="375" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">معدل الإيجابيات الخاطئة (FPR)</text>
+
+    <!-- Y Axis Label -->
+    <text x="-195" y="90" transform="rotate(-90)" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">True Positive Rate (TPR) / Recall</text>
+    <text x="-195" y="90" transform="rotate(-90)" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">معدل الإيجابيات الصحيحة (TPR) / الاستدعاء</text>
+
+    <!-- Good Classifier Label -->
+    <text x="350" y="55" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Good Classifier (AUC ≈ 0.9)</text>
+    <text x="350" y="55" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">مصنف جيد (AUC ≈ 0.9)</text>
+
+    <!-- Random Classifier Label -->
+    <text x="450" y="185" text-anchor="middle" transform="rotate(-26.5, 450, 185)" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Random Classifier (AUC = 0.5)</text>
+    <text x="450" y="185" text-anchor="middle" transform="rotate(-26.5, 450, 185)" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">مصنف عشوائي (AUC = 0.5)</text>
+
+    <!-- AUC Label -->
+    <text x="300" y="220" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Area Under Curve (AUC)</text>
+    <text x="300" y="220" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">المساحة تحت المنحنى (AUC)</text>
+
+    <!-- Perfect Point Label -->
+    <text x="165" y="65" text-anchor="start" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Perfect Classification</text>
+    <text x="165" y="65" text-anchor="start" font-size="14" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تصنيف مثالي</text>
+  </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Precision (الإحكام)</th><th>Recall (الاستدعاء)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التركيز الأساسي</template>
+          <template class="content-en">Primary Focus</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">دقة التنبؤات الإيجابية (تقليل الإيجابيات الخاطئة)</template>
+          <template class="content-en">Accuracy of positive predictions (minimize False Positives)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">التقاط جميع الحالات الإيجابية الفعلية (تقليل السلبيات الخاطئة)</template>
+          <template class="content-en">Capturing all actual positive instances (minimize False Negatives)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالة الاستخدام المثلى</template>
+          <template class="content-en">Ideal Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عندما تكون تكلفة الإيجابية الخاطئة عالية (مثل تصفية البريد المزعج)</template>
+          <template class="content-en">When cost of False Positive is high (e.g., spam filtering)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عندما تكون تكلفة السلبية الخاطئة عالية (مثل تشخيص الأمراض)</template>
+          <template class="content-en">When cost of False Negative is high (e.g., disease diagnosis)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نظام يكتشف المعاملات المصرفية الاحتيالية، أيهما أهم: الإحكام أم الاستدعاء؟ ولماذا؟</template>
+      <template class="content-en">In a system detecting fraudulent bank transactions, which is more important: Precision or Recall? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الاستدعاء (Recall) أهم عادةً. تكلفة تفويت معاملة احتيالية (سلبية خاطئة) أعلى بكثير من إزعاج العميل للتحقق من معاملة شرعية (إيجابية خاطئة).</p></template>
+      <template class="content-en"><p>Recall is usually more important. The cost of missing a fraudulent transaction (False Negative) is much higher than slightly inconveniencing a customer to verify a legitimate transaction (False Positive).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-validation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التحقق المتقاطع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Cross-Validation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التحقق المتقاطع هو تقنية لتقسيم مجموعة البيانات إلى مجموعات فرعية متعددة (طيات) لتدريب وتقييم النموذج بشكل تكراري، مما يضمن تقييماً أكثر قوة.</p></template>
+    <template class="content-en"><p>Cross-validation involves partitioning the dataset into multiple subsets (folds) to iteratively train and evaluate the model, ensuring a more robust assessment.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>خطوات قياس الدقة باستخدام التحقق المتقاطع:</p><ol><li><b>إعداد البيانات:</b> تقسيم مجموعة البيانات إلى <i>k</i> طيات (folds) متساوية الحجم تقريباً (عادة 5 أو 10).</li><li><b>التدريب والتحقق:</b> لكل تكرار <i>i</i> (من 1 إلى <i>k</i>)، استخدم طية واحدة للتحقق والطيات المتبقية للتدريب.</li><li><b>حساب الدقة:</b> احسب الدقة لكل طية.</li><li><b>تقدير الدقة النهائي:</b> متوسط الدقة عبر جميع الطيات <i>k</i> يمثل تقدير أداء النموذج.</li></ol></template>
+    <template class="content-en"><p>Steps to Measure Accuracy Using Cross-Validation:</p><ol><li><b>Data Preparation:</b> Split the dataset into <i>k</i> approximately equal-sized folds (typically 5 or 10).</li><li><b>Training and Validation:</b> For each iteration <i>i</i> (from 1 to <i>k</i>), use one fold for validation and the remaining folds for training.</li><li><b>Calculate Accuracy:</b> Compute the accuracy for each fold.</li><li><b>Final Accuracy Estimation:</b> The average accuracy across all <i>k</i> folds serves as the estimate of the model's performance.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تضمن هذه الطريقة أن كل مجموعة فرعية تعمل كمجموعة تدريب ومجموعة تحقق في مراحل مختلفة من العملية، مما يقلل من التباين في تقييم الأداء ويمنع التخصيص الزائد (overfitting) على مجموعة اختبار واحدة.</p><p>في Scikit-Learn، يمكن استخدام <code>cross_val_score</code> مع <code>KFold</code> لتنفيذ هذه العملية بسهولة.</p></template>
+    <template class="content-en"><p>This method ensures that each subset serves both as a training set and as a validation set at different stages, reducing variance in performance evaluation and preventing overfitting to a single test set.</p><p>In Scikit-Learn, <code>cross_val_score</code> along with <code>KFold</code> can be used to implement this easily.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.model_selection import cross_val_score, KFold
+from sklearn.linear_model import LogisticRegression
+
+classifier = LogisticRegression()
+k_fold = KFold(n_splits=5, shuffle=True, random_state=42)
+accuracies = cross_val_score(classifier, X, y, cv=k_fold, scoring='accuracy')
+
+print("Average accuracy:", accuracies.mean())</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram illustrating 5-fold cross-validation. Show a dataset split into 5 equal blocks. Show 5 iterations (rows). In each iteration, one block is highlighted in a different color (e.g., orange) representing the 'Test/Validation' set, while the other 4 blocks are colored blue representing the 'Training' set. The validation block shifts position in each iteration. Style: educational, dark background #0d1117, accent colors #3b82f6 and #f97316, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">5-Fold Cross-Validation</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">التحقق المتقاطع بخمسة طيات</text>
+
+    <!-- Legend -->
+    <rect x="250" y="70" width="20" height="20" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="280" y="85" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">Training Data</text>
+    <text x="280" y="85" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">بيانات التدريب</text>
+
+    <rect x="420" y="70" width="20" height="20" rx="4" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="450" y="85" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">Validation Data</text>
+    <text x="450" y="85" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)">بيانات التحقق</text>
+
+    <!-- Entire Dataset Bar -->
+    <rect x="142" y="120" width="516" height="36" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="244" y1="120" x2="244" y2="156" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="348" y1="120" x2="348" y2="156" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="452" y1="120" x2="452" y2="156" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4"/>
+    <line x1="556" y1="120" x2="556" y2="156" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4"/>
+    
+    <text x="400" y="144" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Entire Dataset</text>
+    <text x="400" y="144" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">مجموعة البيانات الكاملة</text>
+
+    <!-- Arrow down to iterations -->
+    <line x1="400" y1="164" x2="400" y2="184" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- ================= ITERATION 1 ================= -->
+    <text x="125" y="225" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Iteration 1</text>
+    <text x="125" y="225" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">التكرار 1</text>
+
+    <rect x="142" y="200" width="100" height="40" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="192" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">Fold 1</text>
+    <text x="192" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">طية 1</text>
+
+    <rect x="246" y="200" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="296" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 2</text>
+    <text x="296" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 2</text>
+
+    <rect x="350" y="200" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="400" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 3</text>
+    <text x="400" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 3</text>
+
+    <rect x="454" y="200" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="504" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 4</text>
+    <text x="504" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 4</text>
+
+    <rect x="558" y="200" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="608" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 5</text>
+    <text x="608" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 5</text>
+
+    <line x1="662" y1="220" x2="674" y2="220" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="685" y="225" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Accuracy 1</text>
+    <text x="685" y="225" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">دقة 1</text>
+
+    <!-- ================= ITERATION 2 ================= -->
+    <text x="125" y="285" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Iteration 2</text>
+    <text x="125" y="285" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">التكرار 2</text>
+
+    <rect x="142" y="260" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="192" y="285" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 1</text>
+    <text x="192" y="285" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 1</text>
+
+    <rect x="246" y="260" width="100" height="40" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="296" y="285" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">Fold 2</text>
+    <text x="296" y="285" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">طية 2</text>
+
+    <rect x="350" y="260" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="400" y="285" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 3</text>
+    <text x="400" y="285" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 3</text>
+
+    <rect x="454" y="260" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="504" y="285" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 4</text>
+    <text x="504" y="285" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 4</text>
+
+    <rect x="558" y="260" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="608" y="285" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 5</text>
+    <text x="608" y="285" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 5</text>
+
+    <line x1="662" y1="280" x2="674" y2="280" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="685" y="285" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Accuracy 2</text>
+    <text x="685" y="285" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">دقة 2</text>
+
+    <!-- ================= ITERATION 3 ================= -->
+    <text x="125" y="345" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Iteration 3</text>
+    <text x="125" y="345" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">التكرار 3</text>
+
+    <rect x="142" y="320" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="192" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 1</text>
+    <text x="192" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 1</text>
+
+    <rect x="246" y="320" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="296" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 2</text>
+    <text x="296" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 2</text>
+
+    <rect x="350" y="320" width="100" height="40" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="400" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">Fold 3</text>
+    <text x="400" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">طية 3</text>
+
+    <rect x="454" y="320" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="504" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 4</text>
+    <text x="504" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 4</text>
+
+    <rect x="558" y="320" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="608" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 5</text>
+    <text x="608" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 5</text>
+
+    <line x1="662" y1="340" x2="674" y2="340" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="685" y="345" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Accuracy 3</text>
+    <text x="685" y="345" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">دقة 3</text>
+
+    <!-- ================= ITERATION 4 ================= -->
+    <text x="125" y="405" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Iteration 4</text>
+    <text x="125" y="405" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">التكرار 4</text>
+
+    <rect x="142" y="380" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="192" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 1</text>
+    <text x="192" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 1</text>
+
+    <rect x="246" y="380" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="296" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 2</text>
+    <text x="296" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 2</text>
+
+    <rect x="350" y="380" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="400" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 3</text>
+    <text x="400" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 3</text>
+
+    <rect x="454" y="380" width="100" height="40" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="504" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">Fold 4</text>
+    <text x="504" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">طية 4</text>
+
+    <rect x="558" y="380" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="608" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 5</text>
+    <text x="608" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 5</text>
+
+    <line x1="662" y1="400" x2="674" y2="400" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="685" y="405" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Accuracy 4</text>
+    <text x="685" y="405" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">دقة 4</text>
+
+    <!-- ================= ITERATION 5 ================= -->
+    <text x="125" y="465" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Iteration 5</text>
+    <text x="125" y="465" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">التكرار 5</text>
+
+    <rect x="142" y="440" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="192" y="465" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 1</text>
+    <text x="192" y="465" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 1</text>
+
+    <rect x="246" y="440" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="296" y="465" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 2</text>
+    <text x="296" y="465" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 2</text>
+
+    <rect x="350" y="440" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="400" y="465" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 3</text>
+    <text x="400" y="465" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 3</text>
+
+    <rect x="454" y="440" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="504" y="465" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Fold 4</text>
+    <text x="504" y="465" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">طية 4</text>
+
+    <rect x="558" y="440" width="100" height="40" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="608" y="465" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">Fold 5</text>
+    <text x="608" y="465" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">طية 5</text>
+
+    <line x1="662" y1="460" x2="674" y2="460" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="685" y="465" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Accuracy 5</text>
+    <text x="685" y="465" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">دقة 5</text>
+
+    <!-- ================= FINAL ACCURACY ================= -->
+    <line x1="400" y1="488" x2="400" y2="508" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="142" y="520" width="516" height="46" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="400" y="548" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">Final Performance = Average(Accuracy 1..5)</text>
+    <text x="400" y="548" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">الأداء النهائي = متوسط(الدقة 1..5)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي ميزة استخدام التحقق المتقاطع بدلاً من تقسيم البيانات مرة واحدة إلى مجموعة تدريب واختبار؟</template>
+      <template class="content-en">What is the advantage of using cross-validation instead of a single train-test split?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يوفر تقييماً أكثر موثوقية لأداء النموذج لأنه يختبر النموذج على أجزاء مختلفة من البيانات، مما يقلل من احتمالية أن تكون النتائج الجيدة أو السيئة مجرد صدفة بسبب طريقة التقسيم.</p></template>
+      <template class="content-en"><p>It provides a more reliable evaluation of model performance because it tests the model on different portions of the data, reducing the chance that good or bad results are just a fluke due to how the data was split.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="confusion-matrix-and-error-analysis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مصفوفة الارتباك وتحليل الأخطاء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Confusion Matrix and Error Analysis</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مصفوفة الارتباك هي جدول يلخص أداء نموذج التصنيف من خلال مقارنة التسميات المتوقعة بالتسميات الفعلية، مما يساعد في تحديد أنواع الأخطاء التي يرتكبها النموذج.</p></template>
+    <template class="content-en"><p>A confusion matrix is a table that summarizes the performance of a classification model by comparing predicted and actual class labels, helping identify the types of errors the model makes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون المصفوفة من أربعة مكونات أساسية للتصنيف الثنائي:</p><ul><li><b>الإيجابية الحقيقية (TP):</b> يتوقع النموذج الفئة بشكل صحيح كإيجابية.</li><li><b>السلبية الحقيقية (TN):</b> يتوقع النموذج الفئة بشكل صحيح كسلبية.</li><li><b>الإيجابية الخاطئة (FP):</b> يتوقع النموذج الفئة كإيجابية، لكنها في الواقع سلبية (<span class="smart-term" data-term-en="Type I Error" data-ar="خطأ من النوع الأول" data-en-def="False Positive (FP) - predicting an event will occur when it does not.">خطأ من النوع الأول<span class="smart-term-tooltip"></span></span>).</li><li><b>السلبية الخاطئة (FN):</b> يتوقع النموذج الفئة كسلبية، لكنها في الواقع إيجابية (<span class="smart-term" data-term-en="Type II Error" data-ar="خطأ من النوع الثاني" data-en-def="False Negative (FN) - predicting an event will not occur when it actually does.">خطأ من النوع الثاني<span class="smart-term-tooltip"></span></span>).</li></ul><p>تحليل الأخطاء أمر حاسم لتحسين النموذج. يمكننا استخدام <code>cross_val_predict</code> لإنشاء تنبؤات ثم بناء المصفوفة باستخدام <code>confusion_matrix</code>.</p></template>
+    <template class="content-en"><p>The matrix consists of four core components for binary classification:</p><ul><li><b>True Positive (TP):</b> Model correctly predicts the positive class.</li><li><b>True Negative (TN):</b> Model correctly predicts the negative class.</li><li><b>False Positive (FP):</b> Model predicts positive, but it's actually negative (<span class="smart-term" data-term-en="Type I Error" data-ar="خطأ من النوع الأول" data-en-def="False Positive (FP) - predicting an event will occur when it does not.">Type I error<span class="smart-term-tooltip"></span></span>).</li><li><b>False Negative (FN):</b> Model predicts negative, but it's actually positive (<span class="smart-term" data-term-en="Type II Error" data-ar="خطأ من النوع الثاني" data-en-def="False Negative (FN) - predicting an event will not occur when it actually does.">Type II error<span class="smart-term-tooltip"></span></span>).</li></ul><p>Error analysis is crucial for improving models. We can use <code>cross_val_predict</code> to generate predictions and then construct the matrix using <code>confusion_matrix</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لتفسير المصفوفة بشكل أفضل، يمكننا تصورها باستخدام دالة <code>matshow</code> من مكتبة Matplotlib. من المهم تطبيع (Normalize) المصفوفة لمقارنة معدلات الخطأ بدلاً من الأرقام المطلقة، خاصة إذا كانت الفئات غير متوازنة.</p><p>من خلال تحليل المصفوفة، يمكننا تحديد الفئات التي يتم تصنيفها بشكل خاطئ بشكل متكرر (مثال: الخلط بين الرقمين 3 و 5 بسبب تشابه أنماط البكسل). استراتيجيات التحسين تشمل:</p><ul><li><strong>جمع المزيد من البيانات</strong> للفئات الإشكالية،</li><li><strong>هندسة ميزات جديدة</strong>، أو</li><li><strong>المعالجة المسبقة للصور</strong> (مثل توحيد الموضع والدوران).</li></ul></template>
+    <template class="content-en"><p>To better interpret the matrix, we can visualize it using Matplotlib's <code>matshow</code> function. It's important to normalize the matrix to compare error rates rather than absolute counts, especially if classes are imbalanced.</p><p>By analyzing the matrix, we can identify frequently misclassified classes (e.g., 3s and 5s confused due to similar pixel patterns). Improvement strategies include:</p><ul><li><strong>gathering more data</strong> for problematic classes,</li><li><strong>engineering new features</strong>, or</li><li><strong>preprocessing images</strong> (standardizing position and rotation).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import confusion_matrix
+
+y_train_pred = cross_val_predict(sgd_clf, X_train_scaled, y_train, cv=3)
+conf_mx = confusion_matrix(y_train, y_train_pred)
+print(conf_mx)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A 2x2 grid representing a binary confusion matrix. Columns labeled 'Predicted Positive' and 'Predicted Negative'. Rows labeled 'Actual Positive' and 'Actual Negative'. The four cells contain 'True Positive (TP)', 'False Negative (FN)', 'False Positive (FP) - Type I Error', and 'True Negative (TN)'. Style: educational, dark background #0d1117, cells colored with varying shades of blue/red to indicate correct/incorrect predictions, viewBox 0 0 600 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <!-- Gradient for Correct Predictions (TP, TN) -->
+    <linearGradient id="correctGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Hatch Pattern for Incorrect Predictions (FP, FN) -->
+    <pattern id="errorHatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="12" stroke="var(--brand-500)" stroke-width="1.5" opacity="0.1" />
+    </pattern>
+
+    <!-- Clip path for the rounded grid -->
+    <clipPath id="gridClip">
+      <rect x="280" y="190" width="400" height="300" rx="12" />
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="45" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Confusion Matrix &amp; Error Analysis</text>
+  <text x="400" y="45" font-size="24" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">مصفوفة الارتباك وتحليل الأخطاء</text>
+
+  <!-- Predicted Class Bracket & Label -->
+  <path d="M 290 140 L 290 130 L 670 130 L 670 140 M 480 130 L 480 120" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="480" y="105" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Predicted Class</text>
+  <text x="480" y="105" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الفئة المتوقعة</text>
+
+  <!-- Actual Class Bracket & Label -->
+  <path d="M 140 200 L 130 200 L 130 480 L 140 480 M 130 340 L 120 340" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <g transform="translate(100, 340) rotate(-90)">
+    <text x="0" y="0" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Actual Class</text>
+    <text x="0" y="0" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الفئة الفعلية</text>
+  </g>
+
+  <!-- Column Headers -->
+  <text x="380" y="175" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Positive (1)</text>
+  <text x="380" y="175" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">إيجابي (1)</text>
+  
+  <text x="580" y="175" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Negative (0)</text>
+  <text x="580" y="175" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">سلبي (0)</text>
+
+  <!-- Row Headers -->
+  <text x="260" y="270" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="end" class="gsvg-en">Positive (1)</text>
+  <text x="260" y="270" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="end" class="gsvg-ar">إيجابي (1)</text>
+  
+  <text x="260" y="420" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="end" class="gsvg-en">Negative (0)</text>
+  <text x="260" y="420" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="end" class="gsvg-ar">سلبي (0)</text>
+
+  <!-- Matrix Grid -->
+  <g clip-path="url(#gridClip)">
+    <!-- True Positive (TP) -->
+    <rect x="280" y="190" width="200" height="150" fill="url(#correctGrad)" />
+    <circle cx="380" cy="225" r="16" fill="var(--on-brand-hi)" opacity="0.2" />
+    <path d="M 373 225 l 5 5 l 10 -10" fill="none" stroke="var(--on-brand-hi)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="380" y="265" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">True Positive (TP)</text>
+    <text x="380" y="265" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">إيجابي صحيح (TP)</text>
+    <text x="380" y="295" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" text-anchor="middle" class="gsvg-en">Correctly predicted Positive</text>
+    <text x="380" y="295" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" text-anchor="middle" class="gsvg-ar">توقع الفئة الإيجابية بشكل صحيح</text>
+
+    <!-- False Negative (FN) -->
+    <rect x="480" y="190" width="200" height="150" fill="var(--bg-elevated)" />
+    <rect x="480" y="190" width="200" height="150" fill="url(#errorHatch)" />
+    <circle cx="580" cy="220" r="16" fill="var(--brand-500)" opacity="0.15" />
+    <path d="M 574 214 l 12 12 M 586 214 l -12 12" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="580" y="255" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">False Negative (FN)</text>
+    <text x="580" y="255" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">سلبي خاطئ (FN)</text>
+    <text x="580" y="280" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Type II Error</text>
+    <text x="580" y="280" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">خطأ من النوع الثاني</text>
+    <text x="580" y="305" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Missed Positive</text>
+    <text x="580" y="305" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">إخفاق في توقع الإيجابي</text>
+
+    <!-- False Positive (FP) -->
+    <rect x="280" y="340" width="200" height="150" fill="var(--bg-elevated)" />
+    <rect x="280" y="340" width="200" height="150" fill="url(#errorHatch)" />
+    <circle cx="380" cy="370" r="16" fill="var(--brand-500)" opacity="0.15" />
+    <path d="M 374 364 l 12 12 M 386 364 l -12 12" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="380" y="405" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">False Positive (FP)</text>
+    <text x="380" y="405" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">إيجابي خاطئ (FP)</text>
+    <text x="380" y="430" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Type I Error</text>
+    <text x="380" y="430" font-size="15" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">خطأ من النوع الأول</text>
+    <text x="380" y="455" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">False Alarm</text>
+    <text x="380" y="455" font-size="14" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">إنذار كاذب</text>
+
+    <!-- True Negative (TN) -->
+    <rect x="480" y="340" width="200" height="150" fill="url(#correctGrad)" />
+    <circle cx="580" cy="375" r="16" fill="var(--on-brand-hi)" opacity="0.2" />
+    <path d="M 573 375 l 5 5 l 10 -10" fill="none" stroke="var(--on-brand-hi)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="580" y="415" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">True Negative (TN)</text>
+    <text x="580" y="415" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">سلبي صحيح (TN)</text>
+    <text x="580" y="445" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" text-anchor="middle" class="gsvg-en">Correctly predicted Negative</text>
+    <text x="580" y="445" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" text-anchor="middle" class="gsvg-ar">توقع الفئة السلبية بشكل صحيح</text>
+
+    <!-- Inner Grid Lines (using background color to create gaps) -->
+    <line x1="480" y1="190" x2="480" y2="490" stroke="var(--bg-surface)" stroke-width="4" />
+    <line x1="280" y1="340" x2="680" y2="340" stroke="var(--bg-surface)" stroke-width="4" />
+  </g>
+
+  <!-- Outer Grid Border -->
+  <rect x="280" y="190" width="400" height="300" rx="12" fill="none" stroke="var(--border-color)" stroke-width="2" />
+
+  <!-- Key Metrics Section -->
+  <rect x="100" y="520" width="180" height="44" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="190" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Precision = TP / (TP + FP)</text>
+  <text x="190" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الدقة = TP / (TP + FP)</text>
+
+  <rect x="310" y="520" width="180" height="44" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="400" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Recall = TP / (TP + FN)</text>
+  <text x="400" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الاستدعاء = TP / (TP + FN)</text>
+
+  <rect x="520" y="520" width="180" height="44" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="610" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Accuracy = (TP+TN) / Total</text>
+  <text x="610" y="547" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الصحة = (TP+TN) / المجموع</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل تطبيع (Normalize) مصفوفة الارتباك عند تحليل الأخطاء في مجموعة بيانات متعددة الفئات؟</template>
+      <template class="content-en">Why do we prefer to normalize the confusion matrix when analyzing errors in a multi-class dataset?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الفئات قد تحتوي على أعداد مختلفة من العينات. التطبيع يحول الأعداد المطلقة إلى نسب مئوية، مما يسمح بمقارنة عادلة لمعدلات الخطأ بين الفئات بغض النظر عن حجمها.</p></template>
+      <template class="content-en"><p>Because classes might have different numbers of samples. Normalization converts absolute counts into percentages, allowing for a fair comparison of error rates across classes regardless of their size.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-extraction-categorical" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> استخراج الميزات من المتغيرات الفئوية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Feature Extraction from Categorical Variables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتاج نماذج التعلم الآلي إلى بيانات رقمية. الترميز الأحادي الساخن (One-Hot Encoding) هو طريقة لتحويل الفئات النصية (مثل أسماء المدن) إلى متجهات ثنائية (أصفار وواحدات).</p></template>
+    <template class="content-en"><p>Machine learning models require numerical data. One-Hot Encoding is a method to convert text categories (like city names) into binary vectors (zeros and ones).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المتغيرات الفئوية هي بيانات اسمية مثل موقع الوظيفة، الجنس، إلخ. يجب تحويلها إلى تنسيقات رقمية.</p><p><b><span class="smart-term" data-term-en="One-Hot Encoding" data-ar="الترميز الأحادي الساخن" data-en-def="A method to convert categorical variables into binary features.">الترميز الأحادي الساخن<span class="smart-term-tooltip"></span></span> (One-Hot Encoding):</b></p><ul><li>يتم تمثيل كل فئة بمتجه ثنائي حيث يتم تعيين عنصر واحد إلى 1 والباقي إلى 0.</li><li>مثال: متغير فئوي للمدينة (نيويورك، سان فرانسيسكو، تشابل هيل). سيتم تمثيل كل مدينة بمتجه طوله 3.</li></ul><p>يمكن استخدام <code>DictVectorizer</code> من Scikit-Learn لتنفيذ ذلك.</p></template>
+    <template class="content-en"><p>Categorical variables are nominal data like job location, gender, etc. They must be transformed into numeric formats.</p><p><b><span class="smart-term" data-term-en="One-Hot Encoding" data-ar="الترميز الأحادي الساخن" data-en-def="A method to convert categorical variables into binary features.">One-Hot Encoding<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Each category is represented by a binary vector with one element set to 1 and the rest set to 0.</li><li>Example: Categorical Variable: City (New York, San Francisco, Chapel Hill). Each city becomes a vector of length 3.</li></ul><p>Scikit-Learn's <code>DictVectorizer</code> can be used to implement this.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>تجنب الترميزات الخاطئة:</b> لا يجب استخدام ميزات أعداد صحيحة مفردة لتمثيل البيانات الفئوية الاسمية (مثال: نيويورك = 0، سان فرانسيسكو = 1، تشابل هيل = 2).</p><p>السبب هو أن خوارزميات التعلم الآلي ستفترض وجود علاقة ترتيبية (Ordinal relationship) اصطناعية لا وجود لها في الواقع (أي ستعتقد أن تشابل هيل أكبر من نيويورك لأن 2 > 0)، مما يؤدي إلى نتائج مضللة.</p></template>
+    <template class="content-en"><p><b>Avoiding Incorrect Encodings:</b> Do not use single integer features to represent nominal categorical data (e.g., New York = 0, San Francisco = 1, Chapel Hill = 2).</p><p>The reason is that machine learning algorithms will assume an artificial ordinal relationship that doesn't exist in the data (i.e., it will think Chapel Hill is "greater" than New York because 2 > 0), leading to misleading results.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.feature_extraction import DictVectorizer
+onehot_encoder = DictVectorizer()
+instances = [ {'city': 'New York'}, {'city': 'San Francisco'}, {'city': 'Chapel Hill'} ]
+print(onehot_encoder.fit_transform(instances).toarray())</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون استخدام الأعداد الصحيحة (0, 1, 2...) مقبولاً لترميز المتغيرات الفئوية؟</template>
+      <template class="content-en">When is it acceptable to use integers (0, 1, 2...) to encode categorical variables?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يكون مقبولاً عندما تكون البيانات الفئوية ترتيبية (Ordinal)، أي أن هناك ترتيباً منطقياً بين الفئات (مثل: منخفض = 0، متوسط = 1، مرتفع = 2).</p></template>
+      <template class="content-en"><p>It is acceptable when the categorical data is ordinal, meaning there is a logical order or ranking among the categories (e.g., Low = 0, Medium = 1, High = 2).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-extraction-text" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> استخراج الميزات من النصوص (حقيبة الكلمات)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Feature Extraction from Text (Bag-of-Words)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نموذج حقيبة الكلمات (Bag-of-Words) يحول النص إلى أرقام عن طريق حساب تكرار كل كلمة، متجاهلاً القواعد النحوية وترتيب الكلمات.</p></template>
+    <template class="content-en"><p>The Bag-of-Words model converts text into numbers by counting the frequency of each word, ignoring grammar and word order.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>من المهم تحويل النص إلى تنسيق مناسب لنماذج التعلم الآلي لالتقاط معنى النص في متجهات الميزات.</p><p><b>تمثيل <span class="smart-term" data-term-en="Bag-of-Words" data-ar="حقيبة الكلمات" data-en-def="A text representation technique that treats text as a collection of words, ignoring syntax and word order.">حقيبة الكلمات<span class="smart-term-tooltip"></span></span> (Bag-of-Words):</b></p><ul><li>يعامل النص كمجموعة من الكلمات، متجاهلاً بناء الجملة وترتيب الكلمات والقواعد.</li><li>تصبح كل كلمة في النص ميزة في متجه عالي الأبعاد.</li><li>المستندات التي تحتوي على كلمات متشابهة من المرجح أن يكون لها معاني متشابهة.</li></ul><p>يتم تنفيذ ذلك باستخدام <code>CountVectorizer</code>. يمكن قياس تشابه المستندات باستخدام <b>المسافة الإقليدية (Euclidean Distance)</b> بين متجهات المستندات؛ المسافات الأقرب تشير إلى مستندات أكثر تشابهاً.</p></template>
+    <template class="content-en"><p>It is important to transform text into a format suitable for machine learning models to capture the meaning of text in feature vectors.</p><p><b><span class="smart-term" data-term-en="Bag-of-Words" data-ar="حقيبة الكلمات" data-en-def="A text representation technique that treats text as a collection of words, ignoring syntax and word order.">Bag-of-Words<span class="smart-term-tooltip"></span></span> Representation:</b></p><ul><li>Treats text as a collection of words, ignoring syntax, word order, and grammar.</li><li>Each word in the text becomes a feature in a high-dimensional vector.</li><li>Documents with similar words are likely to have similar meanings.</li></ul><p>This is implemented using <code>CountVectorizer</code>. Document similarity can be measured using <b>Euclidean Distance</b> between document vectors; closer distances indicate more similar documents.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>تحديات البيانات عالية الأبعاد:</b></p><ul><li>متطلبات ذاكرة متزايدة.</li><li>العديد من العناصر في المتجهات تكون صفراً، مما يخلق <b>متجهات متناثرة (Sparse vectors)</b>.</li><li>مع زيادة الأبعاد، يُطلب المزيد من بيانات التدريب، ويزداد خطر التخصيص الزائد (Overfitting).</li></ul><p>لحل هذه المشاكل، نستخدم تقنيات <b>اختيار الميزات (Feature Selection)</b> أو <b>تقليل الأبعاد (Dimensionality Reduction)</b> مثل PCA لتقليل عدد الميزات.</p></template>
+    <template class="content-en"><p><b>Challenges with High-Dimensional Data:</b></p><ul><li>Increased memory requirements.</li><li>Many elements in the vectors are zero, creating <b><span class="smart-term" data-term-en="Sparse Vector" data-ar="المتجه المتناثر" data-en-def="A vector in which most of the elements are zero.">sparse vector<span class="smart-term-tooltip"></span></span>s</b>.</li><li>As dimensionality increases, more training data is required, and the risk of overfitting increases.</li></ul><p>To solve these issues, we use <b>Feature Selection</b> or <b>Dimensionality Reduction Techniques</b> like PCA to reduce the number of features.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.feature_extraction.text import CountVectorizer
+corpus = ['UNC played Duke in basketball', 'Duke lost the basketball game']
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(corpus).todense()
+print(X)
+print(vectorizer.vocabulary_)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي لتجاهل ترتيب الكلمات في نموذج حقيبة الكلمات؟</template>
+      <template class="content-en">What is the main drawback of ignoring word order in the Bag-of-Words model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تجاهل ترتيب الكلمات يؤدي إلى فقدان السياق والمعنى الدلالي. على سبيل المثال، الجملتان 'الكلب عض الرجل' و 'الرجل عض الكلب' سيكون لهما نفس التمثيل بالضبط رغم اختلاف معناهما تماماً.</p></template>
+      <template class="content-en"><p>Ignoring word order leads to a loss of context and semantic meaning. For example, the sentences 'The dog bit the man' and 'The man bit the dog' would have the exact same representation despite having completely different meanings.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-extraction-images" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> استخراج الميزات من الصور</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Extracting Features from Images</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن تحويل الصور إلى ميزات إما عن طريق تسطيح شبكة البكسلات إلى متجه طويل، أو عن طريق استخراج نقاط اهتمام محددة (مثل الحواف والزوايا) تكون مقاومة للتغيرات.</p></template>
+    <template class="content-en"><p>Images can be converted into features either by flattening the pixel grid into a long vector, or by extracting specific points of interest (like edges and corners) that are robust to changes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الصور الرقمية عبارة عن شبكات من البكسلات، حيث يكون لكل بكسل قيمة شدة. أسهل طريقة هي تحويل شبكة (مصفوفة) شدة البكسل إلى متجه عن طريق تسلسل الصفوف (مثال: صورة 8x8 تصبح متجه بـ 64 بُعداً).</p><p>ومع ذلك، هذا يؤدي إلى متجهات عالية الأبعاد جداً (صورة 100x100 = 10,000 بُعد) وتكون النماذج حساسة جداً للتحولات (تغيير الحجم، الدوران، الإزاحة).</p><p>البديل هو استخراج <b>نقاط الاهتمام (Points of Interest)</b>:</p><ul><li>التركيز على الأجزاء الأكثر إفادة مثل الحواف (تغير سريع في شدة البكسل) والزوايا (تقاطع حافتين).</li><li>يقلل من الضوضاء والميزات غير ذات الصلة.</li></ul></template>
+    <template class="content-en"><p>Digital images are grids of pixels, with each pixel having an intensity value. The simplest method is to convert the grid (matrix) of pixel intensities into a vector by concatenating rows (e.g., an 8x8 image becomes a 64-dimensional vector).</p><p>However, this leads to very high-dimensional vectors (100x100 image = 10,000 dimensions) and models become highly sensitive to transformations (scale, rotation, translation).</p><p>The alternative is extracting <b>Points of Interest</b>:</p><ul><li>Focus on the most informative parts like edges (rapid pixel intensity changes) and corners (intersections of two edges).</li><li>Reduces noise and irrelevant features.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>خوارزميات متقدمة لاستخراج الميزات:</p><ul><li><b>SIFT (<span class="smart-term" data-term-en="SIFT" data-ar="تحويل الميزات غير المتأثر بالمقياس" data-en-def="Scale-Invariant Feature Transform; an algorithm to detect and describe local features in images.">تحويل الميزات غير المتأثر بالمقياس<span class="smart-term-tooltip"></span></span>):</b> يلتقط الحواف والزوايا بمعلومات حول المناطق المحيطة. وهو غير متأثر (Invariant) بالتغيرات في الحجم، الدوران، والإضاءة.</li><li><b>SURF (الميزات القوية المسرعة):</b> يوفر حساباً أسرع من SIFT وفعال للتعرف على الميزات عبر الصور المحولة.</li></ul></template>
+    <template class="content-en"><p>Advanced feature extraction algorithms:</p><ul><li><b><span class="smart-term" data-term-en="SIFT" data-ar="تحويل الميزات غير المتأثر بالمقياس" data-en-def="Scale-Invariant Feature Transform; an algorithm to detect and describe local features in images.">SIFT<span class="smart-term-tooltip"></span></span> (Scale-Invariant Feature Transform):</b> Captures edges and corners with information about surroundings. It is invariant to changes in scale, rotation, and illumination.</li><li><b>SURF (Speeded-Up Robust Features):</b> Provides faster computation than SIFT and is effective for recognizing features across transformed images.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn import datasets
+digits = datasets.load_digits()
+# Reshaping an 8x8 image into a 64-dimensional feature vector
+print('Feature vector:\n', digits.images[0].reshape(-1, 64))</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفشل النماذج التي تعتمد على شدة البكسل الخام (Pixel Intensities) غالباً إذا تم إزاحة الصورة قليلاً؟</template>
+      <template class="content-en">Why do models relying on raw pixel intensities often fail if the image is shifted slightly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الإزاحة تغير موضع كل بكسل. النموذج يتوقع قيماً معينة في فهارس محددة للمتجه. الإزاحة تدمر هذا التوافق المكاني الدقيق، بينما الخوارزميات مثل SIFT تبحث عن الأنماط بغض النظر عن موقعها الدقيق.</p></template>
+      <template class="content-en"><p>Because shifting changes the position of every pixel. The model expects specific values at specific vector indices. Shifting destroys this exact spatial alignment, whereas algorithms like SIFT look for patterns regardless of their exact location.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-standardization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التوحيد القياسي للبيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Data Standardization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التوحيد القياسي هو عملية تغيير مقياس الميزات بحيث يكون متوسطها صفراً وتباينها واحداً، مما يمنع الميزات ذات القيم الكبيرة من السيطرة على النموذج.</p></template>
+    <template class="content-en"><p>Standardization is the process of rescaling features so they have a mean of zero and a variance of one, preventing features with large values from dominating the model.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تؤدي العديد من مقدرات التعلم الآلي أداءً أفضل عند تدريبها على مجموعات بيانات موحدة قياسياً. يضمن <span class="smart-term" data-term-en="Standardization" data-ar="التوحيد القياسي" data-en-def="Rescaling data to have a mean of 0 and a standard deviation of 1.">التوحيد القياسي<span class="smart-term-tooltip"></span></span> ما يلي:</p><ul><li><b>متوسط صفري (Zero Mean):</b> تتمركز البيانات حول نقطة الأصل (متوسط قيمة كل ميزة هو صفر).</li><li><b>تباين الوحدة (Unit Variance):</b> تباينات الميزات تكون من نفس ترتيب الحجم.</li></ul><p><b>لماذا نوحد القياس؟</b> إذا كان تباين إحدى الميزات أكبر بكثير من غيرها، فقد تهيمن على عملية التعلم. يساعد التوحيد القياسي الخوارزميات على التقارب (converge) بسرعة أكبر نحو قيم المعلمات المثلى.</p></template>
+    <template class="content-en"><p>Many machine learning estimators perform better when trained on standardized data sets. <span class="smart-term" data-term-en="Standardization" data-ar="التوحيد القياسي" data-en-def="Rescaling data to have a mean of 0 and a standard deviation of 1.">Standardization<span class="smart-term-tooltip"></span></span> ensures:</p><ul><li><b>Zero Mean:</b> Data is centered around the origin (average value of each feature is zero).</li><li><b>Unit Variance:</b> Variances of features are of the same order of magnitude.</li></ul><p><b>Why Standardize?</b> If a feature's variance is much greater than others, it can dominate the learning process. Standardization helps algorithms converge more quickly to optimal parameter values.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>صيغة التوحيد القياسي هي: <code>القيمة الموحدة = (القيمة - المتوسط) / الانحراف المعياري</code>.</p><p>في Scikit-Learn، يمكن توحيد البيانات بسهولة باستخدام دالة <code>scale</code> أو فئة <code>StandardScaler</code>. هذه الخطوة حاسمة بشكل خاص للخوارزميات التي تعتمد على حسابات المسافة (مثل KNN) أو التحسين القائم على الانحدار (مثل الشبكات العصبية و SVM).</p></template>
+    <template class="content-en"><p>The standardization formula is: <code>Standardized Value = (Value - Mean) / Standard Deviation</code>.</p><p>In Scikit-Learn, data can be easily standardized using the <code>scale</code> function or the <code>StandardScaler</code> class. This step is especially crucial for algorithms relying on distance calculations (like KNN) or gradient-based optimization (like Neural Networks and SVMs).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>صيغة التوحيد القياسي (Z-score)، حيث x هي القيمة، و mu هو المتوسط، و sigma هو الانحراف المعياري.</strong></template>
+      <template class="content-en"><strong>Standardization formula (Z-score), where x is the value, mu is the mean, and sigma is the standard deviation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$z = \frac{x - \mu}{\sigma}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل التوحيد القياسي يغير شكل توزيع البيانات (مثلاً من توزيع ملتوٍ إلى توزيع طبيعي)؟</template>
+      <template class="content-en">Does standardization change the shape of the data's distribution (e.g., from skewed to normal)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، التوحيد القياسي يغير فقط المقياس (ينقل المتوسط إلى الصفر ويجعل التباين 1). لا يغير شكل التوزيع الأساسي للبيانات.</p></template>
+      <template class="content-en"><p>No, standardization only changes the scale (shifts the mean to zero and scales variance to 1). It does not change the underlying shape of the data's distribution.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي البيانات المستقبلين. في هذه الوحدة، ننتقل من مجرد تغذية البيانات للنماذج إلى فهم *كيفية* تغذيتها و*كيفية* تقييم النتائج. تذكروا القاعدة الذهبية: 'بيانات سيئة تعني نتائج سيئة' (Garbage in, garbage out). لا يمكن لأي خوارزمية، مهما كانت متقدمة، أن تتعلم من بيانات غير مهيأة بشكل صحيح. لقد تعلمنا أن الدقة (Accuracy) ليست كافية دائماً؛ في الامتحان، ركزوا بشدة على متى نستخدم الإحكام (Precision) ومتى نستخدم الاستدعاء (Recall). فهم مصفوفة الارتباك هو مفتاح تحليل أخطاء نموذجكم. 
+
+الجزء الثاني من الوحدة هو السحر الحقيقي: استخراج الميزات. كيف نجعل الحاسوب يفهم كلمة 'نيويورك'؟ (الترميز الأحادي الساخن). كيف نجعله يقرأ جملة؟ (حقيبة الكلمات). كيف نجعله يرى صورة؟ (SIFT و SURF). وأخيراً، لا تنسوا أبداً خطوة التوحيد القياسي (Standardization)؛ فهي تجعل ميزاتكم تتحدث نفس اللغة من حيث المقياس، مما يمنع ميزة واحدة من السيطرة على النموذج. راجعوا هذه المفاهيم جيداً، فهي أساس كل ما سيأتي لاحقاً!</template>
+    <template class="content-en">Welcome, future data scientists. In this module, we move from simply feeding data to models to understanding *how* to feed it and *how* to evaluate the results. Remember the golden rule: 'Garbage in, garbage out'. No algorithm can learn from improperly prepared data. We learned that Accuracy isn't always enough; for the exam, focus heavily on when to use Precision versus Recall. Mastering the Confusion Matrix is your key to debugging model errors.
+
+The second half of the module is the real magic: Feature Extraction. How do we make a computer understand the word 'New York'? (One-Hot Encoding). How does it read a sentence? (Bag-of-Words). How does it see an image? (SIFT and SURF). Finally, never forget Standardization; it ensures your features speak the same language in terms of scale, preventing one feature from dominating the model. Review these concepts thoroughly; they are the foundation of everything that follows!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي باستخدام مقياس الدقة (Accuracy) لتقييم جميع نماذج التصنيف؟</template>
+          <template class="content-en">Why don't we just use Accuracy to evaluate all classification models?</template>
+          <span class="content-target">لماذا لا نكتفي باستخدام مقياس الدقة (Accuracy) لتقييم جميع نماذج التصنيف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الدقة مضللة جداً في مجموعات البيانات غير المتوازنة. إذا كان 99% من المرضى أصحاء، فإن نموذجاً يتوقع دائماً 'سليم' سيكون دقيقاً بنسبة 99%، لكنه سيفشل في اكتشاف أي مريض فعلي. نحتاج إلى الإحكام والاستدعاء للحصول على صورة حقيقية.</template>
+          <template class="content-en">Accuracy is highly misleading on imbalanced datasets. If 99% of patients are healthy, a model that always predicts 'healthy' is 99% accurate but fails to detect any actual patients. We need Precision and Recall for a true picture.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أهتم بزيادة الاستدعاء (Recall) على حساب الإحكام (Precision)؟</template>
+          <template class="content-en">When should I care about maximizing Recall over Precision?</template>
+          <span class="content-target">متى يجب أن أهتم بزيادة الاستدعاء (Recall) على حساب الإحكام (Precision)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما تكون تكلفة السلبية الخاطئة (False Negative) عالية جداً. مثال: في الفحوصات الطبية للأمراض الخطيرة، من الأفضل أن يكون لديك إيجابية خاطئة (إجراء المزيد من الفحوصات لمريض سليم) بدلاً من سلبية خاطئة (إرسال مريض مصاب إلى المنزل).</template>
+          <template class="content-en">When the cost of a False Negative is very high. Example: In medical screening for severe diseases, it's better to have a false positive (doing more tests on a healthy person) than a false negative (sending a sick person home).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف من التحقق المتقاطع (Cross-Validation)؟</template>
+          <template class="content-en">What is the point of Cross-Validation?</template>
+          <span class="content-target">ما هو الهدف من التحقق المتقاطع (Cross-Validation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إنه يمنعنا من الانخداع بتقسيم 'محظوظ' أو 'سيئ' للبيانات. من خلال تدوير مجموعة الاختبار عبر طيات مختلفة، نحصل على تقدير أكثر قوة وموثوقية لكيفية أداء النموذج على بيانات غير مرئية.</template>
+          <template class="content-en">It prevents us from being fooled by a 'lucky' or 'unlucky' train-test split. By rotating the test set across different folds, we get a much more robust and reliable estimate of how the model will perform on unseen data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة في استخدام الأرقام (0، 1، 2) لتمثيل المدن (نيويورك، لندن، باريس)؟</template>
+          <template class="content-en">What is the problem with using numbers (0, 1, 2) to represent cities (New York, London, Paris)?</template>
+          <span class="content-target">ما هي المشكلة في استخدام الأرقام (0، 1، 2) لتمثيل المدن (نيويورك، لندن، باريس)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخوارزميات تتعامل مع الأرقام رياضياً. ستعتقد أن باريس (2) أكبر من نيويورك (0)، وأن متوسط نيويورك وباريس هو لندن (1). هذا هراء بالنسبة للبيانات الاسمية. يجب استخدام الترميز الأحادي الساخن (One-Hot Encoding).</template>
+          <template class="content-en">Algorithms treat numbers mathematically. It will think Paris (2) is greater than New York (0), and the average of New York and Paris is London (1). This is nonsense for nominal data. You must use One-Hot Encoding.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل نموذج حقيبة الكلمات (Bag-of-Words) باختصار؟</template>
+          <template class="content-en">How does the Bag-of-Words model work in a nutshell?</template>
+          <span class="content-target">كيف يعمل نموذج حقيبة الكلمات (Bag-of-Words) باختصار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إنه ينشئ قائمة بكل الكلمات الفريدة في جميع مستنداتك (المفردات). ثم، لكل مستند، يحسب عدد مرات ظهور كل كلمة. يتجاهل القواعد وترتيب الكلمات تماماً.</template>
+          <template class="content-en">It creates a list of every unique word across all your documents (the vocabulary). Then, for each document, it counts how many times each word appears. It completely ignores grammar and word order.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا نعني بـ 'المتجهات المتناثرة' (Sparse Vectors) في معالجة النصوص؟</template>
+          <template class="content-en">What do we mean by 'Sparse Vectors' in text processing?</template>
+          <span class="content-target">ماذا نعني بـ 'المتجهات المتناثرة' (Sparse Vectors) في معالجة النصوص؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في حقيبة الكلمات، إذا كان لديك مفردات من 10,000 كلمة، فإن جملة من 5 كلمات ستُمثل بمتجه يحتوي على 5 أرقام غير صفرية و 9,995 صفراً. هذا المتجه المليء بالأصفار يسمى متناثراً، ويستهلك ذاكرة كبيرة.</template>
+          <template class="content-en">In Bag-of-Words, if you have a vocabulary of 10,000 words, a 5-word sentence is represented by a vector with 5 non-zero numbers and 9,995 zeros. This zero-filled vector is called sparse, and it consumes a lot of memory.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي بتسطيح بكسلات الصورة إلى متجه واحد طويل للتعرف على الصور؟</template>
+          <template class="content-en">Why don't we just flatten image pixels into one long vector for image recognition?</template>
+          <span class="content-target">لماذا لا نكتفي بتسطيح بكسلات الصورة إلى متجه واحد طويل للتعرف على الصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن هذا النهج حساس جداً لأي تغيير. إذا تحرك الكائن في الصورة بكسل واحد فقط، فإن جميع قيم المتجه ستتغير مواقعها، وسيفشل النموذج. نحتاج إلى خوارزميات مثل SIFT التي تبحث عن الميزات بغض النظر عن موقعها.</template>
+          <template class="content-en">Because this approach is highly sensitive to any change. If the object in the image shifts by just one pixel, all the vector values change positions, and the model fails. We need algorithms like SIFT that look for features regardless of location.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو SIFT ولماذا هو مهم؟</template>
+          <template class="content-en">What is SIFT and why is it important?</template>
+          <span class="content-target">ما هو SIFT ولماذا هو مهم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">SIFT (تحويل الميزات غير المتأثر بالمقياس) هو خوارزمية تستخرج نقاط الاهتمام (مثل الزوايا) من الصورة. أهميته تكمن في أنه 'غير متأثر' (Invariant)؛ يمكنه التعرف على نفس الميزة حتى لو تم تكبير الصورة، تصغيرها، أو تدويرها.</template>
+          <template class="content-en">SIFT (Scale-Invariant Feature Transform) is an algorithm that extracts points of interest (like corners) from an image. Its importance is that it's 'invariant'; it can recognize the same feature even if the image is zoomed, shrunk, or rotated.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يفعل التوحيد القياسي (Standardization) للبيانات رياضياً؟</template>
+          <template class="content-en">What does Standardization do to data mathematically?</template>
+          <span class="content-target">ماذا يفعل التوحيد القياسي (Standardization) للبيانات رياضياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إنه يطرح المتوسط من كل قيمة (مما يجعل المتوسط الجديد صفراً) ويقسم على الانحراف المعياري (مما يجعل التباين الجديد 1). هذا يضع جميع الميزات على نفس المقياس.</template>
+          <template class="content-en">It subtracts the mean from every value (making the new mean zero) and divides by the standard deviation (making the new variance 1). This puts all features on the exact same scale.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا لم نقم بتوحيد قياس بياناتنا قبل تدريب النموذج؟</template>
+          <template class="content-en">What happens if we don't standardize our data before training a model?</template>
+          <span class="content-target">ماذا يحدث إذا لم نقم بتوحيد قياس بياناتنا قبل تدريب النموذج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الميزات ذات النطاقات الكبيرة (مثل الراتب بالآلاف) ستهيمن تماماً على الميزات ذات النطاقات الصغيرة (مثل العمر بالسنوات). ستعتقد الخوارزمية أن الراتب أهم بكثير فقط لأن أرقامه أكبر.</template>
+          <template class="content-en">Features with large ranges (like salary in thousands) will completely dominate features with small ranges (like age in years). The algorithm will think salary is much more important simply because the numbers are bigger.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو التصنيف (Classification) في التعلم الآلي؟",
+      "en": "What is Classification in machine learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مهمة تتضمن تصنيف البيانات إلى فئات محددة مسبقاً بناءً على ميزاتها.",
+        "en": "A task that involves categorizing data into predefined classes based on their features."
+      },
+      "example": {
+        "ar": "التنبؤ بما إذا كان البريد الإلكتروني عشوائياً أم لا.",
+        "en": "Predicting whether an email is spam or not."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي مجموعة بيانات MNIST؟",
+      "en": "What is the MNIST dataset?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة من 70,000 صورة صغيرة لأرقام مكتوبة بخط اليد، تُستخدم غالباً كـ 'Hello World' للتعلم الآلي.",
+        "en": "A set of 70,000 small images of handwritten digits, often called the 'Hello World' of Machine Learning."
+      },
+      "example": {
+        "ar": "تدريب نموذج للتعرف على الرقم '5' من صورة بكسلية.",
+        "en": "Training a model to recognize the digit '5' from a pixel image."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو المصنف الثنائي (Binary Classifier)؟",
+      "en": "What is a Binary Classifier?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصنف قادر على التمييز بين فئتين فقط.",
+        "en": "A classifier capable of distinguishing between just two classes."
+      },
+      "example": {
+        "ar": "مكتشف الرقم 5 (يصنف كـ 5 أو ليس 5).",
+        "en": "A 5-detector (classifies as 5 or not-5)."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي ميزة استخدام SGDClassifier؟",
+      "en": "What is an advantage of using SGDClassifier?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قادر على التعامل مع مجموعات البيانات الكبيرة جداً بكفاءة ومناسب للتعلم عبر الإنترنت.",
+        "en": "Capable of handling very large datasets efficiently and well-suited for online learning."
+      },
+      "example": {
+        "ar": "تدريب نموذج على ملايين السجلات حيث يتم معالجة كل مثيل على حدة.",
+        "en": "Training a model on millions of records where instances are processed one at a time."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف تُعرّف الدقة (Accuracy)؟",
+      "en": "How is Accuracy defined?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة الحالات المصنفة بشكل صحيح من إجمالي الحالات التي تم تقييمها.",
+        "en": "The proportion of correctly classified instances out of the total instances evaluated."
+      },
+      "example": {
+        "ar": "90 تنبؤاً صحيحاً من أصل 100 يعطي دقة 90%.",
+        "en": "90 correct predictions out of 100 gives 90% accuracy."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الإحكام (Precision)؟",
+      "en": "What is Precision?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة التنبؤات الإيجابية الصحيحة من بين جميع التنبؤات الإيجابية التي قام بها النموذج.",
+        "en": "The proportion of true positive predictions among all positive predictions made by the model."
+      },
+      "example": {
+        "ar": "TP / (TP + FP)",
+        "en": "TP / (TP + FP)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الاستدعاء (Recall)؟",
+      "en": "What is Recall?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة التنبؤات الإيجابية الصحيحة من بين جميع الحالات الإيجابية الفعلية في البيانات.",
+        "en": "The proportion of true positive predictions among all actual positive instances in the data."
+      },
+      "example": {
+        "ar": "TP / (TP + FN)",
+        "en": "TP / (TP + FN)"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي درجة F1 (F1 Score)؟",
+      "en": "What is the F1 Score?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المتوسط التوافقي للإحكام والاستدعاء، يوفر مقياساً واحداً يوازن بينهما.",
+        "en": "The harmonic mean of precision and recall, providing a single metric that balances both."
+      },
+      "example": {
+        "ar": "مفيد عندما تحتاج إلى توازن بين الإحكام والاستدعاء في مجموعات البيانات غير المتوازنة.",
+        "en": "Useful when you need a balance between Precision and Recall on imbalanced datasets."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو الغرض من التحقق المتقاطع (Cross-validation)؟",
+      "en": "What is the purpose of Cross-validation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم البيانات إلى مجموعات فرعية لتدريب وتقييم النموذج بشكل تكراري لضمان تقييم أداء قوي.",
+        "en": "Partitioning data into subsets to iteratively train and evaluate the model to ensure robust performance estimation."
+      },
+      "example": {
+        "ar": "استخدام K-Fold بـ 5 طيات لتدريب واختبار النموذج 5 مرات مختلفة.",
+        "en": "Using 5-fold K-Fold to train and test the model 5 different times."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي مصفوفة الارتباك (Confusion Matrix)؟",
+      "en": "What is a Confusion Matrix?"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول يلخص أداء نموذج التصنيف من خلال مقارنة التسميات المتوقعة بالتسميات الفعلية.",
+        "en": "A table that summarizes the performance of a classification model by comparing predicted and actual class labels."
+      },
+      "example": {
+        "ar": "يُظهر عدد الـ TP, TN, FP, و FN.",
+        "en": "Shows the counts of TP, TN, FP, and FN."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو الخطأ من النوع الأول (Type I Error)؟",
+      "en": "What is a Type I Error?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الإيجابية الخاطئة (FP): يتوقع النموذج الفئة كإيجابية، لكنها في الواقع سلبية.",
+        "en": "False Positive (FP): The model predicts the class as positive, but it's actually negative."
+      },
+      "example": {
+        "ar": "تصنيف بريد إلكتروني سليم على أنه بريد مزعج.",
+        "en": "Classifying a legitimate email as spam."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الخطأ من النوع الثاني (Type II Error)؟",
+      "en": "What is a Type II Error?"
+    },
+    "back": {
+      "definition": {
+        "ar": "السلبية الخاطئة (FN): يتوقع النموذج الفئة كسلبية، لكنها في الواقع إيجابية.",
+        "en": "False Negative (FN): The model predicts the class as negative, but it's actually positive."
+      },
+      "example": {
+        "ar": "الفشل في اكتشاف مرض موجود لدى المريض.",
+        "en": "Failing to detect a disease that a patient actually has."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما الذي يوضحه منحنى ROC؟",
+      "en": "What does the ROC curve illustrate?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المفاضلة بين معدل الإيجابية الحقيقية (TPR) ومعدل الإيجابية الخاطئة (FPR) عبر عتبات قرار مختلفة.",
+        "en": "The trade-off between the true positive rate (TPR) and the false positive rate (FPR) across different decision thresholds."
+      },
+      "example": {
+        "ar": "يُستخدم لتقييم نماذج التصنيف الثنائي.",
+        "en": "Used to evaluate binary classification models."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الترميز الأحادي الساخن (One-Hot Encoding)؟",
+      "en": "What is One-Hot Encoding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لتحويل المتغيرات الفئوية إلى ميزات ثنائية، حيث يتم تعيين عنصر واحد إلى 1 والباقي إلى 0.",
+        "en": "A method to convert categorical variables into binary features, where one element is set to 1 and the rest to 0."
+      },
+      "example": {
+        "ar": "تحويل الألوان (أحمر، أخضر، أزرق) إلى [1,0,0]، [0,1,0]، [0,0,1].",
+        "en": "Converting colors (Red, Green, Blue) to [1,0,0], [0,1,0], [0,0,1]."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو نموذج حقيبة الكلمات (Bag-of-Words)؟",
+      "en": "What is the Bag-of-Words model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل يعامل النص كمجموعة من الكلمات، متجاهلاً بناء الجملة وترتيب الكلمات، ويستخدم تكرار الكلمات كميزات.",
+        "en": "A representation that treats text as a collection of words, ignoring syntax and word order, using word frequencies as features."
+      },
+      "example": {
+        "ar": "استخدام CountVectorizer في Scikit-Learn.",
+        "en": "Using CountVectorizer in Scikit-Learn."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو التحدي الرئيسي لنموذج حقيبة الكلمات؟",
+      "en": "What is a major challenge of the Bag-of-Words model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يخلق متجهات متناثرة عالية الأبعاد (Sparse vectors) تتطلب ذاكرة كبيرة وتزيد من خطر التخصيص الزائد.",
+        "en": "It creates high-dimensional sparse vectors that require significant memory and increase the risk of overfitting."
+      },
+      "example": {
+        "ar": "مفردات من 10,000 كلمة تعني أن كل جملة تُمثل بمتجه طوله 10,000، معظمه أصفار.",
+        "en": "A vocabulary of 10,000 words means each sentence is a 10,000-length vector, mostly zeros."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هو SIFT في معالجة الصور؟",
+      "en": "What is SIFT in image processing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل الميزات غير المتأثر بالمقياس؛ خوارزمية تلتقط الحواف والزوايا وتكون غير متأثرة بتغيرات الحجم والدوران.",
+        "en": "Scale-Invariant Feature Transform; an algorithm that captures edges and corners and is invariant to scale and rotation changes."
+      },
+      "example": {
+        "ar": "التعرف على كائن في صورة حتى لو تم تكبيره أو تدويره.",
+        "en": "Recognizing an object in an image even if it's zoomed in or rotated."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "ما هو التوحيد القياسي للبيانات (Data Standardization)؟",
+      "en": "What is Data Standardization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تغيير مقياس البيانات بحيث يكون لها متوسط صفري وتباين يساوي الوحدة (1).",
+        "en": "Rescaling data so it has a zero mean and unit variance (1)."
+      },
+      "example": {
+        "ar": "القيمة الموحدة = (القيمة - المتوسط) / الانحراف المعياري.",
+        "en": "Standardized Value = (Value - Mean) / Standard Deviation."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مقياس أداء هو الأهم عندما تكون تكلفة الإيجابية الخاطئة (False Positive) عالية جداً؟",
+      "en": "Which performance measure is most important when the cost of a False Positive is very high?"
+    },
+    "options": {
+      "ar": [
+        "الاستدعاء (Recall)",
+        "الإحكام (Precision)",
+        "الدقة (Accuracy)",
+        "معدل الإيجابية الخاطئة (FPR)"
+      ],
+      "en": [
+        "Recall",
+        "Precision",
+        "Accuracy",
+        "False Positive Rate (FPR)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الإحكام يقيس نسبة التنبؤات الإيجابية الصحيحة. الإحكام العالي يعني معدل إيجابية خاطئة منخفض، وهو أمر حاسم في تطبيقات مثل اكتشاف البريد المزعج.",
+      "en": "Precision measures the proportion of correct positive predictions. High precision means a low false positive rate, crucial in applications like spam detection."
+    },
+    "hint": {
+      "ar": "فكر في تصفية البريد المزعج: لا تريد تصنيف بريد مهم كبريد مزعج.",
+      "en": "Think of spam filtering: you don't want to mark an important email as spam."
+    },
+    "difficulty": "medium",
+    "conceptId": "performance-measures"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في مصفوفة الارتباك، ماذا يمثل الخطأ من النوع الثاني (Type II Error)؟",
+      "en": "In a confusion matrix, what does a Type II Error represent?"
+    },
+    "options": {
+      "ar": [
+        "الإيجابية الحقيقية (TP)",
+        "الإيجابية الخاطئة (FP)",
+        "السلبية الحقيقية (TN)",
+        "السلبية الخاطئة (FN)"
+      ],
+      "en": [
+        "True Positive (TP)",
+        "False Positive (FP)",
+        "True Negative (TN)",
+        "False Negative (FN)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الخطأ من النوع الثاني يحدث عندما يتوقع النموذج أن الفئة سلبية، لكنها في الواقع إيجابية (سلبية خاطئة).",
+      "en": "A Type II error occurs when the model predicts the class as negative, but it is actually positive (False Negative)."
+    },
+    "hint": {
+      "ar": "إنه الفشل في اكتشاف شيء موجود بالفعل.",
+      "en": "It's failing to detect something that is actually there."
+    },
+    "difficulty": "easy",
+    "conceptId": "confusion-matrix-and-error-analysis"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا يجب تجنب استخدام أعداد صحيحة مفردة (مثل 0، 1، 2) لترميز المتغيرات الفئوية الاسمية (مثل أسماء المدن)؟",
+      "en": "Why should you avoid using single integers (like 0, 1, 2) to encode nominal categorical variables (like city names)?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تستهلك ذاكرة أكبر من الترميز الأحادي الساخن.",
+        "لأنها تُدخل علاقات ترتيبية اصطناعية لا وجود لها في البيانات.",
+        "لأن خوارزميات التعلم الآلي لا يمكنها معالجة الأعداد الصحيحة.",
+        "لأنها تؤدي دائماً إلى التخصيص الزائد (Overfitting)."
+      ],
+      "en": [
+        "Because it consumes more memory than One-Hot Encoding.",
+        "Because it introduces artificial ordinal relationships that don't exist in the data.",
+        "Because machine learning algorithms cannot process integers.",
+        "Because it always leads to overfitting."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "استخدام الأعداد الصحيحة يجعل الخوارزمية تعتقد أن الفئة '2' أكبر أو أهم من الفئة '0'، وهو أمر غير صحيح للبيانات الاسمية مثل المدن.",
+      "en": "Using integers makes the algorithm think that category '2' is greater or more important than category '0', which is untrue for nominal data like cities."
+    },
+    "hint": {
+      "ar": "هل نيويورك 'أكبر' رياضياً من سان فرانسيسكو؟",
+      "en": "Is New York mathematically 'greater' than San Francisco?"
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-extraction-categorical"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي النتيجة الرئيسية لاستخدام نموذج حقيبة الكلمات (Bag-of-Words) على مجموعة نصوص كبيرة؟",
+      "en": "What is a primary consequence of using the Bag-of-Words model on a large text corpus?"
+    },
+    "options": {
+      "ar": [
+        "يتم الحفاظ على القواعد النحوية بشكل مثالي.",
+        "يتم إنشاء متجهات متناثرة عالية الأبعاد (Sparse vectors).",
+        "يتم تقليل أبعاد البيانات تلقائياً.",
+        "يتم تجاهل تكرار الكلمات."
+      ],
+      "en": [
+        "Grammar is perfectly preserved.",
+        "High-dimensional sparse vectors are created.",
+        "Data dimensionality is automatically reduced.",
+        "Word frequencies are ignored."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نظراً لأن كل كلمة فريدة تصبح ميزة، فإن المفردات الكبيرة تؤدي إلى متجهات طويلة جداً حيث تكون معظم القيم أصفاراً (متناثرة).",
+      "en": "Since every unique word becomes a feature, a large vocabulary results in very long vectors where most values are zero (sparse)."
+    },
+    "hint": {
+      "ar": "فكر في عدد الكلمات الفريدة في كتاب كامل مقارنة بالكلمات في جملة واحدة.",
+      "en": "Think about the number of unique words in a whole book versus the words in a single sentence."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-extraction-text"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "أي مما يلي يمثل صيغة التوحيد القياسي (Standardization)؟",
+      "en": "Which of the following represents the formula for Standardization?"
+    },
+    "options": {
+      "ar": [
+        "(القيمة - الحد الأدنى) / (الحد الأقصى - الحد الأدنى)",
+        "(القيمة - المتوسط) / الانحراف المعياري",
+        "(القيمة - الوسيط) / التباين",
+        "القيمة / الحد الأقصى"
+      ],
+      "en": [
+        "(Value - Min) / (Max - Min)",
+        "(Value - Mean) / Standard Deviation",
+        "(Value - Median) / Variance",
+        "Value / Max"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوحيد القياسي (Z-score) يطرح المتوسط ويقسم على الانحراف المعياري لضمان متوسط صفري وتباين يساوي 1.",
+      "en": "Standardization (Z-score) subtracts the mean and divides by the standard deviation to ensure a zero mean and unit variance."
+    },
+    "hint": {
+      "ar": "إنها تحول البيانات ليكون لها متوسط 0 وتباين 1.",
+      "en": "It transforms data to have a mean of 0 and variance of 1."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-standardization"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لخوارزمية SIFT في استخراج ميزات الصور؟",
+      "en": "What is the main advantage of the SIFT algorithm in image feature extraction?"
+    },
+    "options": {
+      "ar": [
+        "إنها تحول الصورة إلى متجه أحادي البعد.",
+        "إنها تعتمد فقط على قيم شدة البكسل الخام.",
+        "إنها غير متأثرة (Invariant) بالتغيرات في الحجم والدوران.",
+        "إنها أسرع خوارزمية متاحة لمعالجة الصور."
+      ],
+      "en": [
+        "It flattens the image into a 1D vector.",
+        "It relies solely on raw pixel intensity values.",
+        "It is invariant to changes in scale and rotation.",
+        "It is the fastest algorithm available for image processing."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "SIFT (Scale-Invariant Feature Transform) مصمم خصيصاً لاكتشاف الميزات التي تظل ثابتة حتى إذا تم تكبير الصورة أو تدويرها.",
+      "en": "SIFT (Scale-Invariant Feature Transform) is specifically designed to detect features that remain consistent even if the image is scaled or rotated."
+    },
+    "hint": {
+      "ar": "الاسم نفسه يحتوي على الإجابة (Scale-Invariant).",
+      "en": "The name itself contains the answer (Scale-Invariant)."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-extraction-images"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ماذا يضمن التوحيد القياسي (Standardization) للبيانات؟",
+      "en": "What does data standardization ensure?"
+    },
+    "options": {
+      "ar": [
+        "أن جميع القيم تقع بين 0 و 1.",
+        "أن البيانات لها متوسط صفري وتباين يساوي الوحدة.",
+        "أن جميع الميزات لها نفس الحد الأقصى للقيمة.",
+        "أنه يتم إزالة جميع القيم المتطرفة (Outliers)."
+      ],
+      "en": [
+        "That all values fall between 0 and 1.",
+        "That data has a zero mean and unit variance.",
+        "That all features have the same maximum value.",
+        "That all outliers are removed."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التوحيد القياسي يركز البيانات حول الصفر (متوسط صفري) ويقيسها بحيث يكون التباين 1 (تباين الوحدة).",
+      "en": "Standardization centers the data around zero (zero mean) and scales it so the variance is 1 (unit variance)."
+    },
+    "hint": {
+      "ar": "فكر في خصائص التوزيع الطبيعي القياسي.",
+      "en": "Think about the properties of a standard normal distribution."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-standardization"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في التحقق المتقاطع K-Fold، إذا كان K=5، فما هي نسبة البيانات المستخدمة للتحقق (Validation) في كل تكرار؟",
+      "en": "In K-Fold cross-validation, if K=5, what percentage of the data is used for validation in each iteration?"
+    },
+    "options": {
+      "ar": [
+        "10%",
+        "20%",
+        "50%",
+        "80%"
+      ],
+      "en": [
+        "10%",
+        "20%",
+        "50%",
+        "80%"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا تم تقسيم البيانات إلى 5 طيات متساوية، فإن كل طية تمثل 1/5 أو 20% من البيانات. تُستخدم طية واحدة للتحقق في كل تكرار.",
+      "en": "If data is split into 5 equal folds, each fold represents 1/5 or 20% of the data. One fold is used for validation in each iteration."
+    },
+    "hint": {
+      "ar": "1 مقسومة على 5.",
+      "en": "1 divided by 5."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-validation"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي مما يلي يمثل تحدياً عند استخدام متجهات شدة البكسل الخام (Raw Pixel Intensities) كاستخراج للميزات؟",
+      "en": "Which of the following is a challenge when using raw pixel intensity vectors for feature extraction?"
+    },
+    "options": {
+      "ar": [
+        "إنها تتطلب خوارزميات معقدة جداً لحسابها.",
+        "إنها تؤدي إلى متجهات منخفضة الأبعاد جداً.",
+        "النماذج تكون حساسة جداً للتحولات مثل الإزاحة والدوران.",
+        "لا يمكن استخدامها مع مجموعة بيانات MNIST."
+      ],
+      "en": [
+        "They require very complex algorithms to compute.",
+        "They result in very low-dimensional vectors.",
+        "Models are highly sensitive to transformations like translation and rotation.",
+        "They cannot be used with the MNIST dataset."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تسطيح البكسلات يربط الميزات بمواقع مكانية دقيقة. أي إزاحة أو دوران يغير قيم البكسل في تلك المواقع، مما يربك النموذج.",
+      "en": "Flattening pixels ties features to exact spatial locations. Any shift or rotation changes the pixel values at those locations, confusing the model."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا تحرك الرقم بكسل واحد إلى اليمين؟",
+      "en": "What happens if the digit moves one pixel to the right?"
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-extraction-images"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الغرض من تطبيع (Normalizing) مصفوفة الارتباك؟",
+      "en": "What is the purpose of normalizing a confusion matrix?"
+    },
+    "options": {
+      "ar": [
+        "لتحويل جميع القيم إلى أصفار وواحدات.",
+        "لمقارنة معدلات الخطأ بشكل عادل، خاصة عندما تكون الفئات غير متوازنة.",
+        "لزيادة دقة النموذج تلقائياً.",
+        "لتقليل أبعاد المصفوفة."
+      ],
+      "en": [
+        "To convert all values to zeros and ones.",
+        "To compare error rates fairly, especially when classes are imbalanced.",
+        "To automatically increase the model's accuracy.",
+        "To reduce the dimensionality of the matrix."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التطبيع يحول الأعداد المطلقة إلى نسب مئوية، مما يسمح لك برؤية نسبة الأخطاء لكل فئة، وهو أمر ضروري إذا كان لبعض الفئات عينات أكثر بكثير من غيرها.",
+      "en": "Normalization converts absolute counts to percentages, allowing you to see the proportion of errors per class, which is essential if some classes have many more samples than others."
+    },
+    "hint": {
+      "ar": "كيف تقارن الأخطاء إذا كان لديك 1000 عينة من الفئة أ و 10 عينات فقط من الفئة ب؟",
+      "en": "How do you compare errors if you have 1000 samples of Class A and only 10 of Class B?"
+    },
+    "difficulty": "medium",
+    "conceptId": "confusion-matrix-and-error-analysis"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الدقة (Accuracy) كمقياس وحيد لتقييم نموذج يعمل على بيانات غير متوازنة. إذا كانت 99% من رسائل البريد الإلكتروني سليمة و1% مزعجة، فإن نموذجاً يتوقع دائماً 'سليم' سيحقق دقة 99%، لكنه نموذج فاشل تماماً. استخدم الإحكام والاستدعاء بدلاً من ذلك.</template>
+    <template class="content-en">Using Accuracy as the sole metric for imbalanced datasets. If 99% of emails are ham and 1% are spam, a model that always predicts 'ham' is 99% accurate but completely useless. Use Precision and Recall instead.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المفاضلة بين الإحكام والاستدعاء (Precision/Recall Trade-off). لا يمكنك عادةً زيادة أحدهما دون تقليل الآخر. يعتمد اختيار المقياس الأهم على مشكلة العمل (تكلفة الإيجابية الخاطئة مقابل السلبية الخاطئة).</template>
+    <template class="content-en">The Precision/Recall Trade-off. You usually cannot increase one without decreasing the other. Choosing which is more important depends entirely on the business problem (cost of False Positive vs False Negative).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">ترميز المتغيرات الفئوية الاسمية (مثل الألوان أو المدن) باستخدام أرقام متسلسلة (0، 1، 2). هذا يخدع النموذج للاعتقاد بوجود ترتيب رياضي. استخدم الترميز الأحادي الساخن (One-Hot Encoding) دائماً للبيانات الاسمية.</template>
+    <template class="content-en">Encoding nominal categorical variables (like colors or cities) with sequential integers (0, 1, 2). This tricks the model into thinking there is a mathematical order. Always use One-Hot Encoding for nominal data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نموذج حقيبة الكلمات (Bag-of-Words) يتجاهل السياق تماماً. 'ليس جيداً' و 'جيداً ليس' لهما نفس التمثيل. هذا هو السبب في أن النماذج اللغوية الحديثة تستخدم تقنيات أكثر تقدماً (مثل التضمينات - Embeddings) لالتقاط المعنى الدلالي.</template>
+    <template class="content-en">The Bag-of-Words model completely ignores context. 'Not good' and 'Good not' have the exact same representation. This is why modern NLP uses more advanced techniques (like embeddings) to capture semantic meaning.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التوحيد القياسي (Standardization) لا يغير شكل توزيع بياناتك؛ إنه يغير المقياس فقط. إذا كانت بياناتك ملتوية (Skewed) قبل التوحيد، فستظل ملتوية بعده، ولكن بمتوسط 0 وتباين 1.</template>
+    <template class="content-en">Standardization does not change the shape of your data's distribution; it only changes the scale. If your data was skewed before, it will still be skewed after, just with a mean of 0 and variance of 1.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M02.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M04.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

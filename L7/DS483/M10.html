@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="10" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تصنيف التسلسل لأجزاء الكلام والكيانات المسماة · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M09.html" data-gh-next="M11.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#english-word-classes" class="toc-link" data-bilingual>
+        <template class="content-ar">فئات الكلمات الإنجليزية (المفتوحة والمغلقة)</template>
+        <template class="content-en">English Word Classes (Open vs. Closed)</template>
+        <span class="content-target">فئات الكلمات الإنجليزية (المفتوحة والمغلقة)</span>
+      </a>
+      <a href="#pos-tagging" class="toc-link" data-bilingual>
+        <template class="content-ar">تحديد أجزاء الكلام (POS Tagging)</template>
+        <template class="content-en">Part-of-Speech (POS) Tagging</template>
+        <span class="content-target">تحديد أجزاء الكلام (POS Tagging)</span>
+      </a>
+      <a href="#named-entity-recognition" class="toc-link" data-bilingual>
+        <template class="content-ar">التعرف على الكيانات المسماة (NER)</template>
+        <template class="content-en">Named Entity Recognition (NER)</template>
+        <span class="content-target">التعرف على الكيانات المسماة (NER)</span>
+      </a>
+      <a href="#bio-tagging" class="toc-link" data-bilingual>
+        <template class="content-ar">مخطط التوسيم BIO</template>
+        <template class="content-en">BIO Tagging Scheme</template>
+        <span class="content-target">مخطط التوسيم BIO</span>
+      </a>
+      <a href="#hmm-pos-tagging" class="toc-link" data-bilingual>
+        <template class="content-ar">نماذج ماركوف المخفية (HMM) لتحديد أجزاء الكلام</template>
+        <template class="content-en">HMM Part-of-Speech Tagging</template>
+        <span class="content-target">نماذج ماركوف المخفية (HMM) لتحديد أجزاء الكلام</span>
+      </a>
+      <a href="#conditional-random-fields" class="toc-link" data-bilingual>
+        <template class="content-ar">الحقول العشوائية الشرطية (CRFs)</template>
+        <template class="content-en">Conditional Random Fields (CRFs)</template>
+        <span class="content-target">الحقول العشوائية الشرطية (CRFs)</span>
+      </a>
+      <a href="#evaluation-ner" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم التعرف على الكيانات المسماة</template>
+        <template class="content-en">Evaluation of Named Entity Recognition</template>
+        <span class="content-target">تقييم التعرف على الكيانات المسماة</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 10</template>
+      <template class="content-en">Module 10</template>
+      <span class="content-target">الوحدة 10</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تصنيف التسلسل لأجزاء الكلام والكيانات المسماة</h1>
+      <p class="hero-description">تغطي هذه الوحدة تصنيف الكلمات الإنجليزية، وتحديد أجزاء الكلام (POS)، والتعرف على الكيانات المسماة (NER)، بالإضافة إلى الخوارزميات القياسية مثل نماذج ماركوف المخفية (HMM) والحقول العشوائية الشرطية (CRF).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Sequence Labeling for Parts of Speech and Named Entities</h1>
+      <p class="hero-description">This module covers English word classes, Part-of-Speech (POS) tagging, Named Entity Recognition (NER), and standard algorithms like Hidden Markov Models (HMM) and Conditional Random Fields (CRF).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">أجزاء الكلام</span>
+      <span class="tag">التعرف على الكيانات المسماة</span>
+      <span class="tag">نماذج ماركوف المخفية</span>
+      <span class="tag">الحقول العشوائية الشرطية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">POS Tagging</span>
+      <span class="tag">NER</span>
+      <span class="tag">HMM</span>
+      <span class="tag">CRF</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم دور السياق في التحديد الدقيق لفئات الكلمات والكيانات المسماة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح الغرض من تحديد أجزاء الكلام وطرقها في معالجة اللغة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد الكيانات المسماة في النص، بما في ذلك الأشخاص والمنظمات والمواقع.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات HMM و CRF لإجراء تحديد أجزاء الكلام وتصنيف التسلسل.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم دقة التعرف على الكيانات المسماة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the role of context in accurately identifying word classes and named entities.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the purpose and methods of part-of-speech tagging in language processing.</span></li>
+      <li><span class="obj-icon">✦</span><span>Identify named entities in text, including persons, organizations, and locations.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply HMM and CRF techniques to perform part-of-speech and sequence tagging.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate the accuracy of named entity recognition.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="english-word-classes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> فئات الكلمات الإنجليزية (المفتوحة والمغلقة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> English Word Classes (Open vs. Closed)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُصنف الكلمات إلى فئات نحوية؛ الفئات المفتوحة تقبل كلمات جديدة باستمرار، بينما الفئات المغلقة لها عضوية ثابتة وتؤدي وظائف نحوية.</p></template>
+    <template class="content-en"><p>Words are classified into grammatical categories; open classes accept new words, while closed classes have fixed memberships and serve grammatical functions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تنقسم الكلمات في اللغة إلى نوعين رئيسيين:</p><ul><li><b>الفئات المغلقة (Closed class):</b> كلمات وظيفية قصيرة ومتكررة ذات عضوية ثابتة نسبياً. تشمل المحددات (a, an, the)، الضمائر (she, he, I)، وحروف الجر (on, under).</li><li><b>الفئات المفتوحة (Open class):</b> كلمات المحتوى التي تحمل المعنى الأساسي. تشمل الأسماء، الأفعال، الصفات، والأحوال. يمكن إضافة كلمات جديدة لهذه الفئة بسهولة (مثل: iPhone أو to fax).</li></ul></template>
+    <template class="content-en"><p>Words in a language are divided into two main types:</p><ul><li><b><span class="smart-term" data-term-en="Closed Class" data-ar="الفئة المغلقة" data-en-def="Word categories like prepositions and pronouns that rarely accept new members.">Closed class<span class="smart-term-tooltip"></span></span> words:</b> Short, frequent function words with relatively fixed membership. Includes determiners (a, an, the), pronouns (she, he, I), and prepositions (on, under).</li><li><b><span class="smart-term" data-term-en="Open Class" data-ar="الفئة المفتوحة" data-en-def="Word categories like nouns and verbs that frequently accept new members.">Open class<span class="smart-term-tooltip"></span></span> words:</b> Content words that carry the primary meaning. Includes Nouns, Verbs, Adjectives, and Adverbs. New words are easily added to this class (e.g., iPhone or to fax).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر الفئات المغلقة حاسمة في تحديد البنية النحوية للجملة، وغالباً ما تُستخدم كمعالم (Features) في نماذج تعلم الآلة لتحديد أجزاء الكلام للكلمات المجاورة.</p><p>مجموعة علامات "التبعيات العالمية" (Universal Dependencies) توفر معياراً موحداً لتصنيف هذه الفئات عبر لغات مختلفة، مما يسهل بناء نماذج معالجة لغات طبيعية متعددة اللغات.</p></template>
+    <template class="content-en"><p>Closed class words are crucial for determining the syntactic structure of a sentence and are often used as features in machine learning models to predict the POS tags of neighboring words.</p><p>The 'Universal Dependencies' tagset provides a standardized way to classify these categories across different languages, facilitating the development of multilingual NLP models.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Open Class</th><th>Closed Class</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">العضوية (Membership)</template>
+          <template class="content-en">Membership</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متغيرة، تقبل كلمات جديدة</template>
+          <template class="content-en">Variable, accepts new words</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ثابتة نسبياً</template>
+          <template class="content-en">Relatively fixed</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الوظيفة الأساسية</template>
+          <template class="content-en">Primary Function</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلمات محتوى (تحمل المعنى)</template>
+          <template class="content-en">Content words (carry meaning)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلمات وظيفية (بنية نحوية)</template>
+          <template class="content-en">Function words (grammatical structure)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أمثلة</template>
+          <template class="content-en">Examples</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الأسماء، الأفعال، الصفات</template>
+          <template class="content-en">Nouns, Verbs, Adjectives</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">المحددات، الضمائر، حروف الجر</template>
+          <template class="content-en">Determiners, Pronouns, Prepositions</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر حروف الجر من الفئات المغلقة بينما تعتبر الأسماء من الفئات المفتوحة؟</template>
+      <template class="content-en">Why are prepositions considered a closed class while nouns are an open class?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>حروف الجر تؤدي وظيفة نحوية هيكلية ثابتة في اللغة ولا يتم اختراع حروف جر جديدة عادةً. أما الأسماء فتعبر عن أشياء ومفاهيم جديدة تظهر باستمرار في الحياة (مثل التكنولوجيا الجديدة).</p></template>
+      <template class="content-en"><p>Prepositions serve a fixed structural grammatical function in the language, and new ones are rarely invented. Nouns represent objects and concepts that constantly emerge in life (like new technology).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pos-tagging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تحديد أجزاء الكلام (POS Tagging)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Part-of-Speech (POS) Tagging</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تعيين فئة نحوية (مثل اسم، فعل، صفة) لكل كلمة في النص، وهي مهمة صعبة بسبب الغموض حيث يمكن للكلمة الواحدة أن تمتلك أكثر من فئة.</p></template>
+    <template class="content-en"><p>The process of assigning a grammatical category (like noun, verb, adjective) to each word in a text, which is challenging due to word ambiguity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحديد أجزاء الكلام هو تعيين علامة (Tag) لكل كلمة $x_i$ في تسلسل الكلمات. يفيد ذلك في التحليل النحوي، الترجمة الآلية، وتحويل النص إلى كلام.</p><p><b>صعوبة المهمة:</b> حوالي 15% من أنواع الكلمات في اللغة الإنجليزية غامضة (لها أكثر من علامة محتملة)، ولكن هذه الكلمات شائعة جداً لدرجة أنها تشكل حوالي 60% من الرموز (Tokens) في النصوص.</p><p><b><span class="smart-term" data-term-en="Baseline" data-ar="خط الأساس" data-en-def="A simple, standard method used as a benchmark to evaluate more complex models.">خط الأساس<span class="smart-term-tooltip"></span></span> (Baseline):</b> تعيين العلامة الأكثر شيوعاً لكل كلمة يحقق دقة تصل إلى 92%. النماذج الحديثة تحقق حوالي 97%.</p></template>
+    <template class="content-en"><p>POS tagging maps a sequence of words $x_1...x_n$ to a sequence of tags $y_1...y_n$. It is useful for</p><ul><li>parsing,</li><li>Machine Translation (MT), and</li><li>Text-to-Speech (TTS).</li></ul><p><b>Difficulty:</b> Roughly 15% of English word types are ambiguous, but they tend to be very common, meaning ~60% of word tokens in running text are ambiguous (e.g., 'back' can be ADJ, NOUN, VERB, PART, or ADV).</p><p><b><span class="smart-term" data-term-en="Baseline" data-ar="خط الأساس" data-en-def="A simple, standard method used as a benchmark to evaluate more complex models.">Baseline<span class="smart-term-tooltip"></span></span>:</b> The 'Most frequent class baseline' (tagging every word with its most frequent tag) achieves 92% accuracy.</p><p>State-of-the-art models achieve ~97%.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لحل مشكلة <span class="smart-term" data-term-en="Ambiguity" data-ar="الغموض" data-en-def="When a single word can have multiple valid parts of speech depending on context.">الغموض<span class="smart-term-tooltip"></span></span>، تعتمد النماذج على مصادر معلومات متعددة: الاحتمالات المسبقة للكلمة/العلامة، هوية الكلمات المجاورة (السياق)، والتشكيل (السوابق واللواحق)، وحالة الأحرف (Capitalization).</p><p>الوصول إلى دقة 97% يعتبر قريباً جداً من مستوى الأداء البشري، مما يجعل مهمة POS Tagging تعتبر 'محلولة' إلى حد كبير في اللغات عالية الموارد مثل الإنجليزية.</p></template>
+    <template class="content-en"><p>To resolve <span class="smart-term" data-term-en="Ambiguity" data-ar="الغموض" data-en-def="When a single word can have multiple valid parts of speech depending on context.">ambiguity<span class="smart-term-tooltip"></span></span>, models rely on multiple sources of information:</p><ul><li><strong>prior probabilities</strong> of word/tag,</li><li><strong>identity of neighboring words</strong> (context),</li><li><strong>morphology</strong> (prefixes like 'un-', suffixes like '-ly'), and</li><li><strong>word shape</strong> (capitalization).</li></ul><p>Achieving 97% accuracy is roughly equivalent to human performance, making POS tagging a largely 'solved' problem for high-resource languages like English.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A simple diagram showing a sequence of words 'Janet will back the bill' mapped to POS tags 'PROPN AUX VERB DET NOUN' using arrows pointing from the words to the tags, with a box labeled 'Part of Speech Tagger' in the middle. Style: educational, dark background #0d1117, accent color #58a6ff. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Definitions for Arrow Markers -->
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Accuracy Info Box (Top Right) -->
+    <rect x="560" y="10" width="230" height="30" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text class="gsvg-en" x="675" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Accuracy: Baseline 92% | SOTA ~97%</text>
+    <text class="gsvg-ar" x="675" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">الدقة: الأساس 92% | الأحدث ~97%</text>
+
+    <!-- ARROWS: Words to Tagger -->
+    <line x1="140" y1="280" x2="140" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="270" y1="280" x2="270" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="400" y1="280" x2="400" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="530" y1="280" x2="530" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="660" y1="280" x2="660" y2="220" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- ARROWS: Tagger to Tags -->
+    <line x1="140" y1="160" x2="140" y2="96" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="270" y1="160" x2="270" y2="96" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="400" y1="160" x2="400" y2="96" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="530" y1="160" x2="530" y2="96" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="660" y1="160" x2="660" y2="96" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- MIDDLE COMPONENT: POS Tagger Box -->
+    <rect x="90" y="160" width="620" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text class="gsvg-en" x="400" y="197" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Part-of-Speech Tagger</text>
+    <text class="gsvg-ar" x="400" y="197" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">وسم أجزاء الكلام (POS Tagger)</text>
+
+    <!-- TOP ROW: Output Tags (y_i) -->
+    <!-- y1: PROPN -->
+    <text x="140" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">y₁</text>
+    <rect x="90" y="60" width="100" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="140" y="84" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">PROPN</text>
+
+    <!-- y2: AUX -->
+    <text x="270" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">y₂</text>
+    <rect x="220" y="60" width="100" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="270" y="84" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">AUX</text>
+
+    <!-- y3: VERB (Highlighted) -->
+    <text x="400" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">y₃</text>
+    <rect x="350" y="60" width="100" height="36" rx="18" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="1.5" />
+    <text x="400" y="84" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-lo)">VERB</text>
+
+    <!-- y4: DET -->
+    <text x="530" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">y₄</text>
+    <rect x="480" y="60" width="100" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="530" y="84" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">DET</text>
+
+    <!-- y5: NOUN -->
+    <text x="660" y="48" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">y₅</text>
+    <rect x="610" y="60" width="100" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="660" y="84" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">NOUN</text>
+
+
+    <!-- BOTTOM ROW: Input Words (x_i) -->
+    <!-- x1: Janet -->
+    <rect x="90" y="280" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="140" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)">Janet</text>
+    <text x="140" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">x₁</text>
+
+    <!-- x2: will -->
+    <rect x="220" y="280" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="270" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)">will</text>
+    <text x="270" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">x₂</text>
+
+    <!-- x3: back (Highlighted) -->
+    <rect x="350" y="280" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" />
+    <text x="400" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">back</text>
+    <text x="400" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">x₃</text>
+
+    <!-- x4: the -->
+    <rect x="480" y="280" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="530" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)">the</text>
+    <text x="530" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">x₄</text>
+
+    <!-- x5: bill -->
+    <rect x="610" y="280" width="100" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="660" y="306" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" fill="var(--text-primary)">bill</text>
+    <text x="660" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--text-secondary)">x₅</text>
+
+
+    <!-- AMBIGUITY CALLOUT -->
+    <line x1="400" y1="375" x2="400" y2="355" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" />
+    <rect x="225" y="375" width="350" height="60" rx="8" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" />
+    
+    <text class="gsvg-en" x="400" y="398" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">Ambiguous Word (~60% of tokens)</text>
+    <text class="gsvg-en" x="400" y="420" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Can be ADJ, NOUN, VERB, PART, or ADV</text>
+
+    <text class="gsvg-ar" x="400" y="398" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">كلمة غامضة (~60% من الكلمات)</text>
+    <text class="gsvg-ar" x="400" y="420" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">قد تكون ADJ, NOUN, VERB, PART, أو ADV</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر خط الأساس (تعيين العلامة الأكثر شيوعاً) قوياً جداً (92%) في تحديد أجزاء الكلام؟</template>
+      <template class="content-en">Why is the baseline (most frequent class) so strong (92%) in POS tagging?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن 85% من أنواع الكلمات في اللغة الإنجليزية غير غامضة ولها علامة واحدة فقط، وحتى الكلمات الغامضة غالباً ما تُستخدم في فئتها الأكثر شيوعاً في معظم الأوقات.</p></template>
+      <template class="content-en"><p>Because 85% of English word types are unambiguous and have only one tag. Even for ambiguous words, their most frequent tag accounts for the vast majority of their occurrences.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="named-entity-recognition" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التعرف على الكيانات المسماة (NER)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Named Entity Recognition (NER)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مهمة استخراج المعلومات التي تهدف إلى العثور على أسماء الأعلام في النص وتصنيفها إلى فئات محددة مسبقاً مثل الأشخاص والمواقع والمنظمات.</p></template>
+    <template class="content-en"><p>An information extraction task that aims to find proper names in text and classify them into predefined categories like Persons, Locations, and Organizations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الكيان المسمى هو أي شيء يمكن الإشارة إليه باسم علم. العلامات الأربع الأكثر شيوعاً هي:</p><ul><li><b>PER (شخص):</b> مثل "Marie Curie"</li><li><b>LOC (موقع):</b> مثل "New York City"</li><li><b>ORG (منظمة):</b> مثل "Stanford University"</li><li><b>GPE (<span class="smart-term" data-term-en="GPE" data-ar="كيان جيوسياسي" data-en-def="Geo-Political Entity, representing areas with political boundaries like countries, cities, or states.">كيان جيوسياسي<span class="smart-term-tooltip"></span></span>):</b> مثل "Boulder, Colorado"</li></ul><p><b>لماذا NER صعب؟</b></p><ol><li><b><span class="smart-term" data-term-en="Segmentation" data-ar="التجزئة" data-en-def="The process of identifying the boundaries (start and end) of a multi-word entity in text.">التجزئة<span class="smart-term-tooltip"></span></span> (Segmentation):</b> الكيانات غالباً ما تتكون من عدة كلمات، ويجب تحديد بدايتها ونهايتها بدقة.</li><li><b>غموض النوع (Type Ambiguity):</b> الكلمة الواحدة قد تعني أشياء مختلفة (مثال: "Washington" قد تكون شخصاً، أو منظمة، أو موقعاً، أو كياناً جيوسياسياً).</li></ol></template>
+    <template class="content-en"><p>A named entity is anything that can be referred to with a proper name. The 4 most common tags are:</p><ul><li><b>PER (Person):</b> e.g., "Marie Curie"</li><li><b>LOC (Location):</b> e.g., "New York City"</li><li><b>ORG (Organization):</b> e.g., "Stanford University"</li><li><b><span class="smart-term" data-term-en="GPE" data-ar="كيان جيوسياسي" data-en-def="Geo-Political Entity, representing areas with political boundaries like countries, cities, or states.">GPE<span class="smart-term-tooltip"></span></span> (Geo-Political Entity):</b> e.g., "Boulder, Colorado"</li></ul><p><b>Why NER is hard:</b></p><ol><li><b><span class="smart-term" data-term-en="Segmentation" data-ar="التجزئة" data-en-def="The process of identifying the boundaries (start and end) of a multi-word entity in text.">Segmentation<span class="smart-term-tooltip"></span></span>:</b> Entities are often multi-word phrases, requiring the model to find the exact boundaries.</li><li><b>Type ambiguity:</b> The same word can represent different entity types depending on context (e.g., "Washington" can be a PER, ORG, LOC, or GPE).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُستخدم NER كخطوة أساسية في العديد من مهام معالجة اللغات الطبيعية المتقدمة مثل تحليل المشاعر (لمعرفة رأي المستهلك تجاه شركة معينة)، والإجابة على الأسئلة (لاستخراج الإجابات المتعلقة بالكيانات)، واستخراج المعلومات (لبناء قواعد المعرفة).</p></template>
+    <template class="content-en"><p>NER is used as a foundational step in many downstream NLP tasks such as sentiment analysis (determining sentiment toward a specific company), question answering (answering questions about an entity), and information extraction (extracting facts to build knowledge bases).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن للسياق أن يحل غموض كلمة مثل 'Washington'؟</template>
+      <template class="content-en">How can context resolve the ambiguity of a word like 'Washington'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الكلمات المحيطة توفر أدلة. 'ولد في Washington' تشير إلى موقع (LOC)، بينما 'صرحت Washington' تشير إلى الحكومة/المنظمة (ORG)، و 'الرئيس Washington' تشير إلى شخص (PER).</p></template>
+      <template class="content-en"><p>Surrounding words provide clues. 'Born in Washington' implies a location (LOC), 'Washington announced' implies a government/organization (ORG), and 'President Washington' implies a person (PER).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="bio-tagging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مخطط التوسيم BIO</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> BIO Tagging Scheme</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طريقة لتحويل مشكلة تجزئة الكيانات المسماة إلى مشكلة تصنيف تسلسلي قياسية، حيث تحصل كل كلمة على علامة واحدة تشير إلى موقعها داخل الكيان.</p></template>
+    <template class="content-en"><p>A method to turn the structured NER segmentation problem into a standard sequence labeling problem, where each word gets one tag indicating its position in an entity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نظام BIO يحدد موقع الكلمة بالنسبة للكيان المسمى:</p><ul><li><b>B (Begin):</b> الكلمة التي تبدأ بها الكيان المسمى.</li><li><b>I (Inside):</b> الكلمات الموجودة داخل الكيان المسمى (بعد كلمة البداية).</li><li><b>O (Outside):</b> الكلمات التي لا تنتمي لأي كيان مسمى.</li></ul><p>إذا كان لدينا $n$ من أنواع الكيانات، فإن إجمالي عدد العلامات في نظام BIO هو $2n + 1$ (علامة O واحدة، و $n$ علامات B، و $n$ علامات I).</p></template>
+    <template class="content-en"><p>The BIO scheme identifies a token's position relative to a named entity:</p><ul><li><b>B (Begin):</b> Token that begins a span.</li><li><b>I (Inside):</b> Tokens inside a span.</li><li><b>O (Outside):</b> Tokens outside of any span.</li></ul><p>If there are $n$ entity types, the total number of tags in the BIO scheme is $2n + 1$ (1 'O' tag, $n$ 'B' tags, and $n$ 'I' tags).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هناك متغيرات لنظام BIO مثل <b>IO</b> (حيث يتم استخدام I فقط داخل الكيان دون تمييز البداية، مما يصعب فصل كيانين متتاليين من نفس النوع) و <b>BIOES</b> (الذي يضيف E لنهاية الكيان و S للكيان المكون من كلمة واحدة، مما يعطي النموذج إشارات أوضح حول حدود الكيانات).</p></template>
+    <template class="content-en"><p>There are variants to the BIO scheme such as <b>IO</b> (which only uses 'I' inside an entity, making it hard to separate two adjacent entities of the same type) and <b><span class="smart-term" data-term-en="BIOES" data-ar="نظام BIOES" data-en-def="An extension of BIO tagging adding &#x27;E&#x27; for End and &#x27;S&#x27; for Single token entities.">BIOES<span class="smart-term-tooltip"></span></span></b> (which adds 'E' for the End of a span and 'S' for a Single-token entity, providing the model with stronger boundary signals).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>إجمالي عدد العلامات في نظام BIO حيث n هو عدد أنواع الكيانات.</strong></template>
+      <template class="content-en"><strong>Total number of tags in BIO scheme where n is the number of entity types.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$2n + 1$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: A table showing the BIO tagging for the sentence 'Jane Villanueva of United Airlines Holding discussed the Chicago route.' Columns: Words, BIO Label. Jane -> B-PER, Villanueva -> I-PER, of -> O, United -> B-ORG, Airlines -> I-ORG, Holding -> I-ORG, discussed -> O, the -> O, Chicago -> B-LOC, route -> O. Style: clean data table, dark theme. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      .gsvg-en { display: inline; }
+      .gsvg-ar { display: none; }
+      :root[lang="ar"] .gsvg-en { display: none; }
+      :root[lang="ar"] .gsvg-ar { display: inline; }
+      
+      .title { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 24px; font-weight: 600; fill: var(--text-primary); }
+      .header { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: var(--on-brand-hi); }
+      .cell { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 15px; fill: var(--text-primary); }
+      .tag-text { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: var(--on-brand-lo); }
+      .tag-text-o { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: var(--text-secondary); }
+      
+      .legend-title { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: var(--brand-ink); }
+      .legend-text { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; fill: var(--text-secondary); }
+      .legend-bold { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; font-weight: 600; fill: var(--text-primary); }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" class="title gsvg-en">BIO Tagging Scheme</text>
+  <text x="400" y="40" text-anchor="middle" class="title gsvg-ar">نظام وسم BIO</text>
+
+  <!-- ================= TABLE ================= -->
+  <!-- Table Container -->
+  <rect x="50" y="70" width="400" height="432" fill="var(--bg-elevated)" rx="8" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Table Header Background -->
+  <path d="M 50 78 A 8 8 0 0 1 58 70 L 442 70 A 8 8 0 0 1 450 78 L 450 106 L 50 106 Z" fill="var(--brand-700)" />
+
+  <!-- Table Headers -->
+  <text x="150" y="93" text-anchor="middle" class="header gsvg-en">Token</text>
+  <text x="150" y="93" text-anchor="middle" class="header gsvg-ar">الكلمة (الرمز)</text>
+  <text x="350" y="93" text-anchor="middle" class="header gsvg-en">BIO Label</text>
+  <text x="350" y="93" text-anchor="middle" class="header gsvg-ar">وسم BIO</text>
+
+  <!-- Table Dividers -->
+  <line x1="50" y1="106" x2="450" y2="106" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="142" x2="450" y2="142" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="178" x2="450" y2="178" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="214" x2="450" y2="214" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="250" x2="450" y2="250" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="286" x2="450" y2="286" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="322" x2="450" y2="322" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="358" x2="450" y2="358" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="394" x2="450" y2="394" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="430" x2="450" y2="430" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="50" y1="466" x2="450" y2="466" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="250" y1="106" x2="250" y2="502" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- Table Content: Tokens -->
+  <text x="150" y="129" text-anchor="middle" class="cell">Jane</text>
+  <text x="150" y="165" text-anchor="middle" class="cell">Villanueva</text>
+  <text x="150" y="201" text-anchor="middle" class="cell">of</text>
+  <text x="150" y="237" text-anchor="middle" class="cell">United</text>
+  <text x="150" y="273" text-anchor="middle" class="cell">Airlines</text>
+  <text x="150" y="309" text-anchor="middle" class="cell">Holding</text>
+  <text x="150" y="345" text-anchor="middle" class="cell">discussed</text>
+  <text x="150" y="381" text-anchor="middle" class="cell">the</text>
+  <text x="150" y="417" text-anchor="middle" class="cell">Chicago</text>
+  <text x="150" y="453" text-anchor="middle" class="cell">route</text>
+  <text x="150" y="489" text-anchor="middle" class="cell">.</text>
+
+  <!-- Table Content: BIO Tags -->
+  <!-- Row 1 -->
+  <rect x="310" y="113" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="130" text-anchor="middle" class="tag-text">B-PER</text>
+  
+  <!-- Row 2 -->
+  <rect x="310" y="149" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="166" text-anchor="middle" class="tag-text">I-PER</text>
+  
+  <!-- Row 3 -->
+  <rect x="325" y="185" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="350" y="202" text-anchor="middle" class="tag-text-o">O</text>
+  
+  <!-- Row 4 -->
+  <rect x="310" y="221" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="238" text-anchor="middle" class="tag-text">B-ORG</text>
+  
+  <!-- Row 5 -->
+  <rect x="310" y="257" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="274" text-anchor="middle" class="tag-text">I-ORG</text>
+  
+  <!-- Row 6 -->
+  <rect x="310" y="293" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="310" text-anchor="middle" class="tag-text">I-ORG</text>
+  
+  <!-- Row 7 -->
+  <rect x="325" y="329" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="350" y="346" text-anchor="middle" class="tag-text-o">O</text>
+  
+  <!-- Row 8 -->
+  <rect x="325" y="365" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="350" y="382" text-anchor="middle" class="tag-text-o">O</text>
+  
+  <!-- Row 9 -->
+  <rect x="310" y="401" width="80" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="350" y="418" text-anchor="middle" class="tag-text">B-LOC</text>
+  
+  <!-- Row 10 -->
+  <rect x="325" y="437" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="350" y="454" text-anchor="middle" class="tag-text-o">O</text>
+  
+  <!-- Row 11 -->
+  <rect x="325" y="473" width="50" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="350" y="490" text-anchor="middle" class="tag-text-o">O</text>
+
+
+  <!-- ================= LEGEND ================= -->
+  <!-- Box 1: BIO Scheme -->
+  <rect x="500" y="70" width="250" height="180" fill="var(--bg-elevated)" rx="8" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="625" y="100" text-anchor="middle" class="legend-title gsvg-en">BIO Scheme</text>
+  <text x="625" y="100" text-anchor="middle" class="legend-title gsvg-ar">نظام BIO</text>
+  <line x1="500" y1="115" x2="750" y2="115" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- B Definition -->
+  <rect x="515" y="130" width="30" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="530" y="147" text-anchor="middle" class="tag-text">B</text>
+  <text x="645" y="147" text-anchor="middle" class="legend-text gsvg-en"><tspan class="legend-bold">Begin:</tspan> Starts an entity</text>
+  <text x="645" y="147" text-anchor="middle" class="legend-text gsvg-ar"><tspan class="legend-bold">بداية:</tspan> بداية الكيان</text>
+
+  <!-- I Definition -->
+  <rect x="515" y="170" width="30" height="24" rx="12" fill="var(--brand-500)" />
+  <text x="530" y="187" text-anchor="middle" class="tag-text">I</text>
+  <text x="645" y="187" text-anchor="middle" class="legend-text gsvg-en"><tspan class="legend-bold">Inside:</tspan> Inside an entity</text>
+  <text x="645" y="187" text-anchor="middle" class="legend-text gsvg-ar"><tspan class="legend-bold">داخل:</tspan> داخل الكيان</text>
+
+  <!-- O Definition -->
+  <rect x="515" y="210" width="30" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" />
+  <text x="530" y="227" text-anchor="middle" class="tag-text-o">O</text>
+  <text x="645" y="227" text-anchor="middle" class="legend-text gsvg-en"><tspan class="legend-bold">Outside:</tspan> Not an entity</text>
+  <text x="645" y="227" text-anchor="middle" class="legend-text gsvg-ar"><tspan class="legend-bold">خارج:</tspan> ليس كياناً</text>
+
+  <!-- Box 2: Entity Types -->
+  <rect x="500" y="270" width="250" height="180" fill="var(--bg-elevated)" rx="8" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="625" y="300" text-anchor="middle" class="legend-title gsvg-en">Entity Types</text>
+  <text x="625" y="300" text-anchor="middle" class="legend-title gsvg-ar">أنواع الكيانات</text>
+  <line x1="500" y1="315" x2="750" y2="315" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- PER -->
+  <text x="530" y="347" text-anchor="middle" class="legend-bold">PER</text>
+  <text x="645" y="347" text-anchor="middle" class="legend-text gsvg-en">Person</text>
+  <text x="645" y="347" text-anchor="middle" class="legend-text gsvg-ar">شخص</text>
+
+  <!-- ORG -->
+  <text x="530" y="387" text-anchor="middle" class="legend-bold">ORG</text>
+  <text x="645" y="387" text-anchor="middle" class="legend-text gsvg-en">Organization</text>
+  <text x="645" y="387" text-anchor="middle" class="legend-text gsvg-ar">منظمة</text>
+
+  <!-- LOC -->
+  <text x="530" y="427" text-anchor="middle" class="legend-bold">LOC</text>
+  <text x="645" y="427" text-anchor="middle" class="legend-text gsvg-en">Location</text>
+  <text x="645" y="427" text-anchor="middle" class="legend-text gsvg-ar">موقع</text>
+
+  <!-- ================= CONNECTING ARROWS ================= -->
+  <!-- Arrow from Legend B to Table B-PER -->
+  <path d="M 495 142 C 475 142, 475 125, 455 125" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+  
+  <!-- Arrow from Legend I to Table I-PER -->
+  <path d="M 495 182 C 475 182, 475 161, 455 161" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+  
+  <!-- Arrow from Legend O to Table O -->
+  <path d="M 495 222 C 475 222, 475 197, 455 197" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow)" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي المشكلة التي تحدث إذا استخدمنا نظام IO بدلاً من BIO لكيانين متتاليين من نفس النوع (مثل اسمين لشخصين متتاليين)؟</template>
+      <template class="content-en">What problem occurs if we use the IO scheme instead of BIO for two adjacent entities of the same type (e.g., two consecutive person names)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في نظام IO، سيتم تمييز كلتا الكلمتين بعلامة 'I-PER'، ولن يتمكن النموذج من معرفة ما إذا كانتا تمثلان شخصاً واحداً باسم مركب أم شخصين منفصلين. علامة 'B' في نظام BIO تحل هذه المشكلة بتحديد بداية الكيان الثاني.</p></template>
+      <template class="content-en"><p>In the IO scheme, both words would be tagged 'I-PER', and the model wouldn't know if it's one person with a two-word name or two separate people. The 'B' tag in BIO solves this by marking the start of the second entity.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hmm-pos-tagging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> نماذج ماركوف المخفية (HMM) لتحديد أجزاء الكلام</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> HMM Part-of-Speech Tagging</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نموذج تسلسلي احتمالي يحسب التوزيع الاحتمالي للتسلسلات الممكنة للعلامات ويختار التسلسل الأفضل بناءً على احتمالات الانتقال والانبعاث.</p></template>
+    <template class="content-en"><p>A probabilistic sequence model that computes a probability distribution over possible sequences of labels and chooses the best one based on transition and emission probabilities.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعتمد HMM على <b><span class="smart-term" data-term-en="Markov Assumption" data-ar="افتراض ماركوف" data-en-def="The assumption that the probability of a future state depends only on the current state, not on the sequence of events that preceded it.">افتراض ماركوف<span class="smart-term-tooltip"></span></span> (Markov Assumption):</b> عند التنبؤ بالمستقبل، الماضي لا يهم، فقط الحاضر هو المهم.</p><p>مكونات نموذج HMM:</p><ol><li><b>الحالات (States - Q):</b> مجموعة من $N$ حالات (تمثل علامات POS).</li><li><b>مصفوفة الانتقال (Transition Matrix - A):</b> احتمالية الانتقال من حالة $i$ إلى حالة $j$.</li><li><b>التوزيع الاحتمالي الأولي (Initial Probabilities - $\pi$):</b> احتمالية أن يبدأ التسلسل في حالة معينة.</li><li><b>احتمالات الملاحظة/الانبعاث (Observation Likelihoods - B):</b> احتمالية توليد كلمة معينة (ملاحظة) من حالة معينة.</li></ol></template>
+    <template class="content-en"><p>HMM relies on the <b><span class="smart-term" data-term-en="Markov Assumption" data-ar="افتراض ماركوف" data-en-def="The assumption that the probability of a future state depends only on the current state, not on the sequence of events that preceded it.">Markov Assumption<span class="smart-term-tooltip"></span></span>:</b> when predicting the future, the past doesn’t matter, only the present.</p><p>Components of an HMM:</p><ol><li><b>States (Q):</b> A set of $N$ states (representing POS tags).</li><li><b>Transition Probability Matrix (A):</b> The probability of moving from state $i$ to state $j$.</li><li><b>Initial Probability Distribution ($\pi$):</b> The probability that the sequence will start in a specific state.</li><li><b>Observation Likelihoods (B):</b> The probability of generating a specific word (observation) from a specific state.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مهمة فك التشفير (Decoding) في HMM هي العثور على التسلسل الأكثر احتمالاً للحالات (العلامات) بالنظر إلى تسلسل الملاحظات (الكلمات). يتم حل هذه المشكلة بكفاءة باستخدام <b><span class="smart-term" data-term-en="Viterbi Algorithm" data-ar="خوارزمية فيتربي" data-en-def="A dynamic programming algorithm used to find the most likely sequence of hidden states in an HMM.">خوارزمية فيتربي<span class="smart-term-tooltip"></span></span> (Viterbi Algorithm)</b>، وهي خوارزمية برمجة ديناميكية تتجنب الحساب الأسي من خلال تخزين أفضل مسار جزئي لكل حالة في كل خطوة زمنية.</p></template>
+    <template class="content-en"><p>The Decoding Task in HMM is finding the most likely sequence of states (tags) for a given sequence of observations (words). This is solved efficiently using the <b><span class="smart-term" data-term-en="Viterbi Algorithm" data-ar="خوارزمية فيتربي" data-en-def="A dynamic programming algorithm used to find the most likely sequence of hidden states in an HMM.">Viterbi Algorithm<span class="smart-term-tooltip"></span></span></b>, a dynamic programming instance that avoids exponential computation by storing the best partial path to each state at each time step.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة فك التشفير في HMM: تعظيم حاصل ضرب احتمالات الانبعاث P(w|t) واحتمالات الانتقال P(t|t-1).</strong></template>
+      <template class="content-en"><strong>HMM decoding equation: maximizing the product of emission probabilities P(w|t) and transition probabilities P(t|t-1).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{t}_{1:n} = \text{argmax}_{t_1 \dots t_n} \prod_{i=1}^n P(w_i|t_i) P(t_i|t_{i-1})$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: A diagram illustrating the Viterbi lattice for the sentence 'Janet will back the bill'. Show columns of POS tags (states) for each word. Draw arrows representing transitions between states, highlighting the optimal path (e.g., NNP -> MD -> VB -> DT -> NN) with a thicker, darker line. Grey out states with zero observation probability. Style: educational, dark background. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Marker for faded/zero-prob paths -->
+    <marker id="arrow-faded" viewBox="0 0 10 10" refX="30" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M 0 2 L 8 5 L 0 8 z" fill="var(--border-color)" />
+    </marker>
+    <!-- Marker for valid alternative paths -->
+    <marker id="arrow-valid" viewBox="0 0 10 10" refX="30" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M 0 2 L 8 5 L 0 8 z" fill="var(--brand-400)" />
+    </marker>
+    <!-- Marker for optimal Viterbi path -->
+    <marker id="arrow-optimal" viewBox="0 0 10 10" refX="30" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="425" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Viterbi Decoding Lattice for POS Tagging</text>
+  <text x="425" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شبكة فك التشفير فيتربي لوسم أجزاء الكلام</text>
+  
+  <text x="425" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Finding the most likely sequence of hidden states (POS tags) for a sequence of observations (words)</text>
+  <text x="425" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">إيجاد التسلسل الأكثر احتمالاً للحالات المخفية (وسوم أجزاء الكلام) لتسلسل من الملاحظات (الكلمات)</text>
+
+  <!-- Time Step Vertical Dashed Lines -->
+  <line x1="180" y1="90" x2="180" y2="410" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,6" opacity="0.5" />
+  <line x1="300" y1="90" x2="300" y2="410" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,6" opacity="0.5" />
+  <line x1="420" y1="90" x2="420" y2="410" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,6" opacity="0.5" />
+  <line x1="540" y1="90" x2="540" y2="410" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,6" opacity="0.5" />
+  <line x1="660" y1="90" x2="660" y2="410" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,6" opacity="0.5" />
+
+  <!-- ================= PATHS (Drawn first to stay behind nodes) ================= -->
+  
+  <!-- Start to Col 1 -->
+  <path d="M 60 240 L 180 100" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 60 240 L 180 170" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 60 240 L 180 240" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 60 240 L 180 310" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 60 240 L 180 380" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+
+  <!-- Col 1 to Col 2 -->
+  <path d="M 180 100 L 300 170" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 180 100 L 300 310" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 180 100 L 300 100" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 180 100 L 300 240" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 180 100 L 300 380" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+
+  <!-- Col 2 to Col 3 -->
+  <path d="M 300 170 L 420 240" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 300 170 L 420 310" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 300 310 L 420 240" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 300 310 L 420 310" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 300 170 L 420 100" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 300 170 L 420 380" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+
+  <!-- Col 3 to Col 4 -->
+  <path d="M 420 240 L 540 380" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 420 310 L 540 380" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 420 240 L 540 100" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 420 240 L 540 170" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 420 240 L 540 240" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 420 240 L 540 310" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+
+  <!-- Col 4 to Col 5 -->
+  <path d="M 540 380 L 660 310" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 540 380 L 660 240" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+  <path d="M 540 380 L 660 100" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 540 380 L 660 170" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+  <path d="M 540 380 L 660 380" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow-faded)" fill="none" />
+
+  <!-- Col 5 to End -->
+  <path d="M 660 310 L 780 240" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" fill="none" />
+  <path d="M 660 240 L 780 240" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" fill="none" />
+
+
+  <!-- ================= NODES ================= -->
+
+  <!-- Start Node -->
+  <rect x="30" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="60" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Start</text>
+  <text x="60" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">البداية</text>
+
+  <!-- End Node -->
+  <rect x="750" y="220" width="60" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="780" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">End</text>
+  <text x="780" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">النهاية</text>
+
+  <!-- Col 1: Janet -->
+  <circle cx="180" cy="100" r="20" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="180" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">NNP</text>
+  
+  <circle cx="180" cy="170" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="180" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">MD</text>
+  
+  <circle cx="180" cy="240" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="180" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">VB</text>
+  
+  <circle cx="180" cy="310" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="180" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NN</text>
+  
+  <circle cx="180" cy="380" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="180" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">DT</text>
+
+  <!-- Col 2: will -->
+  <circle cx="300" cy="100" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="300" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NNP</text>
+  
+  <circle cx="300" cy="170" r="20" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="300" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">MD</text>
+  
+  <circle cx="300" cy="240" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="300" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">VB</text>
+  
+  <circle cx="300" cy="310" r="20" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+  <text x="300" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">NN</text>
+  
+  <circle cx="300" cy="380" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="300" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">DT</text>
+
+  <!-- Col 3: back -->
+  <circle cx="420" cy="100" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="420" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NNP</text>
+  
+  <circle cx="420" cy="170" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="420" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">MD</text>
+  
+  <circle cx="420" cy="240" r="20" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="420" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">VB</text>
+  
+  <circle cx="420" cy="310" r="20" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+  <text x="420" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">NN</text>
+  
+  <circle cx="420" cy="380" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="420" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">DT</text>
+
+  <!-- Col 4: the -->
+  <circle cx="540" cy="100" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="540" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NNP</text>
+  
+  <circle cx="540" cy="170" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="540" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">MD</text>
+  
+  <circle cx="540" cy="240" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="540" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">VB</text>
+  
+  <circle cx="540" cy="310" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="540" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NN</text>
+  
+  <circle cx="540" cy="380" r="20" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="540" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">DT</text>
+
+  <!-- Col 5: bill -->
+  <circle cx="660" cy="100" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="660" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">NNP</text>
+  
+  <circle cx="660" cy="170" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="660" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">MD</text>
+  
+  <circle cx="660" cy="240" r="20" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+  <text x="660" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">VB</text>
+  
+  <circle cx="660" cy="310" r="20" fill="var(--brand-500)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="660" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">NN</text>
+  
+  <circle cx="660" cy="380" r="20" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" />
+  <text x="660" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">DT</text>
+
+
+  <!-- ================= OBSERVATIONS (WORDS) ================= -->
+  
+  <text x="180" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Janet</text>
+  <text x="180" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">جانيت (Janet)</text>
+
+  <text x="300" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">will</text>
+  <text x="300" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">سوف (will)</text>
+
+  <text x="420" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">back</text>
+  <text x="420" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">يدعم (back)</text>
+
+  <text x="540" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">the</text>
+  <text x="540" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الـ (the)</text>
+
+  <text x="660" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">bill</text>
+  <text x="660" y="445" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قانون (bill)</text>
+
+
+  <!-- ================= LEGEND ================= -->
+  
+  <rect x="125" y="490" width="600" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Legend Item 1 -->
+  <line x1="150" y1="510" x2="180" y2="510" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-optimal)" />
+  <text x="195" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-en">Optimal Path</text>
+  <text x="195" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-ar">المسار الأمثل</text>
+
+  <!-- Legend Item 2 -->
+  <line x1="320" y1="510" x2="350" y2="510" stroke="var(--brand-400)" stroke-width="1.5" marker-end="url(#arrow-valid)" />
+  <text x="365" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-en">Valid Transition</text>
+  <text x="365" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-ar">انتقال صالح</text>
+
+  <!-- Legend Item 3 -->
+  <circle cx="510" cy="510" r="10" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="2,2" />
+  <text x="530" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-en">Zero Observation Prob.</text>
+  <text x="530" y="515" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" class="gsvg-ar">احتمال ملاحظة صفري</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم خوارزمية فيتربي بدلاً من حساب احتمالية كل تسلسل ممكن للعلامات؟</template>
+      <template class="content-en">Why do we use the Viterbi algorithm instead of calculating the probability of every possible tag sequence?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>حساب كل تسلسل ممكن يتطلب وقتاً أسياً \((O(N^T))\)، وهو غير عملي للنصوص الطويلة. خوارزمية فيتربي تستخدم البرمجة الديناميكية لتقليل التعقيد الزمني إلى \((O(T\cdot N^2))\)، مما يجعلها فعالة جداً.</p></template>
+      <template class="content-en"><p>Calculating every possible sequence takes exponential time \((O(N^T))\), which is intractable for long texts. Viterbi uses dynamic programming to reduce the time complexity to \((O(T\cdot N^2))\), making it highly efficient.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="conditional-random-fields" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الحقول العشوائية الشرطية (CRFs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Conditional Random Fields (CRFs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Log-linear Model" data-ar="نموذج خطي لوغاريتمي" data-en-def="A mathematical model that takes the form of a function whose logarithm is a linear combination of the parameters.">نموذج خطي لوغاريتمي<span class="smart-term-tooltip"></span></span> تمييزي يعين احتمالية لتسلسل المخرجات (العلامات) بالكامل بناءً على تسلسل المدخلات (الكلمات) بالكامل.</p></template>
+    <template class="content-en"><p>A discriminative <span class="smart-term" data-term-en="Log-linear Model" data-ar="نموذج خطي لوغاريتمي" data-en-def="A mathematical model that takes the form of a function whose logarithm is a linear combination of the parameters.">log-linear model<span class="smart-term-tooltip"></span></span> that assigns a probability to an entire output (tag) sequence given the entire input (word) sequence.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحتاج نماذج HMM إلى تعزيزات للتعامل مع الكلمات غير المعروفة (مثل الأسماء الخاصة والاختصارات الجديدة). تتفوق نماذج CRF في هذا الجانب.</p><p>في CRFs، نقوم بحساب الاحتمال البعدي $P(Y|X)$ مباشرةً، حيث يتم تدريب النموذج للتمييز بين تسلسلات العلامات الممكنة.</p><p>المعادلة الأساسية: $\hat{Y} = \text{argmax}_{Y \in \mathcal{Y}} P(Y|X)$</p></template>
+    <template class="content-en"><p>HMMs need augmentations to achieve high accuracy, especially for unknown words (new proper names, acronyms, etc.). CRFs handle this better.</p><p>In CRFs, we compute the posterior $P(Y|X)$ directly, training the CRF to discriminate among the possible tag sequences.</p><p>Core equation: $\hat{Y} = \text{argmax}_{Y \in \mathcal{Y}} P(Y|X)$</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الرئيسي بين HMM و CRF هو أن HMM نموذج توليدي (Generative) يحاول نمذجة التوزيع المشترك $P(X,Y)$، بينما CRF <span class="smart-term" data-term-en="Discriminative Model" data-ar="نموذج تمييزي" data-en-def="A model that learns the boundary between classes by modeling the conditional probability P(Y|X).">نموذج تمييزي<span class="smart-term-tooltip"></span></span> (Discriminative) ينمذج التوزيع الشرطي $P(Y|X)$. هذا يسمح لـ CRF باستخدام ميزات (Features) غنية ومتداخلة من تسلسل المدخلات بأكمله دون القلق بشأن افتراضات الاستقلال الصارمة الموجودة في HMM.</p></template>
+    <template class="content-en"><p>The key difference is that HMM is a generative model modeling the joint distribution $P(X,Y)$, while CRF is a <span class="smart-term" data-term-en="Discriminative Model" data-ar="نموذج تمييزي" data-en-def="A model that learns the boundary between classes by modeling the conditional probability P(Y|X).">discriminative model<span class="smart-term-tooltip"></span></span> modeling the conditional distribution $P(Y|X)$. This allows CRFs to use rich, overlapping, and global features from the entire input sequence without worrying about the strict independence assumptions required by HMMs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة CRF لاختيار تسلسل العلامات Y الذي يزيد الاحتمال الشرطي بالنظر إلى المدخلات X.</strong></template>
+      <template class="content-en"><strong>CRF equation to select the tag sequence Y that maximizes the conditional probability given the input X.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{Y} = \text{argmax}_{Y \in \mathcal{Y}} P(Y|X)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر نماذج CRF أفضل من HMM في التعامل مع الكلمات غير المعروفة؟</template>
+      <template class="content-en">Why are CRFs better than HMMs at handling unknown words?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن CRFs يمكنها دمج ميزات معقدة ومتداخلة بسهولة (مثل السوابق، اللواحق، حالة الأحرف، والكلمات المحيطة) في نفس الوقت لتقييم الكلمة، بينما يتطلب HMM حساب احتمالات انبعاث صريحة لكل كلمة، مما يفشل مع الكلمات غير المرئية مسبقاً.</p></template>
+      <template class="content-en"><p>Because CRFs can easily incorporate complex, overlapping arbitrary features (like prefixes, suffixes, capitalization, and surrounding context) simultaneously to evaluate a word, whereas HMMs require explicit emission probabilities for each word, which fails for unseen words.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluation-ner" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تقييم التعرف على الكيانات المسماة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Evaluation of Named Entity Recognition</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تقييم أجزاء الكلام باستخدام الدقة (Accuracy)، بينما يتطلب تقييم الكيانات المسماة مقاييس الاستدعاء (Recall)، والدقة (Precision)، و<span class="smart-term" data-term-en="F1 Measure" data-ar="مقياس F1" data-en-def="The harmonic mean of precision and recall, providing a single score that balances both concerns.">مقياس F1<span class="smart-term-tooltip"></span></span> بسبب تعقيد مشكلة التجزئة.</p></template>
+    <template class="content-en"><p>POS tagging is evaluated using Accuracy, while NER requires Recall, Precision, and F1 measure due to the complexity of the segmentation problem.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>تقييم POS Tagging:</b> يُقاس بالدقة القياسية (نسبة العلامات الصحيحة). خط الأساس هو 92%، والأداء البشري/النماذج المتقدمة يصل إلى 97%.</p><p><b>تقييم NER:</b> يُقاس باستخدام Precision و Recall و F1-score. حقيقة أن NER يحتوي على مكون تجزئة (Segmentation) يسبب مشاكل في التقييم. على سبيل المثال، إذا حدد النموذج حدود الكيان بشكل خاطئ ولكن النوع صحيح، أو العكس، فكيف يتم حساب الدرجة الجزئية؟</p></template>
+    <template class="content-en"><p><b>POS Tagging Evaluation:</b> Evaluated by standard accuracy (percentage of correct tags).</p><p>Baseline is 92%, SOTA/Human is ~97%.</p><p><b>NER Evaluation:</b> Evaluated by</p><ul><li>Precision,</li><li>Recall, and</li><li><span class="smart-term" data-term-en="F1 Measure" data-ar="مقياس F1" data-en-def="The harmonic mean of precision and recall, providing a single score that balances both concerns.">F1 measure<span class="smart-term-tooltip"></span></span>.</li></ul><p>The fact that NER has a segmentation component causes evaluation problems.</p><p>For instance, if the boundary is slightly off but the entity type is correct, how is partial credit assigned?</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لمعرفة ما إذا كان الفرق بين درجات F1 لنظامين NER هو فرق ذو دلالة إحصائية، نستخدم اختبارات إحصائية متقدمة مثل <b>paired bootstrap test</b> أو <b>randomization test</b>.</p></template>
+    <template class="content-en"><p>To determine if the difference between the F1 scores of two NER systems is statistically significant, advanced statistical tests are used, such as the <b><span class="smart-term" data-term-en="Paired Bootstrap Test" data-ar="اختبار التمهيد المزدوج" data-en-def="A statistical test used to determine if the performance difference between two models is significant.">paired bootstrap test<span class="smart-term-tooltip"></span></span></b> or the similar <b>randomization test</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم الدقة (Accuracy) لتقييم نماذج NER؟</template>
+      <template class="content-en">Why don't we use Accuracy to evaluate NER models?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن معظم الكلمات في النص ليست كيانات مسماة (علامة O). النموذج الذي يتنبأ دائماً بـ 'O' سيحقق دقة عالية جداً ولكنه سيكون عديم الفائدة. مقياس F1 يركز فقط على الكيانات الفعلية المستخرجة.</p></template>
+      <template class="content-en"><p>Because the vast majority of words in a text are not named entities (tag 'O'). A model that always predicts 'O' would achieve very high accuracy but be completely useless. F1 score focuses only on the actual entities extracted.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. تخيلوا أننا نعلم الحاسوب كيف يقرأ جملة ويفهم دور كل كلمة فيها، تماماً كما نفعل نحن. نبدأ بتحديد أجزاء الكلام (POS Tagging)، وهي مهمة تبدو بسيطة لكن الغموض يجعلها تحدياً؛ فالكلمة الواحدة قد تكون اسماً أو فعلاً حسب السياق. هنا نستخدم نماذج مثل HMM التي تعتمد على 'افتراض ماركوف' وخوارزمية 'فيتربي' السريعة لفك التشفير. ثم ننتقل لمستوى أعلى: التعرف على الكيانات المسماة (NER). هنا لا نبحث عن الأفعال والأسماء، بل عن الأشخاص والمنظمات والمواقع. التحدي الأكبر هنا هو 'التجزئة' (الكيان قد يتكون من عدة كلمات)، ونحل ذلك بعبقرية باستخدام نظام BIO. ولأن HMM قد يواجه صعوبة مع الكلمات الجديدة، نقدم لكم بطلنا الجديد: الحقول العشوائية الشرطية (CRF)، وهو نموذج تمييزي قوي. أخيراً، تذكروا دائماً في الامتحان: نقيم POS بالدقة (Accuracy)، لكن NER نقيمه بمقياس F1. ركزوا على هذه الفروق الجوهرية، وحظاً موفقاً!</template>
+    <template class="content-en">Welcome, my friends, to this pivotal module. Imagine we are teaching a computer to read a sentence and understand the role of each word, just as we do. We start with Part-of-Speech (POS) Tagging, a seemingly simple task made challenging by ambiguity; a single word can be a noun or a verb depending on context. Here, we use models like HMM, relying on the 'Markov Assumption' and the fast 'Viterbi' algorithm for decoding. Then, we level up to Named Entity Recognition (NER). We aren't just looking for verbs and nouns anymore, but for Persons, Organizations, and Locations. The biggest challenge here is 'segmentation' (entities spanning multiple words), which we brilliantly solve using the BIO scheme. Because HMMs struggle with unseen words, we introduce our heavy hitter: Conditional Random Fields (CRF), a powerful discriminative model. Finally, always remember for the exam: we evaluate POS with Accuracy, but NER requires the F1 measure. Focus on these core distinctions, and best of luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق الأساسي بين الفئات المفتوحة والمغلقة للكلمات؟</template>
+          <template class="content-en">What is the main difference between open and closed word classes?</template>
+          <span class="content-target">ما الفرق الأساسي بين الفئات المفتوحة والمغلقة للكلمات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الفئات المفتوحة (كالأسماء والأفعال) تقبل كلمات جديدة باستمرار وتحمل المعنى الأساسي. الفئات المغلقة (كحروف الجر والضمائر) ثابتة وتؤدي وظائف نحوية.</template>
+          <template class="content-en">Open classes (like nouns/verbs) constantly accept new words and carry core meaning. Closed classes (like prepositions/pronouns) are fixed and serve grammatical functions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نحقق دقة 100% في تحديد أجزاء الكلام (POS Tagging) بسهولة؟</template>
+          <template class="content-en">Why don't we easily achieve 100% accuracy in POS Tagging?</template>
+          <span class="content-target">لماذا لا نحقق دقة 100% في تحديد أجزاء الكلام (POS Tagging) بسهولة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب الغموض (Ambiguity). حوالي 60% من الكلمات في النصوص الإنجليزية يمكن أن تنتمي لأكثر من فئة نحوية حسب السياق (مثل كلمة back).</template>
+          <template class="content-en">Due to ambiguity. About 60% of word tokens in English text can belong to more than one grammatical category depending on context (e.g., the word 'back').</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو خط الأساس (Baseline) في POS Tagging وكم تبلغ دقته؟</template>
+          <template class="content-en">What is the baseline in POS Tagging and what is its accuracy?</template>
+          <span class="content-target">ما هو خط الأساس (Baseline) في POS Tagging وكم تبلغ دقته؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">خط الأساس هو تعيين العلامة الأكثر شيوعاً لكل كلمة دائماً. دقته عالية بشكل مدهش وتبلغ 92%.</template>
+          <template class="content-en">The baseline is assigning the most frequent tag to each word always. Its accuracy is surprisingly high at 92%.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي التحديات الرئيسية في التعرف على الكيانات المسماة (NER)؟</template>
+          <template class="content-en">What are the main challenges in Named Entity Recognition (NER)?</template>
+          <span class="content-target">ما هي التحديات الرئيسية في التعرف على الكيانات المسماة (NER)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التحديان هما: التجزئة (تحديد أين يبدأ وينتهي الكيان المكون من عدة كلمات) وغموض النوع (نفس الكلمة قد تكون شخصاً أو موقعاً حسب السياق).</template>
+          <template class="content-en">The two challenges are: Segmentation (determining where a multi-word entity starts and ends) and Type Ambiguity (the same word can be a person or location depending on context).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل نظام BIO مشكلة التجزئة في NER؟</template>
+          <template class="content-en">How does the BIO scheme solve the segmentation problem in NER?</template>
+          <span class="content-target">كيف يحل نظام BIO مشكلة التجزئة في NER؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحولها إلى مشكلة تصنيف لكل كلمة على حدة. B تعني بداية الكيان، I تعني داخله، و O تعني خارجه. هذا يحدد الحدود بدقة.</template>
+          <template class="content-en">It turns it into a token-by-token classification problem. B means beginning of entity, I means inside, and O means outside. This precisely marks boundaries.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو افتراض ماركوف في نماذج HMM؟</template>
+          <template class="content-en">What is the Markov Assumption in HMMs?</template>
+          <span class="content-target">ما هو افتراض ماركوف في نماذج HMM؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو افتراض أن التنبؤ بالحالة المستقبلية يعتمد فقط على الحالة الحالية، ولا يتأثر بالتاريخ الماضي بأكمله.</template>
+          <template class="content-en">It is the assumption that predicting the future state depends only on the current state, and is not affected by the entire past history.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما دور خوارزمية فيتربي (Viterbi) في HMM؟</template>
+          <template class="content-en">What is the role of the Viterbi algorithm in HMM?</template>
+          <span class="content-target">ما دور خوارزمية فيتربي (Viterbi) في HMM؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم لفك التشفير (Decoding)؛ أي إيجاد التسلسل الأكثر احتمالاً للعلامات المخفية بكفاءة باستخدام البرمجة الديناميكية بدلاً من حساب كل الاحتمالات الممكنة.</template>
+          <template class="content-en">It is used for decoding; efficiently finding the most likely sequence of hidden tags using dynamic programming instead of calculating all possible combinations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل CRFs على HMMs في بعض المهام؟</template>
+          <template class="content-en">Why do we prefer CRFs over HMMs in some tasks?</template>
+          <span class="content-target">لماذا نفضل CRFs على HMMs في بعض المهام؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن CRFs نماذج تمييزية يمكنها دمج ميزات معقدة ومتداخلة (مثل السوابق واللواحق) بسهولة، مما يجعلها أفضل بكثير في التعامل مع الكلمات غير المعروفة.</template>
+          <template class="content-en">Because CRFs are discriminative models that can easily incorporate complex, overlapping features (like prefixes/suffixes), making them much better at handling unknown words.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم الدقة (Accuracy) لتقييم NER؟</template>
+          <template class="content-en">Why don't we use Accuracy to evaluate NER?</template>
+          <span class="content-target">لماذا لا نستخدم الدقة (Accuracy) لتقييم NER؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن معظم الكلمات ليست كيانات (تأخذ علامة O). نموذج يتنبأ بـ O دائماً سيحقق دقة عالية ولكنه غير مفيد. لذلك نستخدم مقياس F1 الذي يركز على الكيانات المستخرجة.</template>
+          <template class="content-en">Because most words are not entities (tagged O). A model predicting O always gets high accuracy but is useless. Thus, we use F1 measure which focuses on extracted entities.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحدد ما إذا كان نظام NER أفضل من آخر بشكل حقيقي وليس صدفة؟</template>
+          <template class="content-en">How do we determine if one NER system is truly better than another and not just by chance?</template>
+          <span class="content-target">كيف نحدد ما إذا كان نظام NER أفضل من آخر بشكل حقيقي وليس صدفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم اختبارات الدلالة الإحصائية مثل اختبار التمهيد المزدوج (paired bootstrap test) أو اختبار العشوائية (randomization test).</template>
+          <template class="content-en">We use statistical significance tests like the paired bootstrap test or the randomization test.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الفئات المفتوحة (Open class words)؟",
+      "en": "What are Open class words?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كلمات المحتوى التي تقبل إضافة كلمات جديدة باستمرار (مثل الأسماء والأفعال).",
+        "en": "Content words that constantly accept new members (e.g., Nouns, Verbs)."
+      },
+      "example": {
+        "ar": "iPhone, to fax",
+        "en": "iPhone, to fax"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي الفئات المغلقة (Closed class words)؟",
+      "en": "What are Closed class words?"
+    },
+    "back": {
+      "definition": {
+        "ar": "كلمات وظيفية قصيرة ومتكررة ذات عضوية ثابتة نسبياً.",
+        "en": "Short, frequent function words with relatively fixed membership."
+      },
+      "example": {
+        "ar": "a, an, the, she, on",
+        "en": "a, an, the, she, on"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو تحديد أجزاء الكلام (POS Tagging)؟",
+      "en": "What is Part-of-Speech (POS) Tagging?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تعيين فئة نحوية (مثل اسم، فعل) لكل كلمة في النص.",
+        "en": "Assigning a grammatical category (part-of-speech) to each word in a text."
+      },
+      "example": {
+        "ar": "Book (VERB) that flight.",
+        "en": "Book (VERB) that flight."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي نسبة الكلمات الغامضة في اللغة الإنجليزية؟",
+      "en": "What percentage of English word types are ambiguous?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حوالي 15% من أنواع الكلمات غامضة، لكنها تشكل حوالي 60% من الرموز في النصوص.",
+        "en": "Roughly 15% of word types are ambiguous, but they make up ~60% of word tokens."
+      },
+      "example": {
+        "ar": "كلمة 'back' يمكن أن تكون صفة، اسم، فعل، أو حال.",
+        "en": "The word 'back' can be ADJ, NOUN, VERB, or ADV."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو خط الأساس (Baseline) لتحديد أجزاء الكلام؟",
+      "en": "What is the baseline method for POS tagging?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعيين العلامة الأكثر شيوعاً لكل كلمة (يحقق دقة 92%).",
+        "en": "Tagging every word with its most frequent tag (achieves 92% accuracy)."
+      },
+      "example": {
+        "ar": "دائماً تصنيف 'will' كفعل مساعد (AUX).",
+        "en": "Always tagging 'will' as an AUX."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو التعرف على الكيانات المسماة (NER)؟",
+      "en": "What is Named Entity Recognition (NER)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "العثور على أسماء الأعلام في النص وتصنيفها إلى فئات مثل الأشخاص والمواقع.",
+        "en": "Finding spans of text that constitute proper names and tagging their entity type."
+      },
+      "example": {
+        "ar": "[PER Marie Curie] lived in [LOC Paris].",
+        "en": "[PER Marie Curie] lived in [LOC Paris]."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي العلامات الأربع الأكثر شيوعاً في NER؟",
+      "en": "What are the 4 most common tags in NER?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شخص (PER)، موقع (LOC)، منظمة (ORG)، كيان جيوسياسي (GPE).",
+        "en": "Person (PER), Location (LOC), Organization (ORG), Geo-Political Entity (GPE)."
+      },
+      "example": {
+        "ar": "GPE: Boulder, Colorado",
+        "en": "GPE: Boulder, Colorado"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "لماذا يعتبر NER مهمة صعبة؟",
+      "en": "Why is NER a hard task?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بسبب مشكلة التجزئة (الكيانات متعددة الكلمات) وغموض النوع.",
+        "en": "Due to the Segmentation problem (multi-word entities) and Type ambiguity."
+      },
+      "example": {
+        "ar": "'Washington' قد تكون شخصاً أو موقعاً أو منظمة.",
+        "en": "'Washington' can be a PER, LOC, or ORG."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو نظام التوسيم BIO؟",
+      "en": "What is the BIO Tagging scheme?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نظام يحول التجزئة إلى تصنيف تسلسلي: B (بداية)، I (داخل)، O (خارج).",
+        "en": "A scheme turning segmentation into sequence labeling: B (Begin), I (Inside), O (Outside)."
+      },
+      "example": {
+        "ar": "Jane (B-PER) Villanueva (I-PER) said (O)",
+        "en": "Jane (B-PER) Villanueva (I-PER) said (O)"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كم عدد العلامات المطلوبة في نظام BIO إذا كان لدينا n من أنواع الكيانات؟",
+      "en": "How many tags are needed in the BIO scheme for n entity types?"
+    },
+    "back": {
+      "definition": {
+        "ar": "2n + 1 (علامة O واحدة، n علامات B، n علامات I).",
+        "en": "2n + 1 (1 O tag, n B tags, n I tags)."
+      },
+      "example": {
+        "ar": "لـ 4 كيانات، نحتاج 9 علامات.",
+        "en": "For 4 entity types, we need 9 tags."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو افتراض ماركوف (Markov Assumption)؟",
+      "en": "What is the Markov Assumption?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عند التنبؤ بالمستقبل، الماضي لا يهم، فقط الحاضر هو المهم.",
+        "en": "When predicting the future, the past doesn’t matter, only the present."
+      },
+      "example": {
+        "ar": "احتمالية الكلمة التالية تعتمد فقط على الكلمة الحالية.",
+        "en": "The probability of the next word depends only on the current word."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي مكونات نموذج HMM؟",
+      "en": "What are the components of an HMM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحالات (Q)، مصفوفة الانتقال (A)، التوزيع الأولي (π)، احتمالات الانبعاث (B).",
+        "en": "States (Q), Transition matrix (A), Initial distribution (π), Observation likelihoods (B)."
+      },
+      "example": {
+        "ar": "الانتقال من حالة 'اسم' إلى 'فعل'.",
+        "en": "Transitioning from 'Noun' state to 'Verb' state."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي خوارزمية فيتربي (Viterbi Algorithm)؟",
+      "en": "What is the Viterbi Algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية برمجة ديناميكية تُستخدم لفك التشفير وإيجاد أفضل مسار للحالات في HMM.",
+        "en": "A dynamic programming algorithm used for decoding to find the best state path in an HMM."
+      },
+      "example": {
+        "ar": "إيجاد تسلسل POS الأكثر احتمالاً لجملة كاملة.",
+        "en": "Finding the most likely POS sequence for a whole sentence."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الحقل العشوائي الشرطي (CRF)؟",
+      "en": "What is a Conditional Random Field (CRF)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج خطي لوغاريتمي تمييزي يحسب الاحتمال البعدي P(Y|X) مباشرة لتسلسل كامل.",
+        "en": "A discriminative log-linear model that computes the posterior P(Y|X) directly for an entire sequence."
+      },
+      "example": {
+        "ar": "استخدام CRF لـ POS tagging للتعامل بشكل أفضل مع الكلمات غير المعروفة.",
+        "en": "Using CRF for POS tagging to better handle unknown words."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يتم تقييم نماذج NER؟",
+      "en": "How are NER models evaluated?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام مقاييس الاستدعاء (Recall)، الدقة (Precision)، ومقياس F1.",
+        "en": "Using Recall, Precision, and F1 measure."
+      },
+      "example": {
+        "ar": "لا تستخدم الدقة (Accuracy) بسبب مشكلة التجزئة وعدم توازن الفئات.",
+        "en": "Accuracy is not used due to the segmentation problem and class imbalance."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الفئات التالية تعتبر من الفئات المفتوحة (Open class)؟",
+      "en": "Which of the following is considered an Open class word category?"
+    },
+    "options": {
+      "ar": [
+        "الضمائر (Pronouns)",
+        "حروف الجر (Prepositions)",
+        "الأسماء (Nouns)",
+        "المحددات (Determiners)"
+      ],
+      "en": [
+        "Pronouns",
+        "Prepositions",
+        "Nouns",
+        "Determiners"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الأسماء والأفعال والصفات هي فئات مفتوحة تقبل كلمات جديدة باستمرار، بينما البقية فئات مغلقة.",
+      "en": "Nouns, verbs, and adjectives are open classes that constantly accept new words, while the others are closed classes."
+    },
+    "hint": {
+      "ar": "فكر في الفئة التي يمكن اختراع كلمات جديدة لها بسهولة مثل 'iPhone'.",
+      "en": "Think of the category where new words like 'iPhone' can be easily invented."
+    },
+    "difficulty": "easy",
+    "conceptId": "english-word-classes"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي دقة خط الأساس (Baseline) المعتمد على 'الفئة الأكثر شيوعاً' في تحديد أجزاء الكلام (POS Tagging) للغة الإنجليزية؟",
+      "en": "What is the accuracy of the 'Most frequent class' baseline in English POS Tagging?"
+    },
+    "options": {
+      "ar": [
+        "60%",
+        "85%",
+        "92%",
+        "97%"
+      ],
+      "en": [
+        "60%",
+        "85%",
+        "92%",
+        "97%"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خط الأساس البسيط الذي يعين العلامة الأكثر شيوعاً لكل كلمة يحقق دقة 92%، بينما النماذج المتقدمة تصل إلى 97%.",
+      "en": "The simple baseline of assigning the most frequent tag to each word achieves 92% accuracy, while advanced models reach 97%."
+    },
+    "hint": {
+      "ar": "إنه رقم مرتفع بشكل مدهش لطريقة بسيطة جداً.",
+      "en": "It's a surprisingly high number for a very simple method."
+    },
+    "difficulty": "medium",
+    "conceptId": "pos-tagging"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في سياق التعرف على الكيانات المسماة (NER)، ماذا تعني علامة GPE؟",
+      "en": "In the context of Named Entity Recognition (NER), what does the GPE tag stand for?"
+    },
+    "options": {
+      "ar": [
+        "كيان سياسي عام (General Political Entity)",
+        "كيان جيوسياسي (Geo-Political Entity)",
+        "كيان مادي عالمي (Global Physical Entity)",
+        "كيان عام للأشخاص (General Person Entity)"
+      ],
+      "en": [
+        "General Political Entity",
+        "Geo-Political Entity",
+        "Global Physical Entity",
+        "General Person Entity"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "GPE تعني Geo-Political Entity وتستخدم للمناطق ذات الحدود السياسية مثل الدول والمدن.",
+      "en": "GPE stands for Geo-Political Entity and is used for areas with political boundaries like countries and cities."
+    },
+    "hint": {
+      "ar": "تتعلق بالجغرافيا والسياسة معاً.",
+      "en": "It relates to both geography and politics."
+    },
+    "difficulty": "easy",
+    "conceptId": "named-entity-recognition"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "لماذا تعتبر مهمة NER أصعب من مهمة POS Tagging؟",
+      "en": "Why is the NER task considered harder than POS Tagging?"
+    },
+    "options": {
+      "ar": [
+        "لأن NER لا يستخدم نماذج تعلم الآلة.",
+        "بسبب مشكلة التجزئة (Segmentation) وغموض النوع.",
+        "لأن الكيانات المسماة تنتمي دائماً للفئات المغلقة.",
+        "لأن دقة خط الأساس في NER هي 97%."
+      ],
+      "en": [
+        "Because NER does not use machine learning models.",
+        "Due to the segmentation problem and type ambiguity.",
+        "Because named entities always belong to closed classes.",
+        "Because the baseline accuracy in NER is 97%."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في POS Tagging، كل كلمة تحصل على علامة واحدة. في NER، يجب تحديد حدود الكيان (التجزئة) الذي قد يتكون من عدة كلمات، بالإضافة إلى تحديد نوعه الذي قد يكون غامضاً.",
+      "en": "In POS tagging, each word gets one tag. In NER, the model must find the boundaries of multi-word entities (segmentation) and resolve type ambiguity."
+    },
+    "hint": {
+      "ar": "فكر في الكيانات التي تتكون من أكثر من كلمة واحدة.",
+      "en": "Think about entities that consist of more than one word."
+    },
+    "difficulty": "medium",
+    "conceptId": "named-entity-recognition"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في نظام التوسيم BIO، ماذا يمثل الحرف 'B'؟",
+      "en": "In the BIO tagging scheme, what does the letter 'B' represent?"
+    },
+    "options": {
+      "ar": [
+        "الكلمة التي تسبق الكيان (Before)",
+        "الكلمة التي تبدأ الكيان المسمى (Begin)",
+        "الكلمة الموجودة بين كيانين (Between)",
+        "الكلمة الأساسية في الجملة (Base)"
+      ],
+      "en": [
+        "The token before the entity (Before)",
+        "The token that begins a named entity span (Begin)",
+        "The token between two entities (Between)",
+        "The base word in the sentence (Base)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حرف B يرمز إلى Begin ويستخدم لتمييز الكلمة الأولى في الكيان المسمى.",
+      "en": "The letter B stands for Begin and is used to mark the first token of a named entity span."
+    },
+    "hint": {
+      "ar": "يشير إلى نقطة الانطلاق.",
+      "en": "It indicates the starting point."
+    },
+    "difficulty": "easy",
+    "conceptId": "bio-tagging"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "إذا كان لديك 3 أنواع من الكيانات المسماة (PER, LOC, ORG)، كم عدد العلامات الإجمالية في نظام BIO؟",
+      "en": "If you have 3 types of named entities (PER, LOC, ORG), what is the total number of tags in the BIO scheme?"
+    },
+    "options": {
+      "ar": [
+        "3",
+        "6",
+        "7",
+        "9"
+      ],
+      "en": [
+        "3",
+        "6",
+        "7",
+        "9"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الصيغة هي 2n + 1. إذن 2(3) + 1 = 7 علامات (O, B-PER, I-PER, B-LOC, I-LOC, B-ORG, I-ORG).",
+      "en": "The formula is 2n + 1. So 2(3) + 1 = 7 tags (O, B-PER, I-PER, B-LOC, I-LOC, B-ORG, I-ORG)."
+    },
+    "hint": {
+      "ar": "استخدم المعادلة 2n + 1.",
+      "en": "Use the formula 2n + 1."
+    },
+    "difficulty": "medium",
+    "conceptId": "bio-tagging"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الافتراض الأساسي الذي يعتمد عليه نموذج ماركوف المخفي (HMM)؟",
+      "en": "What is the core assumption that a Hidden Markov Model (HMM) relies on?"
+    },
+    "options": {
+      "ar": [
+        "المستقبل يعتمد على كل التاريخ الماضي.",
+        "المستقبل يعتمد فقط على الحاضر، ولا يهم الماضي.",
+        "الاحتمالات الانبعاثية متساوية دائماً.",
+        "الكلمات غير المعروفة لا يمكن معالجتها."
+      ],
+      "en": [
+        "The future depends on the entire past history.",
+        "When predicting the future, the past doesn't matter, only the present.",
+        "Emission probabilities are always equal.",
+        "Unknown words cannot be processed."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "افتراض ماركوف ينص على أن حالة النظام المستقبلية تعتمد فقط على حالته الحالية، وليس على تسلسل الأحداث التي سبقته.",
+      "en": "The Markov Assumption states that the future state depends only on the current state, not on the sequence of events that preceded it."
+    },
+    "hint": {
+      "ar": "الذاكرة قصيرة جداً في هذا النموذج.",
+      "en": "Memory is very short in this model."
+    },
+    "difficulty": "medium",
+    "conceptId": "hmm-pos-tagging"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي الخوارزمية المستخدمة لفك التشفير (Decoding) وإيجاد أفضل مسار في نماذج HMM؟",
+      "en": "Which algorithm is used for decoding and finding the best path in HMMs?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية ديكسترا (Dijkstra)",
+        "خوارزمية فيتربي (Viterbi)",
+        "خوارزمية الترتيب السريع (Quick Sort)",
+        "خوارزمية K-Means"
+      ],
+      "en": [
+        "Dijkstra's Algorithm",
+        "Viterbi Algorithm",
+        "Quick Sort",
+        "K-Means Algorithm"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خوارزمية فيتربي هي خوارزمية برمجة ديناميكية تُستخدم بكفاءة لإيجاد التسلسل الأكثر احتمالاً للحالات المخفية في HMM.",
+      "en": "The Viterbi algorithm is a dynamic programming algorithm used efficiently to find the most likely sequence of hidden states in an HMM."
+    },
+    "hint": {
+      "ar": "تبدأ بحرف V.",
+      "en": "It starts with the letter V."
+    },
+    "difficulty": "easy",
+    "conceptId": "hmm-pos-tagging"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من التالي يصف الحقول العشوائية الشرطية (CRFs) بشكل أفضل مقارنة بـ HMM؟",
+      "en": "Which of the following best describes Conditional Random Fields (CRFs) compared to HMMs?"
+    },
+    "options": {
+      "ar": [
+        "CRF هو نموذج توليدي ينمذج P(X,Y).",
+        "CRF هو نموذج تمييزي ينمذج P(Y|X) مباشرة.",
+        "CRF لا يمكنه التعامل مع الكلمات غير المعروفة.",
+        "CRF لا يستخدم ميزات السياق."
+      ],
+      "en": [
+        "CRF is a generative model modeling P(X,Y).",
+        "CRF is a discriminative model modeling P(Y|X) directly.",
+        "CRF cannot handle unknown words.",
+        "CRF does not use context features."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "CRF هو نموذج تمييزي خطي لوغاريتمي يحسب الاحتمال الشرطي P(Y|X) مباشرة، مما يجعله أفضل في استخدام ميزات معقدة والتعامل مع الكلمات غير المعروفة.",
+      "en": "CRF is a discriminative log-linear model that computes the conditional probability P(Y|X) directly, making it better at using complex features and handling unknown words."
+    },
+    "hint": {
+      "ar": "CRF يركز على التمييز بين المخرجات بدلاً من توليدها.",
+      "en": "CRF focuses on discriminating between outputs rather than generating them."
+    },
+    "difficulty": "hard",
+    "conceptId": "conditional-random-fields"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي المقاييس القياسية المستخدمة لتقييم أنظمة التعرف على الكيانات المسماة (NER)؟",
+      "en": "What are the standard metrics used to evaluate Named Entity Recognition (NER) systems?"
+    },
+    "options": {
+      "ar": [
+        "الدقة (Accuracy) فقط",
+        "الاستدعاء (Recall)، الدقة (Precision)، ومقياس F1",
+        "مصفوفة الانتقال فقط",
+        "اختبار التمهيد المزدوج فقط"
+      ],
+      "en": [
+        "Accuracy only",
+        "Recall, Precision, and F1 measure",
+        "Transition matrix only",
+        "Paired bootstrap test only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بسبب مشكلة التجزئة وعدم توازن الفئات (معظم الكلمات ليست كيانات)، يتم تقييم NER باستخدام Precision و Recall و F1 بدلاً من Accuracy.",
+      "en": "Due to the segmentation problem and class imbalance (most words are not entities), NER is evaluated using Precision, Recall, and F1 instead of Accuracy."
+    },
+    "hint": {
+      "ar": "نحتاج إلى مقاييس تتعامل جيداً مع الفئات غير المتوازنة.",
+      "en": "We need metrics that handle imbalanced classes well."
+    },
+    "difficulty": "medium",
+    "conceptId": "evaluation-ner"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الدقة (Accuracy) هي المقياس المناسب لتقييم NER. هذا فخ! معظم الكلمات في النص تأخذ علامة 'O' (خارج الكيان)، لذا فإن النموذج الذي يتنبأ بـ 'O' دائماً سيحصل على دقة عالية ولكنه فاشل. استخدم دائماً F1-score لـ NER.</template>
+    <template class="content-en">Believing that Accuracy is the right metric for NER evaluation. This is a trap! Most words in a text are 'O' (outside), so a model predicting 'O' everywhere gets high accuracy but is useless. Always use F1-score for NER.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">على الرغم من أن 15% فقط من أنواع الكلمات في الإنجليزية غامضة، إلا أن هذه الكلمات هي الأكثر استخداماً، مما يعني أن 60% من الكلمات الفعلية في أي نص (Tokens) تكون غامضة وتحتاج إلى سياق لتحديد نوعها.</template>
+    <template class="content-en">Even though only 15% of English word types are ambiguous, they are the most frequently used words, meaning 60% of actual word tokens in running text are ambiguous and require context to be tagged correctly.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نظام BIO هو الحيلة السحرية التي تحول مشكلة 'التجزئة' المعقدة (أين يبدأ وينتهي الكيان) إلى مشكلة 'تصنيف تسلسلي' بسيطة (كلمة بكلمة)، مما يسمح لنا باستخدام نفس الخوارزميات (HMM, CRF) التي نستخدمها في POS Tagging.</template>
+    <template class="content-en">The BIO scheme is the magic trick that turns a complex 'segmentation' problem (where does an entity start and end) into a simple 'sequence labeling' problem (word-by-word), allowing us to use the same algorithms (HMM, CRF) used for POS Tagging.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين HMM و CRF. تذكر: HMM هو نموذج توليدي (Generative) يعتمد على احتمالات الانتقال والانبعاث، بينما CRF هو نموذج تمييزي (Discriminative) يحسب الاحتمال الشرطي مباشرة وهو أفضل في التعامل مع الكلمات المجهولة.</template>
+    <template class="content-en">Confusing HMM and CRF. Remember: HMM is a Generative model relying on transition and emission probabilities, while CRF is a Discriminative model computing conditional probability directly and is better at handling unknown words.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M09.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M11.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

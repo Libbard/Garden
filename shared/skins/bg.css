@@ -1,0 +1,103 @@
+html[data-bg] {
+  --gbg-a: color-mix(in oklab, var(--st-accent, #a78bfa) 60%, transparent);
+  --gbg-b: color-mix(in oklab, var(--st-ok, #10b981) 50%, transparent);
+  --gbg-ink: color-mix(in oklab, var(--text-primary, #fff) 9%, transparent);
+  background-color: var(--bg-body);
+}
+html[data-bg] body { background: transparent !important; }
+html[data-bg] body::before, html[data-bg] body::after { display: none !important; }
+html[data-bg]::before, html[data-bg]::after { content: ""; position: fixed; z-index: -1; pointer-events: none; }
+
+html[data-bg="color"] { background-color: var(--gbg-c, var(--bg-body)); }
+html[data-bg="color"]::before { inset: 0; background: radial-gradient(120% 90% at 50% 0%, color-mix(in oklab, #fff 5%, transparent), transparent 60%); }
+
+html[data-bg="mesh"]::before, html[data-bg="mesh"]::after { inline-size: 95vmax; block-size: 95vmax; border-radius: 50%; will-change: transform; }
+html[data-bg="mesh"]::before {
+  inset-block-start: -48vmax; inset-inline-end: -28vmax;
+  background: radial-gradient(closest-side, var(--gbg-a), color-mix(in oklab, var(--gbg-a) 30%, transparent) 55%, transparent);
+  opacity: .55; animation: gbg-m1 30s ease-in-out infinite alternate;
+}
+html[data-bg="mesh"]::after {
+  inset-block-end: -52vmax; inset-inline-start: -30vmax;
+  background: radial-gradient(closest-side, var(--gbg-b), color-mix(in oklab, var(--gbg-b) 25%, transparent) 60%, transparent);
+  opacity: .45; animation: gbg-m2 36s ease-in-out infinite alternate;
+}
+@keyframes gbg-m1 { to { transform: translate3d(-18vw, 14vh, 0) scale(1.15); } }
+@keyframes gbg-m2 { to { transform: translate3d(16vw, -12vh, 0) scale(1.1); } }
+
+html[data-bg="waves"]::before, html[data-bg="waves"]::after {
+  inset-inline-start: 0; inset-block-end: 0; inline-size: 200%; will-change: transform; direction: ltr;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='100' viewBox='0 0 600 100' preserveAspectRatio='none'%3E%3Cpath d='M0 50 C 100 10, 200 90, 300 50 C 400 10, 500 90, 600 50 L600 100 L0 100Z'/%3E%3C/svg%3E") repeat-x 0 100% / 50% 100%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='100' viewBox='0 0 600 100' preserveAspectRatio='none'%3E%3Cpath d='M0 50 C 100 10, 200 90, 300 50 C 400 10, 500 90, 600 50 L600 100 L0 100Z'/%3E%3C/svg%3E") repeat-x 0 100% / 50% 100%;
+}
+html[data-bg="waves"]::before { block-size: 34vh; background: linear-gradient(to bottom, var(--gbg-a), color-mix(in oklab, var(--gbg-a) 40%, transparent)); opacity: .35; animation: gbg-w 26s linear infinite; }
+html[data-bg="waves"]::after { block-size: 22vh; background: linear-gradient(to bottom, var(--gbg-b), color-mix(in oklab, var(--gbg-b) 40%, transparent)); opacity: .3; animation: gbg-w 17s linear infinite reverse; }
+@keyframes gbg-w { to { transform: translate3d(-50%, 0, 0); } }
+
+html[data-bg="pattern"]::before {
+  inset: 0; --gbg-tw: calc(72px * var(--gbg-pz, 1)); --gbg-th: calc(72px * var(--gbg-pz, 1));
+  background: color-mix(in oklab, var(--st-accent, #a78bfa) var(--gbg-ps, 35%), var(--text-primary, #fff));
+  opacity: var(--gbg-po, .14);
+}
+:root {
+  --gbgp-stars: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.3'%3E%3Crect x='22' y='22' width='36' height='36'/%3E%3Crect x='22' y='22' width='36' height='36' transform='rotate(45 40 40)'/%3E%3Cpath d='M0 0 L22 22 M80 0 L58 22 M0 80 L22 58 M80 80 L58 58'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-flower: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.1'%3E%3Ccircle cx='0' cy='0' r='20'/%3E%3Ccircle cx='40' cy='0' r='20'/%3E%3Ccircle cx='0' cy='40' r='20'/%3E%3Ccircle cx='40' cy='40' r='20'/%3E%3Ccircle cx='20' cy='20' r='20'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-scales: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2'%3E%3Cpath d='M0 10 A10 10 0 0 0 20 10 A10 10 0 0 0 40 10'/%3E%3Cpath d='M-10 20 A10 10 0 0 0 10 20 A10 10 0 0 0 30 20 A10 10 0 0 0 50 20'/%3E%3Cpath d='M-10 0 A10 10 0 0 0 10 0 A10 10 0 0 0 30 0 A10 10 0 0 0 50 0'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-hex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34.64' height='60' viewBox='0 0 34.64 60'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.2' stroke-linejoin='round'%3E%3Cpath d='M0 10 L17.32 0 L34.64 10 M0 10 V30 M34.64 10 V30 M0 30 L17.32 40 L34.64 30 M17.32 40 V60'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-circuit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 16 H22 L32 26 H54'/%3E%3Cpath d='M80 52 H60 L50 62 H26'/%3E%3Cpath d='M40 0 V8 M40 80 V72'/%3E%3Cpath d='M12 80 V60 L20 52'/%3E%3Cpath d='M68 0 V18 L60 26'/%3E%3C/g%3E%3Cg fill='%23000'%3E%3Ccircle cx='57' cy='26' r='3'/%3E%3Ccircle cx='23' cy='62' r='3'/%3E%3Ccircle cx='40' cy='11' r='3'/%3E%3Ccircle cx='22' cy='50' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-topo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60' viewBox='0 0 120 60'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.1'%3E%3Cpath d='M0 8 C20 0 40 0 60 8 S100 16 120 8'/%3E%3Cpath d='M0 22 C25 12 45 30 60 22 S95 12 120 22'/%3E%3Cpath d='M0 37 C18 46 42 28 60 37 S102 46 120 37'/%3E%3Cpath d='M0 51 C22 43 38 58 60 51 S98 43 120 51'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20' viewBox='0 0 40 20'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.3' stroke-linejoin='round'%3E%3Cpath d='M0 15 L10 5 L20 15 L30 5 L40 15'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-diamonds: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.1'%3E%3Cpath d='M20 0 L40 20 L20 40 L0 20 Z'/%3E%3Cpath d='M20 12 L28 20 L20 28 L12 20 Z'/%3E%3C/g%3E%3C/svg%3E");
+  --gbgp-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M15 10 V20 M10 15 H20'/%3E%3C/g%3E%3C/svg%3E");
+}
+html[data-bg="pattern"]:is([data-bg-p="stars"], :not([data-bg-p]))::before, .mt-bgpat--stars { -webkit-mask: var(--gbgp-stars) 0 0 / calc(72px * var(--gbg-pz, 1)) calc(72.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-stars) 0 0 / calc(72px * var(--gbg-pz, 1)) calc(72.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="stars"]::before { --gbg-tw: calc(72px * var(--gbg-pz, 1)); --gbg-th: calc(72.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="flower"]::before, .mt-bgpat--flower { -webkit-mask: var(--gbgp-flower) 0 0 / calc(44px * var(--gbg-pz, 1)) calc(44.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-flower) 0 0 / calc(44px * var(--gbg-pz, 1)) calc(44.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="flower"]::before { --gbg-tw: calc(44px * var(--gbg-pz, 1)); --gbg-th: calc(44.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="scales"]::before, .mt-bgpat--scales { -webkit-mask: var(--gbgp-scales) 0 0 / calc(36px * var(--gbg-pz, 1)) calc(18.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-scales) 0 0 / calc(36px * var(--gbg-pz, 1)) calc(18.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="scales"]::before { --gbg-tw: calc(36px * var(--gbg-pz, 1)); --gbg-th: calc(18.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="hex"]::before, .mt-bgpat--hex { -webkit-mask: var(--gbgp-hex) 0 0 / calc(34px * var(--gbg-pz, 1)) calc(58.89px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-hex) 0 0 / calc(34px * var(--gbg-pz, 1)) calc(58.89px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="hex"]::before { --gbg-tw: calc(34px * var(--gbg-pz, 1)); --gbg-th: calc(58.89px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="circuit"]::before, .mt-bgpat--circuit { -webkit-mask: var(--gbgp-circuit) 0 0 / calc(88px * var(--gbg-pz, 1)) calc(88.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-circuit) 0 0 / calc(88px * var(--gbg-pz, 1)) calc(88.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="circuit"]::before { --gbg-tw: calc(88px * var(--gbg-pz, 1)); --gbg-th: calc(88.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="topo"]::before, .mt-bgpat--topo { -webkit-mask: var(--gbgp-topo) 0 0 / calc(150px * var(--gbg-pz, 1)) calc(75.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-topo) 0 0 / calc(150px * var(--gbg-pz, 1)) calc(75.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="topo"]::before { --gbg-tw: calc(150px * var(--gbg-pz, 1)); --gbg-th: calc(75.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="chevron"]::before, .mt-bgpat--chevron { -webkit-mask: var(--gbgp-chevron) 0 0 / calc(34px * var(--gbg-pz, 1)) calc(17.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-chevron) 0 0 / calc(34px * var(--gbg-pz, 1)) calc(17.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="chevron"]::before { --gbg-tw: calc(34px * var(--gbg-pz, 1)); --gbg-th: calc(17.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="diamonds"]::before, .mt-bgpat--diamonds { -webkit-mask: var(--gbgp-diamonds) 0 0 / calc(40px * var(--gbg-pz, 1)) calc(40.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-diamonds) 0 0 / calc(40px * var(--gbg-pz, 1)) calc(40.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="diamonds"]::before { --gbg-tw: calc(40px * var(--gbg-pz, 1)); --gbg-th: calc(40.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="plus"]::before, .mt-bgpat--plus { -webkit-mask: var(--gbgp-plus) 0 0 / calc(30px * var(--gbg-pz, 1)) calc(30.0px * var(--gbg-pz, 1)) repeat; mask: var(--gbgp-plus) 0 0 / calc(30px * var(--gbg-pz, 1)) calc(30.0px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="plus"]::before { --gbg-tw: calc(30px * var(--gbg-pz, 1)); --gbg-th: calc(30.0px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="dots"]::before { --gbg-tw: calc(18px * var(--gbg-pz, 1)); --gbg-th: calc(18px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="grid"]::before { --gbg-tw: calc(32px * var(--gbg-pz, 1)); --gbg-th: calc(32px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="lines"]::before { --gbg-tw: calc(19.8px * var(--gbg-pz, 1)); --gbg-th: 0px; }
+html[data-bg="pattern"][data-bg-p="dots"]::before, .mt-bgpat--dots { -webkit-mask: radial-gradient(circle, #000 1.4px, transparent 1.9px) 0 0 / calc(18px * var(--gbg-pz, 1)) calc(18px * var(--gbg-pz, 1)) repeat; mask: radial-gradient(circle, #000 1.4px, transparent 1.9px) 0 0 / calc(18px * var(--gbg-pz, 1)) calc(18px * var(--gbg-pz, 1)) repeat; }
+html[data-bg="pattern"][data-bg-p="grid"]::before, .mt-bgpat--grid { -webkit-mask: linear-gradient(to right, #000 1px, transparent 1px) 0 0 / calc(32px * var(--gbg-pz, 1)) calc(32px * var(--gbg-pz, 1)), linear-gradient(to bottom, #000 1px, transparent 1px) 0 0 / calc(32px * var(--gbg-pz, 1)) calc(32px * var(--gbg-pz, 1)); mask: linear-gradient(to right, #000 1px, transparent 1px) 0 0 / calc(32px * var(--gbg-pz, 1)) calc(32px * var(--gbg-pz, 1)), linear-gradient(to bottom, #000 1px, transparent 1px) 0 0 / calc(32px * var(--gbg-pz, 1)) calc(32px * var(--gbg-pz, 1)); }
+html[data-bg="pattern"][data-bg-p="lines"]::before, .mt-bgpat--lines { -webkit-mask: repeating-linear-gradient(-45deg, #000 0 1px, transparent 1px calc(14px * var(--gbg-pz, 1))); mask: repeating-linear-gradient(-45deg, #000 0 1px, transparent 1px calc(14px * var(--gbg-pz, 1))); }
+html[data-bg="pattern"][data-bg-m]::before { inset: -360px; will-change: transform, opacity; }
+html[data-bg="pattern"][data-bg-m="drift"]::before { animation: gbg-drift 26s linear infinite; }
+html[data-bg="pattern"][data-bg-m="breathe"]::before { animation: gbg-breathe 4.5s ease-in-out infinite alternate; transform-origin: 50% 50%; }
+@keyframes gbg-drift { to { transform: translate3d(var(--gbg-tw), var(--gbg-th), 0); } }
+@keyframes gbg-breathe { from { opacity: calc(var(--gbg-po, .14) * .15); transform: scale(1); } to { opacity: min(.62, calc(var(--gbg-po, .14) * 2.4)); transform: scale(1.045); } }
+html:root[data-bg]:not(#_):not(#__) .g-header {
+  background: color-mix(in oklab, var(--bg-body) 58%, transparent);
+  backdrop-filter: blur(14px) saturate(1.25); -webkit-backdrop-filter: blur(14px) saturate(1.25);
+}
+
+html[data-bg] .gbg-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+html[data-bg] canvas.gbg-layer { inline-size: 100vw; block-size: 100vh; image-rendering: pixelated; }
+html[data-bg] .gbg-photo { background: center / cover no-repeat; transition: opacity .5s ease; }
+html[data-bg] .gbg-photo::after { content: ""; position: absolute; inset: 0; background: color-mix(in oklab, var(--bg-body) var(--gbg-dim, 45%), transparent); }
+html[data-bg] .gbg-photo.is-blur { filter: blur(var(--gbg-blur, 0px)); inset: -24px; }
+html[data-bg] .gbg-credit {
+  position: fixed; inset-inline-start: 10px; inset-block-end: 8px; z-index: 1; font: 500 11px/1.4 "Cairo", sans-serif;
+  color: color-mix(in oklab, var(--text-primary) 70%, transparent); text-decoration: none; opacity: .7;
+  padding: 2px 8px; border-radius: 99px; background: color-mix(in oklab, var(--bg-body) 50%, transparent);
+}
+html[data-bg] .gbg-credit:hover { opacity: 1; }
+@media (max-width: 1024px) { html[data-bg] .gbg-credit { inset-block-end: calc(64px + var(--sa-b, 0px)); } }
+
+html.gbg-paused[data-bg]::before, html.gbg-paused[data-bg]::after { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-bg]::before, html[data-bg]::after { animation: none !important; }
+}

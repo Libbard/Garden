@@ -1,0 +1,2483 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المحولات (Transformers) · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#contextual-vs-static-embeddings" class="toc-link" data-bilingual>
+        <template class="content-ar">التضمين السياقي مقابل التضمين الثابت</template>
+        <template class="content-en">Contextual vs. Static Embeddings</template>
+        <span class="content-target">التضمين السياقي مقابل التضمين الثابت</span>
+      </a>
+      <a href="#attention-mechanism-qkv" class="toc-link" data-bilingual>
+        <template class="content-ar">آلية الانتباه: الاستعلام والمفتاح والقيمة (Q, K, V)</template>
+        <template class="content-en">Attention Mechanism: Query, Key, Value (Q, K, V)</template>
+        <span class="content-target">آلية الانتباه: الاستعلام والمفتاح والقيمة (Q, K, V)</span>
+      </a>
+      <a href="#multi-head-attention" class="toc-link" data-bilingual>
+        <template class="content-ar">الانتباه متعدد الرؤوس (Multi-head Attention)</template>
+        <template class="content-en">Multi-head Attention</template>
+        <span class="content-target">الانتباه متعدد الرؤوس (Multi-head Attention)</span>
+      </a>
+      <a href="#transformer-blocks" class="toc-link" data-bilingual>
+        <template class="content-ar">الكتل البرمجية للمحول (Transformer Blocks)</template>
+        <template class="content-en">Transformer Blocks</template>
+        <span class="content-target">الكتل البرمجية للمحول (Transformer Blocks)</span>
+      </a>
+      <a href="#parallelizing-attention-masking" class="toc-link" data-bilingual>
+        <template class="content-ar">موازاة الانتباه وإخفاء المستقبل (Parallelization &amp; Masking)</template>
+        <template class="content-en">Parallelizing Attention &amp; Masking</template>
+        <span class="content-target">موازاة الانتباه وإخفاء المستقبل (Parallelization &amp; Masking)</span>
+      </a>
+      <a href="#token-and-position-embeddings" class="toc-link" data-bilingual>
+        <template class="content-ar">تضمين الرموز والمواضع (Token and Position Embeddings)</template>
+        <template class="content-en">Token and Position Embeddings</template>
+        <span class="content-target">تضمين الرموز والمواضع (Token and Position Embeddings)</span>
+      </a>
+      <a href="#language-modeling-head" class="toc-link" data-bilingual>
+        <template class="content-ar">رأس نمذجة اللغة (Language Modeling Head)</template>
+        <template class="content-en">The Language Modeling Head</template>
+        <span class="content-target">رأس نمذجة اللغة (Language Modeling Head)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المحولات (Transformers)</h1>
+      <p class="hero-description">دراسة شاملة لبنية المحولات (Transformers)، بما في ذلك آلية الانتباه، الكتل البرمجية للمحول، المعالجة المتوازية، التضمين الموضعي، ورأس نمذجة اللغة.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Transformers</h1>
+      <p class="hero-description">A comprehensive study of the Transformer architecture, including the attention mechanism, transformer blocks, parallelization, positional embeddings, and the language modeling head.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">المحولات</span>
+      <span class="tag">آلية الانتباه</span>
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">نمذجة اللغة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">Transformers</span>
+      <span class="tag">Attention Mechanism</span>
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Language Modeling</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم دور الانتباه في المحولات وكيف يحسن تركيز النموذج على الأجزاء ذات الصلة من المدخلات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل بنية كتل المحول (Transformer blocks).</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات الموازاة القائمة على المصفوفات لتحسين الحساب في نماذج المحولات.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح وظيفة تضمين الرموز والمواضع وأهميتها في تشفير تسلسل المدخلات.</span></li>
+      <li><span class="obj-icon">✦</span><span>فحص كيف يولد رأس نمذجة اللغة التنبؤات بناءً على التضمينات المكتسبة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the role of attention in transformers and how it improves model focus on relevant parts of the input.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze the structure of transformer blocks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply matrix-based parallelization techniques to optimize computation in transformer models.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the function of token and positional embeddings and their importance in encoding input sequences.</span></li>
+      <li><span class="obj-icon">✦</span><span>Examine how the language modeling head generates predictions based on learned embeddings.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="contextual-vs-static-embeddings" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> التضمين السياقي مقابل التضمين الثابت</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Contextual vs. Static Embeddings</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التضمين الثابت يعطي الكلمة معنى واحداً دائماً، بينما التضمين السياقي يغير معنى الكلمة بناءً على الكلمات المحيطة بها.</p></template>
+    <template class="content-en"><p>Static embeddings give a word one fixed meaning, while contextual embeddings change a word's representation based on its surrounding words.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>النماذج القديمة مثل Word2Vec تستخدم <b><span class="smart-term" data-term-en="Static Embedding" data-ar="التضمين الثابت" data-en-def="A word representation that remains the same regardless of the context.">التضمين الثابت<span class="smart-term-tooltip"></span></span> (Static Embeddings)</b>، حيث يكون لكل كلمة متجه واحد ثابت لا يعكس كيف يتغير معناها في سياقات مختلفة.</p><p>على سبيل المثال، في الجملة: <code>The chicken didn't cross the road because it was too tired</code>، ما هو المعنى الذي يمثله التضمين الثابت للضمير <code>it</code>؟ لا يمكن تحديده بدقة.</p><p><b><span class="smart-term" data-term-en="Contextual Embedding" data-ar="التضمين السياقي" data-en-def="A word representation that dynamically changes based on surrounding words.">التضمين السياقي<span class="smart-term-tooltip"></span></span> (Contextual Embeddings)</b> يحل هذه المشكلة. الفكرة الأساسية هي أن تمثيل معنى الكلمة يجب أن يختلف باختلاف السياقات. كل كلمة تمتلك متجهاً مختلفاً يعبر عن معانٍ مختلفة اعتماداً على الكلمات المحيطة بها. يتم حساب هذه التضمينات السياقية باستخدام آلية <b>الانتباه (Attention)</b>.</p></template>
+    <template class="content-en"><p>Older models like Word2Vec use <b><span class="smart-term" data-term-en="Static Embedding" data-ar="التضمين الثابت" data-en-def="A word representation that remains the same regardless of the context.">Static Embedding<span class="smart-term-tooltip"></span></span>s</b>, where the embedding for a word doesn't reflect how its meaning changes in context.</p><p>For example, in the sentence: <code>The chicken didn't cross the road because it was too tired</code>, what is the meaning represented in the static embedding for <code>it</code>? It's ambiguous.</p><p><b><span class="smart-term" data-term-en="Contextual Embedding" data-ar="التضمين السياقي" data-en-def="A word representation that dynamically changes based on surrounding words.">Contextual Embedding<span class="smart-term-tooltip"></span></span>s</b> solve this. The intuition is that a representation of the meaning of a word should be different in different contexts. Each word has a different vector that expresses different meanings depending on the surrounding words. These contextual embeddings are computed using <b>Attention</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا صُمم التضمين السياقي؟ لحل مشكلة تعدد المعاني (Polysemy) والغموض النحوي. الكلمة الواحدة قد تكون اسماً في سياق وفعلاً في سياق آخر.</p><p>آلية الانتباه تسمح للنموذج بدمج المعلومات من الكلمات المجاورة بشكل انتقائي، مما يبني تمثيلاً غنياً وديناميكياً لكل رمز (Token) في كل طبقة من طبقات النموذج.</p></template>
+    <template class="content-en"><p>Why was contextual embedding designed? To solve polysemy and syntactic ambiguity. A single word can act as a noun in one context and a verb in another.</p><p>The attention mechanism allows the model to selectively integrate information from neighboring words, building a rich, dynamic representation for each token at every layer of the model.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Static Embeddings (Word2Vec)</th><th>Contextual Embeddings (Transformers)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تمثيل الكلمة</template>
+          <template class="content-en">Word Representation</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">متجه واحد ثابت لكل كلمة</template>
+          <template class="content-en">One fixed vector per word</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متجه ديناميكي يتغير حسب السياق</template>
+          <template class="content-en">Dynamic vector changing by context</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع تعدد المعاني (Polysemy)</template>
+          <template class="content-en">Handling Polysemy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ضعيف (يمزج المعاني)</template>
+          <template class="content-en">Poor (conflates meanings)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ممتاز (يفصل المعاني حسب السياق)</template>
+          <template class="content-en">Excellent (separates meanings by context)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الآلية الأساسية</template>
+          <template class="content-en">Core Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">نافذة سياق محلية أثناء التدريب فقط</template>
+          <template class="content-en">Local context window during training only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">آلية الانتباه (Attention) أثناء الاستدلال</template>
+          <template class="content-en">Attention mechanism during inference</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف سيتعامل نموذج Word2Vec مع كلمة 'Bank' في جملتي 'River Bank' و 'Bank Account' مقارنة بنموذج المحول (Transformer)؟</template>
+      <template class="content-en">How would a Word2Vec model handle the word 'Bank' in the sentences 'River Bank' and 'Bank Account' compared to a Transformer model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيعطي Word2Vec نفس المتجه لكلمة 'Bank' في كلتا الجملتين، مما يمزج المعنيين. بينما سيعطي المحول متجهات مختلفة تماماً بناءً على سياق 'River' أو 'Account'.</p></template>
+      <template class="content-en"><p>Word2Vec would assign the exact same vector to 'Bank' in both sentences, conflating the meanings. A Transformer would assign completely different vectors based on the context of 'River' or 'Account'.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="attention-mechanism-qkv" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> آلية الانتباه: الاستعلام والمفتاح والقيمة (Q, K, V)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Attention Mechanism: Query, Key, Value (Q, K, V)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانتباه هو آلية لحساب التضمين السياقي للكلمة عن طريق أخذ مجموع موزون لمعلومات الكلمات المحيطة، باستخدام أدوار: الاستعلام (Query)، المفتاح (Key)، والقيمة (Value).</p></template>
+    <template class="content-en"><p>Attention is a mechanism to compute a contextual embedding by taking a weighted sum of surrounding words' information, using roles: Query, Key, and Value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدلاً من استخدام متجهات الكلمات مباشرة، تمثل آلية الانتباه 3 أدوار منفصلة يلعبها كل متجه $x_i$:</p><ol><li><b><span class="smart-term" data-term-en="Query" data-ar="الاستعلام" data-en-def="The representation of the current token looking for relevant information.">الاستعلام<span class="smart-term-tooltip"></span></span> (Query - $q$):</b> يمثل العنصر الحالي الذي يتم مقارنته بالمدخلات السابقة.</li><li><b><span class="smart-term" data-term-en="Key" data-ar="المفتاح" data-en-def="The representation of a token offering its information to be matched with a query.">المفتاح<span class="smart-term-tooltip"></span></span> (Key - $k$):</b> يمثل مدخلاً سابقاً يتم مقارنته بالعنصر الحالي لتحديد مدى التشابه.</li><li><b><span class="smart-term" data-term-en="Value" data-ar="القيمة" data-en-def="The actual information content of a token that is aggregated if its key matches the query.">القيمة<span class="smart-term-tooltip"></span></span> (Value - $v$):</b> قيمة العنصر السابق التي سيتم وزنها وجمعها.</li></ol><p>نستخدم مصفوفات أوزان ($W^Q, W^K, W^V$) لإسقاط كل متجه $x_i$ إلى هذه الأدوار:</p><p>$q_i = x_i W^Q$<br>$k_i = x_i W^K$<br>$v_i = x_i W^V$</p><p>لحساب التشابه بين العنصر الحالي $x_i$ وعنصر سابق $x_j$، نستخدم الجداء النقطي (Dot Product) بين $q_i$ و $k_j$.</p></template>
+    <template class="content-en"><p>Instead of using vectors directly, the attention mechanism represents 3 separate roles each vector $x_i$ plays:</p><ol><li><b><span class="smart-term" data-term-en="Query" data-ar="الاستعلام" data-en-def="The representation of the current token looking for relevant information.">Query<span class="smart-term-tooltip"></span></span> ($q$):</b> As the current element being compared to the preceding inputs.</li><li><b><span class="smart-term" data-term-en="Key" data-ar="المفتاح" data-en-def="The representation of a token offering its information to be matched with a query.">Key<span class="smart-term-tooltip"></span></span> ($k$):</b> As a preceding input that is being compared to the current element to determine a similarity.</li><li><b><span class="smart-term" data-term-en="Value" data-ar="القيمة" data-en-def="The actual information content of a token that is aggregated if its key matches the query.">Value<span class="smart-term-tooltip"></span></span> ($v$):</b> A value of a preceding element that gets weighted and summed.</li></ol><p>We use matrices to project each vector $x_i$ into a representation of its role:</p><p>$q_i = x_i W^Q$<br>$k_i = x_i W^K$<br>$v_i = x_i W^V$</p><p>To compute the similarity of the current element $x_i$ with some prior element $x_j$, we use the dot product between $q_i$ and $k_j$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نقسم على $\sqrt{d_k}$؟ عند حساب الجداء النقطي بين متجهات ذات أبعاد كبيرة، يمكن أن تصبح القيم كبيرة جداً. هذا يدفع دالة Softmax إلى مناطق ذات تدرجات (Gradients) صغيرة جداً (شبه معدومة)، مما يعيق التعلم. القسمة على الجذر التربيعي للبعد تعيد ضبط التباين (Variance).</p><p>دالة Softmax تضمن أن مجموع الأوزان ($\alpha_{ij}$) يساوي 1، مما يجعل العملية عبارة عن متوسط موزون (Weighted Average) للقيم ($v_j$).</p></template>
+    <template class="content-en"><p>Why do we divide by $\sqrt{d_k}$? When computing the dot product of high-dimensional vectors, the values can grow extremely large. This pushes the softmax function into regions with extremely small (vanishing) gradients, hindering learning. Scaling by the square root of the dimension stabilizes the variance.</p><p>The softmax function ensures that the attention weights ($\alpha_{ij}$) sum to 1, making the operation a valid weighted average of the values ($v_j$).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>المعادلات النهائية لرأس انتباه واحد. يتم حساب النتيجة بالجداء النقطي مقسوماً على عامل التحجيم، ثم تمرر عبر Softmax للحصول على الأوزان، وأخيراً تضرب في القيم.</strong></template>
+      <template class="content-en"><strong>Final equations for one attention head. Score is dot product scaled by sqrt(d_k), passed through softmax for weights, and multiplied by values.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{score}(x_i, x_j) = \frac{q_i \cdot k_j}{\sqrt{d_k}} \\ \alpha_{ij} = \text{softmax}(\text{score}(x_i, x_j)) \\ a_i = \sum_{j \le i} \alpha_{ij} v_j$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG showing the calculation of attention for a token 'x3'. Show x3 generating a Query (q3). Show x1, x2, x3 generating Keys (k1, k2, k3) and Values (v1, v2, v3). Show dot product of q3 with k1, k2, k3. Show division by sqrt(d_k). Show Softmax generating weights. Show weights multiplying v1, v2, v3 and summing to produce output 'a3'. Style: educational, dark background #0d1117, accent colors for Q (blue), K (green), V (purple). -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for Query lines -->
+    <marker id="arrow-q" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <!-- Arrowhead for Key lines -->
+    <marker id="arrow-k" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+    </marker>
+    <!-- Arrowhead for Value lines -->
+    <marker id="arrow-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+    <!-- Arrowhead for General/Sum lines -->
+    <marker id="arrow-general" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- LINES LAYER (Underneath nodes)             -->
+  <!-- ========================================== -->
+  <g id="lines-under" fill="none">
+    <!-- Input to Projections -->
+    <!-- Token 1 -->
+    <path d="M 310 100 L 310 125 L 260 125 L 260 150" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+    <path d="M 310 100 L 310 125 L 360 125 L 360 150" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+    <!-- Token 2 -->
+    <path d="M 610 100 L 610 125 L 560 125 L 560 150" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+    <path d="M 610 100 L 610 125 L 660 125 L 660 150" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+    <!-- Token 3 -->
+    <path d="M 910 100 L 910 125 L 810 125 L 810 150" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 910 100 L 910 125 L 910 150" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+    <path d="M 910 100 L 910 125 L 1010 125 L 1010 150" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+
+    <!-- Keys to Scores -->
+    <path d="M 260 190 L 260 210 L 240 230 L 240 260" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+    <path d="M 560 190 L 560 210 L 540 230 L 540 260" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+    <path d="M 910 190 L 910 210 L 890 230 L 890 260" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow-k)" />
+
+    <!-- Query 3 to Scores -->
+    <path d="M 810 190 L 810 230" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 280 230 L 930 230" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 280 230 L 280 260" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 580 230 L 580 260" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 930 230 L 930 260" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+
+    <!-- Scores to Softmax -->
+    <path d="M 260 300 L 260 340" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+    <path d="M 560 300 L 560 340" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+    <path d="M 910 300 L 910 340" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+
+    <!-- Softmax to Weights -->
+    <path d="M 260 390 L 260 440" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 560 390 L 560 440" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 910 390 L 910 440" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+
+    <!-- Weights to Multiply -->
+    <path d="M 260 480 L 260 520 L 335 520" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 560 480 L 560 520 L 635 520" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+    <path d="M 910 480 L 910 520 L 985 520" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-q)" />
+
+    <!-- Multiply to Sum -->
+    <path d="M 360 545 L 360 580 L 660 580 L 660 615" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+    <path d="M 660 545 L 660 615" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+    <path d="M 1010 545 L 1010 580 L 660 580 L 660 615" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+
+    <!-- Sum to Output -->
+    <path d="M 660 660 L 660 700" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-general)" />
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LAYER 1 NODES (Scores & Softmax)           -->
+  <!-- ========================================== -->
+  <g id="nodes-layer-1">
+    <!-- Scores -->
+    <rect x="210" y="260" width="100" height="40" rx="20" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4" />
+    <text x="260" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      q<tspan dy="3" font-size="12">3</tspan><tspan dy="-3"> · k</tspan><tspan dy="3" font-size="12">1</tspan>
+    </text>
+
+    <rect x="510" y="260" width="100" height="40" rx="20" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4" />
+    <text x="560" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      q<tspan dy="3" font-size="12">3</tspan><tspan dy="-3"> · k</tspan><tspan dy="3" font-size="12">2</tspan>
+    </text>
+
+    <rect x="860" y="260" width="100" height="40" rx="20" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4" />
+    <text x="910" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      q<tspan dy="3" font-size="12">3</tspan><tspan dy="-3"> · k</tspan><tspan dy="3" font-size="12">3</tspan>
+    </text>
+
+    <!-- Softmax Box -->
+    <rect x="200" y="340" width="770" height="50" rx="12" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="585" y="371" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">
+      Scale by 1/√d<tspan dy="3" font-size="13">k</tspan><tspan dy="-3">  &amp;  Softmax</tspan>
+    </text>
+    <text x="585" y="371" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">
+      القياس بـ 1/√d<tspan dy="3" font-size="13">k</tspan><tspan dy="-3">  و  Softmax</tspan>
+    </text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LINES OVER (V lines with background mask)  -->
+  <!-- ========================================== -->
+  <g id="lines-over" fill="none">
+    <!-- V1 Line -->
+    <path d="M 360 190 L 360 495" stroke="var(--bg-surface)" stroke-width="12" />
+    <path d="M 360 190 L 360 495" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+    <!-- V2 Line -->
+    <path d="M 660 190 L 660 495" stroke="var(--bg-surface)" stroke-width="12" />
+    <path d="M 660 190 L 660 495" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+    <!-- V3 Line -->
+    <path d="M 1010 190 L 1010 495" stroke="var(--bg-surface)" stroke-width="12" />
+    <path d="M 1010 190 L 1010 495" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-v)" />
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LAYER 2 NODES (Inputs, Projections, etc.)  -->
+  <!-- ========================================== -->
+  <g id="nodes-layer-2">
+    <!-- Input Tokens -->
+    <rect x="270" y="60" width="80" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="310" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      x<tspan dy="3" font-size="12">1</tspan>
+    </text>
+
+    <rect x="570" y="60" width="80" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="610" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      x<tspan dy="3" font-size="12">2</tspan>
+    </text>
+
+    <rect x="870" y="60" width="80" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="910" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      x<tspan dy="3" font-size="12">3</tspan>
+    </text>
+
+    <!-- Projections -->
+    <!-- Token 1 -->
+    <rect x="215" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <text x="260" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      k<tspan dy="3" font-size="11">1</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">1</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">K</tspan>
+    </text>
+
+    <rect x="315" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+    <text x="360" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      v<tspan dy="3" font-size="11">1</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">1</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">V</tspan>
+    </text>
+
+    <!-- Token 2 -->
+    <rect x="515" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <text x="560" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      k<tspan dy="3" font-size="11">2</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">2</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">K</tspan>
+    </text>
+
+    <rect x="615" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+    <text x="660" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      v<tspan dy="3" font-size="11">2</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">2</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">V</tspan>
+    </text>
+
+    <!-- Token 3 -->
+    <rect x="765" y="150" width="90" height="40" rx="8" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="810" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">
+      q<tspan dy="3" font-size="11">3</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">3</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">Q</tspan>
+    </text>
+
+    <rect x="865" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" />
+    <text x="910" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      k<tspan dy="3" font-size="11">3</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">3</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">K</tspan>
+    </text>
+
+    <rect x="965" y="150" width="90" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+    <text x="1010" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+      v<tspan dy="3" font-size="11">3</tspan><tspan dy="-3"> = x</tspan><tspan dy="3" font-size="11">3</tspan><tspan dy="-3">W</tspan><tspan dy="-4" font-size="11">V</tspan>
+    </text>
+
+    <!-- Weights -->
+    <rect x="220" y="440" width="80" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="260" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      α<tspan dy="3" font-size="12">3,1</tspan>
+    </text>
+
+    <rect x="520" y="440" width="80" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="560" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      α<tspan dy="3" font-size="12">3,2</tspan>
+    </text>
+
+    <rect x="870" y="440" width="80" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="910" y="465" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+      α<tspan dy="3" font-size="12">3,3</tspan>
+    </text>
+
+    <!-- Multiply Nodes -->
+    <circle cx="360" cy="520" r="22" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="360" y="528" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" fill="var(--text-primary)">⊗</text>
+
+    <circle cx="660" cy="520" r="22" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="660" y="528" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" fill="var(--text-primary)">⊗</text>
+
+    <circle cx="1010" cy="520" r="22" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="1010" y="528" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" fill="var(--text-primary)">⊗</text>
+
+    <!-- Sum Node -->
+    <rect x="610" y="620" width="100" height="40" rx="20" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="660" y="648" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" font-weight="bold" fill="var(--on-brand-lo)">∑</text>
+
+    <!-- Output Node -->
+    <rect x="620" y="700" width="80" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="660" y="725" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)">
+      a<tspan dy="3" font-size="13">3</tspan>
+    </text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- LABELS & TITLES                            -->
+  <!-- ========================================== -->
+  <g id="labels" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <!-- Main Title -->
+    <text x="600" y="35" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Attention Calculation for Token x₃</text>
+    <text x="600" y="35" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">حساب الانتباه للرمز x₃</text>
+
+    <!-- Row Labels -->
+    <!-- Row 1 -->
+    <text x="100" y="75" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">1. Input</text>
+    <text x="100" y="93" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Tokens</text>
+    <text x="100" y="75" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">1. الرموز</text>
+    <text x="100" y="93" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">المدخلة</text>
+
+    <!-- Row 2 -->
+    <text x="100" y="165" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">2. Linear</text>
+    <text x="100" y="183" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Projections</text>
+    <text x="100" y="165" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">2. الإسقاطات</text>
+    <text x="100" y="183" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الخطية</text>
+
+    <!-- Row 3 -->
+    <text x="100" y="275" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">3. Dot</text>
+    <text x="100" y="293" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Product</text>
+    <text x="100" y="275" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">3. الجداء</text>
+    <text x="100" y="293" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">النقطي</text>
+
+    <!-- Row 4 -->
+    <text x="100" y="360" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">4. Scale &amp;</text>
+    <text x="100" y="378" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Softmax</text>
+    <text x="100" y="360" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">4. القياس</text>
+    <text x="100" y="378" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">و Softmax</text>
+
+    <!-- Row 5 -->
+    <text x="100" y="455" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">5. Attention</text>
+    <text x="100" y="473" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Weights</text>
+    <text x="100" y="455" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">5. أوزان</text>
+    <text x="100" y="473" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الانتباه</text>
+
+    <!-- Row 6 -->
+    <text x="100" y="525" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">6. Multiply</text>
+    <text x="100" y="543" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">&amp; Sum</text>
+    <text x="100" y="525" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">6. الضرب</text>
+    <text x="100" y="543" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">والجمع</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت نتيجة الجداء النقطي بين استعلام الكلمة 'it' ومفتاح الكلمة 'chicken' عالية جداً، ماذا يعني ذلك بالنسبة للمتجه الناتج؟</template>
+      <template class="content-en">If the dot product score between the query of 'it' and the key of 'chicken' is very high, what does that mean for the resulting vector?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن وزن الانتباه (بعد Softmax) سيكون قريباً من 1، وبالتالي فإن المتجه الناتج للكلمة 'it' سيتكون بشكل أساسي من متجه 'القيمة' (Value) الخاص بكلمة 'chicken'.</p></template>
+      <template class="content-en"><p>It means the attention weight (after softmax) will be close to 1, and therefore the resulting vector for 'it' will be heavily composed of the 'Value' vector of the word 'chicken'.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multi-head-attention" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الانتباه متعدد الرؤوس (Multi-head Attention)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Multi-head Attention</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بدلاً من استخدام آلية انتباه واحدة، نستخدم عدة 'رؤوس' انتباه بالتوازي، مما يسمح للنموذج بالتركيز على أنواع مختلفة من العلاقات في نفس الوقت.</p></template>
+    <template class="content-en"><p>Instead of a single attention mechanism, we use multiple attention 'heads' in parallel, allowing the model to attend to different types of relationships simultaneously.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في <b>الانتباه متعدد الرؤوس</b>، كل رأس (Head) يمتلك مصفوفات أوزان خاصة به ($W^Q, W^K, W^V$). هذا يعني أن كل رأس يمكنه تعلم الانتباه إلى سياقات مختلفة.</p><p>على سبيل المثال، قد يركز الرأس الأول على العلاقات النحوية (مثل الفاعل والفعل)، بينما يركز الرأس الثاني على العلاقات الدلالية (مثل الضمير وما يعود عليه).</p><p>يتم حساب الانتباه لكل رأس بشكل مستقل، ثم يتم <b>دمج (Concatenate)</b> المخرجات من جميع الرؤوس، وتضرب في مصفوفة أوزان نهائية $W^O$ لإسقاطها مرة أخرى إلى البعد الأصلي $d$.</p></template>
+    <template class="content-en"><p>In <b>Multi-head Attention</b>, each head has its own set of weight matrices ($W^Q, W^K, W^V$). This means each head can learn to attend to different contexts.</p><p>For example, Head 1 might focus on syntactic relationships (subject-verb), while Head 2 focuses on semantic relationships (pronoun resolution).</p><p>Attention is computed for each head independently. The outputs are then <b>concatenated</b> and multiplied by a final weight matrix $W^O$ to project them back to the original dimension $d$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الانتباه متعدد الرؤوس يحل مشكلة أن رأس انتباه واحد قد يضطر إلى 'المتوسط' بين عدة إشارات مهمة. بوجود رؤوس متعددة، يمكن الاحتفاظ بتمثيلات فرعية متعددة ومستقلة.</p><p>رياضياً: $\text{MultiHead}(X) = (\text{head}_1 \oplus \text{head}_2 \dots \oplus \text{head}_h) W^O$.</p></template>
+    <template class="content-en"><p>Multi-head attention solves the issue where a single attention head might have to 'average out' multiple important signals. With multiple heads, distinct and independent subspace representations can be maintained.</p><p>Mathematically: $\text{MultiHead}(X) = (\text{head}_1 \oplus \text{head}_2 \dots \oplus \text{head}_h) W^O$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانتباه متعدد الرؤوس، حيث يمثل الرمز ⊕ عملية الدمج (Concatenation).</strong></template>
+      <template class="content-en"><strong>Equation for Multi-head Attention, where ⊕ represents concatenation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{head}_i = \text{SelfAttention}(Q^i, K^i, V^i) \\ \text{MultiHeadAttention}(X) = (\text{head}_1 \oplus \text{head}_2 \dots \oplus \text{head}_h) W^O$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: SVG diagram showing Multi-head attention. Show input X splitting into multiple heads (Head 1, Head 2 ... Head 8). Each head has its own W_Q, W_K, W_V triangles. The outputs of these heads are concatenated (represented by a long rectangle) and then multiplied by W_O to produce the final output a_i. Style: educational, dark background. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="40" y="40" text-anchor="start" class="gsvg-en" font-size="22" font-weight="bold" fill="var(--text-primary)">Multi-head Attention</text>
+    <text x="760" y="40" text-anchor="end" class="gsvg-ar" font-size="22" font-weight="bold" fill="var(--text-primary)">الانتباه متعدد الرؤوس (Multi-head Attention)</text>
+
+    <!-- Bounding Boxes for Heads -->
+    <!-- Head 1 -->
+    <rect x="55" y="320" width="190" height="190" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 6" />
+    <!-- Head 2 -->
+    <rect x="285" y="320" width="190" height="190" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 6" />
+    <!-- Head h -->
+    <rect x="555" y="320" width="190" height="190" rx="12" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 6" />
+
+    <!-- ================= LINES & ARROWS ================= -->
+    
+    <!-- Input to Junction -->
+    <path d="M 400,550 L 400,520" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Horizontal Junction Line (broken for ellipsis) -->
+    <path d="M 150,520 L 460,520" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 570,520 L 650,520" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Junction Dots -->
+    <circle cx="150" cy="520" r="4" fill="var(--brand-500)" />
+    <circle cx="380" cy="520" r="4" fill="var(--brand-500)" />
+    <circle cx="650" cy="520" r="4" fill="var(--brand-500)" />
+
+    <!-- Head 1 Routing -->
+    <path d="M 150,520 L 150,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 90,500 L 210,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 90,500 L 90,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 150,500 L 150,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 210,500 L 210,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Head 2 Routing -->
+    <path d="M 380,520 L 380,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 320,500 L 440,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 320,500 L 320,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 380,500 L 380,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 440,500 L 440,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Head h Routing -->
+    <path d="M 650,520 L 650,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 590,500 L 710,500" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 590,500 L 590,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 650,500 L 650,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 710,500 L 710,480" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Triangles to Attention Arrows -->
+    <!-- Head 1 -->
+    <path d="M 90,430 L 90,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 150,430 L 150,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 210,430 L 210,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <!-- Head 2 -->
+    <path d="M 320,430 L 320,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 380,430 L 380,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 440,430 L 440,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <!-- Head h -->
+    <path d="M 590,430 L 590,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 650,430 L 650,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 710,430 L 710,400" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Attention to Concat Arrows -->
+    <path d="M 150,360 L 150,280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 380,360 L 380,280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 650,360 L 650,280" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Concat to Linear Arrow -->
+    <path d="M 400,240 L 400,190" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Linear to Output Arrow -->
+    <path d="M 400,150 L 400,100" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+
+    <!-- ================= SHAPES & BOXES ================= -->
+
+    <!-- Input Box -->
+    <rect x="300" y="550" width="200" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="576" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Input X</text>
+    <text x="400" y="576" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">المدخل X</text>
+
+    <!-- Label for copying X -->
+    <rect x="320" y="532" width="160" height="16" fill="var(--bg-surface)" />
+    <text x="400" y="544" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-size="13">Identical copies of X</text>
+    <text x="400" y="544" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-size="13">نسخ متطابقة من X</text>
+
+    <!-- Triangles (W_Q, W_K, W_V) -->
+    <!-- Head 1 -->
+    <path d="M 62,480 L 118,480 L 90,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 122,480 L 178,480 L 150,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 182,480 L 238,480 L 210,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Head 2 -->
+    <path d="M 292,480 L 348,480 L 320,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 352,480 L 408,480 L 380,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 412,480 L 468,480 L 440,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- Head h -->
+    <path d="M 562,480 L 618,480 L 590,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 622,480 L 678,480 L 650,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <path d="M 682,480 L 738,480 L 710,430 Z" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- Triangle Labels -->
+    <g fill="var(--brand-ink-strong)" font-size="15" font-weight="bold" text-anchor="middle">
+        <!-- Head 1 -->
+        <text x="90" y="468">W<tspan baseline-shift="super" font-size="11">Q</tspan></text>
+        <text x="150" y="468">W<tspan baseline-shift="super" font-size="11">K</tspan></text>
+        <text x="210" y="468">W<tspan baseline-shift="super" font-size="11">V</tspan></text>
+        <!-- Head 2 -->
+        <text x="320" y="468">W<tspan baseline-shift="super" font-size="11">Q</tspan></text>
+        <text x="380" y="468">W<tspan baseline-shift="super" font-size="11">K</tspan></text>
+        <text x="440" y="468">W<tspan baseline-shift="super" font-size="11">V</tspan></text>
+        <!-- Head h -->
+        <text x="590" y="468">W<tspan baseline-shift="super" font-size="11">Q</tspan></text>
+        <text x="650" y="468">W<tspan baseline-shift="super" font-size="11">K</tspan></text>
+        <text x="710" y="468">W<tspan baseline-shift="super" font-size="11">V</tspan></text>
+    </g>
+
+    <!-- Attention Boxes -->
+    <rect x="80" y="360" width="140" height="40" rx="6" fill="var(--brand-500)" />
+    <rect x="310" y="360" width="140" height="40" rx="6" fill="var(--brand-500)" />
+    <rect x="580" y="360" width="140" height="40" rx="6" fill="var(--brand-500)" />
+
+    <!-- Attention Labels -->
+    <g fill="var(--on-brand-lo)" font-size="15" font-weight="bold" text-anchor="middle">
+        <text x="150" y="386" class="gsvg-en">Attention</text>
+        <text x="150" y="386" class="gsvg-ar">الانتباه</text>
+        
+        <text x="380" y="386" class="gsvg-en">Attention</text>
+        <text x="380" y="386" class="gsvg-ar">الانتباه</text>
+        
+        <text x="650" y="386" class="gsvg-en">Attention</text>
+        <text x="650" y="386" class="gsvg-ar">الانتباه</text>
+    </g>
+
+    <!-- Head Bounding Box Labels -->
+    <g fill="var(--text-secondary)" font-size="16" font-weight="bold" text-anchor="middle">
+        <text x="150" y="340" class="gsvg-en">Head 1</text>
+        <text x="150" y="340" class="gsvg-ar">الرأس 1</text>
+        
+        <text x="380" y="340" class="gsvg-en">Head 2</text>
+        <text x="380" y="340" class="gsvg-ar">الرأس 2</text>
+        
+        <text x="650" y="340" class="gsvg-en">Head h</text>
+        <text x="650" y="340" class="gsvg-ar">الرأس h</text>
+    </g>
+
+    <!-- Z Output Labels -->
+    <g fill="var(--text-muted)" font-size="14" font-weight="bold" text-anchor="middle">
+        <text x="170" y="315">Z<tspan baseline-shift="sub" font-size="10">1</tspan></text>
+        <text x="400" y="315">Z<tspan baseline-shift="sub" font-size="10">2</tspan></text>
+        <text x="670" y="315">Z<tspan baseline-shift="sub" font-size="10">h</tspan></text>
+    </g>
+
+    <!-- Concat Box -->
+    <rect x="100" y="240" width="600" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="266" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Concatenate</text>
+    <text x="400" y="266" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">دمج (Concatenate)</text>
+
+    <!-- Linear Box -->
+    <rect x="300" y="150" width="200" height="40" rx="8" fill="var(--brand-500)" />
+    <text x="400" y="176" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-lo)" font-size="18" font-weight="bold">Linear W<tspan baseline-shift="super" font-size="13">O</tspan></text>
+    <text x="400" y="176" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-lo)" font-size="18" font-weight="bold">طبقة خطية W<tspan baseline-shift="super" font-size="13">O</tspan></text>
+
+    <!-- Output Box -->
+    <rect x="300" y="60" width="200" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <text x="400" y="86" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Final Output</text>
+    <text x="400" y="86" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">الناتج النهائي</text>
+
+    <!-- ================= ELLIPSIS DOTS ================= -->
+    <!-- Between Heads (Middle) -->
+    <circle cx="495" cy="415" r="4" fill="var(--brand-400)" />
+    <circle cx="515" cy="415" r="4" fill="var(--brand-400)" />
+    <circle cx="535" cy="415" r="4" fill="var(--brand-400)" />
+
+    <!-- Between Z Arrows -->
+    <circle cx="495" cy="320" r="3" fill="var(--brand-400)" />
+    <circle cx="515" cy="320" r="3" fill="var(--brand-400)" />
+    <circle cx="535" cy="320" r="3" fill="var(--brand-400)" />
+
+    <!-- On Junction Line -->
+    <circle cx="495" cy="520" r="3" fill="var(--brand-400)" />
+    <circle cx="515" cy="520" r="3" fill="var(--brand-400)" />
+    <circle cx="535" cy="520" r="3" fill="var(--brand-400)" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى المصفوفة $W^O$ بعد دمج مخرجات الرؤوس المتعددة؟</template>
+      <template class="content-en">Why do we need the matrix $W^O$ after concatenating the outputs of the multiple heads?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن عملية الدمج تنتج متجهاً طويلاً جداً. المصفوفة $W^O$ تقوم بإسقاط (تحويل) هذا المتجه الطويل للعودة إلى البعد الأصلي للنموذج ($d$)، مما يسمح بتمريره إلى الطبقات التالية.</p></template>
+      <template class="content-en"><p>Because concatenation produces a very long vector. The $W^O$ matrix projects this long vector back down to the model's original dimension ($d$), allowing it to be passed to subsequent layers.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="transformer-blocks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الكتل البرمجية للمحول (Transformer Blocks)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Transformer Blocks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المحول هو عبارة عن مكدس (Stack) من الكتل. تتكون كل كتلة من تيار متبقي (Residual Stream)، انتباه متعدد الرؤوس، شبكة تغذية أمامية، وتطبيع الطبقة (Layer Norm).</p></template>
+    <template class="content-en"><p>A transformer is a stack of blocks. Each block consists of a residual stream, multi-head attention, a feedforward network, and <span class="smart-term" data-term-en="Layer Normalization" data-ar="تطبيع الطبقة" data-en-def="A technique to normalize the distributions of intermediate layers, stabilizing the learning process.">layer normalization<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون المحول من تكديس عدة كتل (Blocks) فوق بعضها البعض. كل كتلة تحتوي على المكونات التالية:</p><ol><li><b><span class="smart-term" data-term-en="Residual Stream" data-ar="التيار المتبقي" data-en-def="A direct path for information to flow through the network, where layer outputs are added to the inputs.">التيار المتبقي<span class="smart-term-tooltip"></span></span> (Residual Stream):</b> يتم تمرير كل رمز (Token) وتعديله عبر الطبقات. يتم إضافة مخرجات الانتباه والشبكة الأمامية إلى المدخلات الأصلية ($x + f(x)$).</li><li><b><span class="smart-term" data-term-en="Layer Normalization" data-ar="تطبيع الطبقة" data-en-def="A technique to normalize the distributions of intermediate layers, stabilizing the learning process.">تطبيع الطبقة<span class="smart-term-tooltip"></span></span> (Layer Norm):</b> يتم تطبيع المتجه $x_i$ مرتين داخل الكتلة (قبل الانتباه وقبل التغذية الأمامية) لضمان استقرار التدريب.</li><li><b>الانتباه متعدد الرؤوس (Multi-Head Attention):</b> يجمع المعلومات من الرموز الأخرى.</li><li><b>شبكة التغذية الأمامية (Feedforward Network):</b> تضيف اللاخطية (Non-linearities) للنموذج. تطبق على كل رمز بشكل مستقل.</li></ol></template>
+    <template class="content-en"><p>A transformer is a stack of these blocks. Each block contains the following components:</p><ol><li><b><span class="smart-term" data-term-en="Residual Stream" data-ar="التيار المتبقي" data-en-def="A direct path for information to flow through the network, where layer outputs are added to the inputs.">Residual Stream<span class="smart-term-tooltip"></span></span>:</b> Each token gets passed up and modified. The outputs of attention and feedforward layers are added back to the original input ($x + f(x)$).</li><li><b>Layer Norm:</b> The vector $x_i$ is normalized twice within the block (before attention and before feedforward) to stabilize training.</li><li><b>Multi-Head Attention:</b> Gathers information from other tokens.</li><li><b>Feedforward Network:</b> Adds non-linearities to the model. Applied to each token independently.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>التيار المتبقي (Residual Stream):</b> هو المسار الرئيسي للمعلومات. يمكن اعتبار رؤوس الانتباه كآليات تقوم بـ 'قراءة' المعلومات من رموز أخرى و 'كتابتها' (إضافتها) إلى التيار المتبقي للرمز الحالي.</p><p><b>تطبيع الطبقة (Layer Norm):</b> هو تغيير لدرجة Z (z-score) من الإحصاء، يطبق على متجه واحد في طبقة مخفية، مما يمنع القيم من الانفجار أو التلاشي.</p></template>
+    <template class="content-en"><ul><li><b>Residual Stream:</b> This is the main highway of information. Attention heads can be viewed as mechanisms that 'read' information from other tokens and 'write' (add) it into the current token's residual stream.</li><li><b>Layer Norm:</b> A variation of the z-score from statistics, applied to a single vector in a hidden layer, preventing values from exploding or vanishing.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات شبكة التغذية الأمامية (FFN) وتطبيع الطبقة (LayerNorm).</strong></template>
+      <template class="content-en"><strong>Equations for the Feedforward Network (FFN) and Layer Normalization.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{FFN}(x_i) = \text{ReLU}(x_i W_1 + b_1) W_2 + b_2 \\ \text{LayerNorm}(x) = \gamma \frac{(x - \mu)}{\sigma} + \beta$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: SVG diagram of a single Transformer Block. Show a vertical line representing the Residual Stream for token x_i. Show an arrow branching off to 'Layer Norm', then to 'MultiHead Attention', then adding back to the stream (green plus sign). Then another branch to 'Layer Norm', then 'Feedforward', then adding back to the stream (green plus sign). Output is h_i. Style: clean, technical, dark mode. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 760" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Brand Gradient for Main Processing Blocks -->
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Transformer Block Dashed Boundary -->
+  <rect x="120" y="80" width="560" height="620" rx="12" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 8" />
+  
+  <!-- Block Label -->
+  <text x="400" y="115" text-anchor="middle" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Transformer Block</text>
+  <text x="400" y="115" text-anchor="middle" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">كتلة المحول (Transformer Block)</text>
+
+  <!-- ========================================== -->
+  <!-- RESIDUAL STREAM (VERTICAL LINE)            -->
+  <!-- ========================================== -->
+  
+  <!-- Input to Split 1 -->
+  <line x1="200" y1="50" x2="200" y2="156" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Split 1 to Add 1 -->
+  <line x1="200" y1="160" x2="200" y2="360" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Add 1 to Split 2 -->
+  <line x1="200" y1="396" x2="200" y2="436" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Split 2 to Add 2 -->
+  <line x1="200" y1="440" x2="200" y2="640" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Add 2 to Output -->
+  <line x1="200" y1="676" x2="200" y2="710" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Residual Stream Label -->
+  <text transform="translate(160, 380) rotate(-90)" x="0" y="0" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Residual Stream</text>
+  <text transform="translate(160, 380) rotate(-90)" x="0" y="0" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">مسار البقايا (Residual Stream)</text>
+
+  <!-- Junction Dots -->
+  <circle cx="200" cy="160" r="4" fill="var(--brand-500)" />
+  <circle cx="200" cy="440" r="4" fill="var(--brand-500)" />
+
+  <!-- ========================================== -->
+  <!-- BRANCH 1: MULTI-HEAD ATTENTION             -->
+  <!-- ========================================== -->
+
+  <!-- Path: Split 1 to Layer Norm 1 -->
+  <path d="M 200 160 L 490 160 Q 500 160 500 170 L 500 176" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Layer Norm 1 Box -->
+  <rect x="400" y="180" width="200" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="500" y="206" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16">Layer Norm</text>
+  <text x="500" y="206" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16">تسوية الطبقة (Layer Norm)</text>
+
+  <!-- Path: Layer Norm 1 to Attention -->
+  <line x1="500" y1="220" x2="500" y2="266" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Multi-Head Attention Box -->
+  <rect x="380" y="270" width="240" height="60" rx="8" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="500" y="306" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Multi-Head Attention</text>
+  <text x="500" y="306" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">انتباه متعدد الرؤوس</text>
+
+  <!-- Path: Attention to Add 1 -->
+  <path d="M 500 330 L 500 370 Q 500 380 490 380 L 220 380" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Add 1 Node -->
+  <circle cx="200" cy="380" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 192 380 L 208 380 M 200 372 L 200 388" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+
+  <!-- ========================================== -->
+  <!-- BRANCH 2: FEEDFORWARD NETWORK              -->
+  <!-- ========================================== -->
+
+  <!-- Path: Split 2 to Layer Norm 2 -->
+  <path d="M 200 440 L 490 440 Q 500 440 500 450 L 500 456" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Layer Norm 2 Box -->
+  <rect x="400" y="460" width="200" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="500" y="486" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16">Layer Norm</text>
+  <text x="500" y="486" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16">تسوية الطبقة (Layer Norm)</text>
+
+  <!-- Path: Layer Norm 2 to Feedforward -->
+  <line x1="500" y1="500" x2="500" y2="546" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Feedforward Box -->
+  <rect x="380" y="550" width="240" height="60" rx="8" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="500" y="586" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Feedforward Network</text>
+  <text x="500" y="586" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">شبكة التغذية الأمامية</text>
+
+  <!-- Path: Feedforward to Add 2 -->
+  <path d="M 500 610 L 500 650 Q 500 660 490 660 L 220 660" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Add 2 Node -->
+  <circle cx="200" cy="660" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 192 660 L 208 660 M 200 652 L 200 668" fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" />
+
+  <!-- ========================================== -->
+  <!-- INPUT & OUTPUT LABELS                      -->
+  <!-- ========================================== -->
+
+  <!-- Input Label -->
+  <text x="200" y="35" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Input Token x<tspan baseline-shift="sub" font-size="13">i</tspan></text>
+  <text x="200" y="35" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">الرمز المدخل x<tspan baseline-shift="sub" font-size="13">i</tspan></text>
+
+  <!-- Output Label -->
+  <text x="200" y="735" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Output h<tspan baseline-shift="sub" font-size="13">i</tspan></text>
+  <text x="200" y="735" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">المخرج h<tspan baseline-shift="sub" font-size="13">i</tspan></text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا أزلنا اتصالات التيار المتبقي (Residual connections) من نموذج محول عميق جداً (مثلاً 100 طبقة)؟</template>
+      <template class="content-en">What would happen if we removed the residual connections from a very deep transformer model (e.g., 100 layers)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيعاني النموذج من مشكلة تلاشي التدرج (Vanishing Gradients) أثناء التدريب، ولن تتمكن الطبقات الأولى من التعلم بفعالية، مما يؤدي إلى فشل النموذج في التدريب.</p></template>
+      <template class="content-en"><p>The model would suffer from the vanishing gradient problem during training. The earlier layers would not be able to learn effectively, causing the model to fail to train.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="parallelizing-attention-masking" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> موازاة الانتباه وإخفاء المستقبل (Parallelization &amp; Masking)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Parallelizing Attention &amp; Masking</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لجعل الحساب سريعاً، نجمع كل الرموز في مصفوفة واحدة $X$. ولمنع النموذج من الغش برؤية الكلمات المستقبلية، نستخدم 'قناعاً' (Mask) يضع قيماً سالبة لا نهاية في المثلث العلوي لمصفوفة الانتباه.</p></template>
+    <template class="content-en"><p>To make computation fast, we pack all tokens into a single matrix $X$. To prevent the model from cheating by looking at future words, we use a 'mask' that puts negative infinity in the upper triangle of the attention matrix.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدلاً من حساب الانتباه لكل خطوة زمنية بشكل فردي، يمكننا تجميع $N$ رمز من تسلسل الإدخال في مصفوفة واحدة $X$ بحجم $[N \times d]$.</p><p>يتم حساب المصفوفات $Q, K, V$ بضربة واحدة: $Q = X W^Q, K = X W^K, V = X W^V$.</p><p>ثم نقوم بضرب المصفوفات $Q K^T$ للحصول على درجات الانتباه لجميع الرموز معاً.</p><p><b>إخفاء المستقبل (Masking out the future):</b><br>في نمذجة اللغة، التنبؤ بالكلمة التالية سهل إذا كنت تعرفها مسبقاً! مصفوفة $Q K^T$ تحتوي على درجات لكل استعلام مع كل مفتاح، بما في ذلك الكلمات التي <i>تلي</i> الاستعلام.</p><p>لمنع ذلك، نضيف $-\infty$ إلى الخلايا في المثلث العلوي للمصفوفة. دالة Softmax ستحول هذه القيم إلى 0، مما يمنع الانتباه للكلمات المستقبلية.</p></template>
+    <template class="content-en"><p>Instead of computing attention for a single time step individually, we can pack the $N$ tokens of the input sequence into a single matrix $X$ of size $[N \times d]$.</p><p>We compute $Q, K, V$ in one go: $Q = X W^Q, K = X W^K, V = X W^V$.</p><p>We then do a single matrix multiply $Q K^T$ to get the attention scores for all tokens simultaneously.</p><p><b><span class="smart-term" data-term-en="Masking" data-ar="الإخفاء / التقنيع" data-en-def="Applying a filter to prevent the model from accessing certain information, typically future tokens in a sequence.">Masking<span class="smart-term-tooltip"></span></span> out the future:</b><br>In language modeling, guessing the next word is simple if you already know it! $Q K^T$ has a score for each query dot every key, including those that <i>follow</i> the query.</p><p>To prevent this, we add $-\infty$ to cells in the upper triangle. The softmax will turn it to 0, preventing attention to future words.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا القناع (Mask) ضروري فقط أثناء التدريب التراجعي (Autoregressive Training) أو التوليد، حيث يجب أن يعتمد التنبؤ فقط على السياق الأيسر (السابق). في نماذج مثل BERT (التي تعتمد على التشفير فقط)، لا يتم استخدام هذا القناع لأن النموذج مسموح له برؤية السياق من كلا الاتجاهين.</p></template>
+    <template class="content-en"><p>This mask is only strictly necessary during <span class="smart-term" data-term-en="Autoregressive" data-ar="الانحدار الذاتي" data-en-def="A model that predicts future values based on past values.">autoregressive<span class="smart-term-tooltip"></span></span> training or generation, where prediction must rely only on the left (prior) context. In models like BERT (encoder-only), this causal mask is not used because the model is allowed to see bidirectional context.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانتباه الموازي مع القناع (Mask).</strong></template>
+      <template class="content-en"><strong>Equation for parallelized attention with masking.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$A = \text{softmax}\left(\text{mask}\left(\frac{Q K^T}{\sqrt{d_k}}\right)\right) V$$</div>
+  </div>
+
+  <!-- DIAGRAM[4]: SVG showing a matrix representing QK^T. The matrix is N x N. The lower triangle and diagonal have values (e.g., q1.k1, q2.k1). The upper triangle cells all contain the infinity symbol (-∞). Show an arrow pointing to the upper triangle explaining 'Add -∞ to cells in upper triangle. Softmax turns it to 0'. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Gradient for Masked Upper Triangle -->
+        <linearGradient id="mask-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Masked Attention Scores (Q K<tspan dy="-10" font-size="14">T</tspan><tspan dy="10">)</tspan></text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">درجات الانتباه المقنعة (Q K<tspan dy="-10" font-size="14">T</tspan><tspan dy="10">)</tspan></text>
+
+    <!-- Axes Labels -->
+    <text x="270" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Keys (Past &amp; Future Tokens)</text>
+    <text x="270" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">المفاتيح (الرموز السابقة والمستقبلية)</text>
+
+    <text x="-270" y="60" transform="rotate(-90)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Queries (Current Token)</text>
+    <text x="-270" y="60" transform="rotate(-90)" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">الاستعلامات (الرمز الحالي)</text>
+
+    <!-- Column Headers (Keys) -->
+    <text x="157.5" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">K<tspan dy="3" font-size="12">1</tspan></text>
+    <text x="232.5" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">K<tspan dy="3" font-size="12">2</tspan></text>
+    <text x="307.5" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">K<tspan dy="3" font-size="12">3</tspan></text>
+    <text x="382.5" y="105" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">K<tspan dy="3" font-size="12">4</tspan></text>
+
+    <!-- Row Headers (Queries) -->
+    <text x="95" y="163" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Q<tspan dy="3" font-size="12">1</tspan></text>
+    <text x="95" y="238" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Q<tspan dy="3" font-size="12">2</tspan></text>
+    <text x="95" y="313" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Q<tspan dy="3" font-size="12">3</tspan></text>
+    <text x="95" y="388" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Q<tspan dy="3" font-size="12">4</tspan></text>
+
+    <!-- Matrix Base (Lower Triangle & Diagonal) -->
+    <rect x="120" y="120" width="300" height="300" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="4" />
+
+    <!-- Upper Triangle Masked Cells -->
+    <!-- Row 0 -->
+    <rect x="195" y="120" width="75" height="75" fill="url(#mask-grad)" />
+    <rect x="270" y="120" width="75" height="75" fill="url(#mask-grad)" />
+    <rect x="345" y="120" width="75" height="75" fill="url(#mask-grad)" />
+    <!-- Row 1 -->
+    <rect x="270" y="195" width="75" height="75" fill="url(#mask-grad)" />
+    <rect x="345" y="195" width="75" height="75" fill="url(#mask-grad)" />
+    <!-- Row 2 -->
+    <rect x="345" y="270" width="75" height="75" fill="url(#mask-grad)" />
+
+    <!-- Matrix Grid Lines -->
+    <line x1="195" y1="120" x2="195" y2="420" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="270" y1="120" x2="270" y2="420" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="345" y1="120" x2="345" y2="420" stroke="var(--border-color)" stroke-width="1" />
+    
+    <line x1="120" y1="195" x2="420" y2="195" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="120" y1="270" x2="420" y2="270" stroke="var(--border-color)" stroke-width="1" />
+    <line x1="120" y1="345" x2="420" y2="345" stroke="var(--border-color)" stroke-width="1" />
+
+    <!-- Matrix Cell Contents -->
+    <!-- Row 0 -->
+    <text x="157.5" y="162.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">1</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">1</tspan></text>
+    <text x="232.5" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+    <text x="307.5" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+    <text x="382.5" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+
+    <!-- Row 1 -->
+    <text x="157.5" y="237.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">2</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">1</tspan></text>
+    <text x="232.5" y="237.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">2</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">2</tspan></text>
+    <text x="307.5" y="240" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+    <text x="382.5" y="240" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+
+    <!-- Row 2 -->
+    <text x="157.5" y="312.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">3</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">1</tspan></text>
+    <text x="232.5" y="312.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">3</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">2</tspan></text>
+    <text x="307.5" y="312.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">3</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">3</tspan></text>
+    <text x="382.5" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--on-brand-hi)">-∞</text>
+
+    <!-- Row 3 -->
+    <text x="157.5" y="387.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">4</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">1</tspan></text>
+    <text x="232.5" y="387.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">4</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">2</tspan></text>
+    <text x="307.5" y="387.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">4</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">3</tspan></text>
+    <text x="382.5" y="387.5" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">q<tspan dy="4" font-size="11">4</tspan><tspan dy="-4" font-size="15">·k</tspan><tspan dy="4" font-size="11">4</tspan></text>
+
+    <!-- Callout Box -->
+    <rect x="480" y="180" width="290" height="140" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="8" />
+    
+    <!-- Callout Text (English) -->
+    <text x="625" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Masking Future Tokens</text>
+    <text x="625" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Add -∞ to cells in upper triangle.</text>
+    <text x="625" y="270" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Softmax turns it to 0,</text>
+    <text x="625" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">preventing attention to future words.</text>
+
+    <!-- Callout Text (Arabic) -->
+    <text x="625" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">إخفاء الرموز المستقبلية</text>
+    <text x="625" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">إضافة -∞ إلى خلايا المثلث العلوي.</text>
+    <text x="625" y="270" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">دالة Softmax تحولها إلى 0،</text>
+    <text x="625" y="295" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">مما يمنع الانتباه للكلمات المستقبلية.</text>
+
+    <!-- Arrows connecting Callout to Matrix -->
+    <path d="M 480 220 C 450 220, 450 157.5, 425 157.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <circle cx="480" cy="220" r="4" fill="var(--brand-500)" />
+
+    <path d="M 480 260 C 440 260, 380 232.5, 350 232.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <circle cx="480" cy="260" r="4" fill="var(--brand-500)" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم $-\infty$ تحديداً في القناع بدلاً من 0؟</template>
+      <template class="content-en">Why do we specifically use $-\infty$ in the mask instead of 0?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن هذه القيم تمر عبر دالة Softmax التي تستخدم الدالة الأسية ($e^x$). $e^{-\infty}$ يساوي 0، مما يجعل الوزن النهائي صفراً. لو استخدمنا 0 قبل Softmax، فإن $e^0 = 1$، مما سيعطي وزناً غير صفري للكلمات المستقبلية.</p></template>
+      <template class="content-en"><p>Because these values pass through the Softmax function, which uses the exponential function ($e^x$). $e^{-\infty}$ equals 0, making the final weight zero. If we used 0 before Softmax, $e^0 = 1$, which would assign a non-zero weight to future words.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="token-and-position-embeddings" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تضمين الرموز والمواضع (Token and Position Embeddings)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Token and Position Embeddings</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المدخل النهائي للمحول هو مجموع متجهين: تضمين الرمز (معنى الكلمة) وتضمين الموضع (مكان الكلمة في الجملة).</p></template>
+    <template class="content-en"><p>The final input to the transformer is the sum of two vectors: the token embedding (word meaning) and the position embedding (word location in the sentence).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المصفوفة $X$ (بحجم $[N \times d]$) تحتوي على تضمين لكل كلمة في السياق. يتم إنشاء هذا التضمين عن طريق جمع تضمينين مختلفين لكل مدخل:</p><ol><li><b><span class="smart-term" data-term-en="Token Embedding" data-ar="تضمين الرمز" data-en-def="A vector representation of a specific word or subword from the vocabulary.">تضمين الرمز<span class="smart-term-tooltip"></span></span> (Token Embedding):</b> مصفوفة $E$ بحجم $[|V| \times d]$. صف واحد لكل رمز في المفردات. يمثل المعنى الأساسي للكلمة.</li><li><b>تضمين الموضع (Position Embedding):</b> مصفوفة $E_{pos}$ بحجم $[1 \times N]$. بما أن آلية الانتباه لا تهتم بترتيب الكلمات (تعاملها كمجموعة)، يجب أن نخبر النموذج بموقع كل كلمة. نتعلم تضميناً للموضع 1، وتضميناً للموضع 2، وهكذا.</li></ol><p>إذن: $X = \text{Word Embeddings} + \text{Position Embeddings}$.</p></template>
+    <template class="content-en"><p>The matrix $X$ (of shape $[N \times d]$) has an embedding for each word in the context. This embedding is created by adding two distinct embeddings for each input:</p><ol><li><b><span class="smart-term" data-term-en="Token Embedding" data-ar="تضمين الرمز" data-en-def="A vector representation of a specific word or subword from the vocabulary.">Token Embedding<span class="smart-term-tooltip"></span></span>:</b> Matrix $E$ of shape $[|V| \times d]$. One row for each token in the vocabulary. Represents the base meaning.</li><li><b><span class="smart-term" data-term-en="Position Embedding" data-ar="التضمين الموضعي" data-en-def="A vector added to the token embedding to provide information about its position in the sequence.">Position Embedding<span class="smart-term-tooltip"></span></span>:</b> Matrix $E_{pos}$ of shape $[1 \times N]$. Since attention has no inherent notion of order (it's a set operation), we must inject positional information. We learn an embedding for position 1, position 2, etc.</li></ol><p>Thus: $X = \text{Word Embeddings} + \text{Position Embeddings}$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون تضمين الموضع، سيعتبر المحول الجملتين 'الكلب عض الرجل' و 'الرجل عض الكلب' متطابقتين تماماً، لأن الانتباه عملية غير متأثرة بالترتيب (Permutation Invariant).</p><p><span class="smart-term" data-term-en="Position Embedding" data-ar="التضمين الموضعي" data-en-def="A vector added to the token embedding to provide information about its position in the sequence.">التضمين الموضعي<span class="smart-term-tooltip"></span></span> المذكور هنا هو 'مطلق' (Absolute) ويتم تعلمه أثناء التدريب. هناك أنواع أخرى مثل التضمين الموضعي النسبي (Relative) أو الجيبي (Sinusoidal) المستخدم في ورقة Attention Is All You Need الأصلية.</p></template>
+    <template class="content-en"><p>Without position embeddings, the transformer would treat 'Dog bites man' and 'Man bites dog' as exactly identical, because attention is a permutation-invariant operation.</p><p>The position embedding described here is 'absolute' and learned during training. There are other types like relative position embeddings or the fixed sinusoidal embeddings used in the original Attention Is All You Need paper.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: SVG showing the addition of embeddings. Bottom row: words 'Janet', 'will', 'back', 'the', 'bill'. Above them, pink boxes representing Position Embeddings (1, 2, 3, 4, 5). Above them, red boxes representing Word Embeddings. Arrows show Word and Position embeddings adding together (green plus sign) to form the Composite Embedding (X) which goes into the Transformer Block. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg viewBox="0 0 900 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Transformer Block -->
+        <rect x="200" y="70" width="660" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <text x="530" y="106" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transformer Block</text>
+        <text x="530" y="106" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كتلة المحول (Transformer Block)</text>
+
+        <!-- Row Labels -->
+        <g font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="start">
+            <text x="20" y="565" class="gsvg-en">Input Words</text>
+            <text x="20" y="565" class="gsvg-ar">الكلمات المدخلة</text>
+
+            <text x="20" y="465" class="gsvg-en">Position Embeddings</text>
+            <text x="20" y="465" class="gsvg-ar">تضمين الموضع</text>
+
+            <text x="20" y="365" class="gsvg-en">Word Embeddings</text>
+            <text x="20" y="365" class="gsvg-ar">تضمين الكلمات</text>
+
+            <text x="20" y="205" class="gsvg-en">Composite (X)</text>
+            <text x="20" y="205" class="gsvg-ar">التضمين المركب (X)</text>
+        </g>
+
+        <!-- Column 1: Janet -->
+        <g>
+            <!-- Input Level -->
+            <text x="215" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">Janet</text>
+            <text x="215" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">جانيت</text>
+            <text x="285" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">1</text>
+            <text x="285" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">1</text>
+
+            <!-- Arrows Up -->
+            <path d="M 215 545 L 215 388" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <path d="M 285 545 L 285 488" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <!-- Position Embedding -->
+            <rect x="253" y="440" width="64" height="40" rx="6" fill="var(--brand-300)" />
+            <text x="285" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">P(1)</text>
+            <text x="285" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">P(1)</text>
+
+            <!-- Word Embedding -->
+            <rect x="183" y="340" width="64" height="40" rx="6" fill="var(--brand-600)" />
+            <text x="215" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">E(Janet)</text>
+            <text x="215" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">E(جانيت)</text>
+
+            <!-- Arrows to Plus -->
+            <path d="M 285 440 L 285 280 L 274 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+            <path d="M 215 340 L 215 280 L 226 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+
+            <!-- Plus Node -->
+            <circle cx="250" cy="280" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <path d="M 244 280 L 256 280 M 250 274 L 250 286" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" />
+
+            <!-- Arrow to Composite -->
+            <path d="M 250 264 L 250 228" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <!-- Composite Embedding -->
+            <rect x="205" y="180" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="250" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">X₁</text>
+            <text x="250" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">X₁</text>
+
+            <!-- Arrow to Transformer -->
+            <path d="M 250 180 L 250 138" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+
+        <!-- Column 2: will -->
+        <g>
+            <text x="355" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">will</text>
+            <text x="355" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">سوف</text>
+            <text x="425" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">2</text>
+            <text x="425" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">2</text>
+
+            <path d="M 355 545 L 355 388" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <path d="M 425 545 L 425 488" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="393" y="440" width="64" height="40" rx="6" fill="var(--brand-300)" />
+            <text x="425" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">P(2)</text>
+            <text x="425" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">P(2)</text>
+
+            <rect x="323" y="340" width="64" height="40" rx="6" fill="var(--brand-600)" />
+            <text x="355" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">E(will)</text>
+            <text x="355" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">E(سوف)</text>
+
+            <path d="M 425 440 L 425 280 L 414 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+            <path d="M 355 340 L 355 280 L 366 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+
+            <circle cx="390" cy="280" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <path d="M 384 280 L 396 280 M 390 274 L 390 286" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" />
+
+            <path d="M 390 264 L 390 228" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="345" y="180" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="390" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">X₂</text>
+            <text x="390" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">X₂</text>
+
+            <path d="M 390 180 L 390 138" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+
+        <!-- Column 3: back -->
+        <g>
+            <text x="495" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">back</text>
+            <text x="495" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">يدعم</text>
+            <text x="565" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">3</text>
+            <text x="565" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">3</text>
+
+            <path d="M 495 545 L 495 388" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <path d="M 565 545 L 565 488" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="533" y="440" width="64" height="40" rx="6" fill="var(--brand-300)" />
+            <text x="565" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">P(3)</text>
+            <text x="565" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">P(3)</text>
+
+            <rect x="463" y="340" width="64" height="40" rx="6" fill="var(--brand-600)" />
+            <text x="495" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">E(back)</text>
+            <text x="495" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">E(يدعم)</text>
+
+            <path d="M 565 440 L 565 280 L 554 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+            <path d="M 495 340 L 495 280 L 506 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+
+            <circle cx="530" cy="280" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <path d="M 524 280 L 536 280 M 530 274 L 530 286" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" />
+
+            <path d="M 530 264 L 530 228" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="485" y="180" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="530" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">X₃</text>
+            <text x="530" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">X₃</text>
+
+            <path d="M 530 180 L 530 138" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+
+        <!-- Column 4: the -->
+        <g>
+            <text x="635" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">the</text>
+            <text x="635" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">الـ</text>
+            <text x="705" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">4</text>
+            <text x="705" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">4</text>
+
+            <path d="M 635 545 L 635 388" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <path d="M 705 545 L 705 488" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="673" y="440" width="64" height="40" rx="6" fill="var(--brand-300)" />
+            <text x="705" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">P(4)</text>
+            <text x="705" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">P(4)</text>
+
+            <rect x="603" y="340" width="64" height="40" rx="6" fill="var(--brand-600)" />
+            <text x="635" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">E(the)</text>
+            <text x="635" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">E(الـ)</text>
+
+            <path d="M 705 440 L 705 280 L 694 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+            <path d="M 635 340 L 635 280 L 646 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+
+            <circle cx="670" cy="280" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <path d="M 664 280 L 676 280 M 670 274 L 670 286" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" />
+
+            <path d="M 670 264 L 670 228" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="625" y="180" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="670" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">X₄</text>
+            <text x="670" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">X₄</text>
+
+            <path d="M 670 180 L 670 138" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+
+        <!-- Column 5: bill -->
+        <g>
+            <text x="775" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">bill</text>
+            <text x="775" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">فاتورة</text>
+            <text x="845" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">5</text>
+            <text x="845" y="565" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">5</text>
+
+            <path d="M 775 545 L 775 388" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+            <path d="M 845 545 L 845 488" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="813" y="440" width="64" height="40" rx="6" fill="var(--brand-300)" />
+            <text x="845" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-en">P(5)</text>
+            <text x="845" y="465" text-anchor="middle" font-size="14" fill="var(--on-brand-lo)" class="gsvg-ar">P(5)</text>
+
+            <rect x="743" y="340" width="64" height="40" rx="6" fill="var(--brand-600)" />
+            <text x="775" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-en">E(bill)</text>
+            <text x="775" y="365" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" class="gsvg-ar">E(فاتورة)</text>
+
+            <path d="M 845 440 L 845 280 L 834 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+            <path d="M 775 340 L 775 280 L 786 280" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" marker-end="url(#arrow)" />
+
+            <circle cx="810" cy="280" r="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <path d="M 804 280 L 816 280 M 810 274 L 810 286" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round" />
+
+            <path d="M 810 264 L 810 228" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+            <rect x="765" y="180" width="90" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+            <text x="810" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-en">X₅</text>
+            <text x="810" y="205" text-anchor="middle" font-size="16" fill="var(--text-primary)" class="gsvg-ar">X₅</text>
+
+            <path d="M 810 180 L 810 138" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+        </g>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نقوم بجمع (Add) تضمين الرمز وتضمين الموضع بدلاً من دمجهما (Concatenate)؟</template>
+      <template class="content-en">Why do we add the token and position embeddings instead of concatenating them?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الجمع يحافظ على أبعاد المتجه ($d$) ثابتة، مما يقلل من عدد المعلمات (Parameters) المطلوبة في الطبقات التالية. النماذج قادرة على تعلم تمثيلات في فضاء عالي الأبعاد بحيث لا يتداخل المعنى الدلالي مع المعنى الموضعي عند جمعهما.</p></template>
+      <template class="content-en"><p>Adding keeps the vector dimension ($d$) constant, reducing the number of parameters in subsequent layers. Models learn representations in high-dimensional space such that semantic and positional information do not destructively interfere when added.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="language-modeling-head" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> رأس نمذجة اللغة (Language Modeling Head)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> The Language Modeling Head</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هو الطبقة الأخيرة في النموذج التي تحول المخرجات المخفية للمحول إلى احتمالات لكل كلمة ممكنة في القاموس للتنبؤ بالكلمة التالية.</p></template>
+    <template class="content-en"><p>The final layer of the model that converts the transformer's hidden outputs into probabilities for every possible word in the vocabulary to predict the next word.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يأخذ <b>رأس نمذجة اللغة</b> المخرجات من الطبقة الأخيرة للمحول ($h_N^L$) ويخرج توزيعاً احتماليا على المفردات $V$.</p><ol><li><b><span class="smart-term" data-term-en="Unembedding Layer" data-ar="طبقة فك التضمين" data-en-def="The linear layer that maps the model&#x27;s internal hidden state back to the vocabulary space.">طبقة فك التضمين<span class="smart-term-tooltip"></span></span> (Unembedding Layer):</b> طبقة خطية تقوم بإسقاط المتجه $h_N^L$ (بحجم $[1 \times d]$) إلى متجه بحجم $[1 \times |V|]$. غالباً ما نستخدم نفس أوزان مصفوفة التضمين الأصلية $E^T$، وهو ما يسمى <b><span class="smart-term" data-term-en="Weight Tying" data-ar="ربط الأوزان" data-en-def="The practice of sharing the same weight matrix for both the input embedding and the output unembedding layers.">ربط الأوزان<span class="smart-term-tooltip"></span></span> (Weight Tying)</b>.</li><li><b>اللوجيتس (Logits - $u$):</b> المتجه الناتج هو متجه درجات (Score vector)، درجة واحدة لكل كلمة محتملة في المفردات.</li><li><b>Softmax:</b> تحول دالة Softmax اللوجيتس إلى احتمالات (تتراوح بين 0 و 1 ومجموعها 1).</li></ol></template>
+    <template class="content-en"><p>The <b>Language Model Head</b> takes the output from the final transformer layer ($h_N^L$) and outputs a distribution over the vocabulary $V$.</p><ol><li><b><span class="smart-term" data-term-en="Unembedding Layer" data-ar="طبقة فك التضمين" data-en-def="The linear layer that maps the model&#x27;s internal hidden state back to the vocabulary space.">Unembedding Layer<span class="smart-term-tooltip"></span></span>:</b> A linear layer that projects from $h_N^L$ (shape $[1 \times d]$) to a logit vector of shape $[1 \times |V|]$. We often use the same weights as the original embedding matrix $E^T$, a practice called <b><span class="smart-term" data-term-en="Weight Tying" data-ar="ربط الأوزان" data-en-def="The practice of sharing the same weight matrix for both the input embedding and the output unembedding layers.">Weight Tying<span class="smart-term-tooltip"></span></span></b>.</li><li><b><span class="smart-term" data-term-en="Logits" data-ar="اللوجيتس (الدرجات الخام)" data-en-def="The raw, unnormalized scores output by the last linear layer before applying softmax.">Logits<span class="smart-term-tooltip"></span></span> ($u$):</b> The resulting vector is a score vector, one score for each possible word in the vocabulary.</li><li><b>Softmax:</b> Turns the logits into probabilities over the vocabulary.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم ربط الأوزان (Weight Tying)؟ مصفوفة التضمين $E$ تحول الكلمات إلى متجهات $d$-أبعاد. مصفوفة فك التضمين تفعل العكس تماماً. نظراً لأن المفردات $|V|$ عادة ما تكون ضخمة جداً (مثلاً 50,000)، فإن ربط الأوزان يوفر ملايين المعلمات، مما يقلل من خطر فرط التخصيص (Overfitting) ويسرع التدريب.</p></template>
+    <template class="content-en"><p>Why use Weight Tying? The embedding matrix $E$ maps words to $d$-dimensional vectors. The unembedding matrix does the exact opposite. Since the vocabulary size $|V|$ is usually huge (e.g., 50,000), tying the weights saves millions of parameters, reducing overfitting and speeding up training.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات حساب اللوجيتس (u) باستخدام مصفوفة فك التضمين، ثم تحويلها إلى احتمالات (y) باستخدام Softmax.</strong></template>
+      <template class="content-en"><strong>Equations for calculating logits (u) using the unembedding matrix, then converting to probabilities (y) using softmax.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$u = h_N^L E^T \\ y = \text{softmax}(u)$$</div>
+  </div>
+
+  <!-- DIAGRAM[6]: SVG diagram of the Language Modeling Head. Show input h_N^L (1 x d) going into a trapezoid labeled 'Unembedding layer = E^T'. The output is a vector of Logits (u1, u2 ... u|V|) of size 1 x |V|. This goes into a green box labeled 'Softmax over vocabulary V', which outputs Word probabilities (y1, y2 ... y|V|). -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg viewBox="0 0 800 640" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Input Section -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Final Hidden State h<tspan baseline-shift="sub" font-size="12">N</tspan><tspan baseline-shift="super" font-size="12">L</tspan></text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">الحالة المخفية النهائية h<tspan baseline-shift="sub" font-size="12">N</tspan><tspan baseline-shift="super" font-size="12">L</tspan></text>
+    
+    <rect x="300" y="55" width="200" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="81" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-family="monospace">[h<tspan baseline-shift="sub" font-size="12">1</tspan>, h<tspan baseline-shift="sub" font-size="12">2</tspan>, ..., h<tspan baseline-shift="sub" font-size="12">d</tspan>]</text>
+
+    <!-- Arrow 1 -->
+    <line x1="400" y1="95" x2="400" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="415" y="125" text-anchor="start" fill="var(--brand-ink)" font-size="14" font-family="monospace" font-weight="bold">[1 × d]</text>
+
+    <!-- Unembedding Trapezoid -->
+    <polygon points="300,145 500,145 650,245 150,245" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="190" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Unembedding Layer (E<tspan baseline-shift="super" font-size="12">T</tspan>)</text>
+    <text x="400" y="190" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">طبقة فك التضمين (E<tspan baseline-shift="super" font-size="12">T</tspan>)</text>
+    <text x="400" y="215" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14">Weight Tying</text>
+    <text x="400" y="215" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14">ربط الأوزان</text>
+
+    <!-- Arrow 2 -->
+    <line x1="400" y1="245" x2="400" y2="290" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="415" y="275" text-anchor="start" fill="var(--brand-ink)" font-size="14" font-family="monospace" font-weight="bold">[1 × |V|]</text>
+
+    <!-- Logits Section -->
+    <text x="400" y="310" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Logits (u)</text>
+    <text x="400" y="310" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">اللوجيتس (u)</text>
+    
+    <rect x="150" y="325" width="500" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="351" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-family="monospace">[u<tspan baseline-shift="sub" font-size="12">1</tspan>, u<tspan baseline-shift="sub" font-size="12">2</tspan>, ..., u<tspan baseline-shift="sub" font-size="12">|V|</tspan>]</text>
+
+    <!-- Arrow 3 -->
+    <line x1="400" y1="365" x2="400" y2="410" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="415" y="395" text-anchor="start" fill="var(--brand-ink)" font-size="14" font-family="monospace" font-weight="bold">[1 × |V|]</text>
+
+    <!-- Softmax Section -->
+    <rect x="200" y="415" width="400" height="60" rx="8" fill="url(#brandGrad)" />
+    <text x="400" y="451" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">Softmax over vocabulary V</text>
+    <text x="400" y="451" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">دالة Softmax على المفردات V</text>
+
+    <!-- Arrow 4 -->
+    <line x1="400" y1="475" x2="400" y2="520" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="415" y="505" text-anchor="start" fill="var(--brand-ink)" font-size="14" font-family="monospace" font-weight="bold">[1 × |V|]</text>
+
+    <!-- Probabilities Section -->
+    <rect x="150" y="525" width="500" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="551" text-anchor="middle" fill="var(--text-secondary)" font-size="16" font-family="monospace">[y<tspan baseline-shift="sub" font-size="12">1</tspan>, y<tspan baseline-shift="sub" font-size="12">2</tspan>, ..., y<tspan baseline-shift="sub" font-size="12">|V|</tspan>]</text>
+    
+    <text x="400" y="595" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Word Probabilities (y)</text>
+    <text x="400" y="595" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">احتمالات الكلمات (y)</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان حجم القاموس 30,000 وبعد النموذج (d) هو 1024، كم عدد المعلمات التي نوفرها باستخدام 'ربط الأوزان'؟</template>
+      <template class="content-en">If the vocabulary size is 30,000 and the model dimension (d) is 1024, how many parameters do we save by using 'weight tying'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نوفر 30,000 × 1024 = 30,720,000 معلمة (حوالي 30 مليون معلمة).</p></template>
+      <template class="content-en"><p>We save 30,000 × 1024 = 30,720,000 parameters (roughly 30 million parameters).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في قلب ثورة الذكاء الاصطناعي: المحولات (Transformers). تخيلوا أننا بدأنا بنماذج تعطي الكلمة معنى واحداً ثابتاً (مثل Word2Vec)، لكننا أدركنا أن كلمة 'بنك' تختلف إذا كانت بجوار 'نهر' أو 'أموال'. هنا وُلد 'التضمين السياقي'. كيف نبنيه؟ عبر 'آلية الانتباه'. تخيل كل كلمة كباحث (Query) يسأل الكلمات الأخرى (Keys) عن معلوماتها (Values). ولأن لغتنا معقدة، احتجنا لعدة باحثين في نفس الوقت (Multi-head Attention). وضعنا كل هذا في 'كتل' (Blocks) متراصة، وربطناها بـ 'تيار متبقي' (Residual Stream) لضمان عدم ضياع المعلومات في الأعماق. ولأننا نحب السرعة، جمعنا كل الكلمات في مصفوفة واحدة للحساب المتوازي، لكننا وضعنا 'قناعاً' (Mask) لنمنع النموذج من استراق النظر للمستقبل أثناء التدريب. أخيراً، أضفنا 'التضمين الموضعي' لأن الانتباه أعمى عن الترتيب، ووضعنا 'رأس نمذجة اللغة' في النهاية ليترجم كل هذا الجهد إلى احتمالات للكلمة القادمة. ركزوا على فهم Q, K, V، ولماذا نستخدم القناع، وكيف يعمل التيار المتبقي. بالتوفيق في الامتحان!</template>
+    <template class="content-en">Welcome to the heart of the AI revolution: Transformers. We started with models that gave words a single static meaning, but realized 'bank' means different things next to 'river' vs 'money'. Enter 'Contextual Embeddings'. How do we build them? 'Attention'. Imagine each word as a searcher (Query) asking other words (Keys) for their info (Values). Because language is complex, we need multiple searchers simultaneously (Multi-head Attention). We stacked these into Blocks, connected by a 'Residual Stream' so information doesn't get lost in deep networks. For speed, we packed everything into matrices for parallel computation, but added a 'Mask' to stop the model from peeking at the future during training. Finally, we added 'Position Embeddings' because attention is order-blind, and capped it with a 'Language Modeling Head' to turn our hard work into next-word probabilities. Focus on Q, K, V, the purpose of the mask, and the residual stream for the exam. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل التضمين السياقي على التضمين الثابت؟</template>
+          <template class="content-en">Why do we prefer contextual embeddings over static embeddings?</template>
+          <span class="content-target">لماذا نفضل التضمين السياقي على التضمين الثابت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التضمين الثابت لا يستطيع التعامل مع تعدد المعاني (Polysemy). التضمين السياقي يغير متجه الكلمة ديناميكياً بناءً على الكلمات المحيطة بها، مما يعطي تمثيلاً دقيقاً للمعنى في سياقه.</template>
+          <template class="content-en">Because static embeddings cannot handle polysemy. Contextual embeddings dynamically change a word's vector based on surrounding words, giving an accurate representation of meaning in context.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح أدوار Q و K و V ببساطة.</template>
+          <template class="content-en">Explain the roles of Q, K, and V simply.</template>
+          <span class="content-target">اشرح أدوار Q و K و V ببساطة.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تخيل محرك بحث: الاستعلام (Q) هو ما تكتبه للبحث. المفتاح (K) هو عناوين المقالات المتاحة. القيمة (V) هي محتوى المقال الفعلي الذي ستحصل عليه إذا تطابق Q مع K.</template>
+          <template class="content-en">Imagine a search engine: The Query (Q) is what you type to search. The Key (K) is the available article titles. The Value (V) is the actual article content you get if Q matches K.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهدف من القسمة على $\sqrt{d_k}$ في معادلة الانتباه؟</template>
+          <template class="content-en">What is the purpose of dividing by $\sqrt{d_k}$ in the attention equation?</template>
+          <span class="content-target">ما هو الهدف من القسمة على $\sqrt{d_k}$ في معادلة الانتباه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لمنع ناتج الجداء النقطي من أن يصبح كبيراً جداً، مما يؤدي إلى تشبع دالة Softmax وتلاشي التدرجات (Vanishing Gradients) أثناء التدريب.</template>
+          <template class="content-en">To prevent the dot product from becoming too large, which would saturate the Softmax function and cause vanishing gradients during training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التيار المتبقي (Residual Stream) ولماذا هو مهم؟</template>
+          <template class="content-en">What is the Residual Stream and why is it important?</template>
+          <span class="content-target">ما هو التيار المتبقي (Residual Stream) ولماذا هو مهم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو مسار يمر عبر جميع طبقات المحول حيث يتم إضافة مخرجات الطبقات إلى المدخلات ($x + f(x)$). هو مهم لأنه يمنع تلاشي التدرجات ويسمح بتدريب شبكات عميقة جداً.</template>
+          <template class="content-en">It's a pathway through all transformer layers where layer outputs are added to inputs ($x + f(x)$). It's crucial because it prevents vanishing gradients and allows training very deep networks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم تطبيع الطبقة (Layer Norm)؟</template>
+          <template class="content-en">Why do we use Layer Normalization?</template>
+          <span class="content-target">لماذا نستخدم تطبيع الطبقة (Layer Norm)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">للحفاظ على استقرار القيم داخل الشبكة (منعها من الانفجار أو التلاشي) عن طريق ضبط المتوسط والتباين، مما يسرع ويثبت عملية التدريب.</template>
+          <template class="content-en">To keep values stable inside the network (preventing them from exploding or vanishing) by adjusting mean and variance, which speeds up and stabilizes training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نقوم بتسريع حساب الانتباه لجميع الكلمات في الجملة؟</template>
+          <template class="content-en">How do we speed up attention computation for all words in a sentence?</template>
+          <span class="content-target">كيف نقوم بتسريع حساب الانتباه لجميع الكلمات في الجملة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق تجميع متجهات جميع الكلمات في مصفوفة واحدة $X$، ثم استخدام عمليات ضرب المصفوفات ($Q = XW^Q$) لحساب الانتباه للجميع في خطوة واحدة متوازية.</template>
+          <template class="content-en">By packing all word vectors into a single matrix $X$, then using matrix multiplication ($Q = XW^Q$) to compute attention for everyone in one parallel step.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم القناع (Mask) في الانتباه الذاتي؟</template>
+          <template class="content-en">Why do we use a Mask in self-attention?</template>
+          <span class="content-target">لماذا نستخدم القناع (Mask) في الانتباه الذاتي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في نمذجة اللغة، يجب أن يتنبأ النموذج بالكلمة التالية دون رؤيتها. القناع (بإضافة $-\infty$) يضمن أن الكلمة الحالية لا يمكنها 'الانتباه' للكلمات التي تأتي بعدها.</template>
+          <template class="content-en">In language modeling, the model must predict the next word without seeing it. The mask (adding $-\infty$) ensures the current word cannot 'attend' to words that come after it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى التضمين الموضعي (Position Embeddings)؟</template>
+          <template class="content-en">Why do we need Position Embeddings?</template>
+          <span class="content-target">لماذا نحتاج إلى التضمين الموضعي (Position Embeddings)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن آلية الانتباه تعامل الكلمات كمجموعة (Set) ولا تهتم بترتيبها. التضمين الموضعي يضيف معلومات عن مكان الكلمة في الجملة ليميز النموذج بين 'أكل الكلب' و 'الكلب أكل'.</template>
+          <template class="content-en">Because the attention mechanism treats words as a set and ignores order. Position embeddings add information about a word's location so the model can distinguish 'dog ate' from 'ate dog'.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة رأس نمذجة اللغة (Language Modeling Head)؟</template>
+          <template class="content-en">What is the function of the Language Modeling Head?</template>
+          <span class="content-target">ما هي وظيفة رأس نمذجة اللغة (Language Modeling Head)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يأخذ التمثيل المخفي النهائي من المحول ويحوله (عبر طبقة خطية و Softmax) إلى توزيع احتمالي يغطي كل كلمة في القاموس للتنبؤ بالكلمة التالية.</template>
+          <template class="content-en">It takes the final hidden representation from the transformer and converts it (via a linear layer and Softmax) into a probability distribution over the entire vocabulary to predict the next word.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو 'ربط الأوزان' (Weight Tying) في رأس نمذجة اللغة ولماذا نستخدمه؟</template>
+          <template class="content-en">What is 'Weight Tying' in the language modeling head and why use it?</template>
+          <span class="content-target">ما هو 'ربط الأوزان' (Weight Tying) في رأس نمذجة اللغة ولماذا نستخدمه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو استخدام نفس مصفوفة الأوزان لطبقة التضمين الأولى وطبقة فك التضمين الأخيرة. نستخدمه لأنه يوفر ملايين المعلمات، مما يقلل من فرط التخصيص ويسرع التدريب.</template>
+          <template class="content-en">It is using the same weight matrix for the initial embedding layer and the final unembedding layer. We use it because it saves millions of parameters, reducing overfitting and speeding up training.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو التضمين الثابت (Static Embedding)؟",
+      "en": "What is a Static Embedding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل للكلمة بمتجه لا يتغير بغض النظر عن السياق الذي تظهر فيه الكلمة.",
+        "en": "A word representation with a vector that does not change regardless of the context the word appears in."
+      },
+      "example": {
+        "ar": "نماذج مثل Word2Vec.",
+        "en": "Models like Word2Vec."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو التضمين السياقي (Contextual Embedding)؟",
+      "en": "What is a Contextual Embedding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل للكلمة بمتجه يتغير ديناميكياً ليعكس معناها بناءً على الكلمات المحيطة بها.",
+        "en": "A word representation with a vector that dynamically changes to reflect its meaning based on surrounding words."
+      },
+      "example": {
+        "ar": "التمثيلات داخل نموذج المحول (Transformer).",
+        "en": "Representations inside a Transformer model."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي آلية الانتباه (Attention)؟",
+      "en": "What is the Attention mechanism?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لحساب تضمين الكلمة عن طريق دمج المعلومات بشكل انتقائي من الكلمات المجاورة (مجموع موزون).",
+        "en": "A method for computing a word's embedding by selectively integrating information from neighboring words (a weighted sum)."
+      },
+      "example": {
+        "ar": "جعل الضمير 'it' ينتبه أكثر لكلمة 'chicken' في الجملة.",
+        "en": "Making the pronoun 'it' attend more to the word 'chicken' in a sentence."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "في آلية الانتباه، ما هو الاستعلام (Query)؟",
+      "en": "In attention, what is the Query (Q)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل للعنصر الحالي الذي يبحث عن معلومات ذات صلة في المدخلات السابقة.",
+        "en": "The representation of the current element looking for relevant information in preceding inputs."
+      },
+      "example": {
+        "ar": "مثل الكلمة التي تكتبها في محرك البحث.",
+        "en": "Like the search term you type into a search engine."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "في آلية الانتباه، ما هو المفتاح (Key)؟",
+      "en": "In attention, what is the Key (K)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تمثيل لمدخل سابق يتم مقارنته بالاستعلام لتحديد مدى التشابه (الصلة).",
+        "en": "A representation of a preceding input compared to the query to determine similarity (relevance)."
+      },
+      "example": {
+        "ar": "مثل عناوين الصفحات في نتائج محرك البحث.",
+        "en": "Like the page titles in search engine results."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "في آلية الانتباه، ما هي القيمة (Value)؟",
+      "en": "In attention, what is the Value (V)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المعلومات الفعلية للعنصر السابق التي يتم وزنها وجمعها لإنشاء المخرج النهائي.",
+        "en": "The actual information of a preceding element that gets weighted and summed to create the final output."
+      },
+      "example": {
+        "ar": "مثل محتوى الصفحة الفعلي في محرك البحث.",
+        "en": "Like the actual page content in a search engine."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "لماذا نقسم درجة الانتباه على الجذر التربيعي للبعد ($\\sqrt{d_k}$)؟",
+      "en": "Why do we divide the attention score by the square root of the dimension ($\\sqrt{d_k}$)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لمنع قيم الجداء النقطي من أن تصبح كبيرة جداً، مما يؤدي إلى تدرجات شبه معدومة (Vanishing gradients) في دالة Softmax.",
+        "en": "To prevent dot product values from growing too large, which causes vanishing gradients in the softmax function."
+      },
+      "example": {
+        "ar": "بدون القسمة، ستكون مخرجات Softmax قريبة جداً من 1 لعنصر واحد و 0 للبقية.",
+        "en": "Without it, softmax outputs would be very close to 1 for one element and 0 for the rest."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو الانتباه متعدد الرؤوس (Multi-head Attention)؟",
+      "en": "What is Multi-head Attention?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام عدة آليات انتباه بالتوازي، مما يسمح للنموذج بالتركيز على أنواع مختلفة من السياقات والعلاقات في نفس الوقت.",
+        "en": "Using multiple attention mechanisms in parallel, allowing the model to focus on different types of contexts and relationships simultaneously."
+      },
+      "example": {
+        "ar": "رأس يركز على القواعد، ورأس آخر يركز على المعنى.",
+        "en": "One head focusing on grammar, another on meaning."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو التيار المتبقي (Residual Stream) في المحول؟",
+      "en": "What is the Residual Stream in a transformer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المسار المباشر الذي تمر عبره الرموز، حيث يتم إضافة مخرجات الطبقات (مثل الانتباه) إلى المدخلات الأصلية.",
+        "en": "The direct path tokens pass through, where layer outputs (like attention) are added back to the original inputs."
+      },
+      "example": {
+        "ar": "$x_{i+1} = x_i + \\text{Layer}(x_i)$",
+        "en": "$x_{i+1} = x_i + \\text{Layer}(x_i)$"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو الغرض من تطبيع الطبقة (Layer Norm)؟",
+      "en": "What is the purpose of Layer Norm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيع المتجه في الطبقة المخفية (تعديل المتوسط والتباين) لاستقرار وتسريع عملية التدريب.",
+        "en": "Normalizing the vector in a hidden layer (adjusting mean and variance) to stabilize and speed up training."
+      },
+      "example": {
+        "ar": "تطبيق تغيير z-score على متجه واحد.",
+        "en": "Applying a z-score variation to a single vector."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "كيف نقوم بموازاة (Parallelize) حساب الانتباه؟",
+      "en": "How do we parallelize attention computation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق تجميع كل رموز الإدخال في مصفوفة واحدة $X$ واستخدام ضرب المصفوفات ($Q K^T$).",
+        "en": "By packing all input tokens into a single matrix $X$ and using matrix multiplication ($Q K^T$)."
+      },
+      "example": {
+        "ar": "$Q = X W^Q$",
+        "en": "$Q = X W^Q$"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو إخفاء المستقبل (Masking) في الانتباه؟",
+      "en": "What is Masking in attention?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إضافة $-\\infty$ إلى المثلث العلوي لمصفوفة الانتباه لمنع النموذج من رؤية الكلمات المستقبلية أثناء التنبؤ.",
+        "en": "Adding $-\\infty$ to the upper triangle of the attention matrix to prevent the model from seeing future words during prediction."
+      },
+      "example": {
+        "ar": "يضمن أن الكلمة في الموضع $i$ يمكنها الانتباه فقط للكلمات من $1$ إلى $i$.",
+        "en": "Ensures word at position $i$ can only attend to words $1$ to $i$."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو تضمين الرمز (Token Embedding)؟",
+      "en": "What is a Token Embedding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متجه يمثل المعنى الأساسي للكلمة، يتم استخراجه من مصفوفة مفردات $E$.",
+        "en": "A vector representing the base meaning of a word, retrieved from a vocabulary matrix $E$."
+      },
+      "example": {
+        "ar": "الصف رقم 4000 في المصفوفة $E$ يمثل كلمة 'long'.",
+        "en": "Row 4000 in matrix $E$ represents the word 'long'."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو التضمين الموضعي (Position Embedding)؟",
+      "en": "What is a Position Embedding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متجه يضاف إلى تضمين الرمز لإعطاء النموذج معلومات حول موقع الكلمة في الجملة.",
+        "en": "A vector added to the token embedding to give the model information about the word's location in the sentence."
+      },
+      "example": {
+        "ar": "تضمين خاص للموضع رقم 3 في الجملة.",
+        "en": "A specific embedding for position 3 in the sentence."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي طبقة فك التضمين (Unembedding Layer)؟",
+      "en": "What is the Unembedding Layer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طبقة خطية في رأس نمذجة اللغة تقوم بتحويل الحالة المخفية النهائية إلى متجه بحجم القاموس (Logits).",
+        "en": "A linear layer in the language modeling head that projects the final hidden state to a vocabulary-sized vector (Logits)."
+      },
+      "example": {
+        "ar": "غالباً ما تستخدم مصفوفة التضمين المنقولة $E^T$.",
+        "en": "Often uses the transposed embedding matrix $E^T$."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو ربط الأوزان (Weight Tying)؟",
+      "en": "What is Weight Tying?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام نفس مصفوفة الأوزان لطبقة التضمين (المدخلات) وطبقة فك التضمين (المخرجات) لتقليل عدد المعلمات.",
+        "en": "Using the same weight matrix for both the input embedding and output unembedding layers to reduce parameters."
+      },
+      "example": {
+        "ar": "استخدام $E$ للتضمين و $E^T$ لفك التضمين.",
+        "en": "Using $E$ for embedding and $E^T$ for unembedding."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هي اللوجيتس (Logits) في رأس نمذجة اللغة؟",
+      "en": "What are Logits in the language modeling head?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متجه من الدرجات الخام (غير المطبعة)، درجة واحدة لكل كلمة محتملة في القاموس.",
+        "en": "A vector of raw (unnormalized) scores, one score for each possible word in the vocabulary."
+      },
+      "example": {
+        "ar": "المتجه $u$ قبل تمريره إلى دالة Softmax.",
+        "en": "The vector $u$ before passing to the Softmax function."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية في التضمين الثابت (مثل Word2Vec) التي يحلها المحول؟",
+      "en": "What is the main problem with static embeddings (like Word2Vec) that the transformer solves?"
+    },
+    "options": {
+      "ar": [
+        "أنها بطيئة جداً في التدريب.",
+        "أنها لا تعكس كيف يتغير معنى الكلمة في سياقات مختلفة.",
+        "أنها تتطلب مساحة تخزين هائلة.",
+        "أنها لا تستطيع التعامل مع الكلمات خارج القاموس (OOV)."
+      ],
+      "en": [
+        "They are too slow to train.",
+        "They do not reflect how a word's meaning changes in different contexts.",
+        "They require massive storage space.",
+        "They cannot handle out-of-vocabulary (OOV) words."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التضمين الثابت يعطي متجهاً واحداً للكلمة بغض النظر عن سياقها، بينما المحولات تستخدم الانتباه لإنشاء تضمين سياقي ديناميكي.",
+      "en": "Static embeddings give one vector per word regardless of context, while transformers use attention to create dynamic contextual embeddings."
+    },
+    "hint": {
+      "ar": "تذكر مثال الدجاجة والشارع والضمير 'it'.",
+      "en": "Remember the chicken, the road, and the pronoun 'it' example."
+    },
+    "difficulty": "easy",
+    "conceptId": "contextual-vs-static-embeddings"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في آلية الانتباه، أي متجه يمثل 'العنصر الحالي الذي يتم مقارنته بالمدخلات السابقة'؟",
+      "en": "In the attention mechanism, which vector represents 'the current element being compared to the preceding inputs'?"
+    },
+    "options": {
+      "ar": [
+        "المفتاح (Key)",
+        "القيمة (Value)",
+        "الاستعلام (Query)",
+        "التيار المتبقي (Residual)"
+      ],
+      "en": [
+        "Key",
+        "Value",
+        "Query",
+        "Residual"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الاستعلام (Query) هو ما نستخدمه للبحث عن المعلومات ذات الصلة في الكلمات الأخرى (المفاتيح).",
+      "en": "The Query is what we use to search for relevant information in other words (Keys)."
+    },
+    "hint": {
+      "ar": "فكر في كيفية عمل محرك البحث.",
+      "en": "Think about how a search engine works."
+    },
+    "difficulty": "medium",
+    "conceptId": "attention-mechanism-qkv"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا نقوم بالقسمة على $\\sqrt{d_k}$ عند حساب درجات الانتباه؟",
+      "en": "Why do we divide by $\\sqrt{d_k}$ when calculating attention scores?"
+    },
+    "options": {
+      "ar": [
+        "لتقليل حجم النموذج.",
+        "لمنع قيم الجداء النقطي من التسبب في تدرجات معدومة في دالة Softmax.",
+        "لتحويل القيم إلى احتمالات.",
+        "لإضافة اللاخطية إلى النموذج."
+      ],
+      "en": [
+        "To reduce the model size.",
+        "To prevent dot product values from causing vanishing gradients in the softmax function.",
+        "To convert values into probabilities.",
+        "To add non-linearity to the model."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القيم الكبيرة جداً تجعل دالة Softmax تتشبع، مما يؤدي إلى تدرجات صغيرة جداً تعيق التعلم. القسمة على $\\sqrt{d_k}$ تحل هذه المشكلة.",
+      "en": "Very large values cause the softmax function to saturate, leading to extremely small gradients that hinder learning. Dividing by $\\sqrt{d_k}$ solves this."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر باستقرار عملية التدريب ودالة Softmax.",
+      "en": "It relates to training stability and the Softmax function."
+    },
+    "difficulty": "hard",
+    "conceptId": "attention-mechanism-qkv"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الغرض من إضافة $-\\infty$ إلى المثلث العلوي لمصفوفة الانتباه (Masking)؟",
+      "en": "What is the purpose of adding $-\\infty$ to the upper triangle of the attention matrix (Masking)?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عملية ضرب المصفوفات.",
+        "لمنع النموذج من الانتباه إلى الكلمات المستقبلية أثناء التنبؤ.",
+        "لإجبار النموذج على نسيان الكلمات القديمة جداً.",
+        "لتقليل استهلاك الذاكرة."
+      ],
+      "en": [
+        "To speed up matrix multiplication.",
+        "To prevent the model from attending to future words during prediction.",
+        "To force the model to forget very old words.",
+        "To reduce memory consumption."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في نمذجة اللغة، يجب أن يتنبأ النموذج بالكلمة التالية بناءً على الماضي فقط. القناع يضمن أن الكلمات المستقبلية تحصل على وزن 0 بعد تطبيق Softmax.",
+      "en": "In language modeling, the model must predict the next word based only on the past. The mask ensures future words get a weight of 0 after softmax."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا عرفت الإجابة قبل أن تخمن؟",
+      "en": "What happens if you know the answer before you guess?"
+    },
+    "difficulty": "medium",
+    "conceptId": "parallelizing-attention-masking"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف يتم دمج معلومات الموضع (Position) مع معلومات الكلمة (Token) في المحول؟",
+      "en": "How is position information combined with token information in a transformer?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق ضرب المتجهين معاً.",
+        "عن طريق دمج (Concatenate) المتجهين.",
+        "عن طريق جمع (Add) المتجهين معاً.",
+        "عن طريق تمريرهما عبر شبكة عصبية منفصلة."
+      ],
+      "en": [
+        "By multiplying the two vectors together.",
+        "By concatenating the two vectors.",
+        "By adding the two vectors together.",
+        "By passing them through a separate neural network."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم إنشاء التضمين النهائي بجمع تضمين الرمز وتضمين الموضع ($X = \\text{Word} + \\text{Position}$).",
+      "en": "The final embedding is created by adding the token embedding and the position embedding ($X = \\text{Word} + \\text{Position}$)."
+    },
+    "hint": {
+      "ar": "العملية تحافظ على نفس البعد $d$.",
+      "en": "The operation keeps the same dimension $d$."
+    },
+    "difficulty": "easy",
+    "conceptId": "token-and-position-embeddings"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي وظيفة طبقة فك التضمين (Unembedding Layer) في رأس نمذجة اللغة؟",
+      "en": "What is the function of the Unembedding Layer in the language modeling head?"
+    },
+    "options": {
+      "ar": [
+        "تحويل الكلمات إلى متجهات.",
+        "إسقاط الحالة المخفية النهائية إلى متجه بحجم القاموس (Logits).",
+        "حساب الانتباه بين الكلمة الأخيرة والكلمات السابقة.",
+        "تطبيع المخرجات لتسريع التدريب."
+      ],
+      "en": [
+        "Converting words into vectors.",
+        "Projecting the final hidden state to a vocabulary-sized vector (Logits).",
+        "Calculating attention between the last word and previous words.",
+        "Normalizing the outputs to speed up training."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "طبقة فك التضمين تأخذ المخرج النهائي للمحول (بحجم $d$) وتحوله إلى درجات (Logits) لكل كلمة في القاموس (بحجم $|V|$).",
+      "en": "The unembedding layer takes the final transformer output (size $d$) and converts it into scores (Logits) for every word in the vocabulary (size $|V|$)."
+    },
+    "hint": {
+      "ar": "إنها تفعل عكس ما تفعله طبقة التضمين الأولى.",
+      "en": "It does the exact opposite of the initial embedding layer."
+    },
+    "difficulty": "medium",
+    "conceptId": "language-modeling-head"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو مصطلح 'ربط الأوزان' (Weight Tying) في سياق المحولات؟",
+      "en": "What does the term 'Weight Tying' mean in the context of transformers?"
+    },
+    "options": {
+      "ar": [
+        "ربط أوزان الانتباه ببعضها البعض.",
+        "استخدام نفس الأوزان لجميع طبقات المحول.",
+        "استخدام نفس مصفوفة الأوزان لطبقة التضمين وطبقة فك التضمين.",
+        "ربط أوزان الشبكة الأمامية بأوزان الانتباه."
+      ],
+      "en": [
+        "Tying attention weights to each other.",
+        "Using the same weights for all transformer layers.",
+        "Using the same weight matrix for the embedding and unembedding layers.",
+        "Tying feedforward weights to attention weights."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ربط الأوزان يعني استخدام مصفوفة التضمين $E$ كمنقول $E^T$ في طبقة فك التضمين، مما يوفر ملايين المعلمات.",
+      "en": "Weight tying means using the embedding matrix $E$ as its transpose $E^T$ in the unembedding layer, saving millions of parameters."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بتقليل عدد المعلمات بين المدخلات والمخرجات.",
+      "en": "It's about reducing the number of parameters between input and output."
+    },
+    "difficulty": "medium",
+    "conceptId": "language-modeling-head"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من المكونات التالية يضيف اللاخطية (Non-linearity) داخل كتلة المحول (Transformer Block)؟",
+      "en": "Which of the following components adds non-linearity inside a Transformer Block?"
+    },
+    "options": {
+      "ar": [
+        "الانتباه متعدد الرؤوس (Multi-Head Attention)",
+        "تطبيع الطبقة (Layer Norm)",
+        "التيار المتبقي (Residual Stream)",
+        "شبكة التغذية الأمامية (Feedforward Network)"
+      ],
+      "en": [
+        "Multi-Head Attention",
+        "Layer Norm",
+        "Residual Stream",
+        "Feedforward Network"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "شبكة التغذية الأمامية (FFN) تحتوي على دوال تنشيط لاخطية (مثل ReLU) تطبق على كل رمز بشكل مستقل.",
+      "en": "The Feedforward Network (FFN) contains non-linear activation functions (like ReLU) applied to each token independently."
+    },
+    "hint": {
+      "ar": "ابحث عن المكون الذي يحتوي على دالة ReLU.",
+      "en": "Look for the component that contains a ReLU function."
+    },
+    "difficulty": "medium",
+    "conceptId": "transformer-blocks"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي نتيجة تطبيق دالة Softmax على متجه يحتوي على القيمة $-\\infty$؟",
+      "en": "What is the result of applying the Softmax function to a vector containing the value $-\\infty$?"
+    },
+    "options": {
+      "ar": [
+        "تصبح القيمة 1.",
+        "تصبح القيمة 0.",
+        "تصبح القيمة سالبة.",
+        "يحدث خطأ رياضي."
+      ],
+      "en": [
+        "The value becomes 1.",
+        "The value becomes 0.",
+        "The value becomes negative.",
+        "A mathematical error occurs."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة Softmax تستخدم الدالة الأسية ($e^x$). وبما أن $e^{-\\infty} = 0$، فإن الوزن الناتج سيكون صفراً.",
+      "en": "The Softmax function uses the exponential function ($e^x$). Since $e^{-\\infty} = 0$, the resulting weight will be zero."
+    },
+    "hint": {
+      "ar": "تذكر خصائص الدالة الأسية.",
+      "en": "Remember the properties of the exponential function."
+    },
+    "difficulty": "easy",
+    "conceptId": "parallelizing-attention-masking"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف يمكننا رؤية دور رؤوس الانتباه بالنسبة للتيار المتبقي (Residual Stream)؟",
+      "en": "How can we view the role of attention heads relative to the residual stream?"
+    },
+    "options": {
+      "ar": [
+        "إنها تستبدل التيار المتبقي بالكامل.",
+        "إنها تقوم بتصفية التيار المتبقي وحذف المعلومات غير المهمة.",
+        "إنها تقرأ المعلومات من رموز أخرى وتكتبها (تضيفها) إلى التيار المتبقي للرمز الحالي.",
+        "إنها تقوم بتطبيع التيار المتبقي."
+      ],
+      "en": [
+        "They completely replace the residual stream.",
+        "They filter the residual stream and delete unimportant information.",
+        "They read information from other tokens and write (add) it into the current token's residual stream.",
+        "They normalize the residual stream."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "كما أوضح Elhage et al. (2021)، الانتباه ينقل المعلومات حرفياً من التيار المتبقي لرمز مجاور إلى التيار الحالي.",
+      "en": "As Elhage et al. (2021) showed, attention literally moves information from the residual stream of a neighboring token into the current stream."
+    },
+    "hint": {
+      "ar": "فكر في التيار المتبقي كطريق سريع، والانتباه كسيارات تنقل البضائع من مسار لآخر.",
+      "en": "Think of the residual stream as a highway, and attention as cars moving goods from one lane to another."
+    },
+    "difficulty": "hard",
+    "conceptId": "transformer-blocks"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">من الأخطاء الشائعة الاعتقاد بأن الانتباه يجمع 'المفاتيح' (Keys). الصحيح هو أن الانتباه يحسب التشابه بين الاستعلام والمفتاح، لكنه يجمع 'القيم' (Values) بناءً على هذا التشابه.</template>
+    <template class="content-en">A common mistake is thinking attention sums up the 'Keys'. The truth is attention calculates similarity between Query and Key, but it sums the 'Values' based on that similarity.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التيار المتبقي (Residual Stream) هو المسار الحقيقي للمعلومات في المحول. طبقات الانتباه والشبكات الأمامية لا تقطع هذا المسار، بل تقرأ منه وتضيف إليه (تكتب فيه) فقط.</template>
+    <template class="content-en">The Residual Stream is the true pathway of information in a transformer. Attention and feedforward layers don't interrupt this path; they merely read from it and add (write) to it.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام $-\infty$ في القناع (Mask) عبقري لأنه يستغل طبيعة دالة Softmax. $e^{-\infty} = 0$، مما يضمن أن الكلمات المستقبلية تحصل على وزن 0% تماماً ولا تؤثر على التنبؤ الحالي.</template>
+    <template class="content-en">Using $-\infty$ in the mask is brilliant because it exploits the nature of the Softmax function. $e^{-\infty} = 0$, ensuring future words get exactly 0% weight and don't influence the current prediction.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تنسى لماذا نحتاج إلى التضمين الموضعي (Position Embeddings). تذكر: آلية الانتباه بحد ذاتها لا تعرف ترتيب الكلمات (تعامل الجملة ككيس من الكلمات). بدون التضمين الموضعي، 'أكل الكلب' و 'الكلب أكل' متطابقان للنموذج.</template>
+    <template class="content-en">You might forget why Position Embeddings are needed. Remember: the attention mechanism itself has no sense of word order (it treats a sentence as a bag of words). Without it, 'dog ate' and 'ate dog' are identical to the model.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

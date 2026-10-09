@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS483" data-module="4" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تصنيف النصوص: خوارزمية بايز الساذجة والانحدار اللوجستي · DS483 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS483" data-page-title-en="DS483">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=DS483"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#text-classification-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات تصنيف النصوص</template>
+        <template class="content-en">Text Classification Basics</template>
+        <span class="content-target">أساسيات تصنيف النصوص</span>
+      </a>
+      <a href="#naive-bayes-classifier" class="toc-link" data-bilingual>
+        <template class="content-ar">مصنف بايز الساذج</template>
+        <template class="content-en">Naive Bayes Classifier</template>
+        <span class="content-target">مصنف بايز الساذج</span>
+      </a>
+      <a href="#laplace-smoothing" class="toc-link" data-bilingual>
+        <template class="content-ar">تنعيم لابلاس (إضافة 1)</template>
+        <template class="content-en">Laplace (Add-1) Smoothing</template>
+        <span class="content-target">تنعيم لابلاس (إضافة 1)</span>
+      </a>
+      <a href="#multinomial-naive-bayes-example" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال عملي: بايز الساذجة متعددة الحدود</template>
+        <template class="content-en">Worked Example: Multinomial Naive Bayes</template>
+        <span class="content-target">مثال عملي: بايز الساذجة متعددة الحدود</span>
+      </a>
+      <a href="#evaluating-classifiers-metrics" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم المصنفات: مصفوفة الارتباك والمقاييس</template>
+        <template class="content-en">Evaluating Classifiers: Confusion Matrix &amp; Metrics</template>
+        <span class="content-target">تقييم المصنفات: مصفوفة الارتباك والمقاييس</span>
+      </a>
+      <a href="#micro-vs-macro-averaging" class="toc-link" data-bilingual>
+        <template class="content-ar">التقييم متعدد الفئات: المتوسط الدقيق مقابل المتوسط الشامل</template>
+        <template class="content-en">Multi-class Evaluation: Microaveraging vs Macroaveraging</template>
+        <span class="content-target">التقييم متعدد الفئات: المتوسط الدقيق مقابل المتوسط الشامل</span>
+      </a>
+      <a href="#generative-vs-discriminative" class="toc-link" data-bilingual>
+        <template class="content-ar">المصنفات التوليدية مقابل التمييزية</template>
+        <template class="content-en">Generative vs Discriminative Classifiers</template>
+        <span class="content-target">المصنفات التوليدية مقابل التمييزية</span>
+      </a>
+      <a href="#logistic-regression-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات الانحدار اللوجستي ودالة سيجمويد</template>
+        <template class="content-en">Logistic Regression Basics &amp; Sigmoid Function</template>
+        <span class="content-target">أساسيات الانحدار اللوجستي ودالة سيجمويد</span>
+      </a>
+      <a href="#cross-entropy-loss-gradient-descent" class="toc-link" data-bilingual>
+        <template class="content-ar">خسارة الإنتروبيا المتقاطعة والانحدار التدريجي</template>
+        <template class="content-en">Cross-Entropy Loss &amp; Gradient Descent</template>
+        <span class="content-target">خسارة الإنتروبيا المتقاطعة والانحدار التدريجي</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · DS483
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تصنيف النصوص: خوارزمية بايز الساذجة والانحدار اللوجستي</h1>
+      <p class="hero-description">تغطي هذه الوحدة أساسيات تصنيف النصوص، بدءاً من خوارزمية بايز الساذجة (النماذج التوليدية) وتقنيات التنعيم، مروراً بمقاييس تقييم النماذج (الدقة، الاستدعاء، مقياس F1)، وصولاً إلى الانحدار اللوجستي (النماذج التمييزية) وتحسينها باستخدام الانحدار التدريجي.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Text Classification: Naive Bayes and Logistic Regression</h1>
+      <p class="hero-description">This module covers the fundamentals of text classification, starting with Naive Bayes (generative models) and smoothing techniques, moving through model evaluation metrics (Precision, Recall, F1), and concluding with Logistic Regression (discriminative models) and optimization via Gradient Descent.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معالجة اللغات الطبيعية</span>
+      <span class="tag">تصنيف النصوص</span>
+      <span class="tag">بايز الساذجة</span>
+      <span class="tag">الانحدار اللوجستي</span>
+      <span class="tag">تقييم النماذج</span>
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">NLP</span>
+      <span class="tag">Text Classification</span>
+      <span class="tag">Naive Bayes</span>
+      <span class="tag">Logistic Regression</span>
+      <span class="tag">Model Evaluation</span>
+      <span class="tag">Machine Learning</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح مصنفات بايز الساذجة والانحدار اللوجستي ومناقشة تطبيقاتها في معالجة اللغات الطبيعية.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق خوارزمية بايز الساذجة والانحدار اللوجستي متعدد الفئات على مهام تصنيف النصوص، بما في ذلك تحليل المشاعر.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام تقنيات التنظيم، وخسارة الإنتروبيا المتقاطعة، والانحدار التدريجي لتحسين النموذج.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم نماذج التصنيف باستخدام مقاييس مثل الدقة (Precision)، والاستدعاء (Recall)، ومقياس F (F-measure).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain Naive Bayes and logistic regression classifiers, discussing their applications in NLP.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply Naive Bayes and multinomial logistic regression to text classification tasks, including sentiment analysis.</span></li>
+      <li><span class="obj-icon">✦</span><span>Use regularization techniques, cross-entropy loss, and gradient descent for model optimization.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate classification models with metrics like precision, recall, F-measure, and cross-validation.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="text-classification-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات تصنيف النصوص</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Text Classification Basics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تعيين فئات أو مواضيع محددة مسبقاً لمستند نصي، مثل فرز البريد العشوائي.</p></template>
+    <template class="content-en"><p>The process of assigning predefined categories or topics to a text document, like sorting spam.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرّف تصنيف النصوص بأنه أخذ مستند مدخل (d) ومجموعة ثابتة من الفئات (C = {c1, c2, ..., cJ})، وإخراج فئة متوقعة (c ∈ C).</p><p>تتضمن التطبيقات: اكتشاف البريد العشوائي، تحديد المؤلف، تحديد اللغة، وتحليل المشاعر.</p><p><b>طرق التصنيف:</b></p><ol><li><b>القواعد المبرمجة يدوياً (Hand-coded rules):</b> تعتمد على مجموعات من الكلمات (مثل: إذا احتوى البريد على 'دولارات' فهو عشوائي). دقتها عالية في مجالات محددة، لكن بناءها وصيانتها مكلف، وتتسم بأنها حرفية جداً (دقة عالية، استدعاء منخفض).</li><li><b><span class="smart-term" data-term-en="Supervised Machine Learning" data-ar="التعلم الآلي الخاضع للإشراف" data-en-def="Learning a function that maps an input to an output based on example input-output pairs.">التعلم الآلي الخاضع للإشراف<span class="smart-term-tooltip"></span></span> (Supervised ML):</b> يأخذ مجموعة تدريب من المستندات المصنفة يدوياً لتعلم مصنف (γ: d → c). تشمل الخوارزميات: بايز الساذجة، الانحدار اللوجستي، الشبكات العصبية، وغيرها.</li></ol></template>
+    <template class="content-en"><p>Text classification is defined as taking an input document (d) and a fixed set of classes (C = {c1, c2, ..., cJ}), and outputting a predicted class (c ∈ C).</p><p>Applications include: Spam detection, Authorship identification, Language Identification, and Sentiment analysis.</p><p><b>Classification Methods:</b></p><ol><li><b>Hand-coded rules:</b> Based on combinations of words (e.g., if email has 'dollars' it is spam). Accuracy can be high in specific domains, but building and maintaining them is expensive, and they are too literal (high-precision, low-recall).</li><li><b><span class="smart-term" data-term-en="Supervised Machine Learning" data-ar="التعلم الآلي الخاضع للإشراف" data-en-def="Learning a function that maps an input to an output based on example input-output pairs.">Supervised Machine Learning<span class="smart-term-tooltip"></span></span>:</b> Takes a training set of hand-labeled documents to learn a classifier (γ: d → c). Algorithms include Naive Bayes, Logistic Regression, Neural Networks, etc.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا ننتقل من القواعد اليدوية إلى التعلم الآلي؟ القواعد اليدوية هشة؛ فبمجرد تغير نمط البيانات (مثل تغيير مرسلي البريد العشوائي لكلماتهم)، تنهار القواعد. التعلم الآلي يوفر مرونة وقابلية للتوسع.</p><p>في العصر الحديث، يمكن أيضاً استخدام النماذج اللغوية الكبيرة (LLMs) المدربة مسبقاً كمصنفات، إما عن طريق الضبط الدقيق (Fine-tuning) أو التلقين (Prompting).</p></template>
+    <template class="content-en"><p>Why move from hand-coded rules to ML? Hand-coded rules are brittle; as soon as the data distribution changes (e.g., spammers change their vocabulary), the rules fail. ML provides robustness and scalability.</p><p>In the modern era, pre-trained Large Language Models (LLMs) can also be used as classifiers, either by fine-tuning them or by prompting them to give a classification.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Hand-coded Rules</th><th>Machine Learning</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التكلفة والصيانة</template>
+          <template class="content-en">Cost and Maintenance</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مكلفة وصعبة الصيانة</template>
+          <template class="content-en">Expensive and hard to maintain</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تلقائية وقابلة للتحديث بسهولة</template>
+          <template class="content-en">Automated and easily updatable</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الدقة والاستدعاء</template>
+          <template class="content-en">Precision and Recall</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">دقة عالية، استدعاء منخفض (حرفية جداً)</template>
+          <template class="content-en">High precision, low recall (too literal)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">توازن أفضل بين الدقة والاستدعاء</template>
+          <template class="content-en">Better balance of precision and recall</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون استخدام القواعد المبرمجة يدوياً أفضل من التعلم الآلي في تصنيف النصوص؟</template>
+      <template class="content-en">When might using hand-coded rules be better than machine learning for text classification?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما يكون المجال ضيقاً جداً ومحدداً، وتكون الأخطاء مكلفة للغاية، ولا تتوفر بيانات تدريب كافية لتدريب نموذج تعلم آلي.</p></template>
+      <template class="content-en"><p>When the domain is extremely narrow and specific, errors are highly costly, and there is insufficient training data to train an ML model.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="naive-bayes-classifier" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مصنف بايز الساذج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Naive Bayes Classifier</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تصنيف احتمالية تعتمد على نظرية بايز، وتفترض 'سذاجة' أن ميزات (كلمات) المستند مستقلة عن بعضها البعض.</p></template>
+    <template class="content-en"><p>A probabilistic classification algorithm based on Bayes' theorem, making the 'naive' assumption that document features (words) are independent.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يطبق مصنف بايز الساذج نظرية بايز للعثور على الفئة الأكثر احتمالاً (MAP - Maximum A Posteriori) لمستند معين.</p><p>المعادلة الأساسية: <code>c_MAP = argmax_{c ∈ C} P(d|c)P(c) / P(d)</code></p><p>بما أن <code>P(d)</code> (احتمال المستند) ثابت لجميع الفئات، يمكننا إسقاط المقام.</p><p>يتم تمثيل المستند <code>d</code> كمجموعة من الميزات (الكلمات) <code>x_1, x_2, ..., x_n</code>. تصبح المعادلة:</p><p><code>c_MAP = argmax_{c ∈ C} P(x_1, x_2, ..., x_n | c) P(c)</code></p><p>حيث</p><ul><li><strong><code>P(x_1...x_n | c)</code></strong> هو الاحتمال (Likelihood)،</li><li>و <strong><code>P(c)</code></strong> هو <span class="smart-term" data-term-en="Prior Probability" data-ar="الاحتمال المسبق" data-en-def="The probability of a class occurring, calculated before seeing the document.">الاحتمال المسبق<span class="smart-term-tooltip"></span></span> (Prior).</li></ul></template>
+    <template class="content-en"><p>The Naive Bayes classifier applies Bayes' rule to find the most likely class (MAP - Maximum A Posteriori) for a given document.</p><p>Basic equation: <code>c_MAP = argmax_{c ∈ C} P(d|c)P(c) / P(d)</code></p><p>Since <code>P(d)</code> (the probability of the document) is the same for all classes, we can drop the denominator.</p><p>The document <code>d</code> is represented as a set of features (words) <code>x_1, x_2, ..., x_n</code>. The equation becomes:</p><p><code>c_MAP = argmax_{c ∈ C} P(x_1, x_2, ..., x_n | c) P(c)</code></p><p>Where</p><ul><li><strong><code>P(x_1...x_n | c)</code></strong> is the <span class="smart-term" data-term-en="Likelihood" data-ar="الاحتمالية (الترجيح)" data-en-def="The probability of observing the document&#x27;s features given a specific class.">Likelihood<span class="smart-term-tooltip"></span></span>,</li><li>and <strong><code>P(c)</code></strong> is the Prior.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يسمى 'ساذجاً'؟ لأنه يفترض أن ظهور كلمة معينة مستقل تماماً عن ظهور الكلمات الأخرى، وهو افتراض غير صحيح في اللغات الطبيعية (مثلاً كلمة 'نيو' غالباً يتبعها 'يورك').</p><p>على الرغم من هذا الافتراض الخاطئ، يعمل المصنف بشكل جيد جداً في الممارسة العملية لمهام مثل تصنيف النصوص.</p><p>حساب الاحتمال المشترك الدقيق <code>O(|X|^n • |C|)</code> مستحيل عملياً بسبب ندرة البيانات، لذا نستخدم الترددات النسبية في مجموعة التدريب لتقدير المعلمات.</p></template>
+    <template class="content-en"><p>Why is it called 'Naive'? Because it assumes that the presence of a particular word is completely independent of the presence of other words, which is false in natural language (e.g., 'New' is often followed by 'York').</p><p>Despite this flawed assumption, the classifier works surprisingly well in practice for tasks like text classification.</p><p>Calculating the exact joint probability <code>O(|X|^n • |C|)</code> is practically impossible due to data sparsity, so we estimate parameters using relative frequencies in a training corpus.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة بايز الساذجة لإيجاد الفئة الأكثر احتمالاً.</strong></template>
+      <template class="content-en"><strong>Naive Bayes equation to find the Maximum A Posteriori class.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$c_{MAP} = \text{argmax}_{c \in C} P(x_1, x_2, \dots, x_n | c)P(c)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا لم نسقط المقام P(d) في معادلة بايز؟</template>
+      <template class="content-en">What happens if we do not drop the denominator P(d) in the Bayes equation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن تتغير النتيجة النهائية للتصنيف، لأن P(d) قيمة ثابتة لجميع الفئات التي نقارن بينها، لكن إسقاطه يقلل من العمليات الحسابية.</p></template>
+      <template class="content-en"><p>The final classification result will not change, because P(d) is a constant value for all classes being compared, but dropping it saves computational effort.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="laplace-smoothing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تنعيم لابلاس (إضافة 1)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Laplace (Add-1) Smoothing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنية لحل مشكلة 'الاحتمال الصفري' عن طريق إضافة 1 إلى تكرار كل كلمة، مما يمنع الكلمات غير المرئية من تدمير الاحتمال الكلي.</p></template>
+    <template class="content-en"><p>A technique to solve the 'zero probability' problem by adding 1 to every word count, preventing unseen words from zeroing out the total probability.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مشكلة الاحتمال الأقصى (Maximum Likelihood):</b> إذا ظهرت كلمة في مستند الاختبار لم تكن موجودة في بيانات التدريب لفئة معينة، سيكون احتمالها صفر.</p><p>وبما أننا نضرب الاحتمالات، فإن الاحتمال الكلي سيصبح صفراً، بغض النظر عن الأدلة الأخرى القوية.</p><p><b>الحل: تنعيم لابلاس (Add-1 Smoothing):</b></p><p>نضيف 1 إلى بسط المعادلة (عدد مرات ظهور الكلمة)، ونضيف حجم المفردات الكلي <code>|V|</code> إلى المقام.</p><p>المعادلة: <code>P(w_i | c) = (count(w_i, c) + 1) / (sum(count(w, c)) + |V|)</code></p></template>
+    <template class="content-en"><p><b>Problem with Maximum Likelihood:</b> If a word in the test document never appeared in the training data for a specific class, its probability will be zero.</p><p>Since we multiply probabilities, the entire joint probability becomes zero, wiping out all other evidence.</p><p><b>Solution: Laplace (Add-1) Smoothing:</b></p><p>We add 1 to the numerator (the word count), and add the total vocabulary size <code>|V|</code> to the denominator.</p><p>Equation: <code>P(w_i | c) = (count(w_i, c) + 1) / (sum(count(w, c)) + |V|)</code></p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نضيف <code>|V|</code> إلى المقام؟ لضمان أن مجموع الاحتمالات لجميع الكلمات في المفردات لا يزال يساوي 1. نحن فعلياً نأخذ جزءاً صغيراً من كتلة الاحتمال من الكلمات المرئية ونوزعه على الكلمات غير المرئية.</p><p>تنعيم لابلاس هو أبسط أنواع التنعيم، وهناك تقنيات أكثر تقدماً مثل تنعيم (Add-k) أو (Good-Turing).</p></template>
+    <template class="content-en"><p>Why do we add <code>|V|</code> to the denominator? To ensure that the sum of probabilities for all words in the vocabulary still equals 1. We are effectively taking a small amount of probability mass from seen words and distributing it to unseen words.</p><p>Laplace smoothing is the simplest form of smoothing; more advanced techniques include Add-k or Good-Turing smoothing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تنعيم لابلاس لحساب احتمالية الكلمة.</strong></template>
+      <template class="content-en"><strong>Laplace smoothing equation for calculating word likelihood.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{P}(w_i | c) = \frac{count(w_i, c) + 1}{\sum_{w \in V} count(w, c) + |V|}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان حجم المفردات V كبيراً جداً، كيف يؤثر ذلك على احتمالية الكلمات النادرة بعد التنعيم؟</template>
+      <template class="content-en">If the vocabulary size V is very large, how does it affect the probability of rare words after smoothing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المقام سيصبح كبيراً جداً، مما يجعل احتمالية الكلمات النادرة (أو غير المرئية) صغيرة جداً، وهو أمر منطقي، لكنه قد يقلل من تأثير الكلمات المرئية بشكل مفرط.</p></template>
+      <template class="content-en"><p>The denominator becomes very large, making the probability of rare (or unseen) words very small, which is logical but might overly dilute the impact of seen words.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multinomial-naive-bayes-example" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مثال عملي: بايز الساذجة متعددة الحدود</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Worked Example: Multinomial Naive Bayes</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق خطوة بخطوة لخوارزمية بايز الساذجة على مجموعة بيانات صغيرة لتحليل المشاعر (إيجابي/سلبي).</p></template>
+    <template class="content-en"><p>A step-by-step application of the Naive Bayes algorithm on a small sentiment analysis dataset (positive/negative).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>بيانات التدريب:</b></p><ul><li>(-) just plain boring</li><li>(-) entirely predictable and lacks energy</li><li>(-) no surprises and very few laughs</li><li>(+) very powerful</li><li>(+) the most fun film of the summer</li></ul><p><b>مستند الاختبار:</b> <code>? predictable with no fun</code></p><p><b>الخطوة 1: الاحتمال المسبق (Prior):</b><br>P(-) = 3/5<br>P(+) = 2/5</p><p><b>الخطوة 2: إسقاط الكلمات غير الموجودة في المفردات:</b> نسقط كلمة 'with'.</p><p><b>الخطوة 3: حساب الاحتماليات (Likelihoods) مع التنعيم:</b><br>إجمالي الكلمات السلبية = 14، الإيجابية = 9، حجم المفردات |V| = 20.<br>P('predictable'|-) = (1+1) / (14+20) = 2/34<br>P('predictable'|+) = (0+1) / (9+20) = 1/29<br>P('no'|-) = (1+1) / (14+20) = 2/34<br>P('no'|+) = (0+1) / (9+20) = 1/29<br>P('fun'|-) = (0+1) / (14+20) = 1/34<br>P('fun'|+) = (1+1) / (9+20) = 2/29</p><p><b>الخطوة 4: تسجيل مستند الاختبار:</b><br>P(-)P(S|-) = 3/5 * (2/34 * 2/34 * 1/34) = \(6.1 x 10^{-5}\)<br>P(+)P(S|+) = 2/5 * (1/29 * 1/29 * 2/29) = \(3.2 x 10^{-5}\)</p><p>بما أن 6.1 > 3.2، فإن المستند يُصنف كـ <b>سلبي (-)</b>.</p></template>
+    <template class="content-en"><p><b>Training Data:</b></p><ul><li>(-) just plain boring</li><li>(-) entirely predictable and lacks energy</li><li>(-) no surprises and very few laughs</li><li>(+) very powerful</li><li>(+) the most fun film of the summer</li></ul><p><b>Test Document:</b> <code>? predictable with no fun</code></p><p><b>Step 1: Prior from training:</b><br>P(-) = 3/5<br>P(+) = 2/5</p><p><b>Step 2: Drop out-of-vocabulary words:</b> Drop 'with'.</p><p><b>Step 3: Likelihoods with add-1 smoothing:</b><br>Total negative words = 14, positive = 9, Vocabulary size |V| = 20.<br>P('predictable'|-) = (1+1) / (14+20) = 2/34<br>P('predictable'|+) = (0+1) / (9+20) = 1/29<br>P('no'|-) = (1+1) / (14+20) = 2/34<br>P('no'|+) = (0+1) / (9+20) = 1/29<br>P('fun'|-) = (0+1) / (14+20) = 1/34<br>P('fun'|+) = (1+1) / (9+20) = 2/29</p><p><b>Step 4: Scoring the test set:</b><br>P(-)P(S|-) = 3/5 * (2/34 * 2/34 * 1/34) = \(6.1 x 10^{-5}\)<br>P(+)P(S|+) = 2/5 * (1/29 * 1/29 * 2/29) = \(3.2 x 10^{-5}\)</p><p>Since 6.1 > 3.2, the document is classified as <b>Negative (-)</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُظهر هذا المثال كيف أن التنعيم أنقذ كلمة 'fun' في الفئة السلبية وكلمة 'predictable' في الفئة الإيجابية من التسبب في احتمال صفري.</p><p><span class="smart-term" data-term-en="Generative Model" data-ar="النموذج التوليدي" data-en-def="A model that learns the joint probability distribution P(x,y) and can generate new data points.">النموذج التوليدي<span class="smart-term-tooltip"></span></span> لبايز الساذجة متعددة الحدود يفترض أننا نختار الفئة أولاً (مثلاً الصين)، ثم نولد الكلمات واحدة تلو الأخرى بناءً على توزيع الاحتمالات لتلك الفئة.</p></template>
+    <template class="content-en"><p>This example demonstrates how smoothing saved the word 'fun' in the negative class and 'predictable' in the positive class from causing a zero probability.</p><p>The <span class="smart-term" data-term-en="Generative Model" data-ar="النموذج التوليدي" data-en-def="A model that learns the joint probability distribution P(x,y) and can generate new data points.">generative model<span class="smart-term-tooltip"></span></span> for Multinomial Naive Bayes assumes we first pick the class (e.g., China), and then generate words one by one based on the probability distribution for that class.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A tree diagram representing the Generative Model for Multinomial Naive Bayes. Top root node is a red oval labeled 'c=China'. Five arrows point downwards from the root to five leaf nodes (also red ovals). The leaf nodes are labeled from left to right: 'X1=Shanghai', 'X2=and', 'X3=Shenzhen', 'X4=issue', 'X5=bonds'. Style: educational, dark background #0d1117, accent color #ff4d4d, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Node Gradient -->
+        <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+
+        <!-- Drop Shadow for Nodes -->
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.15" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Generative Model for Multinomial Naive Bayes</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">النموذج التوليدي لـ Multinomial Naive Bayes</text>
+
+    <!-- Arrows (Drawn behind nodes) -->
+    <g stroke="var(--brand-500)" stroke-width="2" fill="none">
+        <line x1="340" y1="130" x2="80" y2="264" marker-end="url(#arrow)" />
+        <line x1="370" y1="137" x2="240" y2="264" marker-end="url(#arrow)" />
+        <line x1="400" y1="140" x2="400" y2="264" marker-end="url(#arrow)" />
+        <line x1="430" y1="137" x2="560" y2="264" marker-end="url(#arrow)" />
+        <line x1="460" y1="130" x2="720" y2="264" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- Probability Labels on Arrows (with stroke mask to hide line behind text) -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" stroke="var(--bg-surface)" stroke-width="5" stroke-linejoin="round" paint-order="stroke fill" text-anchor="middle">
+        <text x="210" y="197" dy="0.3em" class="gsvg-en">P(X₁|c)</text>
+        <text x="210" y="197" dy="0.3em" class="gsvg-ar">P(X₁|c)</text>
+
+        <text x="305" y="200" dy="0.3em" class="gsvg-en">P(X₂|c)</text>
+        <text x="305" y="200" dy="0.3em" class="gsvg-ar">P(X₂|c)</text>
+
+        <text x="400" y="202" dy="0.3em" class="gsvg-en">P(X₃|c)</text>
+        <text x="400" y="202" dy="0.3em" class="gsvg-ar">P(X₃|c)</text>
+
+        <text x="495" y="200" dy="0.3em" class="gsvg-en">P(X₄|c)</text>
+        <text x="495" y="200" dy="0.3em" class="gsvg-ar">P(X₄|c)</text>
+
+        <text x="590" y="197" dy="0.3em" class="gsvg-en">P(X₅|c)</text>
+        <text x="590" y="197" dy="0.3em" class="gsvg-ar">P(X₅|c)</text>
+    </g>
+
+    <!-- Nodes -->
+    <g filter="url(#shadow)" stroke="var(--brand-500)" stroke-width="2" fill="url(#nodeGrad)">
+        <!-- Root Node -->
+        <ellipse cx="400" cy="100" rx="90" ry="40" />
+        
+        <!-- Leaf Nodes -->
+        <ellipse cx="80" cy="300" rx="72" ry="36" />
+        <ellipse cx="240" cy="300" rx="72" ry="36" />
+        <ellipse cx="400" cy="300" rx="72" ry="36" />
+        <ellipse cx="560" cy="300" rx="72" ry="36" />
+        <ellipse cx="720" cy="300" rx="72" ry="36" />
+    </g>
+
+    <!-- Node Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle">
+        <!-- Root Label -->
+        <text x="400" y="100" dy="0.3em" font-size="20" class="gsvg-en">c = China</text>
+        <text x="400" y="100" dy="0.3em" font-size="20" class="gsvg-ar">c = الصين</text>
+
+        <!-- Leaf 1 Label -->
+        <text x="80" y="300" dy="0.3em" font-size="16" class="gsvg-en">X₁ = Shanghai</text>
+        <text x="80" y="300" dy="0.3em" font-size="16" class="gsvg-ar">X₁ = شنغهاي</text>
+
+        <!-- Leaf 2 Label -->
+        <text x="240" y="300" dy="0.3em" font-size="16" class="gsvg-en">X₂ = and</text>
+        <text x="240" y="300" dy="0.3em" font-size="16" class="gsvg-ar">X₂ = و</text>
+
+        <!-- Leaf 3 Label -->
+        <text x="400" y="300" dy="0.3em" font-size="16" class="gsvg-en">X₃ = Shenzhen</text>
+        <text x="400" y="300" dy="0.3em" font-size="16" class="gsvg-ar">X₃ = شنجن</text>
+
+        <!-- Leaf 4 Label -->
+        <text x="560" y="300" dy="0.3em" font-size="16" class="gsvg-en">X₄ = issue</text>
+        <text x="560" y="300" dy="0.3em" font-size="16" class="gsvg-ar">X₄ = إصدار</text>
+
+        <!-- Leaf 5 Label -->
+        <text x="720" y="300" dy="0.3em" font-size="16" class="gsvg-en">X₅ = bonds</text>
+        <text x="720" y="300" dy="0.3em" font-size="16" class="gsvg-ar">X₅ = سندات</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تم إسقاط كلمة 'with' من مستند الاختبار؟</template>
+      <template class="content-en">Why was the word 'with' dropped from the test document?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها لم تظهر أبداً في بيانات التدريب (ليست في المفردات V)، وبالتالي لا يمتلك النموذج أي معلومات عنها لتقييمها.</p></template>
+      <template class="content-en"><p>Because it never appeared in the training data (not in vocabulary V), so the model has no information to evaluate it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluating-classifiers-metrics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقييم المصنفات: مصفوفة الارتباك والمقاييس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Evaluating Classifiers: Confusion Matrix &amp; Metrics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أدوات لقياس أداء المصنف، تتجاوز مجرد 'الدقة' للتعامل مع الفئات غير المتوازنة باستخدام الدقة (Precision) والاستدعاء (Recall).</p></template>
+    <template class="content-en"><p>Tools to measure classifier performance, moving beyond simple 'accuracy' to handle imbalanced classes using Precision and Recall.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Confusion Matrix" data-ar="مصفوفة الارتباك" data-en-def="A table used to describe the performance of a classification model on a set of test data for which the true values are known.">مصفوفة الارتباك<span class="smart-term-tooltip"></span></span> (Confusion Matrix):</b> جدول يقارن بين التسميات الذهبية (الصحيحة) ومخرجات النظام.</p><ul><li><b>الإيجابي الحقيقي (TP):</b> النظام قال نعم، والواقع نعم.</li><li><b>الإيجابي الخاطئ (FP):</b> النظام قال نعم، والواقع لا.</li><li><b>السلبي الحقيقي (TN):</b> النظام قال لا، والواقع لا.</li><li><b>السلبي الخاطئ (FN):</b> النظام قال لا، والواقع نعم.</li></ul><p><b>المقاييس:</b></p><ol><li><b>الدقة الكلية (Accuracy):</b> (TP + TN) / (TP + FP + TN + FN). نسبة التوقعات الصحيحة كلياً.</li><li><b>الدقة (Precision):</b> TP / (TP + FP). النسبة المئوية للعناصر المختارة التي هي صحيحة فعلاً.</li><li><b>الاستدعاء (Recall):</b> TP / (TP + FN). النسبة المئوية للعناصر الصحيحة التي تمكن النظام من اختيارها.</li><li><b>مقياس F1:</b> 2PR / (P + R). <span class="smart-term" data-term-en="Harmonic Mean" data-ar="المتوسط التوافقي" data-en-def="A type of average that is calculated by dividing the number of observations by the reciprocal of each number in the series; used in F1 score to penalize extreme values.">المتوسط التوافقي<span class="smart-term-tooltip"></span></span> للدقة والاستدعاء.</li></ol></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Confusion Matrix" data-ar="مصفوفة الارتباك" data-en-def="A table used to describe the performance of a classification model on a set of test data for which the true values are known.">Confusion Matrix<span class="smart-term-tooltip"></span></span>:</b> A table comparing gold standard labels (truth) with system output.</p><ul><li><b>True Positive (TP):</b> System positive, Gold positive.</li><li><b>False Positive (FP):</b> System positive, Gold negative.</li><li><b>True Negative (TN):</b> System negative, Gold negative.</li><li><b>False Negative (FN):</b> System negative, Gold positive.</li></ul><p><b>Metrics:</b></p><ol><li><b>Accuracy:</b> (TP + TN) / (TP + FP + TN + FN). Overall correct predictions.</li><li><b>Precision:</b> TP / (TP + FP). % of selected items that are correct.</li><li><b>Recall:</b> TP / (TP + FN). % of correct items that are selected.</li><li><b>F1-Measure:</b> 2PR / (P + R). The <span class="smart-term" data-term-en="Harmonic Mean" data-ar="المتوسط التوافقي" data-en-def="A type of average that is calculated by dividing the number of observations by the reciprocal of each number in the series; used in F1 score to penalize extreme values.">harmonic mean<span class="smart-term-tooltip"></span></span> of precision and recall.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا نستخدم الدقة الكلية (Accuracy) دائماً؟ تفشل الدقة الكلية عندما نتعامل مع فئات غير متوازنة. مثال: إذا كان لدينا مليون تغريدة، 100 منها فقط عن 'فطيرة'، فإن مصنفاً غبياً يقول دائماً 'ليست عن الفطيرة' سيحقق دقة 99.99%، لكنه مصنف عديم الفائدة. هنا تبرز أهمية الدقة (Precision) والاستدعاء (Recall).</p><p>مقياس F1 هو حالة خاصة من مقياس F العام، حيث يتم إعطاء وزن متساوٍ للدقة والاستدعاء (β=1).</p></template>
+    <template class="content-en"><p>Why don't we use accuracy? Accuracy doesn't work well with uncommon or imbalanced classes.</p><p>Example: Out of 1,000,000 tweets, only 100 are about 'pie'. A stupid classifier that always says 'not about pie' gets 99.99% accuracy, but is useless. This is where Precision and Recall are crucial.</p><p>F1 is a special case of the general F-measure, where precision and recall are weighted equally (β=1).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة مقياس F1 (المتوسط التوافقي).</strong></template>
+      <template class="content-en"><strong>F1-Measure equation (Harmonic Mean).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$F_1 = \frac{2PR}{P + R}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نظام تصفية البريد العشوائي، أيهما أهم: الدقة (Precision) أم الاستدعاء (Recall)؟</template>
+      <template class="content-en">In a spam filtering system, which is more important: Precision or Recall?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الدقة (Precision) أهم عادةً. الإيجابي الخاطئ (تصنيف بريد مهم كعشوائي) أسوأ بكثير من السلبي الخاطئ (وصول بريد عشوائي لصندوق الوارد).</p></template>
+      <template class="content-en"><p>Precision is usually more important. A False Positive (classifying an important email as spam) is much worse than a False Negative (letting a spam email into the inbox).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="micro-vs-macro-averaging" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التقييم متعدد الفئات: المتوسط الدقيق مقابل المتوسط الشامل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Multi-class Evaluation: Microaveraging vs Macroaveraging</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طريقتان لدمج مقاييس الأداء (مثل الدقة) عندما يكون لدينا أكثر من فئتين للتصنيف.</p></template>
+    <template class="content-en"><p>Two methods to combine performance metrics (like precision) when dealing with more than two classification classes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما يحتوي التصنيف على فئات متعددة (مثال: عاجل، عادي، بريد عشوائي)، نحتاج لطريقة لدمج النتائج:</p><ol><li><b><span class="smart-term" data-term-en="Macroaveraging" data-ar="المتوسط الشامل" data-en-def="Computing the metric independently for each class and then taking the average.">المتوسط الشامل<span class="smart-term-tooltip"></span></span> (Macroaveraging):</b> نحسب المقياس (مثلاً الدقة) لكل فئة على حدة، ثم نأخذ المتوسط الحسابي لهذه القيم. يعطي وزناً متساوياً لكل فئة بغض النظر عن حجمها.</li><li><b><span class="smart-term" data-term-en="Microaveraging" data-ar="المتوسط الدقيق" data-en-def="Aggregating the contributions of all classes to compute the average metric.">المتوسط الدقيق<span class="smart-term-tooltip"></span></span> (Microaveraging):</b> نجمع كل الإيجابيات الحقيقية (TP) والإيجابيات الخاطئة (FP) من جميع الفئات في مجمع واحد (Pooled)، ثم نحسب المقياس مرة واحدة. يتأثر بشدة بالفئات الكبيرة.</li></ol></template>
+    <template class="content-en"><p>When classification involves multiple classes (e.g., urgent, normal, spam), we need a way to combine results:</p><ol><li><b><span class="smart-term" data-term-en="Macroaveraging" data-ar="المتوسط الشامل" data-en-def="Computing the metric independently for each class and then taking the average.">Macroaveraging<span class="smart-term-tooltip"></span></span>:</b> Calculate the metric (e.g., precision) for each class separately, then take the arithmetic mean of these values. Gives equal weight to each class regardless of its size.</li><li><b><span class="smart-term" data-term-en="Microaveraging" data-ar="المتوسط الدقيق" data-en-def="Aggregating the contributions of all classes to compute the average metric.">Microaveraging<span class="smart-term-tooltip"></span></span>:</b> Pool all True Positives (TP) and False Positives (FP) from all classes together, then calculate the metric once. It is heavily influenced by larger classes.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>متى نستخدم أيهما؟ إذا كان أداء النموذج على الفئات النادرة مهماً جداً بالنسبة لك، استخدم المتوسط الشامل (Macro). أما إذا كنت تهتم بالأداء العام على مستوى جميع المستندات، فالمتوسط الدقيق (Micro) هو الأفضل لأنه يعكس التوزيع الحقيقي للبيانات.</p></template>
+    <template class="content-en"><p>When to use which? If performance on rare classes is very important to you, use Macroaveraging. If you care about overall performance across all documents, Microaveraging is better because it reflects the true data distribution.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Macroaveraging</th><th>Microaveraging</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع الفئات</template>
+          <template class="content-en">Handling of Classes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يعطي وزناً متساوياً لكل فئة</template>
+          <template class="content-en">Gives equal weight to each class</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتأثر بشدة بالفئات الكبيرة</template>
+          <template class="content-en">Heavily influenced by large classes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك فئة تحتوي على 10 مستندات وفئة تحتوي على 1000 مستند، أي متوسط سيخفي الأداء السيئ في الفئة الصغيرة؟</template>
+      <template class="content-en">If you have a class with 10 documents and a class with 1000 documents, which average will hide poor performance on the small class?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المتوسط الدقيق (Microaveraging) سيخفي الأداء السيئ لأن الفئة الكبيرة ستهيمن على الحسابات.</p></template>
+      <template class="content-en"><p>Microaveraging will hide the poor performance because the large class will dominate the calculations.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="generative-vs-discriminative" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> المصنفات التوليدية مقابل التمييزية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Generative vs Discriminative Classifiers</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>النماذج التوليدية تتعلم كيف تبدو البيانات (مثل رسم قطة)، بينما النماذج التمييزية تتعلم فقط الفروق بين الفئات (مثل البحث عن طوق الكلب).</p></template>
+    <template class="content-en"><p>Generative models learn what the data looks like (e.g., drawing a cat), while discriminative models only learn the boundaries between classes (e.g., looking for a dog collar).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المصنف التوليدي (Generative Classifier):</b></p><ul><li>يبني نموذجاً لكيفية توليد البيانات لكل فئة.</li><li>مثال: بايز الساذجة. يحسب <code>P(d|c)P(c)</code> (الاحتمالية × الاحتمال المسبق).</li><li>يعرف خصائص الفئة بالكامل (مثل: القطط لها شوارب، آذان، عيون).</li></ul><p><b>المصنف التمييزي (Discriminative Classifier):</b></p><ul><li>يحاول فقط التمييز بين الفئات دون الاهتمام بكيفية توليد البيانات.</li><li>مثال: الانحدار اللوجستي. يحسب <code>P(c|d)</code> (الاحتمال اللاحق) مباشرة.</li><li>يركز على الميزات الفارقة (مثل: الكلاب ترتدي أطواقاً، تجاهل الباقي).</li></ul></template>
+    <template class="content-en"><p><b>Generative Classifier:</b></p><ul><li>Builds a model of how the data is generated for each class.</li><li>Example: Naive Bayes. Computes <code>P(d|c)P(c)</code> (likelihood × prior).</li><li>Knows the full characteristics of the class (e.g., cats have whiskers, ears, eyes).</li></ul><p><b>Discriminative Classifier:</b></p><ul><li>Just tries to distinguish between classes without caring how data is generated.</li><li>Example: Logistic Regression. Computes <code>P(c|d)</code> (posterior) directly.</li><li>Focuses on distinguishing features (e.g., dogs have collars, ignore everything else).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>النماذج التمييزية (مثل الانحدار اللوجستي) غالباً ما تتفوق على النماذج التوليدية في مهام التصنيف عندما تكون بيانات التدريب كبيرة، لأنها تخصص سعتها لتعلم حدود القرار بدلاً من إهدار الجهد في نمذجة توزيع البيانات بالكامل.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Discriminative Model" data-ar="النموذج التمييزي" data-en-def="A model that learns the conditional probability distribution P(y|x) directly.">Discriminative model<span class="smart-term-tooltip"></span></span>s (like Logistic Regression) often outperform generative models on classification tasks when training data is large, because they dedicate their capacity to learning the decision boundary rather than wasting effort modeling the full data distribution.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Generative (Naive Bayes)</th><th>Discriminative (Logistic Regression)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">ماذا يتعلم النموذج؟</template>
+          <template class="content-en">What does it learn?</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتعلم خصائص كل فئة P(d|c)</template>
+          <template class="content-en">Learns characteristics of each class P(d|c)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يتعلم الحدود الفاصلة بين الفئات P(c|d)</template>
+          <template class="content-en">Learns boundaries between classes P(c|d)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردت إنشاء بيانات جديدة (مثل توليد نص يشبه أسلوب شكسبير)، أي نوع من النماذج ستستخدم؟</template>
+      <template class="content-en">If you wanted to create new data (like generating text in the style of Shakespeare), which type of model would you use?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>النموذج التوليدي، لأنه يتعلم التوزيع الاحتمالي للبيانات ويمكنه أخذ عينات منه لتوليد بيانات جديدة.</p></template>
+      <template class="content-en"><p>A Generative model, because it learns the probability distribution of the data and can sample from it to generate new data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="logistic-regression-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> أساسيات الانحدار اللوجستي ودالة سيجمويد</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Logistic Regression Basics &amp; Sigmoid Function</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مصنف تمييزي يستخدم دالة 'سيجمويد' لتحويل المجاميع الخطية للميزات إلى احتمالات بين 0 و 1.</p></template>
+    <template class="content-en"><p>A discriminative classifier that uses the 'sigmoid' function to squash linear combinations of features into probabilities between 0 and 1.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الانحدار اللوجستي هو أداة تحليلية هامة وأساس للشبكات العصبية. يتكون من مرحلتين: التدريب (تعلم الأوزان) والاختبار (حساب الاحتمالات).</p><p><b>المكونات:</b></p><ol><li><b>تمثيل الميزات:</b> يُمثل المدخل <code>x</code> كمتجه ميزات <code>[x_1, x_2, ..., x_n]</code>.</li><li><b>الأوزان:</b> وزن <code>w_i</code> لكل ميزة يحدد أهميتها (مثال: كلمة 'رائع' لها وزن +10، 'سيء' لها وزن -10). بالإضافة إلى <span class="smart-term" data-term-en="Bias" data-ar="الانحياز" data-en-def="An extra parameter in the model (b) that shifts the decision boundary away from the origin.">الانحياز<span class="smart-term-tooltip"></span></span> (Bias) <code>b</code>.</li><li><b>دالة التصنيف (Sigmoid):</b> تحول الناتج الخطي <code>w·x + b</code> إلى احتمال <code>P(y=1)</code>.</li></ol><p><b><span class="smart-term" data-term-en="Sigmoid Function" data-ar="دالة سيجمويد" data-en-def="A mathematical function having a characteristic &#x27;S&#x27;-shaped curve, mapping values to probabilities between 0 and 1.">دالة سيجمويد<span class="smart-term-tooltip"></span></span>:</b> <code>P(y=1) = σ(w·x + b) = 1 / (1 + e^{-(w·x + b)})</code></p><p><b>قرار التصنيف:</b> إذا كان <code>P(y=1|x) > 0.5</code> (أي <code>w·x + b > 0</code>)، فإن الفئة المتوقعة هي 1، وإلا فهي 0.</p></template>
+    <template class="content-en"><p>Logistic Regression is an important analytic tool and the foundation of neural networks. It has two phases: Training (learning weights) and Test (computing probabilities).</p><p><b>Components:</b></p><ol><li><b>Feature representation:</b> Input <code>x</code> is a feature vector <code>[x_1, x_2, ..., x_n]</code>.</li><li><b>Weights:</b> A weight <code>w_i</code> for each feature tells its importance (e.g., 'awesome' has weight +10, 'abysmal' has -10). Plus a <span class="smart-term" data-term-en="Bias" data-ar="الانحياز" data-en-def="An extra parameter in the model (b) that shifts the decision boundary away from the origin.">bias<span class="smart-term-tooltip"></span></span> term <code>b</code>.</li><li><b>Classification function (Sigmoid):</b> Converts the linear output <code>w·x + b</code> into a probability <code>P(y=1)</code>.</li></ol><p><b><span class="smart-term" data-term-en="Sigmoid Function" data-ar="دالة سيجمويد" data-en-def="A mathematical function having a characteristic &#x27;S&#x27;-shaped curve, mapping values to probabilities between 0 and 1.">Sigmoid Function<span class="smart-term-tooltip"></span></span>:</b> <code>P(y=1) = σ(w·x + b) = 1 / (1 + e^{-(w·x + b)})</code></p><p><b>Classification Decision:</b> If <code>P(y=1|x) > 0.5</code> (which means <code>w·x + b > 0</code>), the predicted class is 1, otherwise 0.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نستخدم دالة سيجمويد بدلاً من خط مستقيم؟ الخط المستقيم يمكن أن يعطي قيماً أقل من 0 أو أكبر من 1، وهي ليست احتمالات صالحة. دالة سيجمويد تضغط أي قيمة حقيقية لتصبح بين 0 و 1، مما يجعلها مثالية للتصنيف الثنائي.</p><p>في حالة التصنيف متعدد الفئات (أكثر من فئتين)، يتم تعميم الانحدار اللوجستي باستخدام دالة Softmax بدلاً من Sigmoid.</p></template>
+    <template class="content-en"><p>Why use a sigmoid function instead of a straight line? A straight line can output values less than 0 or greater than 1, which are not valid probabilities. The sigmoid function squashes any real value into the range (0, 1), making it perfect for binary classification.</p><p>For multi-class classification (more than 2 classes), logistic regression is generalized using the Softmax function instead of Sigmoid.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة سيجمويد لحساب احتمالية الفئة الإيجابية.</strong></template>
+      <template class="content-en"><strong>Sigmoid function to calculate the probability of the positive class.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P(y=1) = \sigma(w \cdot x + b) = \frac{1}{1 + e^{-(w \cdot x + b)}}$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A 2D plot showing the Sigmoid function curve. The x-axis is labeled 'wx + b' ranging from -8 to 8. The y-axis is labeled 'P(y=1)' ranging from 0.0 to 1.0. An S-shaped blue curve starts near 0 on the left, crosses y=0.5 at x=0, and approaches 1 on the right. A horizontal dashed red line is drawn at y=0.5. A green circle highlights the intersection point at (0, 0.5). Style: educational, dark background #0d1117, accent colors blue and red, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--text-muted)" />
+    </marker>
+    <marker id="arrow-end-brand" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sigmoid Function in Logistic Regression</text>
+  <text x="400" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الدالة السينية (Sigmoid) في الانحدار اللوجستي</text>
+
+  <!-- Grid Lines -->
+  <!-- y = 1.0 -->
+  <line x1="90" y1="50" x2="750" y2="50" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  <!-- y = 0.75 -->
+  <line x1="90" y1="117.5" x2="750" y2="117.5" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  <!-- y = 0.25 -->
+  <line x1="90" y1="252.5" x2="750" y2="252.5" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  
+  <!-- Vertical Grid Lines -->
+  <line x1="100" y1="50" x2="100" y2="320" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="262.5" y1="50" x2="262.5" y2="320" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="587.5" y1="50" x2="587.5" y2="320" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+  <line x1="750" y1="50" x2="750" y2="320" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4" />
+
+  <!-- Threshold Line (y = 0.5) -->
+  <line x1="90" y1="185" x2="750" y2="185" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="8 4" />
+  <text x="650" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Decision Boundary (0.5)</text>
+  <text x="650" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">حد اتخاذ القرار (0.5)</text>
+
+  <!-- Axes -->
+  <!-- X Axis -->
+  <line x1="90" y1="320" x2="760" y2="320" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-end)" />
+  <!-- Y Axis -->
+  <line x1="425" y1="330" x2="425" y2="40" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-end)" />
+
+  <!-- Axis Ticks & Labels -->
+  <!-- X Axis Ticks -->
+  <line x1="100" y1="320" x2="100" y2="326" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="100" y="344" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">-8</text>
+  
+  <line x1="262.5" y1="320" x2="262.5" y2="326" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="262.5" y="344" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">-4</text>
+  
+  <text x="435" y="344" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">0</text>
+  
+  <line x1="587.5" y1="320" x2="587.5" y2="326" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="587.5" y="344" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">4</text>
+  
+  <line x1="750" y1="320" x2="750" y2="326" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="750" y="344" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">8</text>
+
+  <!-- Y Axis Ticks -->
+  <line x1="425" y1="50" x2="419" y2="50" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="412" y="55" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">1.0</text>
+  
+  <line x1="425" y1="185" x2="419" y2="185" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="412" y="190" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">0.5</text>
+  
+  <line x1="425" y1="320" x2="419" y2="320" stroke="var(--text-muted)" stroke-width="2" />
+  <text x="412" y="325" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">0.0</text>
+
+  <!-- Axis Titles -->
+  <text x="425" y="380" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Linear Output (w·x + b)</text>
+  <text x="425" y="380" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الناتج الخطي (w·x + b)</text>
+
+  <g transform="translate(40, 185) rotate(-90)">
+    <text x="0" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Probability P(y=1)</text>
+    <text x="0" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الاحتمال P(y=1)</text>
+  </g>
+
+  <!-- Sigmoid Curve -->
+  <path d="M 100.0 319.9 L 120.3 319.9 L 140.6 319.8 L 160.9 319.6 L 181.3 319.3 L 201.6 318.9 L 221.9 318.2 L 242.2 317.0 L 262.5 315.2 L 282.8 312.0 L 303.1 307.2 L 323.4 300.3 L 343.8 287.9 L 364.1 270.8 L 384.4 247.4 L 404.7 218.1 L 425.0 185.0 L 445.3 151.9 L 465.6 122.6 L 485.9 99.2 L 506.3 82.1 L 526.6 69.7 L 546.9 62.8 L 567.2 58.0 L 587.5 54.8 L 607.8 53.0 L 628.1 51.8 L 648.4 51.1 L 668.8 50.7 L 689.1 50.4 L 709.4 50.2 L 729.7 50.1 L 750.0 50.1" fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Intersection Highlight -->
+  <circle cx="425" cy="185" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+  <text x="410" y="175" text-anchor="end" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">(0, 0.5)</text>
+
+  <!-- Equation Box -->
+  <rect x="100" y="60" width="240" height="44" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="220" y="87" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">
+    P(y=1) = 1 / (1 + e<tspan dy="-6" font-size="12">-(wx+b)</tspan><tspan dy="6">)</tspan>
+  </text>
+
+  <!-- Decision Regions -->
+  <!-- Predict Class 0 (Left Side) -->
+  <rect x="160" y="210" width="160" height="64" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="240" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Predict Class 0</text>
+  <text x="240" y="235" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">توقع الفئة 0</text>
+  <text x="240" y="258" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">P(y=1) &lt; 0.5</text>
+  <text x="240" y="258" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">P(y=1) &lt; 0.5</text>
+
+  <!-- Predict Class 1 (Right Side) -->
+  <rect x="540" y="100" width="160" height="64" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="620" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Predict Class 1</text>
+  <text x="620" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">توقع الفئة 1</text>
+  <text x="620" y="148" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">P(y=1) &gt; 0.5</text>
+  <text x="620" y="148" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">P(y=1) &gt; 0.5</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يعني إذا كان وزن ميزة معينة \((w_i)\) يساوي صفراً في الانحدار اللوجستي؟</template>
+      <template class="content-en">What does it mean if the weight of a specific feature \((w_i)\) is zero in logistic regression?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن هذه الميزة ليس لها أي تأثير على قرار التصنيف؛ النموذج يتجاهلها تماماً.</p></template>
+      <template class="content-en"><p>It means that this feature has no effect on the classification decision; the model completely ignores it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-entropy-loss-gradient-descent" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> خسارة الإنتروبيا المتقاطعة والانحدار التدريجي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Cross-Entropy Loss &amp; Gradient Descent</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دالة الخسارة تقيس مدى خطأ النموذج، والانحدار التدريجي هو الخوارزمية التي تعدل الأوزان لتقليل هذا الخطأ.</p></template>
+    <template class="content-en"><p>The loss function measures how wrong the model is, and gradient descent is the algorithm that adjusts weights to minimize this error.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>دالة الخسارة (Cross-Entropy Loss):</b></p><p>نريد أن تكون الخسارة صغيرة إذا كان تقدير النموذج قريباً من الصحيح، وكبيرة إذا كان النموذج مرتبكاً.</p><p>المعادلة: <code>L_CE(y_hat, y) = -[y log σ(w·x + b) + (1 - y) log(1 - σ(w·x + b))]</code></p><p>إذا كانت القيمة الحقيقية y=1، فإن الخسارة هي <code>-log(P(y=1))</code>. إذا كان النموذج يتوقع P=0.7، الخسارة = 0.36. إذا توقع P=0.3 (مخطئ)، الخسارة = 1.2 (خسارة أكبر!).</p><p><b><span class="smart-term" data-term-en="Gradient Descent" data-ar="الانحدار التدريجي" data-en-def="An optimization algorithm used to minimize some function by iteratively moving in the direction of steepest descent.">الانحدار التدريجي<span class="smart-term-tooltip"></span></span> (Gradient Descent):</b></p><p>للعثور على أفضل الأوزان، نبدأ بأوزان عشوائية ونحسب 'ميل' (Gradient) دالة الخسارة. نتحرك في <b>الاتجاه المعاكس</b> للميل لتقليل الخسارة.</p><p>قاعدة التحديث: <code>w^{t+1} = w^t - η * (d/dw) L(f(x;w), y)</code></p><p>حيث <code>η</code> هو <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A hyperparameter that controls how much to change the model in response to the estimated error each time the model weights are updated.">معدل التعلم<span class="smart-term-tooltip"></span></span> (Learning Rate) الذي يحدد حجم الخطوة.</p></template>
+    <template class="content-en"><p><b>Cross-Entropy Loss:</b></p><p>We want loss to be smaller if the model estimate is close to correct, and bigger if the model is confused.</p><p>Equation: <code>L_CE(y_hat, y) = -[y log σ(w·x + b) + (1 - y) log(1 - σ(w·x + b))]</code></p><p>If true y=1, loss is <code>-log(P(y=1))</code>.</p><ul><li>If model predicts P=0.7, loss = 0.36.</li><li>If it predicts P=0.3 (wrong), loss = 1.2 (bigger loss!).</li></ul><p><b><span class="smart-term" data-term-en="Gradient Descent" data-ar="الانحدار التدريجي" data-en-def="An optimization algorithm used to minimize some function by iteratively moving in the direction of steepest descent.">Gradient Descent<span class="smart-term-tooltip"></span></span>:</b></p><p>To find the best weights, we start with random weights and calculate the 'slope' (gradient) of the loss function. We move in the <b>reverse direction</b> of the slope to minimize loss.</p><p>Update rule: <code>w^{t+1} = w^t - η * (d/dw) L(f(x;w), y)</code></p><p>Where <code>η</code> is the <span class="smart-term" data-term-en="Learning Rate" data-ar="معدل التعلم" data-en-def="A hyperparameter that controls how much to change the model in response to the estimated error each time the model weights are updated.">learning rate<span class="smart-term-tooltip"></span></span>, determining the step size.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشتقة الجزئية لدالة خسارة الإنتروبيا المتقاطعة مع دالة سيجمويد أنيقة جداً وبسيطة: <code>[σ(w·x + b) - y]x_j</code>. هذا يعني أن التحديث يتناسب طردياً مع مقدار الخطأ <code>(التوقع - الحقيقة)</code> وقيمة الميزة <code>x_j</code>.</p><p>في الأبعاد المتعددة (N dimensions)، التدرج (Gradient) هو متجه يعبر عن المكونات الاتجاهية لأشد ميل على طول كل بُعد من الأبعاد N.</p></template>
+    <template class="content-en"><p>The partial derivative of cross-entropy loss with the sigmoid function is elegantly simple: <code>[σ(w·x + b) - y]x_j</code>. This means the update is directly proportional to the error <code>(prediction - truth)</code> and the feature value <code>x_j</code>.</p><p>In N dimensions, the gradient is a vector expressing the directional components of the sharpest slope along each of the N dimensions.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة خسارة الإنتروبيا المتقاطعة للتصنيف الثنائي.</strong></template>
+      <template class="content-en"><strong>Cross-Entropy Loss function for binary classification.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$L_{CE}(\hat{y}, y) = -[y \log \sigma(w \cdot x + b) + (1 - y) \log(1 - \sigma(w \cdot x + b))]$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A 3D surface plot showing a convex cost function bowl (Cost(w,b)). The x-axis is 'w' and y-axis is 'b'. A red dot is placed high on the side of the bowl. A red dashed line drops down to the w-b plane, and a red arrow points towards the center minimum of the bowl, illustrating the gradient descent step. Style: educational, dark background #0d1117, blue wireframe bowl, red accents, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowheads for axes -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)"/>
+        </marker>
+        
+        <!-- Arrowheads for gradient descent path on surface -->
+        <marker id="arrow-step" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+
+        <!-- Arrowheads for gradient descent path on w-b plane -->
+        <marker id="arrow-step-plane" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" opacity="0.7"/>
+        </marker>
+
+        <!-- Subtle gradient for the bowl surface -->
+        <linearGradient id="bowl-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.05"/>
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.25"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- ========================================== -->
+    <!-- 1. W-B PLANE (FLOOR) & CONTOURS            -->
+    <!-- ========================================== -->
+    
+    <!-- Floor Contours (Projected Level Sets) -->
+    <g stroke="var(--brand-500)" fill="none" opacity="0.15" stroke-width="1.5">
+        <ellipse cx="400" cy="380" rx="208" ry="58"/>
+        <ellipse cx="400" cy="380" rx="125" ry="35"/>
+        <ellipse cx="400" cy="380" rx="83" ry="23"/>
+        <ellipse cx="400" cy="380" rx="35" ry="10"/>
+    </g>
+
+    <!-- Axes on the w-b plane -->
+    <g stroke="var(--text-muted)" stroke-width="1.5" opacity="0.6">
+        <!-- w-axis -->
+        <line x1="150" y1="380" x2="700" y2="380" marker-end="url(#arrow-axis)"/>
+        <!-- b-axis -->
+        <line x1="400" y1="280" x2="400" y2="480" marker-end="url(#arrow-axis)"/>
+    </g>
+
+    <!-- Axis Labels -->
+    <text x="720" y="385" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)">w</text>
+    <text x="400" y="505" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)">b</text>
+
+    <!-- ========================================== -->
+    <!-- 2. 3D BOWL SURFACE                         -->
+    <!-- ========================================== -->
+
+    <!-- Bowl Front Face (Frosted glass effect over the floor) -->
+    <path d="M 150 200 A 250 70 0 0 0 650 200 Q 400 580 150 200 Z" fill="var(--bg-surface)" opacity="0.85"/>
+    <path d="M 150 200 A 250 70 0 0 0 650 200 Q 400 580 150 200 Z" fill="url(#bowl-gradient)"/>
+
+    <!-- Bowl Wireframe (Horizontal Ellipses) -->
+    <g stroke="var(--brand-500)" fill="none" opacity="0.3" stroke-width="1.5">
+        <!-- Top Rim -->
+        <ellipse cx="400" cy="200" rx="250" ry="70"/>
+        <!-- Inner Contours -->
+        <ellipse cx="400" cy="255" rx="208" ry="58"/>
+        <ellipse cx="400" cy="335" rx="125" ry="35"/>
+        <ellipse cx="400" cy="360" rx="83" ry="23"/>
+    </g>
+
+    <!-- Outer Profile Line -->
+    <path d="M 150 200 Q 400 580 650 200" fill="none" stroke="var(--brand-500)" stroke-width="2" opacity="0.5"/>
+
+    <!-- Cost Axis (Z-axis) -->
+    <line x1="400" y1="380" x2="400" y2="60" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arrow-axis)" opacity="0.8"/>
+    
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Cost J(w,b)</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">التكلفة J(w,b)</text>
+
+    <!-- ========================================== -->
+    <!-- 3. GRADIENT DESCENT PATH                   -->
+    <!-- ========================================== -->
+
+    <!-- Drop Lines (Dashed lines from surface to w-b plane) -->
+    <g stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.6">
+        <line x1="580" y1="284" x2="580" y2="409"/>
+        <line x1="508" y1="352.5" x2="508" y2="397.5"/>
+        <line x1="472" y1="371.5" x2="472" y2="391.5"/>
+    </g>
+
+    <!-- Path on the w-b plane (Floor) -->
+    <g stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="3 3" opacity="0.8">
+        <line x1="580" y1="409" x2="515" y2="400" marker-end="url(#arrow-step-plane)"/>
+        <line x1="508" y1="397.5" x2="478" y2="393" marker-end="url(#arrow-step-plane)"/>
+        <line x1="472" y1="391.5" x2="438" y2="386" marker-end="url(#arrow-step-plane)"/>
+    </g>
+
+    <!-- Points on the w-b plane -->
+    <g fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" opacity="0.8">
+        <circle cx="580" cy="409" r="4"/>
+        <circle cx="508" cy="397.5" r="3.5"/>
+        <circle cx="472" cy="391.5" r="3"/>
+    </g>
+
+    <!-- Path on the 3D Surface -->
+    <g stroke="var(--brand-500)" stroke-width="3">
+        <line x1="580" y1="284" x2="515" y2="347" marker-end="url(#arrow-step)"/>
+        <line x1="508" y1="352.5" x2="478" y2="368" marker-end="url(#arrow-step)"/>
+        <line x1="472" y1="371.5" x2="438" y2="377" marker-end="url(#arrow-step)"/>
+    </g>
+
+    <!-- Points on the 3D Surface -->
+    <g fill="var(--brand-500)">
+        <circle cx="580" cy="284" r="6"/>
+        <circle cx="508" cy="352.5" r="5"/>
+        <circle cx="472" cy="371.5" r="4"/>
+        <!-- Global Minimum -->
+        <circle cx="400" cy="380" r="5"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- 4. LABELS & ANNOTATIONS                    -->
+    <!-- ========================================== -->
+
+    <!-- Initial Weights Label -->
+    <line x1="585" y1="280" x2="650" y2="235" stroke="var(--text-muted)" stroke-width="1.5"/>
+    <rect x="590" y="195" width="180" height="30" rx="4" fill="var(--bg-surface)" opacity="0.8"/>
+    <text x="680" y="215" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">Initial Weights (w₀, b₀)</text>
+    <text x="680" y="215" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">الأوزان الابتدائية (w₀, b₀)</text>
+
+    <!-- Gradient Step Label -->
+    <line x1="544" y1="318" x2="620" y2="335" stroke="var(--text-muted)" stroke-width="1.5"/>
+    <rect x="600" y="325" width="120" height="30" rx="4" fill="var(--bg-surface)" opacity="0.8"/>
+    <text x="660" y="345" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Gradient Step</text>
+    <text x="660" y="345" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">خطوة الانحدار</text>
+
+    <!-- Minimum Cost Label -->
+    <line x1="400" y1="380" x2="320" y2="420" stroke="var(--text-muted)" stroke-width="1.5"/>
+    <rect x="220" y="415" width="120" height="30" rx="4" fill="var(--bg-surface)" opacity="0.8"/>
+    <text x="280" y="435" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">Minimum Cost</text>
+    <text x="280" y="435" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">أقل تكلفة</text>
+
+    <!-- ========================================== -->
+    <!-- 5. FORMULA BOX                             -->
+    <!-- ========================================== -->
+    <g transform="translate(30, 30)">
+        <rect x="0" y="0" width="290" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5"/>
+        
+        <text x="145" y="25" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Gradient Descent Update</text>
+        <text x="145" y="25" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">تحديث الانحدار التدريجي</text>
+        
+        <text x="145" y="55" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="var(--brand-ink)">w = w - η · ∇J(w, b)</text>
+        
+        <text x="145" y="78" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">J(w,b) = Cross-Entropy Loss</text>
+        <text x="145" y="78" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">J(w,b) = خسارة الإنتروبيا المتقاطعة</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا كان معدل التعلم (Learning Rate) كبيراً جداً في خوارزمية الانحدار التدريجي؟</template>
+      <template class="content-en">What happens if the learning rate is too large in the gradient descent algorithm?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قد تتجاوز الخوارزمية نقطة الحد الأدنى (الهدف) وتقفز ذهاباً وإياباً، مما يؤدي إلى عدم استقرار النموذج وفشله في التقارب (Divergence).</p></template>
+      <template class="content-en"><p>The algorithm might overshoot the minimum (goal) and bounce back and forth, leading to instability and failure to converge (divergence).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. تخيلوا أننا نحاول فرز رسائل البريد الإلكتروني. بدأنا بالطريقة القديمة: كتابة قواعد يدوية (إذا رأيت كلمة 'دولار' فهو مزعج)، لكنها متعبة وتفشل بسرعة. لذا انتقلنا للتعلم الآلي. أول بطل لدينا هو 'بايز الساذج'، وهو نموذج توليدي يحسب احتمالات الكلمات. سميناه ساذجاً لأنه يظن أن الكلمات لا علاقة لها ببعضها! واجهتنا مشكلة الكلمات الجديدة التي تعطي احتمالاً صفرياً، فأنقذنا 'تنعيم لابلاس' بإضافة 1 للجميع. بعد أن بنينا النموذج، كيف نعرف أنه جيد؟ لا تنخدعوا بـ Accuracy إذا كانت البيانات غير متوازنة؛ استخدموا Precision و Recall و F1. أخيراً، تعرفنا على بطلنا الثاني 'الانحدار اللوجستي'، وهو نموذج تمييزي ذكي لا يضيع وقته في فهم الفئات، بل يرسم خطاً فاصلاً بينها باستخدام دالة 'سيجمويد' السحرية، ويتعلم من أخطائه عبر 'الانحدار التدريجي'. ركزوا على الفرق بين التوليدي والتمييزي، وكيفية حساب مقاييس التقييم، فهذه مواضيع مؤكدة في الامتحان!</template>
+    <template class="content-en">Welcome friends to this pivotal module. Imagine we are sorting emails. We started the old way: hand-coded rules (if you see 'dollar', it's spam), but it's exhausting and brittle. So we moved to ML. Our first hero is 'Naive Bayes', a generative model counting word probabilities. It's 'naive' because it thinks words are independent! We hit the zero-probability bug for new words, but 'Laplace Smoothing' saved us by adding 1. Once built, how do we evaluate it? Don't fall for Accuracy on imbalanced data; use Precision, Recall, and F1. Finally, we met our second hero, 'Logistic Regression'. It's a smart discriminative model that doesn't waste time understanding classes; it just draws a line between them using the magical 'Sigmoid' function, learning from its mistakes via 'Gradient Descent'. Focus on Generative vs Discriminative, and how to calculate evaluation metrics—these are guaranteed exam topics!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب الرئيسي لاستخدام القواعد المبرمجة يدوياً في تصنيف النصوص؟</template>
+          <template class="content-en">What is the main drawback of using hand-coded rules in text classification?</template>
+          <span class="content-target">ما هو العيب الرئيسي لاستخدام القواعد المبرمجة يدوياً في تصنيف النصوص؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مكلفة جداً في البناء والصيانة، وتكون حرفية للغاية مما يؤدي إلى استدعاء (Recall) منخفض جداً، وتنهار بمجرد تغير نمط البيانات.</template>
+          <template class="content-en">They are very expensive to build and maintain, too literal (leading to low recall), and break easily when data patterns change.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نطلق على خوارزمية بايز اسم 'الساذجة'؟</template>
+          <template class="content-en">Why do we call the Bayes algorithm 'Naive'?</template>
+          <span class="content-target">لماذا نطلق على خوارزمية بايز اسم 'الساذجة'؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تفترض أن ظهور ميزة (كلمة) معينة مستقل تماماً عن ظهور الميزات الأخرى، وهو افتراض غير واقعي في اللغات الطبيعية.</template>
+          <template class="content-en">Because it assumes that the presence of a particular feature (word) is completely independent of other features, which is unrealistic in natural language.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل تنعيم لابلاس مشكلة الاحتمال الصفري؟</template>
+          <template class="content-en">How does Laplace smoothing solve the zero probability problem?</template>
+          <span class="content-target">كيف يحل تنعيم لابلاس مشكلة الاحتمال الصفري؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق إضافة 1 إلى تكرار كل كلمة (حتى التي لم تظهر)، وإضافة حجم المفردات الكلي |V| إلى المقام لضمان بقاء مجموع الاحتمالات 1.</template>
+          <template class="content-en">By adding 1 to the count of every word (even unseen ones), and adding the total vocabulary size |V| to the denominator to ensure probabilities still sum to 1.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى تكون الدقة الكلية (Accuracy) مقياساً مضللاً؟</template>
+          <template class="content-en">When is Accuracy a misleading metric?</template>
+          <span class="content-target">متى تكون الدقة الكلية (Accuracy) مقياساً مضللاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما تكون الفئات غير متوازنة بشدة (مثلاً 99% من فئة و 1% من فئة أخرى). النموذج الذي يتوقع دائماً الفئة الأكبر سيبدو دقيقاً ولكنه فاشل عملياً.</template>
+          <template class="content-en">When classes are highly imbalanced (e.g., 99% one class, 1% another). A model always predicting the majority class looks accurate but is practically useless.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الدقة (Precision) والاستدعاء (Recall)؟</template>
+          <template class="content-en">What is the difference between Precision and Recall?</template>
+          <span class="content-target">ما الفرق بين الدقة (Precision) والاستدعاء (Recall)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الدقة تقيس: من بين كل ما توقعه النظام كإيجابي، كم نسبة الصحيح فعلاً؟ الاستدعاء يقيس: من بين كل الإيجابيات الحقيقية في الواقع، كم نسبة ما اكتشفه النظام؟</template>
+          <template class="content-en">Precision measures: out of all system's positive predictions, how many were actually correct? Recall measures: out of all actual positives in reality, how many did the system find?</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نفضل استخدام المتوسط الشامل (Macroaveraging) على المتوسط الدقيق (Microaveraging)؟</template>
+          <template class="content-en">When do we prefer Macroaveraging over Microaveraging?</template>
+          <span class="content-target">متى نفضل استخدام المتوسط الشامل (Macroaveraging) على المتوسط الدقيق (Microaveraging)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم المتوسط الشامل عندما يكون أداء النموذج على الفئات النادرة والصغيرة مهماً جداً بالنسبة لنا، لأنه يعطي وزناً متساوياً لكل فئة.</template>
+          <template class="content-en">We use Macroaveraging when the model's performance on rare, small classes is very important to us, because it gives equal weight to every class.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين النموذج التوليدي والنموذج التمييزي؟</template>
+          <template class="content-en">What is the fundamental difference between a Generative and a Discriminative model?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين النموذج التوليدي والنموذج التمييزي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">النموذج التوليدي (مثل بايز) يتعلم التوزيع الاحتمالي للبيانات وكيف تبدو كل فئة. النموذج التمييزي (مثل الانحدار اللوجستي) يتعلم فقط الحدود الفاصلة بين الفئات.</template>
+          <template class="content-en">A Generative model (like Naive Bayes) learns the probability distribution of the data and what each class looks like. A Discriminative model (like Logistic Regression) only learns the boundaries separating the classes.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم دالة سيجمويد في الانحدار اللوجستي؟</template>
+          <template class="content-en">Why do we use the sigmoid function in Logistic Regression?</template>
+          <span class="content-target">لماذا نستخدم دالة سيجمويد في الانحدار اللوجستي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تأخذ الناتج الخطي (الذي يمكن أن يكون أي رقم من سالب ما لا نهاية إلى موجب ما لا نهاية) وتضغطه ليصبح قيمة بين 0 و 1، مما يجعله صالحاً كاحتمال.</template>
+          <template class="content-en">Because it takes the linear output (which can be any number from -infinity to +infinity) and squashes it into a value between 0 and 1, making it valid as a probability.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تقيس دالة خسارة الإنتروبيا المتقاطعة (Cross-Entropy Loss)؟</template>
+          <template class="content-en">What does the Cross-Entropy Loss function measure?</template>
+          <span class="content-target">ماذا تقيس دالة خسارة الإنتروبيا المتقاطعة (Cross-Entropy Loss)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقيس مدى ابتعاد التوقعات الاحتمالية للنموذج عن التسميات الحقيقية. تعاقب النموذج بشدة إذا كان واثقاً جداً من إجابة خاطئة.</template>
+          <template class="content-en">It measures how far the model's probability predictions are from the true labels. It heavily penalizes the model if it is very confident about a wrong answer.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يقرر الانحدار التدريجي (Gradient Descent) اتجاه تحديث الأوزان؟</template>
+          <template class="content-en">How does Gradient Descent decide the direction to update weights?</template>
+          <span class="content-target">كيف يقرر الانحدار التدريجي (Gradient Descent) اتجاه تحديث الأوزان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحسب ميل (Gradient) دالة الخسارة بالنسبة للأوزان، ثم يتحرك خطوة في الاتجاه المعاكس للميل للوصول إلى أدنى نقطة (أقل خسارة).</template>
+          <template class="content-en">It calculates the slope (gradient) of the loss function with respect to the weights, then takes a step in the reverse direction of the slope to reach the minimum point (lowest loss).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "تصنيف النصوص (Text Classification)",
+      "en": "Text Classification"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعيين فئات أو مواضيع لمستند نصي.",
+        "en": "Assigning subject categories or topics to a document."
+      },
+      "example": {
+        "ar": "اكتشاف البريد العشوائي، تحليل المشاعر.",
+        "en": "Spam detection, sentiment analysis."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "مشكلة القواعد المبرمجة يدوياً",
+      "en": "Problem with Hand-coded rules"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكلفة في البناء والصيانة، وتكون حرفية جداً.",
+        "en": "Expensive to build/maintain, and too literal."
+      },
+      "example": {
+        "ar": "تنتج دقة عالية ولكن استدعاء منخفض.",
+        "en": "Produces high-precision, low-recall."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الاحتمال المسبق (Prior)",
+      "en": "Prior Probability"
+    },
+    "back": {
+      "definition": {
+        "ar": "مدى تكرار الفئة في مجموعة البيانات قبل رؤية المستند.",
+        "en": "How often a class occurs before seeing the document evidence."
+      },
+      "example": {
+        "ar": "P(c)",
+        "en": "P(c)"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "الاحتمالية (Likelihood)",
+      "en": "Likelihood"
+    },
+    "back": {
+      "definition": {
+        "ar": "احتمال رؤية ميزات المستند بافتراض فئة معينة.",
+        "en": "The probability of seeing the document's features given a class."
+      },
+      "example": {
+        "ar": "P(d|c)",
+        "en": "P(d|c)"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مشكلة الاحتمال الصفري",
+      "en": "Zero Probability Problem"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما لا تظهر كلمة في بيانات التدريب، يصبح احتمالها صفراً، مما يدمر الاحتمال الكلي المضروب.",
+        "en": "When an unseen word has 0 probability, wiping out the entire multiplied joint probability."
+      },
+      "example": {
+        "ar": "تُحل باستخدام تنعيم لابلاس.",
+        "en": "Solved using Laplace smoothing."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "تنعيم لابلاس (Add-1)",
+      "en": "Laplace (Add-1) Smoothing"
+    },
+    "back": {
+      "definition": {
+        "ar": "إضافة 1 إلى تكرار كل كلمة وإضافة حجم المفردات |V| إلى المقام لتجنب الاحتمال الصفري.",
+        "en": "Adding 1 to word counts and |V| to the denominator to avoid zero probabilities."
+      },
+      "example": {
+        "ar": "(count + 1) / (total_words + |V|)",
+        "en": "(count + 1) / (total_words + |V|)"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "مصفوفة الارتباك (Confusion Matrix)",
+      "en": "Confusion Matrix"
+    },
+    "back": {
+      "definition": {
+        "ar": "جدول يقارن التسميات الصحيحة (الذهبية) مع مخرجات النظام لتقييم الأداء.",
+        "en": "A table comparing gold standard labels with system outputs to evaluate performance."
+      },
+      "example": {
+        "ar": "يحتوي على TP, FP, TN, FN.",
+        "en": "Contains TP, FP, TN, FN."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الدقة (Precision)",
+      "en": "Precision"
+    },
+    "back": {
+      "definition": {
+        "ar": "النسبة المئوية للعناصر التي اختارها النظام وكانت صحيحة فعلاً.",
+        "en": "% of selected items that are correct."
+      },
+      "example": {
+        "ar": "TP / (TP + FP)",
+        "en": "TP / (TP + FP)"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الاستدعاء (Recall)",
+      "en": "Recall"
+    },
+    "back": {
+      "definition": {
+        "ar": "النسبة المئوية للعناصر الصحيحة التي تمكن النظام من العثور عليها.",
+        "en": "% of correct items that are selected."
+      },
+      "example": {
+        "ar": "TP / (TP + FN)",
+        "en": "TP / (TP + FN)"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "مقياس F1",
+      "en": "F1-Measure"
+    },
+    "back": {
+      "definition": {
+        "ar": "المتوسط التوافقي للدقة والاستدعاء، يوازن بينهما.",
+        "en": "The harmonic mean of precision and recall, balancing the two."
+      },
+      "example": {
+        "ar": "2PR / (P + R)",
+        "en": "2PR / (P + R)"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "المتوسط الشامل (Macroaveraging)",
+      "en": "Macroaveraging"
+    },
+    "back": {
+      "definition": {
+        "ar": "حساب المقياس لكل فئة بشكل مستقل ثم أخذ المتوسط. يعطي وزناً متساوياً للفئات.",
+        "en": "Computing metric for each class independently, then averaging. Gives equal weight to classes."
+      },
+      "example": {
+        "ar": "مفيد عند الاهتمام بالفئات النادرة.",
+        "en": "Useful when rare classes are important."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "المتوسط الدقيق (Microaveraging)",
+      "en": "Microaveraging"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجميع كل التوقعات من جميع الفئات ثم حساب المقياس. يتأثر بالفئات الكبيرة.",
+        "en": "Pooling all predictions from all classes then computing the metric. Influenced by large classes."
+      },
+      "example": {
+        "ar": "مفيد لقياس الأداء العام على مستوى المستندات.",
+        "en": "Useful for overall document-level performance."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "المصنف التوليدي",
+      "en": "Generative Classifier"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج يتعلم كيفية توليد البيانات لكل فئة.",
+        "en": "A model that learns how data is generated for each class."
+      },
+      "example": {
+        "ar": "بايز الساذجة (Naive Bayes).",
+        "en": "Naive Bayes."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "المصنف التمييزي",
+      "en": "Discriminative Classifier"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج يتعلم فقط الحدود الفاصلة بين الفئات.",
+        "en": "A model that only learns the boundaries distinguishing classes."
+      },
+      "example": {
+        "ar": "الانحدار اللوجستي (Logistic Regression).",
+        "en": "Logistic Regression."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "دالة سيجمويد (Sigmoid)",
+      "en": "Sigmoid Function"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تحول القيم الخطية إلى احتمالات بين 0 و 1.",
+        "en": "A function that squashes linear values into probabilities between 0 and 1."
+      },
+      "example": {
+        "ar": "1 / (1 + e^-(wx+b))",
+        "en": "1 / (1 + e^-(wx+b))"
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "خسارة الإنتروبيا المتقاطعة",
+      "en": "Cross-Entropy Loss"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة هدف تقيس مدى خطأ توقعات النموذج الاحتمالية مقارنة بالواقع.",
+        "en": "An objective function measuring how wrong the model's probability predictions are."
+      },
+      "example": {
+        "ar": "تكون الخسارة كبيرة إذا كان النموذج واثقاً ومخطئاً.",
+        "en": "Loss is huge if the model is confident but wrong."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "الانحدار التدريجي",
+      "en": "Gradient Descent"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تحسين تقوم بتحديث الأوزان في الاتجاه المعاكس للميل لتقليل الخسارة.",
+        "en": "Optimization algorithm that updates weights in the reverse direction of the slope to minimize loss."
+      },
+      "example": {
+        "ar": "w = w - learning_rate * gradient",
+        "en": "w = w - learning_rate * gradient"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "لماذا نستخدم تنعيم لابلاس (إضافة 1) في خوارزمية بايز الساذجة؟",
+      "en": "Why do we use Laplace (add-1) smoothing in Naive Bayes?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة سرعة التدريب.",
+        "لمنع الكلمات غير المرئية من التسبب في احتمال كلي يساوي صفراً.",
+        "لتقليل حجم المفردات.",
+        "لتحويل الاحتمالات إلى قيم سالبة."
+      ],
+      "en": [
+        "To increase training speed.",
+        "To prevent unseen words from causing a total probability of zero.",
+        "To reduce the vocabulary size.",
+        "To convert probabilities into negative values."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بدون التنعيم، أي كلمة جديدة في الاختبار ستجعل الاحتمال المضروب بأكمله صفراً.",
+      "en": "Without smoothing, any new word in the test set would make the entire multiplied probability zero."
+    },
+    "hint": {
+      "ar": "تذكر مشكلة 'الاحتمال الأقصى' للكلمات النادرة.",
+      "en": "Remember the 'Maximum Likelihood' problem for rare words."
+    },
+    "difficulty": "medium",
+    "conceptId": "laplace-smoothing"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في مصفوفة الارتباك، ماذا يمثل 'الإيجابي الخاطئ' (False Positive)؟",
+      "en": "In a confusion matrix, what does a 'False Positive' represent?"
+    },
+    "options": {
+      "ar": [
+        "النظام توقع إيجابي، والواقع إيجابي.",
+        "النظام توقع سلبي، والواقع إيجابي.",
+        "النظام توقع إيجابي، والواقع سلبي.",
+        "النظام توقع سلبي، والواقع سلبي."
+      ],
+      "en": [
+        "System predicted positive, reality is positive.",
+        "System predicted negative, reality is positive.",
+        "System predicted positive, reality is negative.",
+        "System predicted negative, reality is negative."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الإيجابي الخاطئ يعني أن النظام أخطأ بتصنيف شيء كإيجابي بينما هو في الحقيقة سلبي.",
+      "en": "False Positive means the system incorrectly classified something as positive when it is actually negative."
+    },
+    "hint": {
+      "ar": "الكلمة الأولى (False) تعني أن النظام أخطأ، والثانية (Positive) هي ما قاله النظام.",
+      "en": "The first word (False) means the system was wrong, the second (Positive) is what the system said."
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluating-classifiers-metrics"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا يعتبر مقياس 'الدقة الكلية' (Accuracy) مضللاً في مجموعات البيانات غير المتوازنة؟",
+      "en": "Why is 'Accuracy' misleading in imbalanced datasets?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يتجاهل الإيجابيات الحقيقية.",
+        "لأن المصنف الذي يتوقع دائماً الفئة الأكبر سيحصل على دقة عالية جداً رغم فشله في اكتشاف الفئة الأصغر.",
+        "لأنه لا يمكن حسابه إلا للفئات المتوازنة.",
+        "لأنه يعطي وزناً أكبر للفئات النادرة."
+      ],
+      "en": [
+        "Because it ignores True Positives.",
+        "Because a classifier that always predicts the majority class will get very high accuracy despite failing to detect the minority class.",
+        "Because it can only be calculated for balanced classes.",
+        "Because it gives more weight to rare classes."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في مجموعة بيانات بها 99% سلبي و 1% إيجابي، المصنف الذي يقول دائماً 'سلبي' سيحقق دقة 99% ولكنه عديم الفائدة.",
+      "en": "In a dataset with 99% negative and 1% positive, a classifier that always says 'negative' gets 99% accuracy but is useless."
+    },
+    "hint": {
+      "ar": "تذكر مثال التغريدات عن 'الفطيرة'.",
+      "en": "Remember the 'pie' tweets example."
+    },
+    "difficulty": "medium",
+    "conceptId": "evaluating-classifiers-metrics"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من التالي يُعد مثالاً على مصنف تمييزي (Discriminative Classifier)؟",
+      "en": "Which of the following is an example of a Discriminative Classifier?"
+    },
+    "options": {
+      "ar": [
+        "بايز الساذجة",
+        "نماذج ماركوف المخفية",
+        "الانحدار اللوجستي",
+        "النماذج التوليدية"
+      ],
+      "en": [
+        "Naive Bayes",
+        "Hidden Markov Models",
+        "Logistic Regression",
+        "Generative Models"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الانحدار اللوجستي هو مصنف تمييزي لأنه يتعلم حدود القرار مباشرة P(c|d).",
+      "en": "Logistic Regression is a discriminative classifier because it learns the decision boundary directly P(c|d)."
+    },
+    "hint": {
+      "ar": "هذا المصنف يستخدم دالة سيجمويد.",
+      "en": "This classifier uses the sigmoid function."
+    },
+    "difficulty": "easy",
+    "conceptId": "generative-vs-discriminative"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو دور دالة سيجمويد في الانحدار اللوجستي؟",
+      "en": "What is the role of the sigmoid function in Logistic Regression?"
+    },
+    "options": {
+      "ar": [
+        "حساب الخسارة بين التوقع والواقع.",
+        "تحديث الأوزان أثناء التدريب.",
+        "تحويل المجموع الخطي للميزات إلى قيمة احتمالية بين 0 و 1.",
+        "تنعيم البيانات لمنع الاحتمالات الصفرية."
+      ],
+      "en": [
+        "Calculating the loss between prediction and reality.",
+        "Updating weights during training.",
+        "Squashing the linear combination of features into a probability value between 0 and 1.",
+        "Smoothing data to prevent zero probabilities."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة سيجمويد تأخذ أي رقم حقيقي وتحوله إلى نطاق (0، 1) ليمثل احتمالاً.",
+      "en": "The sigmoid function takes any real number and maps it into the (0, 1) range to represent a probability."
+    },
+    "hint": {
+      "ar": "تذكر المنحنى على شكل حرف S.",
+      "en": "Remember the S-shaped curve."
+    },
+    "difficulty": "medium",
+    "conceptId": "logistic-regression-basics"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في خوارزمية الانحدار التدريجي، في أي اتجاه نتحرك لتحديث الأوزان؟",
+      "en": "In the Gradient Descent algorithm, in which direction do we move to update the weights?"
+    },
+    "options": {
+      "ar": [
+        "في نفس اتجاه ميل دالة الخسارة.",
+        "في الاتجاه المعاكس لميل دالة الخسارة.",
+        "بشكل عشوائي حتى نجد الحد الأدنى.",
+        "في اتجاه زيادة دالة الخسارة."
+      ],
+      "en": [
+        "In the same direction as the slope of the loss function.",
+        "In the reverse direction from the slope of the loss function.",
+        "Randomly until we find the minimum.",
+        "In the direction of increasing the loss function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لتقليل الخسارة، يجب أن نتحرك عكس اتجاه الميل (التدرج).",
+      "en": "To minimize the loss, we must move opposite to the direction of the slope (gradient)."
+    },
+    "hint": {
+      "ar": "نحن نريد 'النزول' إلى أسفل الوادي.",
+      "en": "We want to 'descend' to the bottom of the valley."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-entropy-loss-gradient-descent"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو المقياس الذي يمثل المتوسط التوافقي للدقة (Precision) والاستدعاء (Recall)؟",
+      "en": "Which metric represents the harmonic mean of Precision and Recall?"
+    },
+    "options": {
+      "ar": [
+        "الدقة الكلية (Accuracy)",
+        "المتوسط الشامل (Macroaverage)",
+        "مقياس F1 (F1-Measure)",
+        "المتوسط الدقيق (Microaverage)"
+      ],
+      "en": [
+        "Accuracy",
+        "Macroaverage",
+        "F1-Measure",
+        "Microaverage"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مقياس F1 يجمع بين الدقة والاستدعاء في رقم واحد باستخدام المتوسط التوافقي.",
+      "en": "F1-Measure combines precision and recall into a single number using the harmonic mean."
+    },
+    "hint": {
+      "ar": "المعادلة هي 2PR / (P+R).",
+      "en": "The formula is 2PR / (P+R)."
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluating-classifiers-metrics"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "إذا أردت تقييم أداء مصنف على فئات متعددة وكنت تهتم جداً بأداء الفئات النادرة والصغيرة، أي متوسط يجب أن تستخدم؟",
+      "en": "If you want to evaluate a classifier on multiple classes and you care deeply about the performance on rare, small classes, which average should you use?"
+    },
+    "options": {
+      "ar": [
+        "المتوسط الدقيق (Microaveraging)",
+        "المتوسط الشامل (Macroaveraging)",
+        "المتوسط المرجح (Weighted Averaging)",
+        "الدقة الكلية (Accuracy)"
+      ],
+      "en": [
+        "Microaveraging",
+        "Macroaveraging",
+        "Weighted Averaging",
+        "Accuracy"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المتوسط الشامل يعطي وزناً متساوياً لكل فئة بغض النظر عن حجمها، مما يبرز أداء الفئات النادرة.",
+      "en": "Macroaveraging gives equal weight to each class regardless of size, highlighting performance on rare classes."
+    },
+    "hint": {
+      "ar": "هذا المتوسط يحسب المقياس لكل فئة أولاً ثم يأخذ المتوسط.",
+      "en": "This average computes the metric per class first, then averages."
+    },
+    "difficulty": "hard",
+    "conceptId": "micro-vs-macro-averaging"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "في معادلة تنعيم لابلاس، ماذا يمثل الرمز |V| في المقام؟",
+      "en": "In the Laplace smoothing equation, what does the symbol |V| in the denominator represent?"
+    },
+    "options": {
+      "ar": [
+        "إجمالي عدد المستندات.",
+        "حجم المفردات (عدد الكلمات الفريدة في بيانات التدريب).",
+        "عدد الفئات المتاحة للتصنيف.",
+        "معدل التعلم."
+      ],
+      "en": [
+        "Total number of documents.",
+        "Vocabulary size (number of unique words in training data).",
+        "Number of available classes for classification.",
+        "Learning rate."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نضيف حجم المفردات |V| إلى المقام لضمان أن مجموع الاحتمالات لجميع الكلمات يظل مساوياً لـ 1 بعد إضافة 1 لكل كلمة في البسط.",
+      "en": "We add vocabulary size |V| to the denominator to ensure the sum of probabilities for all words remains 1 after adding 1 to each word in the numerator."
+    },
+    "hint": {
+      "ar": "V ترمز إلى Vocabulary.",
+      "en": "V stands for Vocabulary."
+    },
+    "difficulty": "medium",
+    "conceptId": "laplace-smoothing"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الهدف من دالة خسارة الإنتروبيا المتقاطعة (Cross-Entropy Loss)؟",
+      "en": "What is the goal of the Cross-Entropy Loss function?"
+    },
+    "options": {
+      "ar": [
+        "تعظيم الخسارة عندما يكون النموذج واثقاً وصحيحاً.",
+        "معاقبة النموذج بشدة عندما يكون واثقاً جداً ولكنه مخطئ.",
+        "تحويل الميزات النصية إلى أرقام.",
+        "حساب الاحتمال المسبق للفئات."
+      ],
+      "en": [
+        "Maximize loss when the model is confident and correct.",
+        "Penalize the model heavily when it is very confident but wrong.",
+        "Convert text features into numbers.",
+        "Calculate the prior probability of classes."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة الخسارة تعطي قيمة صغيرة إذا كان التوقع قريباً من الحقيقة، وقيمة كبيرة جداً (عقوبة) إذا كان النموذج يتوقع بقوة إجابة خاطئة.",
+      "en": "The loss function gives a small value if the prediction is close to truth, and a huge value (penalty) if the model strongly predicts a wrong answer."
+    },
+    "hint": {
+      "ar": "الخسارة تعني 'الخطأ'. نحن نريد تقليل الخطأ.",
+      "en": "Loss means 'error'. We want to minimize error."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-entropy-loss-gradient-descent"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الدقة الكلية (Accuracy) لتقييم نموذج يعمل على بيانات غير متوازنة. المصنف الذي يتوقع دائماً الفئة الأغلبية سيبدو ممتازاً ولكنه في الواقع فاشل. استخدم دائماً Precision و Recall و F1.</template>
+    <template class="content-en">Using Accuracy to evaluate a model on imbalanced data. A classifier that always predicts the majority class will look excellent but is actually useless. Always use Precision, Recall, and F1.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان إضافة حجم المفردات |V| إلى المقام عند تطبيق تنعيم لابلاس. إذا أضفت 1 للبسط فقط، فإن مجموع الاحتمالات سيتجاوز 1، مما يفسد النموذج الاحتمالي.</template>
+    <template class="content-en">Forgetting to add the vocabulary size |V| to the denominator when applying Laplace smoothing. If you only add 1 to the numerator, the sum of probabilities will exceed 1, breaking the probabilistic model.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المشتقة الرياضية لدالة خسارة الإنتروبيا المتقاطعة مع دالة سيجمويد تبسط بشكل سحري إلى: (التوقع - الحقيقة) * قيمة الميزة. هذا يجعل حساب الانحدار التدريجي سريعاً جداً برمجياً.</template>
+    <template class="content-en">The mathematical derivative of cross-entropy loss with the sigmoid function magically simplifies to: (Prediction - Truth) * Feature Value. This makes computing gradient descent extremely fast programmatically.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في الانحدار التدريجي، نحن نتحرك دائماً في الاتجاه المعاكس للميل (Gradient). إذا كان الميل موجباً، نطرح لنتحرك يساراً. إذا كان سالباً، نطرح (سالب مع سالب يصبح موجب) لنتحرك يميناً نحو القاع.</template>
+    <template class="content-en">In Gradient Descent, we always move in the reverse direction of the slope (Gradient). If the slope is positive, we subtract to move left. If negative, we subtract (negative minus negative becomes positive) to move right towards the bottom.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين النماذج: بايز الساذجة (توليدي) يحاول فهم كيف تبدو كل فئة من الداخل. الانحدار اللوجستي (تمييزي) لا يهتم بداخل الفئة، بل يبحث فقط عن الخط الفاصل بين الفئات.</template>
+    <template class="content-en">The core difference: Naive Bayes (Generative) tries to understand what each class looks like from the inside. Logistic Regression (Discriminative) doesn't care about the inside; it only looks for the dividing line between classes.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

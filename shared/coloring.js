@@ -3,20 +3,20 @@
   if (window.GardenColoring) return;
 
   var TOOLS = [
-    { id: 'pencil', eng: 'pencil', key: 'p', ar: 'قلمٌ خشبيّ', en: 'Colored pencil', size: [1.4, 9], def: .35, set: 'pencil' },
-    { id: 'graphite', eng: 'graphite', key: 'g', ar: 'قلمُ رصاص', en: 'Graphite pencil', size: [1.2, 8], def: .3, set: 'graphite' },
-    { id: 'marker', eng: 'marker', key: 'm', ar: 'فلوماستر', en: 'Marker', size: [4, 38], def: .35, set: 'marker' },
-    { id: 'wash', eng: 'wash', key: 'w', ar: 'ألوانٌ مائيّة', en: 'Watercolor', size: [6, 90], def: .35, set: 'wash' },
-    { id: 'crayon', eng: 'crayon', key: 'c', ar: 'لونٌ شمعيّ', en: 'Wax crayon', size: [4, 28], def: .4, set: 'crayon' },
-    { id: 'pastel', eng: 'pastel', key: 's', ar: 'طباشيرُ باستيل', en: 'Soft pastel', size: [5, 45], def: .4, set: 'pastel' },
-    { id: 'oil', eng: 'oil', key: 'o', ar: 'فرشاةُ زيت', en: 'Oil brush', size: [5, 70], def: .4, set: 'oil' },
-    { id: 'airbrush', eng: 'airbrush', key: 'a', ar: 'بخّاخ', en: 'Airbrush', size: [12, 170], def: .4, set: 'basic' },
-    { id: 'ink', eng: 'ink', key: 'n', ar: 'قلمُ حبر', en: 'Fineliner', size: [.8, 6], def: .3, set: 'basic' },
-    { id: 'gel', eng: 'gel', key: 'j', ar: 'قلمُ جِل', en: 'Gel pen', size: [1, 8], def: .3, set: 'basic' },
-    { id: 'blend', eng: 'blend', key: 'r', ar: 'ممسحةُ دمج', en: 'Blending stump', size: [6, 60], def: .4 },
-    { id: 'eraser', eng: 'eraser', key: 'e', ar: 'ممحاة', en: 'Eraser', size: [4, 80], def: .35 },
-    { id: 'fill', eng: null, key: 'f', ar: 'دلوُ التعبئة', en: 'Fill bucket', def: 0 },
-    { id: 'pick', eng: null, key: 'i', ar: 'قطّارةُ الألوان', en: 'Color dropper', def: 0 }
+    { id: 'graphite', eng: 'graphite', key: 'g', ar: 'قلمُ رصاص', en: 'Graphite pencil', size: [1.2, 8], def: .3, set: 'graphite', grp: 'sketch' },
+    { id: 'pencil', eng: 'pencil', key: 'p', ar: 'قلمٌ خشبيّ', en: 'Colored pencil', size: [1.4, 9], def: .35, set: 'pencil', grp: 'dry' },
+    { id: 'crayon', eng: 'crayon', key: 'c', ar: 'لونٌ شمعيّ', en: 'Wax crayon', size: [4, 28], def: .4, set: 'crayon', grp: 'dry' },
+    { id: 'pastel', eng: 'pastel', key: 's', ar: 'طباشيرُ باستيل', en: 'Soft pastel', size: [5, 45], def: .4, set: 'pastel', grp: 'dry' },
+    { id: 'marker', eng: 'marker', key: 'm', ar: 'فلوماستر', en: 'Marker', size: [4, 38], def: .35, set: 'marker', grp: 'wet' },
+    { id: 'wash', eng: 'wash', key: 'w', ar: 'ألوانٌ مائيّة', en: 'Watercolor', size: [6, 90], def: .35, set: 'wash', grp: 'wet' },
+    { id: 'oil', eng: 'oil', key: 'o', ar: 'فرشاةُ زيت', en: 'Oil brush', size: [5, 70], def: .4, set: 'oil', grp: 'wet' },
+    { id: 'airbrush', eng: 'airbrush', key: 'a', ar: 'بخّاخ', en: 'Airbrush', size: [12, 170], def: .4, set: 'basic', grp: 'wet' },
+    { id: 'ink', eng: 'ink', key: 'n', ar: 'قلمُ حبر', en: 'Fineliner', size: [.8, 6], def: .3, set: 'basic', grp: 'line' },
+    { id: 'gel', eng: 'gel', key: 'j', ar: 'قلمُ جِل', en: 'Gel pen', size: [1, 8], def: .3, set: 'basic', grp: 'line' },
+    { id: 'blend', eng: 'blend', key: 'r', ar: 'ممسحةُ دمج', en: 'Blending stump', size: [6, 60], def: .4, grp: 'fix' },
+    { id: 'eraser', eng: 'eraser', key: 'e', ar: 'ممحاة', en: 'Eraser', size: [4, 80], def: .35, grp: 'fix' },
+    { id: 'fill', eng: null, key: 'f', ar: 'دلوُ التعبئة', en: 'Fill bucket', def: 0, grp: 'util' },
+    { id: 'pick', eng: null, key: 'i', ar: 'قطّارةُ الألوان', en: 'Color dropper', def: 0, grp: 'util' }
   ];
   var BYID = {}; TOOLS.forEach(function (t) { BYID[t.id] = t; });
 
@@ -93,6 +93,68 @@
       t: ['مع «الأصل» ظاهراً تأخذ ألوانَ الصورة الأصليّة مباشرةً.', 'With "Original" shown, you pick colors straight from the original.'] }
   };
 
+  var GROUPS = { sketch: ['التخطيط', 'Sketch'], dry: ['تلوينٌ جافّ', 'Dry color'], wet: ['تلوينٌ رطب', 'Wet color'], line: ['تحبيرٌ ولمسات', 'Ink & accents'], fix: ['تنعيمٌ وتصحيح', 'Blend & fix'], util: ['أدوات', 'Tools'] };
+  var MORE = {
+    graphite: { k: ['للخطوط الأولى والظلال الدقيقة', 'First lines and fine shading'], g: ['أمِلِ القلمَ لظلٍّ عريضٍ ناعم، وقِفْه عموديّاً لخطٍّ حادّ. الضغطُ الخفيف يُبقي الخطَّ قابلاً للمحو.', 'Tilt for a broad soft shade; hold upright for a crisp line. A light touch keeps lines easy to erase.'],
+      x: ['الضغطُ القويُّ من البداية يحفر خطّاً داكناً يصعب إخفاؤه تحت الألوان.', 'Pressing hard from the start leaves a dark line that is hard to hide under color.'], m: ['الممحاة والممسحة', 'Eraser and blending stump'] },
+    pencil: { k: ['دقيق — طبقاتٌ متأنّية', 'Precise — patient layers'], g: ['الضغطُ يقرّر الكثافة: خفيفٌ = شفّاف، قويٌّ = مشبع. والإمالةُ تعرض الرأسَ لتظليلٍ أسرع.', 'Pressure sets density: light = sheer, firm = rich. Tilt widens the tip for faster shading.'],
+      x: ['لونٌ واحدٌ مضغوطٌ بقوّة يبدو مسطّحاً — ركّبْ لونين أو ثلاثة طبقةً فوق طبقة.', 'One color pressed hard looks flat — layer two or three colors instead.'], m: ['ممسحة الدمج والجِل الأبيض', 'Blending stump and white gel'] },
+    crayon: { k: ['سريع — مساحاتٌ كبيرة', 'Fast — large areas'], g: ['الإمالةُ تعطي أثراً عريضاً خشناً، والرأسُ للحوافّ.', 'Tilt for a wide rough mark; use the tip for edges.'],
+      x: ['المرورُ مرّاتٍ كثيرة يملأ الحبيبات فيضيع الملمس الجميل.', 'Too many passes fill the grain and lose the lovely texture.'], m: ['ورقٌ مائيٌّ خشن', 'Rough watercolor paper'] },
+    pastel: { k: ['سريعٌ وناعم — انتقالاتٌ ومساحات', 'Fast and soft — gradients and areas'], g: ['ضغطٌ متوسّط ثمّ ادمجْ. الإمالةُ تغطّي مساحةً أوسع.', 'Medium pressure, then blend. Tilt to cover more.'],
+      x: ['الدمجُ قبل وضع اللونين معاً يعطي لوناً باهتاً.', 'Blending before both colors are down gives a dull result.'], m: ['ممسحة الدمج', 'Blending stump'] },
+    marker: { k: ['سريع — ألوانٌ زاهية', 'Fast — bright colors'], g: ['الرأسُ مشطوف: عريضٌ بزاويةٍ ورفيعٌ بأخرى. الضغطُ لا يغيّر العرض بل تدفّقَ الحبر.', 'Chisel tip: broad one way, thin the other. Pressure changes ink flow, not width.'],
+      x: ['التوقّفُ في منتصف المساحة يترك بقعةً داكنة عند الحدّ.', 'Stopping mid-area leaves a dark pool at the edge.'], m: ['قلمُ حبرٍ للخطوط فوقه', 'A fineliner on top for lines'] },
+    wash: { k: ['سريع — سماءٌ وخلفيّات', 'Fast — skies and backgrounds'], g: ['الشريحةُ الثانية كمّيّةُ الماء. ضربةٌ على المبلول تمتزج، وعلى الجافّ تضيف طبقة.', 'The second slider is water. On wet paint it blends; on dry paint it layers.'],
+      x: ['العملُ على المنطقة نفسِها وهي تجفّ يترك بقعاً — انتظرْ حتى تجفّ تماماً.', 'Working an area while it dries leaves blooms — wait until fully dry.'], m: ['قلمُ رصاصٍ تحته وحبرٌ فوقه', 'Graphite under, ink on top'] },
+    oil: { k: ['تعبيريّ — ضرباتٌ عريضة', 'Expressive — broad strokes'], g: ['ضرباتٌ قصيرةٌ واثقة تُبرز أثرَ الشعر. ارفعِ القلم لتعيدَ تحميل الفرشاة.', 'Short confident strokes show the bristles. Lift to reload the brush.'],
+      x: ['الضربةُ الطويلةُ جدّاً تفرغ الفرشاةَ فيصير آخرُها باهتاً.', 'A very long stroke empties the brush and fades out.'], m: ['ورقُ القماش', 'Canvas paper'] },
+    airbrush: { k: ['سريعٌ وناعم — ظلٌّ وتوهّج', 'Fast and soft — shadows and glow'], g: ['ابقَ فوق المكان ليزداد اللون، وحرّكْ يدك بسرعةٍ لطبقةٍ خفيفة.', 'Hover to build color; move quickly for a light veil.'],
+      x: ['الرشُّ الكثيفُ مرّةً واحدة يغطّي التفاصيل — ابنِه تدريجيّاً.', 'Heavy spraying at once hides details — build it gradually.'], m: ['«داخل الخطوط» ليبقى داخل الشكل', '“Inside lines” to keep it in the shape'] },
+    ink: { k: ['دقيق — خطوطٌ وتفاصيل', 'Precise — lines and details'], g: ['العرضُ يتغيّر قليلاً بالضغط. كبّرِ الرسمةَ للتفاصيل الصغيرة.', 'Width changes a little with pressure. Zoom in for small details.'],
+      x: ['التحبيرُ قبل جفاف المائيّ يُسيل الخطّ.', 'Inking before watercolor dries makes the line bleed.'], m: ['المائيّ والفلوماستر تحته', 'Watercolor or marker underneath'] },
+    gel: { k: ['دقيق — لمساتٌ أخيرة', 'Precise — finishing touches'], g: ['نقرةٌ صغيرةٌ تكفي للمعة. يغطّي حتّى الألوانَ الداكنة.', 'A tiny tap is enough for a highlight. It covers even dark colors.'],
+      x: ['اللمعاتُ الكثيرة تُفقد الرسمةَ عمقَها.', 'Too many highlights flatten the drawing.'], m: ['كلُّ الأدوات — يأتي في النهاية', 'Every tool — it comes last'] },
+    blend: { k: ['تنعيمٌ دقيق', 'Precise softening'], g: ['حركاتٌ دائريّةٌ صغيرة على الحدّ. الضغطُ الأقوى يسحب لوناً أكثر.', 'Small circles on the border. Firmer pressure drags more color.'],
+      x: ['الدمجُ فوق الرسمة كلِّها يمحو الملمسَ والحدود.', 'Blending everything erases texture and edges.'], m: ['الباستيل والخشبيّ والرصاص', 'Pastel, colored pencil, graphite'] },
+    eraser: { k: ['للتصحيح والإضاءة', 'Fixes and highlights'], g: ['المحوُ الخفيف يفتّح ولا يزيل. وزرُّ القلم الجانبيّ يمحو بلا تبديل الأداة.', 'Light erasing lightens without removing. Your pen’s side button erases without switching.'],
+      x: ['ممحاةٌ كبيرةٌ قرب التفاصيل تمسح ما حولها.', 'A big eraser near details wipes their surroundings.'], m: ['الرصاص والخشبيّ', 'Graphite and colored pencil'] },
+    fill: { k: ['الأسرعُ — بدايةٌ في ثوانٍ', 'Fastest — a start in seconds'], g: ['اضغطْ داخل شكلٍ مغلق. الخامةُ من أداتك الحاليّة، و«تظليل» يضيف ضوءاً وظلّاً.', 'Tap inside a closed shape. The texture comes from your current tool; “Shading” adds light and shade.'],
+      x: ['شكلٌ غيرُ مغلقٍ يُملأ معه ما حوله — أغلقِ الفجوةَ بالحبر أوّلاً.', 'An open shape spills — close the gap with ink first.'], m: ['الخشبيّ والباستيل للظلال بعده', 'Pencil or pastel for shading after'] },
+    pick: { k: ['لإعادة لونٍ بدقّة', 'Reuse a color exactly'], g: ['اضغطْ على النقطة. ومع «الأصل» ظاهراً تأخذ ألوانَ الصورة الأصليّة.', 'Tap a point. With “Original” shown you take the original colors.'],
+      x: ['أخذُ لونٍ من حافّة الخطّ يعطي لوناً مختلطاً بالأسود.', 'Picking at a line edge gives a color mixed with black.'], m: ['«الأصل» (V)', '“Original” (V)'] }
+  };
+  var BOOK = [
+    ['fa-flag-checkered', ['ابدأْ من هنا: خمسُ خطوات', 'Start here: five steps'], [
+      ['انظرْ إلى «الأصل» (V) لتعرف الألوانَ وأين الضوءُ والظلّ.', 'Look at the “Original” (V) to see the colors and where light and shadow fall.'],
+      ['املأِ الأساس: «لوّنْها تلقائيّاً» أو الدلو (F) — أو الخشبيُّ والباستيل بخفّة.', 'Lay the base: “Auto-color” or the bucket (F) — or light pencil and pastel.'],
+      ['ظلّلْ من الفاتح إلى الداكن طبقةً فوق طبقة؛ الداكنُ يُضاف بسهولةٍ ولا يُزال بسهولة.', 'Shade light to dark, layer over layer; dark is easy to add and hard to remove.'],
+      ['نعّمِ الحدودَ بممسحة الدمج (R) حيث تريد انتقالاً ناعماً.', 'Soften borders with the blending stump (R) where you want a smooth transition.'],
+      ['اختمْ بلمساتٍ: حبرٌ (N) للخطوط، وجِلٌ أبيض (J) لِلَمعةٍ أو اثنتين.', 'Finish: ink (N) for lines and white gel (J) for one or two highlights.']]],
+    ['fa-gauge-high', ['سريعٌ أم دقيق؟', 'Fast or precise?'], [
+      ['للسرعة: «لوّنْها» · الدلو · فلوماستر عريض · مائيٌّ بفرشاةٍ كبيرة · بخّاخ · شمعيّ.', 'Fast: Auto-color · bucket · broad marker · big watercolor brush · airbrush · crayon.'],
+      ['للدقّة: رصاص · خشبيّ · حبر · جِل — كبّرِ الرسمة (+ أو Ctrl مع العجلة) وصغّرِ الرأس ( [ ).', 'Precise: graphite · pencil · ink · gel — zoom in (+ or Ctrl+wheel) and shrink the tip ( [ ).'],
+      ['«داخل الخطوط» (L) يمنع اللونَ من تجاوز الشكل الذي بدأتَ فيه — اتركه مفعّلاً وأنت تتعلّم.', '“Inside lines” (L) keeps color in the shape you started in — keep it on while learning.']]],
+    ['fa-pen-nib', ['القلمُ واللمس', 'Pen and touch'], [
+      ['الضغطُ يغيّر الكثافةَ والعرض، والإمالةُ تعرض رأسَ الرصاص والخشبيّ والباستيل والشمعيّ.', 'Pressure changes density and width; tilt widens graphite, pencil, pastel and crayon.'],
+      ['زرُّ القلم الجانبيّ ممحاةٌ فوريّة. وتغيّره من إعدادات القلم في الملاحظات.', 'The pen’s side button is an instant eraser; change it in the notes pen settings.'],
+      ['إصبعان: تكبيرٌ وتحريك · نقرةٌ بإصبعين: تراجع · بثلاثة: إعادة · المسافة (Space) مع السحب: تحريك.', 'Two fingers: zoom and move · two-finger tap: undo · three: redo · Space + drag: move.']]],
+    ['fa-palette', ['الألوان', 'Colors'], [
+      ['«من الرسمة»: ألوانُ الأصل مرتّبةً بدرجاتها — أسرعُ طريقٍ لنتيجةٍ متناسقة.', '“From the drawing”: the original’s colors in their shades — the quickest way to harmony.'],
+      ['الشريطُ العلويّ درجاتُ لونك الحاليّ من الفاتح إلى الداكن: الفاتحُ للضوء والداكنُ للظلّ.', 'The top strip shows your color from light to dark: light for light, dark for shadow.'],
+      ['القطّارة (I) تأخذ لوناً من الرسمة، وX يبدّل بين آخر لونين.', 'The dropper (I) takes a color; X swaps your last two colors.']]],
+    ['fa-layer-group', ['الورقُ والجودة', 'Paper and quality'], [
+      ['ناعم: للفلوماستر والحبر · ورقُ رسم: للأقلام · مائيّ: للمائيّ والشمعيّ · قماش: للزيت.', 'Smooth: marker and ink · Drawing: pencils · Watercolor: watercolor and crayon · Canvas: oil.'],
+      ['الرسمةُ نفسُها بالجودة نفسِها على كلِّ جهاز؛ الجهازُ الأضعف يعرض المؤثّراتِ أخفَّ وهو يرسم فقط.', 'Your drawing is the same full quality on every device; a weaker device only previews effects more lightly.']]],
+    ['fa-floppy-disk', ['احفظْ عملك', 'Keep your work'], [
+      ['«أدرجْ في الصفحة» يضع الرسمةَ في ملاحظتك، و«أكملِ التلوين» يعيدك إليها بكلِّ تفاصيلها وتراجعها.', '“Insert” puts it in your note; “Keep coloring” brings you back with every detail and undo step.'],
+      ['«ملفّ ← احفظْها في رسوماتي» تحفظها في حسابك وحدَها، وتجدها على كلِّ أجهزتك.', '“File → Save to My drawings” keeps it in your account on its own, on all your devices.'],
+      ['«ملفّ ← صدّرْ ملفَّ المرسم» نسخةٌ كاملةٌ تفتحها لاحقاً من «ملفّ ← افتحْ».', '“File → Export studio file” is a full copy you can reopen later from “File → Open”.']]],
+    ['fa-keyboard', ['اختصارات', 'Shortcuts'], [
+      ['G رصاص · P خشبيّ · C شمعيّ · S باستيل · M فلوماستر · W مائيّ · O زيت · A بخّاخ · N حبر · J جِل · R دمج · E ممحاة · F دلو · I قطّارة', 'G graphite · P pencil · C crayon · S pastel · M marker · W watercolor · O oil · A airbrush · N ink · J gel · R blend · E eraser · F bucket · I dropper'],
+      ['[ ] حجمُ الرأس · + − 0 1 التكبير · H اليد · V الأصل · L داخل الخطوط · X تبديلُ اللون · Ctrl+Z تراجع · Ctrl+Y إعادة', '[ ] tip size · + − 0 1 zoom · H hand · V original · L inside lines · X swap color · Ctrl+Z undo · Ctrl+Y redo']]]
+  ];
+
   var SETS = {
     pencil: { ar: 'علبةُ الخشبيّة', en: 'Pencil tin', c: [
       ['#fff36b', 'أصفرُ فاتح', 'Canary'], ['#ffd21f', 'أصفر', 'Yellow'], ['#ffad1f', 'ذهبيّ', 'Golden'], ['#ff7a1a', 'برتقاليّ', 'Orange'],
@@ -141,22 +203,27 @@
     ['skin', 'بشرة', 'Skin', 60, .32], ['brown', 'بنّيّ', 'Brown', 50, .45], ['olive', 'زيتيّ', 'Olive', 110, .42], ['grey', 'رماديّ', 'Grey', 250, .03]
   ];
   var LIGHTS = [.95, .87, .78, .69, .6, .51, .42, .33, .24];
-  var TIERS = { high: { doc: 2048, cap: 2.5 }, mid: { doc: 1600, cap: 1.5 }, low: { doc: 1200, cap: 1 } };
+  var PALMS = [['auto', 'تلقائيّ', 'Automatic'], ['never', 'الإصبعُ يرسم', 'Finger draws'], ['always', 'ارفضِ اللمس', 'Reject touch']];
+  var TIERS = { high: { doc: 2048, cap: 2.5 }, mid: { doc: 2048, cap: 1.5 }, low: { doc: 2048, cap: 1 } };
   var PERF_KEY = 'garden_mirsam_perf', QUALS = [['auto', 'تلقائيّة', 'Auto'], ['high', 'عالية', 'High'], ['mid', 'متوسّطة', 'Medium'], ['low', 'خفيفة', 'Light']];
   function perfKey() { var d = window.devicePixelRatio || 1; return [Math.round(screen.width * d), Math.round(screen.height * d), d].join('x'); }
+  var SOFT_GPU = /swiftshader|llvmpipe|softpipe|basic render|software|microsoft basic/i;
   function autoTier() {
     var c = store(PERF_KEY);
-    if (c && c.v === 1 && c.key === perfKey() && TIERS[c.tier]) return c;
-    var d = Math.min(2.5, window.devicePixelRatio || 1);
-    var b = window.GardenPaintGL && GardenPaintGL.bench ? GardenPaintGL.bench(innerWidth * d, innerHeight * d) : null;
-    var tier = !b ? 'mid' : b.dab <= .6 ? 'high' : b.dab <= 1.6 ? 'mid' : 'low';
-    var cap = TIERS[tier].cap;
-    if (b) { cap = Math.min(cap, d); while (cap > 1 && b.comp * Math.pow(cap / d, 2) > 14) cap = Math.max(1, cap - .25); }
-    c = { v: 1, key: perfKey(), tier: tier, cap: cap, dab: b ? +b.dab.toFixed(2) : null, comp: b ? +b.comp.toFixed(1) : null, gpu: b ? b.gpu : '', at: Date.now() };
+    if (c && c.v === 5 && c.key === perfKey() && TIERS[c.tier]) return c;
+    var g = window.GardenPaintGL && GardenPaintGL.gpu ? GardenPaintGL.gpu() : '', d = Math.min(2.5, window.devicePixelRatio || 1), mem = navigator.deviceMemory || 8;
+    var tier = SOFT_GPU.test(g) ? 'low' : mem <= 2 ? 'mid' : 'high';
+    c = { v: 5, key: perfKey(), tier: tier, cap: Math.min(TIERS[tier].cap, d), gpu: g, at: Date.now() };
     store(PERF_KEY, c);
     return c;
   }
-  function stepDown(c) { var o = ['high', 'mid', 'low'], i = o.indexOf(c.tier); if (i < 2) { c.tier = o[i + 1]; c.cap = Math.min(c.cap, TIERS[c.tier].cap); c.down = (c.down || 0) + 1; store(PERF_KEY, c); return true; } return false; }
+  function stepDown(c) {
+    var o = ['high', 'mid', 'low'], i = o.indexOf(c.tier);
+    if (c.cap > 1) c.cap = Math.max(1, c.cap - .5);
+    else if (i < 2) { c.tier = o[i + 1]; c.cap = Math.min(c.cap, TIERS[c.tier].cap); }
+    else return false;
+    c.down = (c.down || 0) + 1; store(PERF_KEY, c); return true;
+  }
 
   var PAPERS = [['smooth', 'ناعم', 'Smooth'], ['draw', 'ورقُ رسم', 'Drawing'], ['cold', 'ورقٌ مائيّ', 'Watercolor'], ['canvas', 'قماش', 'Canvas']];
   var RECENT_KEY = 'garden_mirsam_recent', PREF_KEY = 'garden_mirsam_prefs';
@@ -207,6 +274,32 @@
     return { id: f[0], ar: f[1], en: f[2], shades: LIGHTS.map(function (L) { return lch(L, cmax * (1 - Math.pow(Math.abs(L - .62) / .62, 2) * .55), f[3]); }) };
   });
 
+  function docSize(item, side, img) {
+    var nw = img.naturalWidth || side, nh = img.naturalHeight || side;
+    return { W: item.W || (nw >= nh ? side : Math.round(side * nw / nh)), H: item.H || (nw >= nh ? Math.round(side * nh / nw) : side) };
+  }
+  function lineOf(img, W, H) { var line = canvas(W, H), lc = ctx2(line); lc.fillStyle = '#fff'; lc.fillRect(0, 0, W, H); lc.drawImage(img, 0, 0, W, H); return line; }
+  function sideFor(item) {
+    var q = (store(PREF_KEY) || {}).quality, tier = q && TIERS[q] ? q : autoTier().tier, side = item.side || TIERS[tier].doc;
+    return side;
+  }
+  var PRE = null;
+  function precompute(item) {
+    if (!item || !item.lineUrl || item.svg) return null;
+    var side = sideFor(item);
+    if (item.W && item.H && Math.max(item.W, item.H) > side) { var k0 = side / Math.max(item.W, item.H); item = Object.assign({}, item, { W: Math.round(item.W * k0), H: Math.round(item.H * k0) }); }
+    if (PRE && PRE.url === item.lineUrl && PRE.side === side) return PRE;
+    var pre = PRE = { url: item.lineUrl, side: side, ref: item.refUrl };
+    if (item.refUrl) pre.refP = rasterImage(item.refUrl).then(function (ref) { try { pre.fam = extractFamilies(ref); } catch (e) {} return ref; }, function () { return null; });
+    pre.p = rasterImage(item.lineUrl).then(function (img) {
+      var sz = docSize(item, side, img), line = lineOf(img, sz.W, sz.H);
+      pre.W = sz.W; pre.H = sz.H; pre.line = line; pre.img = img;
+      pre.regionsP = Regions.build(line, Math.max(2, Math.round(sz.W / 460)), img);
+      return pre;
+    });
+    pre.p.catch(function () { if (PRE === pre) PRE = null; });
+    return pre;
+  }
   function svgImage(text, w, h) {
     var s = text.replace(/<svg\b([^>]*)>/, function (m, a) {
       a = a.replace(/\s(width|height)="[^"]*"/g, '');
@@ -223,7 +316,8 @@
   function rasterImage(url) {
     return new Promise(function (res, rej) {
       var im = new Image(); im.crossOrigin = 'anonymous'; im.decoding = 'async';
-      im.onload = function () { res(im); }; im.onerror = function () { rej(new Error('img ' + url)); }; im.src = url;
+      im.onload = function () { if (im.decode) im.decode().then(function () { res(im); }, function () { res(im); }); else res(im); };
+      im.onerror = function () { rej(new Error('img ' + url)); }; im.src = url;
     });
   }
   var HIDE_COLOR = '<style>#color,#hair,#skin,#skin-shadow,#guide{display:none}</style>';
@@ -273,26 +367,87 @@
     }
     return { lab: lab, n: n, boxes: boxes };
   }
+  function minRun(src, dst, n, off, step, pad, BIG, g, hh) {
+    var k = 2 * pad + 1, i, v;
+    for (i = 0; i < n; i++) { v = src[off + i * step]; g[i] = i % k === 0 ? v : Math.min(g[i - 1], v); }
+    for (i = n - 1; i >= 0; i--) { v = src[off + i * step]; hh[i] = (i % k === k - 1 || i === n - 1) ? v : Math.min(hh[i + 1], v); }
+    for (i = 0; i < n; i++) {
+      var a = i - pad, b = i + pad;
+      if (a < 0) a = 0; if (b > n - 1) b = n - 1;
+      dst[off + i * step] = Math.floor(a / k) === Math.floor(b / k) ? (function () { var m = BIG; for (var q = a; q <= b; q++) if (src[off + q * step] < m) m = src[off + q * step]; return m; })() : Math.min(hh[a], g[b]);
+    }
+  }
+  function order(r, w, h, pad) {
+    var n = r.n, lab = r.lab, N = w * h, BIG = n + 1, ids = [], rank = new Int32Array(n + 1), L, x, y, i, k;
+    for (L = 1; L <= n; L++) ids.push(L);
+    ids.sort(function (a, b) { return r.boxes[b].area - r.boxes[a].area; });
+    for (k = 0; k < n; k++) rank[ids[k]] = k + 1;
+    var base = new Float32Array(N), tmp = new Float32Array(N), col = new Float32Array(N), ord = new Float32Array(N);
+    var g = new Float32Array(Math.max(w, h)), hh = new Float32Array(Math.max(w, h));
+    for (i = 0; i < N; i++) base[i] = lab[i] ? rank[lab[i]] : BIG;
+    for (y = 0; y < h; y++) minRun(base, tmp, w, y * w, 1, pad, BIG, g, hh);
+    for (x = 0; x < w; x++) minRun(tmp, col, h, x, w, pad, BIG, g, hh);
+    var area = new Float64Array(n + 2), box = new Int32Array((n + 2) * 4);
+    for (k = 0; k < n + 2; k++) { box[k * 4] = w; box[k * 4 + 1] = h; box[k * 4 + 2] = -1; box[k * 4 + 3] = -1; }
+    for (y = 0; y < h; y++) {
+      for (x = 0; x < w; x++) {
+        i = y * w + x;
+        var v = lab[i] ? base[i] : col[i];
+        ord[i] = v; area[v]++;
+        var o = v * 4; if (x < box[o]) box[o] = x; if (y < box[o + 1]) box[o + 1] = y; if (x > box[o + 2]) box[o + 2] = x; if (y > box[o + 3]) box[o + 3] = y;
+      }
+    }
+    r.ord = ord; r.area = area; r.rbox = box;
+    return r;
+  }
   function Regions(r, w, h, gap) {
     this.w = w; this.h = h; this.lab = r.lab; this.n = r.n; this.boxes = r.boxes; this.gap = gap; this.cache = new Map();
   }
   var regW = null, regSeq = 0, regWait = {};
-  function labelAsync(ink, w, h, gap) {
-    var sync = function () { return label(ink, w, h, gap); };
+  function inkBits(d, N) {
+    var ink = new Uint8Array(N);
+    for (var i = 0, j = 0; i < N; i++, j += 4) if ((d[j] * 299 + d[j + 1] * 587 + d[j + 2] * 114) / 1000 < 150) ink[i] = 1;
+    return ink;
+  }
+  function inkOfBitmap(bm, w, h) {
+    var c = new OffscreenCanvas(w, h), x = c.getContext('2d', { willReadFrequently: true });
+    x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(bm, 0, 0, w, h); bm.close && bm.close();
+    return inkBits(x.getImageData(0, 0, w, h).data, w * h);
+  }
+  function labelAsync(src, w, h, gap) {
+    var ink0 = null, inkM = function () { return ink0 || (ink0 = inkOf(src.canvas)); };
+    var sync = function () { var r = label(inkM(), w, h, gap); return { r: r, o: function () { return order({ n: r.n, lab: r.lab, boxes: r.boxes }, w, h, gap + 3); } }; };
+    var done = function (s) { return { r: Promise.resolve(s.r), o: new Promise(function (k) { setTimeout(function () { k(s.o()); }, 0); }) }; };
     try {
       if (!regW) {
-        var u = URL.createObjectURL(new Blob([maxFilter.toString() + label.toString() +
-          'onmessage=function(e){var d=e.data,r=label(d.ink,d.w,d.h,d.gap);r.id=d.id;postMessage(r,[r.lab.buffer]);};'], { type: 'text/javascript' }));
+        var u = URL.createObjectURL(new Blob([maxFilter.toString() + label.toString() + minRun.toString() + order.toString() + inkBits.toString() + inkOfBitmap.toString() +
+          'onmessage=function(e){var d=e.data,ink;try{ink=d.ink||inkOfBitmap(d.bm,d.w,d.h);}catch(x){postMessage({id:d.id,fail:1});return;}var r=label(ink,d.w,d.h,d.gap),l2=r.lab.slice();r.id=d.id;postMessage(r,[r.lab.buffer]);' +
+          'var o=order({n:r.n,lab:l2,boxes:r.boxes},d.w,d.h,d.gap+3);postMessage({id:d.id,two:1,ord:o.ord,area:o.area,rbox:o.rbox},[o.ord.buffer,o.area.buffer,o.rbox.buffer]);};'], { type: 'text/javascript' }));
         regW = new Worker(u);
-        regW.onmessage = function (e) { var k = regWait[e.data.id]; delete regWait[e.data.id]; if (k) k.ok(e.data); };
-        regW.onerror = function () { var w = regWait; regWait = {}; regW = null; Object.keys(w).forEach(function (id) { w[id].ok(w[id].sync()); }); };
+        regW.onmessage = function (e) {
+          var k = regWait[e.data.id]; if (!k) return;
+          if (e.data.fail) { regW.postMessage({ id: e.data.id, ink: k.ink(), w: k.w, h: k.h, gap: k.gap }); return; }
+          if (e.data.two) { delete regWait[e.data.id]; k.ok2(e.data); } else k.ok(e.data);
+        };
+        regW.onerror = function () { var w = regWait; regWait = {}; regW = null; Object.keys(w).forEach(function (id) { var s = w[id].sync(); w[id].ok(s.r); w[id].ok2(s.o()); }); };
       }
-      return new Promise(function (ok) { var id = ++regSeq; regWait[id] = { ok: ok, sync: sync }; regW.postMessage({ id: id, ink: ink, w: w, h: h, gap: gap }); });
-    } catch (e) { return Promise.resolve(sync()); }
+      var id = ++regSeq, e = { sync: sync, ink: inkM, w: w, h: h, gap: gap };
+      var out = { r: new Promise(function (k) { e.ok = k; }), o: new Promise(function (k) { e.ok2 = k; }) };
+      regWait[id] = e;
+      var viaInk = function () { if (regWait[id] === e) regW.postMessage({ id: id, ink: inkM(), w: w, h: h, gap: gap }); };
+      if (src.img && window.createImageBitmap && window.OffscreenCanvas) {
+        createImageBitmap(src.img).then(function (bm) { if (regW && regWait[id] === e) regW.postMessage({ id: id, bm: bm, w: w, h: h, gap: gap }, [bm]); }, viaInk);
+      } else viaInk();
+      return out;
+    } catch (x) { return done(sync()); }
   }
-  Regions.build = function (lineCanvas, gap) {
-    var w = lineCanvas.width, h = lineCanvas.height;
-    return labelAsync(inkOf(lineCanvas), w, h, gap).then(function (r) { return new Regions(r, w, h, gap); });
+  Regions.build = function (lineCanvas, gap, img) {
+    var w = lineCanvas.width, h = lineCanvas.height, j = labelAsync({ canvas: lineCanvas, img: img }, w, h, gap);
+    return j.r.then(function (r) {
+      var R = new Regions(r, w, h, gap);
+      R.ordP = j.o.then(function (o) { R.ord = o.ord; R.area = o.area; R.rbox = o.rbox; return R; });
+      return R;
+    });
   };
   Regions.prototype.at = function (x, y) {
     x = x | 0; y = y | 0;
@@ -307,6 +462,20 @@
     }
     return 0;
   };
+  function maskOf(r8, x, y, w, h, area) {
+    var m = { r8: r8, x: x, y: y, w: w, h: h, area: area };
+    m.mkBlur = function () {
+      var c = canvas(w, h), cx = ctx2(c), id = cx.createImageData(w, h);
+      for (var k = 0; k < r8.length; k++) if (r8[k]) { id.data[k * 4] = id.data[k * 4 + 1] = id.data[k * 4 + 2] = 255; id.data[k * 4 + 3] = 255; }
+      cx.putImageData(id, 0, 0);
+      var bl = canvas(w, h), bx = ctx2(bl), rad = Math.max(3, Math.min(w, h) / 7);
+      bx.fillStyle = '#000'; bx.fillRect(0, 0, w, h);
+      if (typeof bx.filter !== 'string') return null;
+      bx.filter = 'blur(' + rad + 'px)'; bx.drawImage(c, 0, 0); bx.filter = 'none';
+      return bl;
+    };
+    return m;
+  }
   Regions.prototype.mask = function (L) {
     if (this.cache.has(L)) { var hit = this.cache.get(L); this.cache.delete(L); this.cache.set(L, hit); return hit; }
     var b = this.boxes[L], pad = this.gap + 3, w = this.w, h = this.h;
@@ -317,15 +486,8 @@
       if (l === L) { src[i] = 1; allow[i] = 1; } else if (l === 0) allow[i] = 1;
     }
     var grown = maxFilter(src, mw, mh, pad, new Uint8Array(M));
-    var c = canvas(mw, mh), cx = ctx2(c), id = cx.createImageData(mw, mh);
-    for (var k = 0; k < M; k++) if (grown[k] && allow[k]) { id.data[k * 4] = id.data[k * 4 + 1] = id.data[k * 4 + 2] = 255; id.data[k * 4 + 3] = 255; }
-    cx.putImageData(id, 0, 0);
-    var m = { c: c, white: c, x: x0, y: y0, w: mw, h: mh, area: b.area };
-    try {
-      var bl = canvas(mw, mh), bx = ctx2(bl), rad = Math.max(3, Math.min(mw, mh) / 7);
-      bx.fillStyle = '#000'; bx.fillRect(0, 0, mw, mh);
-      if (typeof bx.filter === 'string') { bx.filter = 'blur(' + rad + 'px)'; bx.drawImage(c, 0, 0); bx.filter = 'none'; m.blur = bl; }
-    } catch (e) {}
+    for (var k = 0; k < M; k++) grown[k] = grown[k] && allow[k] ? 255 : 0;
+    var m = maskOf(grown, x0, y0, mw, mh, b.area); m.lab = L;
     this.cache.set(L, m);
     if (this.cache.size > 24) this.cache.delete(this.cache.keys().next().value);
     return m;
@@ -453,6 +615,8 @@
     this.paperKind = pref.paper || 'draw';
     this.quality = QUALS.some(function (q) { return q[0] === pref.quality; }) ? pref.quality : 'auto';
     this.help = pref.help == null ? true : !!pref.help;
+    this.helpN = !!pref.helpN;
+    this.dockH = pref.dockH || null;
     this.cat = pref.cat || 'orig';
     this.recent = (store(RECENT_KEY) || []).filter(function (h) { return /^#[0-9a-f]{6}$/i.test(h); }).slice(0, 14);
     this.view = { s: 1, x: 0, y: 0, fit: true };
@@ -471,14 +635,17 @@
         '<button type="button" class="mrs-ib mrs-close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
         '<h2 class="mrs-title"></h2><span class="mrs-sp"></span>' +
         '<div class="mrs-grp"><button type="button" class="mrs-ib mrs-undo" disabled><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></button>' +
-        '<button type="button" class="mrs-ib mrs-redo" disabled><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button></div>' +
-        '<div class="mrs-grp mrs-zoom"><button type="button" class="mrs-ib mrs-hand" aria-pressed="false"><i class="fa-solid fa-hand" aria-hidden="true"></i></button>' +
+        '<button type="button" class="mrs-ib mrs-redo" disabled><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>' +
+        '<button type="button" class="mrs-ib mrs-wipe"><i class="fa-solid fa-broom" aria-hidden="true"></i></button></div>' +
+        '<div class="mrs-grp mrs-zoom"><button type="button" class="mrs-ib mrs-finger" aria-pressed="false"><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i></button><button type="button" class="mrs-ib mrs-hand" aria-pressed="false"><i class="fa-solid fa-hand" aria-hidden="true"></i></button>' +
         '<button type="button" class="mrs-ib mrs-zout"><i class="fa-solid fa-minus" aria-hidden="true"></i></button>' +
         '<button type="button" class="mrs-zpct"></button>' +
         '<button type="button" class="mrs-ib mrs-zin"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>' +
         '<button type="button" class="mrs-ib mrs-fit"><i class="fa-solid fa-expand" aria-hidden="true"></i></button></div>' +
         '<button type="button" class="gsf-btn gsf-btn--sm mrs-auto"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><span></span></button>' +
         '<button type="button" class="gsf-btn gsf-btn--sm mrs-orig" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i><span></span></button>' +
+        '<button type="button" class="mrs-ib mrs-file" aria-haspopup="menu"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i></button>' +
+        '<button type="button" class="mrs-ib mrs-menu" aria-haspopup="menu"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>' +
         '<button type="button" class="gsf-btn gsf-btn--go mrs-insert"><span class="mrs-long"></span><span class="mrs-short"></span></button>' +
       '</header>' +
       '<div class="mrs-lesson" hidden></div>' +
@@ -487,6 +654,7 @@
         '<input class="mrs-size" type="range" min="0" max="1" step="0.005">' +
         '<input class="mrs-str" type="range" min="0" max="1" step="0.01"><i class="fa-solid fa-droplet mrs-str-i" aria-hidden="true"></i></div>' +
       '<section class="mrs-dock">' +
+        '<div class="mrs-grip gsf-handle" role="separator" tabindex="0"></div>' +
         '<div class="mrs-now"><span class="mrs-now-i" aria-hidden="true"></span><b class="mrs-now-n"></b><kbd class="mrs-now-k"></kbd><span class="mrs-sp"></span>' +
           '<button type="button" class="mrs-chip mrs-help" aria-pressed="false"><i class="fa-solid fa-circle-question" aria-hidden="true"></i><span></span></button></div>' +
         '<div class="mrs-guide" hidden></div>' +
@@ -495,18 +663,22 @@
           '<button type="button" class="mrs-chip mrs-shade" aria-pressed="false"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i><span></span></button>' +
           '<button type="button" class="mrs-ib mrs-more" aria-expanded="false"><i class="fa-solid fa-sliders" aria-hidden="true"></i></button>' +
           '<button type="button" class="mrs-ib mrs-fold" aria-expanded="true"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button></div>' +
-        '<div class="mrs-opts" hidden><span class="mrs-olbl"></span><div class="mrs-papers"></div><span class="mrs-olbl mrs-qlbl"></span><div class="mrs-quals"></div></div>' +
+        '<div class="mrs-opts" hidden><span class="mrs-olbl"></span><div class="mrs-papers"></div><span class="mrs-olbl mrs-qlbl"></span><div class="mrs-quals"></div>' +
+          '<span class="mrs-olbl mrs-plbl"></span><div class="mrs-palms"></div><button type="button" class="mrs-chip mrs-penbtn"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i><span></span></button></div>' +
         '<div class="mrs-tabs" role="tablist"></div>' +
         '<div class="mrs-shades" aria-label=""></div>' +
         '<div class="mrs-sw"></div>' +
       '</section>' +
       '<button type="button" class="mrs-peek" hidden><i class="fa-solid fa-eye-slash" aria-hidden="true"></i><span></span></button>' +
       '<div class="mrs-busy"><i class="fa-solid fa-palette" aria-hidden="true"></i></div>' +
+      '<div class="mrs-rebuild" role="status" hidden><b></b><span class="mrs-rb-bar"><i></i></span><small></small></div>' +
       '<div class="mrs-toast" role="status" hidden></div>';
     this.root = root;
     this.$ = function (s) { return root.querySelector(s); };
     var rack = this.$('.mrs-rack');
+    var lastG = null;
     TOOLS.forEach(function (t) {
+      if (t.grp !== lastG) { var hh = el('span', 'mrs-rk'); hh.dataset.grp = t.grp; hh.setAttribute('aria-hidden', 'true'); rack.appendChild(hh); lastG = t.grp; }
       var b = el('button', 'mrs-tool');
       b.type = 'button'; b.dataset.tool = t.id;
       b.innerHTML = art(t.id) + '<span class="mrs-tl"></span>';
@@ -524,6 +696,18 @@
       });
       quals.appendChild(b);
     });
+    var palms = this.$('.mrs-palms');
+    PALMS.forEach(function (m) {
+      var b = el('button', 'mrs-chip'); b.type = 'button'; b.dataset.palm = m[0];
+      b.addEventListener('click', function () { self.setPalm(m[0]); });
+      palms.appendChild(b);
+    });
+    this.$('.mrs-finger').addEventListener('click', function () { self.setPalm(self.palm() === 'never' ? 'auto' : 'never', true); });
+    this.$('.mrs-penbtn').addEventListener('click', function () {
+      var D = window.GardenNotesDial;
+      if (D && D.penButtons) D.penButtons();
+      else self.toast(T('أزرارُ القلم تُضبط من الملاحظات.', 'Pen buttons are set in Notes.'));
+    });
     var papers = this.$('.mrs-papers');
     PAPERS.forEach(function (p) {
       var b = el('button', 'mrs-chip'); b.type = 'button'; b.dataset.paper = p[0];
@@ -532,9 +716,14 @@
     });
     this.$('.mrs-close').addEventListener('click', function () { if (self.opts.onClose) self.opts.onClose(self); });
     this.$('.mrs-insert').addEventListener('click', function () { if (self.opts.onInsert) self.opts.onInsert(self); });
-    this.$('.mrs-help').addEventListener('click', function () { self.help = !self.help; self.savePrefs(); self.paintGuide(); });
+    this.$('.mrs-file').addEventListener('click', function (e) { self.fileMenu(e.currentTarget); });
+    this.$('.mrs-menu').addEventListener('click', function (e) { self.moreMenu(e.currentTarget); });
+    this.$('.mrs-help').addEventListener('click', function () { self.toggleHelp(); });
+    this.bindGrip();
+    this.bindRackDrag();
     this.$('.mrs-undo').addEventListener('click', function () { self.step(-1); });
     this.$('.mrs-redo').addEventListener('click', function () { self.step(1); });
+    this.$('.mrs-wipe').addEventListener('click', function () { self.wipe(); });
     this.$('.mrs-zin').addEventListener('click', function () { self.zoomBy(1.5); });
     this.$('.mrs-zout').addEventListener('click', function () { self.zoomBy(1 / 1.5); });
     this.$('.mrs-fit').addEventListener('click', function () { self.fit(); });
@@ -560,15 +749,15 @@
     this.ro = new ResizeObserver(function () { self.layout(); });
     this.ro.observe(root);
     this._onLang = function () { self.paintChrome(); self.paintPalette(); };
-    document.addEventListener('garden:lang', this._onLang);
+    document.addEventListener('garden:languageChanged', this._onLang);
     this.setTool(this.tool, true);
     this.paintChrome();
   };
 
   Studio.prototype.dpr = function () { return Math.min(this.dprCap || 2.5, window.devicePixelRatio || 1); };
   Studio.prototype.gpuInfo = function () {
-    var gl = this.S && this.S.gl, r = '';
-    try { var x = gl && gl.getExtension('WEBGL_debug_renderer_info'); r = x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : (gl ? gl.getParameter(gl.RENDERER) : ''); } catch (e) {}
+    var gl = this.S && this.S.gl, r = this.S && this.S.shd ? this.S.shd.name : '';
+    if (!r) try { var x = gl && gl.getExtension('WEBGL_debug_renderer_info'); r = x ? gl.getParameter(x.UNMASKED_RENDERER_WEBGL) : (gl ? gl.getParameter(gl.RENDERER) : ''); } catch (e) {}
     return { renderer: String(r || ''), soft: /swiftshader|llvmpipe|basic render|software|microsoft basic/i.test(String(r || '')) };
   };
   Studio.prototype.checkGpu = function () {
@@ -586,27 +775,56 @@
     box.setAttribute('dir', 'ltr');
     box.style.cssText = 'position:absolute;z-index:9;inset-block-start:3.6rem;inset-inline-end:11rem;margin:0;padding:.5rem .7rem;font:11px/1.5 ui-monospace,monospace;background:rgba(0,0,0,.78);color:#9effc9;border-radius:10px;pointer-events:none;white-space:pre';
     this.root.appendChild(box);
-    this.root.addEventListener('pointermove', function (e) { ev += (e.getCoalescedEvents ? Math.max(1, e.getCoalescedEvents().length) : 1); mx = Math.max(mx, e.pointerType === 'pen' ? 1 : 0); }, true);
+    var lb = el('button', 'mrs-lab-btn'); lb.type = 'button'; lb.textContent = T('🧪 اختبارٌ مفصّل', '🧪 Detailed test');
+    lb.style.cssText = 'position:absolute;z-index:9;inset-block-start:.6rem;inset-inline-end:50%;padding:.3rem .7rem;border-radius:8px;border:0;background:rgba(0,0,0,.78);color:#9effc9;font:12px ui-monospace,monospace';
+    lb.addEventListener('click', function () { self.lab(); });
+    this.root.appendChild(lb);
+    var mv = 0, raw = 0, lastTs = 0, lat = [], idle = 0;
+    this.root.addEventListener('pointermove', function (e) { var c = e.getCoalescedEvents ? e.getCoalescedEvents() : []; mv++; ev += Math.max(1, c.length); lastTs = (c.length ? c[c.length - 1] : e).timeStamp; mx = Math.max(mx, e.pointerType === 'pen' ? 1 : 0); }, true);
+    if ('onpointerrawupdate' in window) this.root.addEventListener('pointerrawupdate', function () { raw++; }, true);
+    var back = 0, lt = 0, ltMax = 0;
+    try { new PerformanceObserver(function (l) { l.getEntries().forEach(function (e) { lt += e.duration; ltMax = Math.max(ltMax, e.duration); }); }).observe({ entryTypes: ['longtask'] }); } catch (e) {}
+    var timed = function (S) {
+      if (!S || S._timed) return; S._timed = 1; S.gdiag = [];
+      var pp = S.pump.bind(S), rr = S.render.bind(S);
+      S.pump = function (b) { back = Math.max(back, S.q.length); return pp(b); };
+      S.render = function (b) { var o = rr(b); if (lastTs) { lat.push(performance.now() - lastTs); lastTs = 0; } return o; };
+    };
     var tick = function (now) {
       if (!self.S) return;
+      timed(self.S);
       fr++; worst = Math.max(worst, now - last); last = now;
+      if (!self.live) idle++;
       requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
     this._diagT = setInterval(function () {
-      if (!self.S || !box.isConnected) return;
-      var c = self.gl;
+      if (!self.S || !box.isConnected || self._labRun) return;
+      var c = self.gl, gms = self.S.gdiag || [], tq = self.S.tq;
+      lat.sort(function (a, b) { return a - b; });
       box.textContent = 'gpu: ' + (self.gpu ? self.gpu.renderer : '?') + (self.gpu && self.gpu.soft ? '  [SOFTWARE]' : '') +
         '\ndpr: ' + (window.devicePixelRatio || 1) + ' -> ' + self.dpr() + '   view: ' + (c ? c.width + 'x' + c.height : '?') + '   doc: ' + self.W + 'x' + self.H +
-        '\nfps: ' + fr + '   worst frame: ' + Math.round(worst) + 'ms   input/s: ' + ev + (mx ? ' (pen)' : '') +
+        '\nfps: ' + fr + (idle === fr ? ' (idle)' : '') + '   worst frame: ' + Math.round(worst) + 'ms   input/s: ' + ev + (mx ? ' (pen)' : '') + ' · moves ' + mv + ' · raw ' + ('onpointerrawupdate' in window ? raw : 'n/a') +
+        '\nin->frame: ' + (lat.length ? Math.round(lat[lat.length >> 1]) + 'ms median, ' + Math.round(lat[lat.length - 1]) + ' max' : '-') + (self.capped ? '   CAPPED outside page: ' + self.capped.fps + 'fps, gpu ' + self.capped.gpu + 'ms' : '') +
+        '\nmain thread: long tasks ' + Math.round(lt) + 'ms/s, worst ' + Math.round(ltMax) + 'ms' +
         '\nredraw: ' + (self.S.stat && self.S.stat.n ? Math.round(self.S.stat.px / self.S.stat.n / 1000) + 'k px/frame, full ' + self.S.stat.full + '/' + self.S.stat.n : '-') + '   dabs/s: ' + (self.S.nDab || 0) +
+        '\ngpu ms/frame: ' + (gms.length ? (gms.reduce(function (a, b) { return a + b; }, 0) / gms.length).toFixed(2) + ' avg, ' + Math.max.apply(null, gms).toFixed(1) + ' max' : (tq ? '-' : 'n/a')) + '   queue: ' + back +
+        '\nundo: ' + (self.S.history ? (function (h) { return h.steps + ' steps, ' + (h.bytes / 1e6).toFixed(1) + 'MB' + (h.pending ? ', ' + h.pending + ' pending' : ''); })(self.S.history()) : '-') +
         '\ntier: ' + (self.perf ? self.perf.tier + ' · doc ' + self.W + ' · cap ' + self.dprCap + (self.perf.dab != null ? ' · bench dab ' + self.perf.dab + 'ms comp ' + self.perf.comp + 'ms' : '') : '-') + '\nua: ' + navigator.userAgent.replace(/^.*?\) /, '').slice(0, 60);
-      fr = 0; worst = 0; ev = 0; self.S.stat = null; self.S.nDab = 0;
+      fr = 0; worst = 0; ev = 0; lt = 0; ltMax = 0; self.S.stat = null; self.S.nDab = 0; self.S.gdiag = []; back = 0; mv = 0; raw = 0; lat = []; idle = 0;
     }, 1000);
+  };
+  Studio.prototype.lab = function () {
+    var self = this;
+    if (window.GardenMirsamLab) return GardenMirsamLab.run(this);
+    var me = document.querySelector('script[src*="coloring.js"]'), s = document.createElement('script');
+    s.src = me ? me.src.replace('coloring.js', 'mirsam-lab.js') : '/shared/mirsam-lab.js';
+    s.onload = function () { GardenMirsamLab.run(self); };
+    document.head.appendChild(s);
   };
   Studio.prototype.sizeKey = function () { return this.tool === 'fill' || this.tool === 'pick' ? this.medium : this.tool; };
   Studio.prototype.savePrefs = function () {
-    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat, help: !!this.help, quality: this.quality });
+    store(PREF_KEY, { sizes: this.sizes, tool: this.tool, color: this.color, strength: this.strength, grade: this.grade, shade: this.shade, paper: this.paperKind, cat: this.cat, help: !!this.help, helpN: !!this.helpN, dockH: this.dockH || null, quality: this.quality });
   };
 
   Studio.prototype.paintChrome = function () {
@@ -614,11 +832,23 @@
     this.root.setAttribute('dir', en ? 'ltr' : 'rtl');
     var lbl = function (sel, ar, e) { var b = self.$(sel); b.setAttribute('aria-label', en ? e : ar); b.dataset.arTitle = ar; b.dataset.enTitle = e; b.title = en ? e : ar; };
     lbl('.mrs-close', 'إغلاق المرسم', 'Close the studio');
-    lbl('.mrs-undo', 'تراجع', 'Undo'); lbl('.mrs-redo', 'إعادة', 'Redo');
+    lbl('.mrs-undo', 'تراجع', 'Undo'); lbl('.mrs-redo', 'إعادة', 'Redo'); lbl('.mrs-wipe', 'امسحِ التلوين وابدأْ من جديد', 'Clear the coloring and start over');
     lbl('.mrs-zin', 'تكبير', 'Zoom in'); lbl('.mrs-zout', 'تصغير', 'Zoom out'); lbl('.mrs-fit', 'ملءُ الشاشة بالرسمة', 'Fit to screen');
     lbl('.mrs-more', 'نوعُ الورق', 'Paper type');
+    lbl('.mrs-file', 'ملفّ: احفظْ أو صدّرْ أو افتحْ', 'File: save, export or open');
+    lbl('.mrs-menu', 'المزيد: الثيمُ واللغةُ وأدواتٌ أخرى', 'More: theme, language and other tools');
+    lbl('.mrs-grip', 'اسحبْ لتكبيرِ لوحِ الألوان أو تصغيره — واضغطْ لطيّه', 'Drag to resize the colors panel — tap to fold it');
     lbl('.mrs-hand', 'اليد: اسحبِ الرسمةَ لتتنقّل فيها (‏أو اضغطْ المسافة)', 'Hand: drag to move around (or hold Space)');
     this.$('.mrs-hand').setAttribute('aria-pressed', String(!!this.hand));
+    lbl('.mrs-finger', 'الإصبعُ يرسم (‏أو يحرّك الرسمةَ فقط حين يُطفأ)', 'Finger draws (or only moves the drawing when off)');
+    this.$('.mrs-finger').setAttribute('aria-pressed', String(this.palm() === 'never'));
+    this.$('.mrs-plbl').textContent = T('اللمس', 'Touch');
+    this.$('.mrs-penbtn span').textContent = T('أزرارُ القلم…', 'Pen buttons…');
+    var pm = this.palm();
+    this.root.querySelectorAll('.mrs-palms .mrs-chip').forEach(function (b) {
+      var m = PALMS.filter(function (x) { return x[0] === b.dataset.palm; })[0];
+      b.textContent = en ? m[2] : m[1]; b.setAttribute('aria-pressed', String(m[0] === pm));
+    });
     this.$('.mrs-auto span').textContent = this._auto ? T('أوقِفِ التلوين', 'Stop coloring') : T('لوّنْها تلقائيّاً', 'Auto-color');
     this.$('.mrs-auto').setAttribute('aria-pressed', String(!!this._auto));
     this.paintGuide();
@@ -658,10 +888,11 @@
       var p = PAPERS.filter(function (x) { return x[0] === b.dataset.paper; })[0];
       b.textContent = en ? p[2] : p[1]; b.setAttribute('aria-pressed', String(p[0] === self.paperKind));
     });
+    this.root.querySelectorAll('.mrs-rk').forEach(function (h) { var g = GROUPS[h.dataset.grp]; h.textContent = g ? (en ? g[1] : g[0]) : ''; });
     this.root.querySelectorAll('.mrs-tool').forEach(function (b) {
       var t = BYID[b.dataset.tool], name = en ? t.en : t.ar, k = (t.key || '').toUpperCase();
       b.querySelector('.mrs-tl').textContent = name;
-      b.setAttribute('aria-label', name + (k ? ' (' + k + ')' : '')); b.title = name + (k ? ' — ' + k : '');
+      var gg = GROUPS[t.grp]; b.setAttribute('aria-label', name + (k ? ' (' + k + ')' : '')); b.title = name + (k ? ' — ' + k : '') + (gg ? ' · ' + (en ? gg[1] : gg[0]) : '');
       b.dataset.arTitle = t.ar; b.dataset.enTitle = t.en;
       b.setAttribute('aria-pressed', String(t.id === self.tool));
     });
@@ -677,18 +908,41 @@
     this.$('.mrs-now-n').textContent = e ? t.en : t.ar;
     this.$('.mrs-now-k').textContent = k; this.$('.mrs-now-k').hidden = !k;
     var hb = this.$('.mrs-help');
-    hb.querySelector('span').textContent = this.help ? T('أخفِ الشرح', 'Hide guide') : T('اشرحْ لي', 'Explain');
-    hb.setAttribute('aria-pressed', String(!!this.help));
+    hb.querySelector('span').textContent = this.helpOn() ? T('أخفِ الشرح', 'Hide guide') : T('اشرحْ لي', 'Explain');
+    hb.setAttribute('aria-pressed', String(this.helpOn()));
     var box = this.$('.mrs-guide');
-    box.hidden = !this.help || !g.w;
+    box.hidden = !this.helpOn() || !g.w;
     if (box.hidden) return;
     var L = function (x) { return x ? (e ? x[1] : x[0]) : ''; };
     var row = function (ic, h, x) { return x ? '<p><i class="fa-solid ' + ic + '" aria-hidden="true"></i><b>' + h + '</b> ' + L(x).replace(/[<>&]/g, '') + '</p>' : ''; };
+    var mo = MORE[t.id] || {};
     box.innerHTML = '<p class="mrs-g-what">' + L(g.w).replace(/[<>&]/g, '') + '</p>' +
-      (g.p ? '<div class="mrs-g-tags">' + g.p.map(function (x) { return '<span>' + L(x) + '</span>'; }).join('') + '</div>' : '') +
+      '<div class="mrs-g-tags">' + (mo.k ? '<span class="mrs-g-k">' + L(mo.k).replace(/[<>&]/g, '') + '</span>' : '') + (g.p ? g.p.map(function (x) { return '<span>' + L(x) + '</span>'; }).join('') : '') + '</div>' +
       row('fa-bullseye', T('متى تستعملها:', 'Use it for:'), g.u) +
       row('fa-hand-pointer', T('كيف:', 'How:'), g.h) +
-      row('fa-lightbulb', T('نصيحةُ رسّام:', 'Artist tip:'), g.t);
+      row('fa-pen-nib', T('الضغطُ والإمالة:', 'Pressure & tilt:'), mo.g) +
+      row('fa-lightbulb', T('نصيحةُ رسّام:', 'Artist tip:'), g.t) +
+      row('fa-triangle-exclamation', T('خطأٌ شائع:', 'Common mistake:'), mo.x) +
+      row('fa-link', T('يتناغم مع:', 'Pairs well with:'), mo.m) +
+      '<button type="button" class="gsf-btn gsf-btn--sm gsf-btn--ghost mrs-g-book"><i class="fa-solid fa-book-open" aria-hidden="true"></i><span>' + T('دليلُ الرسّام: من أين أبدأ؟', 'Artist’s guide: where to start?') + '</span></button>';
+    var self = this; box.querySelector('.mrs-g-book').addEventListener('click', function () { self.book(true); });
+  };
+
+  Studio.prototype.book = function (on) {
+    var bx = this.$('.mrs-book'), self = this;
+    if (!on) { if (bx) bx.hidden = true; return; }
+    if (!bx) { bx = el('section', 'mrs-book'); bx.setAttribute('role', 'dialog'); this.root.appendChild(bx); }
+    var e = lang() === 'en', L = function (x) { return (e ? x[1] : x[0]).replace(/[<>&]/g, ''); };
+    bx.setAttribute('aria-label', T('دليلُ الرسّام', 'Artist’s guide'));
+    bx.innerHTML = '<header><i class="fa-solid fa-book-open" aria-hidden="true"></i><h3>' + T('دليلُ الرسّام', 'Artist’s guide') + '</h3><span class="mrs-sp"></span>' +
+      '<button type="button" class="mrs-ib mrs-book-x" aria-label="' + T('أغلقِ الدليل', 'Close the guide') + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></header>' +
+      BOOK.map(function (sec, i) {
+        return '<details' + (i === 0 ? ' open' : '') + '><summary><i class="fa-solid ' + sec[0] + '" aria-hidden="true"></i>' + L(sec[1]) + '</summary><ol>' +
+          sec[2].map(function (x) { return '<li>' + L(x) + '</li>'; }).join('') + '</ol></details>';
+      }).join('');
+    bx.hidden = false;
+    bx.querySelector('.mrs-book-x').addEventListener('click', function () { self.book(false); });
+    bx.querySelector('summary').focus();
   };
 
   Studio.prototype.toast = function (msg) {
@@ -710,6 +964,7 @@
     if (id !== 'graphite' && this.cat === 'grade') this.cat = 'set';
     if (id === 'graphite' && this.cat === 'set') this.cat = 'grade';
     this.paintChrome(); this.paintPalette(); this.paintTip();
+    if (this.S && this.S.prepare) this.S.prepare(this.medium, id === 'fill');
   };
 
   Studio.prototype.setColor = function (hex, fromUser) {
@@ -838,6 +1093,13 @@
 
   Studio.prototype.load = function (item) {
     var self = this;
+    if (item.project) {
+      var ph = item.project.head, pp = item.project.parts;
+      (this._pjUrls || []).forEach(function (u) { URL.revokeObjectURL(u); }); this._pjUrls = [];
+      var mk = function (b) { if (!b) return null; var u = URL.createObjectURL(b); self._pjUrls.push(u); return u; };
+      item = { lineUrl: pp.line ? mk(pp.line) : libUrl(ph.item && ph.item.line), refUrl: pp.ref ? mk(pp.ref) : libUrl(ph.item && ph.item.color), W: ph.W, H: ph.H, paper: pp.state ? ph.paper : (ph.paper0 || ph.paper), id: ph.item && ph.item.id, title: item.title || ph.title,
+        project: item.project, srcLine: libUrl(ph.item && ph.item.line), srcRef: libUrl(ph.item && ph.item.color) };
+    }
     this.item = item;
     this.title = item.title || '';
     this.root.classList.add('is-busy');
@@ -857,19 +1119,33 @@
     var paintP = item.paintUrl ? rasterImage(item.paintUrl).catch(function () { return null; }) : Promise.resolve(null);
     var tok = this._tok = (this._tok || 0) + 1;
     this.hasRef = false; this.refImg = null; this._refC = null; this.families = null; this.regions = null;
+    var pre = !item.svg && PRE && PRE.url === item.lineUrl && PRE.side === side ? PRE : null;
+    if (pre) { var lp0 = lineP; lineP = pre.p.then(function (p) { return p.img; }, function () { return lp0; }); }
+    var preRef = pre && pre.refP && pre.ref === item.refUrl ? pre : null;
+    if (preRef) refP = preRef.refP;
     return Promise.all([lineP, paintP]).then(function (r) {
       var img = r[0], paint = r[1];
-      var nw = img.naturalWidth || side, nh = img.naturalHeight || side;
-      var W = item.W || (nw >= nh ? side : Math.round(side * nw / nh)), H = item.H || (nw >= nh ? Math.round(side * nh / nw) : side);
+      var sz = docSize(item, side, img), W = sz.W, H = sz.H;
       self.W = W; self.H = H;
-      var line = canvas(W, H), lc = ctx2(line);
-      lc.fillStyle = '#fff'; lc.fillRect(0, 0, W, H); lc.drawImage(img, 0, 0, W, H);
+      var hit = pre && pre.line && pre.W === W && pre.H === H;
+      var line = hit ? pre.line : lineOf(img, W, H);
       self.lineCanvas = line;
       self.initGL(W, H, item.paper);
       self.S.setLines(line, 1);
       if (paint) self.S.loadPaint(paint);
-      self.regionsP = Regions.build(line, Math.max(2, Math.round(W / (item.svg ? 300 : 460)))).then(function (g) {
+      self._recipe = null;
+      if (item.project && self.S.restore) {
+        var ph2 = item.project.head, pp2 = item.project.parts, ops0 = null;
+        try { ops0 = pp2.rec ? GardenPaintGL.decodeLog(new Uint8Array(pp2.rec)) : null; } catch (e) { ops0 = null; }
+        if (pp2.state) {
+          self.S.restore({ W: W, H: H, fmt: ph2.fmt, paper: ph2.paper, state: pp2.state, hist: pp2.hist });
+          self.S.log = ops0; self.S.paper0 = ph2.paper0 || ph2.paper;
+          if (ops0) self.S.logN = ops0.reduce(function (m, o) { return o[0] === 'B' ? Math.max(m, o[1]) : m; }, 0);
+        } else if (ops0) self._recipe = { ops: ops0, engine: ph2.engine };
+      }
+      self.regionsP = (hit ? pre.regionsP : Regions.build(line, Math.max(2, Math.round(W / (item.svg ? 300 : 460))), img)).then(function (g) {
         if (self._tok === tok && self.S) self.regions = g;
+        if (g.ordP) g.ordP.then(function (R) { var S = self.S; if (self._tok === tok && S && S.setOrder && S._ordR !== R) { S.setOrder(R.ord); S._ordR = R; } });
         return g;
       });
       var cat = self.cat;
@@ -883,8 +1159,8 @@
       self.refP = refP.then(function (ref) {
         if (self._tok !== tok || !self.S) return null;
         if (ref) {
-          self.S.setRef(ref); self.hasRef = true; self.refImg = ref;
-          try { self.families = extractFamilies(ref); } catch (e) { self.families = null; }
+          ref.__tag = 'ref'; self.S.setRef(ref); self.hasRef = true; self.refImg = ref; if (self.S.prepare) self.S.prepare(self.medium, self.tool === 'fill');
+          try { self.families = preRef && preRef.fam ? preRef.fam : extractFamilies(ref); } catch (e) { self.families = null; }
         }
         if (!self.families || !self.families.length) { self.families = null; if (self.cat === 'orig') self.cat = 'basic'; }
         else if (self.tool !== 'graphite' && !self._pickedCat) self.cat = 'orig';
@@ -896,19 +1172,56 @@
         if (ref && self.opts.onRef) self.opts.onRef(self);
         return ref;
       });
+      if (self._recipe) self.rebuild(self._recipe, tok);
       return self;
     }, function (e) { self.root.classList.remove('is-busy'); throw e; });
+  };
+
+  Studio.prototype.rebuild = function (rc, tok) {
+    var self = this, ops = rc.ops, S = this.S;
+    var needOrd = ops.some(function (o) { return o[0] === 'R'; }), needRef = needOrd || ops.some(function (o) { return o[0] === 'P' || o[0] === 'L'; });
+    this._replaying = true; this.rebuildUI(0);
+    var live = function () { return self._tok === tok && self.S === S; };
+    return Promise.all([this.regionsP, needRef ? this.refP : null]).then(function (r) {
+      var R = r[0];
+      return needOrd && R && R.ordP ? R.ordP : R;
+    }).then(function (R) {
+      if (!live()) return;
+      if (needOrd && R && R.ord && S._ordR !== R) { S.setOrder(R.ord); S._ordR = R; }
+      return S.replay(ops, { mask: function (L) { return self.regions.mask(L); }, img: function () { return self.refImg; }, progress: function (f) { if (live()) self.rebuildUI(f); } });
+    }).then(function () {
+      if (!live()) return;
+      self._replaying = false; self.rebuildUI(null);
+      self.paintChrome(); self.kick();
+      if (rc.engine && rc.engine !== GardenPaintGL.ENGINE) self.toast(T('أُعيد تركيبُ الرسمة بمحرّكٍ أحدث من الذي رُسمت به — قد تختلف الخامةُ اختلافاً طفيفاً.', 'Rebuilt with a newer engine than it was drawn with — textures may differ slightly.'));
+    }, function () {
+      if (!live()) return;
+      self._replaying = false; self.rebuildUI(null); self.paintChrome(); self.kick();
+      self.toast(T('تعذّرت إعادةُ تركيب الرسمة كاملةً.', 'The drawing could not be fully rebuilt.'));
+    });
+  };
+  Studio.prototype.rebuildUI = function (f) {
+    var box = this.$('.mrs-rebuild'); if (!box) return;
+    if (f == null) { box.hidden = true; this.root.classList.remove('is-rebuild'); return; }
+    box.hidden = false; this.root.classList.add('is-rebuild');
+    box.querySelector('b').textContent = T('نعيد تركيبَ رسمتك… ', 'Rebuilding your drawing… ') + Math.round(f * 100) + T('٪', '%');
+    box.querySelector('i').style.inlineSize = (f * 100).toFixed(1) + '%';
+    box.querySelector('small').textContent = T('حُفظت بأصغر حجمٍ ممكن، وتُبنى الآن على جهازك من جديد بكلِّ تفاصيلها وتراجعها.', 'It was saved as small as possible and is now rebuilt on your device with every detail and its undo.');
   };
 
   Studio.prototype.initGL = function (W, H, paper) {
     if (paper) this.paperKind = paper;
     if (this.S) { this.S.destroy(); this.S = null; }
-    var old = this.$('.mrs-gl'), fresh = el('canvas', 'mrs-gl'); old.parentNode.replaceChild(fresh, old);
+    var old = this.$('.mrs-gl');
+    this.S = GardenPaintGL.create(el('canvas', 'mrs-gl'), { W: W, H: H, paper: this.paperKind, shared: true, queue: true });
+    var fresh = this.S.canvas; fresh.className = 'mrs-gl'; fresh.removeAttribute('style');
+    if (old !== fresh) old.parentNode.replaceChild(fresh, old);
     this.gl = fresh;
-    this.S = GardenPaintGL.create(fresh, { W: W, H: H, paper: this.paperKind });
     var cs = getComputedStyle(this.root), bg = cs.getPropertyValue('--mrs-desk').trim() || '#1c2029';
     var d = hexRgb(/^#[0-9a-f]{6}$/i.test(bg) ? bg : '#1c2029');
     this.S.setDesk([d[0] / 255, d[1] / 255, d[2] / 255]);
+    this.S.setFlat(!!(this.perf && this.perf.tier === 'low'));
+    if (this.S.prepare) this.S.prepare(this.medium, this.tool === 'fill');
     if (this.router) { this.router.destroy(); this.router = null; }
     this.bindRouter();
   };
@@ -958,7 +1271,7 @@
 
   Studio.prototype.setPaper = function (k) {
     this.paperKind = k;
-    if (this.S) { this.S.setPaper(k); this.kick(); }
+    if (this.S && !this._replaying) { this.S.setPaper(k); this.kick(); }
     this.savePrefs(); this.paintChrome();
   };
 
@@ -970,15 +1283,19 @@
 
   Studio.prototype.match = function () {
     if (!this.S || !this.refImg) return null;
-    var w = Math.round(this.W / 4), h = Math.round(this.H / 4);
+    var w = Math.round(this.W / 4), h = Math.round(this.H / 4), M = this._mref;
+    if (!M || M.img !== this.refImg || M.w !== w) {
+      var b = canvas(w, h), bx = ctx2(b, true); bx.fillStyle = '#fff'; bx.fillRect(0, 0, w, h); bx.drawImage(this.refImg, 0, 0, w, h);
+      var lm = canvas(w, h), lx = ctx2(lm, true); lx.drawImage(this.lineCanvas, 0, 0, w, h);
+      var dl0 = lx.getImageData(0, 0, w, h).data, db0 = bx.getImageData(0, 0, w, h).data, lab0 = [];
+      for (var j = 0; j < db0.length; j += 4) lab0.push(dl0[j] < 215 ? null : toLab(db0[j], db0[j + 1], db0[j + 2]));
+      M = this._mref = { img: this.refImg, w: w, lab: lab0 };
+    }
     var a = this.S.exportCanvas({ scale: .25, lines: true, paper: true });
-    var b = canvas(w, h), bx = ctx2(b, true); bx.fillStyle = '#fff'; bx.fillRect(0, 0, w, h); bx.drawImage(this.refImg, 0, 0, w, h);
-    var lm = canvas(w, h), lx = ctx2(lm, true); lx.drawImage(this.lineCanvas, 0, 0, w, h);
-    var dl = lx.getImageData(0, 0, w, h).data;
-    var da = ctx2(a, true).getImageData(0, 0, w, h).data, db = bx.getImageData(0, 0, w, h).data, n = 0, ok = 0, sum = 0;
+    var da = ctx2(a, true).getImageData(0, 0, w, h).data, n = 0, ok = 0, sum = 0;
     for (var i = 0; i < da.length; i += 4) {
-      if (dl[i] < 215) continue;
-      var p = toLab(da[i], da[i + 1], da[i + 2]), q = toLab(db[i], db[i + 1], db[i + 2]);
+      var q = M.lab[i >> 2]; if (!q) continue;
+      var p = toLab(da[i], da[i + 1], da[i + 2]);
       var e = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); sum += e; n++; if (e < .05) ok++;
     }
     return { pct: Math.round(ok / n * 1000) / 10, mean: Math.round(sum / n * 1000) / 1000 };
@@ -987,45 +1304,61 @@
   Studio.prototype.autoPaint = function (opt) {
     opt = opt || {};
     if (this._auto) { this._autoStop = true; return this._autoP; }
-    if (!this.S || !this.hasRef) return Promise.resolve(null);
+    if (!this.S || !this.hasRef || this._replaying) return Promise.resolve(null);
     var self = this, S = this.S, med = BYID[this.medium] && BYID[this.medium].eng || 'pencil';
     if (med === 'eraser' || med === 'blend') med = 'pencil';
-    var passes = S.refPasses ? S.refPasses(med) : 1, dur = opt.ms == null ? 5200 : opt.ms;
+    var passes = S.refPasses ? S.refPasses(med) : 1, dur = opt.ms == null ? 3500 : opt.ms;
     this._auto = true; this._autoStop = false;
     this.root.classList.add('is-auto');
     this.paintChrome();
     this._autoP = (this.regions ? Promise.resolve(this.regions) : (this.regionsP || Promise.resolve(null))).then(function (R) {
+      return R && R.ordP && S.refRank ? R.ordP : R;
+    }).then(function (R) {
       return new Promise(function (res) {
-        var jobs = [], i = 0, t0 = 0;
-        if (R && S.refPass) {
-          var labs = []; for (var L = 1; L <= R.n; L++) labs.push(L);
-          labs.sort(function (a, b) { return R.boxes[b].area - R.boxes[a].area; });
-          labs.forEach(function (L) { jobs.push([L, 0]); });
-          labs.forEach(function (L) { for (var k = 1; k < passes; k++) jobs.push([L, k]); });
-        }
-        S.begin();
+        var ok = !!(R && R.ord && S.refRank), last = ok ? R.n + 1 : 0, cum = new Float64Array(last + 1), r0 = 1, t0 = 0;
+        if (ok) { for (var k = 1; k <= last; k++) cum[k] = cum[k - 1] + R.area[k]; if (S._ordR !== R) { S.setOrder(R.ord); S._ordR = R; } }
+        S.group(true);
         var done = function () {
-          var m = null;
-          if (self.S === S) {
-            if (!jobs.length) { try { S.paintRef(med); } catch (e) {} }
-            S.end(); self.changed++; S.render();
-            try { m = self._autoStop ? null : self.match(); } catch (e) {}
+          var live = self.S === S, stop = self._autoStop;
+          if (live) {
+            if (!ok) { try { S.paintRef(med); } catch (e) {} }
+            S.group(false); self.changed++; S.render();
           }
-          self._auto = false; self.lastMatch = m;
+          self._auto = false;
           self.root.classList.remove('is-auto'); self.root.style.removeProperty('--auto');
-          if (self.S === S) { self.paintChrome(); self.kick(); }
-          if (m) self.toast(T('لُوّنت ب', 'Colored with ') + (lang() === 'en' ? BYID[self.medium].en : BYID[self.medium].ar) + T(' — مطابقةُ الأصل: ', ' — match with the original: ') + m.pct + '%');
-          res(m);
+          if (live) { self.paintChrome(); self.kick(); }
+          setTimeout(function () {
+            var m = null;
+            if (live && !stop && self.S === S) { try { m = self.match(); } catch (e) {} }
+            self.lastMatch = m;
+            if (m) self.toast(T('لُوّنت ب', 'Colored with ') + (lang() === 'en' ? BYID[self.medium].en : BYID[self.medium].ar) + T(' — مطابقةُ الأصل: ', ' — match with the original: ') + m.pct + '%');
+            res(m);
+          }, 60);
         };
-        if (!jobs.length) { done(); return; }
+        if (!ok || !cum[last]) { done(); return; }
+        var queue = [], budget = 1 << 17, prev = 0, base = 1e9;
         var step = function (now) {
           if (self.S !== S || self._autoStop) { done(); return; }
           if (!t0) t0 = now;
-          var want = dur ? Math.ceil(jobs.length * Math.min(1, (now - t0) / dur)) : jobs.length, f0 = performance.now();
-          while (i < jobs.length && (i < want || i === 0) && performance.now() - f0 < 28) { S.refPass(R.mask(jobs[i][0]), med, jobs[i][1], passes); i++; }
-          self.root.style.setProperty('--auto', (i / jobs.length).toFixed(3));
+          if (prev) { var gap = now - prev, ex; base = Math.min(base * 1.03, gap); ex = gap - base; budget = ex > 14 ? Math.max(1 << 13, budget * .65 | 0) : ex < 7 ? Math.min(1 << 22, budget * 1.3 | 0) : budget; }
+          prev = now;
+          if (r0 <= last) {
+            var target = dur ? cum[last] * Math.min(1, (now - t0) / dur) : cum[last], r1 = r0 + 1;
+            while (r1 <= last && cum[r1 - 1] < target) r1++;
+            var b = R.rbox, x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+            for (var q = r0; q < r1; q++) { var o = q * 4; if (b[o + 2] < 0) continue; x0 = Math.min(x0, b[o]); y0 = Math.min(y0, b[o + 1]); x1 = Math.max(x1, b[o + 2]); y1 = Math.max(y1, b[o + 3]); }
+            if (x1 >= 0) queue.push([r0, r1, x0, y0, x1 - x0 + 1, y1 - y0 + 1]);
+            r0 = r1;
+          }
+          var left = budget;
+          while (queue.length && left > 0) {
+            var c = queue[0], rows = Math.max(8, Math.floor(left / c[4]));
+            if (rows >= c[5]) { queue.shift(); S.refRank(med, c[0], c[1], [c[2], c[3], c[4], c[5]], passes); left -= c[4] * c[5]; }
+            else { S.refRank(med, c[0], c[1], [c[2], c[3], c[4], rows], passes); c[3] += rows; c[5] -= rows; left = 0; }
+          }
+          self.root.style.setProperty('--auto', (cum[r0 - 1] / cum[last]).toFixed(3));
           self.kick();
-          if (i < jobs.length) requestAnimationFrame(step); else done();
+          if (r0 <= last || queue.length) requestAnimationFrame(step); else done();
         };
         requestAnimationFrame(step);
       });
@@ -1045,7 +1378,7 @@
   Studio.prototype.area = function () {
     var r = this.root.getBoundingClientRect(), self = this, pad = 10;
     var x0 = r.left, x1 = r.right, y0 = r.top, y1 = r.bottom, narrow = this.root.classList.contains('is-narrow');
-    ['.mrs-top', '.mrs-lesson', '.mrs-rack', '.mrs-side', '.mrs-dock'].forEach(function (s) {
+    ['.mrs-top', '.mrs-lesson', '.mrs-dock', '.mrs-rack', '.mrs-side'].forEach(function (s) {
       var e = self.$(s); if (!e || e.hidden || !e.getClientRects().length) return;
       var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
       if (s === '.mrs-side' && narrow) return;
@@ -1061,8 +1394,10 @@
   Studio.prototype.layout = function (refit) {
     var r = this.root.getBoundingClientRect();
     if (!r.width || !r.height) return;
-    var narrow = r.width <= 640 || (r.height <= 480 && r.width < r.height * 1.3);
+    var narrow = r.width <= 640 || (r.height <= 480 && r.width < r.height * 1.3), was = this.root.classList.contains('is-narrow');
     this.root.classList.toggle('is-narrow', narrow);
+    this.applyDockH(r);
+    if (was !== narrow) this.paintGuide();
     this.root.classList.toggle('is-wide', !narrow && ((r.width >= 900 && r.height >= 540) || r.width >= r.height * 1.3));
     var dk = this.$('.mrs-dock'); if (dk) this.root.style.setProperty('--dock-h', (narrow ? dk.offsetHeight : 0) + 'px');
     if (!this.S) return;
@@ -1098,6 +1433,8 @@
     if (!this.S) return;
     var v = this.view, dpr = this.dpr();
     this.S.setView(v.s * dpr, v.x * dpr, v.y * dpr);
+    var self = this; this.S.setMoving(true); clearTimeout(this._still);
+    this._still = setTimeout(function () { if (self.S) { self.S.setMoving(false); self.kick(); } }, 160);
     this.paintZoom(); this.paintTip(); this.kick();
   };
   Studio.prototype.paintZoom = function () {
@@ -1111,21 +1448,41 @@
     var loop = function (now) {
       self._raf = 0;
       if (!self.S) return;
-      var dt = Math.min(.05, (now - last) / 1000); last = now;
-      var wet = self.S.wet ? self.S.tick(dt) : false;
+      var gap = now - last, dt = Math.min(.05, gap / 1000); last = now;
+      var S = self.S, t0 = performance.now(), work = !self._replaying && ((S.q && S.q.length) || S.wet || S.dirty);
+      if (work) S.timeBegin();
+      if (S.q && S.q.length) S.pump(Infinity);
+      var wet = S.wet && !self._replaying ? S.tick(dt) : false;
       if (self.live && self.live.dwell) self.dwell(dt);
-      if (self.S.dirty) self.S.render();
-      if (self.live && !self.live.pend && self.quality === 'auto' && self.perf) {
-        var w = self._slow = self._slow || { n: 0, sum: 0 };
-        var dtm = w.t ? now - w.t : 16; if (dtm < 1000) { w.n++; w.sum += dtm; } w.t = now;
+      if (S.dirty && !self._replaying) S.render(true);
+      if (work) S.timeEnd();
+      if (self.live && !self.live.pend && self.quality === 'auto' && self.perf && !self._labRun) {
+        var w = self._slow = self._slow || { n: 0, sum: 0, js: 0 };
+        var dtm = w.t ? now - w.t : 16; if (dtm < 1000) { w.n++; w.sum += dtm; w.js += performance.now() - t0; } w.t = now;
         if (w.n >= 40) {
-          if (w.sum / w.n > 45 && stepDown(self.perf)) { self.dprCap = self.perf.cap; self.layout(); self.toast(T('خفّفنا الجودةَ ليجري الرسمُ بسلاسة على هذا الجهاز — غيّرْها من «الإعدادات» إن شئت.', 'We lowered the quality so drawing stays smooth on this device — change it in Settings if you like.')); }
+          var fa = w.sum / w.n, ga = S.gpuAvg(), outside = ga != null && ga * 2.5 < fa && w.js / w.n * 2.5 < fa;
+          if (fa > 45 && !outside && stepDown(self.perf)) { self.dprCap = self.perf.cap; self.layout(); self.toast(T('خفّفنا الجودةَ ليجري الرسمُ بسلاسة على هذا الجهاز — غيّرْها من «الإعدادات» إن شئت.', 'We lowered the quality so drawing stays smooth on this device — change it in Settings if you like.')); }
+          else if (fa > 28 && outside) self.capHint(fa, ga);
           self._slow = null;
         }
       } else if (self._slow) self._slow.t = 0;
-      if (wet || self.S.wet || (self.live && self.live.dwell)) self._raf = requestAnimationFrame(loop);
+      if (wet || self.S.wet || (self.live && self.live.dwell) || (self.S.q && self.S.q.length)) self._raf = requestAnimationFrame(loop);
     };
     this._raf = requestAnimationFrame(loop);
+  };
+
+  Studio.prototype.capHint = function (fa, ga) {
+    this.capped = { fps: Math.round(1000 / fa), gpu: +ga.toFixed(1) };
+    var k = 'garden_mirsam_caphint', seen = store(k);
+    if (this._capSaid || (seen && seen.key === perfKey() && Date.now() - seen.at < 864e5 * 3)) return;
+    this._capSaid = true; store(k, { key: perfKey(), at: Date.now() });
+    this.toast(T('المتصفّحُ يعرض ' + this.capped.fps + ' إطاراً في الثانية فقط وبطاقةُ الرسوم شبهُ خاملة — غالباً «توفيرُ الطاقة» في المتصفّح أو ويندوز. صِلِ الشاحن أو أطفئه ليجري القلمُ أنعم.', 'The browser shows only ' + this.capped.fps + ' frames a second while the graphics card is almost idle — usually power saving in the browser or Windows. Plug in or turn it off for a smoother pen.'));
+  };
+  Studio.prototype.palm = function () { var I = window.GardenInkInput; return I && I.palmMode ? I.palmMode('auto') : 'auto'; };
+  Studio.prototype.setPalm = function (m, say) {
+    var I = window.GardenInkInput; if (I && I.setPalmMode) I.setPalmMode(m);
+    this.paintChrome();
+    if (say) this.toast(m === 'never' ? T('الإصبعُ يرسم الآن — والتكبيرُ بالأزرار أو بعجلة الفأرة.', 'Your finger draws now — zoom with the buttons or the mouse wheel.') : T('الإصبعُ يحرّك الرسمةَ ويكبّرها، والقلمُ وحدَه يرسم.', 'Your finger moves and zooms the drawing; only the pen draws.'));
   };
 
   Studio.prototype.toDoc = function (x, y) { var v = this.view; return { x: (x - v.x) / v.s, y: (y - v.y) / v.s }; };
@@ -1139,6 +1496,7 @@
       palmDefault: '',
       mode: function () { return self.panKey || self.hand ? 'pan' : 'draw'; },
       onBegin: function (id, pt, ptype, act) {
+        if (self.S) self.S.lastIn = performance.now();
         var p = self.toDoc(pt.x, pt.y);
         p.p = ptype === 'pen' ? pt.p : .6; p.tz = pt.tz || 0; p.az = pt.az;
         var tool = act ? (ACT[act] || null) : null;
@@ -1146,7 +1504,8 @@
         live[id] = self.begin(p, tool, ptype);
         self.cursorAt(pt.x, pt.y, ptype, p);
       },
-      onMove: function (id, pts) {
+      onMove: function (id, pts, tr) {
+        if (self.S) self.S.lastIn = performance.now();
         var s = live[id]; if (!s) return;
         if (s.pan) { var q = pts[pts.length - 1]; self.view.x = s.pan.vx + q.x - s.pan.x; self.view.y = s.pan.vy + q.y - s.pan.y; self.view.fit = false; self.clampView(); self.applyView(); return; }
         for (var i = 0; i < pts.length; i++) {
@@ -1158,6 +1517,7 @@
       },
       onEnd: function (id, keep) { var s = live[id]; delete live[id]; if (s && !s.pan) self.finish(s, keep); },
       onGesture: function (phase, g) {
+        if (self.S) self.S.lastIn = performance.now();
         if (phase === 'start' && !tapG) tapG = { t: performance.now(), n: g.n, at: {}, moved: 0 };
         if (tapG && g.n) {
           tapG.n = Math.max(tapG.n, g.n);
@@ -1228,11 +1588,12 @@
       var k = window.GardenInkInput ? GardenInkInput.keyOf(e) : String(e.key || '').toLowerCase();
       var mod = e.ctrlKey || e.metaKey;
       if (mod && k === 'z') { e.preventDefault(); self.step(e.shiftKey ? 1 : -1); return; }
-      if (mod && e.shiftKey && k === 'd') { e.preventDefault(); var on = !self.$('.mrs-diag'); store('garden_mrsdiag', on ? 1 : 0); if (on) self.diag(); else { self.$('.mrs-diag').remove(); clearInterval(self._diagT); } return; }
+      if (mod && e.shiftKey && k === 'd') { e.preventDefault(); var on = !self.$('.mrs-diag'); store('garden_mrsdiag', on ? 1 : 0); if (on) self.diag(); else { self.$('.mrs-diag').remove(); var b = self.$('.mrs-lab-btn'); if (b) b.remove(); clearInterval(self._diagT); } return; }
       if (mod && k === 'y') { e.preventDefault(); self.step(1); return; }
       if (mod && (k === '0')) { e.preventDefault(); self.fit(); return; }
       if (mod || e.altKey) return;
       if (e.code === 'Space') { if (!self.panKey) { self.panKey = true; self.root.classList.add('is-pan'); } e.preventDefault(); return; }
+      if (k === 'escape' && self.$('.mrs-book') && !self.$('.mrs-book').hidden) { e.preventDefault(); e.stopPropagation(); self.book(false); return; }
       if (k === 'escape' && self.orig) { e.preventDefault(); e.stopPropagation(); self.setOrig(false); return; }
       var pk = window.GardenInkInput ? GardenInkInput.penKeys() : {};
       var MAP = { era: 'eraser', sel: 'pick', lasso: 'pick', hi: 'blend', hand: null };
@@ -1292,7 +1653,7 @@
   };
 
   Studio.prototype.begin = function (p, override, ptype) {
-    if (!this.S || this._auto) return null;
+    if (!this.S || this._auto || this._replaying) return null;
     var tool = override || this.tool;
     if (tool === 'pick') { this.pickAt(p.x, p.y); return { done: 1 }; }
     if (tool === 'fill') return { tap: p, ptype: ptype };
@@ -1305,12 +1666,12 @@
   };
   Studio.prototype.open = function (tool, mask, p, ptype, k) {
     var t = BYID[tool];
-    this.S.setMask(mask);
     var st = this.S.stroke(t.eng, this.color, this.radius(tool), {
-      mask: !!mask, grade: this.grade, load: tool === 'wash' ? .5 + .5 * this.strength : 1, flow: tool === 'marker' || tool === 'airbrush' ? .35 + .75 * this.strength : 1, nib: .6
+      maskObj: mask || null, mask: !!mask, grade: this.grade, load: tool === 'wash' ? .5 + .5 * this.strength : 1, flow: tool === 'marker' || tool === 'airbrush' ? .35 + .75 * this.strength : 1, nib: .6
     });
-    var s = { st: st, tool: tool, ptype: ptype, k: k, last: this.pp(p, k), ctrl: null, dwell: tool === 'airbrush' || tool === 'wash', still: 0 };
-    this.S.startStroke(st, s.last);
+    var s = { st: st, tool: tool, ptype: ptype, k: k, dwell: tool === 'airbrush' || tool === 'wash', still: 0 };
+    s.tip = this.pp(p, k);
+    this.S.startStroke(st, s.tip);
     this.live = s;
     this.kick();
     return s;
@@ -1325,20 +1686,9 @@
       for (var key in o) s[key] = o[key];
       delete s.pend; this.live = s; return;
     }
-    p = this.pp(p, s.k);
-    var c = s.ctrl || s.last, r = s.st.r;
-    if (Math.hypot(p.x - c.x, p.y - c.y) < Math.max(.35, r * .04)) return;
+    p = this.pp(p, s.k); s.tip = p;
+    if (this.S.feed(s.st, p) === false) return;
     s.still = 0;
-    if (!s.ctrl) { s.ctrl = p; return; }
-    var m = { x: (c.x + p.x) / 2, y: (c.y + p.y) / 2, p: (c.p + p.p) / 2, tz: (c.tz + p.tz) / 2, az: p.az };
-    var len = Math.hypot(c.x - s.last.x, c.y - s.last.y) + Math.hypot(m.x - c.x, m.y - c.y);
-    var n = Math.max(1, Math.ceil(len / Math.max(1.2, r * .6))), prev = s.last;
-    for (var i = 1; i <= n; i++) {
-      var t = i / n, u = 1 - t;
-      var q = { x: u * u * s.last.x + 2 * u * t * c.x + t * t * m.x, y: u * u * s.last.y + 2 * u * t * c.y + t * t * m.y, p: u * s.last.p + t * m.p, tz: u * s.last.tz + t * m.tz, az: m.az };
-      this.S.dab(s.st, prev, q); prev = q;
-    }
-    s.last = m; s.ctrl = p;
     this.kick();
   };
 
@@ -1346,15 +1696,14 @@
     var s = this.live; if (!s || !s.dwell || s.done) return;
     s.still += dt;
     if (s.still < .12) return;
-    var at = s.ctrl || s.last;
-    this.S.dab(s.st, at, at, dt * (s.tool === 'wash' ? 1.2 : 2.2));
+    this.S.dwell(s.st, dt);
   };
 
   Studio.prototype.finish = function (s, keep) {
     if (!s || s.done) { this.live = null; return; }
     if (s.tap) { if (keep) this.fillAt(s.tap.x, s.tap.y); this.live = null; return; }
     if (s.pend) { this.live = null; return; }
-    if (s.ctrl) { this.S.dab(s.st, s.last, s.ctrl); }
+    this.S.feedEnd(s.st);
     if (!keep && s.ptype === 'touch') this.S.abort(s.st);
     else { this.S.endStroke(s.st); this.changed++; this.addRecent(this.color); }
     this.live = null;
@@ -1388,9 +1737,15 @@
   };
 
   Studio.prototype.step = function (dir) {
-    if (!this.S) return;
+    if (!this.S || this._replaying) return;
     if (this.S.step(dir)) { this.changed++; this.kick(); }
     this.paintChrome();
+  };
+
+  Studio.prototype.wipe = function () {
+    if (!this.S || this._auto || this._replaying) return;
+    this.S.clear(false); this.changed++; this.kick(); this.paintChrome();
+    this.toast(T('مُسح التلوين — «تراجع» يعيده.', 'Coloring cleared — Undo brings it back.'));
   };
 
   Studio.prototype.isDirty = function () { return this.changed > 0; };
@@ -1406,24 +1761,306 @@
     return new Promise(function (res) { c.toBlob(res, 'image/webp', .95); });
   };
   Studio.prototype.project = function () {
-    return { v: 1, W: this.W, H: this.H, pp: this.paperKind, it: this.item && this.item.id || '', ln: this.item && this.item.lineUrl || '', cr: this.item && this.item.refUrl || '' };
+    var it = this.item || {}, real = function (u) { return u && !/^blob:/.test(u) ? u : ''; };
+    return { v: 1, W: this.W, H: this.H, pp: this.paperKind, it: it.id || '', ln: it.srcLine || real(it.lineUrl), cr: it.srcRef || real(it.refUrl) };
+  };
+
+  var MRS_MIME = 'application/x-garden-mirsam', MRS_MAGIC = [77, 73, 82, 83, 65, 77, 48, 49];
+  function zipBuf(buf) {
+    if (!window.CompressionStream) return Promise.resolve(null);
+    return new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer().catch(function () { return null; });
+  }
+  function unzipBuf(buf) { return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer(); }
+  function bufOf(x) { return x instanceof Blob ? x.arrayBuffer() : Promise.resolve(x); }
+  function packProject(head, parts) {
+    return Promise.all(parts.map(function (p) {
+      return bufOf(p.buf).then(function (b) {
+        if (!p.z) return { n: p.n, data: b, z: 0, t: p.t || '' };
+        return zipBuf(b).then(function (z) { return z ? { n: p.n, data: z, z: 1 } : { n: p.n, data: b, z: 0 }; });
+      });
+    })).then(function (list) {
+      head.parts = list.map(function (x) { return { n: x.n, len: x.data.byteLength, z: x.z, t: x.t || '' }; });
+      var hj = new TextEncoder().encode(JSON.stringify(head)), pre = new Uint8Array(12);
+      pre.set(MRS_MAGIC); new DataView(pre.buffer).setUint32(8, hj.length, true);
+      return new Blob([pre, hj].concat(list.map(function (x) { return x.data; })), { type: MRS_MIME });
+    });
+  }
+  function readProject(blob) {
+    return bufOf(blob).then(function (ab) {
+      var u = new Uint8Array(ab);
+      if (u.length < 12 || MRS_MAGIC.some(function (c, i) { return u[i] !== c; })) throw new Error('not-mirsam');
+      var hl = new DataView(ab).getUint32(8, true), head = JSON.parse(new TextDecoder().decode(u.subarray(12, 12 + hl)));
+      if (head.app !== 'garden-mirsam' || !head.W || !head.H) throw new Error('not-mirsam');
+      var o = 12 + hl, parts = {};
+      return Promise.all((head.parts || []).map(function (p) {
+        var b = ab.slice(o, o + p.len); o += p.len;
+        return (p.z ? unzipBuf(b) : Promise.resolve(b)).then(function (d) { parts[p.n] = p.t ? new Blob([d], { type: p.t }) : d; });
+      })).then(function () { return { head: head, parts: parts }; });
+    });
+  }
+  function libBase() { return window.GardenLibrary && GardenLibrary.base || new URL('../library/', location.href).href; }
+  function libPath(u) {
+    u = String(u || ''); if (!u || /^blob:/.test(u)) return '';
+    if (/^lib:/.test(u)) return u;
+    var b = libBase(); if (u.indexOf(b) === 0) return 'lib:' + u.slice(b.length);
+    var k = u.indexOf('/library/'); return k >= 0 ? 'lib:' + u.slice(k + 9) : u;
+  }
+  function isLib(u) { return /^lib:/.test(u || ''); }
+  function libUrl(u) { u = String(u || ''); return isLib(u) ? libBase() + u.slice(4) : (/\/library\//.test(u) ? libBase() + u.slice(u.indexOf('/library/') + 9) : u); }
+  function slimProject(blob) {
+    return readProject(blob).then(function (pj) {
+      var h = pj.head, P = pj.parts;
+      if (!h.recipe || !P.rec || (!P.state && !P.line && !P.ref)) return blob;
+      var parts = [];
+      if (P.thumb) parts.push({ n: 'thumb', buf: P.thumb, t: 'image/webp' });
+      parts.push({ n: 'rec', buf: P.rec, z: 1 });
+      if (P.line && !isLib(h.item && h.item.line)) parts.push({ n: 'line', buf: P.line, t: 'image/png' });
+      if (P.ref && !isLib(h.item && h.item.color)) parts.push({ n: 'ref', buf: P.ref, t: P.ref.type || 'image/webp' });
+      var head = Object.assign({}, h); delete head.parts;
+      return packProject(head, parts).then(function (b) { return b.size < blob.size ? b : blob; });
+    }, function () { return blob; });
+  }
+  function canvasBlob(c, type, q) { return new Promise(function (k) { c.toBlob(k, type, q); }); }
+  function imgBlob(img, type, q) {
+    var c = canvas(img.naturalWidth || img.width, img.naturalHeight || img.height); ctx2(c).drawImage(img, 0, 0);
+    return canvasBlob(c, type, q);
+  }
+  function fileName(t, ext) { return (String(t || '').replace(/[\\/:*?"<>|]+/g, ' ').trim().slice(0, 60) || T('رسمتي', 'my-drawing')) + '.' + ext; }
+  function download(blob, name) {
+    var a = document.createElement('a'), u = URL.createObjectURL(blob);
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+  }
+
+  Studio.prototype.exportProject = function (opt) {
+    opt = opt || {};
+    var self = this, S = this.S;
+    if (!S || this.steps || !this.lineCanvas || this._replaying) return Promise.reject(new Error('no-project'));
+    if (S.wet) S.dryNow();
+    var log = S.log, recipe = !!log && !log.some(function (o) { return o[0] === 'L' && o[1] !== 'ref'; }), slim = !!opt.slim && recipe;
+    var d = slim ? null : S.dump(), it = this.item || {}, lnk = { line: libPath(it.srcLine || it.lineUrl), color: libPath(it.srcRef || it.refUrl) };
+    var rec = recipe ? GardenPaintGL.encodeLog(log) : null;
+    var thumb = S.exportCanvas({ scale: Math.min(1, 320 / Math.max(this.W, this.H)), lines: true, paper: true });
+    var refP = !this.refImg ? Promise.resolve(null) : (it.refUrl && !/^blob:/.test(it.refUrl) ? fetch(it.refUrl).then(function (r) { if (!r.ok) throw 0; return r.blob(); }) : Promise.reject(0))
+      .catch(function () { return imgBlob(self.refImg, 'image/webp', .95); });
+    return Promise.all([canvasBlob(this.lineCanvas, 'image/png'), refP, canvasBlob(thumb, 'image/webp', .8)]).then(function (r) {
+      var head = { app: 'garden-mirsam', v: rec ? 2 : 1, W: self.W, H: self.H, fmt: d ? d.fmt : (S.hdr ? 'h' : 'b'), paper: S.paperKind, paper0: S.paper0 || S.paperKind,
+        steps: S.undo.length, title: self.title || '', item: { id: it.id || '', line: lnk.line, color: lnk.color },
+        recipe: recipe, engine: GardenPaintGL.ENGINE, ops: log ? log.length : 0, tool: self.tool, color: self.color, saved: Date.now() };
+      var parts = [{ n: 'thumb', buf: r[2], t: 'image/webp' }];
+      if (rec) parts.push({ n: 'rec', buf: rec, z: 1 });
+      if (d) parts.push({ n: 'state', buf: d.state, z: 1 }, { n: 'hist', buf: d.hist, z: 1 });
+      if (!slim || !isLib(lnk.line)) parts.push({ n: 'line', buf: r[0], t: 'image/png' });
+      if (r[1] && (!slim || !isLib(lnk.color))) parts.push({ n: 'ref', buf: r[1], t: r[1].type || 'image/webp' });
+      return packProject(head, parts);
+    });
+  };
+  Studio.prototype.fileItems = function () {
+    var lesson = !!this.steps;
+    return [
+      this.opts.onSaveMine && !lesson ? { a: 'mine', i: 'fa-folder-open', t: T('احفظْها في «رسوماتي»', 'Save to “My drawings”') } : null,
+      { a: 'png', i: 'fa-image', t: T('نزّلْها صورة (PNG)', 'Download as image (PNG)') },
+      { a: 'copy', i: 'fa-copy', t: T('انسخْها صورةً', 'Copy as image') },
+      { sep: 1 },
+      { a: 'file', i: 'fa-floppy-disk', t: T('صدّرْ ملفَّ المرسم — يُكمَل لاحقاً بكلِّ تفاصيله', 'Export studio file — reopen with every detail'), off: lesson },
+      { a: 'open', i: 'fa-file-import', t: T('افتحْ ملفَّ مرسم…', 'Open a studio file…') }
+    ].filter(Boolean);
+  };
+  Studio.prototype.fileMenu = function (btn) {
+    var self = this, M = window.GardenMenu;
+    if (!M) return;
+    var r = btn.getBoundingClientRect();
+    var html = M.head(T('حفظٌ وتصدير', 'Save & export')) + this.fileItems().map(function (x) { return x.sep ? M.sep() : M.item(x.a, x.i, x.t, { off: x.off }); }).join('');
+    M.open(r.left, r.bottom + 6, html, function (act) { self.fileAct(act); }, { within: this.root.closest('dialog') || null, label: T('ملفّ', 'File') });
+  };
+  Studio.prototype.moreMenu = function (btn) {
+    var self = this, M = window.GardenMenu;
+    if (!M || !M.rich) return;
+    var narrow = this.root.classList.contains('is-narrow'), r = btn.getBoundingClientRect(), G = window.Garden || {};
+    var th = document.documentElement.getAttribute('data-theme') || 'dark', en = lang() === 'en', quick = [], items = [];
+    if (narrow) {
+      if (this.hasRef && !this.steps) quick.push({ a: 'auto', i: 'fa-wand-magic-sparkles', t: this._auto ? T('أوقِفْ', 'Stop') : T('لوّنْها', 'Auto-color') });
+      if (this.hasRef) quick.push({ a: 'orig', i: this.orig ? 'fa-eye-slash' : 'fa-eye', t: T('الأصل', 'Original') });
+      quick.push({ a: 'fit', i: 'fa-expand', t: T('ملءُ الشاشة', 'Fit') });
+      quick.push({ a: 'wipe', i: 'fa-broom', t: T('امسحْ', 'Clear'), dz: true });
+      items.push({ h: T('الرسمة', 'Drawing') },
+        { t: T('ملفّ: احفظْ أو صدّرْ أو افتحْ', 'File: save, export or open'), i: 'fa-floppy-disk', sub: this.fileItems() },
+        { a: 'hand', i: 'fa-hand', t: T('اليد: اسحبِ الرسمةَ لتتنقّل فيها', 'Hand: drag to move around'), ok: !!this.hand },
+        { a: 'finger', i: 'fa-hand-pointer', t: T('الإصبعُ يرسم', 'Finger draws'), ok: this.palm() === 'never' });
+    }
+    items.push({ a: 'opts', i: 'fa-sliders', t: T('الورقُ والجودةُ واللمس', 'Paper, quality and touch'), ok: !this.$('.mrs-opts').hidden },
+      { a: 'help', i: 'fa-circle-question', t: T('شرحُ الأداة', 'Tool guide'), ok: this.helpOn() },
+      { h: T('المظهر', 'Appearance') },
+      { t: T('الثيم', 'Theme'), i: 'fa-circle-half-stroke', sub: [['dark', 'fa-moon', 'داكن', 'Dark'], ['dim', 'fa-cloud-moon', 'خافت', 'Dim'], ['light', 'fa-sun', 'فاتح', 'Light']]
+        .map(function (x) { return { a: 'th:' + x[0], i: x[1], t: en ? x[3] : x[2], ok: th === x[0] }; }) },
+      { a: 'lang', i: 'fa-language', t: en ? 'العربيّة' : 'English', off: !G.setLanguage });
+    M.rich(r.left, r.bottom + 6, { quick: quick, items: items }, function (act) { self.moreAct(act); },
+      { within: this.root.closest('dialog') || null, label: T('المزيد', 'More'), anchorEnd: true });
+  };
+  Studio.prototype.moreAct = function (act) {
+    var G = window.Garden || {};
+    if (/^th:/.test(act)) { if (G.applyTheme) G.applyTheme(act.slice(3)); this.deskSync(); return; }
+    if (act === 'lang') { if (G.setLanguage) G.setLanguage(lang() === 'en' ? 'ar' : 'en'); return; }
+    if (act === 'auto') { this.autoPaint(); return; }
+    if (act === 'orig') { this.setOrig(!this.orig); return; }
+    if (act === 'fit') { this.fit(); return; }
+    if (act === 'wipe') { this.wipe(); return; }
+    if (act === 'hand') { this.setHand(!this.hand); return; }
+    if (act === 'finger') { this.setPalm(this.palm() === 'never' ? 'auto' : 'never', true); return; }
+    if (act === 'help') { this.toggleHelp(); return; }
+    if (act === 'opts') { var o = this.$('.mrs-opts'); o.hidden = !o.hidden; if (!o.hidden) this.root.classList.remove('is-folded'); this.paintChrome(); this.layout(); return; }
+    this.fileAct(act);
+  };
+  Studio.prototype.deskSync = function () {
+    if (!this.S) return;
+    var bg = getComputedStyle(this.root).getPropertyValue('--mrs-desk').trim(), d = hexRgb(/^#[0-9a-f]{6}$/i.test(bg) ? bg : '#1c2029');
+    this.S.setDesk([d[0] / 255, d[1] / 255, d[2] / 255]);
+    this.applyView();
+  };
+  Studio.prototype.helpOn = function () { return this.root.classList.contains('is-narrow') ? !!this.helpN : !!this.help; };
+  Studio.prototype.toggleHelp = function () {
+    if (this.root.classList.contains('is-narrow')) this.helpN = !this.helpN; else this.help = !this.help;
+    this.savePrefs(); this.paintGuide(); this.layout();
+  };
+  Studio.prototype.applyDockH = function (r) {
+    var dk = this.$('.mrs-dock'), narrow = this.root.classList.contains('is-narrow');
+    if (!dk) return;
+    if (!narrow || !this.dockH || this.root.classList.contains('is-folded')) { dk.style.blockSize = ''; this.root.classList.remove('is-sized'); return; }
+    var max = Math.round((r || this.root.getBoundingClientRect()).height * .72);
+    dk.style.blockSize = Math.max(this.dockMin(), Math.min(max, this.dockH)) + 'px';
+    this.root.classList.add('is-sized');
+  };
+  Studio.prototype.dockMin = function () {
+    var dk = this.$('.mrs-dock'), h = 0;
+    ['.mrs-grip', '.mrs-now', '.mrs-dhead', '.mrs-tabs'].forEach(function (s) { var e = dk.querySelector(s); if (e && !e.hidden) h += e.offsetHeight; });
+    return h + 60;
+  };
+  Studio.prototype.bindGrip = function () {
+    var self = this, g = this.$('.mrs-grip'), dk = this.$('.mrs-dock'), drag = null, raf = 0;
+    var set = function (h, live) {
+      self.dockH = Math.round(h);
+      if (!live) self.savePrefs();
+      if (raf) return;
+      raf = requestAnimationFrame(function () { raf = 0; self.layout(); });
+    };
+    g.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      e.preventDefault();
+      drag = { id: e.pointerId, y: e.clientY, h: dk.offsetHeight, moved: false, folded: self.root.classList.contains('is-folded') };
+      try { g.setPointerCapture(e.pointerId); } catch (x) {}
+      self.root.classList.add('is-resizing'); g.classList.add('is-drag');
+    });
+    g.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dy = drag.y - e.clientY;
+      if (!drag.moved && Math.abs(dy) > 3) {
+        drag.moved = true;
+        if (drag.folded && dy > 0) { self.root.classList.remove('is-folded'); self.paintChrome(); drag.h = self.dockMin(); }
+      }
+      if (drag.moved && !self.root.classList.contains('is-folded')) set(drag.h + dy, true);
+    });
+    var end = function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var d = drag; drag = null;
+      self.root.classList.remove('is-resizing'); g.classList.remove('is-drag');
+      if (!d.moved || self.root.classList.contains('is-folded')) { if (!d.moved) self.root.classList.toggle('is-folded'); self.paintChrome(); self.layout(); return; }
+      if (self.dockH < self.dockMin() - 24) { self.dockH = null; self.root.classList.add('is-folded'); self.paintChrome(); }
+      set(self.dockH || 0);
+    };
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+    g.addEventListener('dblclick', function () { self.dockH = null; self.root.classList.remove('is-folded'); self.savePrefs(); self.paintChrome(); self.layout(); });
+    g.addEventListener('keydown', function (e) {
+      var k = e.key, step = e.shiftKey ? 80 : 24;
+      if (k !== 'ArrowUp' && k !== 'ArrowDown') return;
+      e.preventDefault();
+      self.root.classList.remove('is-folded');
+      set(dk.offsetHeight + (k === 'ArrowUp' ? step : -step));
+    });
+  };
+  Studio.prototype.bindRackDrag = function () {
+    var rack = this.$('.mrs-rack'), drag = null, eat = false;
+    var edge = function () {
+      var max = rack.scrollWidth - rack.clientWidth, x = Math.abs(rack.scrollLeft);
+      rack.classList.toggle('is-more-s', max > 2 && x > 2);
+      rack.classList.toggle('is-more-e', max > 2 && x < max - 2);
+    };
+    rack.addEventListener('scroll', edge, { passive: true });
+    new ResizeObserver(edge).observe(rack);
+    rack.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button || !this.closest('.is-narrow')) return;
+      drag = { id: e.pointerId, x: e.clientX, l: rack.scrollLeft, moved: false };
+    });
+    rack.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) < 6) return;
+      if (!drag.moved) { drag.moved = true; try { rack.setPointerCapture(e.pointerId); } catch (x) {} }
+      rack.scrollLeft = drag.l - dx;
+    });
+    var stop = function () { if (drag && drag.moved) { eat = true; setTimeout(function () { eat = false; }, 0); } drag = null; };
+    rack.addEventListener('pointerup', stop); rack.addEventListener('pointercancel', stop);
+    rack.addEventListener('click', function (e) { if (eat) { e.stopPropagation(); e.preventDefault(); eat = false; } }, true);
+    rack.addEventListener('wheel', function (e) {
+      if (!this.closest('.is-narrow') || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      rack.scrollLeft += (getComputedStyle(rack).direction === 'rtl' ? -1 : 1) * e.deltaY; e.preventDefault();
+    }, { passive: false });
+  };
+  Studio.prototype.fileAct = function (act) {
+    var self = this;
+    if (act === 'png') { this.toBlob('image/png').then(function (b) { download(b, fileName(self.title, 'png')); }); return; }
+    if (act === 'copy') {
+      var p = this.toBlob('image/png');
+      var w;
+      try { w = navigator.clipboard.write([new ClipboardItem({ 'image/png': p })]); } catch (e) { w = Promise.reject(e); }
+      w.then(function () { self.toast(T('نُسخت الصورة — الصقْها حيث شئت.', 'Image copied — paste it anywhere.')); },
+        function () { self.toast(T('لم يسمحِ المتصفّحُ بالنسخ — نزّلْها صورةً بدلاً منه.', 'The browser blocked copying — download it instead.')); });
+      return;
+    }
+    if (act === 'file') {
+      this.toast(T('أجهّز الملفّ…', 'Preparing the file…'));
+      this.exportProject({ slim: true }).then(function (b) { download(b, fileName(self.title, 'mirsam')); self.toast(T('صُدّر ملفُّ المرسم: افتحْه لاحقاً من «ملفّ ← افتحْ» لتكملَ بكلِّ تفاصيله وتراجعه.', 'Exported — open it later from “File → Open” to continue with every detail and undo step.')); },
+        function () { self.toast(T('تعذّر تصديرُ الملفّ.', 'Could not export the file.')); });
+      return;
+    }
+    if (act === 'open') {
+      var inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.mirsam,' + MRS_MIME;
+      inp.addEventListener('change', function () {
+        var f = inp.files && inp.files[0]; if (!f) return;
+        readProject(f).then(function (pj) {
+          if (self.opts.onOpenFile) self.opts.onOpenFile(pj, self); else self.load({ project: pj, title: pj.head.title });
+        }, function () { self.toast(T('هذا ليس ملفَّ مرسم.', 'This is not a studio file.')); });
+      });
+      inp.click();
+      return;
+    }
+    if (act === 'mine' && this.opts.onSaveMine) this.opts.onSaveMine(this);
   };
 
   Studio.prototype.destroy = function () {
-    document.removeEventListener('garden:lang', this._onLang);
+    document.removeEventListener('garden:languageChanged', this._onLang);
     document.removeEventListener('keydown', this._key, true);
     document.removeEventListener('keyup', this._keyup, true);
     if (this.ro) this.ro.disconnect();
     if (this.router) this.router.destroy();
     if (this._raf) cancelAnimationFrame(this._raf);
     if (this.S) { this.S.destroy(); this.S = null; }
+    (this._pjUrls || []).forEach(function (u) { URL.revokeObjectURL(u); }); this._pjUrls = [];
     this.regions = null; this.refImg = null; this._refC = null;
     this.root.remove();
   };
 
   window.GardenColoring = {
+    precompute: function (it) { try { precompute({ lineUrl: it.line, refUrl: it.color, W: it.W, H: it.H }); } catch (e) {} },
+    warm: function () {
+      if (!window.GardenPaintGL || !GardenPaintGL.warmup) return;
+      var pr = store(PREF_KEY) || {}, t = BYID[pr.tool] && BYID[pr.tool].eng ? pr.tool : 'pencil', id = GardenPaintGL.TOOLS[t];
+      GardenPaintGL.warmup(t === 'wash' ? ['comp', 'init', 'paper', 'back', 'wcAdd', 'wcStep', 'wcDep', 'fill:11:2'] : ['comp', 'init', 'paper', 'back', 'dab:' + id, 'fill:' + id + ':2']);
+    },
     TOOLS: TOOLS,
     SETS: SETS,
+    readProject: readProject,
+    slim: slimProject,
+    MIME: MRS_MIME,
     create: function (host, opts) { return new Studio(host, opts); },
     lineOnly: function (svg) { return withStyle(svg, HIDE_COLOR); },
     colored: function (svg) { return withStyle(svg, HIDE_GUIDE); },

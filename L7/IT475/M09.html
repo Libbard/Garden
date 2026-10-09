@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT475" data-module="9" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تحليل البيانات: البدء مع أورنج (Orange) · IT475 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT475" data-page-title-en="IT475">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=IT475"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#orange-workflow-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات سير العمل في أورنج (Orange Workflow)</template>
+        <template class="content-en">Orange Workflow Basics</template>
+        <span class="content-target">أساسيات سير العمل في أورنج (Orange Workflow)</span>
+      </a>
+      <a href="#interactive-data-exploration" class="toc-link" data-bilingual>
+        <template class="content-ar">استكشاف البيانات التفاعلي (Interactive Data Exploration)</template>
+        <template class="content-en">Interactive Data Exploration</template>
+        <span class="content-target">استكشاف البيانات التفاعلي (Interactive Data Exploration)</span>
+      </a>
+      <a href="#predictive-modeling-evaluation" class="toc-link" data-bilingual>
+        <template class="content-ar">النمذجة التنبؤية والتقييم (Predictive Modeling &amp; Evaluation)</template>
+        <template class="content-en">Predictive Modeling &amp; Evaluation</template>
+        <span class="content-target">النمذجة التنبؤية والتقييم (Predictive Modeling &amp; Evaluation)</span>
+      </a>
+      <a href="#decision-trees" class="toc-link" data-bilingual>
+        <template class="content-ar">أشجار القرار (Decision Trees)</template>
+        <template class="content-en">Decision Trees</template>
+        <span class="content-target">أشجار القرار (Decision Trees)</span>
+      </a>
+      <a href="#regression-models" class="toc-link" data-bilingual>
+        <template class="content-ar">نماذج الانحدار (Regression Models)</template>
+        <template class="content-en">Regression Models</template>
+        <span class="content-target">نماذج الانحدار (Regression Models)</span>
+      </a>
+      <a href="#deep-learning-models" class="toc-link" data-bilingual>
+        <template class="content-ar">نماذج التعلم العميق (Deep Learning Models)</template>
+        <template class="content-en">Deep Learning Models</template>
+        <span class="content-target">نماذج التعلم العميق (Deep Learning Models)</span>
+      </a>
+      <a href="#image-analytics" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل الصور (Image Analytics)</template>
+        <template class="content-en">Image Analytics</template>
+        <span class="content-target">تحليل الصور (Image Analytics)</span>
+      </a>
+      <a href="#text-processing-classification" class="toc-link" data-bilingual>
+        <template class="content-ar">معالجة النصوص والتصنيف (Text Processing &amp; Classification)</template>
+        <template class="content-en">Text Processing &amp; Classification</template>
+        <span class="content-target">معالجة النصوص والتصنيف (Text Processing &amp; Classification)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · IT475
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تحليل البيانات: البدء مع أورنج (Orange)</h1>
+      <p class="hero-description">مقدمة شاملة لاستخدام برنامج Orange للتنقيب عن البيانات، تغطي سير العمل المرئي، استكشاف البيانات، النماذج التنبؤية، تحليل الصور، ومعالجة النصوص.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Data analytics: Getting started with Orange</h1>
+      <p class="hero-description">A comprehensive introduction to using Orange data mining software, covering visual workflows, data exploration, predictive models, image analytics, and text processing.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أورنج</span>
+      <span class="tag">التنقيب عن البيانات</span>
+      <span class="tag">البرمجة المرئية</span>
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">تحليل النصوص</span>
+      <span class="tag">تحليل الصور</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Orange</span>
+      <span class="tag">Data Mining</span>
+      <span class="tag">Visual Programming</span>
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Text Analytics</span>
+      <span class="tag">Image Analytics</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم المبدأ الأساسي للبرمجة المرئية في Orange وبناء مسارات عمل (Workflows) تفاعلية.</span></li>
+      <li><span class="obj-icon">✦</span><span>استكشاف البيانات وتصورها باستخدام أدوات مثل Scatter Plot و Box Plot و Feature Statistics.</span></li>
+      <li><span class="obj-icon">✦</span><span>تدريب وتقييم النماذج التنبؤية (أشجار القرار، الانحدار، الشبكات العصبية) باستخدام أداة Test and Score.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات تحليل الصور والنصوص المتقدمة باستخدام الإضافات (Add-ons) الخاصة بـ Orange.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the core principle of visual programming in Orange and build interactive workflows.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explore and visualize data using widgets like Scatter Plot, Box Plot, and Feature Statistics.</span></li>
+      <li><span class="obj-icon">✦</span><span>Train and evaluate predictive models (Decision Trees, Regression, Neural Networks) using the Test and Score widget.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply advanced image and text analytics techniques using Orange add-ons.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="orange-workflow-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات سير العمل في أورنج (Orange Workflow)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Orange Workflow Basics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد Orange على البرمجة المرئية حيث يتم بناء مسارات العمل عن طريق ربط وحدات معالجة تسمى (Widgets).</p></template>
+    <template class="content-en"><p>Orange relies on visual programming where workflows are built by connecting processing units called Widgets.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>برنامج Orange هو برنامج للتنقيب عن البيانات يعتمد على المكونات (Component-based). المبدأ الأساسي له هو البرمجة المرئية (Visual Programming).</p><p>تسمى وحدة المعالجة الأساسية لأي معالجة للبيانات في Orange بـ <b>الودجت (Widget)</b>. كل خطوة تحليلية أو إجراء يتم احتواؤه داخل ودجت. تتواصل هذه الودجتس عن طريق إرسال المعلومات عبر قناة اتصال، حيث يُستخدم مخرجات ودجت كمدخل لودجت آخر.</p><p><b><span class="smart-term" data-term-en="Workflow" data-ar="مسار العمل" data-en-def="The sequence of connected widgets that perform a particular data analysis task.">مسار العمل<span class="smart-term-tooltip"></span></span> (Workflow)</b> هو تسلسل الخطوات/الإجراءات التي يتم تنفيذها لإنجاز مهمة معينة. يتم وضع الودجتس على لوحة العمل (Canvas) وربطها. يتم تنفيذ مسار العمل التحليلي في Orange من اليسار إلى اليمين ولا يمرر البيانات إلى الخلف أبدًا.</p><ol><li><b>قراءة (Read):</b> مثل ودجت File.</li><li><b>معالجة (Process):</b> مثل ودجت Data Table.</li><li><b>تصور (Visualize):</b> مثل ودجت Scatter Plot.</li></ol></template>
+    <template class="content-en"><p>Orange is a component-based data mining software. Its core principle is visual programming.</p><p>The basic processing unit of any data manipulation in Orange is called a <b><span class="smart-term" data-term-en="Widget" data-ar="ودجت (أداة)" data-en-def="The basic processing unit of any data manipulation in Orange, containing a specific analytical step.">widget<span class="smart-term-tooltip"></span></span></b>. Each analytical step/action is contained within a widget. Widgets communicate by sending information along a communication channel, and the output from one widget is used as input to another.</p><p>A <b><span class="smart-term" data-term-en="Workflow" data-ar="مسار العمل" data-en-def="The sequence of connected widgets that perform a particular data analysis task.">workflow<span class="smart-term-tooltip"></span></span></b> is the sequence of steps/actions performed to accomplish a particular task. Widgets are placed on the canvas and connected into an analytical workflow. Orange analytical workflows are executed from left to right and never pass data backwards.</p><ol><li><b>Read:</b> e.g., File widget.</li><li><b>Process:</b> e.g., Data Table widget.</li><li><b>Visualize:</b> e.g., Scatter Plot widget.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تصميم Orange المبني على البرمجة المرئية يقلل من حاجز الدخول لعلماء البيانات والمحللين الذين قد لا يمتلكون خلفية برمجية قوية، مما يسمح بالتركيز على المنطق التحليلي بدلاً من بناء الجملة البرمجية (Syntax).</p><p>التدفق أحادي الاتجاه (من اليسار إلى اليمين) يمنع حدوث حلقات دائرية (Circular dependencies) في معالجة البيانات، مما يضمن استقرار مسار العمل وسهولة تتبعه.</p><p>يمكن للمستخدمين المتقدمين استخدام Orange كوحدة (Module) داخل لغة البرمجة بايثون (Python) للحصول على مرونة أكبر.</p></template>
+    <template class="content-en"><p>Orange's visual programming design lowers the barrier to entry for data scientists and analysts who may lack a strong programming background, allowing them to focus on analytical logic rather than syntax.</p><p>The unidirectional flow (left to right) prevents circular dependencies in data processing, ensuring workflow stability and traceability.</p><p>Advanced users can bypass the GUI and use Orange as a module within the Python programming language for greater flexibility.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a simple Orange workflow. Three circular nodes representing widgets: 'File' (left), 'Data Table' (middle), 'Scatter Plot' (right). Arrows connecting them from left to right. Label the arrows 'Data'. Style: educational, dark background #0d1117, accent color #ff9900, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      text {
+        font-family: system-ui, 'Cairo', 'Inter', sans-serif;
+      }
+    </style>
+    
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.1"/>
+    </filter>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/>
+    </marker>
+
+    <marker id="arrow-subtle" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Orange Workflow Basics</text>
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أساسيات سير العمل في أورانج</text>
+
+  <!-- Connections (Arrows) -->
+  <line x1="235" y1="140" x2="315" y2="140" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="485" y1="140" x2="565" y2="140" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <!-- Connection Labels -->
+  <text x="275" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Data</text>
+  <text x="275" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بيانات</text>
+  
+  <text x="525" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Data</text>
+  <text x="525" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">بيانات</text>
+
+  <!-- Node 1: File -->
+  <g transform="translate(0, 0)">
+    <circle cx="150" cy="140" r="75" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
+    
+    <!-- File Icon -->
+    <g transform="translate(138, 95) scale(1.2)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+    </g>
+
+    <text x="150" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">File</text>
+    <text x="150" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">ملف</text>
+    
+    <text x="150" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Read</text>
+    <text x="150" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">قراءة</text>
+  </g>
+
+  <!-- Node 2: Data Table -->
+  <g transform="translate(0, 0)">
+    <circle cx="400" cy="140" r="75" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
+    
+    <!-- Data Table Icon -->
+    <g transform="translate(388, 95) scale(1.2)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+      <line x1="3" y1="9" x2="21" y2="9"/>
+      <line x1="3" y1="15" x2="21" y2="15"/>
+      <line x1="9" y1="3" x2="9" y2="21"/>
+      <line x1="15" y1="3" x2="15" y2="21"/>
+    </g>
+
+    <text x="400" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Data Table</text>
+    <text x="400" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جدول البيانات</text>
+    
+    <text x="400" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Process</text>
+    <text x="400" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">معالجة</text>
+  </g>
+
+  <!-- Node 3: Scatter Plot -->
+  <g transform="translate(0, 0)">
+    <circle cx="650" cy="140" r="75" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" filter="url(#shadow)"/>
+    
+    <!-- Scatter Plot Icon -->
+    <g transform="translate(638, 95) scale(1.2)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="3" y1="3" x2="3" y2="21"/>
+      <line x1="3" y1="21" x2="21" y2="21"/>
+      <circle cx="7" cy="17" r="1.5" fill="var(--brand-500)" stroke="none"/>
+      <circle cx="11" cy="11" r="1.5" fill="var(--brand-500)" stroke="none"/>
+      <circle cx="15" cy="15" r="1.5" fill="var(--brand-500)" stroke="none"/>
+      <circle cx="18" cy="7" r="1.5" fill="var(--brand-500)" stroke="none"/>
+    </g>
+
+    <text x="650" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Scatter Plot</text>
+    <text x="650" y="160" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مخطط التشتت</text>
+    
+    <text x="650" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Visualize</text>
+    <text x="650" y="182" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تمثيل مرئي</text>
+  </g>
+
+  <!-- Workflow Direction Indicator -->
+  <line x1="200" y1="250" x2="600" y2="250" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#arrow-subtle)"/>
+  <text x="400" y="270" text-anchor="middle" font-size="14" fill="var(--text-muted)" class="gsvg-en">Workflow Execution Direction</text>
+  <text x="400" y="270" text-anchor="middle" font-size="14" fill="var(--text-muted)" class="gsvg-ar">اتجاه تنفيذ سير العمل</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يمنع Orange تمرير البيانات إلى الخلف (من اليمين إلى اليسار) في مسارات العمل؟</template>
+      <template class="content-en">Why does Orange prevent passing data backwards (from right to left) in workflows?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لمنع حدوث حلقات لا نهائية (Infinite loops) وتجنب التعقيد في تتبع حالة البيانات، مما يضمن أن كل خطوة تعتمد فقط على البيانات المعالجة مسبقًا.</p></template>
+      <template class="content-en"><p>To prevent infinite loops and avoid complexity in tracking data states, ensuring that each step relies only on previously processed data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="interactive-data-exploration" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> استكشاف البيانات التفاعلي (Interactive Data Exploration)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Interactive Data Exploration</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتميز التصورات في Orange بأنها تفاعلية، حيث يمكن تحديد مجموعة فرعية من البيانات في رسم بياني وتمريرها إلى الودجتس التالية.</p></template>
+    <template class="content-en"><p>Visualizations in Orange are interactive; you can select a subset of data in a plot and pass it downstream to other widgets.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر Orange مجموعة من الأدوات لاستكشاف البيانات بصريًا وإحصائيًا:</p><ul><li><b>Feature Statistics:</b> توفر طريقة سريعة لفحص وإيجاد الميزات (Features) المثيرة للاهتمام في مجموعة البيانات. يمكن تحديد <span class="smart-term" data-term-en="Subset" data-ar="مجموعة فرعية" data-en-def="A portion of the data instances selected from a larger dataset, often through interactive visualization.">مجموعة فرعية<span class="smart-term-tooltip"></span></span> من الميزات للاحتفاظ بها.</li><li><b>Box Plot:</b> يُستخدم عادة بعد ودجت File لمراقبة الخصائص الإحصائية واكتشاف الحالات الشاذة (Anomalies) مثل القيم المكررة أو القيم المتطرفة (Outliers).</li><li><b>Scatter Plot:</b> يوفر تصورًا ثنائي الأبعاد للسمات المستمرة. يدعم التكبير والتصغير والتحديد اليدوي لمثيلات البيانات.</li><li><b>Distributions:</b> يعرض توزيع القيم للسمات المنفصلة (Discrete) أو المستمرة (Continuous).</li></ul><p><b>التحديد التفاعلي (Interactive Selection):</b> يمكن للمستخدم النقر وسحب مستطيل حول مجموعة من النقاط في Scatter Plot. سيتم إرسال هذه النقاط المحددة فقط (Subset) عبر قناة الاتصال إلى الودجت التالي (مثل Data Table) لتحليلها بشكل منفصل.</p></template>
+    <template class="content-en"><p>Orange provides a suite of tools for visual and statistical data exploration:</p><ul><li><b>Feature Statistics:</b> Provides a quick way to inspect and find interesting features in a dataset. You can select a <span class="smart-term" data-term-en="Subset" data-ar="مجموعة فرعية" data-en-def="A portion of the data instances selected from a larger dataset, often through interactive visualization.">subset<span class="smart-term-tooltip"></span></span> of features to keep.</li><li><b>Box Plot:</b> Commonly used immediately after the File widget to observe statistical properties and discover anomalies (duplicated values, outliers).</li><li><b>Scatter Plot:</b> Provides a 2-dimensional visualization for continuous attributes. Supports zooming and manual selection of data instances.</li><li><b>Distributions:</b> Displays the value distribution of discrete or continuous attributes.</li></ul><p><b>Interactive Selection:</b> A user can click and drag a rectangle around a subset of points in a Scatter Plot. Only these selected points (Subset) will be sent through the communication channel to the downstream widget (e.g., Data Table) for separate analysis.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ميزة التحديد التفاعلي (المعروفة في تحليل البيانات بـ Brushing and Linking) تسمح باكتشاف الأنماط المخفية. عندما تحدد بيانات في رسم بياني، يتم تمييزها تلقائيًا في الرسوم البيانية الأخرى المتصلة.</p><p>يمكن استخدام ودجت <b>Select Rows</b> لتقسيم البيانات برمجيًا بناءً على قيم الميزات (مثل تقسيم البيانات حسب الجنس) بدلاً من التحديد اليدوي البصري.</p></template>
+    <template class="content-en"><p>The interactive selection feature (known in data analytics as Brushing and Linking) allows for the discovery of hidden patterns. When you select data in one plot, it can be automatically highlighted in other connected plots.</p><p>The <b>Select Rows</b> widget can be used to programmatically split data based on feature values (e.g., splitting data by gender) as an alternative to manual visual selection.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن أن يساعد التحديد التفاعلي في Scatter Plot في تحسين جودة البيانات؟</template>
+      <template class="content-en">How can interactive selection in a Scatter Plot help improve data quality?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يمكن استخدامه لتحديد القيم المتطرفة (Outliers) بصريًا، ثم تمرير هذه المجموعة الفرعية إلى ودجت آخر لحذفها أو دراسة سبب شذوذها.</p></template>
+      <template class="content-en"><p>It can be used to visually identify outliers, then pass this subset to another widget to either remove them or study the cause of their anomaly.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="predictive-modeling-evaluation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> النمذجة التنبؤية والتقييم (Predictive Modeling &amp; Evaluation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Predictive Modeling &amp; Evaluation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تقييم النماذج التنبؤية باستخدام ودجت Test and Score، بينما يُستخدم ودجت Predictions لتطبيق النموذج المدرب على بيانات جديدة.</p></template>
+    <template class="content-en"><p>Predictive models are evaluated using the Test and Score widget, while the Predictions widget is used to apply a trained model to new data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتطلب بناء وتقييم النماذج التنبؤية في Orange عدة مكونات:</p><ol><li><b>Test and Score:</b> ودجت يُستخدم لتقييم النماذج. يقبل عدة مدخلات:<ul><li>Data: مجموعة البيانات لتقييم النماذج.</li><li>Learners: الخوارزميات المستخدمة لتدريب النموذج (مثل شجرة القرار).</li><li>Preprocessor (اختياري): للتطبيع أو اختيار الميزات.</li></ul>يقوم هذا الودجت بعرض نتائج التقييم (مثل دقة التصنيف) ويخرج هذه النتائج ليتم استخدامها بواسطة ودجتس أخرى.</li><li><b>Confusion Matrix:</b> يأخذ مخرجات Test and Score ويعرض النسب بين الفئات المتوقعة والفئات الفعلية، مما يوضح عدد الحالات التي تم تصنيفها بشكل خاطئ وكيفية ذلك.</li><li><b>Predictions:</b> يُستخدم لإجراء تنبؤات على بيانات جديدة. يحتاج إلى مدخلين: النموذج المدرب (Model) والبيانات المراد التنبؤ بها (Test data).</li><li><b>Save/Load Model:</b> يمكن حفظ النماذج المدربة لإعادة استخدامها في مسارات عمل أخرى باستخدام صيغة <code>pickle</code>.</li></ol></template>
+    <template class="content-en"><p>Building and evaluating predictive models in Orange requires several components:</p><ol><li><b>Test and Score:</b> A widget used to evaluate models. It accepts several inputs:<ul><li>Data: The dataset for evaluating models.</li><li>Learners: Algorithms to use for training the model (e.g., Decision Tree).</li><li>Preprocessor (optional): For normalization or feature selection.</li></ul>This widget shows evaluation results (e.g., classification accuracy) and outputs these results to be used by other widgets.</li><li><b><span class="smart-term" data-term-en="Confusion Matrix" data-ar="مصفوفة الارتباك" data-en-def="A table used to describe the performance of a classification model, showing true vs. predicted classes.">Confusion Matrix<span class="smart-term-tooltip"></span></span>:</b> Takes the output of Test and Score and shows proportions between the predicted and actual class, revealing how many instances were misclassified and in which way.</li><li><b>Predictions:</b> Used to make predictions on new data. It requires two inputs: the trained model (Model) and the data to predict on (Test data).</li><li><b>Save/Load Model:</b> Trained models can be saved for reuse in different workflows using the <code>pickle</code> format.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ودجت Test and Score لا يقوم فقط بالتدريب، بل يقوم بإعدادات أخذ العينات (Sampling) مثل <span class="smart-term" data-term-en="Cross-validation" data-ar="التحقق المتقاطع" data-en-def="A resampling procedure used to evaluate machine learning models on a limited data sample.">التحقق المتقاطع<span class="smart-term-tooltip"></span></span> (Cross-validation) لضمان عدم حدوث Overfitting.</p><p>ودجت Predictions بحد ذاته لا يقوم بأي تنبؤ إذا لم يتم تزويده بنموذج تنبؤي (Predictive Model) عبر قناة الاتصال.</p></template>
+    <template class="content-en"><p>The Test and Score widget doesn't just train; it handles sampling settings like <span class="smart-term" data-term-en="Cross-validation" data-ar="التحقق المتقاطع" data-en-def="A resampling procedure used to evaluate machine learning models on a limited data sample.">Cross-validation<span class="smart-term-tooltip"></span></span> to ensure the model doesn't overfit.</p><p>The Predictions widget itself makes no predictions if it is not supplied with a predictive model via the communication channel.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show a predictive modeling workflow. 'File' widget connects to 'Test and Score' (Data channel). 'Logistic Regression' and 'Tree' widgets connect to 'Test and Score' (Learner channel). 'Test and Score' connects to 'Confusion Matrix' (Evaluation Results channel). Style: educational, dark background #0d1117, accent color #ff9900, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 840 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="420" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Predictive Modeling Workflow</text>
+  <text x="420" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">سير عمل النمذجة التنبؤية</text>
+
+  <!-- Connection Paths -->
+  <path d="M 220 107.5 C 280 107.5, 280 207.5, 330 207.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 220 222.5 L 330 222.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 220 337.5 C 280 337.5, 280 237.5, 330 237.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <path d="M 500 222.5 L 610 222.5" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Edge Labels Backgrounds -->
+  <rect x="250" y="138" width="60" height="24" rx="4" fill="var(--bg-surface)" />
+  <rect x="240" y="200" width="80" height="24" rx="4" fill="var(--bg-surface)" />
+  <rect x="240" y="283" width="80" height="24" rx="4" fill="var(--bg-surface)" />
+  <rect x="490" y="200" width="130" height="24" rx="4" fill="var(--bg-surface)" />
+
+  <!-- Edge Labels Texts -->
+  <text x="280" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Data</text>
+  <text x="280" y="155" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">بيانات</text>
+
+  <text x="280" y="217" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Learner</text>
+  <text x="280" y="217" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">مُتعلِّم</text>
+
+  <text x="280" y="300" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Learner</text>
+  <text x="280" y="300" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">مُتعلِّم</text>
+
+  <text x="555" y="217" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Evaluation Results</text>
+  <text x="555" y="217" text-anchor="middle" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">نتائج التقييم</text>
+
+  <!-- Nodes -->
+  <!-- File Node -->
+  <g>
+    <rect x="60" y="70" width="160" height="75" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(128, 82)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+    </g>
+    <text x="140" y="132" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">File</text>
+    <text x="140" y="132" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">ملف</text>
+    <circle cx="220" cy="107.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- Logistic Regression Node -->
+  <g>
+    <rect x="60" y="185" width="160" height="75" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(128, 197)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round">
+      <rect x="2" y="2" width="20" height="20" rx="4" />
+      <path d="M 6 18 C 10 18, 14 6, 18 6" />
+    </g>
+    <text x="140" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Logistic Regression</text>
+    <text x="140" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">انحدار لوجستي</text>
+    <circle cx="220" cy="222.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- Tree Node -->
+  <g>
+    <rect x="60" y="300" width="160" height="75" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(128, 312)" stroke="var(--brand-500)" stroke-width="2" stroke-linecap="round">
+      <path d="M12 5 L6 10 M12 5 L18 10 M18 13 L14 18 M18 13 L22 18" fill="none" />
+      <circle cx="12" cy="4" r="2" fill="var(--brand-500)" stroke="none" />
+      <circle cx="6" cy="11" r="2" fill="var(--brand-500)" stroke="none" />
+      <circle cx="18" cy="11" r="2" fill="var(--brand-500)" stroke="none" />
+      <circle cx="14" cy="19" r="2" fill="var(--brand-500)" stroke="none" />
+      <circle cx="22" cy="19" r="2" fill="var(--brand-500)" stroke="none" />
+    </g>
+    <text x="140" y="362" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Tree</text>
+    <text x="140" y="362" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">شجرة</text>
+    <circle cx="220" cy="337.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- Test and Score Node (Highlighted) -->
+  <g>
+    <rect x="340" y="185" width="160" height="75" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <g transform="translate(408, 197)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="3" fill="var(--brand-500)" stroke="none" />
+      <line x1="12" y1="0" x2="12" y2="4" />
+      <line x1="12" y1="20" x2="12" y2="24" />
+      <line x1="0" y1="12" x2="4" y2="12" />
+      <line x1="20" y1="12" x2="24" y2="12" />
+    </g>
+    <text x="420" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Test and Score</text>
+    <text x="420" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">اختبار وتقييم</text>
+    <circle cx="340" cy="207.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="340" cy="222.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="340" cy="237.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="500" cy="222.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+
+  <!-- Confusion Matrix Node -->
+  <g>
+    <rect x="620" y="185" width="160" height="75" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <g transform="translate(688, 197)" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linecap="round">
+      <rect x="2" y="2" width="20" height="20" rx="3" />
+      <line x1="12" y1="2" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <circle cx="7" cy="7" r="1.5" fill="var(--brand-500)" stroke="none" />
+      <circle cx="17" cy="17" r="1.5" fill="var(--brand-500)" stroke="none" />
+    </g>
+    <text x="700" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Confusion Matrix</text>
+    <text x="700" y="247" text-anchor="middle" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">مصفوفة الارتباك</text>
+    <circle cx="620" cy="222.5" r="4" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى ودجت Confusion Matrix إذا كان Test and Score يعطينا دقة النموذج (Accuracy)؟</template>
+      <template class="content-en">Why do we need a Confusion Matrix widget if Test and Score gives us the model's Accuracy?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الدقة وحدها قد تكون مضللة في البيانات غير المتوازنة. مصفوفة الارتباك توضح بالضبط أين يخطئ النموذج (مثلاً، هل يخطئ في تصنيف الفئة أ كـ ب، أم العكس؟).</p></template>
+      <template class="content-en"><p>Accuracy alone can be misleading in imbalanced datasets. The confusion matrix shows exactly where the model makes errors (e.g., misclassifying class A as B, or vice versa).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="decision-trees" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> أشجار القرار (Decision Trees)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Decision Trees</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>شجرة القرار هي خوارزمية تعلم آلي تضع الميزة الأكثر فائدة في الجذر وتقسم البيانات إلى مجموعات فرعية نقية.</p></template>
+    <template class="content-en"><p>A decision tree is a machine learning algorithm that places the most useful feature at the root and splits data into pure subsets.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أشجار القرار هي واحدة من أقدم طرق التعلم الآلي وأكثرها شيوعًا. في Orange، لا تتطلب أشجار القرار أي معالجة مسبقة للبيانات (Data pre-processing).</p><p><b>كيف تعمل:</b> تضع الشجرة الميزة الأكثر فائدة (التي تقسم البيانات إلى أنقى مجموعتين فرعيتين) في الجذر. تتكرر هذه العملية لتقسيم المجموعات الفرعية حتى تنتمي جميع البيانات في المجموعة إلى نفس الفئة (تسمى العقد الطرفية أو الأوراق - Leaf nodes).</p><p><b>معلمات الشجرة (Tree Parameters):</b></p><ul><li><b>Induce binary tree:</b> بناء شجرة ثنائية (التقسيم إلى عقدتين فرعيتين فقط).</li><li><b>Min. number of instances in leaves:</b> يمنع الخوارزمية من إنشاء تقسيم يضع عددًا أقل من المحدد في أي فرع.</li><li><b>Do not split subsets smaller than:</b> يمنع تقسيم العقد التي تحتوي على عدد حالات أقل من المحدد.</li><li><b>Limit the maximal tree depth:</b> يحد من عمق الشجرة لعدد محدد من المستويات.</li><li><b>Stop when majority reaches [%]:</b> يوقف التقسيم عندما تصل الأغلبية إلى حد معين.</li></ul><p>يمكن استخدام ودجت <b>Tree Viewer</b> لتصور الشجرة، وودجت <b>Rank</b> لتقدير جودة الميزات وترتيبها حسب كمية المعلومات التي تحملها.</p></template>
+    <template class="content-en"><p>Decision trees are one of the oldest and most popular machine learning methods. In Orange, decision trees do not use any data pre-processing.</p><p><b>How it works:</b> Trees place the most useful feature (that splits the data into two purest possible subsets) at the root. This process of breaking up subsets repeats until we reach subsets where all data belongs to the same class (represented by <span class="smart-term" data-term-en="Leaf Node" data-ar="العقدة الطرفية (الورقة)" data-en-def="The terminal node of a decision tree representing the final predicted class or value.">leaf node<span class="smart-term-tooltip"></span></span>s).</p><p><b>Tree Parameters:</b></p><ul><li><b>Induce binary tree:</b> Build a binary tree (split into two child nodes).</li><li><b>Min. number of instances in leaves:</b> The algorithm will never construct a split which would put less than the specified number of training examples into any branch.</li><li><b>Do not split subsets smaller than:</b> Forbids the algorithm to split nodes with less than the given number of instances.</li><li><b>Limit the maximal tree depth:</b> Limits the depth of the classification tree to the specified number of node levels.</li><li><b>Stop when majority reaches [%]:</b> Stop splitting nodes after a specified majority threshold is reached.</li></ul><p>The <b>Tree Viewer</b> widget can be used to visualize the tree, and the <b>Rank</b> widget estimates the quality of data features and ranks them according to how much information they carry.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعلمات مثل (Limit maximal tree depth) و (Min instances in leaves) تعتبر حاسمة لمنع ظاهرة التخصيص الزائد (Overfitting)، حيث تحفظ الشجرة بيانات التدريب بدلاً من تعلم الأنماط العامة.</p><p>على الرغم من استخدامها الشائع في التصنيف، يمكن لأشجار القرار في Orange أن تعمل أيضًا في مهام الانحدار (Regression tasks) للتنبؤ بقيم مستمرة.</p></template>
+    <template class="content-en"><p>Parameters like 'Limit maximal tree depth' and 'Min instances in leaves' are crucial for preventing Overfitting, where the tree memorizes the training data instead of learning general patterns.</p><p>Although commonly used for classification, decision trees in Orange can also work for regression tasks to predict continuous values.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا لم نضع أي قيود (Parameters) على عمق شجرة القرار؟</template>
+      <template class="content-en">What happens if we put no limits (Parameters) on the depth of a decision tree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستستمر الشجرة في التقسيم حتى تصبح كل ورقة نقية تمامًا (تحتوي على عنصر واحد أو عناصر من نفس الفئة فقط)، مما يؤدي إلى Overfitting شديد وضعف في الأداء على البيانات الجديدة.</p></template>
+      <template class="content-en"><p>The tree will continue to split until every leaf is perfectly pure (containing one item or items of only one class), leading to severe Overfitting and poor performance on new data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="regression-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> نماذج الانحدار (Regression Models)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Regression Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانحدار الخطي يُستخدم للبيانات المستمرة، بينما الانحدار اللوجستي يُستخدم لمهام التصنيف.</p></template>
+    <template class="content-en"><p>Linear Regression is used for continuous data, while Logistic Regression is used for classification tasks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر Orange نموذجين أساسيين للانحدار:</p><ol><li><b>الانحدار الخطي (Linear Regression):</b> يبني متعلم/متنبئ يتعلم دالة خطية من بيانات الإدخال. يحدد العلاقة بين المتنبئ (x) ومتغير الاستجابة (y). يعمل الانحدار الخطي <b>فقط</b> على مهام الانحدار (البيانات المستمرة). يدعم تقنيات <span class="smart-term" data-term-en="Regularization" data-ar="التنظيم" data-en-def="A technique used to prevent overfitting by adding a penalty term to the loss function (e.g., Ridge L2, Lasso L1).">التنظيم<span class="smart-term-tooltip"></span></span> (Regularization) مثل Ridge (L2) و Lasso (L1) و Elastic net.</li><li><b>الانحدار اللوجستي (Logistic Regression):</b> على الرغم من اسمه، فإنه يعمل <b>فقط</b> لمهام التصنيف (Classification tasks). يتعلم نموذج انحدار لوجستي من البيانات للتنبؤ بالفئات.</li></ol></template>
+    <template class="content-en"><p>Orange provides two main regression models:</p><ol><li><b>Linear Regression:</b> Constructs a learner/predictor that learns a linear function from its input data. It identifies the relationship between a predictor (x) and the response variable (y). Linear regression works <b>only</b> on regression tasks (continuous data). It supports <span class="smart-term" data-term-en="Regularization" data-ar="التنظيم" data-en-def="A technique used to prevent overfitting by adding a penalty term to the loss function (e.g., Ridge L2, Lasso L1).">regularization<span class="smart-term-tooltip"></span></span> techniques like Ridge (L2), Lasso (L1), and Elastic net.</li><li><b>Logistic Regression:</b> Despite its name, it works <b>only</b> for classification tasks. It learns a Logistic Regression model from the data to predict classes.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>سبب استخدام الانحدار اللوجستي للتصنيف هو أنه يطبق دالة (Sigmoid) على المخرجات الخطية لضغطها بين 0 و 1، مما يمثل احتمالية الانتماء لفئة معينة.</p><p>التنظيم (Regularization) في الانحدار الخطي (مثل L1 و L2) يساعد في منع التخصيص الزائد عن طريق معاقبة المعاملات الكبيرة.</p></template>
+    <template class="content-en"><p>The reason Logistic Regression is used for classification is that it applies a Sigmoid function to the linear output to squash it between 0 and 1, representing the probability of belonging to a certain class.</p><p>Regularization in Linear Regression (like L1 and L2) helps prevent overfitting by penalizing large coefficients.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Linear Regression</th><th>Logistic Regression</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع المهمة</template>
+          <template class="content-en">Task Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مهام الانحدار (Regression)</template>
+          <template class="content-en">Regression tasks</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مهام التصنيف (Classification)</template>
+          <template class="content-en">Classification tasks</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع البيانات المستهدفة</template>
+          <template class="content-en">Target Data Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بيانات مستمرة (Continuous)</template>
+          <template class="content-en">Continuous data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بيانات فئوية (Categorical)</template>
+          <template class="content-en">Categorical data</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك مجموعة بيانات تتنبأ بسعر المنزل، هل ستستخدم الانحدار الخطي أم اللوجستي؟</template>
+      <template class="content-en">If you have a dataset predicting the price of a house, would you use Linear or Logistic Regression?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الانحدار الخطي، لأن سعر المنزل هو قيمة مستمرة (Regression task)، بينما الانحدار اللوجستي يُستخدم فقط للتصنيف (مثل التنبؤ بما إذا كان المنزل سيباع أم لا).</p></template>
+      <template class="content-en"><p>Linear Regression, because house price is a continuous value (Regression task), whereas Logistic Regression is used only for classification (e.g., predicting whether a house will sell or not).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="deep-learning-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> نماذج التعلم العميق (Deep Learning Models)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Deep Learning Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ودجت الشبكة العصبية (Neural Network) في Orange هو خوارزمية إدراك متعدد الطبقات (MLP) مع انتشار خلفي، ويطبق معالجة مسبقة افتراضية للبيانات.</p></template>
+    <template class="content-en"><p>The Neural Network widget in Orange is a multi-layer perceptron (MLP) algorithm with backpropagation, applying default data preprocessing.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ودجت <b>Neural Network</b> هو خوارزمية Multi-layer Perceptron (MLP) تستخدم الانتشار الخلفي (Backpropagation). يمكن للمستخدم تحديد عدد الخلايا العصبية في الطبقات المخفية (مثلاً: 100, 3, 2 تعني 3 طبقات مخفية).</p><p><b>المعالجة المسبقة الافتراضية (Default Preprocessing):</b><br>تستخدم الشبكة العصبية معالجة مسبقة افتراضية عندما لا يتم توفير معالجات أخرى. يتم تنفيذها بالترتيب التالي:</p><ol><li>إزالة الحالات ذات القيم المستهدفة غير المعروفة (Unknown target values).</li><li>تحويل المتغيرات الفئوية إلى مستمرة (Continuizes categorical variables باستخدام One-hot-encoding).</li><li>إزالة الأعمدة الفارغة.</li><li>احتساب القيم المفقودة (Imputes missing values) باستخدام القيم المتوسطة.</li><li>تطبيع البيانات (Normalizes) عن طريق التوسيط إلى المتوسط والقياس إلى انحراف معياري قدره 1.</li></ol><p>لإزالة هذه المعالجة المسبقة الافتراضية، يجب توصيل ودجت Preprocess فارغ بالمتعلم.</p></template>
+    <template class="content-en"><p>The <b>Neural Network</b> widget is a <span class="smart-term" data-term-en="Multi-layer Perceptron (MLP)" data-ar="الإدراك متعدد الطبقات" data-en-def="A class of feedforward artificial neural network used in the Neural Network widget.">Multi-layer Perceptron (MLP)<span class="smart-term-tooltip"></span></span> algorithm with backpropagation. Users can define the number of neurons in hidden layers (e.g., 100, 3, 2 means 3 hidden layers).</p><p><b>Default Preprocessing:</b><br>Neural Network uses default preprocessing when no other preprocessors are given. It executes them in the following order:</p><ol><li>Removes instances with unknown target values.</li><li>Continuizes categorical variables (with <span class="smart-term" data-term-en="One-hot-encoding" data-ar="الترميز الأحادي الساخن" data-en-def="A process of converting categorical variables into a continuous numerical format suitable for ML algorithms.">one-hot-encoding<span class="smart-term-tooltip"></span></span>).</li><li>Removes empty columns.</li><li>Imputes missing values with mean values.</li><li>Normalizes the data by centering to mean and scaling to standard deviation of 1.</li></ol><p>To remove default preprocessing, connect an empty Preprocess widget to the learner.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الشبكات العصبية حساسة جدًا لمقياس البيانات (Scale)، لذا فإن خطوة التطبيع (Normalization) الافتراضية حاسمة لضمان تقارب خوارزمية التحسين (مثل Adam) بشكل صحيح.</p><p>تحويل المتغيرات الفئوية (One-hot-encoding) ضروري لأن الشبكات العصبية تتعامل فقط مع المدخلات الرقمية.</p></template>
+    <template class="content-en"><p>Neural networks are highly sensitive to data scale, so the default Normalization step is crucial to ensure the optimization algorithm (like Adam) converges properly.</p><p>Continuizing categorical variables (One-hot-encoding) is necessary because neural networks only process numerical inputs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يقوم ودجت الشبكة العصبية باحتساب القيم المفقودة (Imputation) افتراضيًا بينما شجرة القرار لا تفعل ذلك؟</template>
+      <template class="content-en">Why does the Neural Network widget impute missing values by default while Decision Tree does not?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشبكات العصبية تتطلب مصفوفات رقمية كاملة لإجراء العمليات الحسابية (الضرب في الأوزان)، بينما يمكن لأشجار القرار التعامل مع القيم المفقودة هيكليًا أثناء التقسيم.</p></template>
+      <template class="content-en"><p>Neural networks require complete numerical matrices to perform mathematical operations (weight multiplication), whereas decision trees can handle missing values structurally during splitting.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="image-analytics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تحليل الصور (Image Analytics)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Image Analytics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لتحليل الصور في Orange، يجب تحويلها أولاً إلى أرقام باستخدام ودجت Image Embedding.</p></template>
+    <template class="content-en"><p>To analyze images in Orange, they must first be converted into numbers using the Image Embedding widget.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتطلب تحليل الصور في Orange استخدام إضافة (Add-on) خاصة. مسار العمل النموذجي يتضمن:</p><ol><li><b>Import Images:</b> استيراد بيانات الصور.</li><li><b>Image Viewer:</b> عرض جميع الصور المحملة.</li><li><b>Image Embedding:</b> هذه هي الخطوة الأهم. مهام التصنيف والانحدار تقبل البيانات في شكل أرقام فقط. يقوم هذا الودجت بتحويل الصور إلى متجهات من الأرقام (Vectors of numbers) باستخدام شبكات عميقة مدربة مسبقًا (مثل Inception v3, SqueezeNet, VGG-16, VGG-19).</li><li><b>Image Grid:</b> يعرض الصور من مجموعة البيانات في شبكة تشابه، بحيث يتم وضع الصور ذات المحتوى المتشابه بالقرب من بعضها البعض. يُستخدم لمقارنة الصور والبحث عن أوجه التشابه أو التناقضات.</li></ol></template>
+    <template class="content-en"><p>Image analytics in Orange requires a specific Add-on. A typical workflow includes:</p><ol><li><b>Import Images:</b> Import the image data.</li><li><b>Image Viewer:</b> Display all loaded images.</li><li><b><span class="smart-term" data-term-en="Image Embedding" data-ar="تضمين الصور" data-en-def="The process of converting an image into a dense vector of numbers using a pre-trained neural network.">Image Embedding<span class="smart-term-tooltip"></span></span>:</b> This is the most critical step. Classification and regression tasks accept data only in the form of numbers. This widget converts images to vectors of numbers using pre-trained deep networks (e.g., Inception v3, SqueezeNet, VGG-16, VGG-19).</li><li><b>Image Grid:</b> Displays images from a dataset in a similarity grid such that images with similar content are placed closer to each other. Used for image comparison and finding discrepancies.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام نماذج مدربة مسبقًا (Pre-trained models) مثل Inception v3 يُعرف باسم نقل التعلم (Transfer Learning). هذا يوفر قوة حوسبة هائلة ويسمح لـ Orange بتصنيف الصور بدقة عالية دون الحاجة لتدريب شبكة عصبية من الصفر.</p><p>يمكن استخدام Image Viewer لاحقًا في مسار العمل (بعد Confusion Matrix) للتحقيق في أسباب التصنيف الخاطئ (Misclassification) بصريًا.</p></template>
+    <template class="content-en"><p>Using pre-trained models like Inception v3 is known as Transfer Learning. This saves massive computational power and allows Orange to classify images with high accuracy without training a neural network from scratch.</p><p>The Image Viewer can be used later in the workflow (after a Confusion Matrix) to visually investigate the reasons for Misclassification.</template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكننا إدخال الصور مباشرة إلى ودجت Logistic Regression؟</template>
+      <template class="content-en">Why can't we feed images directly into the Logistic Regression widget?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن خوارزميات تعلم الآلة التقليدية تتطلب بيانات رقمية مهيكلة (مصفوفات). الصور عبارة عن بكسلات تحتاج إلى استخراج ميزات (Feature extraction) عبر Image Embedding أولاً.</p></template>
+      <template class="content-en"><p>Because traditional ML algorithms require structured numerical data (matrices). Images are pixels that need feature extraction via Image Embedding first.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="text-processing-classification" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> معالجة النصوص والتصنيف (Text Processing &amp; Classification)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Text Processing &amp; Classification</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يدعم Orange تحليل النصوص من خلال إضافة Text Add-on، حيث يتم تحويل النصوص إلى وحدات (Tokens) قبل تحليلها.</p></template>
+    <template class="content-en"><p>Orange supports text analysis through the Text Add-on, where text is converted into tokens before analysis.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أدوات النص الشائعة في Orange تشمل:</p><ul><li><b>Corpus viewer:</b> لعرض محتوى مجموعة النصوص (Corpus).</li><li><b>Preprocess Text:</b> لإنشاء وحدات التحليل الأساسية (Tokens). يقوم بتقسيم النصوص إلى كلمات، تطبيق الأحرف الصغيرة (Lowercase)، وإزالة الكلمات الشائعة (Stopwords).</li><li><b>Word Cloud:</b> يعرض تكرار الكلمات بصريًا.</li><li><b>Sentiment Analysis:</b> يتيح التحليل الأساسي للمشاعر (إيجابي/سلبي).</li><li><b>Topic Modelling:</b> يكشف عن البنية الموضوعية الخفية في النصوص (Latent topics).</li></ul><p><b>تصنيف النصوص:</b> يمكن استخدام النماذج التنبؤية لتصنيف المستندات (مثل تصنيف التغريدات أو القصص). في مثال تصنيف قصص جريم (Grimm tales)، أظهر الانحدار اللوجستي أداءً أفضل (دقة تفوق 90%) مقارنة بشجرة القرار.</p></template>
+    <template class="content-en"><p>Common text widgets in Orange include:</p><ul><li><b>Corpus viewer:</b> To view corpus content.</li><li><b>Preprocess Text:</b> Creates core units of analysis (<span class="smart-term" data-term-en="Token" data-ar="وحدة نصية (رمز)" data-en-def="The core unit of text analysis, usually a single word created by splitting a text document.">token<span class="smart-term-tooltip"></span></span>s). It splits text into words, applies lowercase, and removes frequent <span class="smart-term" data-term-en="Stopwords" data-ar="كلمات التوقف" data-en-def="Common words (like &#x27;and&#x27;, &#x27;the&#x27;) that are removed during text preprocessing because they carry little meaningful information.">stopwords<span class="smart-term-tooltip"></span></span>.</li><li><b>Word Cloud:</b> Displays word frequency visually.</li><li><b>Sentiment Analysis:</b> Enables basic sentiment analysis of corpora (positive/negative).</li><li><b>Topic Modelling:</b> Uncovers the hidden thematic structure (latent topics) in a corpus.</li></ul><p><b>Text Classification:</b> Predictive models can be used to classify documents (e.g., tweets, tales). In the Grimm tales classification example, Logistic Regression correctly distinguished between them in over 90% of cases, performing better than Decision Tree.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>خطوة Preprocess Text ضرورية لتقليل الأبعاد (Dimensionality reduction) في بيانات النص. إزالة الـ Stopwords يمنع الكلمات الشائعة غير المفيدة (مثل 'the', 'is') من السيطرة على التحليل.</p><p>في Topic Modelling، يتم تلوين الكلمات حسب أوزانها (الأوزان الإيجابية باللون الأخضر والسلبية باللون الأحمر) لتسهيل تفسير المواضيع المكتشفة.</p></template>
+    <template class="content-en"><p>The Preprocess Text step is essential for dimensionality reduction in text data. Removing stopwords prevents uninformative frequent words (like 'the', 'is') from dominating the analysis.</p><p>In Topic Modelling, words are colored by their weights (positive weights green, negative red) to make interpreting the discovered topics easier.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفوق الانحدار اللوجستي على شجرة القرار في تصنيف النصوص في مثال Orange؟</template>
+      <template class="content-en">Why did Logistic Regression outperform Decision Tree in text classification in the Orange example?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بيانات النص (Bag of Words) عادة ما تكون عالية الأبعاد ومتفرقة (Sparse). الانحدار اللوجستي يتعامل مع هذه المساحات عالية الأبعاد بشكل أفضل من أشجار القرار التي قد تعاني من التخصيص الزائد (Overfitting) السريع.</p></template>
+      <template class="content-en"><p>Text data (Bag of Words) is typically high-dimensional and sparse. Logistic Regression handles these high-dimensional spaces better than Decision Trees, which can quickly overfit.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة التاسعة. اليوم ننتقل من النظريات إلى التطبيق العملي باستخدام برنامج Orange. تذكروا دائمًا أن Orange يعتمد على 'البرمجة المرئية'؛ نحن نبني مسارات عمل (Workflows) من اليسار إلى اليمين باستخدام أدوات تسمى (Widgets). للامتحان، ركزوا جيدًا على وظيفة كل ودجت أساسي: Test and Score للتقييم، Confusion Matrix لمعرفة أين أخطأ النموذج، و Predictions للتطبيق. لا تنسوا الفروق الدقيقة: الانحدار اللوجستي يُستخدم للتصنيف وليس للقيم المستمرة! وتذكروا أن الشبكات العصبية تقوم بمعالجة مسبقة خفية للبيانات. أخيرًا، عند التعامل مع الصور أو النصوص، القاعدة الذهبية هي: 'الآلة تفهم الأرقام فقط'، لذا نحتاج دائمًا إلى خطوة التضمين (Embedding) أو المعالجة المسبقة (Preprocessing) لتحويل البيانات غير المهيكلة إلى أرقام. بالتوفيق!</template>
+    <template class="content-en">Welcome to Module 9. Today we move from theory to practical application using Orange. Always remember that Orange relies on 'visual programming'; we build workflows from left to right using Widgets. For the exam, focus heavily on the function of core widgets: Test and Score for evaluation, Confusion Matrix to see where the model failed, and Predictions for application. Don't forget the nuances: Logistic Regression is for classification, not continuous values! And remember that Neural Networks perform hidden default preprocessing. Finally, when dealing with images or text, the golden rule is: 'Machines only understand numbers', so we always need an Embedding or Preprocessing step to convert unstructured data into numbers. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو المبدأ الأساسي لعمل برنامج Orange؟</template>
+          <template class="content-en">What is the core working principle of Orange?</template>
+          <span class="content-target">ما هو المبدأ الأساسي لعمل برنامج Orange؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعتمد على البرمجة المرئية (Visual Programming) حيث يتم بناء مسارات العمل بربط الودجتس من اليسار إلى اليمين.</template>
+          <template class="content-en">It relies on Visual Programming where workflows are built by connecting widgets from left to right.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تتواصل الودجتس مع بعضها البعض؟</template>
+          <template class="content-en">How do widgets communicate with each other?</template>
+          <span class="content-target">كيف تتواصل الودجتس مع بعضها البعض؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق إرسال المعلومات عبر قنوات اتصال، حيث تصبح مخرجات ودجت معين مدخلات لودجت آخر.</template>
+          <template class="content-en">By sending information along communication channels, where the output of one widget becomes the input to another.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المدخلات المطلوبة لودجت Test and Score؟</template>
+          <template class="content-en">What are the required inputs for the Test and Score widget?</template>
+          <span class="content-target">ما هي المدخلات المطلوبة لودجت Test and Score؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يحتاج إلى البيانات (Data) والخوارزميات/المتعلمين (Learners) لتدريب وتقييم النموذج.</template>
+          <template class="content-en">It requires Data and algorithms/Learners to train and evaluate the model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الانحدار الخطي والانحدار اللوجستي في Orange؟</template>
+          <template class="content-en">What is the difference between Linear and Logistic Regression in Orange?</template>
+          <span class="content-target">ما الفرق بين الانحدار الخطي والانحدار اللوجستي في Orange؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الانحدار الخطي يُستخدم للتنبؤ بقيم مستمرة (Regression)، بينما الانحدار اللوجستي يُستخدم حصريًا لمهام التصنيف (Classification).</template>
+          <template class="content-en">Linear Regression is used to predict continuous values (Regression), while Logistic Regression is used exclusively for Classification tasks.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نمنع شجرة القرار من التخصيص الزائد (Overfitting)؟</template>
+          <template class="content-en">How do we prevent a Decision Tree from Overfitting?</template>
+          <span class="content-target">كيف نمنع شجرة القرار من التخصيص الزائد (Overfitting)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق ضبط المعلمات (Parameters) مثل الحد من أقصى عمق للشجرة (Limit maximal tree depth) أو تحديد الحد الأدنى لعدد الحالات في الأوراق.</template>
+          <template class="content-en">By adjusting parameters like limiting the maximal tree depth or setting a minimum number of instances in leaves.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة ودجت Image Embedding؟</template>
+          <template class="content-en">What is the function of the Image Embedding widget?</template>
+          <span class="content-target">ما هي وظيفة ودجت Image Embedding؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم بتحويل الصور إلى متجهات من الأرقام باستخدام نماذج تعلم عميق مدربة مسبقًا، لتتمكن خوارزميات تعلم الآلة من معالجتها.</template>
+          <template class="content-en">It converts images into vectors of numbers using pre-trained deep learning models, so ML algorithms can process them.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخطوات الأساسية في ودجت Preprocess Text؟</template>
+          <template class="content-en">What are the basic steps in the Preprocess Text widget?</template>
+          <span class="content-target">ما هي الخطوات الأساسية في ودجت Preprocess Text؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحويل النص إلى أحرف صغيرة، تقسيمه إلى كلمات (Tokens)، وإزالة الكلمات الشائعة غير المفيدة (Stopwords).</template>
+          <template class="content-en">Converting text to lowercase, splitting it into words (Tokens), and removing uninformative frequent words (Stopwords).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكننا إيقاف المعالجة المسبقة الافتراضية للشبكة العصبية؟</template>
+          <template class="content-en">How can we stop the default preprocessing of the Neural Network?</template>
+          <span class="content-target">كيف يمكننا إيقاف المعالجة المسبقة الافتراضية للشبكة العصبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق توصيل ودجت Preprocess فارغ (بدون إعدادات) بمدخل المتعلم (Learner).</template>
+          <template class="content-en">By connecting an empty Preprocess widget (with no settings) to the Learner input.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني التحديد التفاعلي (Interactive Selection) في Orange؟</template>
+          <template class="content-en">What does Interactive Selection mean in Orange?</template>
+          <span class="content-target">ماذا يعني التحديد التفاعلي (Interactive Selection) في Orange؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني أنه يمكنك تحديد مجموعة فرعية من البيانات في رسم بياني (مثل Scatter Plot) وسيتم تمرير هذه المجموعة فقط إلى الودجتس المتصلة بها.</template>
+          <template class="content-en">It means you can select a subset of data in a plot (like Scatter Plot) and only this subset will be passed to connected downstream widgets.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">بأي صيغة يتم حفظ النماذج المدربة لاستخدامها لاحقًا؟</template>
+          <template class="content-en">In what format are trained models saved for later use?</template>
+          <span class="content-target">بأي صيغة يتم حفظ النماذج المدربة لاستخدامها لاحقًا؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم حفظها بصيغة Pickle (.pkl) باستخدام ودجت Save Model.</template>
+          <template class="content-en">They are saved in Pickle format (.pkl) using the Save Model widget.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو المبدأ الأساسي لبرنامج Orange؟",
+      "en": "What is the core principle of Orange?"
+    },
+    "back": {
+      "definition": {
+        "ar": "البرمجة المرئية (Visual programming).",
+        "en": "Visual programming."
+      },
+      "example": {
+        "ar": "بناء مسارات عمل عن طريق ربط الودجتس بدلاً من كتابة الأكواد.",
+        "en": "Building workflows by connecting widgets instead of writing code."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الـ Widget في Orange؟",
+      "en": "What is a Widget in Orange?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وحدة المعالجة الأساسية لأي معالجة بيانات، تحتوي على خطوة تحليلية محددة.",
+        "en": "The basic processing unit of any data manipulation, containing a specific analytical step."
+      },
+      "example": {
+        "ar": "ودجت File لقراءة البيانات، ودجت Scatter Plot للرسم.",
+        "en": "File widget for reading data, Scatter Plot widget for plotting."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "في أي اتجاه يتم تنفيذ مسار العمل (Workflow) في Orange؟",
+      "en": "In which direction is an Orange workflow executed?"
+    },
+    "back": {
+      "definition": {
+        "ar": "من اليسار إلى اليمين، ولا يمرر البيانات إلى الخلف أبدًا.",
+        "en": "From left to right, and never passes data backwards."
+      },
+      "example": {
+        "ar": "البيانات تتدفق من File (يسار) إلى Data Table (يمين).",
+        "en": "Data flows from File (left) to Data Table (right)."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي وظيفة ودجت Feature Statistics؟",
+      "en": "What is the function of the Feature Statistics widget?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يوفر طريقة سريعة لفحص وإيجاد الميزات المثيرة للاهتمام في مجموعة البيانات.",
+        "en": "Provides a quick way to inspect and find interesting features in a given data set."
+      },
+      "example": {
+        "ar": "تحديد مجموعة فرعية من الميزات للاحتفاظ بها في التحليل.",
+        "en": "Selecting a subset of features to keep for analysis."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي المدخلات الثلاثة التي يقبلها ودجت Test and Score؟",
+      "en": "What are the three inputs accepted by the Test and Score widget?"
+    },
+    "back": {
+      "definition": {
+        "ar": "البيانات (Data)، المتعلمون (Learners)، والمعالج المسبق الاختياري (Optional preprocessor).",
+        "en": "Data, Learners (algorithms), and Optional preprocessor."
+      },
+      "example": {
+        "ar": "إدخال بيانات Iris، وخوارزمية Tree، لمعرفة دقة النموذج.",
+        "en": "Inputting Iris data and a Tree algorithm to see model accuracy."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي وظيفة ودجت Confusion Matrix؟",
+      "en": "What is the function of the Confusion Matrix widget?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعرض النسب بين الفئة المتوقعة والفئة الفعلية، ويوضح حالات التصنيف الخاطئ.",
+        "en": "Shows proportions between the predicted and actual class, revealing misclassifications."
+      },
+      "example": {
+        "ar": "معرفة كم مرة توقع النموذج 'قطة' بينما الصورة الحقيقية كانت 'كلب'.",
+        "en": "Seeing how many times the model predicted 'cat' when the actual image was 'dog'."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الودجت المستخدم لإجراء تنبؤات على بيانات جديدة؟",
+      "en": "Which widget is used to make predictions on new data?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ودجت Predictions.",
+        "en": "The Predictions widget."
+      },
+      "example": {
+        "ar": "إدخال نموذج مدرب وبيانات اختبار جديدة لرؤية التوقعات.",
+        "en": "Inputting a trained model and new test data to see the predictions."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "بأي صيغة يتم حفظ النماذج المدربة في Orange؟",
+      "en": "In what format are trained models saved in Orange?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صيغة Pickle.",
+        "en": "Pickle format."
+      },
+      "example": {
+        "ar": "استخدام ودجت Save Model لحفظ النموذج كملف .pkl.",
+        "en": "Using Save Model widget to save as a .pkl file."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ماذا يفعل خيار 'Induce binary tree' في إعدادات شجرة القرار؟",
+      "en": "What does the 'Induce binary tree' parameter do in Decision Trees?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجبر الخوارزمية على بناء شجرة ثنائية (تقسيم كل عقدة إلى عقدتين فرعيتين فقط).",
+        "en": "Forces the algorithm to build a binary tree (split into exactly two child nodes)."
+      },
+      "example": {
+        "ar": "بدلاً من تقسيم 'اللون' إلى أحمر، أخضر، أزرق، يقسمه إلى (أحمر) و (ليس أحمر).",
+        "en": "Instead of splitting 'Color' into Red, Green, Blue, it splits into (Red) and (Not Red)."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي وظيفة ودجت Rank؟",
+      "en": "What is the function of the Rank widget?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقدر جودة ميزات البيانات ويرتبها حسب كمية المعلومات التي تحملها.",
+        "en": "Estimates the quality of data features and ranks them according to how much information they carry."
+      },
+      "example": {
+        "ar": "معرفة أي ميزة (مثل العمر أو الدخل) هي الأهم في التنبؤ بشراء منتج.",
+        "en": "Finding out which feature (e.g., Age or Income) is most important for predicting a purchase."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "متى نستخدم الانحدار اللوجستي (Logistic Regression)؟",
+      "en": "When do we use Logistic Regression?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يُستخدم فقط لمهام التصنيف (Classification tasks).",
+        "en": "It works only for classification tasks."
+      },
+      "example": {
+        "ar": "التنبؤ بنوع زهرة السوسن (Iris flower type).",
+        "en": "Predicting the Iris flower type."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هي الخطوة الأولى في المعالجة المسبقة الافتراضية للشبكة العصبية في Orange؟",
+      "en": "What is the first step in the default preprocessing of a Neural Network in Orange?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إزالة الحالات ذات القيم المستهدفة غير المعروفة.",
+        "en": "Removes instances with unknown target values."
+      },
+      "example": {
+        "ar": "حذف صف لا يحتوي على تصنيف (Label) قبل التدريب.",
+        "en": "Deleting a row that lacks a class label before training."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يتم تحويل الصور إلى أرقام في Orange؟",
+      "en": "How are images converted to numbers in Orange?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام ودجت Image Embedding.",
+        "en": "Using the Image Embedding widget."
+      },
+      "example": {
+        "ar": "استخدام نموذج Inception v3 لاستخراج متجهات الأرقام من الصور.",
+        "en": "Using Inception v3 model to extract number vectors from images."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي وظيفة ودجت Image Grid؟",
+      "en": "What is the function of the Image Grid widget?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعرض الصور في شبكة تشابه بحيث توضع الصور المتشابهة بالقرب من بعضها.",
+        "en": "Displays images in a similarity grid such that images with similar content are placed closer to each other."
+      },
+      "example": {
+        "ar": "تجميع صور القطط معًا وصور الكلاب معًا بصريًا.",
+        "en": "Visually grouping cat images together and dog images together."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ماذا يفعل ودجت Preprocess Text؟",
+      "en": "What does the Preprocess Text widget do?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ينشئ وحدات التحليل (Tokens) عن طريق تقسيم النص، تحويله لأحرف صغيرة، وإزالة كلمات التوقف.",
+        "en": "Creates core units of analysis (tokens) by splitting text, applying lowercase, and removing stopwords."
+      },
+      "example": {
+        "ar": "تحويل جملة إلى قائمة من الكلمات المفيدة فقط.",
+        "en": "Converting a sentence into a list of only meaningful words."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو المبدأ الأساسي الذي يعتمد عليه برنامج Orange؟",
+      "en": "What is the core principle of Orange software?"
+    },
+    "options": {
+      "ar": [
+        "البرمجة النصية (Scripting)",
+        "البرمجة المرئية (Visual programming)",
+        "قواعد البيانات العلاقية",
+        "الحوسبة السحابية"
+      ],
+      "en": [
+        "Scripting",
+        "Visual programming",
+        "Relational databases",
+        "Cloud computing"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يعتمد Orange على البرمجة المرئية من خلال ربط الودجتس على لوحة العمل.",
+      "en": "Orange relies on visual programming by connecting widgets on a canvas."
+    },
+    "hint": {
+      "ar": "لا تحتاج لكتابة كود لبناء النماذج.",
+      "en": "You don't need to write code to build models."
+    },
+    "difficulty": "easy",
+    "conceptId": "orange-workflow-basics"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي ودجت يُستخدم لتقييم النماذج التنبؤية؟",
+      "en": "Which widget is used to evaluate predictive models?"
+    },
+    "options": {
+      "ar": [
+        "Predictions",
+        "Confusion Matrix",
+        "Test and Score",
+        "Rank"
+      ],
+      "en": [
+        "Predictions",
+        "Confusion Matrix",
+        "Test and Score",
+        "Rank"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ودجت Test and Score هو المسؤول عن تقييم النماذج باستخدام تقنيات مثل التحقق المتقاطع.",
+      "en": "The Test and Score widget is responsible for evaluating models using techniques like cross-validation."
+    },
+    "hint": {
+      "ar": "يأخذ البيانات والمتعلمين كمدخلات.",
+      "en": "It takes Data and Learners as inputs."
+    },
+    "difficulty": "medium",
+    "conceptId": "predictive-modeling-evaluation"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض من ودجت Confusion Matrix؟",
+      "en": "What is the purpose of the Confusion Matrix widget?"
+    },
+    "options": {
+      "ar": [
+        "تدريب النموذج",
+        "عرض النسب بين الفئات المتوقعة والفعلية",
+        "تطبيق النموذج على بيانات جديدة",
+        "حفظ النموذج"
+      ],
+      "en": [
+        "Training the model",
+        "Showing proportions between predicted and actual classes",
+        "Applying the model to new data",
+        "Saving the model"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مصفوفة الارتباك توضح أين أخطأ النموذج في التصنيف بمقارنة التوقع بالواقع.",
+      "en": "The confusion matrix shows where the model misclassified by comparing predictions to actuals."
+    },
+    "hint": {
+      "ar": "تساعد في رؤية حالات التصنيف الخاطئ.",
+      "en": "Helps in seeing misclassifications."
+    },
+    "difficulty": "medium",
+    "conceptId": "predictive-modeling-evaluation"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من النماذج التالية يعمل فقط على مهام التصنيف (Classification) في Orange؟",
+      "en": "Which of the following models works ONLY for classification tasks in Orange?"
+    },
+    "options": {
+      "ar": [
+        "Linear Regression",
+        "Decision Tree",
+        "Logistic Regression",
+        "Neural Network"
+      ],
+      "en": [
+        "Linear Regression",
+        "Decision Tree",
+        "Logistic Regression",
+        "Neural Network"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "على الرغم من اسمه، الانحدار اللوجستي يُستخدم حصريًا للتصنيف.",
+      "en": "Despite its name, Logistic Regression is used exclusively for classification."
+    },
+    "hint": {
+      "ar": "اسمه يحتوي على كلمة 'انحدار' لكنه لا يستخدم للبيانات المستمرة.",
+      "en": "Its name contains 'regression' but it's not for continuous data."
+    },
+    "difficulty": "hard",
+    "conceptId": "regression-models"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي الخطوة التي تقوم بها الشبكة العصبية (Neural Network) كجزء من المعالجة المسبقة الافتراضية؟",
+      "en": "Which step does the Neural Network perform as part of its default preprocessing?"
+    },
+    "options": {
+      "ar": [
+        "حذف جميع المتغيرات الفئوية",
+        "احتساب القيم المفقودة باستخدام المتوسط",
+        "تحويل البيانات إلى نصوص",
+        "بناء شجرة ثنائية"
+      ],
+      "en": [
+        "Deleting all categorical variables",
+        "Imputing missing values with mean values",
+        "Converting data to text",
+        "Building a binary tree"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الشبكة العصبية تقوم باحتساب القيم المفقودة (Imputation) باستخدام المتوسط كجزء من المعالجة الافتراضية.",
+      "en": "The Neural Network imputes missing values using the mean as part of its default preprocessing."
+    },
+    "hint": {
+      "ar": "الشبكات العصبية لا يمكنها التعامل مع القيم الفارغة.",
+      "en": "Neural networks cannot handle empty values."
+    },
+    "difficulty": "hard",
+    "conceptId": "deep-learning-models"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "كيف يمكن إزالة المعالجة المسبقة الافتراضية لودجت الشبكة العصبية؟",
+      "en": "How can you remove the default preprocessing of the Neural Network widget?"
+    },
+    "options": {
+      "ar": [
+        "لا يمكن إزالتها",
+        "بتوصيل ودجت Preprocess فارغ بالمتعلم",
+        "بتغيير إعدادات ودجت File",
+        "باستخدام ودجت Rank"
+      ],
+      "en": [
+        "It cannot be removed",
+        "By connecting an empty Preprocess widget to the learner",
+        "By changing the File widget settings",
+        "By using the Rank widget"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "توصيل ودجت Preprocess فارغ يتجاوز المعالجة الافتراضية المدمجة في الشبكة العصبية.",
+      "en": "Connecting an empty Preprocess widget overrides the built-in default preprocessing."
+    },
+    "hint": {
+      "ar": "تحتاج إلى إعطاء المتعلم تعليمات معالجة 'فارغة'.",
+      "en": "You need to give the learner 'empty' preprocessing instructions."
+    },
+    "difficulty": "hard",
+    "conceptId": "deep-learning-models"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي ودجت ضروري لتحويل الصور إلى أرقام قبل تطبيق نماذج تعلم الآلة؟",
+      "en": "Which widget is necessary to convert images into numbers before applying ML models?"
+    },
+    "options": {
+      "ar": [
+        "Image Viewer",
+        "Image Grid",
+        "Image Embedding",
+        "Import Images"
+      ],
+      "en": [
+        "Image Viewer",
+        "Image Grid",
+        "Image Embedding",
+        "Import Images"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ودجت Image Embedding يستخدم نماذج مدربة مسبقًا لتحويل الصور إلى متجهات رقمية.",
+      "en": "The Image Embedding widget uses pre-trained models to convert images into numerical vectors."
+    },
+    "hint": {
+      "ar": "يستخدم نماذج مثل Inception v3.",
+      "en": "It uses models like Inception v3."
+    },
+    "difficulty": "medium",
+    "conceptId": "image-analytics"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في معالجة النصوص، ماذا يفعل خيار إزالة 'Stopwords'؟",
+      "en": "In text processing, what does removing 'Stopwords' do?"
+    },
+    "options": {
+      "ar": [
+        "يزيل علامات الترقيم",
+        "يزيل الكلمات الشائعة غير المفيدة",
+        "يحول الحروف إلى صغيرة",
+        "يقسم النص إلى جمل"
+      ],
+      "en": [
+        "Removes punctuation",
+        "Removes uninformative frequent words",
+        "Converts letters to lowercase",
+        "Splits text into sentences"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "كلمات التوقف (Stopwords) هي الكلمات الشائعة جدًا التي لا تحمل معنى تحليلي كبير.",
+      "en": "Stopwords are very common words that carry little analytical meaning."
+    },
+    "hint": {
+      "ar": "مثل كلمات 'the', 'is', 'and'.",
+      "en": "Like the words 'the', 'is', 'and'."
+    },
+    "difficulty": "easy",
+    "conceptId": "text-processing-classification"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الميزة التفاعلية في تصورات Orange (مثل Scatter Plot)؟",
+      "en": "What is the interactive feature in Orange visualizations (like Scatter Plot)?"
+    },
+    "options": {
+      "ar": [
+        "كتابة أكواد بايثون داخل الرسم",
+        "تحديد مجموعة فرعية من البيانات وتمريرها للودجتس التالية",
+        "تغيير ألوان الواجهة",
+        "تصدير الرسم كفيديو"
+      ],
+      "en": [
+        "Writing Python code inside the plot",
+        "Selecting a data subset and passing it to downstream widgets",
+        "Changing interface colors",
+        "Exporting the plot as a video"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يمكنك تحديد نقاط في الرسم البياني وإرسالها كـ Subset إلى ودجت آخر.",
+      "en": "You can select points in a plot and send them as a Subset to another widget."
+    },
+    "hint": {
+      "ar": "Brushing and linking.",
+      "en": "Brushing and linking."
+    },
+    "difficulty": "medium",
+    "conceptId": "interactive-data-exploration"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي معلمة (Parameter) في شجرة القرار تمنع التقسيم إذا كان عدد الحالات قليلًا جدًا؟",
+      "en": "Which Decision Tree parameter prevents splitting if the number of instances is too small?"
+    },
+    "options": {
+      "ar": [
+        "Induce binary tree",
+        "Limit the maximal tree depth",
+        "Do not split subsets smaller than",
+        "Stop when majority reaches [%]"
+      ],
+      "en": [
+        "Induce binary tree",
+        "Limit the maximal tree depth",
+        "Do not split subsets smaller than",
+        "Stop when majority reaches [%]"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هذا الخيار يمنع الخوارزمية من تقسيم العقد التي تحتوي على عدد حالات أقل من المحدد، مما يمنع Overfitting.",
+      "en": "This option forbids the algorithm to split nodes with less than the given number of instances, preventing Overfitting."
+    },
+    "hint": {
+      "ar": "الاسم يشرح الوظيفة مباشرة.",
+      "en": "The name directly explains the function."
+    },
+    "difficulty": "medium",
+    "conceptId": "decision-trees"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن ودجت Predictions يقوم بتدريب النموذج. الحقيقة: هو فقط يطبق نموذجًا مدربًا مسبقًا على بيانات جديدة.</template>
+    <template class="content-en">Thinking the Predictions widget trains the model. Fact: It only applies an already trained model to new data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التحديد التفاعلي (Interactive Selection): عند تحديد نقاط في Scatter Plot، يتم تحديث الودجتس المتصلة به (مثل Data Table) فورًا لعرض تلك النقاط فقط.</template>
+    <template class="content-en">Interactive Selection: When you select points in a Scatter Plot, connected downstream widgets (like Data Table) instantly update to show only those points.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التضمين (Embeddings): خوارزميات تعلم الآلة لا تفهم الصور أو النصوص، بل تفهم الأرقام. ودجت Image Embedding يحول الصور إلى متجهات رقمية لتتمكن النماذج من معالجتها.</template>
+    <template class="content-en">Embeddings: ML algorithms don't understand images or text; they understand numbers. The Image Embedding widget converts images into numerical vectors so models can process them.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الانحدار الخطي (Linear Regression) لمهام التصنيف. في Orange، الانحدار الخطي مخصص فقط للبيانات المستمرة، بينما الانحدار اللوجستي مخصص للتصنيف.</template>
+    <template class="content-en">Using Linear Regression for classification tasks. In Orange, Linear Regression is strictly for continuous data, while Logistic Regression is for classification.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المعالجة المسبقة المخفية: ودجت الشبكة العصبية (Neural Network) يقوم بمعالجة مسبقة للبيانات تلقائيًا (مثل احتساب القيم المفقودة والتطبيع) ما لم تقم بتوصيل ودجت Preprocess فارغ لإيقاف ذلك.</template>
+    <template class="content-en">Hidden Preprocessing: The Neural Network widget automatically preprocesses data (e.g., imputation, normalization) unless you connect an empty Preprocess widget to override it.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

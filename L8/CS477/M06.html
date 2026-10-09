@@ -527,8 +527,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>التعقيد في الـ AST ينبع من ارتباطها الوثيق بقواعد لغة المصدر. هذا الارتباط يجعلها ممتازة لاكتشاف الأخطاء الدلالية، ولكنه يمثل عائقاً عند محاولة إعادة ترتيب التعليمات لتحسين الأداء.</p><p>حالة الحافة هنا هي العمليات المتعددة الأشكال (Polymorphic operations). في الـ AST، تظل العملية مجردة (مثلاً `+`) حتى يتم تحليل الأنواع. في الـ IR المنخفض، يجب أن تكون العملية صريحة تماماً (مثلاً `IADD` للرقم الصحيح أو `FADD` للرقم العائم).</p><p>لذلك، يتم عادةً تحويل الـ AST إلى هياكل أبسط مثل DAG أو CFG قبل البدء في مراحل التحسين المعقدة.</p></template>
-    <template class="content-en"><p>The complexity of the AST stems from its tight coupling with the source language's grammar. This makes it excellent for semantic error detection but a hindrance when trying to reorder instructions for performance optimization.</p><p>An edge case here is polymorphic operations. In an AST, an operation remains abstract (e.g., `+`) until types are resolved. In a lower-level IR, the operation must be completely explicit (e.g., `IADD` for integer or `FADD` for float).</p><p>Therefore, the AST is typically transformed into simpler structures like a DAG or CFG before complex optimization phases begin.</p></template>
+    <template class="content-ar"><p>التعقيد في الـ AST ينبع من ارتباطها الوثيق بقواعد لغة المصدر. هذا الارتباط يجعلها ممتازة لاكتشاف الأخطاء الدلالية، ولكنه يمثل عائقاً عند محاولة إعادة ترتيب التعليمات لتحسين الأداء.</p><p>حالة الحافة هنا هي العمليات المتعددة الأشكال (Polymorphic operations). في الـ AST، تظل العملية مجردة (مثلاً <code>+</code>) حتى يتم تحليل الأنواع. في الـ IR المنخفض، يجب أن تكون العملية صريحة تماماً (مثلاً <code>IADD</code> للرقم الصحيح أو <code>FADD</code> للرقم العائم).</p><p>لذلك، يتم عادةً تحويل الـ AST إلى هياكل أبسط مثل DAG أو CFG قبل البدء في مراحل التحسين المعقدة.</p></template>
+    <template class="content-en"><p>The complexity of the AST stems from its tight coupling with the source language's grammar. This makes it excellent for semantic error detection but a hindrance when trying to reorder instructions for performance optimization.</p><p>An edge case here is polymorphic operations. In an AST, an operation remains abstract (e.g., <code>+</code>) until types are resolved. In a lower-level IR, the operation must be completely explicit (e.g., <code>IADD</code> for integer or <code>FADD</code> for float).</p><p>Therefore, the AST is typically transformed into simpler structures like a DAG or CFG before complex optimization phases begin.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -734,8 +734,8 @@
 
   <details class="thinking-question">
     <summary data-bilingual>
-      <template class="content-ar">لماذا لا يمكننا استخدام الـ DAG لتمثيل حلقة `while`؟</template>
-      <template class="content-en">Why can't we use a DAG to represent a `while` loop?</template>
+      <template class="content-ar">لماذا لا يمكننا استخدام الـ DAG لتمثيل حلقة <code>while</code>؟</template>
+      <template class="content-en">Why can't we use a DAG to represent a <code>while</code> loop?</template>
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
@@ -765,8 +765,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يمثل الرسم البياني لتدفق التحكم (CFG) الهيكل عالي المستوى للبرنامج. هو رسم بياني موجه (يمكن أن يكون دورياً/يحتوي على حلقات) حيث تتكون كل عقدة من <b>كتلة أساسية (Basic Block)</b> من العبارات المتسلسلة.</p><p>تمثل حواف الرسم البياني التدفقات المحتملة للتحكم بين الكتل الأساسية. ينتج عن البناء الشرطي (مثل `if` أو `switch`) تفرعات (Branches) في الرسم البياني، بينما ينتج عن بناء الحلقة (مثل `for` أو `while`) <span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a CFG that points back to a previously executed block, representing a loop.">حواف عكسية (Reverse edges)<span class="smart-term-tooltip"></span></span>.</p><p>يختلف الـ CFG عن الـ AST في الهيكلة؛ فبينما تضع الـ AST تعبيرات التحكم كأبناء مباشرين لعقدة الحلقة، يضع الـ CFG كل تعبير في الترتيب الذي سيتم تنفيذه به فعلياً، مما يسهل تتبع تدفق التنفيذ.</p></template>
-    <template class="content-en"><p>A control flow graph (CFG) represents the higher-level structure of the program. It is a directed graph (possibly cyclic) where each node consists of a <b>basic block</b> of sequential statements.</p><p>The edges of the graph represent the possible flows of control between <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of sequential statements with no branches in or out, except at the entry and exit.">basic block<span class="smart-term-tooltip"></span></span>s. A conditional construct (like `if` or `switch`) results in branches in the graph, while a loop construct (like `for` or `while`) results in <span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a CFG that points back to a previously executed block, representing a loop.">reverse edges<span class="smart-term-tooltip"></span></span>.</p><p>The CFG has a different structure than the AST. While an AST for a `for-loop` has control expressions as immediate children of the loop node, the CFG places each one in the exact order it would be executed in practice, making execution flow easy to trace.</p></template>
+    <template class="content-ar"><p>يمثل الرسم البياني لتدفق التحكم (CFG) الهيكل عالي المستوى للبرنامج. هو رسم بياني موجه (يمكن أن يكون دورياً/يحتوي على حلقات) حيث تتكون كل عقدة من <b>كتلة أساسية (Basic Block)</b> من العبارات المتسلسلة.</p><p>تمثل حواف الرسم البياني التدفقات المحتملة للتحكم بين الكتل الأساسية. ينتج عن البناء الشرطي (مثل <code>if</code> أو <code>switch</code>) تفرعات (Branches) في الرسم البياني، بينما ينتج عن بناء الحلقة (مثل <code>for</code> أو <code>while</code>) <span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a CFG that points back to a previously executed block, representing a loop.">حواف عكسية (Reverse edges)<span class="smart-term-tooltip"></span></span>.</p><p>يختلف الـ CFG عن الـ AST في الهيكلة؛ فبينما تضع الـ AST تعبيرات التحكم كأبناء مباشرين لعقدة الحلقة، يضع الـ CFG كل تعبير في الترتيب الذي سيتم تنفيذه به فعلياً، مما يسهل تتبع تدفق التنفيذ.</p></template>
+    <template class="content-en"><p>A control flow graph (CFG) represents the higher-level structure of the program. It is a directed graph (possibly cyclic) where each node consists of a <b>basic block</b> of sequential statements.</p><p>The edges of the graph represent the possible flows of control between <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of sequential statements with no branches in or out, except at the entry and exit.">basic block<span class="smart-term-tooltip"></span></span>s. A conditional construct (like <code>if</code> or <code>switch</code>) results in branches in the graph, while a loop construct (like <code>for</code> or <code>while</code>) results in <span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a CFG that points back to a previously executed block, representing a loop.">reverse edges<span class="smart-term-tooltip"></span></span>.</p><p>The CFG has a different structure than the AST. While an AST for a <code>for-loop</code> has control expressions as immediate children of the loop node, the CFG places each one in the exact order it would be executed in practice, making execution flow easy to trace.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1122,9 +1122,9 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف يمثل الـ CFG حلقة `while`؟</template>
-          <template class="content-en">How does a CFG represent a `while` loop?</template>
-          <span class="content-target">كيف يمثل الـ CFG حلقة `while`؟</span>
+          <template class="content-ar">كيف يمثل الـ CFG حلقة <code>while</code>؟</template>
+          <template class="content-en">How does a CFG represent a <code>while</code> loop?</template>
+          <span class="content-target">كيف يمثل الـ CFG حلقة <code>while</code>؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
@@ -1139,9 +1139,9 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ماذا تعني عقدة `ITOF` في الـ DAG؟</template>
-          <template class="content-en">What does an `ITOF` node mean in a DAG?</template>
-          <span class="content-target">ماذا تعني عقدة `ITOF` في الـ DAG؟</span>
+          <template class="content-ar">ماذا تعني عقدة <code>ITOF</code> في الـ DAG؟</template>
+          <template class="content-en">What does an <code>ITOF</code> node mean in a DAG?</template>
+          <span class="content-target">ماذا تعني عقدة <code>ITOF</code> في الـ DAG؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
@@ -1156,16 +1156,16 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">كيف يتم تمثيل الوصول لمصفوفة `a[i]` في الـ DAG؟</template>
-          <template class="content-en">How is array access `a[i]` represented in a DAG?</template>
-          <span class="content-target">كيف يتم تمثيل الوصول لمصفوفة `a[i]` في الـ DAG؟</span>
+          <template class="content-ar">كيف يتم تمثيل الوصول لمصفوفة <code>a[i]</code> في الـ DAG؟</template>
+          <template class="content-en">How is array access <code>a[i]</code> represented in a DAG?</template>
+          <span class="content-target">كيف يتم تمثيل الوصول لمصفوفة <code>a[i]</code> في الـ DAG؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لا يُمثل كعقدة واحدة، بل يتوسع لعمليات حسابية: ضرب الفهرس `i` في حجم العنصر، ثم جمعه مع عنوان بداية المصفوفة `a`.</template>
-          <template class="content-en">It is not represented as a single node, but expands into math operations: multiplying index `i` by element size, then adding it to the base address of `a`.</template>
+          <template class="content-ar">لا يُمثل كعقدة واحدة، بل يتوسع لعمليات حسابية: ضرب الفهرس <code>i</code> في حجم العنصر، ثم جمعه مع عنوان بداية المصفوفة <code>a</code>.</template>
+          <template class="content-en">It is not represented as a single node, but expands into math operations: multiplying index <code>i</code> by element size, then adding it to the base address of <code>a</code>.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1310,8 +1310,8 @@
         "en": "Tree representation of code, its structure is too rich making it non-ideal for complex optimizations."
       },
       "example": {
-        "ar": "عقدة `+` قد تعني جمع أرقام أو دمج نصوص.",
-        "en": "A `+` node could mean number addition or string concatenation."
+        "ar": "عقدة <code>+</code> قد تعني جمع أرقام أو دمج نصوص.",
+        "en": "A <code>+</code> node could mean number addition or string concatenation."
       }
     }
   },
@@ -1327,8 +1327,8 @@
         "en": "Simplified AST allowing node sharing to avoid redundant computation of common sub-expressions."
       },
       "example": {
-        "ar": "في `(a+10)*(a+10)`، تُحسب `a+10` مرة واحدة.",
-        "en": "In `(a+10)*(a+10)`, `a+10` is computed only once."
+        "ar": "في <code>(a+10)*(a+10)</code>، تُحسب <code>a+10</code> مرة واحدة.",
+        "en": "In <code>(a+10)*(a+10)</code>, <code>a+10</code> is computed only once."
       }
     }
   },
@@ -1344,8 +1344,8 @@
         "en": "A computation repeated with the same values, can be computed once and reused (detected by DAG)."
       },
       "example": {
-        "ar": "`a+10` في التعبير `(a+10)*(a+10)`.",
-        "en": "`a+10` in the expression `(a+10)*(a+10)`."
+        "ar": "<code>a+10</code> في التعبير <code>(a+10)*(a+10)</code>.",
+        "en": "<code>a+10</code> in the expression <code>(a+10)*(a+10)</code>."
       }
     }
   },
@@ -1361,8 +1361,8 @@
         "en": "Graph representing overall program structure, nodes are basic blocks and edges are control paths."
       },
       "example": {
-        "ar": "تمثيل حلقة `while` باستخدام حافة عكسية (Reverse edge).",
-        "en": "Representing a `while` loop using a reverse edge."
+        "ar": "تمثيل حلقة <code>while</code> باستخدام حافة عكسية (Reverse edge).",
+        "en": "Representing a <code>while</code> loop using a reverse edge."
       }
     }
   },
@@ -1378,8 +1378,8 @@
         "en": "Sequence of statements executed sequentially without incoming or outgoing branches (except at entry/exit)."
       },
       "example": {
-        "ar": "ثلاث عمليات حسابية متتالية قبل جملة `if`.",
-        "en": "Three sequential math operations before an `if` statement."
+        "ar": "ثلاث عمليات حسابية متتالية قبل جملة <code>if</code>.",
+        "en": "Three sequential math operations before an <code>if</code> statement."
       }
     }
   },
@@ -1446,8 +1446,8 @@
         "en": "Explicit node in a DAG that converts an Integer value to a Float value."
       },
       "example": {
-        "ar": "تحويل الرقم `10` إلى `10.0` قبل جمعه مع متغير عائم `a`.",
-        "en": "Converting `10` to `10.0` before adding to float `a`."
+        "ar": "تحويل الرقم <code>10</code> إلى <code>10.0</code> قبل جمعه مع متغير عائم <code>a</code>.",
+        "en": "Converting <code>10</code> to <code>10.0</code> before adding to float <code>a</code>."
       }
     }
   }
@@ -1603,8 +1603,8 @@
       "en": "DAG allows multiple arrows to point to the same node, preventing redundant computation of the same expression (like a+10)."
     },
     "hint": {
-      "ar": "كيف يتعامل مع `(a+10)*(a+10)`؟",
-      "en": "How does it handle `(a+10)*(a+10)`?"
+      "ar": "كيف يتعامل مع <code>(a+10)*(a+10)</code>؟",
+      "en": "How does it handle <code>(a+10)*(a+10)</code>?"
     },
     "difficulty": "medium",
     "conceptId": "directed-acyclic-graph-dag"
@@ -1708,8 +1708,8 @@
   {
     "id": 8,
     "question": {
-      "ar": "في سياق الـ DAG، ماذا تمثل عقدة `ITOF`؟",
-      "en": "In the context of a DAG, what does an `ITOF` node represent?"
+      "ar": "في سياق الـ DAG، ماذا تمثل عقدة <code>ITOF</code>؟",
+      "en": "In the context of a DAG, what does an <code>ITOF</code> node represent?"
     },
     "options": {
       "ar": [
@@ -1772,8 +1772,8 @@
   {
     "id": 10,
     "question": {
-      "ar": "كيف يتم تمثيل الوصول إلى مصفوفة `x=a[i]` في الـ DAG قبل توليد الكود؟",
-      "en": "How is an array access `x=a[i]` represented in a DAG before code generation?"
+      "ar": "كيف يتم تمثيل الوصول إلى مصفوفة <code>x=a[i]</code> في الـ DAG قبل توليد الكود؟",
+      "en": "How is an array access <code>x=a[i]</code> represented in a DAG before code generation?"
     },
     "options": {
       "ar": [
@@ -1833,8 +1833,8 @@
   <div class="vault-entry">
     <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
-      <template class="content-ar">في الـ DAG، عملية بسيطة مثل `a[i]` تتحول إلى عملية رياضية معقدة تتضمن جلب عنوان `a` من جدول الرموز (Symbol Table)، وضرب `i` في حجم العنصر، ثم جمعهما.</template>
-      <template class="content-en">In a DAG, a simple operation like `a[i]` turns into complex math involving fetching the address of `a` from the symbol table, multiplying `i` by the element size, and adding them.</template>
+      <template class="content-ar">في الـ DAG، عملية بسيطة مثل <code>a[i]</code> تتحول إلى عملية رياضية معقدة تتضمن جلب عنوان <code>a</code> من جدول الرموز (Symbol Table)، وضرب <code>i</code> في حجم العنصر، ثم جمعهما.</template>
+      <template class="content-en">In a DAG, a simple operation like <code>a[i]</code> turns into complex math involving fetching the address of <code>a</code> from the symbol table, multiplying <code>i</code> by the element size, and adding them.</template>
       <div class="content-target"></div>
     </div>
   </div>

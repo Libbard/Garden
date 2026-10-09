@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT488" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تحليل البرمجيات الخبيثة باستخدام Volatility و Redline · IT488 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT488" data-page-title-en="IT488">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=IT488"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#volatility-imageinfo" class="toc-link" data-bilingual>
+        <template class="content-ar">تحديد ملف تعريف الذاكرة (imageinfo)</template>
+        <template class="content-en">Memory Profiling (imageinfo)</template>
+        <span class="content-target">تحديد ملف تعريف الذاكرة (imageinfo)</span>
+      </a>
+      <a href="#volatility-pslist-pstree" class="toc-link" data-bilingual>
+        <template class="content-ar">سرد العمليات (pslist و pstree)</template>
+        <template class="content-en">Process Listing (pslist and pstree)</template>
+        <span class="content-target">سرد العمليات (pslist و pstree)</span>
+      </a>
+      <a href="#volatility-psscan" class="toc-link" data-bilingual>
+        <template class="content-ar">فحص العمليات (psscan)</template>
+        <template class="content-en">Process Scanning (psscan)</template>
+        <span class="content-target">فحص العمليات (psscan)</span>
+      </a>
+      <a href="#volatility-procdump-memmap" class="toc-link" data-bilingual>
+        <template class="content-ar">استخراج العمليات وتخطيط الذاكرة (procdump و memmap)</template>
+        <template class="content-en">Process Dumping and Memory Mapping (procdump and memmap)</template>
+        <span class="content-target">استخراج العمليات وتخطيط الذاكرة (procdump و memmap)</span>
+      </a>
+      <a href="#volatility-connscan-sockets" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل الشبكة (connscan و sockets)</template>
+        <template class="content-en">Network Analysis (connscan and sockets)</template>
+        <span class="content-target">تحليل الشبكة (connscan و sockets)</span>
+      </a>
+      <a href="#volatility-malfind" class="toc-link" data-bilingual>
+        <template class="content-ar">اكتشاف الأكواد الخبيثة (malfind)</template>
+        <template class="content-en">Malware Finding (malfind)</template>
+        <span class="content-target">اكتشاف الأكواد الخبيثة (malfind)</span>
+      </a>
+      <a href="#redline-overview-collection" class="toc-link" data-bilingual>
+        <template class="content-ar">نظرة عامة على Redline وجمع البيانات</template>
+        <template class="content-en">Redline Overview and Data Collection</template>
+        <span class="content-target">نظرة عامة على Redline وجمع البيانات</span>
+      </a>
+      <a href="#redline-analysis-views" class="toc-link" data-bilingual>
+        <template class="content-ar">طرق عرض التحليل في Redline</template>
+        <template class="content-en">Redline Analysis Views</template>
+        <span class="content-target">طرق عرض التحليل في Redline</span>
+      </a>
+      <a href="#redline-ioc-analysis" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل مؤشرات الاختراق (IOC Analysis)</template>
+        <template class="content-en">Indicator of Compromise (IOC) Analysis</template>
+        <span class="content-target">تحليل مؤشرات الاختراق (IOC Analysis)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · IT488
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تحليل البرمجيات الخبيثة باستخدام Volatility و Redline</h1>
+      <p class="hero-description">تغطي هذه الوحدة تقنيات تحليل الذاكرة لاكتشاف البرمجيات الخبيثة باستخدام أدوات سطر الأوامر Volatility وأداة الواجهة الرسومية Redline، مع التركيز على اكتشاف العمليات المخفية، وتحليل الشبكة، ومؤشرات الاختراق (IOCs).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Malware Analysis with Volatility and Redline</h1>
+      <p class="hero-description">This module covers memory analysis techniques for malware detection using the Volatility command-line framework and the Redline GUI tool, focusing on hidden process detection, network analysis, and Indicators of Compromise (IOCs).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تحليل الذاكرة</span>
+      <span class="tag">البرمجيات الخبيثة</span>
+      <span class="tag">الطب الشرعي الرقمي</span>
+      <span class="tag">مؤشرات الاختراق</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Memory Analysis</span>
+      <span class="tag">Malware</span>
+      <span class="tag">Digital Forensics</span>
+      <span class="tag">IOC</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم كيفية عمل الحاسوب بشكل طبيعي لتحديد ما يختلف عن ذلك أثناء الإصابة.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة قدرات البرمجيات الخبيثة والأساليب التي تطبقها لإخفاء نفسها من قوائم العمليات.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف أساسيات استخدام سطر أوامر Volatility لاكتشاف البرمجيات الخبيثة.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام أداة Redline الرسومية لجمع البيانات وتحليل مؤشرات الاختراق (IOC).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand how a computer would normally operate and to find what differs from that.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss what a malware can do to a computer and what approaches can apply in order to hide itself from process listings.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the basics of using the Volatility command line for malware detection.</span></li>
+      <li><span class="obj-icon">✦</span><span>Present and use the graphical tool Redline for data collection and IOC analysis.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="volatility-imageinfo" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تحديد ملف تعريف الذاكرة (imageinfo)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Memory Profiling (imageinfo)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أمر يُستخدم لتحديد ملف تعريف نظام التشغيل (Profile) المناسب لتفريغ الذاكرة، وهو بمثابة الخريطة التي تمكن الأداة من قراءة البيانات.</p></template>
+    <template class="content-en"><p>A module used to determine the correct OS <span class="smart-term" data-term-en="Memory Profile" data-ar="ملف تعريف الذاكرة" data-en-def="A configuration that tells Volatility how to interpret the specific data structures of a particular operating system version.">memory profile<span class="smart-term-tooltip"></span></span>, acting as a map for the tool to interpret raw memory data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند بدء تحليل تفريغ الذاكرة (Memory Dump) باستخدام Volatility، يجب أولاً معرفة نظام التشغيل الذي أُخذت منه العينة. تقوم وحدة <code>imageinfo</code> بفحص الذاكرة واقتراح ملفات التعريف المحتملة.</p><p>على سبيل المثال، قد تقترح الأداة ملف التعريف <code>WinXPSP2x86</code>. يتم استخدام هذا الملف في جميع الأوامر اللاحقة لضمان ترجمة هياكل الذاكرة بشكل صحيح.</p></template>
+    <template class="content-en"><p>When starting memory analysis with Volatility, the examiner must first determine the operating system the sample was taken from. The <code>imageinfo</code> module scans the memory and suggests potential profiles.</p><p>For example, it might suggest the <code>WinXPSP2x86</code> profile. This profile is then used in all subsequent commands to ensure memory structures are parsed correctly.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى ملف تعريف؟ تختلف هياكل البيانات الداخلية (مثل كتل التحكم في العمليات) بشكل كبير بين إصدارات أنظمة التشغيل (مثل Windows XP مقابل Windows 10) وحتى بين حزم الخدمات (Service Packs). بدون ملف التعريف الصحيح، ستظهر الذاكرة كمجرد بيانات عشوائية غير مفهومة.</p></template>
+    <template class="content-en"><p>Why is a profile needed? Internal data structures (like process control blocks) vary significantly between OS versions (e.g., Windows XP vs. Windows 10) and even Service Packs. Without the correct profile, the memory appears as unintelligible raw data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمت ملف تعريف خاطئ أثناء تحليل الذاكرة؟</template>
+      <template class="content-en">What happens if you use the wrong profile during memory analysis?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستفشل أوامر Volatility في العثور على العمليات أو ستعرض بيانات تالفة وغير منطقية لأنها تبحث عن هياكل البيانات في العناوين الخاطئة.</p></template>
+      <template class="content-en"><p>Volatility commands will either fail to find processes or display corrupted, nonsensical data because it is looking for data structures at the wrong offsets.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="volatility-pslist-pstree" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> سرد العمليات (pslist و pstree)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Process Listing (pslist and pstree)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أوامر تستخرج قائمة العمليات النشطة من الذاكرة عن طريق تتبع القائمة المرتبطة المزدوجة الخاصة بنظام التشغيل.</p></template>
+    <template class="content-en"><p>Commands that extract the list of active processes from memory by walking the operating system's doubly linked list.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعد وحدة <code>pslist</code> طريقة سريعة للحصول على نظرة عامة على العمليات التي كانت قيد التشغيل وقت التقاط الذاكرة. تقوم هذه الوحدة بالمرور عبر القائمة المرتبطة المزدوجة (Doubly Linked List) التي يستخدمها نظام التشغيل لتتبع العمليات.</p><p>أما وحدة <code>pstree</code>، فتقدم نفس المعلومات ولكن بتنسيق شجري يوضح العلاقات بين العمليات (الآباء والأبناء)، مما يسهل اكتشاف العمليات التي تم تشغيلها بواسطة برامج غير معتادة.</p></template>
+    <template class="content-en"><p>The <code>pslist</code> module is a quick way to get low-hanging fruit by looking at what processes were running at the time of the memory dump. It walks the <span class="smart-term" data-term-en="Doubly Linked List" data-ar="قائمة مرتبطة مزدوجة" data-en-def="A data structure where each node contains a reference to the previous and the next node. Used by Windows to track active processes.">doubly linked list<span class="smart-term-tooltip"></span></span> that contains the processes.</p><p>The <code>pstree</code> module provides output that makes parent/child relationships more visual, helping examiners spot processes spawned by unusual parents.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نقطة الضعف الرئيسية في <code>pslist</code> هي اعتمادها على القائمة المرتبطة الخاصة بنظام التشغيل. عندما تنتهي عملية ما، تتم إزالتها من هذه القائمة. الأهم من ذلك، تستخدم البرمجيات الخبيثة المتقدمة تقنيات (مثل DKOM) لفصل نفسها من هذه القائمة لتجنب الاكتشاف، مما يجعلها غير مرئية لأمر <code>pslist</code> رغم أنها لا تزال تعمل في الذاكرة.</p></template>
+    <template class="content-en"><p>The main weakness of <code>pslist</code> is its reliance on the OS's active process linked list. When a process terminates, it is removed from this list. More importantly, advanced malware uses techniques (like DKOM) to unlink itself from this list to avoid detection, making it invisible to <code>pslist</code> even though it is still running in memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A diagram showing a doubly linked list of process blocks (EPROCESS). Show one malicious process block being unlinked from the list (arrows bypassing it) but still residing in memory. Labels: 'Active Process List', 'Hidden Malware Process', 'pslist path'. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Gradients -->
+        <linearGradient id="malwareGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+
+        <!-- Arrow Markers -->
+        <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        <marker id="arrow-stale" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Title & Subtitle -->
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Process Unlinking (DKOM)</text>
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">إلغاء ربط العملية (DKOM)</text>
+        
+        <text x="400" y="65" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Malware hides by manipulating EPROCESS list pointers</text>
+        <text x="400" y="65" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">تخفي البرمجيات الخبيثة نفسها بتعديل مؤشرات قائمة EPROCESS</text>
+
+        <!-- Active Process List Label -->
+        <text x="400" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Active Process List (pslist path)</text>
+        <text x="400" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قائمة العمليات النشطة (مسار pslist)</text>
+
+        <!-- Active Pointers (Bypassing Malware) -->
+        <!-- Block 1 FLINK to Block 3 -->
+        <path d="M 240 210 L 545 210" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow-active)"/>
+        <circle cx="240" cy="210" r="4" fill="var(--brand-500)"/>
+        
+        <!-- Block 3 BLINK to Block 1 -->
+        <path d="M 560 240 L 255 240" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow-active)"/>
+        <circle cx="560" cy="240" r="4" fill="var(--brand-500)"/>
+
+        <!-- Stale Pointers (From Malware) -->
+        <!-- Malware FLINK to Block 3 -->
+        <path d="M 500 400 L 630 278" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#arrow-stale)"/>
+        <circle cx="500" cy="400" r="4" fill="var(--brand-400)"/>
+        
+        <!-- Malware BLINK to Block 1 -->
+        <path d="M 300 430 L 170 278" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#arrow-stale)"/>
+        <circle cx="300" cy="430" r="4" fill="var(--brand-400)"/>
+
+        <!-- Stale Pointer Labels -->
+        <text x="210" y="350" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Stale BLINK</text>
+        <text x="210" y="350" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">BLINK قديم</text>
+        
+        <text x="590" y="340" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">Stale FLINK</text>
+        <text x="590" y="340" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">FLINK قديم</text>
+
+        <!-- Block 1: Normal Process -->
+        <rect x="40" y="130" width="200" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <line x1="40" y1="165" x2="240" y2="165" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <text x="140" y="153" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">EPROCESS</text>
+        <text x="140" y="153" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">EPROCESS</text>
+        
+        <text x="140" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">svchost.exe (PID: 448)</text>
+        <text x="140" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">svchost.exe (PID: 448)</text>
+        
+        <text x="190" y="215" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">FLINK</text>
+        <text x="190" y="215" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">FLINK</text>
+        
+        <text x="190" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">BLINK</text>
+        <text x="190" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">BLINK</text>
+
+        <!-- Block 3: Normal Process -->
+        <rect x="560" y="130" width="200" height="140" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <line x1="560" y1="165" x2="760" y2="165" stroke="var(--border-color)" stroke-width="1"/>
+        
+        <text x="660" y="153" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">EPROCESS</text>
+        <text x="660" y="153" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">EPROCESS</text>
+        
+        <text x="660" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">explorer.exe (PID: 1337)</text>
+        <text x="660" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">explorer.exe (PID: 1337)</text>
+        
+        <text x="610" y="215" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">FLINK</text>
+        <text x="610" y="215" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">FLINK</text>
+        
+        <text x="610" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">BLINK</text>
+        <text x="610" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">BLINK</text>
+
+        <!-- Block 2: Hidden Malware Process -->
+        <text x="400" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Hidden Malware Process</text>
+        <text x="400" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">عملية برمجية خبيثة مخفية</text>
+
+        <rect x="300" y="320" width="200" height="140" rx="8" fill="url(#malwareGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+        <line x1="300" y1="355" x2="500" y2="355" stroke="var(--on-brand-hi)" opacity="0.3" stroke-width="1"/>
+        
+        <text x="400" y="343" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">EPROCESS</text>
+        <text x="400" y="343" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">EPROCESS</text>
+        
+        <text x="400" y="375" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-en">malware.exe (PID: 666)</text>
+        <text x="400" y="375" text-anchor="middle" font-size="14" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-ar">malware.exe (PID: 666)</text>
+        
+        <text x="450" y="405" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" opacity="0.8" class="gsvg-en">FLINK</text>
+        <text x="450" y="405" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" opacity="0.8" class="gsvg-ar">FLINK</text>
+        
+        <text x="350" y="435" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" opacity="0.8" class="gsvg-en">BLINK</text>
+        <text x="350" y="435" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" opacity="0.8" class="gsvg-ar">BLINK</text>
+
+        <!-- Bottom Context Label -->
+        <text x="400" y="485" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Unlinked from ActiveProcessLinks but still resides in memory</text>
+        <text x="400" y="485" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تم إلغاء ربطها من ActiveProcessLinks ولكنها لا تزال في الذاكرة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تظهر العمليات المنتهية في مخرجات pslist؟</template>
+      <template class="content-en">Why do terminated processes not appear in the pslist output?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن نظام التشغيل يقوم بإزالة العملية من القائمة المرتبطة المزدوجة بمجرد انتهائها، وبما أن pslist يعتمد على قراءة هذه القائمة، فلن يجدها.</p></template>
+      <template class="content-en"><p>Because the OS removes the process from the doubly linked list once it terminates. Since pslist relies on walking this list, it will not find it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="volatility-psscan" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> فحص العمليات (psscan)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Process Scanning (psscan)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أمر يبحث في الذاكرة عن كائنات العمليات الفعلية بدلاً من الاعتماد على القائمة المرتبطة، مما يجعله قادراً على كشف العمليات المخفية أو المنتهية.</p></template>
+    <template class="content-en"><p>A command that scans memory for actual process objects rather than relying on the linked list, allowing it to detect hidden or terminated processes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>على عكس <code>pslist</code>، لا تعتمد وحدة <code>psscan</code> على القائمة المرتبطة. بدلاً من ذلك، تقوم بمسح الذاكرة بحثاً عن التوقيعات (Pool Tags) الخاصة بكائنات العمليات الفعلية.</p><p>هذا النهج يجعله أداة قوية جداً لاكتشاف التناقضات. إذا كانت هناك عملية تظهر في <code>psscan</code> ولكنها لا تظهر في <code>pslist</code>، فهذا يعتبر سلوكاً مشبوهاً للغاية يشير إلى أن العملية تحاول إخفاء نفسها.</p><p>في دراسة الحالة المذكورة، تم اكتشاف العملية <code>wmiprvse.exe</code> بواسطة <code>psscan</code> ولم تكن موجودة في <code>pslist</code>، كما أن العملية الأب (PID 888) لم تكن موجودة، مما أثار الشكوك.</p></template>
+    <template class="content-en"><p>Unlike <code>pslist</code>, the <code>psscan</code> module does not rely on the linked list. Instead, it scans the memory for the objects that are the actual processes (using <span class="smart-term" data-term-en="Pool Tag Scanning" data-ar="فحص علامات التجمع" data-en-def="A technique used by psscan to find data structures in memory by searching for specific byte signatures (tags) associated with process objects.">pool tag scanning<span class="smart-term-tooltip"></span></span>).</p><p>This approach makes it a powerful tool for finding discrepancies. A running process that is presented using <code>psscan</code> but not <code>pslist</code> is highly suspicious, indicating it is trying to hide.</p><p>In the studied case, the process <code>wmiprvse.exe</code> was found by <code>psscan</code> but not <code>pslist</code>, and its parent process (PID 888) was nowhere to be found, which is odd.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُعد مقارنة مخرجات <code>pslist</code> و <code>psscan</code> من أهم خطوات التحليل. العمليات التي تظهر في <code>psscan</code> فقط قد تكون إما</p><ul><li><strong>عمليات منتهية</strong> (بقايا في الذاكرة لم يتم الكتابة فوقها بعد)</li><li>أو <strong>برمجيات خبيثة مخفية</strong> (Rootkits).</li></ul><p>يجب على المحلل التمييز بين الحالتين بناءً على وقت الإنهاء والنشاط.</p></template>
+    <template class="content-en"><p>Comparing the output of <code>pslist</code> and <code>psscan</code> is a critical analysis step. Processes appearing only in <code>psscan</code> are either terminated processes (remnants in memory not yet overwritten) or hidden malware (Rootkits). The examiner must distinguish between the two based on exit times and activity.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>pslist</th><th>psscan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">آلية العمل</template>
+          <template class="content-en">Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتتبع القائمة المرتبطة المزدوجة لنظام التشغيل</template>
+          <template class="content-en">Walks the OS doubly linked list</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يبحث عن كائنات العمليات (Pool Tags) في الذاكرة</template>
+          <template class="content-en">Scans memory for process objects (Pool Tags)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">اكتشاف العمليات المخفية</template>
+          <template class="content-en">Detecting Hidden Processes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يفشل إذا قامت البرمجية بفصل نفسها من القائمة</template>
+          <template class="content-en">Fails if malware unlinks itself</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ينجح في اكتشافها لأن الكائن لا يزال في الذاكرة</template>
+          <template class="content-en">Succeeds as the object remains in memory</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">اكتشاف العمليات المنتهية</template>
+          <template class="content-en">Detecting Terminated Processes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يظهرها (تُزال من القائمة)</template>
+          <template class="content-en">Does not show them (removed from list)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قد يظهرها إذا لم يتم الكتابة فوق مساحتها</template>
+          <template class="content-en">May show them if memory isn't overwritten</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا وجدت عملية في psscan ولم تجدها في pslist، ما هي الاحتمالات الممكنة؟</template>
+      <template class="content-en">If you find a process in psscan but not in pslist, what are the possible scenarios?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الاحتمال الأول: العملية انتهت وتمت إزالتها من القائمة ولكن بياناتها لا تزال في الذاكرة. الاحتمال الثاني: العملية خبيثة وقامت بفصل نفسها من القائمة لإخفاء نشاطها.</p></template>
+      <template class="content-en"><p>Scenario 1: The process terminated and was removed from the list, but its data remains in memory. Scenario 2: The process is malicious and unlinked itself from the list to hide.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="volatility-procdump-memmap" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> استخراج العمليات وتخطيط الذاكرة (procdump و memmap)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Process Dumping and Memory Mapping (procdump and memmap)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أدوات تُستخدم لاستخراج الملف التنفيذي لعملية مشبوهة من الذاكرة إلى القرص، والتحقق مما إذا كانت العملية تمتلك صفحات نشطة في الذاكرة.</p></template>
+    <template class="content-en"><p>Tools used to extract a suspicious process's executable from memory to disk, and to check if the process has active pages in memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند تحديد عملية مشبوهة، فإن الخطوة التالية هي فحصها عن كثب. أسهل طريقة هي استخدام <code>procdump</code> لاستخراج الملف التنفيذي للعملية من الذاكرة.</p><p>إذا فشل <code>procdump</code>، يمكن استخدام <code>memmap</code> لمعرفة ما إذا كانت العملية تحتوي على أي صفحات في الذاكرة. إذا لم يُرجع <code>memmap</code> شيئاً، فهذا يعني أنه لا توجد بيانات يمكن العمل عليها لهذه العملية.</p><p>في دراسة الحالة، لفتت العملية <code>cleansweep.exe</code> الانتباه لأنها أُنهيت في نفس وقت بدئها تقريباً، ومع ذلك بقيت لفترة طويلة في قائمة العمليات النشطة.</p><p>فشل استخراجها باستخدام <code>procdump</code> لأن بعض صفحاتها تم ترحيلها (Paged out) من الذاكرة الرئيسية.</p></template>
+    <template class="content-en"><p>When a suspicious process is identified, the next step is to examine it. The easiest way is to use <code>procdump</code> to dump the memory of the process (extract the executable).</p><p>If <code>procdump</code> fails, <code>memmap</code> can be used to see if the process has any pages in memory. If it returns nothing, there is no data to work on.</p><p>In the case study, <code>cleansweep.exe</code> attracted attention because it appeared to terminate at the exact time it started, yet spent a long time in the active process list. Dumping it failed because some pages were <span class="smart-term" data-term-en="Paged Out" data-ar="مُرحّل (إلى القرص)" data-en-def="Memory pages that have been moved from physical RAM to the hard disk (pagefile) by the operating system to free up space.">paged out<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يفشل <code>procdump</code> أحياناً؟ تعتمد أنظمة التشغيل الحديثة على الذاكرة الافتراضية، حيث يتم نقل أجزاء من الذاكرة غير المستخدمة بنشاط إلى القرص الصلب (Pagefile). إذا تم التقاط تفريغ الذاكرة (RAM) فقط دون ملفات الترحيل، فإن أي عملية تم ترحيل صفحاتها لن تكون قابلة للاستخراج بالكامل.</p></template>
+    <template class="content-en"><p>Why does <code>procdump</code> sometimes fail? Modern OSs use virtual memory, paging inactive memory segments to the hard drive (Pagefile). If only the RAM is dumped without the pagefiles, any process whose pages were paged out cannot be fully extracted.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الاستنتاج إذا أظهر memmap أنه لا توجد صفحات في الذاكرة لعملية معينة؟</template>
+      <template class="content-en">What is the conclusion if memmap shows no pages in memory for a specific process?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الاستنتاج هو أنه لا توجد بيانات فعلية يمكن تحليلها لهذه العملية في تفريغ الذاكرة الحالي، ويجب على المحلل الانتقال للبحث عن أدلة أخرى.</p></template>
+      <template class="content-en"><p>The conclusion is that there is no actual data to analyze for this process in the current memory dump, and the examiner must move on to look for other evidence.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="volatility-connscan-sockets" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تحليل الشبكة (connscan و sockets)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Network Analysis (connscan and sockets)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أوامر تُستخدم لاكتشاف اتصالات الشبكة النشطة (TCP) والمنافذ المفتوحة للاستماع، لربط العمليات المشبوهة بنشاط الشبكة.</p></template>
+    <template class="content-en"><p>Commands used to discover active network connections (TCP) and listening sockets, linking suspicious processes to network activity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعد وحدة <code>connscan</code> أداة للبحث عن اتصالات TCP النشطة في الذاكرة، مما يساعد في تحديد عناوين IP الخارجية التي يتواصل معها الجهاز.</p><p>أما وحدة <code>sockets</code>، فتحدد العمليات التي تمتلك منافذ استماع نشطة (Listening Sockets). وجود منافذ مفتوحة لعمليات غير متوقعة يُعد سلوكاً مشبوهاً.</p><p>على سبيل المثال، أظهر التحليل أن العملية <code>lsass.exe</code> (المسؤولة عن تسجيل الدخول) والعملية <code>jucheck.exe</code> (تحديث جافا) تمتلكان منافذ استماع، وهو أمر يستدعي التحقيق.</p><p>في المقابل، من الطبيعي أن يمتلك النظام (PID 4) منفذ 445 مفتوحاً لبروتوكول مشاركة الملفات SMB.</p></template>
+    <template class="content-en"><p>The <code>connscan</code> module is used to look for network activity by finding active TCP connections in memory, helping identify external IP addresses the host is communicating with.</p><p>The <code>sockets</code> plugin specifies what processes have active <span class="smart-term" data-term-en="Listening Socket" data-ar="منفذ استماع" data-en-def="A network endpoint in a process that is waiting for incoming connections from other computers.">listening socket<span class="smart-term-tooltip"></span></span>s. Having open sockets in unexpected processes is suspicious behavior.</p><p>For example, analysis showed <code>lsass.exe</code> (handles logins) and <code>jucheck.exe</code> (Java update) had listening sockets, which requires investigation.</p><p>Conversely, it is normal for System (PID 4) to listen on port 445 for SMB file sharing.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يتطلب تحليل الشبكة في الذاكرة معرفة مسبقة بالسلوك الطبيعي لنظام التشغيل. يجب على المحلل الرجوع إلى وثائق مايكروسوفت الرسمية لمعرفة المنافذ الافتراضية (مثل 135 لـ svchost.exe، و 500/4500 لخدمات النظام). أي انحراف عن هذا المعيار يُعد مؤشراً قوياً على وجود باب خلفي (Backdoor) أو برمجية خبيثة.</p></template>
+    <template class="content-en"><p>Network analysis in memory requires prior knowledge of normal OS behavior. The examiner must reference official Microsoft documentation to know default ports (e.g., 135 for svchost.exe, 500/4500 for system services). Any deviation is a strong indicator of a backdoor or malware.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر وجود منفذ استماع مفتوح لعملية lsass.exe أمراً مشبوهاً؟</template>
+      <template class="content-en">Why is an open listening socket for lsass.exe considered suspicious?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن lsass.exe هي عملية نظام مسؤولة عن المصادقة المحلية، ولا يُفترض بها عادةً أن تفتح منافذ للاستماع إلى اتصالات الشبكة الواردة. هذا قد يشير إلى حقن كود خبيث داخل هذه العملية.</p></template>
+      <template class="content-en"><p>Because lsass.exe is a system process responsible for local authentication and is not normally supposed to open sockets to listen for incoming network connections. This could indicate malicious code injection.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="volatility-malfind" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> اكتشاف الأكواد الخبيثة (malfind)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Malware Finding (malfind)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>وحدة تبحث في الذاكرة عن الأكواد المحقونة والملفات التنفيذية المخفية داخل مساحات ذاكرة العمليات الأخرى.</p></template>
+    <template class="content-en"><p>A module that searches memory for injected code and hidden executables within the memory spaces of other processes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم وحدة <code>malfind</code> للتحقق من الأكواد المشبوهة. تنظر هذه الوحدة إلى شيئين رئيسيين: البيانات (بصيغة Hex) وتفكيك هذه البيانات (Disassembly) إلى تعليمات برمجية (Assembly).</p><p>تبحث الأداة تحديداً عن أقسام البيانات التي تبدأ بالحرفين <code>MZ</code>، وهو التوقيع القياسي الذي يحدد بداية أي ملف تنفيذي في نظام ويندوز. إذا تم العثور على ملف تنفيذي مخفي داخل مساحة ذاكرة عملية أخرى (مثل <code>explorer.exe</code>)، فهذا دليل قوي على حقن البرمجيات الخبيثة.</p><p>في المثال، تم فحص العملية الأب <code>explorer.exe</code> (PID 1008) للعملية المشبوهة <code>cleansweep.exe</code>، وتم استخراج الملفات وتحليلها عبر موقع VirusTotal، مما أكد الإصابة بفيروس SpyEye.</p></template>
+    <template class="content-en"><p>The <code>malfind</code> module is used to check for suspicious code. It looks at two different things: the data (in hex) and the disassembly of the data (assembly code).</p><p>It specifically looks for data sections beginning with <code>MZ</code>, which identifies the start of a Windows executable. Finding a hidden executable inside another process's memory space (like <code>explorer.exe</code>) is strong evidence of code injection.</p><p>In the example, the parent process <code>explorer.exe</code> (PID 1008) of the suspicious <code>cleansweep.exe</code> was examined. The output was scanned using VirusTotal, confirming a SpyEye Trojan infection.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من المهم ملاحظة أن <code>malfind</code> يولد غالباً الكثير من الإيجابيات الخاطئة (False Positives). ليس كل ملف تنفيذي موجود في الذاكرة هو ملف شرير، وليست كل التعليمات المشبوهة خبيثة بالفعل (بعض برامج الحماية أو الألعاب تستخدم تقنيات حقن مشابهة). لذلك، يجب دائماً فحص مخرجات <code>malfind</code> باستخدام برامج مكافحة الفيروسات أو أدوات مثل VirusTotal.</p></template>
+    <template class="content-en"><p>It is important to note that <code>malfind</code> will often generate a lot of <span class="smart-term" data-term-en="False Positive" data-ar="إيجابية خاطئة" data-en-def="A test result which incorrectly indicates that a particular condition or attribute is present (e.g., flagging benign code as malware).">false positive<span class="smart-term-tooltip"></span></span>s. Not all executables are evil, and not all suspicious instructions are actually malicious (some security software or games use similar injection techniques). Therefore, <code>malfind</code> output should always be further examined by running it through antivirus scanning like VirusTotal.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يجب فحص مخرجات malfind باستخدام أدوات خارجية مثل VirusTotal؟</template>
+      <template class="content-en">Why should malfind output be checked using external tools like VirusTotal?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن malfind يعتمد على الأنماط وقد يولد إيجابيات خاطئة لبرامج شرعية تستخدم تقنيات مشابهة للبرمجيات الخبيثة. أدوات مثل VirusTotal توفر تأكيداً مبنياً على قواعد بيانات ضخمة للفيروسات المعروفة.</p></template>
+      <template class="content-en"><p>Because malfind relies on patterns and can generate false positives for legitimate software using malware-like techniques. Tools like VirusTotal provide confirmation based on massive databases of known malware signatures.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="redline-overview-collection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> نظرة عامة على Redline وجمع البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Redline Overview and Data Collection</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أداة رسومية مجانية من FireEye تُستخدم لجمع بيانات الذاكرة وتحليلها والبحث عن مؤشرات الاختراق (IOCs).</p></template>
+    <template class="content-en"><p>A free graphical memory analysis tool by FireEye used for data collection, analysis, and searching for Indicators of Compromise (IOCs).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أداة Redline هي أداة تحليل ذاكرة رسومية تمتلك ثلاث وظائف رئيسية: جمع البيانات، تحليل البيانات، وتحليل مؤشرات الاختراق (IOC).</p><p>على الرغم من إمكانية تحليل تفريغ ذاكرة تم إنشاؤه بواسطة أدوات أخرى (مثل FTK Imager)، يُنصح بشدة باستخدام أداة جمع البيانات الخاصة بـ Redline. لجمع البيانات، يقوم المحلل بإنشاء "مُجمّع" (Collector)، والذي يتم حفظه كملف نصي تنفيذي يسمى <code>RunRedlineAudit.bat</code>.</p><p>يسمح هذا <span class="smart-term" data-term-en="Collector" data-ar="المُجمّع" data-en-def="A script generated by Redline (e.g., RunRedlineAudit.bat) configured to extract specific volatile data, memory, and system artifacts from a target machine.">المُجمّع<span class="smart-term-tooltip"></span></span> بضبط دقيق للبيانات التي سيتم جمعها، مثل سجلات الأحداث (Event Logs)، معلومات النظام، الملفات، وقوائم العمليات، مما يوفر بيانات متطايرة أكثر شمولاً من مجرد تفريغ الذاكرة التقليدي.</p></template>
+    <template class="content-en"><p>Redline is a graphical memory analysis tool that has three major functions:</p><ul><li><strong>Data collection</strong>,</li><li><strong>Data analysis</strong>,</li><li>and <strong>Indicator of Compromise (IOC) analysis</strong>.</li></ul><p>While it is possible to analyze a memory dump created by other tools (like FTK Imager), it is recommended to capture data using Redline's own data collection tool.</p><p>To collect data, the examiner creates a <span class="smart-term" data-term-en="Collector" data-ar="المُجمّع" data-en-def="A script generated by Redline (e.g., RunRedlineAudit.bat) configured to extract specific volatile data, memory, and system artifacts from a target machine.">collector<span class="smart-term-tooltip"></span></span>, which is saved as a file called <code>RunRedlineAudit.bat</code>.</p><p>This collector allows fine-tuning of what data to gather, ranging from event logs and system information to files and process listings, capturing more volatile data than a standard memory dump.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تكمن قوة المُجمّع الشامل (Comprehensive Collector) في Redline في قدرته على جمع سياق النظام بالكامل، وليس فقط محتويات الذاكرة العشوائية (RAM). هذا السياق (مثل مفاتيح التسجيل، وسجلات الأحداث) ضروري جداً لإجراء تحليل فعال لمؤشرات الاختراق (IOC) لاحقاً.</p></template>
+    <template class="content-en"><p>The power of Redline's Comprehensive Collector lies in its ability to gather the entire system context, not just the RAM contents. This context (like registry keys and event logs) is absolutely essential for performing effective IOC analysis later.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفضل استخدام مُجمّع Redline بدلاً من مجرد أخذ نسخة من الذاكرة باستخدام FTK Imager؟</template>
+      <template class="content-en">Why is it preferable to use a Redline collector instead of just taking a memory dump with FTK Imager?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مُجمّع Redline يجمع بيانات متطايرة إضافية مثل سجلات الأحداث ومعلومات النظام الدقيقة التي لا تكون موجودة دائماً في تفريغ الذاكرة الخام، مما يسهل تحليل IOC.</p></template>
+      <template class="content-en"><p>Because the Redline collector gathers additional volatile data like event logs and detailed system information that isn't always present in a raw memory dump, facilitating better IOC analysis.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="redline-analysis-views" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> طرق عرض التحليل في Redline</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Redline Analysis Views</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يوفر Redline خمس طرق عرض مختلفة لتنظيم وتحليل البيانات المجمعة، تتراوح من معلومات النظام الأساسية إلى الجداول الزمنية المعقدة.</p></template>
+    <template class="content-en"><p>Redline provides five different views to organize and analyze collected data, ranging from basic system info to complex timelines.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بمجرد جمع البيانات، يمكن للمحلل فتحها في Redline واستخدام خمس طرق عرض رئيسية:</p><ol><li><b>معلومات النظام (System Information):</b> لمراجعة البيانات الأساسية مثل نظام التشغيل والمالك المسجل.</li><li><b>مجموعة الفرز (Triage Collection):</b> مصممة للتحليل المتعمق للعمليات وسلوكها.</li><li><b>التحقيق المستند إلى المضيف (Host Based Investigation):</b> تتيح للمحلل تحليل الأحداث وتنظيمها في جدول زمني (Timeline).</li><li><b>بيانات سجل الويب (Web History Data):</b> لمراجعة سجل المتصفح.</li><li><b>البحث عن مؤشرات الاختراق (IOC Search):</b> لاستيراد مؤشرات النشاط الخبيث والبحث عنها.</li></ol><p>كما يمكن للمحلل التصفح اليدوي للبيانات عبر خيار "المضيف" (Host).</p></template>
+    <template class="content-en"><p>Once data is collected, the examiner can open it in Redline and use five main views:</p><ol><li><b>System Information:</b> Reviews basic data like OS and registered owner.</li><li><b>Triage Collection:</b> Designed for in-depth analysis of processes and their behavior.</li><li><b>Host Based Investigation:</b> Allows the examiner to analyze events and organize them in a timeline.</li><li><b>Web History Data:</b> Reviews browser history.</li><li><b>IOC Search:</b> Imports indicators of malicious activity and searches for them.</li></ol><p>The examiner can also manually browse the data via the "Host" option.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُعد ميزة الجدول الزمني (Timeline) في طريقة عرض التحقيق المستند إلى المضيف من أقوى أدوات Redline. فهي تدمج طوابع الوقت (Timestamps) من الملفات، وسجلات الأحداث، والعمليات في تسلسل زمني واحد، مما يسمح للمحلل بتتبع تسلسل هجوم البرمجيات الخبيثة خطوة بخطوة.</p></template>
+    <template class="content-en"><p>The Timeline feature in the Host Based Investigation view is one of Redline's most powerful tools. It merges timestamps from files, event logs, and processes into a single chronological sequence, allowing the examiner to trace the malware attack sequence step-by-step.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي طريقة عرض في Redline ستستخدمها إذا كنت تريد معرفة ما حدث على الجهاز بالترتيب الزمني؟</template>
+      <template class="content-en">Which Redline view would you use if you wanted to know what happened on the machine in chronological order?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>طريقة عرض التحقيق المستند إلى المضيف (Host Based Investigation) لأنها تتيح تنظيم الأحداث في جدول زمني (Timeline).</p></template>
+      <template class="content-en"><p>The Host Based Investigation view, because it allows organizing events into a timeline.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="redline-ioc-analysis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تحليل مؤشرات الاختراق (IOC Analysis)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Indicator of Compromise (IOC) Analysis</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية مطابقة بصمات وسلوكيات البرمجيات الخبيثة المعروفة (المكتوبة في ملفات XML) مع البيانات المجمعة من الجهاز لاكتشاف الإصابات بسرعة.</p></template>
+    <template class="content-en"><p>The process of matching known malware signatures and behaviors (written in XML files) against collected host data to quickly detect infections.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>القدرة النهائية والأهم لـ Redline هي تحليل IOC. الفكرة هي أن المحلل يجمع مؤشرات للسلوكيات الخبيثة (مثل أسماء ملفات معينة، مفاتيح تسجيل، أو عناوين IP) ويرى ما إذا كانت هذه السلوكيات تتجلى في المضيف الذي يتم تحليله.</p><p>تتم كتابة هذه المواصفات أساساً في ملفات بصيغة <code>XML</code>. عند تطبيق ملف IOC (مثل ملف خاص بفيروس SpyEye) على بيانات الذاكرة، سيقوم Redline بتسليط الضوء على الأجزاء التي تتطابق مع المؤشرات.</p><p>في حالة اكتشاف جهاز مصاب في الشبكة، يمكن للمحلل إنشاء ملف تعريف IOC لهذه الإصابة المحددة واستخدامه لفحص باقي الأجهزة في الشبكة بسرعة.</p></template>
+    <template class="content-en"><p>The final capability of Redline is IOC analysis. The idea is that the examiner gathers indicators of malicious behaviors (like specific filenames, registry keys, or IP addresses) and sees if those behaviors manifest in the analyzed host.</p><p>These specifications are essentially <code>XML</code> files. When an IOC file (e.g., for the SpyEye Trojan) is applied to the memory data, Redline highlights the parts of the data that match the indicators.</p><p>If one infected host is identified in a network, the examiner can create an IOC profile for that specific infection and use it to rapidly analyze other hosts in the network.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُعد نهج IOC نقلة نوعية في الاستجابة للحوادث (Incident Response). بدلاً من التحليل اليدوي البطيء لكل جهاز، تسمح ملفات IOC بأتمتة عملية البحث (Hunting) عبر آلاف الأجهزة، مما يقلل بشكل كبير من الوقت اللازم لاحتواء الحادث والتعافي منه بالكامل.</p></template>
+    <template class="content-en"><p>The IOC approach is a paradigm shift in Incident Response. Instead of slow manual analysis of each machine, IOC files allow automating the hunting process across thousands of endpoints, drastically reducing the time needed to contain and fully recover from an incident.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: A flow diagram showing the IOC process: 1. 'Infected Host' -> 2. 'Extract Indicators (IPs, Hashes)' -> 3. 'Create XML IOC File' -> 4. 'Redline Scanner' -> 5. 'Scan Entire Network'. Show arrows indicating the flow of data. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Highlight Gradient for XML Node -->
+        <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">IOC Analysis Workflow</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">سير عمل تحليل مؤشرات الاختراق (IOC)</text>
+
+    <!-- ================= CONNECTIONS (PATHS) ================= -->
+    
+    <!-- 1 to 2 -->
+    <path d="M 228 145 L 302 145" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="265" y="135" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Analyze</text>
+    <text x="265" y="135" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">تحليل</text>
+
+    <!-- 2 to 3 -->
+    <path d="M 498 145 L 572 145" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="535" y="135" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Format</text>
+    <text x="535" y="135" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">تنسيق</text>
+
+    <!-- 3 to 4 (Vertical) -->
+    <path d="M 670 195 L 670 287" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="680" y="245" text-anchor="start" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Apply to Scanner</text>
+    <text x="680" y="245" text-anchor="start" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">تطبيق على الفاحص</text>
+
+    <!-- 4 to 5 -->
+    <path d="M 572 345 L 498 345" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="535" y="335" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Deploy</text>
+    <text x="535" y="335" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">نشر</text>
+
+    <!-- 5 to 6 -->
+    <path d="M 302 345 L 228 345" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text x="265" y="335" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Match</text>
+    <text x="265" y="335" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">مطابقة</text>
+
+
+    <!-- ================= NODES ================= -->
+
+    <!-- Node 1: Infected Host -->
+    <rect x="40" y="95" width="180" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <g transform="translate(118, 110)">
+        <rect x="0" y="0" width="24" height="16" rx="2" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <path d="M8 20 L16 20 M12 16 L12 20" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <circle cx="12" cy="8" r="4" fill="var(--brand-500)"/>
+        <path d="M12 6 L12 9 M12 11 L12 11.5" stroke="var(--bg-elevated)" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <text x="130" y="155" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Infected Host</text>
+    <text x="130" y="155" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">المضيف المصاب</text>
+    <text x="130" y="175" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Initial Discovery</text>
+    <text x="130" y="175" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">الاكتشاف الأولي</text>
+    <circle cx="55" cy="110" r="12" fill="var(--brand-500)" />
+    <text x="55" y="114" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+
+    <!-- Node 2: Extract Indicators -->
+    <rect x="310" y="95" width="180" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <g transform="translate(388, 110)">
+        <path d="M4 0 L14 0 L20 6 L20 20 L4 20 Z" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <path d="M14 0 L14 6 L20 6" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <circle cx="10" cy="12" r="4" fill="none" stroke="var(--brand-500)" stroke-width="1.5"/>
+        <line x1="13" y1="15" x2="17" y2="19" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <text x="400" y="155" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Extract Indicators</text>
+    <text x="400" y="155" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">استخراج المؤشرات</text>
+    <text x="400" y="175" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(IPs, Hashes, Files)</text>
+    <text x="400" y="175" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(عناوين IP، الهاش، الملفات)</text>
+    <circle cx="325" cy="110" r="12" fill="var(--brand-500)" />
+    <text x="325" y="114" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">2</text>
+
+    <!-- Node 3: Create XML IOC File (Highlighted) -->
+    <rect x="580" y="95" width="180" height="100" rx="8" fill="url(#brandGradient)" stroke="none" />
+    <g transform="translate(658, 110)">
+        <path d="M4 0 L14 0 L20 6 L20 20 L4 20 Z" fill="none" stroke="var(--on-brand-hi)" stroke-width="1.5"/>
+        <path d="M14 0 L14 6 L20 6" fill="none" stroke="var(--on-brand-hi)" stroke-width="1.5"/>
+        <path d="M8 10 L5 13 L8 16 M12 10 L15 13 L12 16" fill="none" stroke="var(--on-brand-hi)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="670" y="155" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Create XML IOC File</text>
+    <text x="670" y="155" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">إنشاء ملف IOC (XML)</text>
+    <text x="670" y="175" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)">Standardized Format</text>
+    <text x="670" y="175" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--on-brand-hi)">تنسيق موحد</text>
+    <circle cx="595" cy="110" r="12" fill="var(--bg-surface)" />
+    <text x="595" y="114" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">3</text>
+
+    <!-- Node 4: Redline Scanner -->
+    <rect x="580" y="295" width="180" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <g transform="translate(658, 310)">
+        <circle cx="12" cy="12" r="10" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="5" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <path d="M12 2 L12 12 L20 20" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <text x="670" y="355" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Redline Scanner</text>
+    <text x="670" y="355" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">فاحص Redline</text>
+    <text x="670" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Load IOC Profile</text>
+    <text x="670" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تحميل ملف المؤشرات</text>
+    <circle cx="595" cy="310" r="12" fill="var(--brand-500)" />
+    <text x="595" y="314" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">4</text>
+
+    <!-- Node 5: Scan Entire Network -->
+    <rect x="310" y="295" width="180" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <g transform="translate(388, 310)">
+        <circle cx="12" cy="4" r="3" fill="var(--text-primary)"/>
+        <circle cx="4" cy="18" r="3" fill="var(--text-primary)"/>
+        <circle cx="20" cy="18" r="3" fill="var(--text-primary)"/>
+        <path d="M12 4 L4 18 M12 4 L20 18 M4 18 L20 18" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="12" fill="none" stroke="var(--brand-500)" stroke-width="1" stroke-dasharray="2 2"/>
+    </g>
+    <text x="400" y="355" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Scan Entire Network</text>
+    <text x="400" y="355" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">فحص الشبكة بالكامل</text>
+    <text x="400" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Rapid Analysis</text>
+    <text x="400" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تحليل سريع</text>
+    <circle cx="325" cy="310" r="12" fill="var(--brand-500)" />
+    <text x="325" y="314" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">5</text>
+
+    <!-- Node 6: Identify Infections -->
+    <rect x="40" y="295" width="180" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <g transform="translate(118, 310)">
+        <path d="M12 2 L20 6 L20 12 C20 18 14 22 12 24 C10 22 4 18 4 12 L4 6 Z" fill="none" stroke="var(--text-primary)" stroke-width="1.5"/>
+        <path d="M8 12 L11 15 L16 9" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="130" y="355" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Identify Infections</text>
+    <text x="130" y="355" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">تحديد الإصابات</text>
+    <text x="130" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Highlight Matches</text>
+    <text x="130" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">إبراز التطابقات</text>
+    <circle cx="55" cy="310" r="12" fill="var(--brand-500)" />
+    <text x="55" y="314" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)">6</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يساهم تحليل IOC في تقليل وقت الاستجابة للحوادث؟</template>
+      <template class="content-en">How does IOC analysis contribute to reducing incident response time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال تحويل الأدلة المكتشفة في جهاز واحد إلى قاعدة بحث آلية (ملف XML) يمكن تطبيقها بسرعة لفحص شبكة كاملة بدلاً من فحص كل جهاز يدوياً.</p></template>
+      <template class="content-en"><p>By converting evidence found on one machine into an automated search rule (XML file) that can be quickly applied to scan an entire network, rather than manually investigating each machine.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه المراجعة السريعة. في هذا الجزء من المنهج، ننتقل من النظرية إلى التطبيق العملي في صيد البرمجيات الخبيثة داخل الذاكرة. تذكروا دائماً في الامتحان: الأداة الأولى هي Volatility، والخطوة الأولى دائماً هي تحديد الخريطة باستخدام <code>imageinfo</code>. لا تنخدعوا بـ <code>pslist</code>، فالبرمجيات الخبيثة الذكية تختبئ منه؛ استخدموا <code>psscan</code> لكشفها. إذا وجدتم شيئاً مريباً، استخرجوه بـ <code>procdump</code>، وإذا فشل، تذكروا أن الذاكرة ربما تم ترحيلها (Paged out). لا تنسوا الشبكة! <code>connscan</code> و <code>sockets</code> سيفضحان اتصالات المخترق. أما بالنسبة لـ Redline، فهو صديقكم الرسومي. تذكروا أن ميزته الكبرى هي إنشاء 'المُجمّع' (Collector) لجمع سياق النظام بالكامل، واستخدام ملفات XML الخاصة بـ IOC للبحث السريع في الشبكة. ركزوا على فهم 'لماذا' نستخدم كل أداة ومتى تفشل، فهذا ما يميز المحلل المحترف. بالتوفيق!</template>
+    <template class="content-en">Welcome everyone to this quick review. Here, we move from theory to practical malware hunting in memory. Always remember for the exam: your primary CLI tool is Volatility, and step one is always finding the map with <code>imageinfo</code>. Don't be fooled by <code>pslist</code>; smart malware hides from it. Use <code>psscan</code> to expose them. If you find a suspect, extract it with <code>procdump</code>, and if it fails, remember the memory might be paged out. Don't forget the network! <code>connscan</code> and <code>sockets</code> will expose the attacker's connections. As for Redline, it's your GUI best friend. Its superpower is creating a 'Collector' to grab full system context, and using XML IOC files to rapidly hunt across a network. Focus on 'why' we use each tool and when they fail—that's what makes a pro analyst. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر خطوة imageinfo حاسمة قبل أي تحليل في Volatility؟</template>
+          <template class="content-en">Why is the imageinfo step crucial before any analysis in Volatility?</template>
+          <span class="content-target">لماذا نعتبر خطوة imageinfo حاسمة قبل أي تحليل في Volatility؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن هياكل الذاكرة تختلف باختلاف نظام التشغيل. بدون ملف التعريف الصحيح، لن تتمكن الأداة من ترجمة البيانات الثنائية الخام إلى معلومات مفهومة.</template>
+          <template class="content-en">Because memory structures differ by OS. Without the correct profile, the tool cannot translate raw binary data into understandable information.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تنجح البرمجيات الخبيثة في إخفاء نفسها من أمر pslist؟</template>
+          <template class="content-en">How does malware successfully hide itself from the pslist command?</template>
+          <span class="content-target">كيف تنجح البرمجيات الخبيثة في إخفاء نفسها من أمر pslist؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم البرمجيات الخبيثة بتعديل هياكل النواة (DKOM) لفصل كتلة العملية الخاصة بها من القائمة المرتبطة المزدوجة التي يعتمد عليها pslist.</template>
+          <template class="content-en">Malware modifies kernel structures (DKOM) to unlink its process block from the doubly linked list that pslist relies on.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كان psscan أفضل في كشف التخفي، فلماذا نستخدم pslist أصلاً؟</template>
+          <template class="content-en">If psscan is better at detecting stealth, why use pslist at all?</template>
+          <span class="content-target">إذا كان psscan أفضل في كشف التخفي، فلماذا نستخدم pslist أصلاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمهما معاً للمقارنة. التناقض بينهما (عملية في psscan وليست في pslist) هو المؤشر الأقوى على وجود إخفاء متعمد.</template>
+          <template class="content-en">We use them together for comparison. The discrepancy between them (a process in psscan but not pslist) is the strongest indicator of intentional hiding.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">حاولت استخراج عملية باستخدام procdump ولكنه فشل. ما هو التفسير التقني لذلك؟</template>
+          <template class="content-en">I tried to extract a process using procdump but it failed. What is the technical explanation for this?</template>
+          <span class="content-target">حاولت استخراج عملية باستخدام procdump ولكنه فشل. ما هو التفسير التقني لذلك؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التفسير الأكثر ترجيحاً هو أن نظام التشغيل قام بترحيل (Paging out) صفحات الذاكرة الخاصة بهذه العملية إلى القرص الصلب لتوفير مساحة في الـ RAM.</template>
+          <template class="content-en">The most likely explanation is that the OS paged out the memory pages of this process to the hard drive to free up RAM space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل كل منفذ استماع (Listening Socket) يظهر في الذاكرة يعتبر دليلاً على اختراق؟</template>
+          <template class="content-en">Is every listening socket found in memory evidence of a compromise?</template>
+          <span class="content-target">هل كل منفذ استماع (Listening Socket) يظهر في الذاكرة يعتبر دليلاً على اختراق؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، العديد من عمليات النظام الشرعية (مثل مشاركة الملفات عبر منفذ 445) تتطلب منافذ استماع. الشك يقع عندما تفتح عمليات غير متوقعة (مثل lsass.exe) هذه المنافذ.</template>
+          <template class="content-en">No, many legitimate system processes (like file sharing on port 445) require listening sockets. Suspicion arises when unexpected processes (like lsass.exe) open them.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التوقيع الذي يبحث عنه malfind، ولماذا؟</template>
+          <template class="content-en">What signature does malfind look for, and why?</template>
+          <span class="content-target">ما هو التوقيع الذي يبحث عنه malfind، ولماذا؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يبحث عن الحرفين 'MZ'. لأنهما يمثلان الترويسة القياسية لأي ملف تنفيذي في ويندوز، ووجودهما داخل مساحة عملية أخرى يشير إلى حقن كود.</template>
+          <template class="content-en">It looks for the characters 'MZ'. Because they represent the standard header for any Windows executable, and finding them inside another process's space indicates code injection.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الذي يجعل مُجمّع Redline (Collector) أداة قوية مقارنة بأخذ نسخة خام من الذاكرة؟</template>
+          <template class="content-en">What makes the Redline Collector a powerful tool compared to taking a raw memory dump?</template>
+          <span class="content-target">ما الذي يجعل مُجمّع Redline (Collector) أداة قوية مقارنة بأخذ نسخة خام من الذاكرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المُجمّع لا ينسخ الذاكرة فحسب، بل يجمع سياق النظام بالكامل مثل سجلات الأحداث، ومعلومات التسجيل، والملفات، مما يوفر رؤية شاملة للتحقيق.</template>
+          <template class="content-en">The collector doesn't just dump memory; it gathers full system context like event logs, registry info, and files, providing a comprehensive view for investigation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تساعد ميزة الجدول الزمني (Timeline) في Redline المحققين؟</template>
+          <template class="content-en">How does the Timeline feature in Redline help investigators?</template>
+          <span class="content-target">كيف تساعد ميزة الجدول الزمني (Timeline) في Redline المحققين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم بدمج طوابع الوقت من مصادر متعددة (ملفات، سجلات، عمليات) في تسلسل واحد، مما يسمح للمحقق برؤية قصة الهجوم خطوة بخطوة.</template>
+          <template class="content-en">It merges timestamps from multiple sources (files, logs, processes) into a single sequence, allowing the investigator to see the story of the attack step-by-step.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو ملف IOC وكيف يتم استخدامه؟</template>
+          <template class="content-en">What is an IOC file and how is it used?</template>
+          <span class="content-target">ما هو ملف IOC وكيف يتم استخدامه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو ملف XML يحتوي على بصمات وسلوكيات البرمجيات الخبيثة. يتم استخدامه لفحص الأجهزة آلياً للبحث عن تطابقات تؤكد الإصابة.</template>
+          <template class="content-en">It is an XML file containing malware signatures and behaviors. It is used to automatically scan machines looking for matches that confirm an infection.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يغير تحليل IOC من طريقة الاستجابة للحوادث في الشركات الكبرى؟</template>
+          <template class="content-en">How does IOC analysis change incident response in large enterprises?</template>
+          <span class="content-target">كيف يغير تحليل IOC من طريقة الاستجابة للحوادث في الشركات الكبرى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من فحص كل جهاز يدوياً، يمكن للمحلل استخراج IOC من جهاز مصاب واحد، ثم استخدامه لفحص آلاف الأجهزة في الشبكة في وقت قياسي.</template>
+          <template class="content-en">Instead of manually examining each machine, an analyst can extract an IOC from one infected host, then use it to scan thousands of network machines in record time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي وظيفة أمر imageinfo في Volatility؟",
+      "en": "What is the function of the imageinfo command in Volatility?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدد ملف تعريف الذاكرة (Profile) المناسب لنظام التشغيل لترجمة البيانات بشكل صحيح.",
+        "en": "Determines the correct memory profile for the OS to interpret data correctly."
+      },
+      "example": {
+        "ar": "اقتراح ملف WinXPSP2x86.",
+        "en": "Suggesting the WinXPSP2x86 profile."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "كيف يعمل أمر pslist؟",
+      "en": "How does the pslist command work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخرج قائمة العمليات النشطة من خلال تتبع القائمة المرتبطة المزدوجة لنظام التشغيل.",
+        "en": "Extracts the list of active processes by walking the OS's doubly linked list."
+      },
+      "example": {
+        "ar": "عرض العمليات الظاهرة للنظام بشكل طبيعي.",
+        "en": "Showing processes normally visible to the system."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما الذي يميز pstree عن pslist؟",
+      "en": "What distinguishes pstree from pslist?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقدم المخرجات بتنسيق شجري يوضح العلاقات بين العمليات (الآباء والأبناء).",
+        "en": "Provides output in a tree format showing parent/child relationships."
+      },
+      "example": {
+        "ar": "رؤية أن cmd.exe تم تشغيله بواسطة explorer.exe.",
+        "en": "Seeing that cmd.exe was spawned by explorer.exe."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "كيف يكتشف psscan العمليات المخفية؟",
+      "en": "How does psscan detect hidden processes?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يمسح الذاكرة بحثاً عن كائنات العمليات الفعلية بدلاً من الاعتماد على القائمة المرتبطة.",
+        "en": "Scans memory for actual process objects instead of relying on the linked list."
+      },
+      "example": {
+        "ar": "العثور على عملية غير موجودة في مخرجات pslist.",
+        "en": "Finding a process that is missing from pslist output."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو الغرض من أمر procdump؟",
+      "en": "What is the purpose of the procdump command?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخراج الملف التنفيذي لعملية معينة من الذاكرة إلى القرص لتحليله.",
+        "en": "Extracts the executable of a specific process from memory to disk for analysis."
+      },
+      "example": {
+        "ar": "استخراج cleansweep.exe لفحصه ببرامج مكافحة الفيروسات.",
+        "en": "Dumping cleansweep.exe to scan it with antivirus."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "لماذا قد يفشل أمر procdump؟",
+      "en": "Why might the procdump command fail?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن بعض صفحات الذاكرة الخاصة بالعملية قد تم ترحيلها (Paged out) إلى القرص الصلب.",
+        "en": "Because some memory pages of the process have been paged out to the hard drive."
+      },
+      "example": {
+        "ar": "محاولة استخراج عملية خاملة لفترة طويلة.",
+        "en": "Trying to dump a process that has been idle for a long time."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ماذا يفعل أمر memmap؟",
+      "en": "What does the memmap command do?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتحقق مما إذا كانت العملية تمتلك أي صفحات نشطة في الذاكرة.",
+        "en": "Checks to see if the process has any active pages in memory."
+      },
+      "example": {
+        "ar": "استخدامه بعد فشل procdump للتأكد من وجود بيانات.",
+        "en": "Using it after procdump fails to confirm if data exists."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما الفرق بين connscan و sockets؟",
+      "en": "What is the difference between connscan and sockets?"
+    },
+    "back": {
+      "definition": {
+        "ar": "connscan يبحث عن اتصالات TCP النشطة، بينما sockets يحدد العمليات التي لديها منافذ استماع.",
+        "en": "connscan looks for active TCP connections, while sockets specifies processes with listening ports."
+      },
+      "example": {
+        "ar": "connscan يظهر اتصالاً بـ IP خارجي، sockets يظهر lsass.exe يستمع على منفذ.",
+        "en": "connscan shows connection to external IP, sockets shows lsass.exe listening."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "عن ماذا يبحث أمر malfind في الذاكرة؟",
+      "en": "What does the malfind command look for in memory?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يبحث عن الملفات التنفيذية المخفية (تبدأ بـ MZ) والأكواد المحقونة في مساحات العمليات الأخرى.",
+        "en": "Looks for hidden executables (starting with MZ) and injected code in other processes' spaces."
+      },
+      "example": {
+        "ar": "اكتشاف كود خبيث داخل مساحة ذاكرة explorer.exe.",
+        "en": "Discovering malicious code inside explorer.exe's memory space."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي الأداة الرسومية Redline؟",
+      "en": "What is the Redline graphical tool?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أداة من FireEye لجمع بيانات الذاكرة وتحليلها والبحث عن مؤشرات الاختراق (IOC).",
+        "en": "A FireEye tool for memory data collection, analysis, and IOC searching."
+      },
+      "example": {
+        "ar": "استخدامها لإنشاء جدول زمني للأحداث على جهاز مصاب.",
+        "en": "Using it to create a timeline of events on an infected machine."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو ملف RunRedlineAudit.bat؟",
+      "en": "What is the RunRedlineAudit.bat file?"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج نصي (مُجمّع) يتم إنشاؤه بواسطة Redline لجمع بيانات محددة من الجهاز المستهدف.",
+        "en": "A script (collector) generated by Redline to gather specific data from a target machine."
+      },
+      "example": {
+        "ar": "تشغيله لجمع سجلات الأحداث وتفريغ الذاكرة معاً.",
+        "en": "Running it to collect event logs and memory dump together."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ماذا يعني اختصار IOC؟",
+      "en": "What does the acronym IOC stand for?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مؤشر الاختراق (Indicator of Compromise)، وهي أدلة تشير إلى وجود نشاط خبيث.",
+        "en": "Indicator of Compromise, which are artifacts indicating malicious activity."
+      },
+      "example": {
+        "ar": "عنوان IP معروف لخادم تحكم وسيطرة (C2).",
+        "en": "A known IP address for a Command and Control (C2) server."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "بأي صيغة يتم حفظ مواصفات IOC في Redline؟",
+      "en": "In what format are IOC specifications saved in Redline?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم حفظها كملفات XML.",
+        "en": "They are saved as XML files."
+      },
+      "example": {
+        "ar": "استيراد ملف XML يحتوي على بصمات فيروس SpyEye.",
+        "en": "Importing an XML file containing SpyEye signatures."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي دلالة التوقيع 'MZ' في تحليل الذاكرة؟",
+      "en": "What is the significance of the 'MZ' signature in memory analysis?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدد بداية قسم البيانات لملف تنفيذي في بيئة ويندوز.",
+        "en": "Identifies the start of a data section for an executable file in a Windows environment."
+      },
+      "example": {
+        "ar": "يبحث malfind عن MZ لاكتشاف الملفات المحقونة.",
+        "en": "malfind searches for MZ to detect injected files."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "لماذا يجب الحذر من الإيجابيات الخاطئة (False Positives) عند استخدام malfind؟",
+      "en": "Why should one be cautious of False Positives when using malfind?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن بعض البرامج الشرعية تستخدم تقنيات مشابهة للبرمجيات الخبيثة، مما يجعل malfind يشتبه بها خطأً.",
+        "en": "Because some legitimate programs use techniques similar to malware, causing malfind to incorrectly flag them."
+      },
+      "example": {
+        "ar": "برامج مكافحة الفيروسات قد تظهر كعمليات مشبوهة في malfind.",
+        "en": "Antivirus software might appear as suspicious processes in malfind."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي وحدة في Volatility يجب استخدامها أولاً لتحديد كيفية قراءة هياكل الذاكرة؟",
+      "en": "Which Volatility module should be used first to determine how to read memory structures?"
+    },
+    "options": {
+      "ar": [
+        "pslist",
+        "imageinfo",
+        "malfind",
+        "procdump"
+      ],
+      "en": [
+        "pslist",
+        "imageinfo",
+        "malfind",
+        "procdump"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم وحدة imageinfo لتحديد ملف تعريف نظام التشغيل (Profile) الصحيح، وهو أمر ضروري لجميع الأوامر اللاحقة.",
+      "en": "The imageinfo module is used to determine the correct OS profile, which is essential for all subsequent commands."
+    },
+    "hint": {
+      "ar": "إنها توفر 'المعلومات' الأساسية عن 'صورة' الذاكرة.",
+      "en": "It provides basic 'info' about the memory 'image'."
+    },
+    "difficulty": "easy",
+    "conceptId": "volatility-imageinfo"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو السلوك الذي يعتبر مشبوهاً للغاية عند مقارنة مخرجات pslist و psscan؟",
+      "en": "What behavior is considered highly suspicious when comparing pslist and psscan outputs?"
+    },
+    "options": {
+      "ar": [
+        "عملية تظهر في pslist ولكن ليس في psscan.",
+        "عملية تظهر في كل من pslist و psscan.",
+        "عملية تظهر في psscan ولكن ليس في pslist.",
+        "عملية تستهلك الكثير من الذاكرة في pslist."
+      ],
+      "en": [
+        "A process appears in pslist but not in psscan.",
+        "A process appears in both pslist and psscan.",
+        "A process appears in psscan but not in pslist.",
+        "A process consumes a lot of memory in pslist."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إذا ظهرت عملية في psscan (الذي يبحث عن الكائنات) ولم تظهر في pslist (الذي يقرأ القائمة الرسمية)، فهذا يعني أن العملية تحاول إخفاء نفسها.",
+      "en": "If a process appears in psscan (which scans for objects) but not in pslist (which reads the official list), it means the process is trying to hide."
+    },
+    "hint": {
+      "ar": "تذكر أن البرمجيات الخبيثة تفصل نفسها من القائمة المرتبطة.",
+      "en": "Remember that malware unlinks itself from the linked list."
+    },
+    "difficulty": "medium",
+    "conceptId": "volatility-psscan"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا قد يفشل أمر procdump في استخراج عملية من الذاكرة؟",
+      "en": "Why might the procdump command fail to extract a process from memory?"
+    },
+    "options": {
+      "ar": [
+        "لأن العملية محمية بكلمة مرور.",
+        "لأن بعض صفحات الذاكرة الخاصة بها تم ترحيلها (Paged out).",
+        "لأن العملية مخفية عن pslist.",
+        "لأن Volatility لا يدعم استخراج الملفات التنفيذية."
+      ],
+      "en": [
+        "Because the process is password protected.",
+        "Because some of its memory pages were paged out.",
+        "Because the process is hidden from pslist.",
+        "Because Volatility does not support extracting executables."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا تم نقل أجزاء من ذاكرة العملية إلى القرص الصلب (Pagefile) ولم يتم تضمينها في تفريغ الذاكرة، سيفشل الاستخراج.",
+      "en": "If parts of the process memory were moved to the hard drive (Pagefile) and not included in the memory dump, extraction will fail."
+    },
+    "hint": {
+      "ar": "فكر في الذاكرة الافتراضية وكيف يتعامل نظام التشغيل مع الذاكرة الممتلئة.",
+      "en": "Think about virtual memory and how the OS handles full RAM."
+    },
+    "difficulty": "medium",
+    "conceptId": "volatility-procdump-memmap"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من العمليات التالية يُعتبر وجود منفذ استماع (Listening Socket) مفتوح لها أمراً مشبوهاً؟",
+      "en": "For which of the following processes is having an open listening socket considered suspicious?"
+    },
+    "options": {
+      "ar": [
+        "System (PID 4)",
+        "svchost.exe",
+        "lsass.exe",
+        "alg.exe"
+      ],
+      "en": [
+        "System (PID 4)",
+        "svchost.exe",
+        "lsass.exe",
+        "alg.exe"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "عملية lsass.exe مسؤولة عن تسجيل الدخول المحلي ولا يُفترض أن تفتح منافذ لاستقبال اتصالات الشبكة. العمليات الأخرى لها أدوار شرعية في الشبكة.",
+      "en": "lsass.exe is responsible for local logins and is not supposed to open ports for incoming network connections. The others have legitimate network roles."
+    },
+    "hint": {
+      "ar": "هذه العملية تتعامل مع كلمات المرور والمصادقة المحلية.",
+      "en": "This process handles passwords and local authentication."
+    },
+    "difficulty": "hard",
+    "conceptId": "volatility-connscan-sockets"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "عن أي توقيع يبحث أمر malfind لتحديد بداية الملفات التنفيذية المحقونة؟",
+      "en": "What signature does the malfind command look for to identify the start of injected executables?"
+    },
+    "options": {
+      "ar": [
+        "EXE",
+        "DLL",
+        "MZ",
+        "PE"
+      ],
+      "en": [
+        "EXE",
+        "DLL",
+        "MZ",
+        "PE"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يبحث malfind عن الحرفين MZ (بالنظام الست عشري 4D 5A) وهما يمثلان ترويسة الملفات التنفيذية في ويندوز.",
+      "en": "malfind looks for the characters MZ (hex 4D 5A), which represent the header of Windows executables."
+    },
+    "hint": {
+      "ar": "حرفان يمثلان الأحرف الأولى لمصمم صيغة الملفات التنفيذية القديمة.",
+      "en": "Two letters representing the initials of the designer of the old executable format."
+    },
+    "difficulty": "easy",
+    "conceptId": "volatility-malfind"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي الوظائف الرئيسية الثلاث لأداة Redline؟",
+      "en": "What are the three major functions of the Redline tool?"
+    },
+    "options": {
+      "ar": [
+        "تفريغ الذاكرة، كسر كلمات المرور، فحص الشبكة",
+        "جمع البيانات، تحليل البيانات، تحليل مؤشرات الاختراق (IOC)",
+        "حذف الفيروسات، تحديث النظام، مراقبة الأداء",
+        "تشفير الملفات، فك التشفير، إخفاء البيانات"
+      ],
+      "en": [
+        "Memory dumping, password cracking, network scanning",
+        "Data collection, Data analysis, IOC analysis",
+        "Virus removal, system update, performance monitoring",
+        "File encryption, decryption, steganography"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تم تصميم Redline خصيصاً لجمع بيانات الذاكرة، وتحليلها عبر طرق عرض مختلفة، والبحث عن مؤشرات الاختراق (IOCs).",
+      "en": "Redline is specifically designed for memory data collection, analysis through various views, and searching for IOCs."
+    },
+    "hint": {
+      "ar": "تذكر الخطوات: احصل على البيانات، افهمها، وابحث عن التهديدات المعروفة.",
+      "en": "Remember the steps: get data, understand it, and look for known threats."
+    },
+    "difficulty": "easy",
+    "conceptId": "redline-overview-collection"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لاستخدام مُجمّع Redline (Collector) بدلاً من تفريغ الذاكرة التقليدي؟",
+      "en": "What is the main advantage of using a Redline Collector instead of a traditional memory dump?"
+    },
+    "options": {
+      "ar": [
+        "أنه أسرع بكثير في التنفيذ.",
+        "أنه يجمع بيانات متطايرة إضافية مثل سجلات الأحداث ومعلومات النظام.",
+        "أنه يقوم بحذف البرمجيات الخبيثة تلقائياً أثناء الجمع.",
+        "أنه لا يتطلب صلاحيات المسؤول (Administrator)."
+      ],
+      "en": [
+        "It is much faster to execute.",
+        "It gathers additional volatile data like event logs and system information.",
+        "It automatically deletes malware during collection.",
+        "It does not require Administrator privileges."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يسمح المُجمّع بجمع سياق أوسع للنظام (مثل السجلات والملفات) مما يسهل تحليل IOC لاحقاً، وهو ما لا يوفره تفريغ الذاكرة الخام وحده.",
+      "en": "The collector allows gathering a broader system context (like logs and files) which facilitates later IOC analysis, something a raw memory dump alone doesn't provide."
+    },
+    "hint": {
+      "ar": "فكر في 'السياق' الإضافي الذي تحتاجه لفهم ما حدث في النظام.",
+      "en": "Think about the extra 'context' needed to understand what happened on the system."
+    },
+    "difficulty": "medium",
+    "conceptId": "redline-overview-collection"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "بأي صيغة يتم كتابة وتخزين مواصفات مؤشرات الاختراق (IOC) في Redline؟",
+      "en": "In what format are Indicator of Compromise (IOC) specifications written and stored in Redline?"
+    },
+    "options": {
+      "ar": [
+        "JSON",
+        "TXT",
+        "XML",
+        "CSV"
+      ],
+      "en": [
+        "JSON",
+        "TXT",
+        "XML",
+        "CSV"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تستخدم Redline ملفات XML لتنظيم وتخزين مؤشرات الاختراق.",
+      "en": "Redline uses XML files to structure and store Indicators of Compromise."
+    },
+    "hint": {
+      "ar": "لغة ترميز شائعة تستخدم العلامات (Tags) مثل HTML.",
+      "en": "A common markup language that uses tags like HTML."
+    },
+    "difficulty": "easy",
+    "conceptId": "redline-ioc-analysis"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي طريقة العرض في Redline الأفضل لتتبع تسلسل هجوم البرمجيات الخبيثة خطوة بخطوة؟",
+      "en": "Which Redline view is best for tracing the step-by-step sequence of a malware attack?"
+    },
+    "options": {
+      "ar": [
+        "System Information",
+        "Host Based Investigation (Timeline)",
+        "Web History Data",
+        "IOC Search"
+      ],
+      "en": [
+        "System Information",
+        "Host Based Investigation (Timeline)",
+        "Web History Data",
+        "IOC Search"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتيح طريقة عرض التحقيق المستند إلى المضيف إنشاء جدول زمني (Timeline) يدمج جميع الأحداث ترتيباً زمنياً.",
+      "en": "The Host Based Investigation view allows creating a timeline that merges all events chronologically."
+    },
+    "hint": {
+      "ar": "أنت تبحث عن أداة ترتب الأحداث حسب الوقت.",
+      "en": "You are looking for a tool that orders events by time."
+    },
+    "difficulty": "medium",
+    "conceptId": "redline-analysis-views"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هو الإجراء الموصى به بعد الحصول على نتائج إيجابية من أمر malfind؟",
+      "en": "What is the recommended action after getting positive hits from the malfind command?"
+    },
+    "options": {
+      "ar": [
+        "حذف العملية فوراً من النظام.",
+        "تجاهل النتائج لأنها دائماً إيجابيات خاطئة.",
+        "فحص المخرجات باستخدام برامج مكافحة الفيروسات أو VirusTotal.",
+        "إعادة تشغيل الجهاز لمسح الذاكرة."
+      ],
+      "en": [
+        "Immediately delete the process from the system.",
+        "Ignore the results as they are always false positives.",
+        "Examine the output using antivirus software or VirusTotal.",
+        "Restart the machine to clear the memory."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "نظراً لأن malfind يولد إيجابيات خاطئة، يجب دائماً التحقق من الملفات المستخرجة باستخدام أدوات فحص خارجية لتأكيد ما إذا كانت خبيثة أم لا.",
+      "en": "Because malfind generates false positives, extracted files must always be verified using external scanning tools to confirm if they are malicious."
+    },
+    "hint": {
+      "ar": "لا تثق بأداة واحدة فقط، ابحث عن رأي ثانٍ.",
+      "en": "Don't trust just one tool, seek a second opinion."
+    },
+    "difficulty": "medium",
+    "conceptId": "volatility-malfind"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتماد على pslist فقط للتحقق من العمليات. البرمجيات الخبيثة المتقدمة تفصل نفسها من القائمة المرتبطة، لذا يجب دائماً استخدام psscan للمقارنة واكتشاف التناقضات.</template>
+    <template class="content-en">Relying solely on pslist to check processes. Advanced malware unlinks itself from the linked list, so you must always use psscan to compare and find discrepancies.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">العمليات التي تظهر في psscan ولا تظهر في pslist ليست دائماً برمجيات خبيثة؛ قد تكون ببساطة عمليات انتهت للتو ولم يتم الكتابة فوق مساحتها في الذاكرة بعد.</template>
+    <template class="content-en">Processes appearing in psscan but not pslist aren't always malware; they might simply be recently terminated processes whose memory space hasn't been overwritten yet.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قوة مؤشرات الاختراق (IOCs) تكمن في قابليتها للتوسع. بمجرد تحليل جهاز واحد واستخراج الـ IOCs، يمكنك أتمتة فحص آلاف الأجهزة في الشبكة في دقائق.</template>
+    <template class="content-en">The power of IOCs lies in scalability. Once you analyze one machine and extract IOCs, you can automate the scanning of thousands of network endpoints in minutes.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">افتراض أن كل ما يجده malfind هو فيروس. بعض البرامج الشرعية (مثل برامج الحماية) تستخدم تقنيات حقن مشابهة وتظهر كإيجابيات خاطئة (False Positives).</template>
+    <template class="content-en">Assuming everything malfind finds is a virus. Some legitimate software (like security tools) use similar injection techniques and appear as False Positives.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

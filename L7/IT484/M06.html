@@ -1,0 +1,2471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT484" data-module="6" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تحديد الموقع والتتبّع (الجزء الأول) · IT484 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT484" data-page-title-en="IT484">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M05.html" data-gh-next="M07.html" data-gh-card="../../hub/course.html?code=IT484"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#localization-fundamentals" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات تحديد المواقع والتتبع</template>
+        <template class="content-en">Localization and Tracking Fundamentals</template>
+        <span class="content-target">أساسيات تحديد المواقع والتتبع</span>
+      </a>
+      <a href="#gps-limitations-wsn" class="toc-link" data-bilingual>
+        <template class="content-ar">قيود نظام تحديد المواقع العالمي (GPS) في شبكات الاستشعار</template>
+        <template class="content-en">GPS Limitations in WSNs</template>
+        <span class="content-target">قيود نظام تحديد المواقع العالمي (GPS) في شبكات الاستشعار</span>
+      </a>
+      <a href="#localization-problem-abstraction" class="toc-link" data-bilingual>
+        <template class="content-ar">تجريد مشكلة تحديد المواقع</template>
+        <template class="content-en">Localization Problem Abstraction</template>
+        <span class="content-target">تجريد مشكلة تحديد المواقع</span>
+      </a>
+      <a href="#distance-estimation-rssi" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير المسافة: مؤشر قوة الإشارة المستلمة (RSSI)</template>
+        <template class="content-en">Distance Estimation: Received Signal Strength Indication (RSSI)</template>
+        <span class="content-target">تقدير المسافة: مؤشر قوة الإشارة المستلمة (RSSI)</span>
+      </a>
+      <a href="#distance-estimation-hop-count" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير المسافة: عدد قفزات الراديو (Radio Hop Count)</template>
+        <template class="content-en">Distance Estimation: Radio Hop Count</template>
+        <span class="content-target">تقدير المسافة: عدد قفزات الراديو (Radio Hop Count)</span>
+      </a>
+      <a href="#distance-estimation-tdoa" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير المسافة: فرق وقت الوصول (TDOA)</template>
+        <template class="content-en">Distance Estimation: Time Difference of Arrival (TDOA)</template>
+        <span class="content-target">تقدير المسافة: فرق وقت الوصول (TDOA)</span>
+      </a>
+      <a href="#distance-estimation-aoa" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير المسافة: زاوية الوصول (AOA)</template>
+        <template class="content-en">Distance Estimation: Angle of Arrival (AOA)</template>
+        <span class="content-target">تقدير المسافة: زاوية الوصول (AOA)</span>
+      </a>
+      <a href="#localization-algorithms-categories" class="toc-link" data-bilingual>
+        <template class="content-ar">فئات خوارزميات تحديد المواقع</template>
+        <template class="content-en">Localization Algorithms Categories</template>
+        <span class="content-target">فئات خوارزميات تحديد المواقع</span>
+      </a>
+      <a href="#centralized-mds-map" class="toc-link" data-bilingual>
+        <template class="content-ar">الخوارزميات المركزية: MDS-MAP</template>
+        <template class="content-en">Centralized Algorithms: MDS-MAP</template>
+        <span class="content-target">الخوارزميات المركزية: MDS-MAP</span>
+      </a>
+      <a href="#adaptive-beacon-placement" class="toc-link" data-bilingual>
+        <template class="content-ar">وضع العقد المرجعية التكيفي (Adaptive Beacon Placement)</template>
+        <template class="content-en">Adaptive Beacon Placement</template>
+        <span class="content-target">وضع العقد المرجعية التكيفي (Adaptive Beacon Placement)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 6</template>
+      <template class="content-en">Module 6</template>
+      <span class="content-target">الوحدة 6</span>
+    </span> · IT484
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تحديد الموقع والتتبّع (الجزء الأول)</h1>
+      <p class="hero-description">دراسة مفاهيم وخوارزميات تحديد المواقع وتتبع الأهداف في شبكات الاستشعار اللاسلكية، بما في ذلك تقنيات تقدير المسافة وخوارزميات التموضع المركزية والموزعة.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Localization and Tracking (Part 1)</h1>
+      <p class="hero-description">Study of localization and target tracking concepts and algorithms in WSNs, including distance estimation techniques and centralized/distributive localization algorithms.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تحديد المواقع</span>
+      <span class="tag">تتبع الأهداف</span>
+      <span class="tag">تقدير المسافة</span>
+      <span class="tag">MDS-MAP</span>
+      <span class="tag">RSSI</span>
+      <span class="tag">TDOA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Localization</span>
+      <span class="tag">Target Tracking</span>
+      <span class="tag">Distance Estimation</span>
+      <span class="tag">MDS-MAP</span>
+      <span class="tag">RSSI</span>
+      <span class="tag">TDOA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم المفهوم الأساسي لتحديد المواقع في شبكات الاستشعار اللاسلكية.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف خوارزميات تحديد المواقع في شبكات الاستشعار اللاسلكية.</span></li>
+      <li><span class="obj-icon">✦</span><span>مناقشة تتبع الأهداف من خلال نشر عقد الاستشعار.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the fundamental concept of localization in WSNs.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe localization algorithms in WSNs.</span></li>
+      <li><span class="obj-icon">✦</span><span>Discuss target tracking by deploying sensor nodes.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="localization-fundamentals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات تحديد المواقع والتتبع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Localization and Tracking Fundamentals</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحديد المواقع هو معرفة مكان الجهاز بدون بنية تحتية إضافية كالأقمار الصناعية، وهو ضروري لتتبع الأهداف.</p></template>
+    <template class="content-en"><p>Localization is determining a device's location without additional infrastructure like satellites, essential for target tracking.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Localization" data-ar="تحديد المواقع" data-en-def="Determining the location of a device in the absence of additional infrastructure.">تحديد المواقع<span class="smart-term-tooltip"></span></span> (Localization) يشير إلى تحديد موقع الجهاز في غياب البنية التحتية الإضافية. تعود أصول هذه المشكلة إلى علم الروبوتات. في شبكات الاستشعار اللاسلكية (WSNs)، ترتبط المعلومات المقدمة ارتباطاً وثيقاً بالمكان والزمان.</p><p><span class="smart-term" data-term-en="Target Tracking" data-ar="تتبع الأهداف" data-en-def="Monitoring the location of a target at different times.">تتبع الأهداف<span class="smart-term-tooltip"></span></span> (Target Tracking) يتطلب معرفة موقع الهدف في أوقات مختلفة. من تطبيقاته المراقبة العسكرية وتتبع حرائق الغابات. يتطلب التتبع الناجح تحديد موقع كل من العقدة والهدف.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Localization" data-ar="تحديد المواقع" data-en-def="Determining the location of a device in the absence of additional infrastructure.">Localization<span class="smart-term-tooltip"></span></span> refers to determining the location of a device in the absence of additional infrastructure. The problem has its origins in robotics. In WSNs, information provided is highly correlated with respect to space and time.</p><p><span class="smart-term" data-term-en="Target Tracking" data-ar="تتبع الأهداف" data-en-def="Monitoring the location of a target at different times.">Target tracking<span class="smart-term-tooltip"></span></span> requires knowledge about a target's location at different times. Applications include military tracking and forest fire monitoring. Successful target tracking requires both node and target localization.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تختلف مشكلة تحديد المواقع في شبكات الاستشعار اللاسلكية عن الشبكات الأخرى لأن عقد الاستشعار هي أجهزة صغيرة منخفضة الطاقة.</p><p>تحدد العقد مواقعها الجغرافية باستخدام تقنيات تحديد المواقع المدعومة خارجياً أو التحديد الذاتي للمواقع.</p><p>يجب أن تحافظ مخططات تتبع الأهداف على التوازن بين موارد الشبكة مثل استهلاك الطاقة، وعرض النطاق الترددي للاتصالات، وعبء البروتوكول.</p></template>
+    <template class="content-en"><p>The localization problem for WSNs is very different from other networks since sensor nodes are small low-powered devices.</p><p>Nodes determine their geographic positions by using externally aided localization or self-localization techniques.</p><p>Target tracking schemes must maintain a balance between network resources such as power consumption, communication bandwidth, and protocol overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تحديد موقع العقدة (Node Localization) شرطاً مسبقاً لتتبع الهدف (Target Tracking)؟</template>
+      <template class="content-en">Why is node localization a prerequisite for target tracking?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن العقدة التي تكتشف الهدف يجب أن تعرف موقعها الخاص أولاً لكي تتمكن من الإبلاغ عن الإحداثيات الجغرافية الدقيقة للهدف المكتشف إلى المحطة الأساسية.</p></template>
+      <template class="content-en"><p>Because the node detecting the target must first know its own location in order to report the accurate geographical coordinates of the detected target to the base station.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="gps-limitations-wsn" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> قيود نظام تحديد المواقع العالمي (GPS) في شبكات الاستشعار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> GPS Limitations in WSNs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام GPS في كل عقدة غير عملي بسبب التكلفة العالية، واستهلاك الطاقة، وعدم عمله في الأماكن المغلقة.</p></template>
+    <template class="content-en"><p>Using GPS in every node is impractical due to high cost, energy consumption, and inability to work indoors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>على الرغم من أن نظام تحديد المواقع العالمي (GPS) يمكنه تحديد المواقع بدقة تصل إلى بضعة أمتار، إلا أن استخدامه في شبكات الاستشعار اللاسلكية التي تحتوي على آلاف العقد غير مجدٍ لثلاثة أسباب رئيسية:</p><ol><li><b>التكلفة:</b> مستقبلات GPS باهظة الثمن، وتزويد كل عقدة بها سيزيد من تكلفة نشر الشبكة بشكل كبير.</li><li><b>الطاقة:</b> شبكات الاستشعار مقيدة الطاقة بطبيعتها، واستخدام GPS ليس حلاً موفراً للطاقة.</li><li><b>البيئة:</b> لا يعمل GPS في البيئات الداخلية (Indoors)، وتتأثر كفاءته بالعوامل البيئية مثل المباني الكبيرة.</li></ol></template>
+    <template class="content-en"><p>Although GPS can find positions within a few meters of accuracy, its use in WSNs with thousands of nodes is not feasible for three main reasons:</p><ol><li><b>Cost:</b> A GPS receiver is expensive, and the deployment cost increases significantly if built inside every node.</li><li><b>Energy:</b> WSNs are intrinsically energy-constrained, and GPS is not an energy-efficient solution.</li><li><b>Environment:</b> GPS does not work in indoor environments, and large buildings affect its performance.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بسبب هذه القيود، تعتمد شبكات الاستشعار اللاسلكية على عدد قليل من العقد المجهزة بـ GPS (تسمى العقد المرجعية أو Beacons) بينما تقوم العقد الأخرى (Unknown nodes) بحساب مواقعها بناءً على المسافة أو الزاوية بالنسبة لهذه العقد المرجعية.</p></template>
+    <template class="content-en"><p>Due to these limitations, WSNs rely on a small fraction of GPS-equipped nodes (called beacons or anchors), while the rest (<span class="smart-term" data-term-en="Unknown Node" data-ar="العقدة المجهولة" data-en-def="A node that does not know its position at the beginning.">unknown node<span class="smart-term-tooltip"></span></span>s) calculate their locations based on distance or angle relative to these beacons.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان GPS غير عملي، فكيف يمكن لشبكة استشعار مراقبة مبنى من الداخل تحديد مواقع العقد؟</template>
+      <template class="content-en">If GPS is impractical, how can an indoor building monitoring WSN localize its nodes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال نشر عدد قليل من العقد المرجعية (Beacons) في مواقع معروفة مسبقاً (مثل زوايا الغرف)، واستخدام تقنيات التحديد الذاتي للمواقع مثل RSSI أو TDOA للعقد الأخرى لتقدير المسافة وحساب الموقع.</p></template>
+      <template class="content-en"><p>By deploying a few beacon nodes at pre-known locations (e.g., room corners) and using self-localization techniques like RSSI or TDOA for the unknown nodes to estimate distance and calculate their positions.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="localization-problem-abstraction" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تجريد مشكلة تحديد المواقع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Localization Problem Abstraction</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُمثّل الشبكة كرسم بياني حيث تمثل الحواف القدرة على الاتصال المباشر، والهدف هو إيجاد إحداثيات العقد المجهولة باستخدام العقد المرجعية.</p></template>
+    <template class="content-en"><p>The network is modeled as a graph where edges represent direct communication, aiming to find coordinates of unknown nodes using beacon nodes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم تجريد مشكلة تحديد المواقع رياضياً على النحو التالي:</p><ul><li>تُمثل شبكة الاستشعار اللاسلكية كرسم بياني $G = (V, E)$، حيث $|V| = N$ (عدد العقد).</li><li>توجد حافة (Edge) بين عقدتين إذا كان بإمكانهما الاتصال ببعضهما مباشرة (ضمن نطاق الاتصال $R$).</li><li>$B$ يمثل مجموعة العقد المرجعية (Beacon nodes) ذات الإحداثيات المعروفة $(x_b, y_b)$ لجميع $b \in B$، حيث $B \subseteq V$.</li><li>الهدف هو تحديد المواقع $(x_u, y_u)$ لجميع العقد المجهولة $u \in U$.</li></ul></template>
+    <template class="content-en"><p>The localization problem is abstracted mathematically as follows:</p><ul><li>A WSN is represented by a graph $G = (V, E)$, where $|V| = N$.</li><li>An edge exists between two nodes if they can communicate directly (within communication range $R$).</li><li>$B$ indicates the set of beacon nodes with known coordinates $(x_b, y_b)$ for all $b \in B$, and $B \subseteq V$.</li><li>The goal is to determine the positions $(x_u, y_u)$ for all unknown nodes $u \in U$.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تتضمن المشكلة قضيتين رئيسيتين:</p><ol><li>كيفية تحديد نظام الإحداثيات، و</li><li>كيفية حساب المسافة بين عقدتين.</li></ol><p>تقوم العقد المجهولة بحساب موقعها بالرجوع إلى عدد معين من العقد المرجعية باستخدام منهجيات مختلفة لقياس المسافة (Ranging) والاتجاه (Direction).</p></template>
+    <template class="content-en"><p>The problem involves two main issues:</p><ol><li>how to define the coordinate system, and</li><li>how to calculate the distance between two nodes.</li></ol><p>Unknown nodes calculate their location by referencing a certain number of anchors using various ranging and direction methodologies.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تمثيل الشبكة كرسم بياني حيث V هي العقد و E هي روابط الاتصال.</strong></template>
+      <template class="content-en"><strong>Graph representation of the network where V are nodes and E are communication links.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$G = (V, E)$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A 2D plane showing a graph representation of a WSN. Use dark background #0d1117. Draw 5 solid dark grey circles labeled 'Beacon node' with known (x,y) coordinates next to them. Draw 10 empty white circles with grey borders labeled 'Unknown node'. Draw dashed lines connecting some nodes to represent edges (communication range R). Add a legend at the bottom right distinguishing Beacon nodes and Unknown nodes. Style: educational, clean, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">WSN Localization Graph Model G = (V, E)</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نموذج بيان تموضع شبكة المستشعرات اللاسلكية G = (V, E)</text>
+
+    <!-- Communication Range Indicator (around B3) -->
+    <circle cx="320" cy="260" r="130" fill="var(--brand-500)" fill-opacity="0.06" stroke="var(--brand-400)" stroke-dasharray="6,6" stroke-width="1.5"/>
+    <line x1="320" y1="260" x2="445" y2="260" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="385" y="252" text-anchor="middle" font-size="14" fill="var(--brand-ink)" font-weight="bold" class="gsvg-en">Range R</text>
+    <text x="385" y="252" text-anchor="middle" font-size="14" fill="var(--brand-ink)" font-weight="bold" class="gsvg-ar">النطاق R</text>
+
+    <!-- Edges (Communication Links) -->
+    <g stroke="var(--brand-400)" stroke-dasharray="5,5" stroke-width="1.5" opacity="0.6">
+        <!-- B1 connections -->
+        <line x1="150" y1="120" x2="240" y2="170"/>
+        <line x1="150" y1="120" x2="100" y2="260"/>
+        <line x1="150" y1="120" x2="320" y2="90"/>
+        <!-- B2 connections -->
+        <line x1="480" y1="120" x2="400" y2="180"/>
+        <line x1="480" y1="120" x2="320" y2="90"/>
+        <line x1="480" y1="120" x2="560" y2="260"/>
+        <!-- B3 connections -->
+        <line x1="320" y1="260" x2="240" y2="170"/>
+        <line x1="320" y1="260" x2="400" y2="180"/>
+        <line x1="320" y1="260" x2="220" y2="290"/>
+        <line x1="320" y1="260" x2="420" y2="300"/>
+        <line x1="320" y1="260" x2="320" y2="380"/>
+        <!-- B4 connections -->
+        <line x1="160" y1="400" x2="220" y2="290"/>
+        <line x1="160" y1="400" x2="100" y2="260"/>
+        <line x1="160" y1="400" x2="240" y2="450"/>
+        <line x1="160" y1="400" x2="320" y2="380"/>
+        <!-- B5 connections -->
+        <line x1="500" y1="400" x2="420" y2="300"/>
+        <line x1="500" y1="400" x2="560" y2="260"/>
+        <line x1="500" y1="400" x2="420" y2="450"/>
+        <line x1="500" y1="400" x2="320" y2="380"/>
+        <!-- U-U connections -->
+        <line x1="240" y1="170" x2="320" y2="90"/>
+        <line x1="240" y1="170" x2="220" y2="290"/>
+        <line x1="400" y1="180" x2="420" y2="300"/>
+        <line x1="220" y1="290" x2="100" y2="260"/>
+        <line x1="420" y1="300" x2="560" y2="260"/>
+        <line x1="320" y1="380" x2="240" y2="450"/>
+        <line x1="320" y1="380" x2="420" y2="450"/>
+    </g>
+
+    <!-- Node Highlights (Glow for Beacons) -->
+    <g fill="var(--brand-500)" opacity="0.15">
+        <circle cx="150" cy="120" r="22"/>
+        <circle cx="480" cy="120" r="22"/>
+        <circle cx="320" cy="260" r="22"/>
+        <circle cx="160" cy="400" r="22"/>
+        <circle cx="500" cy="400" r="22"/>
+    </g>
+
+    <!-- Edges to Nodes (Drawing nodes on top of lines) -->
+    
+    <!-- Unknown Nodes (U) -->
+    <g fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2.5">
+        <circle cx="240" cy="170" r="10"/>
+        <circle cx="400" cy="180" r="10"/>
+        <circle cx="220" cy="290" r="10"/>
+        <circle cx="420" cy="300" r="10"/>
+        <circle cx="320" cy="380" r="10"/>
+        <circle cx="100" cy="260" r="10"/>
+        <circle cx="560" cy="260" r="10"/>
+        <circle cx="240" cy="450" r="10"/>
+        <circle cx="420" cy="450" r="10"/>
+        <circle cx="320" cy="90" r="10"/>
+    </g>
+
+    <!-- Beacon Nodes (B) -->
+    <g fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2">
+        <circle cx="150" cy="120" r="14"/>
+        <circle cx="480" cy="120" r="14"/>
+        <circle cx="320" cy="260" r="14"/>
+        <circle cx="160" cy="400" r="14"/>
+        <circle cx="500" cy="400" r="14"/>
+    </g>
+
+    <!-- Labels for Beacon Nodes -->
+    <g font-size="14" font-weight="bold" fill="var(--text-primary)">
+        <text x="150" y="92" text-anchor="middle">B₁ (x₁, y₁)</text>
+        <text x="480" y="92" text-anchor="middle">B₂ (x₂, y₂)</text>
+        <text x="320" y="232" text-anchor="middle">B₃ (x₃, y₃)</text>
+        <text x="160" y="432" text-anchor="middle">B₄ (x₄, y₄)</text>
+        <text x="500" y="432" text-anchor="middle">B₅ (x₅, y₅)</text>
+    </g>
+
+    <!-- Labels for Unknown Nodes -->
+    <g font-size="13" fill="var(--text-secondary)">
+        <text x="240" y="150" text-anchor="middle">U₁ (x, y)?</text>
+        <text x="400" y="160" text-anchor="middle">U₂ (x, y)?</text>
+        <text x="220" y="318" text-anchor="middle">U₃ (x, y)?</text>
+        <text x="420" y="328" text-anchor="middle">U₄ (x, y)?</text>
+        <text x="320" y="410" text-anchor="middle">U₅ (x, y)?</text>
+        <text x="100" y="288" text-anchor="middle">U₆ (x, y)?</text>
+        <text x="560" y="288" text-anchor="middle">U₇ (x, y)?</text>
+        <text x="240" y="478" text-anchor="middle">U₈ (x, y)?</text>
+        <text x="420" y="478" text-anchor="middle">U₉ (x, y)?</text>
+        <text x="320" y="68" text-anchor="middle">U₁₀ (x, y)?</text>
+    </g>
+
+    <!-- Legend -->
+    <g transform="translate(580, 320)">
+        <rect x="0" y="0" width="200" height="160" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" rx="8"/>
+        
+        <text x="100" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Legend</text>
+        <text x="100" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مفتاح الرسم</text>
+        
+        <!-- Beacon Node Legend Item -->
+        <circle cx="30" cy="60" r="12" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2"/>
+        <text x="115" y="65" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Beacon Node (b ∈ B)</text>
+        <text x="115" y="65" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">عقدة مرجعية (b ∈ B)</text>
+        
+        <!-- Unknown Node Legend Item -->
+        <circle cx="30" cy="100" r="9" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2.5"/>
+        <text x="115" y="105" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Unknown Node (u ∈ U)</text>
+        <text x="115" y="105" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">عقدة مجهولة (u ∈ U)</text>
+        
+        <!-- Communication Edge Legend Item -->
+        <line x1="18" y1="140" x2="42" y2="140" stroke="var(--brand-400)" stroke-dasharray="4,4" stroke-width="2"/>
+        <text x="115" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-en">Comm. Edge (e ∈ E)</text>
+        <text x="115" y="145" text-anchor="middle" font-size="15" fill="var(--text-primary)" class="gsvg-ar">حافة اتصال (e ∈ E)</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا تمثل الحافة (Edge) في الرسم البياني لشبكة الاستشعار؟</template>
+      <template class="content-en">What does an edge represent in the WSN graph?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تمثل الحافة أن المسافة الإقليدية بين العقدتين أقل من أو تساوي الحد الأقصى لنطاق الراديو (R)، مما يسمح بالاتصال المباشر.</p></template>
+      <template class="content-en"><p>An edge represents that the Euclidean distance between the two nodes is less than or equal to the maximum radio range (R), allowing direct communication.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distance-estimation-rssi" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تقدير المسافة: مؤشر قوة الإشارة المستلمة (RSSI)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Distance Estimation: Received Signal Strength Indication (RSSI)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقدير المسافة بناءً على مدى ضعف الإشارة عند وصولها؛ كلما كانت أضعف، كانت المسافة أبعد.</p></template>
+    <template class="content-en"><p>Estimating distance based on how weak the signal is upon arrival; the weaker it is, the farther the distance.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتناقص طاقة إشارة الراديو بشكل يتناسب مع مربع المسافة التي تقطعها عند انتشارها عبر وسط معين.</p><p>لذلك، يمكن للمستقبل تقدير مسافته من المصدر من خلال معرفة قوة الإشارة عند المصدر وقوة الإشارة عند المستقبل.</p><p>العلاقة بين الطاقة المستلمة والمسافة هي: $P_r = k d^{-\alpha}$</p><ul><li>$P_r$: طاقة الإشارة المستلمة.</li><li>$k$: ثابت يعتمد على التردد والطاقة المرسلة.</li><li>$d$: المسافة بين المرسل والمستقبل.</li><li>$\alpha$: <span class="smart-term" data-term-en="Attenuation Exponent" data-ar="أُس التوهين" data-en-def="A parameter (alpha) describing how quickly a signal&#x27;s power decays with distance.">أُس التوهين<span class="smart-term-tooltip"></span></span> (Attenuation exponent).</li></ul></template>
+    <template class="content-en"><p>The energy of a radio signal decreases proportional to the square of the distance traveled by it when the signal propagates through a medium.</p><p>So, a receiver can estimate its distance from the source by knowing the signal strength at the source end and the strength of the signal at the receiver end.</p><p>The relation between received power and distance is: $P_r = k d^{-\alpha}$</p><ul><li>$P_r$: power of the received signal.</li><li>$k$: a constant depending on frequency and transmitted power.</li><li>$d$: distance between transmitter and receiver.</li><li>$\alpha$: <span class="smart-term" data-term-en="Attenuation Exponent" data-ar="أُس التوهين" data-en-def="A parameter (alpha) describing how quickly a signal&#x27;s power decays with distance.">attenuation exponent<span class="smart-term-tooltip"></span></span>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>القيود:</b> قياسات RSSI تحتوي على ضوضاء (Noise) يمكن أن تصل إلى عدة أمتار، خاصة في بعض المناطق مثل الأماكن المغلقة (Indoors) بسبب الانعكاسات وتعدد المسارات (Multipath fading).</p></template>
+    <template class="content-en"><p><b>Limitations:</b> <span class="smart-term" data-term-en="RSSI" data-ar="مؤشر قوة الإشارة المستلمة" data-en-def="Received Signal Strength Indication; a measurement of the power present in a received radio signal.">RSSI<span class="smart-term-tooltip"></span></span> measurements contain noise up to several meters in a few areas such as indoors, largely due to reflections and multipath fading.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة RSSI لتقدير المسافة بناءً على تدهور طاقة الإشارة.</strong></template>
+      <template class="content-en"><strong>RSSI formula to estimate distance based on signal power degradation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P_r = k d^{-\alpha}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تكون دقة RSSI منخفضة في الأماكن المغلقة؟</template>
+      <template class="content-en">Why is RSSI accuracy low indoors?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بسبب العوائق والجدران التي تسبب انعكاس الإشارة وتشتتها (تأثير المسارات المتعددة)، مما يجعل قوة الإشارة المستلمة لا تعكس المسافة الحقيقية بدقة.</p></template>
+      <template class="content-en"><p>Due to obstacles and walls causing signal reflection and scattering (multipath effect), making the received signal strength an inaccurate reflection of the true distance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distance-estimation-hop-count" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تقدير المسافة: عدد قفزات الراديو (Radio Hop Count)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Distance Estimation: Radio Hop Count</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقدير المسافة عن طريق ضرب عدد القفزات (Hops) في متوسط المسافة لكل قفزة.</p></template>
+    <template class="content-en"><p>Estimating distance by multiplying the number of hops by the expected distance per hop.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>إذا تمكنت عقدتان من الاتصال المباشر، فإن المسافة بينهما $\le R$ (نطاق الراديو).</p><p>طول أقصر مسار بين العقدتين $s_i$ و $s_j$ هو $h_{ij}$ (<span class="smart-term" data-term-en="Hop Count" data-ar="عدد القفزات" data-en-def="The number of intermediate devices through which data must pass between source and destination.">عدد القفزات<span class="smart-term-tooltip"></span></span>).</p><p>المسافة المتوقعة المقطوعة لكل قفزة اتصال يُرمز لها بـ $d_{hop}$.</p><p>يتم حساب المسافة $d_{ij}$ كالتالي: $d_{ij} \approx h_{ij} \times d_{hop}$</p><p>في الحالة المثالية، المسافة تساوي $h_{ij} \times R$.</p></template>
+    <template class="content-en"><p>If two nodes can directly communicate, the distance between them is $\le R$ (radio range). The length of the shortest path between nodes $s_i$ and $s_j$ is $h_{ij}$ (<span class="smart-term" data-term-en="Hop Count" data-ar="عدد القفزات" data-en-def="The number of intermediate devices through which data must pass between source and destination.">hop count<span class="smart-term-tooltip"></span></span>).</p><p>The expected distance covered per communication hop is denoted as $d_{hop}$.</p><p>Then $d_{ij}$ can be calculated as: $d_{ij} \approx h_{ij} \times d_{hop}$</p><p>In the ideal case, this distance is equal to $h_{ij} \times R$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>القيود:</b> يتم حساب المسافة كمضاعفات صحيحة لـ $d_{hop}$، مما يبرر وجود عدم دقة (Inaccuracy) تصل إلى حوالي $0.5R$ في كل قياس.</p><p>كما أن العوائق البيئية قد تؤثر على الاتصال، مما يجعل مسار القفزات يلتف حول العائق، مما يعطي مسافة مقدرة أكبر بكثير من المسافة الإقليدية الحقيقية.</p></template>
+    <template class="content-en"><p><b>Limitations:</b> The distance is calculated as integral multiples of $d_{hop}$, which justifies an inaccuracy of almost $0.5R$ in every measurement.</p><p>Also, environmental obstacles may influence connectivity, causing the hop path to curve around the obstacle, yielding an estimated distance much larger than the true Euclidean distance.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تقدير المسافة باستخدام عدد القفزات.</strong></template>
+      <template class="content-en"><strong>Distance estimation using hop count.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$d_{ij} \approx h_{ij} \times d_{hop}$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show a WSN with an obstacle. Draw nodes A, B, C, D, E, F, G. Draw a large grey irregular shape representing an 'Obstruction' between A and E. Show a path of dashed arrows from A -> B -> C -> F (Hop count AF = 3). Show another path B -> D -> E. Show that the physical distance AE is short, but the hop count path has to go around the obstruction, illustrating the error in hop-count distance estimation. Style: educational, dark background #0d1117, accent colors for paths, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Distance Estimation: Radio Hop Count</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تقدير المسافة: عدد القفزات الراديوية</text>
+
+    <!-- Radio Range Circle for Node A -->
+    <circle cx="200" cy="320" r="195" fill="var(--brand-500)" opacity="0.05" />
+    <circle cx="200" cy="320" r="195" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="8,4" />
+    
+    <!-- Label for Radio Range -->
+    <text x="200" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Radio Range (R)</text>
+    <text x="200" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">النطاق الراديوي (R)</text>
+
+    <!-- Obstruction Shape -->
+    <path d="M 260 240 Q 320 200 340 260 T 350 340 Q 330 400 280 380 T 230 320 Q 220 270 260 240 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" stroke-linejoin="round" />
+    <!-- Obstruction Inner Texture Lines -->
+    <path d="M 250 270 Q 280 250 300 290 M 320 240 Q 310 280 330 320 M 260 350 Q 290 370 310 340" stroke="var(--text-muted)" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round" />
+    
+    <!-- Obstruction Label -->
+    <text x="295" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Obstruction</text>
+    <text x="295" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">عائق</text>
+
+    <!-- Direct Blocked Path (A to E) -->
+    <line x1="200" y1="320" x2="380" y2="320" stroke="var(--text-muted)" stroke-width="2.5" stroke-dasharray="4,4" />
+    <!-- X mark indicating blockage -->
+    <g transform="translate(295, 320)">
+        <line x1="-8" y1="-8" x2="8" y2="8" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round" />
+        <line x1="-8" y1="8" x2="8" y2="-8" stroke="var(--text-primary)" stroke-width="3" stroke-linecap="round" />
+    </g>
+    
+    <!-- Label for short physical distance -->
+    <text x="295" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Short physical distance (Blocked)</text>
+    <text x="295" y="345" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">مسافة مادية قصيرة (مسدودة)</text>
+
+    <!-- Edges (Paths) -->
+    <!-- Path 1: A -> B -> C -> F -->
+    <line x1="200" y1="320" x2="150" y2="150" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    <line x1="150" y1="150" x2="320" y2="90" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    <line x1="320" y1="90" x2="500" y2="90" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    
+    <!-- Path 2: B -> D -> E -->
+    <line x1="150" y1="150" x2="340" y2="170" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    <line x1="340" y1="170" x2="380" y2="320" stroke="var(--brand-500)" stroke-width="2.5" stroke-dasharray="6,4" marker-end="url(#arrow)" />
+    
+    <!-- Extra edge E -> G -->
+    <line x1="380" y1="320" x2="550" y2="320" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-muted)" />
+
+    <!-- Nodes -->
+    <!-- Node A -->
+    <circle cx="200" cy="320" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="200" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">A</text>
+    
+    <!-- Node B -->
+    <circle cx="150" cy="150" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="150" y="156" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">B</text>
+    
+    <!-- Node C -->
+    <circle cx="320" cy="90" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="320" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">C</text>
+    
+    <!-- Node D -->
+    <circle cx="340" cy="170" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="340" y="176" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">D</text>
+    
+    <!-- Node E -->
+    <circle cx="380" cy="320" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="380" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">E</text>
+    
+    <!-- Node F -->
+    <circle cx="500" cy="90" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="500" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">F</text>
+    
+    <!-- Node G -->
+    <circle cx="550" cy="320" r="20" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+    <text x="550" y="326" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">G</text>
+
+    <!-- Path Annotations -->
+    <!-- Hop count AF = 3 -->
+    <rect x="330" y="50" width="160" height="26" rx="4" fill="var(--bg-surface)" opacity="0.8" />
+    <text x="410" y="68" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Hop count AF = 3</text>
+    <text x="410" y="68" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">عدد القفزات AF = 3</text>
+    
+    <!-- Hop count AE = 3 -->
+    <rect x="370" y="200" width="160" height="26" rx="4" fill="var(--bg-surface)" opacity="0.8" />
+    <text x="450" y="218" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Hop count AE = 3</text>
+    <text x="450" y="218" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">عدد القفزات AE = 3</text>
+
+    <!-- Formula Box -->
+    <rect x="410" y="380" width="360" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    
+    <text x="590" y="405" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Distance Estimation Error</text>
+    <text x="590" y="405" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خطأ في تقدير المسافة</text>
+    
+    <!-- Formula -->
+    <text x="590" y="430" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-style="italic" fill="var(--brand-ink)">d<tspan baseline-shift="sub" font-size="12">AE</tspan> ≈ h<tspan baseline-shift="sub" font-size="12">AE</tspan> × d<tspan baseline-shift="sub" font-size="12">hop</tspan></text>
+    
+    <text x="590" y="455" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Estimated distance is 3 hops, but</text>
+    <text x="590" y="455" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">المسافة المقدرة هي 3 قفزات، لكن</text>
+    
+    <text x="590" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">actual physical distance is ≤ 1 hop (R).</text>
+    <text x="590" y="472" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">المسافة المادية الفعلية ≤ قفزة واحدة (R).</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تؤثر العوائق المادية على دقة خوارزمية Hop Count؟</template>
+      <template class="content-en">How do physical obstacles affect the accuracy of the Hop Count algorithm?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تجبر العوائق الإشارات على اتخاذ مسارات أطول (قفزات أكثر) للالتفاف حولها، مما يجعل الخوارزمية تبالغ في تقدير المسافة الحقيقية (الإقليدية) بين العقدتين.</p></template>
+      <template class="content-en"><p>Obstacles force signals to take longer paths (more hops) to route around them, causing the algorithm to overestimate the true (Euclidean) distance between the two nodes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distance-estimation-tdoa" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تقدير المسافة: فرق وقت الوصول (TDOA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Distance Estimation: Time Difference of Arrival (TDOA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام الفرق في سرعة انتشار إشارتين مختلفتين (مثل الراديو والصوت) لحساب المسافة بدقة.</p></template>
+    <template class="content-en"><p>Using the difference in propagation speeds of two different signals (like radio and sound) to calculate distance accurately.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في نهج TDOA، يتم تجهيز كل عقدة بمكبر صوت وميكروفون.</p><ol><li>يرسل المرسل أولاً رسالة راديو.</li><li>بعد إرسال الرسالة، يتأخر لفترة زمنية ثابتة $t_{delay}$، ثم يولد نمطاً صوتياً.</li><li>يسجل المستقبل وقت استلام رسالة الراديو $t_{radio}$ وينتظر إشارة الصوت.</li><li>يسجل وقت استلام إشارة الصوت $t_{sound}$.</li></ol><p>يحسب المستقبل المسافة $d$ كالتالي: <br> $d = (S_{radio} - S_{sound}) \times (t_{sound} - t_{radio} - t_{delay})$</p></template>
+    <template class="content-en"><p>In the <span class="smart-term" data-term-en="TDOA" data-ar="فرق وقت الوصول" data-en-def="Time Difference of Arrival; a technique using the difference in arrival times of two signals to estimate distance.">TDOA<span class="smart-term-tooltip"></span></span> approach, each node is equipped with a speaker and a microphone.</p><ol><li>The transmitter first sends a radio message.</li><li>After sending, it delays for a fixed interval $t_{delay}$, then generates a sound pattern.</li><li>The receiver records the radio receiving time $t_{radio}$ and waits for the sound.</li><li>It records the sound receiving time $t_{sound}$.</li></ol><p>The receiver calculates distance $d$ as: <br> $d = (S_{radio} - S_{sound}) \times (t_{sound} - t_{radio} - t_{delay})$</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>نهج آخر لـ TDOA:</b> يرسل المرسل إشارة إلى مستقبلات متعددة ذات مواقع معروفة.</p><p>يتم إعطاء TDOA لزوج من المستقبلات $i, j$ كالتالي:</p><p>$\Delta t_{ij} = t_i - t_j = \frac{1}{c} (||r_i - r_t|| - ||r_j - r_t||)$</p><p>حيث $c$ هي سرعة انتشار الإشارة، و $||.||$ هي المسافة الإقليدية.</p><p><b>القيود:</b> يتطلب أجهزة إضافية (ميكروفون/مكبر صوت) مما يزيد من التكلفة واستهلاك الطاقة.</p></template>
+    <template class="content-en"><p><b>Another TDOA approach:</b> A transmitter sends a signal to multiple receivers with known locations. The TDOA of a pair of receivers $i, j$ is given as:</p><p>$\Delta t_{ij} = t_i - t_j = \frac{1}{c} (||r_i - r_t|| - ||r_j - r_t||)$</p><p>where $c$ is signal propagation speed, and $||.||$ is Euclidean distance.</p><p><b>Limitations:</b> Requires extra hardware (microphone/speaker), increasing cost and energy consumption.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب المسافة باستخدام فرق وقت الوصول بين الراديو والصوت.</strong></template>
+      <template class="content-en"><strong>Distance calculation using time difference of arrival between radio and sound.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$d = (S_{radio} - S_{sound}) \times (t_{sound} - t_{radio} - t_{delay})$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A timing diagram showing TDOA. Two circles on the left: 'T' (Transmitter) and 'R' (Receiver). A horizontal time axis for both. From T, a vertical arrow goes up to R labeled 'Radio signal' (arriving almost instantly at t_radio). At T, a block labeled 't_delay' occurs, then a diagonal arrow labeled 'Sound signal' goes to R, arriving at 't_sound'. The gap at R between t_radio+t_delay and t_sound is labeled 'd / (S_radio - S_sound)'. Style: educational, dark background #0d1117, clear timeline arrows, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Axis Arrow Marker -->
+    <marker id="axis-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+    
+    <!-- Signal Arrow Marker -->
+    <marker id="signal-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Dimension Line Markers -->
+    <marker id="dim-left" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--text-secondary)" />
+    </marker>
+    <marker id="dim-right" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Axes -->
+  <g id="axes">
+    <!-- Receiver Axis -->
+    <line x1="120" y1="140" x2="750" y2="140" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="740" y="130" text-anchor="end" class="gsvg-en" fill="var(--text-muted)" font-size="13">Time</text>
+    <text x="740" y="130" text-anchor="end" class="gsvg-ar" fill="var(--text-muted)" font-size="13">الزمن</text>
+    
+    <!-- Transmitter Axis -->
+    <line x1="120" y1="320" x2="750" y2="320" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <text x="740" y="310" text-anchor="end" class="gsvg-en" fill="var(--text-muted)" font-size="13">Time</text>
+    <text x="740" y="310" text-anchor="end" class="gsvg-ar" fill="var(--text-muted)" font-size="13">الزمن</text>
+  </g>
+
+  <!-- Nodes (T and R) -->
+  <g id="nodes">
+    <!-- Receiver Node -->
+    <circle cx="70" cy="140" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="70" y="146" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="18">R</text>
+    <text x="70" y="190" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Receiver</text>
+    <text x="70" y="190" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">المستقبل</text>
+
+    <!-- Transmitter Node -->
+    <circle cx="70" cy="320" r="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="70" y="326" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="18">T</text>
+    <text x="70" y="370" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Transmitter</text>
+    <text x="70" y="370" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">المرسل</text>
+  </g>
+
+  <!-- Delay Block -->
+  <g id="delay-block">
+    <rect x="200" y="305" width="150" height="30" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="4" />
+    <text x="275" y="325" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15">t<tspan dy="3" font-size="0.75em">delay</tspan></text>
+    <text x="275" y="325" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15">t<tspan dy="3" font-size="0.75em">delay</tspan> (تأخير)</text>
+  </g>
+
+  <!-- Signals -->
+  <g id="signals">
+    <!-- Radio Signal (Vertical, almost instant) -->
+    <line x1="200" y1="305" x2="200" y2="145" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#signal-arrow)" />
+    <circle cx="200" cy="305" r="4" fill="var(--brand-500)" />
+    <text x="190" y="230" text-anchor="end" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="500">Radio signal</text>
+    <text x="190" y="230" text-anchor="end" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="500">إشارة الراديو</text>
+
+    <!-- Sound Signal (Diagonal, slower) -->
+    <line x1="350" y1="305" x2="600" y2="145" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#signal-arrow)" />
+    <circle cx="350" cy="305" r="4" fill="var(--brand-500)" />
+    <text x="490" y="205" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="500">Sound signal</text>
+    <text x="490" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="500">إشارة الصوت</text>
+    
+    <!-- Projection line for t_delay end -->
+    <line x1="350" y1="305" x2="350" y2="145" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4,4" />
+  </g>
+
+  <!-- Time Annotations on Receiver Axis -->
+  <g id="time-annotations">
+    <!-- t_radio -->
+    <line x1="200" y1="135" x2="200" y2="145" stroke="var(--text-primary)" stroke-width="2" />
+    <text x="200" y="125" text-anchor="middle" fill="var(--text-primary)" font-size="15">t<tspan dy="3" font-size="0.75em">radio</tspan></text>
+
+    <!-- t_radio + t_delay -->
+    <line x1="350" y1="135" x2="350" y2="145" stroke="var(--text-primary)" stroke-width="2" />
+    <text x="350" y="125" text-anchor="middle" fill="var(--text-primary)" font-size="15">t<tspan dy="3" font-size="0.75em">radio</tspan><tspan dy="-3"> + t</tspan><tspan dy="3" font-size="0.75em">delay</tspan></text>
+
+    <!-- t_sound -->
+    <line x1="600" y1="135" x2="600" y2="145" stroke="var(--text-primary)" stroke-width="2" />
+    <text x="600" y="125" text-anchor="middle" fill="var(--text-primary)" font-size="15">t<tspan dy="3" font-size="0.75em">sound</tspan></text>
+  </g>
+
+  <!-- Gap Dimension (Time Difference) -->
+  <g id="gap-dimension">
+    <!-- Dimension Line -->
+    <line x1="350" y1="80" x2="600" y2="80" stroke="var(--text-secondary)" stroke-width="1.5" marker-start="url(#dim-left)" marker-end="url(#dim-right)" />
+    
+    <!-- Broken Guide Lines -->
+    <line x1="350" y1="135" x2="350" y2="130" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />
+    <line x1="350" y1="110" x2="350" y2="70" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />
+    
+    <line x1="600" y1="135" x2="600" y2="130" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />
+    <line x1="600" y1="110" x2="600" y2="70" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2,2" />
+    
+    <!-- Formula Label -->
+    <text x="475" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="15">d / (S<tspan dy="3" font-size="0.75em">radio</tspan><tspan dy="-3"> - S</tspan><tspan dy="3" font-size="0.75em">sound</tspan><tspan dy="-3">)</tspan></text>
+    <text x="475" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="15">d / (S<tspan dy="3" font-size="0.75em">radio</tspan><tspan dy="-3"> - S</tspan><tspan dy="3" font-size="0.75em">sound</tspan><tspan dy="-3">)</tspan></text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم إشارتين (راديو وصوت) في TDOA بدلاً من إشارة راديو واحدة فقط؟</template>
+      <template class="content-en">Why use two signals (radio and sound) in TDOA instead of just one radio signal?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن سرعة الراديو عالية جداً (سرعة الضوء)، مما يجعل قياس وقت الرحلة (Time of Flight) بدقة أمراً صعباً جداً ويتطلب ساعات دقيقة للغاية. استخدام الصوت البطيء نسبياً مع الراديو السريع يخلق فرقاً زمنياً قابلاً للقياس بسهولة.</p></template>
+      <template class="content-en"><p>Because radio speed is extremely high (speed of light), making accurate Time of Flight measurement very difficult and requiring highly precise clocks. Using relatively slow sound alongside fast radio creates an easily measurable time difference.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distance-estimation-aoa" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تقدير المسافة: زاوية الوصول (AOA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Distance Estimation: Angle of Arrival (AOA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحديد الموقع عن طريق قياس الزاوية التي تصل منها الإشارة باستخدام هوائيات موجهة أو بوصلات رقمية.</p></template>
+    <template class="content-en"><p>Determining location by measuring the angle from which a signal arrives using directional antennas or digital compasses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في نهج <span class="smart-term" data-term-en="AOA" data-ar="زاوية الوصول" data-en-def="Angle of Arrival; determining the direction of propagation of a radio-frequency wave incident on an antenna array.">زاوية الوصول<span class="smart-term-tooltip"></span></span> (AOA)، تكون العقد قادرة على استشعار زاوية وصول الإشارة المستلمة.</p><p>يتطلب استشعار AOA تزويد العقد بمصفوفة من الهوائيات (Array of antennas) أو مستقبلات موجات فوق صوتية متعددة.</p><p>تقوم كل عقدة في الشبكة بقياس جميع الزوايا بناءً على محورها الرئيسي (Main axis) أو باستخدام بوصلات رقمية لتحديد الاتجاه بالنسبة للشمال.</p></template>
+    <template class="content-en"><p>In the <span class="smart-term" data-term-en="AOA" data-ar="زاوية الوصول" data-en-def="Angle of Arrival; determining the direction of propagation of a radio-frequency wave incident on an antenna array.">AOA<span class="smart-term-tooltip"></span></span> approach, nodes are capable of sensing the angle of arrival of a received signal.</p><p>AOA sensing requires an array of antennas or multiple ultrasound receivers to be equipped with the nodes.</p><p>Each node in the network measures all angles based on its main axis or using digital compasses to determine direction relative to North.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>القيود:</b> يتطلب AOA أجهزة معقدة ومكلفة (مصفوفات هوائيات)، مما يزيد من حجم العقدة واستهلاكها للطاقة، وهو ما يتعارض غالباً مع قيود شبكات الاستشعار اللاسلكية.</p></template>
+    <template class="content-en"><p><b>Limitations:</b> AOA requires complex and expensive hardware (antenna arrays), increasing node size and power consumption, which often conflicts with WSN constraints.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show three nodes A, B, C forming a triangle. Draw a vertical line representing 'North' next to node B. Show angles theta_ab, theta_bc, theta_ca representing the angles of arrival of signals between the nodes relative to their axes. Style: educational, dark background #0d1117, clear angle arcs, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Arrowhead for signal lines -->
+        <marker id="signal-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)" />
+        </marker>
+        
+        <!-- Arrowhead for North axes -->
+        <marker id="north-arrow" viewBox="0 0 10 10" refX="5" refY="2" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 10 L 5 0 L 10 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title and Subtitle -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-size="22" font-weight="bold" fill="var(--text-primary)">Angle of Arrival (AOA) Distance Estimation</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-size="22" font-weight="bold" fill="var(--text-primary)">تقدير المسافة باستخدام زاوية الوصول (AOA)</text>
+    
+    <text x="400" y="65" text-anchor="middle" class="gsvg-en" font-size="15" fill="var(--text-secondary)">Nodes determine the direction of incoming signals relative to their North axis</text>
+    <text x="400" y="65" text-anchor="middle" class="gsvg-ar" font-size="15" fill="var(--text-secondary)">تحدد العقد اتجاه الإشارات الواردة بالنسبة لمحور الشمال الخاص بها</text>
+
+    <!-- Global Compass Rose (Top Left) -->
+    <g transform="translate(80, 110)">
+        <circle cx="0" cy="0" r="25" stroke="var(--border-color)" stroke-width="2" fill="none" />
+        <line x1="0" y1="-30" x2="0" y2="30" stroke="var(--border-color)" stroke-width="1" />
+        <line x1="-30" y1="0" x2="30" y2="0" stroke="var(--border-color)" stroke-width="1" />
+        <path d="M -6 0 L 0 -35 L 6 0 Z" fill="var(--brand-500)" />
+        <text x="0" y="-42" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="bold" fill="var(--text-muted)">N</text>
+        <text x="0" y="-42" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="bold" fill="var(--text-muted)">ش</text>
+    </g>
+
+    <!-- Signal Lines between Nodes -->
+    <!-- A to B -->
+    <path d="M 214.1 365.9 L 377.4 202.6" stroke="var(--brand-400)" stroke-width="2" fill="none" marker-end="url(#signal-arrow)" />
+    <!-- B to C -->
+    <path d="M 414.1 194.1 L 577.4 357.4" stroke="var(--brand-400)" stroke-width="2" fill="none" marker-end="url(#signal-arrow)" />
+    <!-- C to A -->
+    <path d="M 580 380 L 232 380" stroke="var(--brand-400)" stroke-width="2" fill="none" marker-end="url(#signal-arrow)" />
+
+    <!-- North Axes for each Node -->
+    <!-- Node A North -->
+    <line x1="200" y1="360" x2="200" y2="290" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#north-arrow)" />
+    <text x="200" y="275" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-muted)">N</text>
+    <text x="200" y="275" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-muted)">ش</text>
+
+    <!-- Node B North -->
+    <line x1="400" y1="160" x2="400" y2="90" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#north-arrow)" />
+    <text x="400" y="75" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-muted)">N</text>
+    <text x="400" y="75" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-muted)">ش</text>
+
+    <!-- Node C North -->
+    <line x1="600" y1="360" x2="600" y2="290" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#north-arrow)" />
+    <text x="600" y="275" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-muted)">N</text>
+    <text x="600" y="275" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-muted)">ش</text>
+
+    <!-- Angle Arcs and Wedges -->
+    <!-- Theta AB (45 degrees at Node A) -->
+    <path d="M 200 380 L 200 330 A 50 50 0 0 1 235.4 344.6 Z" fill="var(--brand-500)" fill-opacity="0.15" />
+    <path d="M 200 330 A 50 50 0 0 1 235.4 344.6" stroke="var(--brand-500)" stroke-width="2" fill="none" />
+    <text x="226.7" y="315.3" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">AB</tspan></text>
+    <text x="226.7" y="315.3" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">AB</tspan></text>
+
+    <!-- Theta BC (135 degrees at Node B) -->
+    <path d="M 400 180 L 400 130 A 50 50 0 0 1 435.4 215.4 Z" fill="var(--brand-500)" fill-opacity="0.15" />
+    <path d="M 400 130 A 50 50 0 0 1 435.4 215.4" stroke="var(--brand-500)" stroke-width="2" fill="none" />
+    <text x="464.7" y="153.3" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">BC</tspan></text>
+    <text x="464.7" y="153.3" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">BC</tspan></text>
+
+    <!-- Theta CA (270 degrees at Node C) -->
+    <path d="M 600 380 L 600 330 A 50 50 0 1 1 550 380 Z" fill="var(--brand-500)" fill-opacity="0.15" />
+    <path d="M 600 330 A 50 50 0 1 1 550 380" stroke="var(--brand-500)" stroke-width="2" fill="none" />
+    <text x="649.5" y="429.5" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">CA</tspan></text>
+    <text x="649.5" y="429.5" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--brand-ink)">θ<tspan baseline-shift="sub" font-size="0.75em">CA</tspan></text>
+
+    <!-- Nodes -->
+    <!-- Node A -->
+    <circle cx="200" cy="380" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <text x="200" y="386" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">A</text>
+    <text x="200" y="386" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">A</text>
+    <text x="160" y="415" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Node A</text>
+    <text x="160" y="415" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة A</text>
+
+    <!-- Node B -->
+    <circle cx="400" cy="180" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <text x="400" y="186" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">B</text>
+    <text x="400" y="186" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">B</text>
+    <text x="350" y="175" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Node B</text>
+    <text x="350" y="175" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة B</text>
+
+    <!-- Node C -->
+    <circle cx="600" cy="380" r="20" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+    <text x="600" y="386" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">C</text>
+    <text x="600" y="386" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">C</text>
+    <text x="640" y="415" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Node C</text>
+    <text x="640" y="415" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">العقدة C</text>
+
+    <!-- Educational Callout for Node B (Antenna Array / Compass) -->
+    <g transform="translate(0, 0)">
+        <line x1="500" y1="120" x2="425" y2="165" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="4,4" />
+        <circle cx="425" cy="165" r="4" fill="var(--border-color)" />
+        
+        <rect x="500" y="90" width="220" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        
+        <text x="610" y="115" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">Antenna Array / Compass</text>
+        <text x="610" y="115" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">مصفوفة هوائيات / بوصلة</text>
+        
+        <text x="610" y="135" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Senses angle of arrival</text>
+        <text x="610" y="135" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">تستشعر زاوية الوصول</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي لاستخدام AOA في شبكات الاستشعار اللاسلكية؟</template>
+      <template class="content-en">What is the main drawback of using AOA in WSNs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الحاجة إلى أجهزة إضافية معقدة مثل مصفوفات الهوائيات، مما يزيد من التكلفة المادية واستهلاك الطاقة وحجم العقدة.</p></template>
+      <template class="content-en"><p>The need for complex additional hardware like antenna arrays, which increases physical cost, power consumption, and node size.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="localization-algorithms-categories" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> فئات خوارزميات تحديد المواقع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Localization Algorithms Categories</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنقسم الخوارزميات إلى مركزية (عقدة رئيسية تحسب للجميع) وموزعة (كل عقدة تحسب لنفسها).</p></template>
+    <template class="content-en"><p>Algorithms are categorized into centralized (a master node calculates for all) and distributive (each node calculates for itself).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تصنيف خوارزميات تحديد المواقع إلى فئتين رئيسيتين:</p><ol><li><b>الخوارزميات المركزية (Centralized):</b> تقوم عقدة واحدة قوية بحساب مواقع العقد المجهولة. ترسل العقدة المجهولة معلوماتها المقاسة (مثل موقع العقدة المرجعية والمسافة) إلى العقدة المركزية، وتقوم الأخيرة بإرسال الموقع المقدر مرة أخرى.</li><li><b>الخوارزميات الموزعة (Distributive):</b> تقوم العقدة المجهولة بتقدير موقعها الخاص محلياً بناءً على المعلومات التي تجمعها من جيرانها.</li></ol></template>
+    <template class="content-en"><p>Localization algorithms can be categorized as centralized and distributive:</p><ol><li><b><span class="smart-term" data-term-en="Centralized Algorithm" data-ar="خوارزمية مركزية" data-en-def="An algorithm where a single central node processes data and computes locations for all nodes.">Centralized algorithm<span class="smart-term-tooltip"></span></span>s:</b> A single powerful node calculates the positions of the unknown nodes. An unknown node sends its measured info to the central node, which sends back the estimated position.</li><li><b><span class="smart-term" data-term-en="Distributive Algorithm" data-ar="خوارزمية موزعة" data-en-def="An algorithm where each node computes its own location locally.">Distributive algorithm<span class="smart-term-tooltip"></span></span>s:</b> An unknown node estimates its own location locally based on information gathered from neighbors.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>مشكلة النهج المركزي:</b> يتم تبادل الكثير من الحزم (Packets) بين العقد المركزية والمجهولة. ونتيجة لذلك، تمثل قابلية التوسع (Scalability) مشكلة حقيقية.</p><p>إذا زاد حجم الشبكة، فإن استهلاك الطاقة بسبب الاتصالات يزداد بشكل كبير، مما يؤدي إلى استنزاف طاقة العقد القريبة من المركز (عنق الزجاجة).</p></template>
+    <template class="content-en"><p><b>Problem with Centralized approach:</b> Lots of packets are exchanged among the central and unknown nodes. As a result, scalability is a real issue.</p><p>If the network size increases, the power consumption due to communication also increases significantly, leading to energy depletion of nodes near the center (bottleneck).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A hierarchical tree diagram showing 'Localization Algorithms' at the root. Split into two main branches: 'Centralized Algorithms' and 'Distributive Algorithms'. Under Distributive, show sub-branches: 'Beacon based', 'Relaxation based', 'Coordinate System Stitching', 'Hybrid', 'Inter-ferometric Ranging', 'Error Propagation Aware'. Under Beacon based, show 'Diffusion', 'Bounding Box', 'Gradient', 'Multilateration'. Style: educational, dark background #0d1117, clean tree structure, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 880" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-400)" />
+        </marker>
+        <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Paths -->
+    <g fill="none" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)">
+        <!-- Root to Level 1 -->
+        <path d="M 270 400 C 310 400, 310 200, 340 200" />
+        <path d="M 270 400 C 310 400, 310 600, 340 600" />
+
+        <!-- Distributive to Level 2 -->
+        <path d="M 590 600 C 650 600, 650 300, 700 300" />
+        <path d="M 590 600 C 650 600, 650 500, 700 500" />
+        <path d="M 590 600 C 650 600, 650 580, 700 580" />
+        <path d="M 590 600 C 650 600, 650 660, 700 660" />
+        <path d="M 590 600 C 650 600, 650 740, 700 740" />
+        <path d="M 590 600 C 650 600, 650 820, 700 820" />
+
+        <!-- Beacon based to Level 3 -->
+        <path d="M 950 300 C 1010 300, 1010 150, 1060 150" />
+        <path d="M 950 300 C 1010 300, 1010 250, 1060 250" />
+        <path d="M 950 300 C 1010 300, 1010 350, 1060 350" />
+        <path d="M 950 300 C 1010 300, 1010 450, 1060 450" />
+    </g>
+
+    <!-- Nodes -->
+    <g>
+        <!-- Root -->
+        <rect x="30" y="370" width="240" height="60" rx="12" fill="url(#brandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Level 1 -->
+        <rect x="350" y="165" width="240" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <rect x="350" y="565" width="240" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Level 2 -->
+        <rect x="710" y="275" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="710" y="475" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="710" y="555" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="710" y="635" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="710" y="715" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        <rect x="710" y="795" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+        <!-- Level 3 -->
+        <rect x="1070" y="125" width="200" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4" />
+        <rect x="1070" y="225" width="200" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4" />
+        <rect x="1070" y="325" width="200" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4" />
+        <rect x="1070" y="425" width="200" height="50" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4" />
+    </g>
+
+    <!-- Text Elements -->
+    <g text-anchor="middle">
+        <!-- Root Text -->
+        <text x="150" y="406" class="gsvg-en" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">Localization Algorithms</text>
+        <text x="150" y="406" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="18" font-weight="bold">خوارزميات تحديد الموقع</text>
+
+        <!-- Level 1 Text -->
+        <!-- Centralized -->
+        <text x="470" y="194" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Centralized Algorithms</text>
+        <text x="470" y="216" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Single node calculates positions</text>
+        
+        <text x="470" y="194" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">خوارزميات مركزية</text>
+        <text x="470" y="216" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">عقدة مركزية تحسب المواقع</text>
+
+        <!-- Distributive -->
+        <text x="470" y="594" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Distributive Algorithms</text>
+        <text x="470" y="616" class="gsvg-en" fill="var(--text-secondary)" font-size="13">Nodes estimate locations locally</text>
+        
+        <text x="470" y="594" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">خوارزميات موزعة</text>
+        <text x="470" y="616" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">العقد تقدر مواقعها محلياً</text>
+
+        <!-- Level 2 Text -->
+        <text x="830" y="305" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Beacon based</text>
+        <text x="830" y="305" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">قائمة على المنارات</text>
+
+        <text x="830" y="505" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Relaxation based</text>
+        <text x="830" y="505" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">قائمة على الاسترخاء</text>
+
+        <text x="830" y="585" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Coordinate System Stitching</text>
+        <text x="830" y="585" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">دمج أنظمة الإحداثيات</text>
+
+        <text x="830" y="665" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Hybrid</text>
+        <text x="830" y="665" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">هجينة</text>
+
+        <text x="830" y="745" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Inter-ferometric Ranging</text>
+        <text x="830" y="745" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">قياس التداخل</text>
+
+        <text x="830" y="825" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="600">Error Propagation Aware</text>
+        <text x="830" y="825" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="600">مدركة لانتشار الخطأ</text>
+
+        <!-- Level 3 Text -->
+        <text x="1170" y="155" class="gsvg-en" fill="var(--text-primary)" font-size="14">Diffusion</text>
+        <text x="1170" y="155" class="gsvg-ar" fill="var(--text-primary)" font-size="14">الانتشار</text>
+
+        <text x="1170" y="255" class="gsvg-en" fill="var(--text-primary)" font-size="14">Bounding Box</text>
+        <text x="1170" y="255" class="gsvg-ar" fill="var(--text-primary)" font-size="14">الصندوق المحيط</text>
+
+        <text x="1170" y="355" class="gsvg-en" fill="var(--text-primary)" font-size="14">Gradient</text>
+        <text x="1170" y="355" class="gsvg-ar" fill="var(--text-primary)" font-size="14">التدرج</text>
+
+        <text x="1170" y="455" class="gsvg-en" fill="var(--text-primary)" font-size="14">Multilateration</text>
+        <text x="1170" y="455" class="gsvg-ar" fill="var(--text-primary)" font-size="14">التثليث المتعدد</text>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Centralized Algorithms</th><th>Distributive Algorithms</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مكان الحساب</template>
+          <template class="content-en">Computation Location</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عقدة مركزية واحدة قوية</template>
+          <template class="content-en">Single powerful central node</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">محلياً في كل عقدة مجهولة</template>
+          <template class="content-en">Locally at each unknown node</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قابلية التوسع (Scalability)</template>
+          <template class="content-en">Scalability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ضعيفة (عنق زجاجة في الاتصالات)</template>
+          <template class="content-en">Poor (communication bottleneck)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية</template>
+          <template class="content-en">High</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك طاقة الاتصال</template>
+          <template class="content-en">Communication Energy Consumption</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع جداً للشبكات الكبيرة</template>
+          <template class="content-en">Very high for large networks</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (اتصال مع الجيران فقط)</template>
+          <template class="content-en">Low (communication with neighbors only)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أيهما أفضل لشبكة استشعار ضخمة جداً (10,000 عقدة): الخوارزميات المركزية أم الموزعة؟ ولماذا؟</template>
+      <template class="content-en">Which is better for a massive WSN (10,000 nodes): Centralized or Distributive algorithms? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الخوارزميات الموزعة أفضل. الخوارزميات المركزية ستعاني من مشكلة قابلية التوسع (Scalability) واستهلاك هائل للطاقة في توجيه جميع البيانات إلى عقدة واحدة، مما يؤدي إلى انهيار الشبكة.</p></template>
+      <template class="content-en"><p>Distributive algorithms are better. Centralized algorithms will suffer from scalability issues and massive energy consumption routing all data to a single node, leading to network failure.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="centralized-mds-map" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الخوارزميات المركزية: MDS-MAP</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Centralized Algorithms: MDS-MAP</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية مركزية تبني خريطة نسبية للشبكة باستخدام أقصر المسارات، ثم تحولها إلى خريطة مطلقة باستخدام العقد المرجعية.</p></template>
+    <template class="content-en"><p>A centralized algorithm that builds a relative map of the network using shortest paths, then transforms it into an absolute map using anchors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تستخدم خوارزمية MDS-MAP <span class="smart-term" data-term-en="MDS" data-ar="القياس متعدد الأبعاد" data-en-def="Multidimensional Scaling; a statistical technique used to visualize the level of similarity of individual cases of a dataset.">القياس متعدد الأبعاد<span class="smart-term-tooltip"></span></span> (Multidimensional Scaling - MDS) لتعيين العقد على مستوى ثنائي الأبعاد بناءً على المسافات بينها. تتكون من 4 خطوات:</p><ol><li><b>جمع البيانات:</b> يتم جمع بيانات النطاق (Ranging data) وحساب مصفوفة متفرقة $R$ ($r_{ij}$ هي المسافة بين $i$ و $j$).</li><li><b>أقصر المسارات:</b> يتم تحديد أقصر المسارات بين جميع أزواج العقد لإنشاء مصفوفة المسافات $D$.</li><li><b>تطبيق MDS:</b> يتم تطبيق MDS الكلاسيكي على المصفوفة $D$ لإنشاء <span class="smart-term" data-term-en="Relative Map" data-ar="خريطة نسبية" data-en-def="A map showing the positions of nodes relative to each other, without real-world geographic coordinates.">خريطة نسبية<span class="smart-term-tooltip"></span></span> (Relative map) بالاحتفاظ بأكبر قيمتين أو ثلاث قيم ذاتية (Eigenvalues).</li><li><b>الخريطة المطلقة:</b> إذا كان هناك عدد كافٍ من العقد المرجعية (Anchors)، يتم تحويل الخريطة النسبية إلى خريطة مطلقة (Absolute map).</li></ol></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="MDS" data-ar="القياس متعدد الأبعاد" data-en-def="Multidimensional Scaling; a statistical technique used to visualize the level of similarity of individual cases of a dataset.">MDS<span class="smart-term-tooltip"></span></span>-MAP uses Multidimensional Scaling (MDS) to map nodes on a 2D plane based on distances among them. It has 4 steps:</p><ol><li><b>Gather Data:</b> Ranging data is gathered, and a sparse matrix $R$ is calculated ($r_{ij}$ is range between $i$ and $j$).</li><li><b>Shortest Paths:</b> Shortest paths between all pairs of nodes are determined to calculate distance matrix $D$.</li><li><b>Apply MDS:</b> Classical MDS is applied on matrix $D$ to construct a <span class="smart-term" data-term-en="Relative Map" data-ar="خريطة نسبية" data-en-def="A map showing the positions of nodes relative to each other, without real-world geographic coordinates.">relative map<span class="smart-term-tooltip"></span></span> by retaining the first two (or three) largest eigenvalues and eigenvectors.</li><li><b>Absolute Map:</b> If sufficient anchor nodes exist, the relative map is transformed into an absolute map based on anchor coordinates.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>كثافة العقد المرجعية:</b> تؤثر كثافة العقد المرجعية على دقة مناطق التحديد. شبكة 3x3 من العقد المرجعية توفر مناطق تحديد أصغر وأكثر دقة مقارنة بشبكة 2x2.</p><p>يعتمد MDS على مصفوفات التقارب (Proximity matrices) المشتقة من مساحات متعددة الأبعاد لتقليل الأبعاد مع الحفاظ على أوجه التشابه الأصلية للمسافات.</p></template>
+    <template class="content-en"><p><b>Beacon Density:</b> The density of beacons affects the granularity of localization regions. A 3x3 grid of beacons provides more and smaller localization areas compared to a 2x2 grid.</p><p>MDS relies on proximity matrices derived from multidimensional spaces to reduce dimensionality while maintaining original distance similarities.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: Detailed SVG generation prompt: Show two side-by-side diagrams comparing beacon density. Left diagram: '2*2 Grid of beacons' showing 4 circles with overlapping coverage areas, creating a large shaded intersection area in the middle. Right diagram: '3*2 Grid of beacons' showing 6 circles with overlapping coverage areas, creating a much smaller, finer shaded intersection area. Label below: 'Beacon density vs. granularity of localization regions'. Style: educational, dark background #0d1117, white outlines, accent color for shaded regions, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 850" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrow Markers -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-primary" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)" />
+        </marker>
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+
+        <!-- Clip Paths for Beacon Intersections (Left Diagram 2x2) -->
+        <clipPath id="left-c1"><circle cx="150" cy="170" r="140"/></clipPath>
+        <clipPath id="left-c2"><circle cx="350" cy="170" r="140"/></clipPath>
+        <clipPath id="left-c3"><circle cx="150" cy="320" r="140"/></clipPath>
+
+        <!-- Clip Paths for Beacon Intersections (Right Diagram 3x2) -->
+        <clipPath id="right-c1"><circle cx="550" cy="170" r="115"/></clipPath>
+        <clipPath id="right-c2"><circle cx="700" cy="170" r="115"/></clipPath>
+        <clipPath id="right-c3"><circle cx="550" cy="320" r="115"/></clipPath>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- ========================================== -->
+    <!-- TOP SECTION: BEACON DENSITY                -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="475" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Beacon Density vs. Granularity of Localization Regions</text>
+    <text x="475" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كثافة المنارات مقابل دقة مناطق تحديد المواقع</text>
+
+    <!-- LEFT DIAGRAM: 2x2 Grid -->
+    <g>
+        <!-- Circles -->
+        <circle cx="150" cy="170" r="140" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="350" cy="170" r="140" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="150" cy="320" r="140" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="350" cy="320" r="140" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+
+        <!-- Shaded Intersection -->
+        <g clip-path="url(#left-c1)">
+            <g clip-path="url(#left-c2)">
+                <g clip-path="url(#left-c3)">
+                    <circle cx="350" cy="320" r="140" fill="var(--brand-500)" opacity="0.35" />
+                </g>
+            </g>
+        </g>
+
+        <!-- Beacons (Dots) -->
+        <circle cx="150" cy="170" r="6" fill="var(--text-primary)" />
+        <circle cx="350" cy="170" r="6" fill="var(--text-primary)" />
+        <circle cx="150" cy="320" r="6" fill="var(--text-primary)" />
+        <circle cx="350" cy="320" r="6" fill="var(--text-primary)" />
+
+        <!-- Intersection Label -->
+        <text x="250" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Large Region</text>
+        <text x="250" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">منطقة كبيرة</text>
+
+        <!-- Subtitle -->
+        <text x="250" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">2×2 Grid of Beacons</text>
+        <text x="250" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">شبكة 2×2 من المنارات</text>
+    </g>
+
+    <!-- RIGHT DIAGRAM: 3x2 Grid -->
+    <g>
+        <!-- Circles -->
+        <circle cx="550" cy="170" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="700" cy="170" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="850" cy="170" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="550" cy="320" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="700" cy="320" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+        <circle cx="850" cy="320" r="115" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 6" opacity="0.6" />
+
+        <!-- Shaded Intersection (Finer region between first 4 beacons) -->
+        <g clip-path="url(#right-c1)">
+            <g clip-path="url(#right-c2)">
+                <g clip-path="url(#right-c3)">
+                    <circle cx="700" cy="320" r="115" fill="var(--brand-500)" opacity="0.35" />
+                </g>
+            </g>
+        </g>
+
+        <!-- Beacons (Dots) -->
+        <circle cx="550" cy="170" r="6" fill="var(--text-primary)" />
+        <circle cx="700" cy="170" r="6" fill="var(--text-primary)" />
+        <circle cx="850" cy="170" r="6" fill="var(--text-primary)" />
+        <circle cx="550" cy="320" r="6" fill="var(--text-primary)" />
+        <circle cx="700" cy="320" r="6" fill="var(--text-primary)" />
+        <circle cx="850" cy="320" r="6" fill="var(--text-primary)" />
+
+        <!-- Intersection Label -->
+        <text x="625" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Fine Region</text>
+        <text x="625" y="250" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">منطقة دقيقة</text>
+
+        <!-- Subtitle -->
+        <text x="700" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">3×2 Grid of Beacons</text>
+        <text x="700" y="400" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">شبكة 3×2 من المنارات</text>
+    </g>
+
+    <!-- Divider -->
+    <line x1="50" y1="440" x2="900" y2="440" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="8 8" />
+
+    <!-- ========================================== -->
+    <!-- BOTTOM SECTION: MDS-MAP ALGORITHM          -->
+    <!-- ========================================== -->
+
+    <!-- Section Title -->
+    <text x="475" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Centralized Algorithms: MDS-MAP (4-Step Process)</text>
+    <text x="475" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الخوارزميات المركزية: MDS-MAP (عملية من 4 خطوات)</text>
+
+    <!-- Connecting Arrows -->
+    <path d="M 234 670 L 254 670" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-brand)" />
+    <path d="M 464 670 L 484 670" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-brand)" />
+    <path d="M 694 670 L 714 670" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-brand)" />
+
+    <!-- CARD 1: Gather Data -->
+    <g>
+        <rect x="30" y="540" width="200" height="260" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Icon Area (Sparse Graph) -->
+        <g stroke="var(--text-muted)" stroke-width="2">
+            <line x1="110" y1="580" x2="130" y2="610" />
+            <line x1="160" y1="600" x2="130" y2="610" />
+            <line x1="100" y1="630" x2="130" y2="610" />
+            <line x1="150" y1="640" x2="130" y2="610" />
+        </g>
+        <circle cx="110" cy="580" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="160" cy="600" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="100" cy="630" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="150" cy="640" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="130" cy="610" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Text -->
+        <text x="130" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">1. Gather Data</text>
+        <text x="130" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">1. جمع البيانات</text>
+        
+        <text x="130" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Calculate sparse</text>
+        <text x="130" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">matrix R (ranges)</text>
+        
+        <text x="130" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">حساب المصفوفة المتناثرة R</text>
+        <text x="130" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">(نطاقات المسافات)</text>
+    </g>
+
+    <!-- CARD 2: Shortest Paths -->
+    <g>
+        <rect x="260" y="540" width="200" height="260" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Icon Area (Complete Graph with Highlighted Path) -->
+        <g stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="3 3">
+            <line x1="340" y1="580" x2="390" y2="600" />
+            <line x1="340" y1="580" x2="330" y2="630" />
+            <line x1="390" y1="600" x2="380" y2="640" />
+            <line x1="330" y1="630" x2="380" y2="640" />
+            <line x1="390" y1="600" x2="330" y2="630" />
+            <line x1="340" y1="580" x2="380" y2="640" />
+            <line x1="360" y1="610" x2="390" y2="600" />
+            <line x1="360" y1="610" x2="330" y2="630" />
+        </g>
+        <!-- Highlighted Shortest Path -->
+        <g stroke="var(--brand-500)" stroke-width="3">
+            <line x1="340" y1="580" x2="360" y2="610" />
+            <line x1="360" y1="610" x2="380" y2="640" />
+        </g>
+        <circle cx="340" cy="580" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="390" cy="600" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="330" cy="630" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="380" cy="640" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="360" cy="610" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Text -->
+        <text x="360" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">2. Shortest Paths</text>
+        <text x="360" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">2. أقصر المسارات</text>
+        
+        <text x="360" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Compute distance</text>
+        <text x="360" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">matrix D for all pairs</text>
+        
+        <text x="360" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">حساب مصفوفة المسافات D</text>
+        <text x="360" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">لجميع أزواج العقد</text>
+    </g>
+
+    <!-- CARD 3: Apply MDS -->
+    <g>
+        <rect x="490" y="540" width="200" height="260" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Icon Area (Relative Map / Floating Axes) -->
+        <path d="M 530 620 L 650 620 M 590 560 L 590 660" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4" />
+        
+        <!-- Nodes (Rotated/Shifted to show relative nature) -->
+        <circle cx="620" cy="590" r="6" fill="var(--brand-500)" />
+        <circle cx="600" cy="640" r="6" fill="var(--brand-500)" />
+        <circle cx="570" cy="580" r="6" fill="var(--brand-500)" />
+        <circle cx="560" cy="630" r="6" fill="var(--brand-500)" />
+        <circle cx="590" cy="610" r="6" fill="var(--brand-500)" />
+
+        <!-- Text -->
+        <text x="590" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">3. Apply MDS</text>
+        <text x="590" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">3. تطبيق MDS</text>
+        
+        <text x="590" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Construct relative map</text>
+        <text x="590" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">using eigenvalues</text>
+        
+        <text x="590" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">بناء خريطة نسبية</text>
+        <text x="590" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">باستخدام القيم الذاتية</text>
+    </g>
+
+    <!-- CARD 4: Absolute Map -->
+    <g>
+        <rect x="720" y="540" width="200" height="260" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Icon Area (Absolute Map / Solid Axes) -->
+        <path d="M 750 650 L 880 650 M 750 650 L 750 560" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-primary)" />
+        
+        <!-- Nodes (Original Positions) -->
+        <!-- Anchors -->
+        <rect x="795" y="575" width="10" height="10" fill="var(--brand-500)" />
+        <rect x="785" y="625" width="10" height="10" fill="var(--brand-500)" />
+        
+        <!-- Regular Nodes -->
+        <circle cx="850" cy="600" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="840" cy="640" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        <circle cx="820" cy="610" r="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Anchor Label -->
+        <path d="M 780 580 Q 760 580 760 595" stroke="var(--text-secondary)" fill="none" />
+        <text x="760" y="610" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="11" fill="var(--text-secondary)" class="gsvg-en">Anchors</text>
+        <text x="760" y="610" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="11" fill="var(--text-secondary)" class="gsvg-ar">عقد مرجعية</text>
+
+        <!-- Text -->
+        <text x="820" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">4. Absolute Map</text>
+        <text x="820" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">4. الخريطة المطلقة</text>
+        
+        <text x="820" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Transform to absolute</text>
+        <text x="820" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">map via anchor nodes</text>
+        
+        <text x="820" y="740" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">التحويل لخريطة مطلقة</text>
+        <text x="820" y="760" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">عبر العقد المرجعية</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى العقد المرجعية (Anchors) في الخطوة الرابعة من MDS-MAP؟</template>
+      <template class="content-en">Why do we need anchor nodes in step 4 of MDS-MAP?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الخطوات الثلاث الأولى تنتج خريطة نسبية فقط (العقد تعرف مواقعها بالنسبة لبعضها البعض ولكن ليس في العالم الحقيقي). العقد المرجعية توفر الإحداثيات الجغرافية الحقيقية لتدوير الخريطة النسبية وتغيير حجمها لتصبح خريطة مطلقة.</p></template>
+      <template class="content-en"><p>Because the first three steps only produce a relative map (nodes know positions relative to each other, not in the real world). Anchors provide true geographic coordinates to rotate, translate, and scale the relative map into an absolute map.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="adaptive-beacon-placement" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> وضع العقد المرجعية التكيفي (Adaptive Beacon Placement)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Adaptive Beacon Placement</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نشر العقد المرجعية بذكاء لتقليل التكلفة والتصادمات مع زيادة دقة تحديد المواقع.</p></template>
+    <template class="content-en"><p>Smartly deploying beacon nodes to minimize cost and collisions while maximizing localization accuracy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تؤثر كثافة وموضع العقد المرجعية على جودة تحديد المواقع. التوزيع الكثيف والموحد ليس فعالاً لأنه يزيد التكلفة ويزيد من احتمالية التصادمات (Collisions) مما يستهلك الطاقة.</p><p>يتم استخدام روبوتات متنقلة مزودة بـ GPS لتقدير الموضع المناسب لنشر العقد المرجعية الجديدة بشكل تدريجي. هناك ثلاث خوارزميات رئيسية:</p><ol><li><b>Random (عشوائي):</b> اختيار نقطة عشوائياً ووضع العقدة المرجعية فيها (تُستخدم كخط أساس للمقارنة).</li><li><b>MAX (الحد الأقصى):</b> تقسيم التضاريس إلى مربعات، وحساب <span class="smart-term" data-term-en="Localization Error" data-ar="خطأ تحديد المواقع" data-en-def="The Euclidean distance between the estimated position and the actual position of a node.">خطأ تحديد المواقع<span class="smart-term-tooltip"></span></span> في كل نقطة، ثم إضافة العقدة الجديدة في النقطة ذات الخطأ الأقصى.</li><li><b>Grid (الشبكة):</b> حساب الخطأ التراكمي فوق شبكات متداخلة، وإضافة العقدة الجديدة في مركز الشبكة ذات الخطأ التراكمي الأقصى.</li></ol></template>
+    <template class="content-en"><p>The density and placement of beacons affect localization quality. A uniform and dense distribution is not efficient as it increases cost and the probability of collisions, wasting energy.</p><p>GPS-equipped mobile robots are used to estimate proper positions to deploy new beacons incrementally. There are three main algorithms:</p><ol><li><b>Random:</b> A point is chosen randomly to place a beacon (used as a baseline).</li><li><b>MAX:</b> The terrain is divided into squares, <span class="smart-term" data-term-en="Localization Error" data-ar="خطأ تحديد المواقع" data-en-def="The Euclidean distance between the estimated position and the actual position of a node.">localization error<span class="smart-term-tooltip"></span></span> at each point is calculated, and a new beacon is added at the point with maximum error.</li><li><b>Grid:</b> Cumulative error is calculated over overlapping grids, and a new beacon is added at the center of the grid with the maximum cumulative error.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><ul><li><b>حساب الخطأ (Localization Error - LE):</b> إذا كان الموقع الفعلي للعقدة هو $(X_A, Y_A)$ والموقع المقدر هو $(X_E, Y_E)$، فإن الخطأ هو: <br> $LE = \sqrt{(X_E - X_A)^2 + (Y_E - Y_A)^2}$</li><li><b>خوارزمية MAX:</b> عدد نقاط البيانات في التضاريس هو $DP_T = (S/s + 1)^2$ حيث $S$ طول ضلع التضاريس و $s$ نطاق الروبوت.</li><li><b>خوارزمية Grid:</b> يتم حساب مركز الشبكة $G_C(i,j)$ باستخدام معادلات تعتمد على حجم الشبكة $gridSide$ وعدد الشبكات المتداخلة $N_G$.</li></ul></template>
+    <template class="content-en"><ul><li><b>Localization Error (LE):</b> If actual position is $(X_A, Y_A)$ and estimated is $(X_E, Y_E)$, then: <br> $LE = \sqrt{(X_E - X_A)^2 + (Y_E - Y_A)^2}$</li><li><b>MAX Algorithm:</b> Number of data points is $DP_T = (S/s + 1)^2$ where $S$ is terrain side and $s$ is robot range.</li><li><b>Grid Algorithm:</b> The center of grid $G_C(i,j)$ is calculated using formulas based on $gridSide$ and number of overlapping grids $N_G$.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب خطأ تحديد المواقع (المسافة الإقليدية بين الموقع الفعلي والمقدر).</strong></template>
+      <template class="content-en"><strong>Calculation of localization error (Euclidean distance between actual and estimated position).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$LE = \sqrt{(X_E - X_A)^2 + (Y_E - Y_A)^2}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر خوارزمية MAX أو Grid أفضل من التوزيع العشوائي (Random) للعقد المرجعية؟</template>
+      <template class="content-en">Why are MAX or Grid algorithms better than Random distribution of beacons?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تستهدف المناطق التي تعاني من أعلى نسبة خطأ في تحديد المواقع، مما يؤدي إلى تحسين الدقة الإجمالية للشبكة باستخدام عدد أقل من العقد المرجعية المكلفة.</p></template>
+      <template class="content-en"><p>Because they target areas with the highest localization error, improving the overall accuracy of the network using fewer expensive beacon nodes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في الوحدة السادسة. تخيلوا أننا ألقينا آلاف المستشعرات الدقيقة من طائرة فوق غابة لمراقبة الحرائق. كيف ستعرف كل عقدة مكانها لتبلغنا بموقع الحريق؟ لا يمكننا وضع GPS في كل عقدة؛ فهذا مكلف وسيستنزف بطارياتها فوراً، ناهيك عن أن GPS لا يعمل داخل المباني! هنا تبرز عبقرية 'تحديد المواقع' (Localization). نبدأ بنشر عدد قليل من العقد 'الذكية' التي تعرف مكانها (Beacons)، ثم نترك البقية تحزر مواقعها. كيف؟ إما بقياس قوة الإشارة (RSSI)، أو بعدّ القفزات (Hop Count)، أو بحساب فرق الوقت بين الراديو والصوت (TDOA)، أو حتى بقياس زاوية الإشارة (AOA). بعد جمع هذه القياسات، نحتاج لخوارزمية للحل. هل نرسل كل شيء للمدير (Centralized) مثل خوارزمية MDS-MAP؟ هذا دقيق لكنه يرهق الشبكة. أم نترك كل عقدة تحل مشكلتها بنفسها (Distributive)؟ وأخيراً، أين نضع العقد المرجعية؟ عشوائياً؟ أم بذكاء في أسوأ الأماكن دقة (MAX و Grid)؟ ركزوا على الفروق بين تقنيات قياس المسافة وعيوب كل منها، فهذا هو قلب الامتحان!</template>
+    <template class="content-en">Welcome, future engineers, to Module 6. Imagine dropping thousands of tiny sensors from a plane over a forest to monitor fires. How does each node know where it is to report the fire's location? We can't put GPS in every node; it's too expensive, drains batteries instantly, and doesn't even work indoors! This is where the brilliance of 'Localization' comes in. We deploy a few 'smart' nodes that know their location (Beacons), and let the rest figure it out. How? By measuring signal strength (RSSI), counting hops (Hop Count), timing the difference between radio and sound (TDOA), or measuring the angle (AOA). Once we have these measurements, we need an algorithm. Do we send everything to the boss (Centralized) like MDS-MAP? It's accurate but exhausts the network. Or do we let each node solve its own math (Distributive)? Finally, where do we place the beacons? Randomly? Or smartly in the worst-accuracy spots (MAX and Grid)? Focus on the differences between distance estimation techniques and their drawbacks—that's the core of the exam!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر تحديد المواقع (Localization) مشكلة مختلفة تماماً في شبكات الاستشعار اللاسلكية مقارنة بالشبكات التقليدية؟</template>
+          <template class="content-en">Why is localization considered a completely different problem in WSNs compared to traditional networks?</template>
+          <span class="content-target">لماذا نعتبر تحديد المواقع (Localization) مشكلة مختلفة تماماً في شبكات الاستشعار اللاسلكية مقارنة بالشبكات التقليدية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن عقد الاستشعار هي أجهزة صغيرة جداً، منخفضة التكلفة، ومقيدة بشدة من حيث الطاقة والحساب. لا يمكننا ببساطة تزويدها بأجهزة تحديد مواقع متقدمة مثل GPS.</template>
+          <template class="content-en">Because sensor nodes are tiny, low-cost devices that are severely constrained in terms of energy and computation. We cannot simply equip them with advanced localization hardware like GPS.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين العقدة المرجعية (Beacon) والعقدة المجهولة (Unknown node)؟</template>
+          <template class="content-en">What is the fundamental difference between a Beacon node and an Unknown node?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين العقدة المرجعية (Beacon) والعقدة المجهولة (Unknown node)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العقدة المرجعية تعرف إحداثياتها الجغرافية مسبقاً (غالباً عبر GPS أو التثبيت اليدوي)، بينما العقدة المجهولة لا تعرف موقعها وتستخدم العقد المرجعية لحسابه.</template>
+          <template class="content-en">A beacon node knows its geographic coordinates in advance (often via GPS or manual placement), while an unknown node does not know its location and uses beacons to calculate it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تؤثر البيئة الداخلية (Indoors) على تقنية RSSI؟</template>
+          <template class="content-en">How does the indoor environment affect the RSSI technique?</template>
+          <span class="content-target">كيف تؤثر البيئة الداخلية (Indoors) على تقنية RSSI؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الجدران والأثاث تسبب انعكاسات وتشتت للإشارة (Multipath fading)، مما يجعل الإشارة تضعف لأسباب غير المسافة، مما يؤدي إلى خطأ في التقدير يصل لعدة أمتار.</template>
+          <template class="content-en">Walls and furniture cause signal reflections and scattering (multipath fading), making the signal weaken for reasons other than distance, leading to estimation errors of several meters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في تقنية Hop Count، متى يكون تقدير المسافة دقيقاً جداً ومتى يكون سيئاً؟</template>
+          <template class="content-en">In the Hop Count technique, when is the distance estimation very accurate and when is it poor?</template>
+          <span class="content-target">في تقنية Hop Count، متى يكون تقدير المسافة دقيقاً جداً ومتى يكون سيئاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يكون دقيقاً نسبياً في الشبكات الكثيفة والموزعة بانتظام في مناطق مفتوحة. ويكون سيئاً جداً إذا كان هناك عائق مادي كبير يجبر مسار الاتصال على الالتفاف حوله.</template>
+          <template class="content-en">It is relatively accurate in dense, uniformly distributed networks in open areas. It is very poor if there is a large physical obstacle forcing the communication path to route around it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تتطلب تقنية TDOA أجهزة إضافية، وما هي هذه الأجهزة؟</template>
+          <template class="content-en">Why does the TDOA technique require extra hardware, and what is it?</template>
+          <span class="content-target">لماذا تتطلب تقنية TDOA أجهزة إضافية، وما هي هذه الأجهزة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تتطلب ميكروفون ومكبر صوت، لأنها تعتمد على إرسال إشارة صوتية (بطيئة) بعد إشارة راديو (سريعة) لقياس الفرق الزمني بين وصولهما.</template>
+          <template class="content-en">It requires a microphone and a speaker, because it relies on sending a sound signal (slow) after a radio signal (fast) to measure the time difference between their arrivals.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب القاتل للخوارزميات المركزية في شبكات الاستشعار الضخمة؟</template>
+          <template class="content-en">What is the fatal flaw of centralized algorithms in massive WSNs?</template>
+          <span class="content-target">ما هو العيب القاتل للخوارزميات المركزية في شبكات الاستشعار الضخمة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مشكلة قابلية التوسع (Scalability). إرسال بيانات آلاف العقد إلى عقدة مركزية واحدة يسبب اختناقاً مرورياً ويستنزف طاقة العقد القريبة من المركز بسرعة هائلة.</template>
+          <template class="content-en">The scalability issue. Sending data from thousands of nodes to a single central node causes a traffic bottleneck and rapidly depletes the energy of nodes near the center.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح باختصار كيف تعمل خوارزمية MDS-MAP.</template>
+          <template class="content-en">Briefly explain how the MDS-MAP algorithm works.</template>
+          <span class="content-target">اشرح باختصار كيف تعمل خوارزمية MDS-MAP.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تجمع المسافات بين العقد، تحسب أقصر المسارات، تستخدم القياس متعدد الأبعاد (MDS) لرسم خريطة نسبية، ثم تستخدم العقد المرجعية لتحويلها لخريطة حقيقية (مطلقة).</template>
+          <template class="content-en">It gathers distances between nodes, calculates shortest paths, uses Multidimensional Scaling (MDS) to draw a relative map, then uses anchor nodes to transform it into a true (absolute) map.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نقوم ببساطة بنشر عدد هائل من العقد المرجعية (Beacons) لحل مشكلة الدقة؟</template>
+          <template class="content-en">Why don't we simply deploy a massive number of beacons to solve the accuracy problem?</template>
+          <span class="content-target">لماذا لا نقوم ببساطة بنشر عدد هائل من العقد المرجعية (Beacons) لحل مشكلة الدقة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن العقد المرجعية مكلفة مادياً. بالإضافة إلى ذلك، الكثافة العالية جداً تؤدي إلى تداخل إشاراتها وتصادم الحزم (Collisions)، مما يضيع طاقة الشبكة.</template>
+          <template class="content-en">Because beacon nodes are expensive. Additionally, very high density leads to signal interference and packet collisions, wasting network energy.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل خوارزمية MAX في وضع العقد المرجعية؟</template>
+          <template class="content-en">How does the MAX algorithm work in beacon placement?</template>
+          <span class="content-target">كيف تعمل خوارزمية MAX في وضع العقد المرجعية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم بتقسيم المنطقة لمربعات، تحسب نسبة الخطأ في كل مربع، ثم تضع العقدة المرجعية الجديدة في المربع الذي يعاني من أعلى نسبة خطأ لتحسينه.</template>
+          <template class="content-en">It divides the area into squares, calculates the error rate in each square, then places the new beacon in the square suffering from the highest error rate to improve it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين الخريطة النسبية (Relative Map) والخريطة المطلقة (Absolute Map) في MDS-MAP؟</template>
+          <template class="content-en">What is the difference between a Relative Map and an Absolute Map in MDS-MAP?</template>
+          <span class="content-target">ما هو الفرق بين الخريطة النسبية (Relative Map) والخريطة المطلقة (Absolute Map) في MDS-MAP؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخريطة النسبية توضح شكل الشبكة ومسافات العقد بالنسبة لبعضها البعض فقط. الخريطة المطلقة تضع هذا الشكل على إحداثيات جغرافية حقيقية (خطوط طول وعرض).</template>
+          <template class="content-en">A relative map only shows the shape of the network and node distances relative to each other. An absolute map places this shape onto true geographic coordinates (latitude and longitude).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "تحديد المواقع (Localization)",
+      "en": "Localization"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد موقع الجهاز في غياب البنية التحتية الإضافية مثل الأقمار الصناعية.",
+        "en": "Determining the location of a device in the absence of additional infrastructure like satellites."
+      },
+      "example": {
+        "ar": "معرفة موقع مستشعر حرارة داخل غابة بدون استخدام GPS.",
+        "en": "Finding the location of a temperature sensor in a forest without GPS."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "تتبع الأهداف (Target Tracking)",
+      "en": "Target Tracking"
+    },
+    "back": {
+      "definition": {
+        "ar": "معرفة موقع الهدف في أوقات مختلفة.",
+        "en": "Knowledge about a target's location at different times."
+      },
+      "example": {
+        "ar": "تتبع مسار مركبة معادية في تطبيق عسكري.",
+        "en": "Tracking the path of an enemy vehicle in a military application."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "العقدة المرجعية (Beacon Node)",
+      "en": "Beacon Node"
+    },
+    "back": {
+      "definition": {
+        "ar": "عقدة تعرف موقعها مسبقاً باستخدام GPS أو طرق أخرى.",
+        "en": "A node that knows its position using GPS or some other methods."
+      },
+      "example": {
+        "ar": "عقدة مثبتة في زاوية الغرفة بإحداثيات معروفة.",
+        "en": "A node fixed at the corner of a room with known coordinates."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "العقدة المجهولة (Unknown Node)",
+      "en": "Unknown Node"
+    },
+    "back": {
+      "definition": {
+        "ar": "عقدة لا تعرف موقعها في البداية وتحتاج إلى حسابه.",
+        "en": "A node that does not know its position at the beginning."
+      },
+      "example": {
+        "ar": "مستشعر تم إسقاطه عشوائياً من طائرة.",
+        "en": "A sensor randomly dropped from an airplane."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مؤشر قوة الإشارة المستلمة (RSSI)",
+      "en": "RSSI"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لتقدير المسافة بناءً على تدهور طاقة إشارة الراديو مع المسافة.",
+        "en": "A technique to estimate distance based on the degradation of radio signal energy with distance."
+      },
+      "example": {
+        "ar": "استخدام ضعف إشارة الواي فاي لمعرفة مدى بعدك عن الراوتر.",
+        "en": "Using the weakness of a Wi-Fi signal to know how far you are from the router."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "أُس التوهين (Attenuation Exponent - α)",
+      "en": "Attenuation Exponent (α)"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير في معادلة RSSI يمثل مدى سرعة فقدان الإشارة لطاقتها في وسط معين.",
+        "en": "A variable in the RSSI formula representing how quickly a signal loses power in a specific medium."
+      },
+      "example": {
+        "ar": "قيمته أعلى في الأماكن المغلقة مقارنة بالأماكن المفتوحة.",
+        "en": "Its value is higher indoors compared to open spaces."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "عدد القفزات (Hop Count)",
+      "en": "Hop Count"
+    },
+    "back": {
+      "definition": {
+        "ar": "عدد الروابط (الحواف) في أقصر مسار بين عقدتين لتقدير المسافة.",
+        "en": "The number of links (edges) in the shortest path between two nodes to estimate distance."
+      },
+      "example": {
+        "ar": "إذا مرت الرسالة عبر عقدتين وسيطتين، فإن عدد القفزات هو 3.",
+        "en": "If a message passes through two intermediate nodes, the hop count is 3."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "فرق وقت الوصول (TDOA)",
+      "en": "TDOA"
+    },
+    "back": {
+      "definition": {
+        "ar": "حساب المسافة باستخدام الفرق الزمني بين وصول إشارتين بسرعات مختلفة (راديو وصوت).",
+        "en": "Calculating distance using the time difference between the arrival of two signals with different speeds (radio and sound)."
+      },
+      "example": {
+        "ar": "رؤية البرق (راديو/ضوء) ثم سماع الرعد (صوت) لمعرفة بعد العاصفة.",
+        "en": "Seeing lightning (radio/light) then hearing thunder (sound) to know the storm's distance."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "زاوية الوصول (AOA)",
+      "en": "AOA"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد الموقع عن طريق استشعار الزاوية التي تصل منها الإشارة باستخدام مصفوفات الهوائيات.",
+        "en": "Determining location by sensing the angle from which a signal arrives using antenna arrays."
+      },
+      "example": {
+        "ar": "استخدام بوصلة رقمية لمعرفة الاتجاه الذي تأتي منه إشارة العقدة المرجعية.",
+        "en": "Using a digital compass to know the direction a beacon's signal is coming from."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "خوارزمية مركزية (Centralized Algorithm)",
+      "en": "Centralized Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تقوم فيها عقدة واحدة قوية بجمع البيانات وحساب المواقع لجميع العقد.",
+        "en": "An algorithm where a single powerful node collects data and calculates positions for all nodes."
+      },
+      "example": {
+        "ar": "خوارزمية MDS-MAP.",
+        "en": "MDS-MAP algorithm."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "خوارزمية موزعة (Distributive Algorithm)",
+      "en": "Distributive Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تقوم فيها كل عقدة مجهولة بتقدير موقعها الخاص محلياً.",
+        "en": "An algorithm where each unknown node estimates its own location locally."
+      },
+      "example": {
+        "ar": "استخدام التثليث (Trilateration) محلياً بواسطة العقدة نفسها.",
+        "en": "Using local trilateration by the node itself."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "MDS-MAP",
+      "en": "MDS-MAP"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية مركزية تستخدم القياس متعدد الأبعاد لإنشاء خريطة نسبية ثم تحويلها لخريطة مطلقة.",
+        "en": "A centralized algorithm using Multidimensional Scaling to create a relative map, then transforming it to an absolute map."
+      },
+      "example": {
+        "ar": "تحويل مصفوفة مسافات أقصر مسار إلى إحداثيات 2D باستخدام القيم الذاتية (Eigenvalues).",
+        "en": "Converting a shortest-path distance matrix into 2D coordinates using eigenvalues."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "خريطة نسبية (Relative Map)",
+      "en": "Relative Map"
+    },
+    "back": {
+      "definition": {
+        "ar": "خريطة توضح مواقع العقد بالنسبة لبعضها البعض دون إحداثيات جغرافية حقيقية.",
+        "en": "A map showing node positions relative to each other without true geographic coordinates."
+      },
+      "example": {
+        "ar": "الناتج من الخطوة الثالثة في خوارزمية MDS-MAP قبل تطبيق العقد المرجعية.",
+        "en": "The output of step 3 in MDS-MAP before applying anchors."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "خوارزمية MAX (MAX Algorithm)",
+      "en": "MAX Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية لوضع العقد المرجعية تضيف العقدة الجديدة في النقطة ذات الحد الأقصى لخطأ تحديد المواقع.",
+        "en": "A beacon placement algorithm that adds a new beacon at the point with the maximum localization error."
+      },
+      "example": {
+        "ar": "تقسيم التضاريس لمربعات وإيجاد المربع الأسوأ دقة لوضع منارة فيه.",
+        "en": "Dividing terrain into squares and finding the worst-accuracy square to place a beacon."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "خوارزمية الشبكة (Grid Algorithm)",
+      "en": "Grid Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تحسب الخطأ التراكمي فوق شبكات متداخلة وتضع العقدة في مركز الشبكة ذات الخطأ الأقصى.",
+        "en": "An algorithm calculating cumulative error over overlapping grids and placing a beacon at the center of the grid with max error."
+      },
+      "example": {
+        "ar": "استخدام شبكات متداخلة لضمان تغطية أفضل للخطأ التراكمي.",
+        "en": "Using overlapping grids to ensure better coverage of cumulative error."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "لماذا لا يعتبر استخدام GPS في كل عقدة استشعار حلاً عملياً؟",
+      "en": "Why is using GPS in every sensor node not a feasible solution?"
+    },
+    "options": {
+      "ar": [
+        "لأنه دقيق جداً",
+        "بسبب التكلفة العالية واستهلاك الطاقة وعدم عمله في الأماكن المغلقة",
+        "لأنه يتطلب خوارزميات موزعة فقط",
+        "لأنه يزيد من عرض النطاق الترددي للاتصالات"
+      ],
+      "en": [
+        "Because it is too accurate",
+        "Due to high cost, energy consumption, and inability to work indoors",
+        "Because it requires only distributive algorithms",
+        "Because it increases communication bandwidth"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مستقبلات GPS مكلفة، تستهلك طاقة كبيرة (وهو ما يتعارض مع طبيعة WSN)، ولا تعمل جيداً داخل المباني.",
+      "en": "GPS receivers are expensive, consume high energy (conflicting with WSN nature), and do not work well indoors."
+    },
+    "hint": {
+      "ar": "تذكر القيود الثلاثة الرئيسية لـ GPS المذكورة في المحاضرة.",
+      "en": "Remember the three main limitations of GPS mentioned in the lecture."
+    },
+    "difficulty": "easy",
+    "conceptId": "gps-limitations-wsn"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في معادلة RSSI ($P_r = k d^{-\\alpha}$)، ماذا يمثل الرمز $\\alpha$؟",
+      "en": "In the RSSI formula ($P_r = k d^{-\\alpha}$), what does the symbol $\\alpha$ represent?"
+    },
+    "options": {
+      "ar": [
+        "طاقة الإشارة المستلمة",
+        "المسافة بين المرسل والمستقبل",
+        "أُس التوهين (Attenuation exponent)",
+        "ثابت التردد"
+      ],
+      "en": [
+        "Power of the received signal",
+        "Distance between transmitter and receiver",
+        "Attenuation exponent",
+        "Frequency constant"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الرمز $\\alpha$ يمثل أُس التوهين، والذي يحدد مدى سرعة تدهور الإشارة في وسط معين.",
+      "en": "The symbol $\\alpha$ represents the attenuation exponent, which determines how fast the signal degrades in a specific medium."
+    },
+    "hint": {
+      "ar": "إنه الأس الذي يحدد معدل فقدان الطاقة.",
+      "en": "It is the exponent that determines the rate of power loss."
+    },
+    "difficulty": "medium",
+    "conceptId": "distance-estimation-rssi"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لتقدير المسافة باستخدام عدد القفزات (Hop Count)؟",
+      "en": "What is the main drawback of distance estimation using Hop Count?"
+    },
+    "options": {
+      "ar": [
+        "يتطلب أجهزة GPS",
+        "يحتوي على عدم دقة تصل إلى حوالي 0.5R في كل قياس ويتأثر بالعوائق",
+        "يستهلك طاقة أكثر من TDOA",
+        "يعمل فقط في الخوارزميات المركزية"
+      ],
+      "en": [
+        "It requires GPS hardware",
+        "It has an inaccuracy of almost 0.5R in every measurement and is affected by obstacles",
+        "It consumes more energy than TDOA",
+        "It only works in centralized algorithms"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لأن المسافة تحسب كمضاعفات صحيحة، هناك خطأ متأصل، كما أن العوائق تجبر المسار على الالتفاف مما يعطي مسافة خاطئة.",
+      "en": "Because distance is calculated as integral multiples, there is an inherent error, and obstacles force the path to curve, giving incorrect distance."
+    },
+    "hint": {
+      "ar": "فكر في كيف تلتف الإشارة حول جدار.",
+      "en": "Think about how a signal routes around a wall."
+    },
+    "difficulty": "medium",
+    "conceptId": "distance-estimation-hop-count"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي تقنية لتقدير المسافة تتطلب تزويد العقدة بمكبر صوت وميكروفون؟",
+      "en": "Which distance estimation technique requires equipping the node with a speaker and a microphone?"
+    },
+    "options": {
+      "ar": [
+        "RSSI",
+        "Hop Count",
+        "TDOA",
+        "AOA"
+      ],
+      "en": [
+        "RSSI",
+        "Hop Count",
+        "TDOA",
+        "AOA"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تقنية TDOA تعتمد على إرسال إشارة راديو متبوعة بإشارة صوتية، مما يتطلب ميكروفون ومكبر صوت.",
+      "en": "TDOA relies on sending a radio signal followed by a sound signal, requiring a microphone and speaker."
+    },
+    "hint": {
+      "ar": "التقنية التي تقارن بين سرعة الراديو وسرعة الصوت.",
+      "en": "The technique that compares radio speed with sound speed."
+    },
+    "difficulty": "easy",
+    "conceptId": "distance-estimation-tdoa"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية في الخوارزميات المركزية لتحديد المواقع عند زيادة حجم الشبكة؟",
+      "en": "What is the main problem with centralized localization algorithms when network size increases?"
+    },
+    "options": {
+      "ar": [
+        "عدم القدرة على حساب المسافات",
+        "مشكلة قابلية التوسع (Scalability) وزيادة استهلاك الطاقة بسبب الاتصالات",
+        "تحتاج إلى عدد أقل من العقد المرجعية",
+        "تصبح الخريطة النسبية غير دقيقة"
+      ],
+      "en": [
+        "Inability to calculate distances",
+        "Scalability issue and increased power consumption due to communication",
+        "Requires fewer beacon nodes",
+        "Relative map becomes inaccurate"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إرسال جميع البيانات إلى عقدة مركزية واحدة يسبب اختناقاً ويستهلك طاقة العقد القريبة من المركز بسرعة.",
+      "en": "Sending all data to a single central node causes a bottleneck and quickly depletes the energy of nodes near the center."
+    },
+    "hint": {
+      "ar": "ماذا يحدث عندما يتحدث الجميع إلى شخص واحد في نفس الوقت؟",
+      "en": "What happens when everyone talks to one person at the same time?"
+    },
+    "difficulty": "medium",
+    "conceptId": "localization-algorithms-categories"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في خوارزمية MDS-MAP، ما هو الغرض من استخدام العقد المرجعية (Anchors) في الخطوة الأخيرة؟",
+      "en": "In the MDS-MAP algorithm, what is the purpose of using anchor nodes in the final step?"
+    },
+    "options": {
+      "ar": [
+        "لحساب أقصر المسارات",
+        "لجمع بيانات النطاق (Ranging data)",
+        "لتحويل الخريطة النسبية إلى خريطة مطلقة",
+        "لتقليل استهلاك الطاقة"
+      ],
+      "en": [
+        "To calculate shortest paths",
+        "To gather ranging data",
+        "To transform the relative map into an absolute map",
+        "To reduce power consumption"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُنتج الخطوات الأولى خريطة نسبية فقط. العقد المرجعية توفر الإحداثيات الحقيقية لربط هذه الخريطة بالعالم الحقيقي (خريطة مطلقة).",
+      "en": "The first steps produce only a relative map. Anchors provide true coordinates to tie this map to the real world (absolute map)."
+    },
+    "hint": {
+      "ar": "الخريطة النسبية لا تحتوي على إحداثيات جغرافية حقيقية.",
+      "en": "A relative map lacks true geographic coordinates."
+    },
+    "difficulty": "medium",
+    "conceptId": "centralized-mds-map"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "لماذا لا يعتبر التوزيع الكثيف والموحد للعقد المرجعية (Beacons) فعالاً؟",
+      "en": "Why is a uniform and dense distribution of beacons not efficient?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يقلل من دقة تحديد المواقع",
+        "لأنه يزيد التكلفة ويزيد من احتمالية التصادمات (Collisions)",
+        "لأنه يمنع استخدام خوارزمية MDS-MAP",
+        "لأنه يتطلب خوارزميات موزعة فقط"
+      ],
+      "en": [
+        "Because it reduces localization accuracy",
+        "Because it increases cost and the probability of collisions",
+        "Because it prevents the use of MDS-MAP",
+        "Because it requires only distributive algorithms"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "أجهزة العقد المرجعية مكلفة، وكثرتها تؤدي إلى تداخل إشاراتها وتصادمها، مما يضيع الطاقة.",
+      "en": "Beacon hardware is expensive, and too many of them cause signal interference and collisions, wasting energy."
+    },
+    "hint": {
+      "ar": "فكر في التكلفة المادية وتداخل الإشارات اللاسلكية.",
+      "en": "Think about hardware cost and wireless signal interference."
+    },
+    "difficulty": "medium",
+    "conceptId": "adaptive-beacon-placement"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي خوارزمية لوضع العقد المرجعية تقوم بإضافة العقدة الجديدة في النقطة ذات الحد الأقصى لخطأ تحديد المواقع؟",
+      "en": "Which beacon placement algorithm adds the new beacon at the point with the maximum localization error?"
+    },
+    "options": {
+      "ar": [
+        "Random",
+        "MAX",
+        "Grid",
+        "MDS-MAP"
+      ],
+      "en": [
+        "Random",
+        "MAX",
+        "Grid",
+        "MDS-MAP"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خوارزمية MAX تحسب الخطأ في كل نقطة وتضع العقدة الجديدة في النقطة الأسوأ دقة لتحسينها.",
+      "en": "The MAX algorithm calculates error at each point and places the new beacon at the worst-accuracy point to improve it."
+    },
+    "hint": {
+      "ar": "الاسم يدل على 'الحد الأقصى'.",
+      "en": "The name implies 'maximum'."
+    },
+    "difficulty": "easy",
+    "conceptId": "adaptive-beacon-placement"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو المتطلب الأساسي لتقنية زاوية الوصول (AOA)؟",
+      "en": "What is the primary hardware requirement for the Angle of Arrival (AOA) technique?"
+    },
+    "options": {
+      "ar": [
+        "ميكروفون ومكبر صوت",
+        "مصفوفة من الهوائيات (Array of antennas) أو بوصلات رقمية",
+        "مستقبل GPS في كل عقدة",
+        "خوارزمية مركزية قوية"
+      ],
+      "en": [
+        "Microphone and speaker",
+        "Array of antennas or digital compasses",
+        "GPS receiver in every node",
+        "Powerful centralized algorithm"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتطلب AOA أجهزة قادرة على تحديد الاتجاه، مثل مصفوفات الهوائيات أو البوصلات الرقمية.",
+      "en": "AOA requires hardware capable of determining direction, such as antenna arrays or digital compasses."
+    },
+    "hint": {
+      "ar": "كيف يمكنك معرفة الاتجاه الذي يأتي منه الصوت أو الإشارة؟",
+      "en": "How can you tell which direction a sound or signal is coming from?"
+    },
+    "difficulty": "easy",
+    "conceptId": "distance-estimation-aoa"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في خوارزمية Grid لوضع العقد المرجعية، أين يتم وضع العقدة الجديدة؟",
+      "en": "In the Grid beacon placement algorithm, where is the new beacon placed?"
+    },
+    "options": {
+      "ar": [
+        "في نقطة عشوائية",
+        "في النقطة ذات الخطأ الأقصى الفردي",
+        "في مركز الشبكة ذات الخطأ التراكمي الأقصى",
+        "بجوار العقدة المركزية"
+      ],
+      "en": [
+        "At a random point",
+        "At the point with the maximum individual error",
+        "At the center of the grid with the maximum cumulative error",
+        "Next to the central node"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خوارزمية Grid تحسب الخطأ التراكمي (Cumulative error) لشبكات متداخلة وتضع العقدة في مركز الشبكة الأسوأ.",
+      "en": "The Grid algorithm calculates cumulative error for overlapping grids and places the beacon at the center of the worst grid."
+    },
+    "hint": {
+      "ar": "إنها تتعامل مع مناطق (شبكات) بدلاً من نقاط فردية.",
+      "en": "It deals with areas (grids) rather than individual points."
+    },
+    "difficulty": "medium",
+    "conceptId": "adaptive-beacon-placement"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن GPS هو الحل الأمثل دائماً لتحديد المواقع. في شبكات الاستشعار، GPS مكلف جداً، يستهلك طاقة هائلة، ويفشل تماماً في الأماكن المغلقة.</template>
+    <template class="content-en">Believing GPS is always the ultimate localization solution. In WSNs, GPS is too expensive, consumes massive energy, and fails completely indoors.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">خوارزمية Hop Count تبالغ دائماً في تقدير المسافة إذا كان هناك عائق مادي بين العقدتين، لأن الإشارة تضطر للالتفاف حول العائق (قفزات أكثر) بدلاً من المرور عبره.</template>
+    <template class="content-en">The Hop Count algorithm always overestimates distance if there is a physical obstacle between nodes, because the signal must route around it (more hops) rather than passing through.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تعتمد تقنية TDOA بشكل أساسي على التفاوت الهائل بين سرعة الضوء (الراديو) وسرعة الصوت. بدون هذا الفارق، سيكون من المستحيل قياس التأخير الزمني بدقة باستخدام ساعات العقد البسيطة.</template>
+    <template class="content-en">TDOA relies fundamentally on the massive disparity between the speed of light (radio) and the speed of sound. Without this gap, measuring time delay accurately with simple node clocks would be impossible.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">افتراض أن زيادة عدد العقد المرجعية (Beacons) يؤدي دائماً إلى أداء أفضل. الكثافة العالية جداً تسبب تصادمات في الإشارات (Collisions) وتستنزف طاقة الشبكة دون فائدة تذكر.</template>
+    <template class="content-en">Assuming that increasing the number of beacons always leads to better performance. Too high density causes signal collisions and drains network energy with little benefit.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية MDS-MAP، يتم استخدام القيم الذاتية (Eigenvalues) لضغط مصفوفة المسافات المعقدة إلى خريطة ثنائية أو ثلاثية الأبعاد، متجاهلة الأبعاد الأقل أهمية لتبسيط الحسابات.</template>
+    <template class="content-en">In MDS-MAP, eigenvalues are used to compress the complex distance matrix into a 2D or 3D map, discarding less important dimensions to simplify calculations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M05.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M07.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

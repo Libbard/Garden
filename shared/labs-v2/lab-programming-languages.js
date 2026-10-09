@@ -343,8 +343,8 @@
     var badge = $('plSaved');
     badge.className = 'pl-saved' + (ok ? '' : ' is-warn');
     badge.innerHTML = ok
-      ? '<i class="fa-solid fa-check"></i> ' + t('saved')
-      : '<i class="fa-solid fa-triangle-exclamation"></i> ' + L('لم يُحفظ', 'Not saved');
+      ? '<i class="fa-solid fa-check"></i><span class="pl-saved-t">' + t('saved') + '</span>'
+      : '<i class="fa-solid fa-triangle-exclamation"></i><span class="pl-saved-t">' + L('لم يُحفظ', 'Not saved') + '</span>';
     badge.setAttribute('data-tip-ar', ok
       ? 'يُحفظ على جهازك تلقائياً، ويُزامَن مع بقية أجهزتك.'
       : 'تعذّر الحفظُ على هذا الجهاز — صدّر نسخةً قبل إغلاق الصفحة.');
@@ -355,7 +355,7 @@
   function markDirty() {
     var badge = $('plSaved');
     badge.className = 'pl-saved';
-    badge.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + t('saving');
+    badge.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span class="pl-saved-t">' + t('saving') + '</span>';
     clearTimeout(savedTimer);
     savedTimer = setTimeout(function () {
       var store = window.GardenPLStore;
@@ -1591,6 +1591,7 @@
     var text = document.createElement('span');
     text.textContent = label;
     button.appendChild(text);
+    button.setAttribute('aria-label', label);
     button.setAttribute('data-tip-ar', tipAr);
     button.setAttribute('data-tip-en', tipEn);
     return button;
@@ -3375,6 +3376,16 @@
     document.querySelectorAll('[data-out-panel]').forEach(function (panel) {
       panel.hidden = panel.dataset.outPanel !== name;
     });
+    revealOutTab();
+  }
+  /*@4.LAPLJ.206*/
+  function revealOutTab() {
+    var strip = document.querySelector('.pl-out-tabs-scroll');
+    var tab = strip && strip.querySelector('.pl-out-tab.is-on');
+    if (!tab || strip.scrollWidth <= strip.clientWidth + 1) return;
+    var s = strip.getBoundingClientRect(), r = tab.getBoundingClientRect();
+    if (r.left < s.left) strip.scrollLeft -= (s.left - r.left) + 8;
+    else if (r.right > s.right) strip.scrollLeft += (r.right - s.right) + 8;
   }
   document.querySelector('.pl-out-tabs').addEventListener('click', function (event) {
     var tab = event.target.closest('.pl-out-tab');
@@ -3416,6 +3427,7 @@
       other.setAttribute('aria-selected', String(on));
     });
     if (name === 'examples') loadLibrary();
+    revealOutTab();
   }
   document.querySelector('.pl-side-tabs').addEventListener('click', function (event) {
     var tab = event.target.closest('.pl-side-tab');
@@ -3692,7 +3704,7 @@
     lab.querySelectorAll('[data-tip-ar]').forEach(function (node) {
       node.setAttribute('aria-label', isAr() ? node.getAttribute('data-tip-ar') : node.getAttribute('data-tip-en'));
     });
-    $('plSaved').innerHTML = '<i class="fa-solid fa-check"></i> ' + t('saved');
+    $('plSaved').innerHTML = '<i class="fa-solid fa-check"></i><span class="pl-saved-t">' + t('saved') + '</span>';
     $('plQuotaN').textContent = isAr() ? '٨٠' : '80';
     runLabel(null);
     syncArrow(sideToggle, lab.classList.contains('is-side-collapsed'), 'start');

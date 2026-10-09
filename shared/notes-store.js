@@ -297,8 +297,9 @@
   /*@3.NOSJ.8*/
   function putImage(blob, meta) {
     if (!blob || !blob.size) return Promise.reject(mkErr('img_empty'));
-    if (blob.size > MAX_IMG_BYTES) {
-      return Promise.reject(mkErr('img_too_large', { bytes: blob.size, max: MAX_IMG_BYTES }));
+    var cap = /mirsam/.test(blob.type || '') ? 96 * 1024 * 1024 : MAX_IMG_BYTES;
+    if (blob.size > cap) {
+      return Promise.reject(mkErr('img_too_large', { bytes: blob.size, max: cap }));
     }
     return sha256(blob).then(function (h) {
       var id = h ? h.slice(0, 24) : imgId();
@@ -384,6 +385,17 @@
     var fin = function () { upBusy = false; if (UPQ.length) setTimeout(pump, 400); };
     getImage(id).then(function (row) {
       if (!row || !row.blob || row.up) return null;
+      if (/mirsam/.test(row.type || '')) {
+        return slimMirsam(row.blob).then(function (small) {
+          if (!F.normMime(row.type)) return toDrive(row, small);
+          return sha256(small).then(function (h) {
+            return F.upload(small, { refId: refOf(id), name: 'drawing-' + id.slice(0, 8) + '.mirsam', mime: row.type, hash: h }).then(function (r) {
+              row.up = 1; row.cb = r.bytes || small.size;
+              return tx(S_IMGS, 'readwrite', function (os) { return os.put(row); });
+            }, function () { return null; }).then(function () { return toDrive(row, small); });
+          });
+        });
+      }
       return shrink(row.blob).then(function (small) {
         var mime = F.normMime(small.type) ? small.type : '';
         if (!mime) return null;
@@ -409,11 +421,17 @@
     var D = window.GardenDrive;
     return !!(D && D.enabled && D.enabled() && D.linked && D.linked() && D.upload);
   }
-  function toDrive(row) {
+  function slimMirsam(blob) {
+    var C = window.GardenColoring, L = window.GardenNotesLibrary;
+    var ready = C && C.slim ? Promise.resolve() : (L && L.deps ? L.deps() : Promise.resolve());
+    return ready.then(function () { var G = window.GardenColoring; return G && G.slim ? G.slim(blob) : blob; })['catch'](function () { return blob; });
+  }
+  function toDrive(row, body) {
     if (!row || row.gd || !row.blob || !driveOn()) return null;
-    return sha256(row.blob).then(function (full) {
-      var ext = String(row.type || 'image/png').split('/')[1] || 'png';
-      return window.GardenDrive.upload(row.blob, { kind: 'img', mime: row.type || 'image/png', sha: full,
+    body = body || row.blob;
+    return sha256(body).then(function (full) {
+      var ext = /mirsam/.test(row.type || '') ? 'mirsam' : (String(row.type || 'image/png').split('/')[1] || 'png');
+      return window.GardenDrive.upload(body, { kind: 'img', mime: row.type || 'image/png', sha: full,
         name: (row.name || ('image-' + row.id.slice(0, 8))) + (/[.][a-z0-9]{2,5}$/i.test(row.name || '') ? '' : '.' + ext),
         props: { img: row.id } });
     }).then(function (r) {
@@ -527,6 +545,7 @@
     putDoc: putDoc,
     delDoc: delDoc,
     manifest: manifest,
+    allRows: allRows,
     dirtyIds: dirtyIds,
     markClean: markClean,
     totalBytes: totalBytes,

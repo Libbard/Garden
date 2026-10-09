@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS472" data-module="2" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المعالجة المسبقة للبيانات (الجزء الأول) · DS472 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS472" data-page-title-en="DS472">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M01.html" data-gh-next="M03.html" data-gh-card="../../hub/course.html?code=DS472"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#data-quality-preprocessing" class="toc-link" data-bilingual>
+        <template class="content-ar">جودة البيانات وأهمية المعالجة المسبقة</template>
+        <template class="content-en">Data Quality and Why Preprocess</template>
+        <span class="content-target">جودة البيانات وأهمية المعالجة المسبقة</span>
+      </a>
+      <a href="#major-tasks-preprocessing" class="toc-link" data-bilingual>
+        <template class="content-ar">المهام الرئيسية في المعالجة المسبقة للبيانات</template>
+        <template class="content-en">Major Tasks in Data Preprocessing</template>
+        <span class="content-target">المهام الرئيسية في المعالجة المسبقة للبيانات</span>
+      </a>
+      <a href="#handling-missing-values" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع البيانات غير المكتملة (القيم المفقودة)</template>
+        <template class="content-en">Handling Incomplete Data (Missing Values)</template>
+        <span class="content-target">التعامل مع البيانات غير المكتملة (القيم المفقودة)</span>
+      </a>
+      <a href="#handling-noisy-data" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع البيانات الصاخبة (Noisy Data)</template>
+        <template class="content-en">Handling Noisy Data</template>
+        <span class="content-target">التعامل مع البيانات الصاخبة (Noisy Data)</span>
+      </a>
+      <a href="#data-cleaning-process" class="toc-link" data-bilingual>
+        <template class="content-ar">تنظيف البيانات كعملية متكاملة</template>
+        <template class="content-en">Data Cleaning as a Process</template>
+        <span class="content-target">تنظيف البيانات كعملية متكاملة</span>
+      </a>
+      <a href="#data-integration-redundancy" class="toc-link" data-bilingual>
+        <template class="content-ar">تكامل البيانات ومعالجة التكرار</template>
+        <template class="content-en">Data Integration and Handling Redundancy</template>
+        <span class="content-target">تكامل البيانات ومعالجة التكرار</span>
+      </a>
+      <a href="#chi-square-correlation" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبار الارتباط مربع كاي (Chi-Square) للبيانات الاسمية</template>
+        <template class="content-en">Chi-Square Correlation Test for Nominal Data</template>
+        <span class="content-target">اختبار الارتباط مربع كاي (Chi-Square) للبيانات الاسمية</span>
+      </a>
+      <a href="#covariance-numeric-data" class="toc-link" data-bilingual>
+        <template class="content-ar">التغاير (Covariance) للبيانات الرقمية</template>
+        <template class="content-en">Covariance for Numeric Data</template>
+        <span class="content-target">التغاير (Covariance) للبيانات الرقمية</span>
+      </a>
+      <a href="#weka-tool-overview" class="toc-link" data-bilingual>
+        <template class="content-ar">أداة ويكا (Weka Tool)</template>
+        <template class="content-en">Weka Tool Overview</template>
+        <span class="content-target">أداة ويكا (Weka Tool)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 2</template>
+      <template class="content-en">Module 2</template>
+      <span class="content-target">الوحدة 2</span>
+    </span> · DS472
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المعالجة المسبقة للبيانات (الجزء الأول)</h1>
+      <p class="hero-description">مقدمة شاملة لمهام المعالجة المسبقة للبيانات، مع التركيز على تنظيف البيانات (القيم المفقودة والبيانات الصاخبة) وتكامل البيانات (تحليل التكرار والارتباط باستخدام مربع كاي والتغاير).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Data Preprocessing (Part 1)</h1>
+      <p class="hero-description">A comprehensive introduction to data preprocessing tasks, focusing on data cleaning (missing values and noisy data) and data integration (redundancy and correlation analysis using Chi-Square and Covariance).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تنظيف البيانات</span>
+      <span class="tag">تكامل البيانات</span>
+      <span class="tag">مربع كاي</span>
+      <span class="tag">التغاير</span>
+      <span class="tag">ويكا</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Data Cleaning</span>
+      <span class="tag">Data Integration</span>
+      <span class="tag">Chi-Square</span>
+      <span class="tag">Covariance</span>
+      <span class="tag">Weka</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>التعرف على المهام الرئيسية في المعالجة المسبقة للبيانات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ عمليات تنظيف البيانات للتعامل مع القيم المفقودة والبيانات الصاخبة.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ عمليات تكامل البيانات وحل مشاكل التكرار والتعارض.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Recognize major tasks in data preprocessing.</span></li>
+      <li><span class="obj-icon">✦</span><span>Perform data cleaning to handle missing values and noisy data.</span></li>
+      <li><span class="obj-icon">✦</span><span>Perform data integration and resolve redundancy and conflict issues.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="data-quality-preprocessing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> جودة البيانات وأهمية المعالجة المسبقة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Data Quality and Why Preprocess</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المعالجة المسبقة هي خطوة ضرورية لتحسين جودة البيانات الخام قبل تحليلها، تماماً مثل غسل الخضروات وتقطيعها قبل الطبخ.</p></template>
+    <template class="content-en"><p>Preprocessing is a necessary step to improve raw data quality before analysis, much like washing and chopping vegetables before cooking.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل المعالجة المسبقة على تحسين جودة البيانات من خلال عدة أبعاد رئيسية:</p><ul><li><b><span class="smart-term" data-term-en="Accuracy" data-ar="الدقة" data-en-def="Correctness of data, free from errors.">الدقة<span class="smart-term-tooltip"></span></span> (Accuracy):</b> صحة البيانات، حيث قد تنتج القيم الخاطئة عن أجهزة معيبة أو أخطاء بشرية.</li><li><b><span class="smart-term" data-term-en="Completeness" data-ar="الاكتمال" data-en-def="Having all required information available.">الاكتمال<span class="smart-term-tooltip"></span></span> (Completeness):</b> توفر المعلومات كاملة، حيث قد تنقص بعض القيم (مثل معلومات العميل في بيانات المبيعات).</li><li><b>الاتساق (Consistency):</b> تطابق البيانات من جميع المصادر، لتجنب التناقضات الناتجة عن اختلاف المستخدمين أو المناطق الزمنية.</li><li><b>التوقيت (Timeliness):</b> الفروق الزمنية والتأخير، مثل تأخر بعض فروع المتاجر في مزامنة المبيعات.</li><li><b>الموثوقية (Believability):</b> مدى ثقة المستخدمين في البيانات.</li><li><b>قابلية التفسير (Interpretability):</b> مدى سهولة فهم البيانات.</li></ul></template>
+    <template class="content-en"><p>Preprocessing improves data quality across several key dimensions:</p><ul><li><b><span class="smart-term" data-term-en="Accuracy" data-ar="الدقة" data-en-def="Correctness of data, free from errors.">Accuracy<span class="smart-term-tooltip"></span></span>:</b> Correctness of data; incorrect values could be due to faulty instruments or human error.</li><li><b><span class="smart-term" data-term-en="Completeness" data-ar="الاكتمال" data-en-def="Having all required information available.">Completeness<span class="smart-term-tooltip"></span></span>:</b> Full information availability; incomplete data occurs when values are not always available.</li><li><b>Consistency:</b> Data from all sources are the same; avoids discrepancies from different users or time zones.</li><li><b>Timeliness:</b> Time difference and delay; e.g., store branches delaying sales syncing.</li><li><b>Believability:</b> Reflects how much the data are trusted by users.</li><li><b>Interpretability:</b> Reflects how easy the data are understood.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في العالم الحقيقي، البيانات دائماً متسخة (Dirty Data). لا يمكن لخوارزميات استخراج البيانات أن تقدم نتائج دقيقة إذا كانت المدخلات معيبة (مبدأ القمامة للداخل، القمامة للخارج - GIGO).</p><p>تعتبر أبعاد الجودة مترابطة؛ فمثلاً، البيانات غير المكتملة قد تؤدي إلى استنتاجات غير دقيقة، والبيانات غير المتسقة تقلل من الموثوقية.</p><p>تتطلب هذه المرحلة غالباً وقتاً وجهداً أكبر من مرحلة بناء النماذج نفسها في مشاريع علم البيانات.</p></template>
+    <template class="content-en"><p>In the real world, data is inherently 'dirty'. Data mining algorithms cannot produce accurate results if the input is flawed (the Garbage-In, Garbage-Out principle).</p><p>Quality dimensions are interconnected; incomplete data can lead to inaccurate conclusions, and inconsistent data reduces believability.</p><p>This phase often requires more time and effort than the actual model-building phase in data science projects.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن أن تؤثر البيانات غير المتسقة (Inconsistent Data) على قرارات التسويق في شركة متعددة الجنسيات؟</template>
+      <template class="content-en">How can inconsistent data affect marketing decisions in a multinational company?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قد تؤدي إلى استهداف خاطئ للعملاء، أو حسابات أرباح غير دقيقة بسبب اختلاف العملات أو المناطق الزمنية، مما يهدر ميزانية التسويق.</p></template>
+      <template class="content-en"><p>It could lead to incorrect customer targeting or inaccurate profit calculations due to different currencies or time zones, wasting the marketing budget.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="major-tasks-preprocessing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> المهام الرئيسية في المعالجة المسبقة للبيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Major Tasks in Data Preprocessing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتكون المعالجة المسبقة من أربع مهام رئيسية: التنظيف، التكامل، التقليل، والتحويل.</p></template>
+    <template class="content-en"><p>Data preprocessing consists of four main tasks: Cleaning, Integration, Reduction, and Transformation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المهام الرئيسية تشمل:</p><ol><li><b><span class="smart-term" data-term-en="Data Cleaning" data-ar="تنظيف البيانات" data-en-def="Routines that work to &#x27;clean&#x27; the data by filling in missing values, smoothing noisy data, identifying or removing outliers, and resolving inconsistencies.">تنظيف البيانات<span class="smart-term-tooltip"></span></span> (Data Cleaning):</b> ملء القيم المفقودة، تنعيم البيانات الصاخبة، تحديد أو إزالة القيم المتطرفة، وحل التناقضات.</li><li><b>تكامل البيانات (Data Integration):</b> دمج البيانات من مصادر متعددة (قواعد بيانات، مكعبات بيانات، أو ملفات) في مخزن بيانات متماسك.</li><li><b>تقليل البيانات (Data Reduction):</b> الحصول على تمثيل مصغر لمجموعة البيانات يكون أصغر حجماً بكثير ولكنه ينتج نفس نتائج التعدين (أو تقريباً نفس النتائج).</li><li><b>تحويل البيانات (Data Transformation):</b> تحويل البيانات إلى أشكال مناسبة لتحسين نتائج التعدين (مثل التطبيع أو التجميع).</li></ol></template>
+    <template class="content-en"><p>The major tasks include:</p><ol><li><b><span class="smart-term" data-term-en="Data Cleaning" data-ar="تنظيف البيانات" data-en-def="Routines that work to &#x27;clean&#x27; the data by filling in missing values, smoothing noisy data, identifying or removing outliers, and resolving inconsistencies.">Data Cleaning<span class="smart-term-tooltip"></span></span>:</b> Fill in missing values, smooth noisy data, identify or remove outliers, and resolve inconsistencies.</li><li><b>Data Integration:</b> Integrate data from multiple sources (databases, data cubes, or files).</li><li><b>Data Reduction:</b> Obtain a reduced representation of the data set that is much smaller in volume but produces the same (or almost the same) mining results.</li><li><b>Data Transformation:</b> Convert the data into appropriate forms for better mining results.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه المهام ليست متسلسلة بشكل صارم؛ فقد تحتاج إلى تنظيف البيانات بعد تكاملها، أو تحويلها قبل تقليلها.</p><p>الهدف النهائي من جميع هذه المهام هو تزويد خوارزميات التعلم الآلي ببيانات عالية الجودة لتقليل وقت التدريب وزيادة دقة التنبؤ.</p></template>
+    <template class="content-en"><p>These tasks are not strictly sequential; you might need to clean data after integrating it, or transform it before reducing it.</p><p>The ultimate goal of all these tasks is to provide machine learning algorithms with high-quality data to reduce training time and increase prediction accuracy.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a 4-part diagram showing Data Preprocessing Overview. 1. Data Cleaning: A dirty cylinder (database) being cleaned into a shiny cylinder. 2. Data Integration: Multiple cylinders and a data cube merging into one large cylinder. 3. Data Reduction: A large table transforming into a smaller table with fewer rows/columns. 4. Data Transformation: A list of raw numbers (-2, 32, 100) transforming into normalized numbers (-0.02, 0.32, 1.00). Style: educational, dark background #0d1117, accent color #3b82f6, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 640" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,2 L6,5 L0,8 Z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Gradients -->
+        <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        
+        <linearGradient id="brandGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-500)" />
+            <stop offset="100%" stop-color="var(--brand-400)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="450" y="45" text-anchor="middle" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Major Tasks in Data Preprocessing</text>
+    <text x="450" y="45" text-anchor="middle" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">المهام الرئيسية في المعالجة المسبقة للبيانات</text>
+
+    <!-- ========================================== -->
+    <!-- QUADRANT 1: DATA CLEANING                  -->
+    <!-- ========================================== -->
+    <rect x="40" y="80" width="390" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="235" y="115" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">1. Data Cleaning</text>
+    <text x="235" y="115" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">1. تنظيف البيانات</text>
+
+    <!-- Dirty Cylinder -->
+    <g transform="translate(140, 165)">
+        <path d="M-30,0 L-30,60 A30,10 0 0,0 30,60 L30,0 Z" fill="var(--bg-surface)" stroke="var(--text-muted)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="30" ry="10" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2"/>
+        <!-- Dirt spots -->
+        <circle cx="-10" cy="20" r="3" fill="var(--text-muted)"/>
+        <circle cx="15" cy="35" r="4" fill="var(--text-muted)"/>
+        <circle cx="5" cy="50" r="2" fill="var(--text-muted)"/>
+        <path d="M-15,40 Q-10,45 -5,40" stroke="var(--text-muted)" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 180 195 L 285 195" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <!-- Shiny Cylinder -->
+    <g transform="translate(330, 165)">
+        <path d="M-30,0 L-30,60 A30,10 0 0,0 30,60 L30,0 Z" fill="url(#brandGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="30" ry="10" fill="var(--brand-500)" stroke="var(--brand-400)" stroke-width="2"/>
+        <!-- Sparkles -->
+        <path d="M 15 10 Q 20 10 20 5 Q 20 10 25 10 Q 20 10 20 15 Q 20 10 15 10 Z" fill="var(--bg-surface)"/>
+        <path d="M -25 35 Q -20 35 -20 30 Q -20 35 -15 35 Q -20 35 -20 40 Q -20 35 -25 35 Z" fill="var(--bg-surface)"/>
+    </g>
+
+    <text x="235" y="305" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Fill missing values, smooth noisy data</text>
+    <text x="235" y="305" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">ملء القيم المفقودة، وتنعيم البيانات الصاخبة</text>
+
+
+    <!-- ========================================== -->
+    <!-- QUADRANT 2: DATA INTEGRATION               -->
+    <!-- ========================================== -->
+    <rect x="470" y="80" width="390" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="665" y="115" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">2. Data Integration</text>
+    <text x="665" y="115" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">2. تكامل البيانات</text>
+
+    <!-- Small Cylinders (Sources) -->
+    <g transform="translate(530, 130)">
+        <path d="M-15,0 L-15,30 A15,5 0 0,0 15,30 L15,0 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="15" ry="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <g transform="translate(530, 180)">
+        <path d="M-15,0 L-15,30 A15,5 0 0,0 15,30 L15,0 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="15" ry="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+    <g transform="translate(530, 230)">
+        <path d="M-15,0 L-15,30 A15,5 0 0,0 15,30 L15,0 Z" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="15" ry="5" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+    </g>
+
+    <!-- Converging Arrows -->
+    <path d="M 550 145 Q 630 145 705 185" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <path d="M 550 195 L 705 195" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <path d="M 550 245 Q 630 245 705 205" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <!-- Large Cylinder (Integrated) -->
+    <g transform="translate(760, 155)">
+        <path d="M-40,0 L-40,80 A40,15 0 0,0 40,80 L40,0 Z" fill="url(#brandGrad)" stroke="var(--brand-500)" stroke-width="2"/>
+        <ellipse cx="0" cy="0" rx="40" ry="15" fill="var(--brand-500)" stroke="var(--brand-400)" stroke-width="2"/>
+        <!-- Data lines inside -->
+        <path d="M-20,30 L20,30 M-20,50 L20,50" stroke="var(--on-brand-hi)" stroke-width="2" stroke-dasharray="4,4" opacity="0.6"/>
+    </g>
+
+    <text x="665" y="305" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Merge data from multiple sources</text>
+    <text x="665" y="305" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">دمج البيانات من مصادر متعددة</text>
+
+
+    <!-- ========================================== -->
+    <!-- QUADRANT 3: DATA REDUCTION                 -->
+    <!-- ========================================== -->
+    <rect x="40" y="350" width="390" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="235" y="385" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">3. Data Reduction</text>
+    <text x="235" y="385" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">3. تقليل البيانات</text>
+
+    <!-- Large Table -->
+    <g transform="translate(90, 425)">
+        <rect x="0" y="0" width="100" height="100" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" rx="4"/>
+        <!-- Grid lines -->
+        <line x1="25" y1="0" x2="25" y2="100" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="50" y1="0" x2="50" y2="100" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="75" y1="0" x2="75" y2="100" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="25" x2="100" y2="25" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="50" x2="100" y2="50" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="0" y1="75" x2="100" y2="75" stroke="var(--border-color)" stroke-width="1"/>
+        <!-- Highlighted subset -->
+        <rect x="25" y="25" width="50" height="50" fill="var(--brand-500)" opacity="0.15"/>
+        <rect x="25" y="25" width="50" height="50" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2"/>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 205 475 L 290 475" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <!-- Small Table -->
+    <g transform="translate(305, 450)">
+        <rect x="0" y="0" width="50" height="50" fill="url(#brandGrad)" stroke="var(--brand-500)" stroke-width="2" rx="4"/>
+        <line x1="25" y1="0" x2="25" y2="50" stroke="var(--on-brand-hi)" stroke-width="1" opacity="0.5"/>
+        <line x1="0" y1="25" x2="50" y2="25" stroke="var(--on-brand-hi)" stroke-width="1" opacity="0.5"/>
+    </g>
+
+    <text x="235" y="575" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Reduce volume but produce same results</text>
+    <text x="235" y="575" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">تقليل الحجم مع إنتاج نفس النتائج</text>
+
+
+    <!-- ========================================== -->
+    <!-- QUADRANT 4: DATA TRANSFORMATION            -->
+    <!-- ========================================== -->
+    <rect x="470" y="350" width="390" height="250" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <text x="665" y="385" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">4. Data Transformation</text>
+    <text x="665" y="385" text-anchor="middle" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">4. تحويل البيانات</text>
+
+    <!-- Raw Data Box -->
+    <g transform="translate(490, 425)">
+        <rect x="0" y="0" width="100" height="100" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" rx="8"/>
+        <text x="50" y="32" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">-2</text>
+        <text x="50" y="57" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">32</text>
+        <text x="50" y="82" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">100</text>
+    </g>
+
+    <!-- Arrow & Function Label -->
+    <path d="M 605 475 L 685 475" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="645" y="465" text-anchor="middle" fill="var(--brand-ink)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">f(x)</text>
+    <text x="645" y="465" text-anchor="middle" fill="var(--brand-ink)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">د(س)</text>
+
+    <!-- Normalized Data Box -->
+    <g transform="translate(700, 425)">
+        <rect x="0" y="0" width="100" height="100" fill="url(#brandGrad)" stroke="var(--brand-500)" stroke-width="2" rx="8"/>
+        <text x="50" y="32" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">-0.02</text>
+        <text x="50" y="57" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0.32</text>
+        <text x="50" y="82" text-anchor="middle" fill="var(--on-brand-hi)" font-size="16" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1.00</text>
+    </g>
+
+    <text x="665" y="575" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-en">Convert data into appropriate forms</text>
+    <text x="665" y="575" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif" class="gsvg-ar">تحويل البيانات إلى أشكال مناسبة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نلجأ إلى تقليل البيانات (Data Reduction) رغم أننا نفقد بعض المعلومات؟</template>
+      <template class="content-en">Why do we resort to Data Reduction even though we might lose some information?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مجموعات البيانات الضخمة جداً تتطلب وقتاً وموارد حسابية هائلة. التقليل الذكي يحافظ على الأنماط الأساسية مع تسريع عملية التعدين بشكل كبير.</p></template>
+      <template class="content-en"><p>Because massive datasets require enormous time and computational resources. Smart reduction preserves essential patterns while significantly speeding up the mining process.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="handling-missing-values" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التعامل مع البيانات غير المكتملة (القيم المفقودة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Handling Incomplete Data (Missing Values)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>البيانات المفقودة تحدث لأسباب عديدة (أعطال، رفض الإدخال)، ويمكن معالجتها بالتجاهل، أو التعبئة اليدوية، أو التعبئة التلقائية باستخدام الإحصائيات.</p></template>
+    <template class="content-en"><p>Missing data occurs for many reasons (malfunctions, refusal to enter) and can be handled by ignoring, manual filling, or automatic statistical filling.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أسباب فقدان البيانات تشمل: أعطال المعدات، عدم الاتساق مع بيانات أخرى مما أدى لحذفها، سوء الفهم عند الإدخال، أو عدم اعتبار البيانات مهمة وقت الإدخال.</p><p>طرق التعامل مع <span class="smart-term" data-term-en="Missing Values" data-ar="القيم المفقودة" data-en-def="Data tuples that have no recorded value for several attributes.">القيم المفقودة<span class="smart-term-tooltip"></span></span>:</p><ol><li><b>تجاهل العينة (Ignore the sample):</b> غير فعال إذا كانت نسبة العينات المتجاهلة عالية جداً.</li><li><b>التعبئة اليدوية (Fill manually):</b> مملة وغير عملية للبيانات الضخمة.</li><li><b>التعبئة التلقائية (Fill automatically):</b><ul><li>استخدام ثابت عالمي (Global constant): مثل كلمة 'غير معروف' (unknown)، ولكن قد يعتبرها النظام فئة جديدة.</li><li>استخدام المتوسط (Attribute mean): متوسط السمة لجميع البيانات.</li><li>استخدام المتوسط لنفس الفئة (Mean for same class): متوسط السمة للعينات التي تنتمي لنفس الفئة.</li><li>القيمة الأكثر احتمالاً (Most probable value): بناءً على نماذج إحصائية (مثل الانحدار أو شجرة القرار).</li></ul></li></ol></template>
+    <template class="content-en"><p>Reasons for missing data include: equipment malfunction, inconsistency with other data (thus deleted), misunderstanding during entry, or data not considered important at entry time.</p><p>How to Handle <span class="smart-term" data-term-en="Missing Values" data-ar="القيم المفقودة" data-en-def="Data tuples that have no recorded value for several attributes.">Missing Values<span class="smart-term-tooltip"></span></span>:</p><ol><li><b>Ignore the sample:</b> Not effective when the percentage of ignored samples is too high.</li><li><b>Fill in manually:</b> Tedious and infeasible for large datasets.</li><li><b>Fill in automatically with:</b><ul><li>A global constant: e.g., 'unknown', but this might be treated as a new class.</li><li>The attribute mean: for all data.</li><li>The attribute mean for all samples belonging to the same class.</li><li>The most probable value: based on some statistical models (like regression or decision trees).</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام ثابت عالمي مثل 'unknown' خطير لأنه قد يخدع خوارزمية التعدين لتكوين أنماط حول هذه الكلمة بدلاً من اكتشاف النمط الحقيقي.</p><p>استخدام 'القيمة الأكثر احتمالاً' هو الأسلوب الأكثر دقة لأنه يستفيد من العلاقات بين السمات المختلفة لتقدير القيمة المفقودة، ولكنه يتطلب تكلفة حسابية أعلى.</p></template>
+    <template class="content-en"><p>Using a global constant like 'unknown' is dangerous because the mining algorithm might form patterns around this word instead of discovering the true pattern.</p><p>Using the 'most probable value' is the most accurate approach as it leverages relationships between different attributes to estimate the missing value, though it incurs a higher computational cost.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Ignore Sample</th><th>Global Constant</th><th>Most Probable Value</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الدقة الإحصائية</template>
+          <template class="content-en">Statistical Accuracy</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفضة (يقلل حجم البيانات)</template>
+          <template class="content-en">Low (reduces data size)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفضة (يخلق أنماطاً وهمية)</template>
+          <template class="content-en">Low (creates fake patterns)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية (يحافظ على التوزيع)</template>
+          <template class="content-en">High (preserves distribution)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التكلفة الحسابية</template>
+          <template class="content-en">Computational Cost</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفضة جداً</template>
+          <template class="content-en">Very Low</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفضة</template>
+          <template class="content-en">Low</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالية (يتطلب بناء نموذج)</template>
+          <template class="content-en">High (requires model building)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون 'تجاهل العينة' (حذف الصف) هو الخيار الأفضل للتعامل مع القيم المفقودة؟</template>
+      <template class="content-en">When is 'ignoring the sample' (deleting the row) the best option for handling missing values?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تحتوي العينة على قيم مفقودة في سمات حرجة جداً (مثل تصنيف الهدف Class Label)، وتكون مجموعة البيانات كبيرة بما يكفي بحيث لا يؤثر الحذف على التوزيع العام.</p></template>
+      <template class="content-en"><p>When the sample has missing values in highly critical attributes (like the Class Label), and the dataset is large enough that deletion doesn't affect the overall distribution.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="handling-noisy-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التعامل مع البيانات الصاخبة (Noisy Data)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Handling Noisy Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الضوضاء هي أخطاء عشوائية في البيانات. يمكن تنعيمها باستخدام تقنيات مثل التجميع (Binning)، الانحدار (Regression)، أو التجميع العنقودي (Clustering).</p></template>
+    <template class="content-en"><p>Noise is random error in data. It can be smoothed using techniques like Binning, Regression, or Clustering.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Noise" data-ar="الضوضاء" data-en-def="Random error or variance in a measured variable.">الضوضاء<span class="smart-term-tooltip"></span></span> (Noise) هي خطأ عشوائي أو تباين في متغير مقاس. قد تنتج عن أدوات جمع بيانات معيبة، مشاكل في الإدخال أو النقل، أو قيود تكنولوجية.</p><p>طرق التعامل مع البيانات الصاخبة:</p><ol><li><b><span class="smart-term" data-term-en="Binning" data-ar="التجميع في صناديق" data-en-def="A data smoothing technique that sorts data and partitions it into bins, then replaces values based on bin statistics.">التجميع في صناديق<span class="smart-term-tooltip"></span></span> (Binning):</b><ul><li>أولاً، فرز البيانات وتقسيمها إلى صناديق (bins) متساوية التردد (equal-frequency).</li><li>ثم تنعيم البيانات بواسطة: متوسط الصندوق (bin means)، وسيط الصندوق (bin median)، أو حدود الصندوق (bin boundaries).</li></ul></li><li><b>الانحدار (Regression):</b> تنعيم البيانات عن طريق ملاءمتها في دوال انحدار (إيجاد خط أو منحنى يمثل البيانات).</li><li><b>التجميع العنقودي (Clustering):</b> اكتشاف وإزالة القيم المتطرفة (Outliers) التي تقع خارج العناقيد الرئيسية.</li><li><b>الفحص المشترك (Computer and human inspection):</b> اكتشاف القيم المشبوهة بواسطة الحاسوب وفحصها بشرياً للتعامل مع القيم المتطرفة المحتملة.</li></ol></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Noise" data-ar="الضوضاء" data-en-def="Random error or variance in a measured variable.">Noise<span class="smart-term-tooltip"></span></span> is a random error or variance in a measured variable. It may be due to faulty data collection instruments, entry problems, transmission problems, or technology limitations.</p><p>How to Handle Noisy Data:</p><ol><li><b><span class="smart-term" data-term-en="Binning" data-ar="التجميع في صناديق" data-en-def="A data smoothing technique that sorts data and partitions it into bins, then replaces values based on bin statistics.">Binning<span class="smart-term-tooltip"></span></span>:</b><ul><li>First, sort data and partition into (equal-frequency) bins.</li><li>Then smooth by bin means, smooth by bin median, or smooth by bin boundaries.</li></ul></li><li><b>Regression:</b> Smooth by fitting the data into regression functions (finding a line or curve that fits the data).</li><li><b>Clustering:</b> Detect and remove outliers that fall outside the main clusters.</li><li><b>Combined computer and human inspection:</b> Detect suspicious values computationally and check them manually (e.g., dealing with possible outliers).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تقنية Binning تعتبر طريقة محلية للتنعيم (Local Smoothing) لأنها تنظر فقط إلى الجيران القريبين للقيمة. بينما الانحدار يعتبر طريقة عالمية (Global Smoothing) لأنه يأخذ في الاعتبار جميع نقاط البيانات لبناء النموذج.</p><p>القيم المتطرفة (Outliers) ليست دائماً 'ضوضاء' يجب التخلص منها؛ في بعض التطبيقات مثل اكتشاف الاحتيال (Fraud Detection)، تكون القيمة المتطرفة هي الهدف الأساسي للبحث.</p></template>
+    <template class="content-en"><p>Binning is considered a local smoothing method because it only looks at the immediate neighbors of a value. Regression is a global smoothing method because it considers all data points to build the model.</p><p>Outliers are not always 'noise' to be discarded; in applications like Fraud Detection, the outlier is the primary target of the investigation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا القيم المرتبة: 4, 8, 15, 21, 21, 24. كيف نقوم بتنعيمها باستخدام 'متوسط الصندوق' (Bin Means) إذا كان حجم الصندوق = 3؟</template>
+      <template class="content-en">Given sorted values: 4, 8, 15, 21, 21, 24. How do we smooth them using 'Bin Means' if bin depth = 3?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الصندوق 1: [4, 8, 15] -> المتوسط = 9. القيم تصبح: 9, 9, 9. الصندوق 2: [21, 21, 24] -> المتوسط = 22. القيم تصبح: 22, 22, 22.</p></template>
+      <template class="content-en"><p>Bin 1: [4, 8, 15] -> Mean = 9. Values become: 9, 9, 9. Bin 2: [21, 21, 24] -> Mean = 22. Values become: 22, 22, 22.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-cleaning-process" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تنظيف البيانات كعملية متكاملة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Data Cleaning as a Process</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنظيف البيانات ليس خطوة واحدة، بل عملية تشمل اكتشاف التناقضات باستخدام البيانات الوصفية (Metadata) وأدوات متخصصة، ثم ترحيل ودمج البيانات.</p></template>
+    <template class="content-en"><p>Data cleaning is not a single step, but a process involving discrepancy detection using metadata and specialized tools, followed by data migration and integration.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتضمن عملية تنظيف البيانات خطوتين رئيسيتين:</p><ol><li><b>اكتشاف التناقضات (Data discrepancy detection):</b><ul><li>استخدام البيانات الوصفية (Metadata) لمعرفة النطاق، التبعية، والتوزيع.</li><li>التحقق من التحميل الزائد للحقول (Field overloading).</li><li>التحقق من قواعد التفرد (Uniqueness rule)، والتسلسل (Consecutive rule)، والقيم الفارغة (Null rule).</li><li>استخدام أدوات تجارية:<ul><li><b>Data scrubbing:</b> استخدام معرفة المجال البسيطة (مثل الرمز البريدي، التدقيق الإملائي) لاكتشاف الأخطاء وتصحيحها.</li><li><b>Data auditing:</b> تحليل البيانات لاكتشاف القواعد والعلاقات لضبط المخالفين (مثل الارتباط والتجميع لاكتشاف القيم المتطرفة).</li></ul></li></ul></li><li><b>ترحيل وتكامل البيانات (Data migration and integration):</b><ul><li>أدوات ترحيل البيانات: تسمح بتحديد التحويلات.</li><li>أدوات ETL (الاستخراج/التحويل/التحميل): تسمح للمستخدمين بتحديد التحويلات عبر واجهة رسومية.</li></ul></li></ol></template>
+    <template class="content-en"><p>The data cleaning process involves two main steps:</p><ol><li><b>Data discrepancy detection:</b><ul><li>Use metadata (e.g., domain, range, dependency, distribution).</li><li>Check field overloading.</li><li>Check uniqueness rule, consecutive rule, and null rule.</li><li>Use commercial tools:<ul><li><b><span class="smart-term" data-term-en="Data Scrubbing" data-ar="تنقيح البيانات" data-en-def="Using simple domain knowledge to detect errors and make corrections.">Data scrubbing<span class="smart-term-tooltip"></span></span>:</b> use simple domain knowledge (e.g., postal code, spell-check) to detect errors and make corrections.</li><li><b><span class="smart-term" data-term-en="Data Auditing" data-ar="تدقيق البيانات" data-en-def="Analyzing data to discover rules and relationships to detect violators.">Data auditing<span class="smart-term-tooltip"></span></span>:</b> by analyzing data to discover rules and relationship to detect violators (e.g., correlation and clustering to find outliers).</li></ul></li></ul></li><li><b>Data migration and integration:</b><ul><li>Data migration tools: allow transformations to be specified.</li><li><span class="smart-term" data-term-en="ETL" data-ar="الاستخراج والتحويل والتحميل" data-en-def="Extraction, Transformation, and Loading tools used in data warehousing.">ETL<span class="smart-term-tooltip"></span></span> (Extraction/Transformation/Loading) tools: allow users to specify transformations through a graphical user interface.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عملية التنظيف هي عملية تكرارية وتفاعلية (Iterative and interactive). لا يمكنك كتابة سكريبت تنظيف واحد وتوقع أن يحل كل المشاكل من المرة الأولى.</p><p>أدوات مثل Potter’s Wheels تدمج بين اكتشاف الأخطاء والتحويل في بيئة تفاعلية، مما يسمح للمحلل برؤية تأثير قواعد التنظيف فوراً على البيانات.</p></template>
+    <template class="content-en"><p>The cleaning process is highly iterative and interactive. You cannot write a single cleaning script and expect it to solve all problems on the first run.</p><p>Tools like Potter’s Wheels integrate error detection and transformation in an interactive environment, allowing the analyst to immediately see the impact of cleaning rules on the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الفرق الأساسي بين Data Scrubbing و Data Auditing؟</template>
+      <template class="content-en">What is the main difference between Data Scrubbing and Data Auditing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>Scrubbing يعتمد على قواعد مسبقة ومعرفة بالمجال (مثل التأكد من أن الرمز البريدي يتكون من 5 أرقام)، بينما Auditing يكتشف القواعد من البيانات نفسها إحصائياً (مثل اكتشاف أن العمر لا يتناسب مع الراتب).</p></template>
+      <template class="content-en"><p>Scrubbing relies on predefined rules and domain knowledge (e.g., checking a zip code format), while Auditing discovers rules statistically from the data itself (e.g., finding an anomaly between age and salary).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-integration-redundancy" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تكامل البيانات ومعالجة التكرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Data Integration and Handling Redundancy</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تكامل البيانات يجمع مصادر متعددة معاً، مما يطرح تحديات مثل تحديد الكيانات (هل Bill Clinton هو نفسه William Clinton؟) ومعالجة البيانات المكررة أو المشتقة.</p></template>
+    <template class="content-en"><p>Data integration combines multiple sources, raising challenges like entity identification (is Bill Clinton the same as William Clinton?) and handling redundant or derivable data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>تكامل البيانات (Data Integration):</b> يجمع البيانات من مصادر متعددة في مخزن متماسك.</p><p>التحديات الرئيسية:</p><ol><li><b>تكامل المخطط (Schema integration):</b> دمج البيانات الوصفية (Metadata) من مصادر مختلفة (مثال: A.cust-id = B.cust-#).</li><li><b>مشكلة <span class="smart-term" data-term-en="Entity Identification" data-ar="تحديد الكيان" data-en-def="The process of matching records from different sources that refer to the same real-world entity.">تحديد الكيان<span class="smart-term-tooltip"></span></span> (Entity identification problem):</b> تحديد كيانات العالم الحقيقي من مصادر متعددة (مثال: Bill Clinton = William Clinton).</li><li><b>اكتشاف وحل تعارض قيم البيانات:</b> لنفس الكيان، قد تختلف القيم من مصادر مختلفة بسبب اختلاف التمثيلات أو المقاييس (مثل الوحدات المترية مقابل البريطانية).</li></ol><p><b>معالجة التكرار (Handling Redundancy):</b></p><ul><li>يحدث التكرار غالباً عند دمج قواعد بيانات متعددة.</li><li><b>تحديد الكائن (Object identification):</b> قد يكون لنفس السمة أسماء مختلفة في قواعد بيانات مختلفة.</li><li><b><span class="smart-term" data-term-en="Derivable Data" data-ar="البيانات القابلة للاشتقاق" data-en-def="Data that can be computed or inferred from other existing data attributes.">البيانات القابلة للاشتقاق<span class="smart-term-tooltip"></span></span> (Derivable data):</b> قد تكون إحدى السمات 'مشتقة' من سمة أخرى (مثل الإيرادات الربع سنوية والإيرادات السنوية).</li></ul></template>
+    <template class="content-en"><p><b>Data Integration:</b> Combines data from multiple sources into a coherent store.</p><p>Key Challenges:</p><ol><li><b>Schema integration:</b> Integrate metadata from different sources (e.g., A.cust-id = B.cust-#).</li><li><b><span class="smart-term" data-term-en="Entity Identification" data-ar="تحديد الكيان" data-en-def="The process of matching records from different sources that refer to the same real-world entity.">Entity identification<span class="smart-term-tooltip"></span></span> problem:</b> Identify real-world entities from multiple data sources (e.g., Bill Clinton = William Clinton).</li><li><b>Detecting and resolving data value conflicts:</b> For the same real-world entity, attribute values from different sources are different (due to different representations or scales, e.g., metric vs. British units).</li></ol><p><b>Handling Redundancy:</b></p><ul><li>Redundant data occur often when integrating multiple databases.</li><li><b>Object identification:</b> The same attribute or object may have different names in different databases.</li><li><b><span class="smart-term" data-term-en="Derivable Data" data-ar="البيانات القابلة للاشتقاق" data-en-def="Data that can be computed or inferred from other existing data attributes.">Derivable data<span class="smart-term-tooltip"></span></span>:</b> One attribute may be a 'derived' attribute in another table (e.g., quarters revenue and annual revenue).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التكامل الدقيق للبيانات يقلل من التكرار والتناقضات، مما يحسن سرعة وجودة عملية التعدين بشكل كبير.</p><p>يمكن اكتشاف بعض التكرارات رياضياً باستخدام تحليل الارتباط (Correlation Analysis)، حيث نقيس مدى قوة دلالة سمة على أخرى.</p></template>
+    <template class="content-en"><p>Careful integration of data from multiple sources helps reduce/avoid redundancies and inconsistencies, improving mining speed and quality.</p><p>Some redundancies can be detected mathematically using correlation analysis, measuring how strongly one attribute implies the other.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نعتبر 'البيانات القابلة للاشتقاق' (مثل العمر وتاريخ الميلاد) نوعاً من التكرار (Redundancy)؟</template>
+      <template class="content-en">Why is 'derivable data' (like Age and Date of Birth) considered a form of redundancy?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الاحتفاظ بالاثنين لا يضيف معلومات جديدة للنموذج، بل يزيد من حجم البيانات وقد يؤدي إلى مشاكل في التعددية الخطية (Multicollinearity) في بعض الخوارزميات.</p></template>
+      <template class="content-en"><p>Because keeping both adds no new information to the model, increases data size, and can lead to multicollinearity issues in certain algorithms.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="chi-square-correlation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> اختبار الارتباط مربع كاي (Chi-Square) للبيانات الاسمية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Chi-Square Correlation Test for Nominal Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم اختبار مربع كاي لاكتشاف ما إذا كان هناك ارتباط إحصائي بين سمتين اسميتين (فئويتين) من خلال مقارنة التكرارات الفعلية بالتكرارات المتوقعة.</p></template>
+    <template class="content-en"><p>The Chi-Square test is used to discover if there is a statistical correlation between two nominal (categorical) attributes by comparing observed frequencies with expected frequencies.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بالنسبة للبيانات الاسمية (Nominal Data)، يمكن إيجاد علاقة الارتباط بين سمتين A و B باستخدام اختبار $X^2$.</p><p><b>الخطوات:</b></p><ol><li>إنشاء جدول توافق (Contingency Table) يوضح التكرار الفعلي (Observed Frequency - $o_{ij}$) لكل زوج من القيم.</li><li>حساب التكرار المتوقع (Expected Frequency - $e_{ij}$) لكل خلية باستخدام المعادلة: $e_{ij} = \frac{count(A=a_i) \times count(B=b_j)}{n}$</li><li>حساب قيمة $X^2$ بجمع الفروق المربعة مقسومة على المتوقع لجميع الخلايا.</li><li>مقارنة القيمة المحسوبة بالقيمة الحرجة من جدول التوزيع بناءً على <span class="smart-term" data-term-en="Degrees of Freedom" data-ar="درجات الحرية" data-en-def="Calculated as (rows - 1) * (columns - 1) for a contingency table, used to find the critical value in statistical tests.">درجات الحرية<span class="smart-term-tooltip"></span></span> (Degrees of Freedom) ومستوى الدلالة (Significance level).</li></ol><p><b>مثال عملي:</b> دراسة 1500 شخص حول الجنس (ذكر/أنثى) ونوع القراءة المفضل (خيال/غير خيال).</p><ul><li>الذكور يفضلون الخيال: 250 (فعلي)</li><li>حساب المتوقع لهذه الخلية: (إجمالي الذكور 300 × إجمالي محبي الخيال 450) / 1500 = 90.</li><li>قيمة $X^2$ المحسوبة للجدول كامل = 507.93.</li><li>درجات الحرية = (2-1) × (2-1) = 1. القيمة الحرجة عند 0.001 هي 10.828.</li><li>بما أن 507.93 > 10.828، نرفض فرضية الاستقلال، ونستنتج أن السمتين مرتبطتان بقوة.</li></ul></template>
+    <template class="content-en"><p>For nominal data, a correlation relationship between two attributes, A and B, can be found using a $X^2$ (chi-square) test.</p><p><b>Steps:</b></p><ol><li>Create a <span class="smart-term" data-term-en="Contingency Table" data-ar="جدول التوافق" data-en-def="A table showing the distribution of one variable in rows and another in columns, used to study the association between the two variables.">contingency table<span class="smart-term-tooltip"></span></span> showing the actual count (Observed Frequency - $o_{ij}$) of joint events.</li><li>Calculate the Expected Frequency ($e_{ij}$) for each cell: $e_{ij} = \frac{count(A=a_i) \times count(B=b_j)}{n}$</li><li>Calculate the $X^2$ value by summing the squared differences divided by the expected frequency over all cells.</li><li>Compare the computed value with the critical value from the distribution table based on <span class="smart-term" data-term-en="Degrees of Freedom" data-ar="درجات الحرية" data-en-def="Calculated as (rows - 1) * (columns - 1) for a contingency table, used to find the critical value in statistical tests.">degrees of freedom<span class="smart-term-tooltip"></span></span> and significance level.</li></ol><p><b>Worked Example:</b> 1500 people surveyed on gender (male/female) and preferred reading (fiction/non-fiction).</p><ul><li>Male & Fiction: 250 (Observed)</li><li>Expected for this cell: (Total Male 300 × Total Fiction 450) / 1500 = 90.</li><li>Computed $X^2$ for the whole table = 507.93.</li><li>Degrees of freedom = (2-1) × (2-1) = 1. Critical value at 0.001 is 10.828.</li><li>Since 507.93 > 10.828, we reject the hypothesis of independence and conclude the attributes are strongly correlated.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تختبر إحصائية $X^2$ الفرضية الصفرية (Null Hypothesis) القائلة بأن A و B مستقلان (لا يوجد ارتباط).</p><p>الخلايا التي تساهم بشكل أكبر في قيمة $X^2$ هي تلك التي يختلف فيها العدد الفعلي بشكل كبير عن العدد المتوقع.</p><p>ملاحظة هامة: الارتباط لا يعني السببية (Correlation does not imply causality). إثبات الارتباط بين الجنس ونوع القراءة لا يعني أن أحدهما يسبب الآخر.</p></template>
+    <template class="content-en"><p>The $X^2$ statistic tests the null hypothesis that A and B are independent (no correlation).</p><p>The cells that contribute the most to the $X^2$ value are those for which the actual count is very different from that expected.</p><p>Important note: Correlation does not imply causality. Proving a correlation between gender and reading preference doesn't mean one causes the other.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة مربع كاي، حيث o هو التكرار الفعلي و e هو التكرار المتوقع.</strong></template>
+      <template class="content-en"><strong>Chi-Square formula, where o is observed frequency and e is expected frequency.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\chi^2 = \sum_{i=1}^{c} \sum_{j=1}^{r} \frac{(o_{ij} - e_{ij})^2}{e_{ij}}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يعني إذا كانت قيمة $X^2$ المحسوبة تساوي صفراً؟</template>
+      <template class="content-en">What does it mean if the calculated $X^2$ value is exactly zero?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن التكرارات الفعلية تتطابق تماماً مع التكرارات المتوقعة في كل خلية، مما يدل على استقلال تام (لا يوجد أي ارتباط) بين السمتين.</p></template>
+      <template class="content-en"><p>It means the observed frequencies perfectly match the expected frequencies in every cell, indicating complete independence (no correlation at all) between the two attributes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="covariance-numeric-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التغاير (Covariance) للبيانات الرقمية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Covariance for Numeric Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التغاير يقيس كيف تتغير سمتان رقميتان معاً. إذا كان موجباً فهما يرتفعان معاً، وإذا كان سالباً يتحركان في اتجاهين متعاكسين.</p></template>
+    <template class="content-en"><p>Covariance measures how two numeric attributes vary together. If positive, they rise together; if negative, they move in opposite directions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Covariance" data-ar="التغاير" data-en-def="A measure of how much two random variables vary together.">التغاير<span class="smart-term-tooltip"></span></span> (Covariance) مشابه للارتباط ولكنه يطبق على البيانات الرقمية (Numeric Data).</p><p><b>القواعد الأساسية:</b></p><ul><li><b>تغاير موجب (Positive covariance):</b> إذا كان $Cov(A,B) > 0$، فإن A و B يميلان لأن يكونا أكبر من قيمهما المتوقعة معاً (يرتفعان معاً).</li><li><b>تغاير سالب (Negative covariance):</b> إذا كان $Cov(A,B) < 0$، فإذا كان A أكبر من قيمته المتوقعة، فمن المرجح أن يكون B أصغر من قيمته المتوقعة (علاقة عكسية).</li><li><b>الاستقلال (Independence):</b> إذا كانا مستقلين فإن $Cov(A,B) = 0$.</li></ul><p><b>مثال عملي:</b> سهمان A و B قيمهما في أسبوع: A=(2, 3, 5, 4, 6) و B=(5, 8, 10, 11, 14).</p><ul><li>المتوسط E(A) = 20/5 = 4</li><li>المتوسط E(B) = 48/5 = 9.6</li><li>باستخدام الصيغة المبسطة: $Cov(A, B) = E(A \cdot B) - \bar{A}\bar{B}$</li><li>$Cov(A,B) = (2\times5 + 3\times8 + 5\times10 + 4\times11 + 6\times14)/5 - (4 \times 9.6) = 212/5 - 38.4 = 42.4 - 38.4 = 4$</li><li>بما أن التغاير > 0، فإن السهمين يرتفعان معاً.</li></ul></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Covariance" data-ar="التغاير" data-en-def="A measure of how much two random variables vary together.">Covariance<span class="smart-term-tooltip"></span></span> is similar to correlation but applied to Numeric Data.</p><p><b>Basic Rules:</b></p><ul><li><b>Positive covariance:</b> If $Cov(A,B) > 0$, then A and B both tend to be larger than their expected values (they rise together).</li><li><b>Negative covariance:</b> If $Cov(A,B) < 0$, then if A is larger than its expected value, B is likely to be smaller than its expected value (inverse relationship).</li><li><b>Independence:</b> If independent, $Cov(A,B) = 0$.</li></ul><p><b>Worked Example:</b> Two stocks A and B have values in one week: A=(2, 3, 5, 4, 6) and B=(5, 8, 10, 11, 14).</p><ul><li>Mean E(A) = 20/5 = 4</li><li>Mean E(B) = 48/5 = 9.6</li><li>Using simplified formula: $Cov(A, B) = E(A \cdot B) - \bar{A}\bar{B}$</li><li>$Cov(A,B) = (2\times5 + 3\times8 + 5\times10 + 4\times11 + 6\times14)/5 - (4 \times 9.6) = 212/5 - 38.4 = 42.4 - 38.4 = 4$</li><li>Since Cov(A, B) > 0, A and B rise together.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="Correlation Coefficient" data-ar="معامل الارتباط" data-en-def="A normalized measure of covariance, ranging from -1 to 1.">معامل الارتباط<span class="smart-term-tooltip"></span></span> (Correlation coefficient) هو التغاير مقسوماً على الانحراف المعياري لكل من A و B ($r_{A,B} = \frac{Cov(A,B)}{\sigma_A \sigma_B}$). هذا يجعل معامل الارتباط محصوراً بين -1 و 1، مما يسهل مقارنته.</p><p>ملاحظة هامة: التغاير = 0 لا يعني بالضرورة الاستقلال التام. العكس غير صحيح دائماً؛ فقط تحت افتراضات إضافية (مثل التوزيع الطبيعي متعدد المتغيرات) يعني التغاير الصفري الاستقلال.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Correlation Coefficient" data-ar="معامل الارتباط" data-en-def="A normalized measure of covariance, ranging from -1 to 1.">correlation coefficient<span class="smart-term-tooltip"></span></span> is the covariance divided by the standard deviations of A and B ($r_{A,B} = \frac{Cov(A,B)}{\sigma_A \sigma_B}$). This normalizes the value between -1 and 1, making it easier to interpret.</p><p>Important note: Covariance = 0 does not strictly imply independence. The converse is not true: only under some additional assumptions (e.g., multivariate normal distributions) does a covariance of 0 imply independence.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التغاير الأساسية.</strong></template>
+      <template class="content-en"><strong>Basic covariance formula.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$Cov(A, B) = E((A - \bar{A})(B - \bar{B})) = \frac{\sum_{i=1}^{n}(a_i - \bar{A})(b_i - \bar{B})}{n}$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A grid of 15 small scatter plots showing visual correlation. Top row shows negative correlations from -1.00 (perfect line down) to -0.40 (loose cloud down). Middle row shows near zero correlations (-0.30 to 0.30) as random circular clouds. Bottom row shows positive correlations from 0.40 (loose cloud up) to 1.00 (perfect line up). Style: educational, dark background #0d1117, blue data points #3b82f6, white axes. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 750" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Plot Background and Axes -->
+        <g id="plot-bg">
+            <rect x="10" y="10" width="100" height="100" fill="var(--bg-elevated)" rx="4" />
+            <!-- Subtle Grid Lines -->
+            <line x1="10" y1="60" x2="110" y2="60" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="2,2" opacity="0.5" />
+            <line x1="60" y1="10" x2="60" y2="110" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="2,2" opacity="0.5" />
+            <!-- Axes -->
+            <path d="M 10,110 L 110,110" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" />
+            <path d="M 10,10 L 10,110" stroke="var(--text-muted)" stroke-width="2" stroke-linecap="round" />
+        </g>
+
+        <!-- Base Scatter Points Cloud (Centered at 0,0) -->
+        <!-- We use a single path with zero-length lines and round linecaps to draw perfect circles that don't distort when the coordinate system is scaled -->
+        <g id="scatter-points">
+            <path d="M 0,0 l 0.01,0 M -10,-18 l 0.01,0 M 15,6 l 0.01,0 M -20,12 l 0.01,0 M 18,-15 l 0.01,0 M -6,22 l 0.01,0 M 10,-20 l 0.01,0 M -22,-4 l 0.01,0 M 20,10 l 0.01,0 M -15,-12 l 0.01,0 M 12,18 l 0.01,0 M -4,-22 l 0.01,0 M 6,20 l 0.01,0 M -18,4 l 0.01,0 M 22,-10 l 0.01,0 M -12,15 l 0.01,0 M 4,-6 l 0.01,0 M -2,12 l 0.01,0 M 2,-12 l 0.01,0 M -16,-16 l 0.01,0 M 16,16 l 0.01,0 M 20,20 l 0.01,0 M -20,-20 l 0.01,0 M 8,8 l 0.01,0 M -8,-8 l 0.01,0 M 24,-24 l 0.01,0 M -24,24 l 0.01,0 M 0,16 l 0.01,0 M 0,-16 l 0.01,0 M 16,0 l 0.01,0 M -16,0 l 0.01,0"
+                  stroke="var(--brand-500)" stroke-width="4.5" stroke-linecap="round" fill="none" vector-effect="non-scaling-stroke" />
+        </g>
+    </defs>
+
+    <!-- Main Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title Section -->
+    <text x="450" y="50" text-anchor="middle" class="gsvg-en" font-size="26" font-weight="bold" fill="var(--text-primary)">Covariance &amp; Correlation</text>
+    <text x="450" y="50" text-anchor="middle" class="gsvg-ar" font-size="26" font-weight="bold" fill="var(--text-primary)">التغاير والارتباط</text>
+    
+    <text x="450" y="80" text-anchor="middle" class="gsvg-en" font-size="16" fill="var(--text-secondary)">Visualizing the relationship between two numeric variables</text>
+    <text x="450" y="80" text-anchor="middle" class="gsvg-ar" font-size="16" fill="var(--text-secondary)">تصوير العلاقة بين متغيرين رقميين</text>
+
+    <!-- ================= ROW 1: NEGATIVE CORRELATION ================= -->
+    <!-- Row Label -->
+    <g transform="translate(70, 180) rotate(-90)">
+        <rect x="-70" y="-20" width="140" height="40" fill="var(--bg-elevated)" rx="20" stroke="var(--brand-400)" stroke-width="2" />
+        <text x="0" y="5" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--brand-ink)">Negative</text>
+        <text x="0" y="5" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--brand-ink)">سلبي</text>
+    </g>
+
+    <!-- Plots -->
+    <g transform="translate(150, 120)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -1.00</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(1.40, 0.03)" />
+    </g>
+    <g transform="translate(290, 120)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.85</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(1.26, 0.17)" />
+    </g>
+    <g transform="translate(430, 120)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.70</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(1.12, 0.31)" />
+    </g>
+    <g transform="translate(570, 120)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.55</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(0.98, 0.45)" />
+    </g>
+    <g transform="translate(710, 120)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.40</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(0.84, 0.59)" />
+    </g>
+
+    <!-- ================= ROW 2: NEAR ZERO CORRELATION ================= -->
+    <!-- Row Label -->
+    <g transform="translate(70, 340) rotate(-90)">
+        <rect x="-70" y="-20" width="140" height="40" fill="var(--bg-elevated)" rx="20" stroke="var(--text-muted)" stroke-width="2" />
+        <text x="0" y="5" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Near Zero</text>
+        <text x="0" y="5" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">شبه صفري</text>
+    </g>
+
+    <!-- Plots -->
+    <g transform="translate(150, 280)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.30</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(0.80, 0.63)" />
+    </g>
+    <g transform="translate(290, 280)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = -0.15</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(45) scale(0.75, 0.66)" />
+    </g>
+    <g transform="translate(430, 280)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = 0.00</text>
+        <use href="#scatter-points" transform="translate(60,60) scale(0.70, 0.70)" />
+    </g>
+    <g transform="translate(570, 280)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.15</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(0.75, 0.66)" />
+    </g>
+    <g transform="translate(710, 280)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.30</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(0.80, 0.63)" />
+    </g>
+
+    <!-- ================= ROW 3: POSITIVE CORRELATION ================= -->
+    <!-- Row Label -->
+    <g transform="translate(70, 500) rotate(-90)">
+        <rect x="-70" y="-20" width="140" height="40" fill="var(--bg-elevated)" rx="20" stroke="var(--brand-400)" stroke-width="2" />
+        <text x="0" y="5" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--brand-ink)">Positive</text>
+        <text x="0" y="5" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--brand-ink)">إيجابي</text>
+    </g>
+
+    <!-- Plots -->
+    <g transform="translate(150, 440)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.40</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(0.84, 0.59)" />
+    </g>
+    <g transform="translate(290, 440)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.55</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(0.98, 0.45)" />
+    </g>
+    <g transform="translate(430, 440)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.70</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(1.12, 0.31)" />
+    </g>
+    <g transform="translate(570, 440)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +0.85</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(1.26, 0.17)" />
+    </g>
+    <g transform="translate(710, 440)">
+        <use href="#plot-bg" />
+        <text x="60" y="-5" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)">r = +1.00</text>
+        <use href="#scatter-points" transform="translate(60,60) rotate(-45) scale(1.40, 0.03)" />
+    </g>
+
+    <!-- ================= SUMMARY BOX ================= -->
+    <g transform="translate(150, 590)">
+        <rect x="0" y="0" width="680" height="120" fill="var(--bg-elevated)" rx="8" stroke="var(--border-color)" stroke-width="1" />
+        
+        <!-- English Summary -->
+        <text x="340" y="25" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">Covariance Rules</text>
+        <text x="340" y="50" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Cov(A,B) &gt; 0 : Variables rise together (Positive)  |  Cov(A,B) &lt; 0 : Variables move inversely (Negative)</text>
+        <text x="340" y="75" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Cov(A,B) ≈ 0 : Variables are independent (No linear relationship)</text>
+        <text x="340" y="100" text-anchor="middle" class="gsvg-en" font-size="14" font-family="monospace" fill="var(--brand-ink)">Formula: Cov(A, B) = E(A · B) - E(A)E(B)</text>
+
+        <!-- Arabic Summary -->
+        <text x="340" y="25" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">قواعد التغاير</text>
+        <text x="340" y="50" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">Cov(A,B) &gt; 0 : المتغيران يرتفعان معاً (إيجابي)  |  Cov(A,B) &lt; 0 : المتغيران يتحركان عكسياً (سلبي)</text>
+        <text x="340" y="75" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">Cov(A,B) ≈ 0 : المتغيران مستقلان (لا توجد علاقة خطية)</text>
+        <text x="340" y="100" text-anchor="middle" class="gsvg-ar" font-size="14" font-family="monospace" fill="var(--brand-ink)">الصيغة: Cov(A, B) = E(A · B) - E(A)E(B)</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل استخدام 'معامل الارتباط' على 'التغاير' عند مقارنة العلاقات بين أزواج مختلفة من المتغيرات؟</template>
+      <template class="content-en">Why do we prefer using the 'Correlation Coefficient' over 'Covariance' when comparing relationships between different pairs of variables?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التغاير يتأثر بمقياس (Scale) المتغيرات (مثلاً القياس بالمتر مقابل السنتيمتر سيعطي قيم تغاير مختلفة تماماً)، بينما معامل الارتباط موحد (Normalized) بين -1 و 1، مما يجعله مستقلاً عن المقياس.</p></template>
+      <template class="content-en"><p>Because covariance is affected by the scale of the variables (e.g., measuring in meters vs. centimeters gives vastly different covariances), whereas the correlation coefficient is normalized between -1 and 1, making it scale-independent.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="weka-tool-overview" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> أداة ويكا (Weka Tool)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Weka Tool Overview</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="WEKA" data-ar="ويكا" data-en-def="Waikato Environment for Knowledge Analysis, a suite of machine learning software written in Java.">ويكا<span class="smart-term-tooltip"></span></span> هي أداة مفتوحة المصدر توفر واجهة رسومية لتطبيق خوارزميات التعلم الآلي والمعالجة المسبقة دون الحاجة لكتابة أكواد برمجية.</p></template>
+    <template class="content-en"><p>WEKA is an open-source tool that provides a GUI to apply machine learning algorithms and preprocessing techniques without writing any code.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أداة WEKA توفر الميزات التالية:</p><ul><li>تطبيقات للعديد من خوارزميات التعلم الآلي.</li><li>مجموعة متنوعة من مجموعات البيانات (Datasets) الجاهزة.</li><li>أدوات متنوعة لتحويل ومعالجة البيانات.</li><li>القدرة على معالجة مجموعة بيانات مسبقاً وتدريب نموذج.</li><li>القدرة على تحليل النموذج الناتج وأدائه.</li><li>كل ما سبق يتم <b>دون كتابة أي كود برمجي</b> عبر واجهة رسومية (GUI).</li></ul></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="WEKA" data-ar="ويكا" data-en-def="Waikato Environment for Knowledge Analysis, a suite of machine learning software written in Java.">WEKA<span class="smart-term-tooltip"></span></span> tool provides the following features:</p><ul><li>Implementations of many machine learning algorithms.</li><li>A variety of datasets.</li><li>A variety of tools for transforming datasets.</li><li>Ability to preprocess a dataset and train a model.</li><li>Ability to analyze the resulting model and its performance.</li><li>All of the above <b>without writing any program code</b> via a GUI.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر Weka ممتازة للأغراض التعليمية والنماذج الأولية السريعة (Rapid Prototyping) لأنها تزيل حاجز البرمجة، مما يسمح للمحلل بالتركيز على فهم البيانات والخوارزميات.</p><p>واجهة Explorer في Weka تتيح رؤية التوزيعات الإحصائية للسمات فور تحميل البيانات، مما يسهل اكتشاف القيم المفقودة والضوضاء بصرياً.</p></template>
+    <template class="content-en"><p>Weka is excellent for educational purposes and rapid prototyping because it removes the programming barrier, allowing the analyst to focus on understanding the data and algorithms.</p><p>The Explorer interface in Weka allows viewing statistical distributions of attributes immediately upon loading data, making it easier to visually detect missing values and noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي لاستخدام أدوات تعتمد على الواجهة الرسومية مثل Weka في بيئات الإنتاج (Production) الحقيقية؟</template>
+      <template class="content-en">What is the main drawback of using GUI-based tools like Weka in real production environments?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>صعوبة الأتمتة (Automation) والدمج مع أنظمة برمجية أخرى (Integration). في الإنتاج، نفضل الأكواد (مثل Python/Scikit-learn) لسهولة جدولتها ودمجها في مسارات البيانات (Data Pipelines).</p></template>
+      <template class="content-en"><p>Difficulty in automation and integration with other software systems. In production, code-based solutions (like Python/Scikit-learn) are preferred for easy scheduling and integration into data pipelines.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أبطال البيانات. نحن الآن في قلب المعركة: المعالجة المسبقة. تذكروا دائماً قاعدة GIGO (القمامة للداخل، القمامة للخارج). مهما كانت خوارزميتك ذكية، إذا أعطيتها بيانات متسخة، ستعطيك نتائج مضللة. في هذا الفصل، ركزنا على التنظيف والتكامل. للامتحان، أريدكم أن تفرقوا بوضوح بين طرق معالجة القيم المفقودة (متى نستخدم المتوسط ومتى نستخدم القيمة الأكثر احتمالاً). افهموا جيداً تقنية Binning وكيف تحسبون متوسط الصندوق. الجزء الأهم رياضياً هو اختبار مربع كاي (Chi-Square) للبيانات الاسمية، والتغاير (Covariance) للبيانات الرقمية. تدربوا على حساب التكرار المتوقع في مربع كاي، وتذكروا أن التغاير السالب يعني علاقة عكسية. أخيراً، أداة Weka هي صديقكم الذي ينجز كل هذا بنقرات بسيطة دون برمجة. ركزوا على المفاهيم، فالرياضيات هنا هي مجرد أداة لإثبات الارتباط. بالتوفيق!</template>
+    <template class="content-en">Welcome, Data Champions. We are now in the heart of the battle: Preprocessing. Always remember the GIGO rule (Garbage In, Garbage Out). No matter how smart your algorithm is, if you feed it dirty data, it will give you misleading results. In this chapter, we focused on Cleaning and Integration. For the exam, I want you to clearly distinguish between methods of handling missing values (when to use the mean vs. the most probable value). Understand the Binning technique well and how to calculate bin means. The most mathematically crucial part is the Chi-Square test for nominal data, and Covariance for numeric data. Practice calculating the expected frequency in Chi-Square, and remember that negative covariance means an inverse relationship. Finally, the Weka tool is your friend that accomplishes all this with simple clicks without programming. Focus on the concepts; the math here is just a tool to prove correlation. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر المعالجة المسبقة للبيانات ضرورية؟</template>
+          <template class="content-en">Why is data preprocessing necessary?</template>
+          <span class="content-target">لماذا تعتبر المعالجة المسبقة للبيانات ضرورية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن بيانات العالم الحقيقي غالباً ما تكون غير مكتملة، صاخبة، وغير متسقة. المعالجة المسبقة تحسن جودة البيانات (الدقة، الاكتمال، الاتساق) مما يؤدي إلى نتائج تعدين دقيقة وموثوقة.</template>
+          <template class="content-en">Because real-world data is often incomplete, noisy, and inconsistent. Preprocessing improves data quality (accuracy, completeness, consistency), leading to accurate and reliable mining results.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الخطر في تجاهل العينات (حذف الصفوف) التي تحتوي على قيم مفقودة؟</template>
+          <template class="content-en">What is the danger of ignoring samples (deleting rows) that have missing values?</template>
+          <span class="content-target">ما هو الخطر في تجاهل العينات (حذف الصفوف) التي تحتوي على قيم مفقودة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا كانت نسبة العينات المحذوفة كبيرة، فقد تفقد مجموعة البيانات معلومات حيوية ويتشوه توزيع البيانات، مما يؤدي إلى نموذج متحيز أو ضعيف.</template>
+          <template class="content-en">If the percentage of deleted samples is large, the dataset might lose vital information and the data distribution gets distorted, leading to a biased or weak model.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل تقنية Binning على تنعيم البيانات؟</template>
+          <template class="content-en">How does the Binning technique smooth data?</template>
+          <span class="content-target">كيف تعمل تقنية Binning على تنعيم البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقوم أولاً بفرز البيانات، ثم تقسيمها إلى صناديق متساوية التردد. بعد ذلك، تستبدل القيم داخل كل صندوق بقيمة ممثلة مثل متوسط الصندوق أو وسيطه، مما يقلل من التذبذبات العشوائية (الضوضاء).</template>
+          <template class="content-en">It first sorts the data, then partitions it into equal-frequency bins. Next, it replaces the values inside each bin with a representative value like the bin mean or median, reducing random fluctuations (noise).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين Data Scrubbing و Data Auditing؟</template>
+          <template class="content-en">What is the difference between Data Scrubbing and Data Auditing?</template>
+          <span class="content-target">ما الفرق بين Data Scrubbing و Data Auditing؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">Scrubbing يستخدم قواعد معروفة مسبقاً (مثل صيغة الرمز البريدي) لتصحيح الأخطاء. Auditing يستخدم التحليل الإحصائي لاكتشاف القواعد والعلاقات الخفية من البيانات نفسها لضبط الشذوذ.</template>
+          <template class="content-en">Scrubbing uses predefined rules (like zip code format) to correct errors. Auditing uses statistical analysis to discover hidden rules and relationships from the data itself to detect anomalies.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة 'تحديد الكيان' (Entity Identification)؟ أعط مثالاً.</template>
+          <template class="content-en">What is the 'Entity Identification' problem? Give an example.</template>
+          <span class="content-target">ما هي مشكلة 'تحديد الكيان' (Entity Identification)؟ أعط مثالاً.</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي تحدي معرفة ما إذا كانت سجلات من مصادر مختلفة تشير إلى نفس الكيان الحقيقي. مثال: هل العميل 'محمد أحمد' في قاعدة بيانات المبيعات هو نفسه 'م. أحمد' في قاعدة بيانات الدعم الفني؟</template>
+          <template class="content-en">It is the challenge of determining whether records from different sources refer to the same real-world entity. Example: Is customer 'John Doe' in the sales DB the same as 'J. Doe' in the support DB?</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم اختبار مربع كاي (Chi-Square) ومتى نستخدم التغاير (Covariance)؟</template>
+          <template class="content-en">When do we use the Chi-Square test and when do we use Covariance?</template>
+          <span class="content-target">متى نستخدم اختبار مربع كاي (Chi-Square) ومتى نستخدم التغاير (Covariance)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم مربع كاي لاكتشاف الارتباط بين البيانات الاسمية (الفئوية مثل الجنس واللون). ونستخدم التغاير لاكتشاف الارتباط بين البيانات الرقمية (الكمية مثل الراتب والعمر).</template>
+          <template class="content-en">We use Chi-Square to detect correlation between Nominal (categorical) data (like gender and color). We use Covariance for Numeric (quantitative) data (like salary and age).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحسب 'التكرار المتوقع' لخلية في جدول التوافق لاختبار مربع كاي؟</template>
+          <template class="content-en">How do we calculate the 'Expected Frequency' for a cell in a contingency table for the Chi-Square test?</template>
+          <span class="content-target">كيف نحسب 'التكرار المتوقع' لخلية في جدول التوافق لاختبار مربع كاي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نضرب مجموع الصف الذي تقع فيه الخلية في مجموع العمود الذي تقع فيه، ثم نقسم الناتج على العدد الإجمالي للعينات (n).</template>
+          <template class="content-en">We multiply the total of the row the cell is in by the total of its column, then divide the result by the total number of samples (n).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني أن تكون قيمة التغاير سالبة؟</template>
+          <template class="content-en">What does it mean for a covariance value to be negative?</template>
+          <span class="content-target">ماذا يعني أن تكون قيمة التغاير سالبة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني وجود علاقة عكسية بين المتغيرين؛ إذا زادت قيمة المتغير الأول عن متوسطه، فمن المرجح أن تقل قيمة المتغير الثاني عن متوسطه.</template>
+          <template class="content-en">It means there is an inverse relationship between the two variables; if the first variable increases above its mean, the second is likely to decrease below its mean.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل التغاير الصفري يثبت أن المتغيرين مستقلان تماماً؟</template>
+          <template class="content-en">Does zero covariance prove that the two variables are completely independent?</template>
+          <span class="content-target">هل التغاير الصفري يثبت أن المتغيرين مستقلان تماماً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا. الاستقلال يضمن تغايراً صفرياً، لكن التغاير الصفري يعني فقط عدم وجود ارتباط خطي؛ قد تكون هناك علاقة غير خطية قوية بينهما.</template>
+          <template class="content-en">No. Independence guarantees zero covariance, but zero covariance only means no linear correlation; there could still be a strong non-linear relationship between them.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة الرئيسية من استخدام أداة WEKA للطلاب والمحللين؟</template>
+          <template class="content-en">What is the main benefit of using the WEKA tool for students and analysts?</template>
+          <span class="content-target">ما هي الفائدة الرئيسية من استخدام أداة WEKA للطلاب والمحللين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تسمح بتطبيق خوارزميات معقدة للمعالجة المسبقة والتعلم الآلي عبر واجهة رسومية سهلة الاستخدام دون الحاجة لكتابة أي كود برمجي، مما يسرع عملية التعلم والتجربة.</template>
+          <template class="content-en">It allows applying complex preprocessing and machine learning algorithms via an easy-to-use GUI without needing to write any code, speeding up learning and experimentation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي الأبعاد الرئيسية لجودة البيانات؟",
+      "en": "What are the main dimensions of Data Quality?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الدقة، الاكتمال، الاتساق، التوقيت، الموثوقية، وقابلية التفسير.",
+        "en": "Accuracy, Completeness, Consistency, Timeliness, Believability, and Interpretability."
+      },
+      "example": {
+        "ar": "بيانات غير متسقة: العمر 42 وتاريخ الميلاد 2010.",
+        "en": "Inconsistent data: Age=42, Birthday=2010."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي المهام الأربع الرئيسية في المعالجة المسبقة للبيانات؟",
+      "en": "What are the four major tasks in Data Preprocessing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنظيف البيانات، تكامل البيانات، تقليل البيانات، وتحويل البيانات.",
+        "en": "Data cleaning, Data integration, Data reduction, and Data transformation."
+      },
+      "example": {
+        "ar": "التنظيف يزيل الضوضاء، والتكامل يدمج قواعد البيانات.",
+        "en": "Cleaning removes noise, integration merges databases."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو مبدأ GIGO في استخراج البيانات؟",
+      "en": "What is the GIGO principle in data mining?"
+    },
+    "back": {
+      "definition": {
+        "ar": "القمامة للداخل، القمامة للخارج (Garbage In, Garbage Out). جودة النتائج تعتمد على جودة البيانات المدخلة.",
+        "en": "Garbage In, Garbage Out. The quality of mining results depends on the quality of input data."
+      },
+      "example": {
+        "ar": "تدريب نموذج على بيانات مليئة بالأخطاء سيعطي تنبؤات خاطئة.",
+        "en": "Training a model on error-filled data yields wrong predictions."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي مخاطر استخدام 'ثابت عالمي' (Global Constant) لملء القيم المفقودة؟",
+      "en": "What is the risk of using a 'global constant' to fill missing values?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قد تعتبره خوارزمية التعدين فئة جديدة وتستخرج أنماطاً مضللة حوله.",
+        "en": "The mining algorithm might treat it as a new class and extract misleading patterns around it."
+      },
+      "example": {
+        "ar": "استبدال الوظيفة المفقودة بـ 'غير معروف' قد يجعل النظام يعتقد أن 'غير معروف' هي مهنة شائعة.",
+        "en": "Replacing missing occupation with 'unknown' might make the system think 'unknown' is a common profession."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي تقنية Binning؟",
+      "en": "What is the Binning technique?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لتنعيم البيانات الصاخبة عن طريق فرزها وتقسيمها إلى صناديق، ثم استبدال القيم بمتوسط أو وسيط الصندوق.",
+        "en": "A method to smooth noisy data by sorting and partitioning it into bins, then replacing values with the bin's mean or median."
+      },
+      "example": {
+        "ar": "القيم [4, 8, 15] في صندوق واحد تستبدل بمتوسطها [9, 9, 9].",
+        "en": "Values [4, 8, 15] in one bin are replaced by their mean [9, 9, 9]."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما الفرق بين Data Scrubbing و Data Auditing؟",
+      "en": "What is the difference between Data Scrubbing and Data Auditing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "Scrubbing يستخدم معرفة المجال البسيطة لتصحيح الأخطاء، بينما Auditing يحلل البيانات إحصائياً لاكتشاف القواعد والمخالفات.",
+        "en": "Scrubbing uses simple domain knowledge to correct errors, while Auditing analyzes data statistically to discover rules and violations."
+      },
+      "example": {
+        "ar": "Scrubbing: التدقيق الإملائي. Auditing: اكتشاف القيم المتطرفة عبر التجميع.",
+        "en": "Scrubbing: spell-check. Auditing: finding outliers via clustering."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي مشكلة 'تحديد الكيان' (Entity Identification) في تكامل البيانات؟",
+      "en": "What is the 'Entity Identification' problem in data integration?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صعوبة مطابقة السجلات من مصادر مختلفة التي تشير إلى نفس الكيان في العالم الحقيقي.",
+        "en": "The difficulty of matching records from different sources that refer to the same real-world entity."
+      },
+      "example": {
+        "ar": "معرفة أن Bill Clinton في قاعدة بيانات هو نفسه William Clinton في قاعدة أخرى.",
+        "en": "Knowing that Bill Clinton in one DB is the same as William Clinton in another."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "كيف يمكن اكتشاف التكرار (Redundancy) رياضياً أثناء تكامل البيانات؟",
+      "en": "How can redundancy be detected mathematically during data integration?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام تحليل الارتباط (Correlation Analysis) مثل اختبار مربع كاي للبيانات الاسمية أو التغاير للبيانات الرقمية.",
+        "en": "Using correlation analysis, such as the Chi-Square test for nominal data or Covariance for numeric data."
+      },
+      "example": {
+        "ar": "اكتشاف ارتباط قوي جداً بين 'تاريخ الميلاد' و 'العمر'.",
+        "en": "Discovering a very strong correlation between 'Date of Birth' and 'Age'."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "متى نستخدم اختبار مربع كاي (Chi-Square)؟",
+      "en": "When do we use the Chi-Square test?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لاختبار الارتباط بين سمتين اسميتين (فئويتين).",
+        "en": "To test for correlation between two nominal (categorical) attributes."
+      },
+      "example": {
+        "ar": "اختبار الارتباط بين 'الجنس' و 'نوع القراءة المفضل'.",
+        "en": "Testing correlation between 'Gender' and 'Preferred Reading'."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يتم حساب التكرار المتوقع (Expected Frequency) في اختبار مربع كاي؟",
+      "en": "How is Expected Frequency calculated in a Chi-Square test?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بضرب مجموع الصف في مجموع العمود مقسوماً على العدد الإجمالي للعينات.",
+        "en": "By multiplying the row total by the column total, divided by the total number of samples (n)."
+      },
+      "example": {
+        "ar": "e = (count(A) * count(B)) / n",
+        "en": "e = (count(A) * count(B)) / n"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ماذا يعني التغاير الموجب (Positive Covariance)؟",
+      "en": "What does Positive Covariance mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعني أن المتغيرين يميلان للارتفاع والانخفاض معاً.",
+        "en": "It means the two variables tend to rise and fall together."
+      },
+      "example": {
+        "ar": "أسعار سهمين في نفس الصناعة ترتفع معاً.",
+        "en": "Prices of two stocks in the same industry rising together."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "هل التغاير الصفري (Covariance = 0) يعني دائماً الاستقلال التام؟",
+      "en": "Does zero covariance always mean complete independence?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، الاستقلال يؤدي إلى تغاير صفري، لكن العكس ليس صحيحاً دائماً إلا تحت افتراضات معينة.",
+        "en": "No, independence implies zero covariance, but the converse is not always true except under specific assumptions."
+      },
+      "example": {
+        "ar": "قد تكون هناك علاقة غير خطية لا يكتشفها التغاير.",
+        "en": "There might be a non-linear relationship that covariance doesn't detect."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي أداة WEKA؟",
+      "en": "What is the WEKA tool?"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج مفتوح المصدر يوفر واجهة رسومية لتطبيق خوارزميات التعلم الآلي والمعالجة المسبقة دون برمجة.",
+        "en": "An open-source software providing a GUI to apply machine learning algorithms and preprocessing without programming."
+      },
+      "example": {
+        "ar": "استخدام Weka لتحميل ملف بيانات وتطبيق فلتر لتنظيف القيم المفقودة بنقرة زر.",
+        "en": "Using Weka to load a dataset and apply a filter to clean missing values with a click."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي البيانات القابلة للاشتقاق (Derivable Data)؟",
+      "en": "What is Derivable Data?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سمة يمكن حسابها أو استنتاجها من سمات أخرى موجودة في قاعدة البيانات، وتعتبر نوعاً من التكرار.",
+        "en": "An attribute that can be computed or inferred from other existing attributes, considered a form of redundancy."
+      },
+      "example": {
+        "ar": "حساب الإيرادات السنوية من الإيرادات الربع سنوية.",
+        "en": "Calculating annual revenue from quarterly revenues."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو الغرض من درجات الحرية (Degrees of Freedom) في اختبار مربع كاي؟",
+      "en": "What is the purpose of Degrees of Freedom in the Chi-Square test?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تستخدم لتحديد القيمة الحرجة من جدول التوزيع الإحصائي لتقرير قبول أو رفض الفرضية.",
+        "en": "Used to determine the critical value from the statistical distribution table to decide whether to accept or reject the hypothesis."
+      },
+      "example": {
+        "ar": "لجدول 2x2، درجات الحرية = (2-1)*(2-1) = 1.",
+        "en": "For a 2x2 table, degrees of freedom = (2-1)*(2-1) = 1."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي ليس من الأبعاد الرئيسية لجودة البيانات؟",
+      "en": "Which of the following is NOT a main dimension of data quality?"
+    },
+    "options": {
+      "ar": [
+        "الدقة (Accuracy)",
+        "الاكتمال (Completeness)",
+        "التعقيد (Complexity)",
+        "الاتساق (Consistency)"
+      ],
+      "en": [
+        "Accuracy",
+        "Completeness",
+        "Complexity",
+        "Consistency"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التعقيد ليس من أبعاد جودة البيانات. الأبعاد تشمل الدقة، الاكتمال، الاتساق، التوقيت، الموثوقية، وقابلية التفسير.",
+      "en": "Complexity is not a dimension of data quality. Dimensions include Accuracy, Completeness, Consistency, Timeliness, Believability, and Interpretability."
+    },
+    "hint": {
+      "ar": "تذكر الخصائص التي تجعل البيانات موثوقة وصالحة للاستخدام.",
+      "en": "Remember the characteristics that make data reliable and usable."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-quality-preprocessing"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي الطريقة الأكثر دقة (ولكنها مكلفة حسابياً) للتعامل مع القيم المفقودة؟",
+      "en": "What is the most accurate (but computationally expensive) method to handle missing values?"
+    },
+    "options": {
+      "ar": [
+        "تجاهل العينة",
+        "استخدام ثابت عالمي",
+        "استخدام متوسط السمة",
+        "استخدام القيمة الأكثر احتمالاً (عبر النماذج الإحصائية)"
+      ],
+      "en": [
+        "Ignore the sample",
+        "Use a global constant",
+        "Use the attribute mean",
+        "Use the most probable value (via statistical models)"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "استخدام القيمة الأكثر احتمالاً يعتمد على العلاقات بين المتغيرات (مثل الانحدار) لتقدير القيمة، مما يجعله الأكثر دقة.",
+      "en": "Using the most probable value relies on relationships between variables (like regression) to estimate the value, making it the most accurate."
+    },
+    "hint": {
+      "ar": "أي طريقة تستخدم خوارزميات أخرى للتنبؤ بالقيمة المفقودة؟",
+      "en": "Which method uses other algorithms to predict the missing value?"
+    },
+    "difficulty": "medium",
+    "conceptId": "handling-missing-values"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "تقنية Binning تستخدم أساساً من أجل:",
+      "en": "The Binning technique is primarily used for:"
+    },
+    "options": {
+      "ar": [
+        "ملء القيم المفقودة",
+        "تنعيم البيانات الصاخبة",
+        "تكامل المخططات",
+        "تحويل البيانات الاسمية إلى رقمية"
+      ],
+      "en": [
+        "Filling missing values",
+        "Smoothing noisy data",
+        "Schema integration",
+        "Transforming nominal data to numeric"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "Binning هي تقنية تنعيم محلية تستخدم لتقليل الضوضاء في البيانات عن طريق تجميعها واستبدالها بقيم ممثلة (كالمتوسط).",
+      "en": "Binning is a local smoothing technique used to reduce noise in data by grouping and replacing them with representative values (like the mean)."
+    },
+    "hint": {
+      "ar": "تذكر 'الصناديق' وكيف نضع القيم المتقاربة معاً لتقليل التذبذب.",
+      "en": "Think of 'bins' and how we group close values together to reduce fluctuation."
+    },
+    "difficulty": "easy",
+    "conceptId": "handling-noisy-data"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في سياق تنظيف البيانات، ماذا يفعل Data Auditing؟",
+      "en": "In the context of data cleaning, what does Data Auditing do?"
+    },
+    "options": {
+      "ar": [
+        "يستخدم التدقيق الإملائي لتصحيح النصوص",
+        "يحلل البيانات لاكتشاف القواعد والعلاقات لضبط المخالفين",
+        "ينقل البيانات من قاعدة إلى أخرى",
+        "يحذف جميع السجلات التي تحتوي على قيم مفقودة"
+      ],
+      "en": [
+        "Uses spell-check to correct texts",
+        "Analyzes data to discover rules and relationships to detect violators",
+        "Migrates data from one database to another",
+        "Deletes all records containing missing values"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "Data Auditing يعتمد على التحليل الإحصائي لاكتشاف الأنماط والقواعد من البيانات نفسها للعثور على الشذوذ.",
+      "en": "Data Auditing relies on statistical analysis to discover patterns and rules from the data itself to find anomalies."
+    },
+    "hint": {
+      "ar": "Auditing (التدقيق) هنا يعني البحث العميق عن القواعد المخفية، وليس مجرد تطبيق قواعد معروفة مسبقاً.",
+      "en": "Auditing here means deep searching for hidden rules, not just applying predefined ones."
+    },
+    "difficulty": "medium",
+    "conceptId": "data-cleaning-process"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "مشكلة تحديد أن 'Bill Clinton' و 'William Clinton' هما نفس الشخص تسمى:",
+      "en": "The problem of identifying that 'Bill Clinton' and 'William Clinton' are the same person is called:"
+    },
+    "options": {
+      "ar": [
+        "تكامل المخطط (Schema integration)",
+        "تحديد الكيان (Entity identification)",
+        "البيانات القابلة للاشتقاق (Derivable data)",
+        "تحليل الارتباط (Correlation analysis)"
+      ],
+      "en": [
+        "Schema integration",
+        "Entity identification",
+        "Derivable data",
+        "Correlation analysis"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تحديد الكيان هو عملية مطابقة السجلات من مصادر مختلفة التي تشير إلى نفس الكيان في العالم الحقيقي.",
+      "en": "Entity identification is the process of matching records from different sources that refer to the same real-world entity."
+    },
+    "hint": {
+      "ar": "نحن نحاول التعرف على 'من' هو هذا الشخص عبر قواعد بيانات مختلفة.",
+      "en": "We are trying to identify 'who' this person is across different databases."
+    },
+    "difficulty": "easy",
+    "conceptId": "data-integration-redundancy"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي اختبار إحصائي يستخدم لاكتشاف الارتباط بين البيانات الاسمية (Nominal Data)؟",
+      "en": "Which statistical test is used to detect correlation between Nominal Data?"
+    },
+    "options": {
+      "ar": [
+        "التغاير (Covariance)",
+        "الانحدار الخطي (Linear Regression)",
+        "مربع كاي (Chi-Square)",
+        "التجميع في صناديق (Binning)"
+      ],
+      "en": [
+        "Covariance",
+        "Linear Regression",
+        "Chi-Square",
+        "Binning"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "اختبار مربع كاي ($X^2$) مصمم خصيصاً لاختبار الاستقلالية والارتباط بين المتغيرات الفئوية (الاسمية).",
+      "en": "The Chi-Square ($X^2$) test is specifically designed to test independence and correlation between categorical (nominal) variables."
+    },
+    "hint": {
+      "ar": "يعتمد على جدول التوافق (Contingency Table).",
+      "en": "It relies on a Contingency Table."
+    },
+    "difficulty": "easy",
+    "conceptId": "chi-square-correlation"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في اختبار مربع كاي، إذا كانت القيمة المحسوبة أكبر من القيمة الحرجة (Critical Value)، فماذا نستنتج؟",
+      "en": "In a Chi-Square test, if the computed value is greater than the critical value, what do we conclude?"
+    },
+    "options": {
+      "ar": [
+        "السمتان مستقلتان تماماً",
+        "نرفض فرضية الاستقلال ونستنتج وجود ارتباط",
+        "يجب إعادة حساب التكرار المتوقع",
+        "البيانات تحتوي على ضوضاء عالية"
+      ],
+      "en": [
+        "The attributes are completely independent",
+        "We reject the hypothesis of independence and conclude correlation",
+        "Expected frequency must be recalculated",
+        "The data contains high noise"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تجاوز القيمة الحرجة يعني أن الفروق بين الفعلي والمتوقع كبيرة جداً بحيث لا يمكن أن تكون صدفة، مما يعني وجود ارتباط.",
+      "en": "Exceeding the critical value means the differences between observed and expected are too large to be chance, implying correlation."
+    },
+    "hint": {
+      "ar": "قيمة كبيرة تعني أن الفعلي يختلف كثيراً عن المتوقع (حالة الاستقلال).",
+      "en": "A large value means observed differs greatly from expected (the independent case)."
+    },
+    "difficulty": "medium",
+    "conceptId": "chi-square-correlation"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "إذا كان التغاير (Covariance) بين سمتين رقميتين أقل من الصفر (سالب)، فهذا يعني:",
+      "en": "If the Covariance between two numeric attributes is less than zero (negative), it means:"
+    },
+    "options": {
+      "ar": [
+        "أنهما يرتفعان معاً",
+        "أنهما مستقلان تماماً",
+        "إذا ارتفع أحدهما، يميل الآخر للانخفاض",
+        "يوجد خطأ في البيانات"
+      ],
+      "en": [
+        "They rise together",
+        "They are completely independent",
+        "If one rises, the other tends to fall",
+        "There is an error in the data"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التغاير السالب يشير إلى علاقة عكسية؛ عندما يكون أحد المتغيرين أعلى من متوسطه، يميل الآخر لأن يكون أقل من متوسطه.",
+      "en": "Negative covariance indicates an inverse relationship; when one variable is above its mean, the other tends to be below its mean."
+    },
+    "hint": {
+      "ar": "فكر في العلاقة العكسية.",
+      "en": "Think of an inverse relationship."
+    },
+    "difficulty": "easy",
+    "conceptId": "covariance-numeric-data"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من العبارات التالية صحيحة بخصوص التغاير والاستقلال؟",
+      "en": "Which of the following statements is true regarding Covariance and Independence?"
+    },
+    "options": {
+      "ar": [
+        "إذا كان التغاير صفراً، فالمتغيران مستقلان دائماً",
+        "إذا كان المتغيران مستقلين، فالتغاير يساوي صفراً",
+        "التغاير لا علاقة له بالاستقلال",
+        "الاستقلال يعني دائماً تغايراً موجباً"
+      ],
+      "en": [
+        "If covariance is zero, variables are always independent",
+        "If variables are independent, covariance is zero",
+        "Covariance has nothing to do with independence",
+        "Independence always means positive covariance"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الاستقلال يؤدي حتماً إلى تغاير صفري. لكن العكس ليس صحيحاً دائماً (التغاير الصفري لا يضمن الاستقلال التام إلا بشروط إضافية).",
+      "en": "Independence strictly implies zero covariance. However, the converse is not always true (zero covariance doesn't guarantee independence without extra conditions)."
+    },
+    "hint": {
+      "ar": "الاستقلال شرط أقوى من مجرد انعدام التغاير الخطي.",
+      "en": "Independence is a stronger condition than just zero linear covariance."
+    },
+    "difficulty": "hard",
+    "conceptId": "covariance-numeric-data"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لأداة WEKA؟",
+      "en": "What is the main advantage of the WEKA tool?"
+    },
+    "options": {
+      "ar": [
+        "تتطلب كتابة أكواد بايثون معقدة",
+        "تستخدم فقط لتنظيف البيانات ولا تدعم التعلم الآلي",
+        "توفر واجهة رسومية لتطبيق خوارزميات التعلم الآلي دون برمجة",
+        "هي أداة مدفوعة ومغلقة المصدر"
+      ],
+      "en": [
+        "Requires writing complex Python codes",
+        "Used only for data cleaning and doesn't support ML",
+        "Provides a GUI to apply ML algorithms without programming",
+        "It is a paid, closed-source tool"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ويكا هي أداة مفتوحة المصدر تعتمد على واجهة رسومية (GUI) تتيح للمستخدمين إجراء المعالجة المسبقة وبناء النماذج دون كتابة أي كود.",
+      "en": "Weka is an open-source GUI-based tool that allows users to perform preprocessing and model building without writing any code."
+    },
+    "hint": {
+      "ar": "تذكر أنها مصممة لتسهيل العمل على غير المبرمجين.",
+      "en": "Remember it's designed to make work easier for non-programmers."
+    },
+    "difficulty": "easy",
+    "conceptId": "weka-tool-overview"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من افتراض أن 'التغاير = 0' يعني الاستقلال التام. الاستقلال يؤدي إلى تغاير صفري، لكن التغاير الصفري قد يحدث بين متغيرات غير مستقلة ذات علاقات غير خطية.</template>
+    <template class="content-en">Beware of assuming that 'Covariance = 0' means complete independence. Independence implies zero covariance, but zero covariance can occur between dependent variables with non-linear relationships.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في اختبار مربع كاي، مجموع التكرارات المتوقعة في أي صف أو عمود يجب أن يساوي دائماً مجموع التكرارات الفعلية لنفس الصف أو العمود.</template>
+    <template class="content-en">In the Chi-Square test, the sum of expected frequencies in any row or column must always equal the sum of the observed frequencies for that same row or column.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند التعامل مع القيم المفقودة، استخدام ثابت مثل 'Unknown' قد يبدو حلاً سهلاً، لكنه فخ! خوارزمية التعدين قد تعتبر 'Unknown' نمطاً حقيقياً وتستخرج قواعد مضللة بناءً عليه.</template>
+    <template class="content-en">When handling missing values, using a constant like 'Unknown' seems easy, but it's a trap! The mining algorithm might treat 'Unknown' as a real pattern and extract misleading rules based on it.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">القيم المتطرفة (Outliers) ليست دائماً 'بيانات صاخبة' يجب حذفها. في مجالات مثل اكتشاف الاحتيال البنكي، هذه القيم المتطرفة هي بالضبط ما تبحث عنه الخوارزمية.</template>
+    <template class="content-en">Outliers are not always 'noisy data' to be deleted. In fields like bank fraud detection, these outliers are exactly what the algorithm is looking for.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الأساسي بين مربع كاي والتغاير: مربع كاي يستخدم للبيانات الاسمية (الفئوية)، بينما التغاير يستخدم للبيانات الرقمية (الكمية).</template>
+    <template class="content-en">The core difference between Chi-Square and Covariance: Chi-Square is used for Nominal (categorical) data, while Covariance is used for Numeric (quantitative) data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M01.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M03.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

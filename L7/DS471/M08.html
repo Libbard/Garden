@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="8" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>تقليل الأبعاد والتجميع · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M07.html" data-gh-next="M09.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#curse-of-dimensionality" class="toc-link" data-bilingual>
+        <template class="content-ar">لعنة الأبعاد</template>
+        <template class="content-en">The Curse of Dimensionality</template>
+        <span class="content-target">لعنة الأبعاد</span>
+      </a>
+      <a href="#dimensionality-reduction-approaches" class="toc-link" data-bilingual>
+        <template class="content-ar">مناهج تقليل الأبعاد (الإسقاط والتشعب)</template>
+        <template class="content-en">Dimensionality Reduction Approaches (Projection &amp; Manifold)</template>
+        <span class="content-target">مناهج تقليل الأبعاد (الإسقاط والتشعب)</span>
+      </a>
+      <a href="#principal-component-analysis-pca" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل المكونات الرئيسية (PCA)</template>
+        <template class="content-en">Principal Component Analysis (PCA)</template>
+        <span class="content-target">تحليل المكونات الرئيسية (PCA)</span>
+      </a>
+      <a href="#kernel-pca" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل المكونات الرئيسية بالنواة (Kernel PCA)</template>
+        <template class="content-en">Kernel PCA (kPCA)</template>
+        <span class="content-target">تحليل المكونات الرئيسية بالنواة (Kernel PCA)</span>
+      </a>
+      <a href="#k-means-clustering" class="toc-link" data-bilingual>
+        <template class="content-ar">تجميع K-Means</template>
+        <template class="content-en">K-Means Clustering</template>
+        <span class="content-target">تجميع K-Means</span>
+      </a>
+      <a href="#evaluating-clusters-elbow-silhouette" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم المجموعات (طريقة الكوع ومعامل خيال الظل)</template>
+        <template class="content-en">Evaluating Clusters (Elbow Method &amp; Silhouette)</template>
+        <span class="content-target">تقييم المجموعات (طريقة الكوع ومعامل خيال الظل)</span>
+      </a>
+      <a href="#practical-applications-kmeans" class="toc-link" data-bilingual>
+        <template class="content-ar">التطبيقات العملية (تكميم الصور وتعلم الميزات)</template>
+        <template class="content-en">Practical Applications (Image Quantization &amp; Feature Learning)</template>
+        <span class="content-target">التطبيقات العملية (تكميم الصور وتعلم الميزات)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 8</template>
+      <template class="content-en">Module 8</template>
+      <span class="content-target">الوحدة 8</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">تقليل الأبعاد والتجميع</h1>
+      <p class="hero-description">تغطي هذه الوحدة تقنيات تقليل الأبعاد مثل PCA و Kernel PCA، بالإضافة إلى خوارزميات التجميع غير الخاضعة للإشراف مثل K-Means وطرق تقييمها.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Clustering and Dimensionality Reduction</h1>
+      <p class="hero-description">This module covers dimensionality reduction techniques like PCA and Kernel PCA, as well as unsupervised clustering algorithms like K-Means and their evaluation methods.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">تقليل الأبعاد</span>
+      <span class="tag">التجميع</span>
+      <span class="tag">التعلم غير الخاضع للإشراف</span>
+      <span class="tag">تحليل المكونات الرئيسية</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Dimensionality Reduction</span>
+      <span class="tag">Clustering</span>
+      <span class="tag">Unsupervised Learning</span>
+      <span class="tag">PCA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>صياغة مشكلة من العالم الحقيقي كمهمة تجميع (Clustering).</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ خوارزمية التجميع K-Means باستخدام مكتبة scikit-learn.</span></li>
+      <li><span class="obj-icon">✦</span><span>تقييم نتائج التجميع باستخدام تقنيات مثل طريقة الكوع (Elbow Method) وتحليل خيال الظل (Silhouette Analysis).</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تحليل المكونات الرئيسية (PCA) و Kernel PCA لتقليل أبعاد البيانات.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Formulate a real-world problem as a clustering task.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement the K-Means clustering algorithm using scikit-learn.</span></li>
+      <li><span class="obj-icon">✦</span><span>Evaluate clustering results using techniques like the elbow method and silhouette analysis.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply Principal Component Analysis (PCA) and Kernel PCA for dimensionality reduction.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="curse-of-dimensionality" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> لعنة الأبعاد</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> The Curse of Dimensionality</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كلما زاد عدد الميزات (الأبعاد)، أصبح فضاء البيانات شاسعاً وفارغاً، مما يجعل النماذج عرضة للفرط في التخصيص (Overfitting).</p></template>
+    <template class="content-en"><p>As the number of features increases, the data space becomes exponentially larger and sparser, leading to overfitting.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تشير <span class="smart-term" data-term-en="Curse of Dimensionality" data-ar="لعنة الأبعاد" data-en-def="The exponential increase in volume associated with adding extra dimensions to a mathematical space.">لعنة الأبعاد<span class="smart-term-tooltip"></span></span> إلى التحديات التي تنشأ عند العمل مع بيانات عالية الأبعاد. مع زيادة عدد الأبعاد، يزداد حجم الفضاء بشكل أسي، مما يجعل البيانات متناثرة (Sparse).</p><ul><li>في مكعب فائق (Hypercube) بـ 10,000 بُعد، تكون معظم النقاط قريبة جداً من الحدود.</li><li>في فضاء بـ 1,000,000 بُعد، يبلغ متوسط المسافة بين نقطتين عشوائيتين حوالي 408.25.</li><li>تؤدي هذه المسافات الشاسعة إلى زيادة خطر الفرط في التخصيص (Overfitting) وتتطلب كميات هائلة من بيانات التدريب بشكل أسي.</li></ul><p>فوائد تقليل الأبعاد تشمل: تسريع وقت التدريب، تبسيط النماذج، إمكانية تصور البيانات (في 2D أو 3D)، وتقليل الضوضاء.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Curse of Dimensionality" data-ar="لعنة الأبعاد" data-en-def="The exponential increase in volume associated with adding extra dimensions to a mathematical space.">curse of dimensionality<span class="smart-term-tooltip"></span></span> refers to the phenomena that arise when analyzing data in high-dimensional spaces. As dimensions increase, the volume of the space increases exponentially, making the data sparse.</p><ul><li>In a 10,000-dimensional unit hypercube, most points are very close to the border.</li><li>In a 1,000,000-dimensional hypercube, the average distance between two random points is around 408.25.</li><li>This sparsity leads to an increased risk of overfitting and unreliable predictions, requiring exponentially more training data.</li></ul><p>Benefits of dimensionality reduction include: speeding up training, simplifying models, enabling data visualization (2D/3D), and noise reduction.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>لماذا تفشل مقاييس المسافة في الأبعاد العالية؟</strong> لأن المسافة بين أقرب نقطة وأبعد نقطة تميل إلى التقارب، مما يفقد خوارزميات مثل KNN فعاليتها.</p><p>على الرغم من أن تقليل الأبعاد يسرع التدريب، إلا أنه يؤدي إلى فقدان بعض المعلومات، مما قد يقلل من أداء النموذج قليلاً.</p><p>لذلك، يُنصح دائماً بتجربة النموذج على البيانات الأصلية أولاً.</p></template>
+    <template class="content-en"><p><strong>Why do distance metrics fail in high dimensions?</strong> Because the ratio of the distance to the nearest neighbor to the distance to the farthest neighbor approaches 1, making algorithms like KNN ineffective.</p><p>While dimensionality reduction speeds up training, it inherently loses some information, which can slightly degrade performance.</p><p>It is best practice to try training with the original data first before applying reduction techniques.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تؤثر لعنة الأبعاد على خوارزمية K-Nearest Neighbors (KNN)؟</template>
+      <template class="content-en">How does the curse of dimensionality affect the K-Nearest Neighbors (KNN) algorithm?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في الأبعاد العالية، تصبح المسافة بين جميع النقاط متقاربة تقريباً، مما يجعل مفهوم 'الجار الأقرب' بلا معنى، وتفقد الخوارزمية قدرتها على التمييز.</p></template>
+      <template class="content-en"><p>In high dimensions, the distances between all points become roughly equal, making the concept of 'nearest neighbor' meaningless and causing the algorithm to lose its discriminative power.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dimensionality-reduction-approaches" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> مناهج تقليل الأبعاد (الإسقاط والتشعب)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Dimensionality Reduction Approaches (Projection &amp; Manifold)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإسقاط (Projection) يسقط البيانات على مستوى مسطح، بينما التعلم التشعبي (Manifold Learning) يفك طيات البيانات الملتوية.</p></template>
+    <template class="content-en"><p>Projection flattens data onto a lower-dimensional subspace, while Manifold Learning unrolls twisted data structures.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك نهجان رئيسيان لتقليل الأبعاد:</p><ol><li><b><span class="smart-term" data-term-en="Projection" data-ar="الإسقاط" data-en-def="Mapping data points onto a lower-dimensional subspace.">الإسقاط<span class="smart-term-tooltip"></span></span> (Projection):</b> يسقط البيانات على فضاء فرعي (Subspace) ذي أبعاد أقل. مثال: إسقاط نقاط ثلاثية الأبعاد على مستوى ثنائي الأبعاد. من تقنياته: PCA و LDA. قد لا يكون مناسباً إذا كانت البيانات ملتوية (مثل مجموعة بيانات Swiss roll).</li><li><b><span class="smart-term" data-term-en="Manifold Learning" data-ar="التعلم التشعبي" data-en-def="Techniques that model the lower-dimensional manifold on which training instances lie.">التعلم التشعبي<span class="smart-term-tooltip"></span></span> (Manifold Learning):</b> يفترض أن البيانات تقع على 'تشعب' (Manifold) منخفض الأبعاد داخل الفضاء عالي الأبعاد. يهدف إلى 'فك طيات' (Unroll) هذه البيانات. من تقنياته: t-SNE و LLE.</li></ol><p>تعتمد فرضية التشعب (Manifold Hypothesis) على أن معظم مجموعات البيانات الحقيقية عالية الأبعاد تقع بالقرب من تشعب منخفض الأبعاد (مثل صور الأرقام المكتوبة بخط اليد MNIST).</p></template>
+    <template class="content-en"><p>There are two main approaches to dimensionality reduction:</p><ol><li><b><span class="smart-term" data-term-en="Projection" data-ar="الإسقاط" data-en-def="Mapping data points onto a lower-dimensional subspace.">Projection<span class="smart-term-tooltip"></span></span>:</b> Projects data onto a lower-dimensional subspace. Example: Projecting 3D points onto a 2D plane. Techniques include PCA and LDA. It may not be suitable for datasets that twist and turn (like the Swiss roll dataset), as simple projection loses important structure.</li><li><b><span class="smart-term" data-term-en="Manifold Learning" data-ar="التعلم التشعبي" data-en-def="Techniques that model the lower-dimensional manifold on which training instances lie.">Manifold Learning<span class="smart-term-tooltip"></span></span>:</b> Assumes data lies on a low-dimensional manifold embedded within a high-dimensional space. It aims to 'unroll' such datasets to their intrinsic lower-dimensional form. Techniques include t-SNE and LLE.</li></ol><p>The Manifold Hypothesis assumes that most real-world high-dimensional datasets lie close to a much lower-dimensional manifold (e.g., MNIST digit images have fewer degrees of freedom than random pixels).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هل يؤدي التعلم التشعبي دائماً إلى تبسيط حدود القرار؟ لا. في بعض الأحيان، قد تكون حدود القرار أبسط في الفضاء الأصلي عالي الأبعاد مقارنة بالفضاء التشعبي المفكوك.</p><p>لذلك، يجب دائماً تجربة النماذج على كل من البيانات الأصلية والبيانات المخفضة الأبعاد لاختيار التوازن الأفضل بين الأداء والبساطة.</p></template>
+    <template class="content-en"><p>Does Manifold Learning always simplify decision boundaries? No. Sometimes, the decision boundary is simpler in the original high-dimensional space than in the unrolled lower-dimensional manifold space.</p><p>Therefore, it is a best practice to experiment with both original and reduced-dimensionality datasets to choose the approach that provides the best balance between performance and simplicity.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG showing two approaches: 1. Projection: A 3D scatter plot of points hovering near a 2D plane, with arrows projecting them straight down onto the plane. 2. Manifold Learning: A 3D 'Swiss Roll' dataset (a rolled-up sheet of points) being 'unrolled' into a flat 2D rectangle. Use dark background #0d1117, bright blue and purple points. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Marker for projection dashed lines -->
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M 0,0 L 10,5 L 0,10 Z" fill="var(--brand-400)" />
+    </marker>
+    <!-- Marker for solid arrows -->
+    <marker id="arrow-solid" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0,0 L 10,5 L 0,10 Z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Global Title -->
+  <text x="450" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Dimensionality Reduction Approaches</text>
+  <text x="450" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">مناهج تقليل الأبعاد</text>
+
+  <!-- Center Divider -->
+  <line x1="450" y1="70" x2="450" y2="470" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- ========================================== -->
+  <!-- LEFT PANEL: PROJECTION                     -->
+  <!-- ========================================== -->
+
+  <!-- Subtitle -->
+  <text x="225" y="85" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">1. Projection</text>
+  <text x="225" y="85" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">1. الإسقاط</text>
+
+  <!-- 3D Space Label -->
+  <text x="225" y="115" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Original High-Dimensional Data</text>
+  <text x="225" y="115" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">البيانات الأصلية عالية الأبعاد</text>
+
+  <!-- 2D Plane (Subspace) -->
+  <polygon points="100,340 350,340 410,220 160,220" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  
+  <!-- Plane Grid Lines (Subtle) -->
+  <line x1="130" y1="280" x2="380" y2="280" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4" opacity="0.4" />
+  <line x1="225" y1="340" x2="285" y2="220" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4" opacity="0.4" />
+
+  <!-- Plane Label -->
+  <text x="360" y="330" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">2D Subspace</text>
+  <text x="360" y="330" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">فضاء جزئي ثنائي الأبعاد</text>
+
+  <!-- Projection Lines (Dashed) -->
+  <line x1="200" y1="130" x2="200" y2="264" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="270" y1="110" x2="270" y2="244" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="320" y1="160" x2="320" y2="294" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="240" y1="180" x2="240" y2="314" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="170" y1="170" x2="170" y2="304" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="300" y1="120" x2="300" y2="254" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+  <line x1="350" y1="140" x2="350" y2="274" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-dashed)" />
+
+  <!-- Projected Points (2D) -->
+  <circle cx="200" cy="270" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="270" cy="250" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="320" cy="300" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="240" cy="320" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="170" cy="310" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="300" cy="260" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="350" cy="280" r="6" fill="var(--brand-600)" stroke="var(--bg-surface)" stroke-width="1.5" />
+
+  <!-- Original Points (3D) -->
+  <circle cx="200" cy="130" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="270" cy="110" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="320" cy="160" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="240" cy="180" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="170" cy="170" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="300" cy="120" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="350" cy="140" r="6" fill="var(--brand-300)" stroke="var(--bg-surface)" stroke-width="1.5" />
+
+  <!-- Projection Action Label -->
+  <text x="120" y="195" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">Project Down</text>
+  <text x="120" y="195" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--brand-ink)">إسقاط لأسفل</text>
+  <path d="M 120,205 L 120,225" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-solid)" />
+
+  <!-- Description Box Left -->
+  <rect x="45" y="380" width="360" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="225" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Projects data onto a lower-dimensional subspace.</text>
+  <text x="225" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">يسقط البيانات على فضاء جزئي ذي أبعاد أقل.</text>
+  
+  <text x="225" y="425" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">May lose structure on complex, twisted datasets.</text>
+  <text x="225" y="425" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">قد يفقد الهيكل في مجموعات البيانات المعقدة والملتوية.</text>
+  
+  <text x="225" y="450" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">(e.g., PCA, LDA)</text>
+  <text x="225" y="450" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">(مثل PCA، LDA)</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT PANEL: MANIFOLD LEARNING             -->
+  <!-- ========================================== -->
+
+  <!-- Subtitle -->
+  <text x="675" y="85" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">2. Manifold Learning</text>
+  <text x="675" y="85" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">2. تعلم الطيات</text>
+
+  <!-- 3D Manifold Label -->
+  <text x="540" y="115" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">High-Dimensional Manifold</text>
+  <text x="540" y="115" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">طية عالية الأبعاد</text>
+
+  <!-- Swiss Roll (3D Point Cloud via Dotted Paths) -->
+  <!-- Layer 1 (Back) -->
+  <g transform="translate(16, -24)">
+    <path d="M 540,240 C 540,230 555,230 555,240 C 555,255 525,255 525,240" fill="none" stroke="var(--brand-700)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 525,240 C 525,215 575,215 575,240" fill="none" stroke="var(--brand-600)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 575,240 C 575,275 505,275 505,240" fill="none" stroke="var(--brand-500)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 505,240 C 505,195 605,195 605,240 C 605,295 475,295 475,240" fill="none" stroke="var(--brand-400)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  </g>
+  
+  <!-- Layer 2 (Middle) -->
+  <g transform="translate(8, -12)">
+    <path d="M 540,240 C 540,230 555,230 555,240 C 555,255 525,255 525,240" fill="none" stroke="var(--brand-700)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 525,240 C 525,215 575,215 575,240" fill="none" stroke="var(--brand-600)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 575,240 C 575,275 505,275 505,240" fill="none" stroke="var(--brand-500)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 505,240 C 505,195 605,195 605,240 C 605,295 475,295 475,240" fill="none" stroke="var(--brand-400)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  </g>
+
+  <!-- Layer 3 (Front) -->
+  <g transform="translate(0, 0)">
+    <path d="M 540,240 C 540,230 555,230 555,240 C 555,255 525,255 525,240" fill="none" stroke="var(--brand-700)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 525,240 C 525,215 575,215 575,240" fill="none" stroke="var(--brand-600)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 575,240 C 575,275 505,275 505,240" fill="none" stroke="var(--brand-500)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+    <path d="M 505,240 C 505,195 605,195 605,240 C 605,295 475,295 475,240" fill="none" stroke="var(--brand-400)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  </g>
+
+  <!-- Unrolling Arrow -->
+  <path d="M 630,240 Q 665,190 700,240" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-solid)" />
+  <text x="665" y="195" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">Unroll</text>
+  <text x="665" y="195" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">بسط</text>
+
+  <!-- Flat Rectangle (Unrolled Manifold) -->
+  <text x="780" y="115" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Intrinsic 2D Space</text>
+  <text x="780" y="115" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">فضاء ثنائي الأبعاد جوهري</text>
+
+  <rect x="715" y="160" width="130" height="160" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  
+  <!-- Unrolled Dots Grid -->
+  <path d="M 735,175 L 735,305" fill="none" stroke="var(--brand-700)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  <path d="M 765,175 L 765,305" fill="none" stroke="var(--brand-600)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  <path d="M 795,175 L 795,305" fill="none" stroke="var(--brand-500)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+  <path d="M 825,175 L 825,305" fill="none" stroke="var(--brand-400)" stroke-width="8" stroke-linecap="round" stroke-dasharray="0, 16" />
+
+  <text x="780" y="340" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">2D Manifold</text>
+  <text x="780" y="340" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">طية ثنائية الأبعاد</text>
+
+  <!-- Description Box Right -->
+  <rect x="495" y="380" width="360" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="675" y="405" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Unrolls data to find its intrinsic lower-dimensional form.</text>
+  <text x="675" y="405" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">يبسط البيانات للعثور على شكلها الجوهري ذي الأبعاد الأقل.</text>
+  
+  <text x="675" y="425" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Preserves non-linear relationships and local structures.</text>
+  <text x="675" y="425" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">يحافظ على العلاقات غير الخطية والهياكل المحلية.</text>
+  
+  <text x="675" y="450" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">(e.g., t-SNE, LLE, UMAP)</text>
+  <text x="675" y="450" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">(مثل t-SNE، LLE، UMAP)</text>
+
+
+  <!-- ========================================== -->
+  <!-- BOTTOM PANEL: MANIFOLD HYPOTHESIS          -->
+  <!-- ========================================== -->
+  <rect x="45" y="490" width="810" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4,4" />
+  
+  <text x="450" y="515" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+    <tspan font-weight="bold" fill="var(--brand-ink)">Manifold Hypothesis:</tspan> Real-world high-dimensional data often lies close to a much lower-dimensional manifold.
+  </text>
+  <text x="450" y="515" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">
+    <tspan font-weight="bold" fill="var(--brand-ink)">فرضية الطية:</tspan> البيانات الواقعية عالية الأبعاد تقع غالباً بالقرب من طية ذات أبعاد أقل بكثير.
+  </text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Projection (PCA)</th><th>Manifold Learning (LLE)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع البيانات الملتوية (مثل Swiss Roll)</template>
+          <template class="content-en">Handling twisted data (e.g., Swiss Roll)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يسحق البيانات، يفقد الهيكل</template>
+          <template class="content-en">Squashes data, loses structure</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يفك طيات البيانات بنجاح</template>
+          <template class="content-en">Successfully unrolls data</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعقيد الحسابي</template>
+          <template class="content-en">Computational Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريع وفعال</template>
+          <template class="content-en">Fast and efficient</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أبطأ، يتطلب موارد أكثر</template>
+          <template class="content-en">Slower, resource-intensive</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يفشل الإسقاط (Projection) مع مجموعة بيانات اللفافة السويسرية (Swiss Roll)؟</template>
+      <template class="content-en">Why does simple projection fail with the Swiss Roll dataset?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الإسقاط المباشر سيؤدي إلى سحق الطبقات الملتوية فوق بعضها البعض، مما يؤدي إلى دمج نقاط متباعدة في الأصل وفقدان الهيكل الداخلي للبيانات.</p></template>
+      <template class="content-en"><p>Because a direct projection would squash the rolled layers onto each other, merging points that are actually far apart on the manifold and destroying the intrinsic structure of the data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="principal-component-analysis-pca" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> تحليل المكونات الرئيسية (PCA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Principal Component Analysis (PCA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تبحث عن المحاور (المكونات) التي تحافظ على أكبر قدر من التباين (Variance) في البيانات لتقليل أبعادها.</p></template>
+    <template class="content-en"><p>An algorithm that finds the axes (components) that preserve the maximum variance in the data to reduce its dimensions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحليل المكونات الرئيسية (PCA) هو تقنية إحصائية تُستخدم لتبسيط البيانات عالية الأبعاد. يقوم بذلك عن طريق تحديد الاتجاهات (المكونات الرئيسية) التي يتم على طولها تعظيم تباين البيانات.</p><ol><li><b><span class="smart-term" data-term-en="Principal Component" data-ar="المكون الرئيسي" data-en-def="An orthogonal axis that captures the maximum possible variance in the data.">المكون الرئيسي<span class="smart-term-tooltip"></span></span> الأول (PC1):</b> الاتجاه الذي يحتوي على أكبر تباين.</li><li><b>المكون الرئيسي الثاني (PC2):</b> متعامد (Orthogonal) مع PC1 ويحتوي على ثاني أكبر تباين، وهكذا.</li></ol><p>للعثور على هذه المكونات، يستخدم PCA تقنية رياضية تسمى <span class="smart-term" data-term-en="SVD (Singular Value Decomposition)" data-ar="تحليل القيمة المفردة" data-en-def="A mathematical matrix decomposition technique used by PCA to find principal components.">تحليل القيمة المفردة<span class="smart-term-tooltip"></span></span> (SVD)، حيث يتم تحليل مصفوفة البيانات $X$ إلى $U \Sigma V^T$. المصفوفة $V^T$ تحتوي على المكونات الرئيسية.</p><p><b>ملاحظة هامة:</b> يفترض PCA أن البيانات ممركزة حول نقطة الأصل (Centered). تقوم مكتبة Scikit-Learn بذلك تلقائياً.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Principal Component" data-ar="المكون الرئيسي" data-en-def="An orthogonal axis that captures the maximum possible variance in the data.">Principal Component<span class="smart-term-tooltip"></span></span> Analysis (PCA) is a statistical technique used to simplify high-dimensional data. It identifies the directions (principal components) along which the variance of the data is maximized.</p><ol><li><b>First Principal Component (PC1):</b> The direction with the largest variance.</li><li><b>Second Principal Component (PC2):</b> Orthogonal to PC1 and has the next largest variance, and so on.</li></ol><p>To find these components, PCA uses Singular Value Decomposition (SVD), decomposing the training set matrix $X$ into three matrices: $U \Sigma V^T$. The matrix $V^T$ contains the right singular vectors (the principal components).</p><p><b>Important:</b> PCA assumes data is centered around the origin. Scikit-Learn's PCA class automatically centers the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كيف نختار عدد الأبعاد $d$؟ بدلاً من اختيار رقم عشوائي، نهدف إلى الحفاظ على نسبة كبيرة من التباين (مثلاً 95%). يمكننا حساب التباين التراكمي (Cumulative Variance) واختيار الحد الأدنى من الأبعاد الذي يحقق هذه النسبة.</p><p>يمكن استخدام PCA لضغط البيانات (Compression). على سبيل المثال، يمكن تقليل مجموعة بيانات MNIST من 784 ميزة إلى حوالي 150 ميزة مع الاحتفاظ بـ 95% من التباين. يمكن أيضاً فك ضغط البيانات باستخدام التحويل العكسي (Inverse Transformation)، والفرق بين البيانات الأصلية والمسترجعة يسمى خطأ إعادة البناء (Reconstruction Error).</p></template>
+    <template class="content-en"><p>How do we choose the right number of dimensions $d$? Instead of an arbitrary number, we aim to preserve a large portion of the variance (e.g., 95%). We calculate the cumulative explained variance ratio and select the minimum dimensions needed.</p><p>PCA is highly effective for data compression. For instance, MNIST can be reduced from 784 to ~150 features while retaining 95% variance. Data can be decompressed using the inverse transformation; the mean squared distance between original and reconstructed data is the reconstruction error.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>إسقاط البيانات X على الفضاء الفرعي المحدد بأول d مكونات رئيسية.</strong></template>
+      <template class="content-en"><strong>Projecting data X onto the subspace defined by the top d principal components.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$X_{d} = X \cdot V_{d}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.decomposition import PCA
+import numpy as np
+
+# Standard PCA
+pca = PCA(n_components=0.95) # Preserve 95% of variance
+X_reduced = pca.fit_transform(X_train)
+
+# Inverse Transform (Decompression)
+X_recovered = pca.inverse_transform(X_reduced)
+
+# Randomized PCA (Faster for large datasets)
+rnd_pca = PCA(n_components=154, svd_solver="randomized")
+X_reduced_rnd = rnd_pca.fit_transform(X_train)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: 2D scatter plot showing an elongated cloud of data points. Draw two orthogonal axes through the center of the data. The longer axis (solid line) goes through the length of the cloud (PC1 - Maximum Variance). The shorter axis (dotted line) goes across the width (PC2). Label them PC1 and PC2. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <!-- Grid Pattern -->
+        <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="var(--border-color)" stroke-width="0.5" opacity="0.4"/>
+        </pattern>
+
+        <!-- Arrowheads -->
+        <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Drop Shadow for Info Boxes -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.1"/>
+        </filter>
+    </defs>
+
+    <!-- Background Grid -->
+    <rect width="100%" height="100%" fill="url(#grid)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Principal Component Analysis (PCA)</text>
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تحليل المكونات الرئيسية (PCA)</text>
+
+    <!-- Original Feature Axes (Faint) -->
+    <line x1="100" y1="270" x2="700" y2="270" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" opacity="0.7" />
+    <line x1="400" y1="450" x2="400" y2="90" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" opacity="0.7" />
+
+    <!-- Feature Axes Labels -->
+    <text x="680" y="295" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Feature 1</text>
+    <text x="680" y="295" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الخاصية 1</text>
+    
+    <text x="400" y="75" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Feature 2</text>
+    <text x="400" y="75" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الخاصية 2</text>
+
+    <!-- Data Points Cloud -->
+    <g fill="var(--brand-500)">
+        <!-- Core -->
+        <circle cx="400" cy="270" r="4" opacity="0.5" />
+        <circle cx="395" cy="275" r="4" opacity="0.5" />
+        <circle cx="405" cy="265" r="4" opacity="0.5" />
+        <circle cx="390" cy="265" r="4" opacity="0.5" />
+        <circle cx="410" cy="275" r="4" opacity="0.5" />
+        <circle cx="400" cy="260" r="4" opacity="0.5" />
+        <circle cx="400" cy="280" r="4" opacity="0.5" />
+        <circle cx="385" cy="270" r="4" opacity="0.5" />
+        <circle cx="415" cy="270" r="4" opacity="0.5" />
+        <circle cx="395" cy="260" r="4" opacity="0.5" />
+        <circle cx="405" cy="280" r="4" opacity="0.5" />
+        
+        <!-- Inner Band -->
+        <circle cx="370" cy="285" r="4" opacity="0.5" />
+        <circle cx="380" cy="280" r="4" opacity="0.5" />
+        <circle cx="390" cy="275" r="4" opacity="0.5" />
+        <circle cx="410" cy="265" r="4" opacity="0.5" />
+        <circle cx="420" cy="260" r="4" opacity="0.5" />
+        <circle cx="430" cy="255" r="4" opacity="0.5" />
+        <circle cx="375" cy="295" r="4" opacity="0.5" />
+        <circle cx="385" cy="290" r="4" opacity="0.5" />
+        <circle cx="415" cy="250" r="4" opacity="0.5" />
+        <circle cx="425" cy="245" r="4" opacity="0.5" />
+        <circle cx="365" cy="275" r="4" opacity="0.5" />
+        <circle cx="375" cy="270" r="4" opacity="0.5" />
+        <circle cx="425" cy="270" r="4" opacity="0.5" />
+        <circle cx="435" cy="265" r="4" opacity="0.5" />
+
+        <!-- Mid Band -->
+        <circle cx="340" cy="300" r="4" opacity="0.5" />
+        <circle cx="350" cy="295" r="4" opacity="0.5" />
+        <circle cx="360" cy="290" r="4" opacity="0.5" />
+        <circle cx="440" cy="250" r="4" opacity="0.5" />
+        <circle cx="450" cy="245" r="4" opacity="0.5" />
+        <circle cx="460" cy="240" r="4" opacity="0.5" />
+        <circle cx="345" cy="310" r="4" opacity="0.5" />
+        <circle cx="355" cy="305" r="4" opacity="0.5" />
+        <circle cx="445" cy="235" r="4" opacity="0.5" />
+        <circle cx="455" cy="230" r="4" opacity="0.5" />
+        <circle cx="335" cy="290" r="4" opacity="0.5" />
+        <circle cx="345" cy="285" r="4" opacity="0.5" />
+        <circle cx="455" cy="255" r="4" opacity="0.5" />
+        <circle cx="465" cy="250" r="4" opacity="0.5" />
+
+        <!-- Outer Band -->
+        <circle cx="280" cy="330" r="4" opacity="0.5" />
+        <circle cx="300" cy="320" r="4" opacity="0.5" />
+        <circle cx="320" cy="310" r="4" opacity="0.5" />
+        <circle cx="480" cy="230" r="4" opacity="0.5" />
+        <circle cx="500" cy="220" r="4" opacity="0.5" />
+        <circle cx="520" cy="210" r="4" opacity="0.5" />
+        <circle cx="290" cy="340" r="4" opacity="0.5" />
+        <circle cx="310" cy="330" r="4" opacity="0.5" />
+        <circle cx="490" cy="215" r="4" opacity="0.5" />
+        <circle cx="510" cy="205" r="4" opacity="0.5" />
+        <circle cx="270" cy="320" r="4" opacity="0.5" />
+        <circle cx="290" cy="310" r="4" opacity="0.5" />
+        <circle cx="510" cy="225" r="4" opacity="0.5" />
+        <circle cx="530" cy="215" r="4" opacity="0.5" />
+
+        <!-- Extremes -->
+        <circle cx="220" cy="360" r="4" opacity="0.5" />
+        <circle cx="240" cy="350" r="4" opacity="0.5" />
+        <circle cx="260" cy="340" r="4" opacity="0.5" />
+        <circle cx="540" cy="200" r="4" opacity="0.5" />
+        <circle cx="560" cy="190" r="4" opacity="0.5" />
+        <circle cx="580" cy="180" r="4" opacity="0.5" />
+        <circle cx="230" cy="370" r="4" opacity="0.5" />
+        <circle cx="250" cy="360" r="4" opacity="0.5" />
+        <circle cx="550" cy="185" r="4" opacity="0.5" />
+        <circle cx="570" cy="175" r="4" opacity="0.5" />
+        <circle cx="210" cy="350" r="4" opacity="0.5" />
+        <circle cx="230" cy="340" r="4" opacity="0.5" />
+        <circle cx="570" cy="205" r="4" opacity="0.5" />
+        <circle cx="590" cy="195" r="4" opacity="0.5" />
+    </g>
+
+    <!-- Faint Full Span of Principal Components -->
+    <line x1="180" y1="380" x2="620" y2="160" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5" />
+    <line x1="450" y1="370" x2="350" y2="170" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5" />
+
+    <!-- Right Angle Indicator -->
+    <path d="M 417.88 261.06 L 408.94 243.18 L 391.06 252.12" fill="none" stroke="var(--text-muted)" stroke-width="1.5" />
+
+    <!-- Principal Component Arrows -->
+    <!-- PC1 (Max Variance) -->
+    <line x1="400" y1="270" x2="620" y2="160" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-brand)" />
+    <!-- PC2 (Orthogonal) -->
+    <line x1="400" y1="270" x2="350" y2="170" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrow-brand)" />
+
+    <!-- Center Point (Origin of PCA) -->
+    <circle cx="400" cy="270" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- PC Labels -->
+    <text x="650" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">PC1 (Max Variance)</text>
+    <text x="650" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">المكون الأول (أقصى تباين)</text>
+
+    <text x="310" y="150" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">PC2</text>
+    <text x="310" y="150" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">المكون الثاني</text>
+
+    <!-- Info Box: SVD Decomposition -->
+    <rect x="40" y="60" width="260" height="110" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    
+    <text x="170" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SVD Decomposition</text>
+    <text x="170" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تحليل القيمة المفردة (SVD)</text>
+    
+    <text x="170" y="120" text-anchor="middle" font-size="18" font-family="monospace" fill="var(--brand-ink)">
+        <tspan font-style="italic">X = U Σ V</tspan><tspan baseline-shift="super" font-size="12">T</tspan>
+    </text>
+    
+    <text x="170" y="145" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">
+        <tspan font-style="italic">V</tspan><tspan baseline-shift="super" font-size="10">T</tspan> rows = Principal Components
+    </text>
+    <text x="170" y="145" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">
+        صفوف <tspan font-style="italic">V</tspan><tspan baseline-shift="super" font-size="10">T</tspan> = المكونات الرئيسية
+    </text>
+
+    <!-- Info Box: Centering -->
+    <rect x="500" y="360" width="260" height="90" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    
+    <text x="630" y="390" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Data Centering</text>
+    <text x="630" y="390" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تمركز البيانات</text>
+    
+    <text x="630" y="415" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">PCA assumes data is centered</text>
+    <text x="630" y="415" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يفترض PCA أن البيانات ممركزة</text>
+    
+    <text x="630" y="435" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Mean = (0, 0)</text>
+    <text x="630" y="435" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المتوسط = (0, 0)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا من الضروري تمركز البيانات (Centering) قبل تطبيق PCA؟</template>
+      <template class="content-en">Why is it essential to center the data before applying PCA?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن PCA يبحث عن المحاور التي تعظم التباين انطلاقاً من نقطة الأصل. إذا لم تكن البيانات ممركزة، فإن المكون الرئيسي الأول سيتجه نحو متوسط البيانات بدلاً من اتجاه التباين الأقصى.</p></template>
+      <template class="content-en"><p>Because PCA finds axes of maximum variance starting from the origin. If data isn't centered, the first principal component will just point towards the mean of the data rather than the direction of maximum variance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="kernel-pca" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تحليل المكونات الرئيسية بالنواة (Kernel PCA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Kernel PCA (kPCA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم 'حيلة النواة' (Kernel Trick) لإجراء تقليل أبعاد غير خطي، مما يسمح بفك طيات البيانات المعقدة.</p></template>
+    <template class="content-en"><p>Uses the kernel trick to perform non-linear dimensionality reduction, allowing complex data structures to be unrolled.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوسع Kernel PCA (kPCA) قدرات PCA من خلال السماح بتقليل الأبعاد بشكل غير خطي. يستخدم '<span class="smart-term" data-term-en="Kernel Trick" data-ar="حيلة النواة" data-en-def="A mathematical technique that implicitly maps data into a high-dimensional space without explicitly computing the coordinates.">حيلة النواة<span class="smart-term-tooltip"></span></span>' (Kernel Trick)، والتي تعين البيانات ضمنياً إلى فضاء ميزات عالي الأبعاد حيث تصبح الإسقاطات الخطية أكثر فعالية.</p><ul><li>مثل طرق النواة في SVM، يمكن لـ kPCA الكشف عن الهياكل المعقدة التي قد يفوتها PCA الخطي.</li><li>النوى الشائعة تشمل: RBF (دالة الأساس الشعاعي)، Polynomial (متعددة الحدود)، و Sigmoid.</li><li>الحدود الخطية في هذا الفضاء عالي الأبعاد تتوافق مع حدود غير خطية في الفضاء الأصلي.</li></ul></template>
+    <template class="content-en"><p>Kernel Principal Component Analysis (kPCA) extends PCA by allowing nonlinear dimensionality reduction. It uses the <span class="smart-term" data-term-en="Kernel Trick" data-ar="حيلة النواة" data-en-def="A mathematical technique that implicitly maps data into a high-dimensional space without explicitly computing the coordinates.">kernel trick<span class="smart-term-tooltip"></span></span>, which implicitly maps data into a high-dimensional feature space where linear separation and projections are more effective.</p><ul><li>Like kernel methods in SVMs, kPCA can uncover complex structures that linear PCA might miss.</li><li>Common kernels include Radial Basis Function (RBF), polynomial, and sigmoid.</li><li>A linear decision boundary in this high-dimensional space corresponds to a nonlinear boundary in the original space.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كيف نختار النواة (Kernel) والمعلمات الفائقة (Hyperparameters) في kPCA؟ نظراً لأن kPCA هو تعلم غير خاضع للإشراف، فلا يوجد مقياس أداء مباشر. هناك طريقتان:</p><ol><li><b>الضبط عبر مهمة لاحقة:</b> استخدام Grid Search لضبط المعلمات بناءً على دقة نموذج خاضع للإشراف (مثل الانحدار اللوجستي) يتبع خطوة kPCA.</li><li><b>خطأ إعادة البناء (Reconstruction Error):</b> محاولة تقليل خطأ إعادة البناء. ومع ذلك، إعادة البناء في kPCA معقدة وتتطلب العثور على '<span class="smart-term" data-term-en="Pre-image" data-ar="الصورة المسبقة" data-en-def="The point in the original space that maps closest to the transformed point in the kernel feature space.">الصورة المسبقة<span class="smart-term-tooltip"></span></span>' (Pre-image) في الفضاء الأصلي التي تقترب من النقطة المحولة في فضاء الميزات.</li></ol></template>
+    <template class="content-en"><p>How do we select the kernel and hyperparameters in kPCA? Since it's unsupervised, there's no direct performance measure. Two approaches exist:</p><ol><li><b>Downstream Task Tuning:</b> Use Grid Search to tune parameters based on the accuracy of a supervised model (e.g., Logistic Regression) that follows the kPCA step in a pipeline.</li><li><b>Reconstruction Error:</b> Minimize the <span class="smart-term" data-term-en="Pre-image" data-ar="الصورة المسبقة" data-en-def="The point in the original space that maps closest to the transformed point in the kernel feature space.">pre-image<span class="smart-term-tooltip"></span></span> reconstruction error. Reconstruction in kPCA is complex because it requires finding a 'pre-image' in the original space that maps closest to the transformed point in the high-dimensional feature space.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.decomposition import KernelPCA
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+import numpy as np
+
+# kPCA with RBF kernel
+rbf_pca = KernelPCA(n_components=2, kernel="rbf", gamma=0.04)
+X_reduced = rbf_pca.fit_transform(X)
+
+# Hyperparameter tuning using a pipeline
+clf = Pipeline([
+    ("kpca", KernelPCA(n_components=2)),
+    ("log_reg", LogisticRegression())
+])
+
+param_grid = [{
+    "kpca__gamma": np.linspace(0.03, 0.05, 10),
+    "kpca__kernel": ["rbf", "sigmoid"]
+}]
+
+grid_search = GridSearchCV(clf, param_grid, cv=3)
+grid_search.fit(X, y)</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Linear PCA</th><th>Kernel PCA</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع العلاقات التي يكتشفها</template>
+          <template class="content-en">Type of relationships detected</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">علاقات خطية فقط</template>
+          <template class="content-en">Linear relationships only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">علاقات خطية وغير خطية</template>
+          <template class="content-en">Linear and non-linear relationships</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">إعادة بناء البيانات (Reconstruction)</template>
+          <template class="content-en">Data Reconstruction</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مباشر وبسيط (تحويل عكسي)</template>
+          <template class="content-en">Straightforward (inverse transform)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">معقد (يتطلب إيجاد صورة مسبقة)</template>
+          <template class="content-en">Complex (requires finding pre-image)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر عملية إعادة البناء (Reconstruction) في Kernel PCA أصعب بكثير منها في PCA الخطي؟</template>
+      <template class="content-en">Why is reconstruction in Kernel PCA much harder than in linear PCA?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في PCA الخطي، التحويل العكسي هو مجرد ضرب مصفوفة. في Kernel PCA، التحويل يتم ضمنياً إلى فضاء لا نهائي الأبعاد أحياناً، لذا لا يمكن عكسه رياضياً بسهولة، ويجب استخدام تقنيات تقريبية للعثور على 'الصورة المسبقة'.</p></template>
+      <template class="content-en"><p>In linear PCA, inverse transform is a simple matrix multiplication. In kPCA, the mapping is implicit into a potentially infinite-dimensional space, so it cannot be trivially inverted. We must approximate a 'pre-image' in the original space.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="k-means-clustering" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تجميع K-Means</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> K-Means Clustering</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية تجميع تقسم البيانات إلى K مجموعات عن طريق تعيين كل نقطة لأقرب مركز (Centroid)، ثم تحديث المراكز تكرارياً.</p></template>
+    <template class="content-en"><p>A clustering algorithm that divides data into K clusters by assigning points to the nearest centroid and iteratively updating the centroids.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التجميع (Clustering) هو مهمة تعلم غير خاضع للإشراف تهدف إلى تجميع الكائنات المتشابهة معاً. K-Means هي خوارزمية شائعة لبساطتها وكفاءتها.</p><p><b>خطوات الخوارزمية:</b></p><ol><li><b>التهيئة:</b> اختيار K مراكز (Centroids) عشوائياً من البيانات. (يجب تحديد K مسبقاً).</li><li><b>التعيين:</b> حساب المسافة بين كل نقطة والمراكز، وتعيين النقطة لأقرب مركز.</li><li><b>التحديث:</b> إعادة حساب كل مركز ليكون متوسط (Mean) جميع النقاط المعينة له.</li><li><b>التكرار:</b> تكرار الخطوتين 2 و 3 حتى تتقارب الخوارزمية (لا تتغير المراكز بشكل كبير).</li></ol><p>تهدف الخوارزمية إلى تقليل دالة التكلفة (القصور الذاتي - Inertia)، وهي مجموع المسافات المربعة بين كل نقطة ومركزها.</p></template>
+    <template class="content-en"><p>Clustering is an unsupervised learning task that groups similar objects. K-Means is popular due to its simplicity and efficiency.</p><p><b>Algorithm Steps:</b></p><ol><li><b>Initialize:</b> Start with K <span class="smart-term" data-term-en="Centroid" data-ar="المركز" data-en-def="The center of a cluster, calculated as the mean of all points in the cluster.">centroid<span class="smart-term-tooltip"></span></span>s chosen randomly from the dataset. (K must be specified beforehand).</li><li><b>Assign:</b> Calculate distances from each point to the centroids. Assign each point to the nearest centroid.</li><li><b>Update:</b> Recalculate centroids as the mean of all points assigned to that cluster.</li><li><b>Repeat:</b> Repeat steps 2 and 3 until convergence (centroids no longer change significantly).</li></ol><p>The algorithm aims to minimize the cost function (inertia), which is the sum of squared distances between each point and its assigned centroid.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>مشكلة <span class="smart-term" data-term-en="Local Optima" data-ar="القيم المثلى المحلية" data-en-def="A sub-optimal solution that an algorithm might get stuck in, rather than finding the absolute best (global) solution.">القيم المثلى المحلية<span class="smart-term-tooltip"></span></span> (Local Optima):</b> التهيئة العشوائية قد تؤدي إلى نتائج تجميع سيئة (تستقر الخوارزمية في حد أدنى محلي لدالة التكلفة). الحل هو تشغيل الخوارزمية عدة مرات بتهيئات عشوائية مختلفة واختيار النموذج ذي التكلفة الأقل.</p><p><b>قيود K-Means:</b> تفترض الخوارزمية أن المجموعات كروية الشكل (Spherical) ومتساوية الحجم. تفشل الخوارزمية غالباً إذا كانت المجموعات ذات أشكال معقدة أو كثافات مختلفة جداً.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Local Optima" data-ar="القيم المثلى المحلية" data-en-def="A sub-optimal solution that an algorithm might get stuck in, rather than finding the absolute best (global) solution.">Local Optima<span class="smart-term-tooltip"></span></span> Problem:</b> Random initialization can lead to poor clustering results (converging to a local optimum). The solution is to run the K-Means algorithm multiple times with different random initializations and select the result with the lowest cost function value.</p><p><b>Limitations:</b> K-Means assumes clusters are spherical and equally sized. It struggles with clusters of varying sizes, densities, or non-spherical shapes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة التكلفة لـ K-Means: مجموع المسافات المربعة بين النقاط ومراكزها.</strong></template>
+      <template class="content-en"><strong>K-Means Cost Function: Sum of squared distances between points and their assigned centroids.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$J = \sum_{i=1}^{K} \sum_{x \in C_i} ||x - \mu_i||^2$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.cluster import KMeans
+
+# Initialize and fit K-Means
+kmeans = KMeans(n_clusters=3, n_init=10) # n_init runs it 10 times to avoid local optima
+kmeans.fit(X)
+
+# Get cluster assignments and centroids
+labels = kmeans.labels_
+centroids = kmeans.cluster_centers_</code></pre>
+  </div>
+
+  <!-- DIAGRAM[3]: A 4-panel comic showing K-Means steps: 1. Random initialization of 3 stars (centroids) among gray dots. 2. Points colored based on nearest star. 3. Stars move to the center of their colored point clouds. 4. Final converged state. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Star shape for centroids -->
+        <path id="star" d="M 0 -10 L 2.3 -3.2 L 9.5 -3.2 L 3.6 1.3 L 5.9 8.5 L 0 4.2 L -5.9 8.5 L -3.6 1.3 L -9.5 -3.2 L -2.3 -3.2 Z" stroke="var(--bg-surface)" stroke-width="1.5"/>
+        
+        <!-- Marker for centroid movement -->
+        <marker id="arrow-move" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--text-primary)"/>
+        </marker>
+        
+        <!-- Marker for panel flow -->
+        <marker id="arrow-flow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 Z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Main Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">K-Means Clustering Algorithm</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خوارزمية التجميع K-Means</text>
+
+    <!-- Panel 1: Initialization -->
+    <g transform="translate(40, 70)">
+        <rect width="340" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">1. Initialize Centroids</text>
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">1. تهيئة النقاط المركزية</text>
+
+        <!-- All points unassigned (gray) -->
+        <g fill="var(--text-muted)" opacity="0.5">
+            <!-- Cluster 1 -->
+            <circle cx="60" cy="120" r="4.5"/>
+            <circle cx="80" cy="110" r="4.5"/>
+            <circle cx="50" cy="140" r="4.5"/>
+            <circle cx="70" cy="150" r="4.5"/>
+            <circle cx="90" cy="130" r="4.5"/>
+            <circle cx="65" cy="135" r="4.5"/>
+            <circle cx="85" cy="145" r="4.5"/>
+            <!-- Cluster 2 -->
+            <circle cx="240" cy="50" r="4.5"/>
+            <circle cx="270" cy="45" r="4.5"/>
+            <circle cx="250" cy="70" r="4.5"/>
+            <circle cx="280" cy="60" r="4.5"/>
+            <circle cx="260" cy="80" r="4.5"/>
+            <circle cx="290" cy="55" r="4.5"/>
+            <circle cx="255" cy="55" r="4.5"/>
+            <!-- Cluster 3 -->
+            <circle cx="230" cy="140" r="4.5"/>
+            <circle cx="260" cy="135" r="4.5"/>
+            <circle cx="240" cy="160" r="4.5"/>
+            <circle cx="270" cy="150" r="4.5"/>
+            <circle cx="250" cy="170" r="4.5"/>
+            <circle cx="280" cy="145" r="4.5"/>
+            <circle cx="245" cy="155" r="4.5"/>
+            <!-- Noise/Borderline -->
+            <circle cx="150" cy="90" r="4.5"/>
+            <circle cx="160" cy="160" r="4.5"/>
+            <circle cx="180" cy="120" r="4.5"/>
+            <circle cx="130" cy="180" r="4.5"/>
+        </g>
+
+        <!-- Initial Random Stars -->
+        <use href="#star" x="120" y="70" fill="var(--brand-500)"/>
+        <use href="#star" x="200" y="180" fill="var(--text-primary)"/>
+        <use href="#star" x="220" y="90" fill="var(--text-secondary)"/>
+
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Randomly place K=3 centroids</text>
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">وضع 3 نقاط مركزية عشوائياً</text>
+    </g>
+
+    <!-- Flow Arrow 1 to 2 -->
+    <line x1="388" y1="180" x2="412" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-flow)"/>
+
+    <!-- Panel 2: Assignment -->
+    <g transform="translate(420, 70)">
+        <rect width="340" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">2. Assign Points</text>
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">2. تعيين النقاط</text>
+
+        <!-- Points assigned to nearest star -->
+        <g fill="var(--brand-500)">
+            <circle cx="60" cy="120" r="4.5"/>
+            <circle cx="80" cy="110" r="4.5"/>
+            <circle cx="50" cy="140" r="4.5"/>
+            <circle cx="70" cy="150" r="4.5"/>
+            <circle cx="90" cy="130" r="4.5"/>
+            <circle cx="65" cy="135" r="4.5"/>
+            <circle cx="85" cy="145" r="4.5"/>
+            <circle cx="150" cy="90" r="4.5"/>
+        </g>
+        <g fill="var(--text-primary)">
+            <circle cx="230" cy="140" r="4.5"/>
+            <circle cx="260" cy="135" r="4.5"/>
+            <circle cx="240" cy="160" r="4.5"/>
+            <circle cx="270" cy="150" r="4.5"/>
+            <circle cx="250" cy="170" r="4.5"/>
+            <circle cx="280" cy="145" r="4.5"/>
+            <circle cx="245" cy="155" r="4.5"/>
+            <circle cx="160" cy="160" r="4.5"/>
+            <circle cx="130" cy="180" r="4.5"/>
+        </g>
+        <g fill="var(--text-secondary)">
+            <circle cx="240" cy="50" r="4.5"/>
+            <circle cx="270" cy="45" r="4.5"/>
+            <circle cx="250" cy="70" r="4.5"/>
+            <circle cx="280" cy="60" r="4.5"/>
+            <circle cx="260" cy="80" r="4.5"/>
+            <circle cx="290" cy="55" r="4.5"/>
+            <circle cx="255" cy="55" r="4.5"/>
+            <circle cx="180" cy="120" r="4.5"/>
+        </g>
+
+        <!-- Distance lines -->
+        <line x1="120" y1="70" x2="150" y2="90" stroke="var(--brand-500)" stroke-dasharray="3,3" opacity="0.6"/>
+        <line x1="200" y1="180" x2="160" y2="160" stroke="var(--text-primary)" stroke-dasharray="3,3" opacity="0.6"/>
+        <line x1="220" y1="90" x2="180" y2="120" stroke="var(--text-secondary)" stroke-dasharray="3,3" opacity="0.6"/>
+
+        <!-- Stars -->
+        <use href="#star" x="120" y="70" fill="var(--brand-500)"/>
+        <use href="#star" x="200" y="180" fill="var(--text-primary)"/>
+        <use href="#star" x="220" y="90" fill="var(--text-secondary)"/>
+
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Assign each point to the nearest centroid</text>
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تعيين كل نقطة للمركز الأقرب</text>
+    </g>
+
+    <!-- Flow Arrow 2 to 3 -->
+    <path d="M 590 290 L 590 305 Q 590 310 585 310 L 215 310 Q 210 310 210 315 L 210 322" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-flow)"/>
+
+    <!-- Panel 3: Update -->
+    <g transform="translate(40, 330)">
+        <rect width="340" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">3. Update Centroids</text>
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">3. تحديث النقاط المركزية</text>
+
+        <!-- Points (same colors as Panel 2) -->
+        <g fill="var(--brand-500)">
+            <circle cx="60" cy="120" r="4.5"/>
+            <circle cx="80" cy="110" r="4.5"/>
+            <circle cx="50" cy="140" r="4.5"/>
+            <circle cx="70" cy="150" r="4.5"/>
+            <circle cx="90" cy="130" r="4.5"/>
+            <circle cx="65" cy="135" r="4.5"/>
+            <circle cx="85" cy="145" r="4.5"/>
+            <circle cx="150" cy="90" r="4.5"/>
+        </g>
+        <g fill="var(--text-primary)">
+            <circle cx="230" cy="140" r="4.5"/>
+            <circle cx="260" cy="135" r="4.5"/>
+            <circle cx="240" cy="160" r="4.5"/>
+            <circle cx="270" cy="150" r="4.5"/>
+            <circle cx="250" cy="170" r="4.5"/>
+            <circle cx="280" cy="145" r="4.5"/>
+            <circle cx="245" cy="155" r="4.5"/>
+            <circle cx="160" cy="160" r="4.5"/>
+            <circle cx="130" cy="180" r="4.5"/>
+        </g>
+        <g fill="var(--text-secondary)">
+            <circle cx="240" cy="50" r="4.5"/>
+            <circle cx="270" cy="45" r="4.5"/>
+            <circle cx="250" cy="70" r="4.5"/>
+            <circle cx="280" cy="60" r="4.5"/>
+            <circle cx="260" cy="80" r="4.5"/>
+            <circle cx="290" cy="55" r="4.5"/>
+            <circle cx="255" cy="55" r="4.5"/>
+            <circle cx="180" cy="120" r="4.5"/>
+        </g>
+
+        <!-- Ghost Stars (Old positions) -->
+        <use href="#star" x="120" y="70" fill="var(--brand-500)" opacity="0.3"/>
+        <use href="#star" x="200" y="180" fill="var(--text-primary)" opacity="0.3"/>
+        <use href="#star" x="220" y="90" fill="var(--text-secondary)" opacity="0.3"/>
+
+        <!-- Movement Arrows -->
+        <line x1="120" y1="70" x2="92" y2="115" stroke="var(--text-primary)" stroke-width="1.5" stroke-dasharray="2,2" marker-end="url(#arrow-move)"/>
+        <line x1="200" y1="180" x2="215" y2="160" stroke="var(--text-primary)" stroke-width="1.5" stroke-dasharray="2,2" marker-end="url(#arrow-move)"/>
+        <line x1="220" y1="90" x2="245" y2="75" stroke="var(--text-primary)" stroke-width="1.5" stroke-dasharray="2,2" marker-end="url(#arrow-move)"/>
+
+        <!-- New Stars (Mean positions) -->
+        <use href="#star" x="85" y="125" fill="var(--brand-500)"/>
+        <use href="#star" x="220" y="155" fill="var(--text-primary)"/>
+        <use href="#star" x="250" y="70" fill="var(--text-secondary)"/>
+
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Move centroids to the mean of their points</text>
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تحريك المراكز إلى متوسط نقاطها</text>
+    </g>
+
+    <!-- Flow Arrow 3 to 4 -->
+    <line x1="388" y1="440" x2="412" y2="440" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-flow)"/>
+
+    <!-- Panel 4: Convergence -->
+    <g transform="translate(420, 330)">
+        <rect width="340" height="220" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">4. Convergence</text>
+        <text x="170" y="25" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">4. التقارب</text>
+
+        <!-- Cluster Boundaries (Hulls) -->
+        <path d="M 40 130 C 50 90, 100 100, 110 130 C 120 160, 150 190, 130 200 C 90 210, 30 170, 40 130 Z" fill="var(--brand-500)" opacity="0.1"/>
+        <path d="M 150 150 C 180 130, 240 120, 270 130 C 300 140, 290 190, 250 190 C 200 190, 140 180, 150 150 Z" fill="var(--text-primary)" opacity="0.1"/>
+        <path d="M 140 80 C 180 50, 250 30, 280 50 C 310 70, 290 110, 250 110 C 200 110, 130 110, 140 80 Z" fill="var(--text-secondary)" opacity="0.1"/>
+
+        <!-- Points (Re-assigned to final clusters) -->
+        <g fill="var(--brand-500)">
+            <circle cx="60" cy="120" r="4.5"/>
+            <circle cx="80" cy="110" r="4.5"/>
+            <circle cx="50" cy="140" r="4.5"/>
+            <circle cx="70" cy="150" r="4.5"/>
+            <circle cx="90" cy="130" r="4.5"/>
+            <circle cx="65" cy="135" r="4.5"/>
+            <circle cx="85" cy="145" r="4.5"/>
+            <circle cx="130" cy="180" r="4.5"/> <!-- Changed cluster -->
+        </g>
+        <g fill="var(--text-primary)">
+            <circle cx="230" cy="140" r="4.5"/>
+            <circle cx="260" cy="135" r="4.5"/>
+            <circle cx="240" cy="160" r="4.5"/>
+            <circle cx="270" cy="150" r="4.5"/>
+            <circle cx="250" cy="170" r="4.5"/>
+            <circle cx="280" cy="145" r="4.5"/>
+            <circle cx="245" cy="155" r="4.5"/>
+            <circle cx="160" cy="160" r="4.5"/>
+        </g>
+        <g fill="var(--text-secondary)">
+            <circle cx="240" cy="50" r="4.5"/>
+            <circle cx="270" cy="45" r="4.5"/>
+            <circle cx="250" cy="70" r="4.5"/>
+            <circle cx="280" cy="60" r="4.5"/>
+            <circle cx="260" cy="80" r="4.5"/>
+            <circle cx="290" cy="55" r="4.5"/>
+            <circle cx="255" cy="55" r="4.5"/>
+            <circle cx="150" cy="90" r="4.5"/> <!-- Changed cluster -->
+            <circle cx="180" cy="120" r="4.5"/>
+        </g>
+
+        <!-- Final Stars -->
+        <use href="#star" x="75" y="135" fill="var(--brand-500)"/>
+        <use href="#star" x="250" y="155" fill="var(--text-primary)"/>
+        <use href="#star" x="265" y="60" fill="var(--text-secondary)"/>
+
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Repeat until centroids stop moving</text>
+        <text x="170" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">التكرار حتى تتوقف المراكز عن الحركة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم المسافة المربعة (Squared Distance) بدلاً من المسافة العادية في دالة تكلفة K-Means؟</template>
+      <template class="content-en">Why use squared distance instead of absolute distance in the K-Means cost function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المسافة المربعة تعاقب الأخطاء الكبيرة (النقاط البعيدة جداً عن المركز) بشكل أكبر، مما يجبر المركز على التموضع في مكان يقلل من التباين الكلي للمجموعة. كما أنها أسهل في الاشتقاق الرياضي لحساب المتوسط.</p></template>
+      <template class="content-en"><p>Squared distance heavily penalizes larger errors (points far from the centroid), forcing the centroid to minimize the overall variance. It is also mathematically easier to differentiate, leading directly to the mean as the optimal centroid.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="evaluating-clusters-elbow-silhouette" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تقييم المجموعات (طريقة الكوع ومعامل خيال الظل)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Evaluating Clusters (Elbow Method &amp; Silhouette)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بما أنه لا توجد تسميات (Labels) في التجميع، نستخدم طريقة الكوع لاختيار عدد المجموعات K، ومعامل خيال الظل لقياس جودة الفصل بينها.</p></template>
+    <template class="content-en"><p>Since there are no labels in clustering, we use the Elbow Method to choose K, and the Silhouette Coefficient to measure cluster separation quality.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقييم التجميع يمثل تحدياً لعدم وجود 'حقيقة أساسية' (Ground Truth). نعتمد على مقاييس داخلية:</p><ol><li><b><span class="smart-term" data-term-en="Elbow Method" data-ar="طريقة الكوع" data-en-def="A heuristic used in determining the number of clusters in a data set by finding the point where the cost function&#x27;s rate of decrease slows.">طريقة الكوع<span class="smart-term-tooltip"></span></span> (Elbow Method):</b> طريقة إرشادية لتحديد K الأمثل. نرسم دالة التكلفة (Distortion/Inertia) مقابل قيم K مختلفة. نبحث عن نقطة 'الكوع' حيث يتباطأ معدل الانخفاض بشكل حاد.</li><li><b><span class="smart-term" data-term-en="Silhouette Coefficient" data-ar="معامل خيال الظل" data-en-def="A metric used to calculate the goodness of a clustering technique, ranging from -1 to 1.">معامل خيال الظل<span class="smart-term-tooltip"></span></span> (Silhouette Coefficient):</b> يقيس مدى تراص المجموعات وانفصالها. يُحسب لكل نقطة بالمعادلة: $s = (b - a) / \max(a, b)$<ul><li>$a$: متوسط المسافة بين النقطة وجميع النقاط الأخرى في <b>نفس</b> المجموعة.</li><li>$b$: متوسط المسافة بين النقطة وجميع النقاط في <b>أقرب مجموعة مختلفة</b>.</li></ul></li></ol></template>
+    <template class="content-en"><p>Evaluating clusters is challenging because there are no ground truth labels. We use intrinsic measures:</p><ol><li><b><span class="smart-term" data-term-en="Elbow Method" data-ar="طريقة الكوع" data-en-def="A heuristic used in determining the number of clusters in a data set by finding the point where the cost function&#x27;s rate of decrease slows.">Elbow Method<span class="smart-term-tooltip"></span></span>:</b> A heuristic to determine the optimal K. Plot the cost function (distortion) for different K values. Look for the 'elbow' point where the rate of decrease sharply slows down.</li><li><b><span class="smart-term" data-term-en="Silhouette Coefficient" data-ar="معامل خيال الظل" data-en-def="A metric used to calculate the goodness of a clustering technique, ranging from -1 to 1.">Silhouette Coefficient<span class="smart-term-tooltip"></span></span>:</b> Measures compactness and separation. Calculated for each instance: $s = (b - a) / \max(a, b)$<ul><li>$a$: Mean distance between the instance and all other points in the <b>same</b> cluster.</li><li>$b$: Mean distance between the instance and all points in the <b>nearest different</b> cluster.</li></ul></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تفسير قيم معامل خيال الظل (Silhouette):</p><ul><li><b>يقترب من +1:</b> النقطة داخل مجموعتها بشكل جيد وبعيدة عن المجموعات الأخرى (تجميع ممتاز).</li><li><b>يقترب من 0:</b> النقطة قريبة من حدود القرار بين مجموعتين (تداخل).</li><li><b>يقترب من -1:</b> النقطة ربما تم تعيينها للمجموعة الخاطئة.</li></ul><p>طريقة الكوع قد تكون غامضة أحياناً (لا يوجد كوع واضح)، بينما يوفر تحليل خيال الظل رؤية أكثر تفصيلاً وموثوقية.</p></template>
+    <template class="content-en"><p>Interpreting Silhouette values:</p><ul><li><b>Close to +1:</b> The instance is well inside its own cluster and far from other clusters (excellent).</li><li><b>Close to 0:</b> The instance is close to a cluster boundary (overlapping).</li><li><b>Close to -1:</b> The instance may have been assigned to the wrong cluster.</li></ul><p>The Elbow method can sometimes be ambiguous (no clear elbow), whereas Silhouette analysis provides a more detailed and reliable view of cluster quality.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معامل خيال الظل. a: المسافة داخل المجموعة، b: المسافة لأقرب مجموعة خارجية.</strong></template>
+      <template class="content-en"><strong>Silhouette Coefficient. a: intra-cluster distance, b: nearest-cluster distance.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$s = \frac{b - a}{\max(a, b)}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.metrics import silhouette_score
+from sklearn.cluster import KMeans
+
+# Calculate Silhouette Score for a specific K
+kmeans = KMeans(n_clusters=4)
+labels = kmeans.fit_predict(X)
+score = silhouette_score(X, labels, metric='euclidean')
+print(f'Silhouette Score: {score}')</code></pre>
+  </div>
+
+  <!-- DIAGRAM[4]: Line chart showing the Elbow Method. X-axis is 'Number of clusters (K)' from 1 to 10. Y-axis is 'Average distortion'. The line drops steeply from K=1 to K=3, then flattens out. A red arrow points to K=3 labeled 'Elbow Point'. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for axes -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-primary)" />
+        </marker>
+        
+        <!-- Arrowhead for highlight -->
+        <marker id="arrow-highlight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Subtle drop shadow for elevated elements -->
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.1" flood-color="#000000" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title & Description -->
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">The Elbow Method</text>
+    <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">طريقة المرفق</text>
+
+    <text x="400" y="60" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">The optimal number of clusters is found at the "elbow" where the rate of decrease sharply slows down.</text>
+    <text x="400" y="60" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">يتم العثور على العدد الأمثل للعناقيد عند "المرفق" حيث يتباطأ معدل الانخفاض بشكل حاد.</text>
+
+    <!-- Chart Grid (Horizontal Lines) -->
+    <g stroke="var(--border-color)" stroke-dasharray="4 4" opacity="0.6">
+        <line x1="100" y1="90" x2="700" y2="90" />
+        <line x1="100" y1="157.5" x2="700" y2="157.5" />
+        <line x1="100" y1="225" x2="700" y2="225" />
+        <line x1="100" y1="292.5" x2="700" y2="292.5" />
+    </g>
+
+    <!-- Axes -->
+    <line x1="100" y1="360" x2="720" y2="360" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-axis)" />
+    <line x1="100" y1="360" x2="100" y2="80" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#arrow-axis)" />
+
+    <!-- Axis Labels -->
+    <text x="410" y="435" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Number of Clusters (K)</text>
+    <text x="410" y="435" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">عدد العناقيد (K)</text>
+
+    <g transform="translate(40, 225) rotate(-90)">
+        <text x="0" y="0" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Average Distortion (Inertia)</text>
+        <text x="0" y="0" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">متوسط التشوه (القصور الذاتي)</text>
+    </g>
+
+    <!-- X-Axis Ticks & Numbers -->
+    <g font-size="14" fill="var(--text-secondary)" text-anchor="middle">
+        <text x="100" y="385">1</text>
+        <text x="160" y="385">2</text>
+        <text x="220" y="385" font-size="16" font-weight="bold" fill="var(--brand-ink)">3</text>
+        <text x="280" y="385">4</text>
+        <text x="340" y="385">5</text>
+        <text x="400" y="385">6</text>
+        <text x="460" y="385">7</text>
+        <text x="520" y="385">8</text>
+        <text x="580" y="385">9</text>
+        <text x="640" y="385">10</text>
+    </g>
+
+    <g stroke="var(--text-primary)" stroke-width="2">
+        <line x1="100" y1="360" x2="100" y2="366" />
+        <line x1="160" y1="360" x2="160" y2="366" />
+        <line x1="220" y1="360" x2="220" y2="368" stroke="var(--brand-500)" stroke-width="3" />
+        <line x1="280" y1="360" x2="280" y2="366" />
+        <line x1="340" y1="360" x2="340" y2="366" />
+        <line x1="400" y1="360" x2="400" y2="366" />
+        <line x1="460" y1="360" x2="460" y2="366" />
+        <line x1="520" y1="360" x2="520" y2="366" />
+        <line x1="580" y1="360" x2="580" y2="366" />
+        <line x1="640" y1="360" x2="640" y2="366" />
+    </g>
+
+    <!-- Vertical Dashed Line for Elbow (K=3) -->
+    <line x1="220" y1="290" x2="220" y2="360" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6 4" opacity="0.8" />
+
+    <!-- Data Line -->
+    <polyline points="100,90 160,200 220,290 280,325 340,340 400,348 460,353 520,356 580,358 640,359" fill="none" stroke="var(--brand-500)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+
+    <!-- Data Points -->
+    <circle cx="100" cy="90" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="160" cy="200" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Highlighted Elbow Point (K=3) -->
+    <circle cx="220" cy="290" r="8" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" filter="url(#shadow)" />
+    
+    <circle cx="280" cy="325" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="340" cy="340" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="400" cy="348" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="460" cy="353" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="520" cy="356" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="580" cy="358" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <circle cx="640" cy="359" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+
+    <!-- Elbow Highlight Annotation -->
+    <path d="M 360,210 C 360,250 280,270 235,285" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-highlight)" />
+    
+    <g transform="translate(360, 190)">
+        <rect x="-105" y="-20" width="210" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-400)" stroke-width="2" filter="url(#shadow)" />
+        <text x="0" y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Elbow Point (Optimal K=3)</text>
+        <text x="0" y="5" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">نقطة المرفق (K=3 الأمثل)</text>
+    </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان متوسط معامل خيال الظل لمجموعة بيانات هو 0.1، فماذا تستنتج عن جودة التجميع؟</template>
+      <template class="content-en">If the average silhouette coefficient for a dataset is 0.1, what do you conclude about the clustering quality?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قيمة 0.1 قريبة جداً من الصفر، مما يشير إلى أن المجموعات متداخلة بشكل كبير وأن العديد من النقاط تقع على حدود المجموعات، وبالتالي التجميع ليس جيداً أو أن البيانات لا تحتوي على مجموعات واضحة.</p></template>
+      <template class="content-en"><p>A value of 0.1 is very close to zero, indicating that the clusters are highly overlapping and many points lie on the boundaries between clusters. The clustering is poor, or the data lacks distinct natural clusters.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="practical-applications-kmeans" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التطبيقات العملية (تكميم الصور وتعلم الميزات)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Practical Applications (Image Quantization &amp; Feature Learning)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن استخدام K-Means لضغط الصور (تقليل الألوان) أو لاستخراج ميزات من بيانات غير مسماة لاستخدامها لاحقاً في التصنيف.</p></template>
+    <template class="content-en"><p>K-Means can be used to compress images (color reduction) or to extract features from unlabeled data for later use in classification.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تطبيقات العالم الحقيقي لـ K-Means تشمل:</p><ol><li><b><span class="smart-term" data-term-en="Image Quantization" data-ar="تكميم الصور" data-en-def="A lossy compression method that reduces the number of distinct colors used in an image.">تكميم الصور<span class="smart-term-tooltip"></span></span> (Image Quantization):</b> طريقة ضغط مع فقدان للبيانات (Lossy). تستبدل نطاقاً من الألوان المتشابهة بلون واحد. نستخدم K-Means لاكتشاف 'لوحة ألوان' (Palette) مضغوطة لأهم الألوان في الصورة، ثم نستبدل كل بكسل بمركز المجموعة الذي ينتمي إليه.</li><li><b>التجميع لتعلم الميزات (Clustering to Learn Features):</b> دمج التجميع مع التصنيف في مشكلة تعلم شبه خاضع للإشراف (Semi-supervised). نستخدم التجميع لتعلم الميزات من البيانات غير المسماة (مثل تجميع واصفات SURF للصور)، ثم نستخدم هذه الميزات (كمتجهات) لتدريب مصنف خاضع للإشراف (مثل الانحدار اللوجستي).</li><li><b>تطبيقات أخرى:</b> تجزئة العملاء (Customer Segmentation) واكتشاف الشذوذ (Anomaly Detection).</li></ol></template>
+    <template class="content-en"><p>Real-world applications of K-Means include:</p><ol><li><b><span class="smart-term" data-term-en="Image Quantization" data-ar="تكميم الصور" data-en-def="A lossy compression method that reduces the number of distinct colors used in an image.">Image Quantization<span class="smart-term-tooltip"></span></span>:</b> A lossy compression method. It replaces a range of similar colors with a single color. We use K-Means to discover a compressed palette of the most important colors, replacing each pixel with its assigned cluster center.</li><li><b>Clustering to Learn Features:</b> Combining clustering with classification in a <span class="smart-term" data-term-en="Semi-supervised Learning" data-ar="التعلم شبه الخاضع للإشراف" data-en-def="A learning problem that uses a small amount of labeled data and a large amount of unlabeled data.">semi-supervised learning<span class="smart-term-tooltip"></span></span> setup. We use clustering to learn features from unlabeled data (e.g., grouping SURF image descriptors), and construct feature vectors to train a supervised classifier (like Logistic Regression).</li><li><b>Other applications:</b> Customer Segmentation and Anomaly Detection.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في تعلم الميزات، لماذا نستخدم MiniBatchKMeans بدلاً من KMeans العادي؟ عند استخراج واصفات (Descriptors) من آلاف الصور، يصبح حجم البيانات ضخماً جداً. MiniBatchKMeans يعالج البيانات في دفعات صغيرة (Mini-batches)، مما يجعله أسرع بكثير وقابلاً للتوسع للبيانات الضخمة مع تضحية طفيفة جداً بالدقة.</p></template>
+    <template class="content-en"><p>In feature learning, why use MiniBatchKMeans instead of standard KMeans? When extracting descriptors from thousands of images, the dataset becomes massive. MiniBatchKMeans processes data in small batches, making it significantly faster and scalable for large datasets with only a minor trade-off in accuracy.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Image Quantization Snippet
+from sklearn.cluster import KMeans
+import numpy as np
+
+# image_flattened is (pixels, 3) for RGB
+kmeans = KMeans(n_clusters=64) # Reduce to 64 colors
+kmeans.fit(image_flattened)
+
+# Replace each pixel with its cluster center color
+compressed_palette = kmeans.cluster_centers_
+cluster_assignments = kmeans.predict(image_flattened)
+compressed_img = compressed_palette[cluster_assignments]</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يساهم التجميع في تحسين أداء نماذج التصنيف في التعلم شبه الخاضع للإشراف؟</template>
+      <template class="content-en">How does clustering contribute to improving classification models in semi-supervised learning?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يقوم التجميع باكتشاف الهياكل والأنماط المخفية في البيانات غير المسماة، ويحولها إلى ميزات (Features) جديدة ذات معنى. هذه الميزات المستخرجة تسهل على المصنف الخاضع للإشراف التمييز بين الفئات باستخدام كمية قليلة من البيانات المسماة.</p></template>
+      <template class="content-en"><p>Clustering discovers hidden structures and patterns in unlabeled data, transforming them into meaningful new features. These extracted features make it easier for the supervised classifier to distinguish between classes using only a small amount of labeled data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. تخيلوا أنكم تحاولون العثور على إبرة في ملعب كرة قدم؛ هذا هو حال النماذج مع 'لعنة الأبعاد'. لحل هذه المشكلة، تعلمنا كيف نضغط البيانات باستخدام PCA (الذي يبحث عن المحاور الأوسع للبيانات) و Kernel PCA (الذي يفك طيات البيانات المعقدة كالسجادة الملتوية). بعد تبسيط البيانات، انتقلنا إلى عالم التعلم غير الخاضع للإشراف مع K-Means، الخوارزمية التي تنظم الفوضى وتجمع البيانات المتشابهة. تذكروا دائماً في الاختبار: K-Means أعمى، لا يعرف كم عدد المجموعات، لذا نستخدم 'طريقة الكوع' و'خيال الظل' لنكون نحن عينيه. ركزوا على الفروق بين الإسقاط والتشعب، وافهموا جيداً متى نستخدم كل مقياس تقييم. بالتوفيق!</template>
+    <template class="content-en">Welcome friends to this pivotal module. Imagine trying to find a needle in a football stadium; that's how models feel with the 'curse of dimensionality'. To fix this, we learned to compress data using PCA (finding the widest axes) and Kernel PCA (unrolling complex data like a twisted rug). Once simplified, we entered unsupervised learning with K-Means, the algorithm that organizes chaos by grouping similar data. Always remember for the exam: K-Means is blind, it doesn't know how many clusters exist, so we use the 'Elbow method' and 'Silhouette coefficient' to be its eyes. Focus on the differences between projection and manifold learning, and understand exactly when to use each evaluation metric. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر 'لعنة الأبعاد' مشكلة خطيرة في تعلم الآلة؟</template>
+          <template class="content-en">Why is the 'curse of dimensionality' considered a serious problem in machine learning?</template>
+          <span class="content-target">لماذا نعتبر 'لعنة الأبعاد' مشكلة خطيرة في تعلم الآلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن زيادة الأبعاد تجعل فضاء البيانات شاسعاً جداً. تصبح النقاط متباعدة، وتفقد مقاييس المسافة معناها، مما يؤدي إلى حفظ النموذج لبيانات التدريب (Overfitting) بدلاً من التعميم.</template>
+          <template class="content-en">Because increasing dimensions makes the data space vastly empty. Points become far apart, distance metrics lose meaning, and models tend to memorize training data (overfitting) rather than generalizing.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أتجنب استخدام PCA العادي وألجأ إلى تقنيات التعلم التشعبي (Manifold)؟</template>
+          <template class="content-en">When should I avoid standard PCA and resort to Manifold learning techniques?</template>
+          <span class="content-target">متى يجب أن أتجنب استخدام PCA العادي وألجأ إلى تقنيات التعلم التشعبي (Manifold)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تجنب PCA العادي عندما تكون البيانات ملتوية أو غير خطية (مثل شكل Swiss Roll). PCA يسقط البيانات خطياً مما قد يسحق الهيكل، بينما التعلم التشعبي يفك طيات هذا الهيكل.</template>
+          <template class="content-en">Avoid standard PCA when the data is highly twisted or non-linear (like a Swiss Roll). PCA projects linearly which can squash the structure, whereas manifold learning unrolls it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور تحليل القيمة المفردة (SVD) في PCA؟</template>
+          <template class="content-en">What is the role of Singular Value Decomposition (SVD) in PCA?</template>
+          <span class="content-target">ما هو دور تحليل القيمة المفردة (SVD) في PCA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">SVD هي الأداة الرياضية التي تحلل مصفوفة البيانات لاستخراج المتجهات الذاتية (Eigenvectors) التي تمثل 'المكونات الرئيسية' التي تعظم التباين.</template>
+          <template class="content-en">SVD is the mathematical tool that decomposes the data matrix to extract the eigenvectors, which represent the 'principal components' that maximize variance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحدد عدد المكونات (d) المناسب في PCA؟</template>
+          <template class="content-en">How do we determine the appropriate number of components (d) in PCA?</template>
+          <span class="content-target">كيف نحدد عدد المكونات (d) المناسب في PCA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من التخمين، نحسب التباين التراكمي (Cumulative Variance) ونختار أقل عدد من الأبعاد يحافظ على نسبة مقبولة من التباين الأصلي (مثلاً 95%).</template>
+          <template class="content-en">Instead of guessing, we calculate the cumulative explained variance and choose the minimum number of dimensions that preserve an acceptable ratio of the original variance (e.g., 95%).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي 'الصورة المسبقة' (Pre-image) في Kernel PCA ولماذا نحتاجها؟</template>
+          <template class="content-en">What is the 'Pre-image' in Kernel PCA and why do we need it?</template>
+          <span class="content-target">ما هي 'الصورة المسبقة' (Pre-image) في Kernel PCA ولماذا نحتاجها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بما أن kPCA يحول البيانات لفضاء لا نهائي أحياناً، لا يمكننا عكس التحويل مباشرة. الصورة المسبقة هي نقطة تقريبية في الفضاء الأصلي نستخدمها لحساب خطأ إعادة البناء (Reconstruction Error).</template>
+          <template class="content-en">Since kPCA maps data to a potentially infinite space, we can't directly invert it. The pre-image is an approximate point in the original space used to calculate the reconstruction error.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي دالة التكلفة التي تحاول خوارزمية K-Means تقليلها؟</template>
+          <template class="content-en">What cost function does the K-Means algorithm try to minimize?</template>
+          <span class="content-target">ما هي دالة التكلفة التي تحاول خوارزمية K-Means تقليلها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحاول تقليل 'القصور الذاتي' (Inertia)، وهو مجموع المسافات المربعة بين كل نقطة بيانات والمركز (Centroid) الخاص بمجموعتها.</template>
+          <template class="content-en">It tries to minimize 'Inertia', which is the sum of squared distances between each data point and the centroid of its assigned cluster.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نقوم بتشغيل K-Means عدة مرات بتهيئات مختلفة؟</template>
+          <template class="content-en">Why do we run K-Means multiple times with different initializations?</template>
+          <span class="content-target">لماذا نقوم بتشغيل K-Means عدة مرات بتهيئات مختلفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الخوارزمية حساسة جداً لمواقع المراكز الأولية وقد تستقر في حل سيء (Local Optima). التشغيل المتعدد يضمن فرصة أكبر للعثور على الحل الأفضل (Global Optimum).</template>
+          <template class="content-en">Because the algorithm is highly sensitive to initial centroid locations and can settle in a bad solution (Local Optima). Multiple runs ensure a higher chance of finding the best solution (Global Optimum).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين طريقة الكوع ومعامل خيال الظل؟</template>
+          <template class="content-en">What is the difference between the Elbow method and the Silhouette coefficient?</template>
+          <span class="content-target">ما الفرق بين طريقة الكوع ومعامل خيال الظل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">طريقة الكوع تعتمد على ملاحظة بصرية لتباطؤ التكلفة الكلية، بينما خيال الظل يعطي درجة رياضية دقيقة (-1 إلى 1) تقيس مدى جودة فصل كل نقطة عن المجموعات الأخرى.</template>
+          <template class="content-en">The Elbow method relies on visual observation of the overall cost slowdown, while Silhouette gives a precise mathematical score (-1 to 1) measuring how well each point is separated from other clusters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن استخدام K-Means في ضغط الصور؟</template>
+          <template class="content-en">How can K-Means be used in image compression?</template>
+          <span class="content-target">كيف يمكن استخدام K-Means في ضغط الصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال 'تكميم الصور' (Image Quantization). نجمع ألوان بكسلات الصورة إلى K مجموعة، ثم نستبدل لون كل بكسل بلون مركز المجموعة، مما يقلل عدد الألوان الكلي.</template>
+          <template class="content-en">Through 'Image Quantization'. We cluster the image's pixel colors into K groups, then replace each pixel's color with its cluster's centroid color, reducing the total number of colors.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التعلم شبه الخاضع للإشراف وكيف يفيده التجميع؟</template>
+          <template class="content-en">What is semi-supervised learning and how does clustering benefit it?</template>
+          <span class="content-target">ما هو التعلم شبه الخاضع للإشراف وكيف يفيده التجميع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو استخدام بيانات قليلة مسماة وكثيرة غير مسماة. نستخدم التجميع (مثل K-Means) على البيانات غير المسماة لاستخراج ميزات جديدة، مما يسهل على المصنف التعلم من البيانات القليلة المسماة.</template>
+          <template class="content-en">It uses a small amount of labeled data and a lot of unlabeled data. We use clustering (like K-Means) on unlabeled data to extract new features, making it easier for the classifier to learn from the few labeled examples.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "لعنة الأبعاد",
+      "en": "Curse of Dimensionality"
+    },
+    "back": {
+      "definition": {
+        "ar": "الظاهرة حيث تصبح البيانات متناثرة جداً في الأبعاد العالية، مما يؤدي إلى الفرط في التخصيص.",
+        "en": "The phenomenon where data becomes extremely sparse in high dimensions, leading to overfitting."
+      },
+      "example": {
+        "ar": "في فضاء بمليون بُعد، المسافة بين أي نقطتين عشوائيتين تكون كبيرة جداً.",
+        "en": "In a 1,000,000-D space, the distance between any two random points is very large."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الإسقاط (Projection)",
+      "en": "Projection"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لتقليل الأبعاد تقوم بإسقاط البيانات على فضاء فرعي مسطح ذي أبعاد أقل.",
+        "en": "A dimensionality reduction technique that maps data onto a flat, lower-dimensional subspace."
+      },
+      "example": {
+        "ar": "إسقاط نقاط 3D على مستوى 2D.",
+        "en": "Projecting 3D points onto a 2D plane."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "التعلم التشعبي",
+      "en": "Manifold Learning"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية تفترض أن البيانات تقع على شكل منخفض الأبعاد ملتوي داخل فضاء عالي الأبعاد، وتحاول فك طياته.",
+        "en": "A technique assuming data lies on a twisted low-D shape within a high-D space, attempting to unroll it."
+      },
+      "example": {
+        "ar": "فك طيات مجموعة بيانات اللفافة السويسرية (Swiss Roll).",
+        "en": "Unrolling the Swiss Roll dataset."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "تحليل المكونات الرئيسية (PCA)",
+      "en": "PCA (Principal Component Analysis)"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تقلل الأبعاد عن طريق إيجاد المحاور المتعامدة التي تعظم تباين البيانات.",
+        "en": "An algorithm that reduces dimensions by finding orthogonal axes that maximize data variance."
+      },
+      "example": {
+        "ar": "ضغط صور MNIST من 784 بكسل إلى 150 مكون رئيسي.",
+        "en": "Compressing MNIST images from 784 pixels to 150 principal components."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "المكون الرئيسي الأول (PC1)",
+      "en": "First Principal Component (PC1)"
+    },
+    "back": {
+      "definition": {
+        "ar": "الاتجاه في فضاء البيانات الذي يحتوي على أكبر قدر من التباين.",
+        "en": "The direction in the data space that contains the largest amount of variance."
+      },
+      "example": {
+        "ar": "المحور الطولي لسحابة بيانات بيضاوية الشكل.",
+        "en": "The longitudinal axis of an oval-shaped data cloud."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "تحليل القيمة المفردة (SVD)",
+      "en": "SVD (Singular Value Decomposition)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية رياضية لتحليل المصفوفات يستخدمها PCA للعثور على المكونات الرئيسية.",
+        "en": "A mathematical matrix decomposition technique used by PCA to find principal components."
+      },
+      "example": {
+        "ar": "تحليل المصفوفة X إلى U, Sigma, \\(V^T\\).",
+        "en": "Decomposing matrix X into U, Sigma, \\(V^T\\)."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "تمركز البيانات (Centering)",
+      "en": "Data Centering"
+    },
+    "back": {
+      "definition": {
+        "ar": "طرح المتوسط من كل ميزة بحيث يكون متوسط البيانات عند نقطة الأصل (0,0). خطوة ضرورية قبل PCA.",
+        "en": "Subtracting the mean from each feature so the data is centered at the origin. Required before PCA."
+      },
+      "example": {
+        "ar": "تقوم فئة PCA في Scikit-Learn بذلك تلقائياً.",
+        "en": "Scikit-Learn's PCA class does this automatically."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "Kernel PCA",
+      "en": "Kernel PCA"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسخة غير خطية من PCA تستخدم حيلة النواة لتعيين البيانات إلى فضاء عالي الأبعاد لتبسيطها.",
+        "en": "A non-linear version of PCA using the kernel trick to map data to a high-D space for simplification."
+      },
+      "example": {
+        "ar": "استخدام نواة RBF لفك طيات بيانات معقدة لا يمكن فصلها خطياً.",
+        "en": "Using an RBF kernel to unroll complex data that isn't linearly separable."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الصورة المسبقة (Pre-image)",
+      "en": "Pre-image"
+    },
+    "back": {
+      "definition": {
+        "ar": "النقطة في الفضاء الأصلي التي تقترب من النقطة المحولة في فضاء ميزات Kernel PCA (تستخدم لإعادة البناء).",
+        "en": "The point in the original space closest to the transformed point in the kPCA feature space (used for reconstruction)."
+      },
+      "example": {
+        "ar": "حساب خطأ إعادة البناء يتطلب إيجاد الصورة المسبقة.",
+        "en": "Calculating reconstruction error requires finding the pre-image."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "التجميع (Clustering)",
+      "en": "Clustering"
+    },
+    "back": {
+      "definition": {
+        "ar": "مهمة تعلم غير خاضع للإشراف لتجميع الكائنات المتشابهة معاً في مجموعات.",
+        "en": "An unsupervised learning task to group similar objects together into clusters."
+      },
+      "example": {
+        "ar": "تجزئة العملاء بناءً على سلوك الشراء.",
+        "en": "Segmenting customers based on purchasing behavior."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "K-Means",
+      "en": "K-Means"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تجميع تقسم البيانات إلى K مجموعات عن طريق تقليل المسافة إلى مراكز المجموعات.",
+        "en": "A clustering algorithm that divides data into K clusters by minimizing distance to cluster centroids."
+      },
+      "example": {
+        "ar": "تجميع نقاط البيانات إلى 3 مجموعات كروية.",
+        "en": "Grouping data points into 3 spherical clusters."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "المركز (Centroid)",
+      "en": "Centroid"
+    },
+    "back": {
+      "definition": {
+        "ar": "النقطة المركزية للمجموعة، وتُحسب كمتوسط لجميع النقاط داخل تلك المجموعة.",
+        "en": "The center point of a cluster, calculated as the mean of all points within that cluster."
+      },
+      "example": {
+        "ar": "في K-Means، يتم تحديث المركز في كل تكرار.",
+        "en": "In K-Means, the centroid is updated in each iteration."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "طريقة الكوع (Elbow Method)",
+      "en": "Elbow Method"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة بصرية لاختيار العدد الأمثل للمجموعات (K) من خلال البحث عن نقطة تباطؤ الانخفاض في التكلفة.",
+        "en": "A visual method to choose the optimal number of clusters (K) by finding the point where cost decrease slows."
+      },
+      "example": {
+        "ar": "رسم التكلفة مقابل K واختيار النقطة التي ينحني فيها الخط كالكوع.",
+        "en": "Plotting cost vs K and picking the point where the line bends like an elbow."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "معامل خيال الظل (Silhouette Coefficient)",
+      "en": "Silhouette Coefficient"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس لجودة التجميع يتراوح بين -1 و 1، يقيس مدى تراص المجموعة وانفصالها عن المجموعات الأخرى.",
+        "en": "A clustering quality metric from -1 to 1, measuring cluster compactness and separation from other clusters."
+      },
+      "example": {
+        "ar": "قيمة قريبة من 1 تعني تجميعاً ممتازاً.",
+        "en": "A value close to 1 means excellent clustering."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "تكميم الصور (Image Quantization)",
+      "en": "Image Quantization"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق لـ K-Means لضغط الصور عن طريق تقليل عدد الألوان المستخدمة إلى K لون أساسي.",
+        "en": "An application of K-Means to compress images by reducing the number of colors used to K main colors."
+      },
+      "example": {
+        "ar": "تحويل صورة بملايين الألوان إلى صورة بـ 64 لوناً فقط.",
+        "en": "Converting an image with millions of colors to just 64 colors."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو التأثير الرئيسي لـ 'لعنة الأبعاد' على خوارزميات تعلم الآلة؟",
+      "en": "What is the primary effect of the 'curse of dimensionality' on machine learning algorithms?"
+    },
+    "options": {
+      "ar": [
+        "تجعل البيانات متقاربة جداً مما يسهل التصنيف.",
+        "تزيد من حجم الفضاء بشكل أسي، مما يجعل البيانات متناثرة ويزيد من خطر الفرط في التخصيص.",
+        "تقلل من وقت التدريب بشكل كبير.",
+        "تزيل الضوضاء من البيانات تلقائياً."
+      ],
+      "en": [
+        "It makes data very close together, easing classification.",
+        "It increases space volume exponentially, making data sparse and increasing overfitting risk.",
+        "It significantly reduces training time.",
+        "It automatically removes noise from the data."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في الأبعاد العالية، يصبح الفضاء شاسعاً جداً وتصبح نقاط البيانات متناثرة، مما يسهل على النماذج حفظ البيانات (Overfitting) بدلاً من تعلم الأنماط العامة.",
+      "en": "In high dimensions, the space becomes vast and data points become sparse, making it easy for models to memorize the data (overfitting) rather than learning general patterns."
+    },
+    "hint": {
+      "ar": "تذكر كيف تتغير المسافة بين النقاط في مكعب فائق بمليون بُعد.",
+      "en": "Remember how the distance between points changes in a 1,000,000-D hypercube."
+    },
+    "difficulty": "medium",
+    "conceptId": "curse-of-dimensionality"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من الطرق التالية تفترض أن البيانات عالية الأبعاد تقع بالقرب من شكل منخفض الأبعاد ملتوي؟",
+      "en": "Which of the following approaches assumes that high-dimensional data lies close to a twisted lower-dimensional shape?"
+    },
+    "options": {
+      "ar": [
+        "الإسقاط (Projection)",
+        "تحليل المكونات الرئيسية (PCA)",
+        "التعلم التشعبي (Manifold Learning)",
+        "تجميع K-Means"
+      ],
+      "en": [
+        "Projection",
+        "Principal Component Analysis (PCA)",
+        "Manifold Learning",
+        "K-Means Clustering"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التعلم التشعبي (Manifold Learning) يعتمد على فرضية التشعب، والتي تحاول فك طيات البيانات الملتوية (مثل Swiss Roll) بدلاً من مجرد إسقاطها بشكل مسطح.",
+      "en": "Manifold Learning relies on the manifold hypothesis, attempting to unroll twisted data (like the Swiss Roll) rather than just projecting it flatly."
+    },
+    "hint": {
+      "ar": "فكر في كيفية التعامل مع مجموعة بيانات اللفافة السويسرية (Swiss Roll).",
+      "en": "Think about how the Swiss Roll dataset is handled."
+    },
+    "difficulty": "easy",
+    "conceptId": "dimensionality-reduction-approaches"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الهدف الأساسي لتحليل المكونات الرئيسية (PCA) عند اختيار المحاور؟",
+      "en": "What is the primary goal of Principal Component Analysis (PCA) when selecting axes?"
+    },
+    "options": {
+      "ar": [
+        "تقليل التباين إلى الصفر.",
+        "تعظيم التباين (Variance) المحفوظ في البيانات.",
+        "فصل الفئات المختلفة بأكبر هامش ممكن.",
+        "تحويل البيانات إلى توزيع طبيعي."
+      ],
+      "en": [
+        "Minimize variance to zero.",
+        "Maximize the variance preserved in the data.",
+        "Separate different classes with the maximum margin.",
+        "Transform data into a normal distribution."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يبحث PCA عن المكونات الرئيسية (المحاور) التي تحافظ على أكبر قدر ممكن من التباين لتقليل فقدان المعلومات أثناء تقليل الأبعاد.",
+      "en": "PCA finds principal components (axes) that preserve the maximum possible variance to minimize information loss during dimensionality reduction."
+    },
+    "hint": {
+      "ar": "PCA يحاول الحفاظ على انتشار البيانات قدر الإمكان.",
+      "en": "PCA tries to keep the spread of the data as much as possible."
+    },
+    "difficulty": "medium",
+    "conceptId": "principal-component-analysis-pca"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الخطوة التحضيرية الضرورية التي يفترضها PCA قبل تطبيقه على البيانات؟",
+      "en": "What is the necessary preprocessing step that PCA assumes before being applied to data?"
+    },
+    "options": {
+      "ar": [
+        "تطبيع البيانات (Normalization) بين 0 و 1.",
+        "تمركز البيانات (Centering) حول نقطة الأصل.",
+        "تحويل البيانات إلى قيم فئوية.",
+        "إزالة القيم المتطرفة (Outliers)."
+      ],
+      "en": [
+        "Normalizing data between 0 and 1.",
+        "Centering data around the origin.",
+        "Converting data to categorical values.",
+        "Removing outliers."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يفترض PCA أن البيانات ممركزة حول نقطة الأصل (متوسط كل ميزة يساوي صفر). تقوم مكتبة Scikit-Learn بذلك تلقائياً، ولكن يجب الانتباه لذلك عند البرمجة اليدوية.",
+      "en": "PCA assumes that the data is centered around the origin (mean of each feature is zero). Scikit-Learn does this automatically, but it's crucial when implementing manually."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بمتوسط البيانات.",
+      "en": "It relates to the mean of the data."
+    },
+    "difficulty": "medium",
+    "conceptId": "principal-component-analysis-pca"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "لماذا نستخدم Kernel PCA بدلاً من PCA العادي؟",
+      "en": "Why would we use Kernel PCA instead of standard PCA?"
+    },
+    "options": {
+      "ar": [
+        "لأنه أسرع بكثير من PCA العادي.",
+        "لإجراء تقليل أبعاد غير خطي للبيانات المعقدة.",
+        "لأنه لا يتطلب تمركز البيانات.",
+        "لأنه يحدد عدد المكونات تلقائياً."
+      ],
+      "en": [
+        "Because it is much faster than standard PCA.",
+        "To perform non-linear dimensionality reduction for complex data.",
+        "Because it does not require data centering.",
+        "Because it automatically determines the number of components."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يستخدم Kernel PCA حيلة النواة لتعيين البيانات إلى فضاء عالي الأبعاد، مما يسمح له باكتشاف الهياكل غير الخطية التي لا يستطيع PCA الخطي التعامل معها.",
+      "en": "Kernel PCA uses the kernel trick to map data to a high-dimensional space, allowing it to uncover non-linear structures that linear PCA cannot handle."
+    },
+    "hint": {
+      "ar": "فكر في الفرق بين النماذج الخطية والنماذج التي تستخدم النواة (Kernels).",
+      "en": "Think about the difference between linear models and models using kernels."
+    },
+    "difficulty": "medium",
+    "conceptId": "kernel-pca"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في خوارزمية K-Means، ما هي الخطوة التي تلي مباشرة التهيئة العشوائية للمراكز (Centroids)؟",
+      "en": "In the K-Means algorithm, what is the step immediately following the random initialization of centroids?"
+    },
+    "options": {
+      "ar": [
+        "إعادة حساب المراكز.",
+        "تعيين كل نقطة بيانات لأقرب مركز.",
+        "حساب معامل خيال الظل.",
+        "إيقاف الخوارزمية."
+      ],
+      "en": [
+        "Recalculating the centroids.",
+        "Assigning each data point to the nearest centroid.",
+        "Calculating the silhouette coefficient.",
+        "Stopping the algorithm."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بعد تهيئة المراكز، تقوم الخوارزمية بحساب المسافات وتعيين كل نقطة بيانات إلى المركز الأقرب إليها، لتشكيل المجموعات الأولية.",
+      "en": "After initializing centroids, the algorithm calculates distances and assigns each data point to its nearest centroid to form the initial clusters."
+    },
+    "hint": {
+      "ar": "كيف تعرف النقاط لأي مجموعة تنتمي؟",
+      "en": "How do points know which cluster they belong to?"
+    },
+    "difficulty": "easy",
+    "conceptId": "k-means-clustering"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف تتعامل خوارزمية K-Means مع مشكلة القيم المثلى المحلية (Local Optima)؟",
+      "en": "How does the K-Means algorithm handle the problem of local optima?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام حيلة النواة (Kernel Trick).",
+        "عن طريق تشغيل الخوارزمية عدة مرات بتهيئات عشوائية مختلفة واختيار الأفضل.",
+        "عن طريق زيادة عدد المجموعات (K) تدريجياً.",
+        "باستخدام طريقة الكوع."
+      ],
+      "en": [
+        "By using the Kernel Trick.",
+        "By running the algorithm multiple times with different random initializations and picking the best.",
+        "By gradually increasing the number of clusters (K).",
+        "By using the Elbow method."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نظراً لأن K-Means حساسة للتهيئة الأولية، فإن الممارسة القياسية هي تشغيلها عدة مرات (مثلاً 10 مرات) واختيار النموذج الذي ينتج أقل قيمة لدالة التكلفة.",
+      "en": "Because K-Means is sensitive to initial placement, the standard practice is to run it multiple times (e.g., 10 times) and select the model that yields the lowest cost function value."
+    },
+    "hint": {
+      "ar": "إذا كانت البداية السيئة تؤدي لنتيجة سيئة، فما هو الحل البسيط؟",
+      "en": "If a bad start leads to a bad result, what is a simple solution?"
+    },
+    "difficulty": "medium",
+    "conceptId": "k-means-clustering"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما الذي تبحث عنه عند استخدام 'طريقة الكوع' (Elbow Method) لتقييم K-Means؟",
+      "en": "What are you looking for when using the 'Elbow Method' to evaluate K-Means?"
+    },
+    "options": {
+      "ar": [
+        "النقطة التي يصل فيها معامل خيال الظل إلى 1.",
+        "النقطة التي يتباطأ عندها معدل انخفاض دالة التكلفة بشكل حاد.",
+        "النقطة التي تتقاطع فيها جميع المجموعات.",
+        "أعلى قيمة لدالة التكلفة."
+      ],
+      "en": [
+        "The point where the silhouette coefficient reaches 1.",
+        "The point where the rate of decrease in the cost function sharply slows down.",
+        "The point where all clusters intersect.",
+        "The highest value of the cost function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في طريقة الكوع، نرسم التكلفة مقابل K. النقطة المثلى هي 'الكوع'، حيث لا تؤدي إضافة المزيد من المجموعات إلى انخفاض كبير في التكلفة.",
+      "en": "In the Elbow method, we plot cost vs K. The optimal point is the 'elbow', where adding more clusters no longer yields a significant drop in cost."
+    },
+    "hint": {
+      "ar": "تخيل شكل ذراعك، أين يقع الكوع؟",
+      "en": "Imagine the shape of your arm, where is the elbow?"
+    },
+    "difficulty": "easy",
+    "conceptId": "evaluating-clusters-elbow-silhouette"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "إذا كان معامل خيال الظل (Silhouette Coefficient) لنقطة بيانات يساوي -0.8، فماذا يعني ذلك؟",
+      "en": "If the Silhouette Coefficient for a data point is -0.8, what does this mean?"
+    },
+    "options": {
+      "ar": [
+        "النقطة مجمعة بشكل مثالي.",
+        "النقطة تقع بالضبط على الحدود بين مجموعتين.",
+        "النقطة ربما تم تعيينها للمجموعة الخاطئة وهي أقرب لمجموعة أخرى.",
+        "الخوارزمية فشلت في حساب المسافة."
+      ],
+      "en": [
+        "The point is perfectly clustered.",
+        "The point lies exactly on the boundary between two clusters.",
+        "The point may have been assigned to the wrong cluster and is closer to another.",
+        "The algorithm failed to calculate the distance."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "القيم السلبية في معامل خيال الظل تعني أن النقطة أقرب إلى مجموعة أخرى (المسافة b) مقارنة بالنقاط في مجموعتها الحالية (المسافة a)، مما يشير إلى تعيين خاطئ.",
+      "en": "Negative Silhouette values mean the point is closer to another cluster (distance b) than to the points in its assigned cluster (distance a), indicating a likely wrong assignment."
+    },
+    "hint": {
+      "ar": "تذكر أن النطاق هو من -1 إلى 1. القيم الموجبة جيدة، والصفر تداخل، والسالب...؟",
+      "en": "Remember the range is -1 to 1. Positive is good, zero is overlap, negative is...?"
+    },
+    "difficulty": "hard",
+    "conceptId": "evaluating-clusters-elbow-silhouette"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في تطبيق 'تكميم الصور' (Image Quantization) باستخدام K-Means، ماذا يمثل المتغير K؟",
+      "en": "In the 'Image Quantization' application using K-Means, what does the variable K represent?"
+    },
+    "options": {
+      "ar": [
+        "عدد البكسلات في الصورة.",
+        "عدد الألوان في اللوحة المضغوطة (Palette).",
+        "أبعاد الصورة (العرض × الارتفاع).",
+        "عدد الصور في مجموعة البيانات."
+      ],
+      "en": [
+        "The number of pixels in the image.",
+        "The number of colors in the compressed palette.",
+        "The dimensions of the image (width x height).",
+        "The number of images in the dataset."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في تكميم الصور، نستخدم K-Means لتجميع الألوان المتشابهة. المتغير K يحدد عدد المجموعات، وبالتالي عدد الألوان النهائية التي ستتكون منها الصورة المضغوطة.",
+      "en": "In image quantization, we use K-Means to group similar colors. The variable K determines the number of clusters, and thus the number of final colors in the compressed image."
+    },
+    "hint": {
+      "ar": "الهدف هو تقليل حجم الصورة عن طريق تقليل عدد...",
+      "en": "The goal is to reduce image size by reducing the number of..."
+    },
+    "difficulty": "medium",
+    "conceptId": "practical-applications-kmeans"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تمركز البيانات (Centering) قبل تطبيق PCA يدوياً. مكتبة Scikit-Learn تفعل ذلك تلقائياً، ولكن في الاختبارات أو عند البرمجة من الصفر، عدم طرح المتوسط سيؤدي إلى مكونات رئيسية خاطئة تماماً.</template>
+    <template class="content-en">Forgetting to center data before applying PCA manually. Scikit-Learn does this automatically, but in exams or scratch implementations, failing to subtract the mean results in completely wrong principal components.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">فرضية التشعب (Manifold Hypothesis) هي السر وراء نجاح تقنيات مثل t-SNE و LLE. تفترض أن البيانات الحقيقية عالية الأبعاد ليست عشوائية، بل تتركز حول أشكال هندسية منخفضة الأبعاد (مثل ورقة مطوية داخل غرفة).</template>
+    <template class="content-en">The Manifold Hypothesis is the secret behind the success of techniques like t-SNE and LLE. It assumes real-world high-dimensional data isn't random, but concentrated around low-dimensional geometric shapes (like a folded sheet in a room).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">إعادة البناء في Kernel PCA ليست عملية عكسية دقيقة. نظراً لأننا نسقط البيانات في فضاء ميزات لا نهائي الأبعاد أحياناً، فإن العودة للفضاء الأصلي تتطلب إيجاد 'صورة مسبقة' (Pre-image) تقريبية، مما يجعل حساب خطأ إعادة البناء معقداً.</template>
+    <template class="content-en">Reconstruction in Kernel PCA is not an exact inverse operation. Because we project data into a potentially infinite-dimensional feature space, returning to the original space requires finding an approximate 'pre-image', making reconstruction error calculation complex.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن K-Means سيجد دائماً أفضل تجميع من أول محاولة. الخوارزمية حساسة جداً لمواقع المراكز الأولية وقد تعلق في 'قيم مثلى محلية'. يجب دائماً تشغيلها عدة مرات (n_init).</template>
+    <template class="content-en">Believing K-Means will always find the best clustering on the first try. The algorithm is highly sensitive to initial centroid locations and can get stuck in 'local optima'. Always run it multiple times (n_init).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">معامل خيال الظل (Silhouette) يتفوق على طريقة الكوع لأنه يوفر قيمة رقمية واضحة (-1 إلى 1) لكل نقطة بيانات، مما يسمح بتقييم جودة التجميع حتى عندما لا يكون 'الكوع' واضحاً في الرسم البياني.</template>
+    <template class="content-en">The Silhouette Coefficient is superior to the Elbow method because it provides a clear numerical value (-1 to 1) for every data point, allowing evaluation of clustering quality even when the 'elbow' is not visually obvious.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M07.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M09.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

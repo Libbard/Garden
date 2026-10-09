@@ -221,8 +221,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>لماذا نستخدم تحليل LU بدلاً من الحذف الغاوسي المباشر؟</p><p>تكمن القوة الحقيقية لتحليل LU عندما نحتاج إلى حل النظام <code>Ax = b</code> لعدة متجهات <code>b</code> مختلفة. بدلاً من إعادة إجراء عمليات الصفوف على المصفوفة <code>A</code> في كل مرة، نقوم بتحليلها مرة واحدة فقط.</p><p><strong>حالة الحافة:</strong> تفشل هذه الطريقة المباشرة إذا تطلب الحذف الغاوسي تبديل الصفوف (Row Swapping) لتجنب القسمة على صفر. في هذه الحالة، نحتاج إلى مصفوفة تبديل (Permutation Matrix)، ليصبح التحليل <code>PA = LU</code>.</p><p>يرتبط هذا المفهوم ارتباطاً وثيقاً بالكفاءة الحسابية، حيث يقلل بشكل كبير من عدد العمليات الحسابية (Flops) المطلوبة للأنظمة الكبيرة مقارنة بإيجاد معكوس المصفوفة.</p></template>
-    <template class="content-en"><p>Why use LU-decomposition instead of direct Gaussian elimination?</p><p>The true power of LU emerges when solving <code>Ax = b</code> for multiple different <code>b</code> vectors. Instead of re-applying row operations to <code>A</code> every time, we factorize it just once.</p><p><strong>Edge case:</strong> This specific method fails if Gaussian elimination requires row interchanges to avoid division by zero. In such cases, a Permutation matrix is required, leading to <code>PA = LU</code> factorization.</p><p>This concept is deeply tied to computational efficiency, drastically reducing the number of floating-point operations (flops) required for large systems compared to finding the matrix inverse.</p></template>
+    <template class="content-ar"><p>لماذا نستخدم تحليل LU بدلاً من الحذف الغاوسي المباشر؟</p><p>تكمن القوة الحقيقية لتحليل LU عندما نحتاج إلى حل النظام <code>Ax = b</code> لعدة متجهات <code>b</code> مختلفة. بدلاً من إعادة إجراء عمليات الصفوف على المصفوفة <code>A</code> في كل مرة، نقوم بتحليلها مرة واحدة فقط.</p><p><strong>حالة الحافة:</strong> تفشل هذه الطريقة المباشرة إذا تطلب الحذف الغاوسي تبديل الصفوف (Row Swapping) لتجنب القسمة على صفر. في هذه الحالة، نحتاج إلى مصفوفة تبديل (Permutation Matrix)، ليصبح التحليل \(PA = LU\).</p><p>يرتبط هذا المفهوم ارتباطاً وثيقاً بالكفاءة الحسابية، حيث يقلل بشكل كبير من عدد العمليات الحسابية (Flops) المطلوبة للأنظمة الكبيرة مقارنة بإيجاد معكوس المصفوفة.</p></template>
+    <template class="content-en"><p>Why use LU-decomposition instead of direct Gaussian elimination?</p><p>The true power of LU emerges when solving <code>Ax = b</code> for multiple different <code>b</code> vectors. Instead of re-applying row operations to <code>A</code> every time, we factorize it just once.</p><p><strong>Edge case:</strong> This specific method fails if Gaussian elimination requires row interchanges to avoid division by zero. In such cases, a Permutation matrix is required, leading to \(PA = LU\) factorization.</p><p>This concept is deeply tied to computational efficiency, drastically reducing the number of floating-point operations (flops) required for large systems compared to finding the matrix inverse.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -358,8 +358,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تعتمد طريقة القوة على البدء بمتجه غير صفري عشوائي <code>x_0</code> وتكرار ضربه في المصفوفة <code>A</code>. الخطوات الأساسية:</p><ul><li>اختر متجهاً ابتدائياً <code>x_0</code> وقم بتسويته (Normalize).</li><li>احسب <code>Ax_0</code> وقم بتسويته للحصول على التقريب الأول <code>x_1</code>.</li><li>احسب <span class="smart-term" data-term-en="Rayleigh Quotient" data-ar="خارج قسمة رايلي" data-en-def="A formula used in the Power Method to estimate the eigenvalue corresponding to an eigenvector approximation.">خارج قسمة رايلي<span class="smart-term-tooltip"></span></span> (Rayleigh quotient) للحصول على تقريب القيمة الذاتية.</li><li>كرر العملية: <code>x_k = Ax_{k-1} / scaling_factor</code>.</li></ul><p>هناك نوعان من التسوية (Scaling):</p><ul><li><strong>التسوية الإقليدية</strong> (القسمة على طول المتجه).</li><li><strong>تسوية الإدخال الأقصى</strong> (القسمة على أكبر عنصر في المتجه).</li></ul></template>
-    <template class="content-en"><p>The Power Method relies on starting with an arbitrary nonzero vector <code>x_0</code> and repeatedly multiplying it by matrix <code>A</code>. Key steps:</p><ul><li>Choose an initial vector <code>x_0</code> and normalize it.</li><li>Compute <code>Ax_0</code> and normalize it to get the first approximation <code>x_1</code>.</li><li>Compute the <span class="smart-term" data-term-en="Rayleigh Quotient" data-ar="خارج قسمة رايلي" data-en-def="A formula used in the Power Method to estimate the eigenvalue corresponding to an eigenvector approximation.">Rayleigh quotient<span class="smart-term-tooltip"></span></span> to approximate the dominant eigenvalue.</li><li>Repeat: <code>x_k = Ax_{k-1} / scaling_factor</code>.</li></ul><p>There are two types of scaling:</p><ul><li><strong>Euclidean Scaling</strong> (dividing by the vector's magnitude).</li><li><strong>Maximum Entry Scaling</strong> (dividing by the maximum entry of the vector).</li></ul></template>
+    <template class="content-ar"><p>تعتمد طريقة القوة على البدء بمتجه غير صفري عشوائي \(x_0\) وتكرار ضربه في المصفوفة <code>A</code>. الخطوات الأساسية:</p><ul><li>اختر متجهاً ابتدائياً \(x_0\) وقم بتسويته (Normalize).</li><li>احسب <code>Ax_0</code> وقم بتسويته للحصول على التقريب الأول \(x_1\).</li><li>احسب <span class="smart-term" data-term-en="Rayleigh Quotient" data-ar="خارج قسمة رايلي" data-en-def="A formula used in the Power Method to estimate the eigenvalue corresponding to an eigenvector approximation.">خارج قسمة رايلي<span class="smart-term-tooltip"></span></span> (Rayleigh quotient) للحصول على تقريب القيمة الذاتية.</li><li>كرر العملية: <code>x_k = Ax_{k-1} / scaling_factor</code>.</li></ul><p>هناك نوعان من التسوية (Scaling):</p><ul><li><strong>التسوية الإقليدية</strong> (القسمة على طول المتجه).</li><li><strong>تسوية الإدخال الأقصى</strong> (القسمة على أكبر عنصر في المتجه).</li></ul></template>
+    <template class="content-en"><p>The Power Method relies on starting with an arbitrary nonzero vector \(x_0\) and repeatedly multiplying it by matrix <code>A</code>. Key steps:</p><ul><li>Choose an initial vector \(x_0\) and normalize it.</li><li>Compute <code>Ax_0</code> and normalize it to get the first approximation \(x_1\).</li><li>Compute the <span class="smart-term" data-term-en="Rayleigh Quotient" data-ar="خارج قسمة رايلي" data-en-def="A formula used in the Power Method to estimate the eigenvalue corresponding to an eigenvector approximation.">Rayleigh quotient<span class="smart-term-tooltip"></span></span> to approximate the dominant eigenvalue.</li><li>Repeat: <code>x_k = Ax_{k-1} / scaling_factor</code>.</li></ul><p>There are two types of scaling:</p><ul><li><strong>Euclidean Scaling</strong> (dividing by the vector's magnitude).</li><li><strong>Maximum Entry Scaling</strong> (dividing by the maximum entry of the vector).</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -410,8 +410,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لبناء مجموعة بحث تحتوي على <code>n</code> من المواقع، نعرّف مصفوفة التجاور <code>A = [a_{ij}]</code> ذات الأبعاد <code>n x n</code> بحيث:</p><ul><li><strong><code>a_{ij} = 1</code></strong> إذا كان الموقع <code>i</code> يشير (يربط) إلى الموقع <code>j</code>.</li><li><strong><code>a_{ij} = 0</code></strong> إذا كان الموقع <code>i</code> لا يشير إلى الموقع <code>j</code>.</li></ul><p>بافتراض أن الموقع لا يشير إلى نفسه، فإن جميع عناصر القطر الرئيسي للمصفوفة <code>A</code> ستكون أصفاراً.</p></template>
-    <template class="content-en"><p>To build a search set containing <code>n</code> sites, we define an <code>n x n</code> adjacency matrix <code>A = [a_{ij}]</code> where:</p><ul><li><strong><code>a_{ij} = 1</code></strong> if site <code>i</code> references site <code>j</code>.</li><li><strong><code>a_{ij} = 0</code></strong> if site <code>i</code> does not reference site <code>j</code>.</li></ul><p>Assuming no site references itself, the diagonal entries of matrix <code>A</code> will all be 0.</p></template>
+    <template class="content-ar"><p>لبناء مجموعة بحث تحتوي على <code>n</code> من المواقع، نعرّف مصفوفة التجاور \(A = [a_{ij}]\) ذات الأبعاد <code>n x n</code> بحيث:</p><ul><li><strong>\(a_{ij} = 1\)</strong> إذا كان الموقع <code>i</code> يشير (يربط) إلى الموقع <code>j</code>.</li><li><strong>\(a_{ij} = 0\)</strong> إذا كان الموقع <code>i</code> لا يشير إلى الموقع <code>j</code>.</li></ul><p>بافتراض أن الموقع لا يشير إلى نفسه، فإن جميع عناصر القطر الرئيسي للمصفوفة <code>A</code> ستكون أصفاراً.</p></template>
+    <template class="content-en"><p>To build a search set containing <code>n</code> sites, we define an <code>n x n</code> adjacency matrix \(A = [a_{ij}]\) where:</p><ul><li><strong>\(a_{ij} = 1\)</strong> if site <code>i</code> references site <code>j</code>.</li><li><strong>\(a_{ij} = 0\)</strong> if site <code>i</code> does not reference site <code>j</code>.</li></ul><p>Assuming no site references itself, the diagonal entries of matrix <code>A</code> will all be 0.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -453,13 +453,13 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الفلوب (Flop) هو عملية حسابية واحدة على عددين حقيقيين. التكلفة التقريبية لمصفوفة <code>n x n</code> كبيرة هي:</p><ul><li><strong>الحذف الغاوسي-جوردان (المرحلة الأمامية):</strong> <code>≈ (2/3)n^3</code></li><li><strong>تحليل LU للمصفوفة A:</strong> <code>≈ (2/3)n^3</code></li><li><strong>التعويض الأمامي أو الخلفي:</strong> <code>≈ n^2</code></li><li><strong>إيجاد المعكوس <code>A^{-1}</code>:</strong> <code>≈ 2n^3</code></li><li><strong>حساب <code>A^{-1}b</code>:</strong> <code>≈ 2n^3</code></li></ul></template>
-    <template class="content-en"><p>A flop is an arithmetic operation on two real numbers. The approximate cost for a large <code>n x n</code> matrix is:</p><ul><li><strong>Gauss-Jordan elimination (forward phase):</strong> <code>≈ (2/3)n^3</code></li><li><strong>LU-decomposition of A:</strong> <code>≈ (2/3)n^3</code></li><li><strong>Forward or backward substitution:</strong> <code>≈ n^2</code></li><li><strong>Finding the inverse <code>A^{-1}</code>:</strong> <code>≈ 2n^3</code></li><li><strong>Computing <code>A^{-1}b</code>:</strong> <code>≈ 2n^3</code></li></ul></template>
+    <template class="content-ar"><p>الفلوب (Flop) هو عملية حسابية واحدة على عددين حقيقيين. التكلفة التقريبية لمصفوفة <code>n x n</code> كبيرة هي:</p><ul><li><strong>الحذف الغاوسي-جوردان (المرحلة الأمامية):</strong> \(≈ (2/3)n^3\)</li><li><strong>تحليل LU للمصفوفة A:</strong> \(≈ (2/3)n^3\)</li><li><strong>التعويض الأمامي أو الخلفي:</strong> \(≈ n^2\)</li><li><strong>إيجاد المعكوس \(A^{-1}\):</strong> \(≈ 2n^3\)</li><li><strong>حساب <code>A^{-1}b</code>:</strong> \(≈ 2n^3\)</li></ul></template>
+    <template class="content-en"><p>A flop is an arithmetic operation on two real numbers. The approximate cost for a large <code>n x n</code> matrix is:</p><ul><li><strong>Gauss-Jordan elimination (forward phase):</strong> \(≈ (2/3)n^3\)</li><li><strong>LU-decomposition of A:</strong> \(≈ (2/3)n^3\)</li><li><strong>Forward or backward substitution:</strong> \(≈ n^2\)</li><li><strong>Finding the inverse \(A^{-1}\):</strong> \(≈ 2n^3\)</li><li><strong>Computing <code>A^{-1}b</code>:</strong> \(≈ 2n^3\)</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>لماذا نفضل تحليل LU على حساب المعكوس؟</p><p>حساب المعكوس يتطلب <code>2n^3</code> عملية، بينما تحليل LU يتطلب <code>(2/3)n^3</code> فقط. هذا يعني أن إيجاد المعكوس يستغرق ثلاثة أضعاف الوقت تقريباً.</p><p>علاوة على ذلك، بمجرد إيجاد تحليل LU، فإن حل النظام لأي متجه <code>b</code> جديد يتطلب فقط <code>2n^2</code> عملية (تعويض أمامي ثم خلفي)، وهي تكلفة ضئيلة جداً مقارنة بالتكلفة التكعيبية للتحليل الأولي.</p><p>هذا المبدأ حاسم في التطبيقات الهندسية والمحاكاة الفيزيائية حيث يتم حل نفس النظام الخطي آلاف المرات مع تغير الطرف الأيمن <code>b</code> فقط.</p></template>
-    <template class="content-en"><p>Why prefer LU decomposition over computing the inverse?</p><p>Computing the inverse takes <code>2n^3</code> flops, while LU takes only <code>(2/3)n^3</code>. This means finding the inverse is roughly three times more expensive.</p><p>Furthermore, once the LU decomposition is found, solving the system for any new vector <code>b</code> requires only <code>2n^2</code> flops (forward then backward substitution), which is a trivial cost compared to the cubic cost of the initial factorization.</p><p>This principle is critical in engineering applications and physics simulations where the same linear system is solved thousands of times with only the right-hand side vector <code>b</code> changing.</p></template>
+    <template class="content-ar"><p>لماذا نفضل تحليل LU على حساب المعكوس؟</p><p>حساب المعكوس يتطلب \(2n^3\) عملية، بينما تحليل LU يتطلب \((2/3)n^3\) فقط. هذا يعني أن إيجاد المعكوس يستغرق ثلاثة أضعاف الوقت تقريباً.</p><p>علاوة على ذلك، بمجرد إيجاد تحليل LU، فإن حل النظام لأي متجه <code>b</code> جديد يتطلب فقط \(2n^2\) عملية (تعويض أمامي ثم خلفي)، وهي تكلفة ضئيلة جداً مقارنة بالتكلفة التكعيبية للتحليل الأولي.</p><p>هذا المبدأ حاسم في التطبيقات الهندسية والمحاكاة الفيزيائية حيث يتم حل نفس النظام الخطي آلاف المرات مع تغير الطرف الأيمن <code>b</code> فقط.</p></template>
+    <template class="content-en"><p>Why prefer LU decomposition over computing the inverse?</p><p>Computing the inverse takes \(2n^3\) flops, while LU takes only \((2/3)n^3\). This means finding the inverse is roughly three times more expensive.</p><p>Furthermore, once the LU decomposition is found, solving the system for any new vector <code>b</code> requires only \(2n^2\) flops (forward then backward substitution), which is a trivial cost compared to the cubic cost of the initial factorization.</p><p>This principle is critical in engineering applications and physics simulations where the same linear system is solved thousands of times with only the right-hand side vector <code>b</code> changing.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -482,13 +482,13 @@
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">≈ (2/3)n^3</template>
-          <template class="content-en">≈ (2/3)n^3</template>
+          <template class="content-ar">≈ \((2/3)n^3\)</template>
+          <template class="content-en">≈ \((2/3)n^3\)</template>
           <span class="content-target"></span>
         </td>
         <td class="td-bad" data-bilingual>
-          <template class="content-ar">≈ 2n^3</template>
-          <template class="content-en">≈ 2n^3</template>
+          <template class="content-ar">≈ \(2n^3\)</template>
+          <template class="content-en">≈ \(2n^3\)</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -499,13 +499,13 @@
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">≈ n^2 (تعويض أمامي وخلفي)</template>
-          <template class="content-en">≈ n^2 (Forward/Backward substitution)</template>
+          <template class="content-ar">≈ \(n^2\) (تعويض أمامي وخلفي)</template>
+          <template class="content-en">≈ \(n^2\) (Forward/Backward substitution)</template>
           <span class="content-target"></span>
         </td>
         <td class="td-good" data-bilingual>
-          <template class="content-ar">≈ 2n^2 (ضرب مصفوفة في متجه)</template>
-          <template class="content-en">≈ 2n^2 (Matrix-vector multiplication)</template>
+          <template class="content-ar">≈ \(2n^2\) (ضرب مصفوفة في متجه)</template>
+          <template class="content-en">≈ \(2n^2\) (Matrix-vector multiplication)</template>
           <span class="content-target"></span>
         </td>
       </tr>
@@ -519,8 +519,8 @@
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>بما أن التكلفة تتناسب مع n^3، فإن مضاعفة الحجم ستؤدي إلى زيادة التكلفة بـ 8 أضعاف (2^3).</p></template>
-      <template class="content-en"><p>Since the cost is proportional to n^3, doubling the size will increase the cost by a factor of 8 (2^3).</p></template>
+      <template class="content-ar"><p>بما أن التكلفة تتناسب مع \(n^3\)، فإن مضاعفة الحجم ستؤدي إلى زيادة التكلفة بـ 8 أضعاف \((2^3)\).</p></template>
+      <template class="content-en"><p>Since the cost is proportional to \(n^3\), doubling the size will increase the cost by a factor of \(8 (2^3)\).</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -540,18 +540,18 @@
   </div>
 
   <div class="depth-layer active" data-layer="flash" data-bilingual>
-    <template class="content-ar"><p>طريقة لتحليل أي مصفوفة إلى ثلاث مصفوفات <code>U Σ V^T</code>، وتعتمد على القيم الذاتية للمصفوفة <code>A^T A</code>.</p></template>
-    <template class="content-en"><p>A method to factorize any matrix into three matrices <code>U Σ V^T</code>, based on the eigenvalues of <code>A^T A</code>.</p></template>
+    <template class="content-ar"><p>طريقة لتحليل أي مصفوفة إلى ثلاث مصفوفات \(U Σ V^T\)، وتعتمد على القيم الذاتية للمصفوفة \(A^T A\).</p></template>
+    <template class="content-en"><p>A method to factorize any matrix into three matrices \(U Σ V^T\), based on the eigenvalues of \(A^T A\).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>خصائص المصفوفة <code>A^T A</code> (حيث A مصفوفة m x n):</p><ul><li>لها نفس الفضاء الصفري، فضاء الصفوف، فضاء الأعمدة، والرتبة (Rank) مثل المصفوفة A.</li><li>قابلة للقطرية المتعامدة (Orthogonally diagonalizable).</li><li>جميع قيمها الذاتية غير سالبة (أكبر من أو تساوي صفراً).</li></ul><p><span class="smart-term" data-term-en="Singular Values" data-ar="القيم المفردة" data-en-def="The square roots of the eigenvalues of the matrix A^T A.">القيم المفردة<span class="smart-term-tooltip"></span></span> (Singular Values) للمصفوفة A، ويُرمز لها بـ <code>σ_i</code>، هي الجذور التربيعية للقيم الذاتية للمصفوفة <code>A^T A</code>: <code>σ_i = √λ_i</code>.</p><p>نظرية SVD تنص على أن أي مصفوفة A يمكن كتابتها على الصورة <code>A = U Σ V^T</code>، حيث U و V مصفوفتان <span class="smart-term" data-term-en="Orthogonal Matrix" data-ar="مصفوفة متعامدة" data-en-def="A square matrix whose columns and rows are orthogonal unit vectors (i.e., Q^T Q = I).">متعامدتان<span class="smart-term-tooltip"></span></span>، و Σ مصفوفة قطرية تحتوي على القيم المفردة.</p></template>
-    <template class="content-en"><p>Properties of the matrix <code>A^T A</code> (where A is an m x n matrix):</p><ul><li>It has the same null space, row space, column space, and rank as matrix A.</li><li>It is orthogonally diagonalizable.</li><li>Its eigenvalues are all nonnegative (greater than or equal to zero).</li></ul><p>The <span class="smart-term" data-term-en="Singular Values" data-ar="القيم المفردة" data-en-def="The square roots of the eigenvalues of the matrix A^T A.">singular values<span class="smart-term-tooltip"></span></span> of A, denoted by <code>σ_i</code>, are the square roots of the eigenvalues of <code>A^T A</code>: <code>σ_i = √λ_i</code>.</p><p>The SVD theorem states that any matrix A can be expressed as <code>A = U Σ V^T</code>, where U and V are <span class="smart-term" data-term-en="Orthogonal Matrix" data-ar="مصفوفة متعامدة" data-en-def="A square matrix whose columns and rows are orthogonal unit vectors (i.e., Q^T Q = I).">orthogonal matrices<span class="smart-term-tooltip"></span></span>, and Σ is a diagonal matrix containing the singular values.</p></template>
+    <template class="content-ar"><p>خصائص المصفوفة \(A^T A\) (حيث A مصفوفة m x n):</p><ul><li>لها نفس الفضاء الصفري، فضاء الصفوف، فضاء الأعمدة، والرتبة (Rank) مثل المصفوفة A.</li><li>قابلة للقطرية المتعامدة (Orthogonally diagonalizable).</li><li>جميع قيمها الذاتية غير سالبة (أكبر من أو تساوي صفراً).</li></ul><p><span class="smart-term" data-term-en="Singular Values" data-ar="القيم المفردة" data-en-def="The square roots of the eigenvalues of the matrix A^T A.">القيم المفردة<span class="smart-term-tooltip"></span></span> (Singular Values) للمصفوفة A، ويُرمز لها بـ <code>σ_i</code>، هي الجذور التربيعية للقيم الذاتية للمصفوفة \(A^T A\): \(σ_i = √λ_i\).</p><p>نظرية SVD تنص على أن أي مصفوفة A يمكن كتابتها على الصورة \(A = U Σ V^T\)، حيث U و V مصفوفتان <span class="smart-term" data-term-en="Orthogonal Matrix" data-ar="مصفوفة متعامدة" data-en-def="A square matrix whose columns and rows are orthogonal unit vectors (i.e., Q^T Q = I).">متعامدتان<span class="smart-term-tooltip"></span></span>، و Σ مصفوفة قطرية تحتوي على القيم المفردة.</p></template>
+    <template class="content-en"><p>Properties of the matrix \(A^T A\) (where A is an m x n matrix):</p><ul><li>It has the same null space, row space, column space, and rank as matrix A.</li><li>It is orthogonally diagonalizable.</li><li>Its eigenvalues are all nonnegative (greater than or equal to zero).</li></ul><p>The <span class="smart-term" data-term-en="Singular Values" data-ar="القيم المفردة" data-en-def="The square roots of the eigenvalues of the matrix A^T A.">singular values<span class="smart-term-tooltip"></span></span> of A, denoted by <code>σ_i</code>, are the square roots of the eigenvalues of \(A^T A\): \(σ_i = √λ_i\).</p><p>The SVD theorem states that any matrix A can be expressed as \(A = U Σ V^T\), where U and V are <span class="smart-term" data-term-en="Orthogonal Matrix" data-ar="مصفوفة متعامدة" data-en-def="A square matrix whose columns and rows are orthogonal unit vectors (i.e., Q^T Q = I).">orthogonal matrices<span class="smart-term-tooltip"></span></span>, and Σ is a diagonal matrix containing the singular values.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>لماذا نستخدم <code>A^T A</code>؟</p><p>المصفوفة A قد لا تكون مربعة، وبالتالي قد لا تمتلك قيماً ذاتية بالمعنى التقليدي. لكن <code>A^T A</code> دائماً مصفوفة مربعة ومتماثلة (Symmetric)، مما يضمن أن قيمها الذاتية حقيقية وغير سالبة.</p><p>القيم المفردة <code>σ_i</code> ترتب عادة تنازلياً. تمثل هذه القيم "قوة" أو "أهمية" المكونات المختلفة للمصفوفة، وهو ما يجعل SVD أداة أساسية في ضغط البيانات (Data Compression) وتقليل الأبعاد.</p><p>المصفوفة U تحتوي على المتجهات المفردة اليسرى، والمصفوفة V تحتوي على المتجهات المفردة اليمنى.</p></template>
-    <template class="content-en"><p>Why use <code>A^T A</code>?</p><p>Matrix A might not be square, so it might not have eigenvalues in the traditional sense. However, <code>A^T A</code> is always square and symmetric, guaranteeing that its eigenvalues are real and nonnegative.</p><p>The singular values <code>σ_i</code> are conventionally sorted in descending order. These values represent the 'strength' or 'importance' of different components of the matrix, making SVD a fundamental tool in data compression and dimensionality reduction.</p><p>Matrix U contains the left singular vectors, and matrix V contains the right singular vectors.</p></template>
+    <template class="content-ar"><p>لماذا نستخدم \(A^T A\)؟</p><p>المصفوفة A قد لا تكون مربعة، وبالتالي قد لا تمتلك قيماً ذاتية بالمعنى التقليدي. لكن \(A^T A\) دائماً مصفوفة مربعة ومتماثلة (Symmetric)، مما يضمن أن قيمها الذاتية حقيقية وغير سالبة.</p><p>القيم المفردة <code>σ_i</code> ترتب عادة تنازلياً. تمثل هذه القيم "قوة" أو "أهمية" المكونات المختلفة للمصفوفة، وهو ما يجعل SVD أداة أساسية في ضغط البيانات (Data Compression) وتقليل الأبعاد.</p><p>المصفوفة U تحتوي على المتجهات المفردة اليسرى، والمصفوفة V تحتوي على المتجهات المفردة اليمنى.</p></template>
+    <template class="content-en"><p>Why use \(A^T A\)?</p><p>Matrix A might not be square, so it might not have eigenvalues in the traditional sense. However, \(A^T A\) is always square and symmetric, guaranteeing that its eigenvalues are real and nonnegative.</p><p>The singular values <code>σ_i</code> are conventionally sorted in descending order. These values represent the 'strength' or 'importance' of different components of the matrix, making SVD a fundamental tool in data compression and dimensionality reduction.</p><p>Matrix U contains the left singular vectors, and matrix V contains the right singular vectors.</p></template>
     <div class="content-target"></div>
   </div>
 
@@ -566,8 +566,8 @@
 
   <details class="thinking-question">
     <summary data-bilingual>
-      <template class="content-ar">إذا كانت إحدى القيم الذاتية للمصفوفة A^T A تساوي صفراً، فماذا يعني ذلك بالنسبة للقيم المفردة؟</template>
-      <template class="content-en">If one of the eigenvalues of A^T A is zero, what does this mean for the singular values?</template>
+      <template class="content-ar">إذا كانت إحدى القيم الذاتية للمصفوفة \(A^T A\) تساوي صفراً، فماذا يعني ذلك بالنسبة للقيم المفردة؟</template>
+      <template class="content-en">If one of the eigenvalues of \(A^T A\) is zero, what does this mean for the singular values?</template>
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
@@ -584,8 +584,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. حتى الآن، كنا نحل الأنظمة الخطية يدوياً، ولكن كيف تفعل الحواسيب ذلك عندما يكون لدينا مليون معادلة؟ هنا تتدخل 'الطرق العددية'. ركزوا جيداً للامتحان على أربعة محاور: أولاً، تحليل LU؛ تذكروا أنه أسرع بكثير من إيجاد المعكوس (تكلفته ثلث تكلفة المعكوس بالفلوبس). ثانياً، طريقة القوة؛ تأكدوا من فهمكم لمعنى 'القيمة الذاتية السائدة' (الأكبر كقيمة مطلقة) وكيف نستخدم التسوية لمنع الأرقام من الانفجار. ثالثاً، مصفوفات التجاور؛ تذكروا أن القطر الرئيسي أصفار، وهي أساس خوارزمية PageRank لجوجل. وأخيراً، جوهرة التاج: SVD. تذكروا دائماً أن القيم المفردة تأتي من المصفوفة A^T A وليس من A مباشرة. في الامتحان، لا تقعوا في فخ حساب المعكوس إذا طلب منكم حل النظام بكفاءة، واستخدموا LU دائماً. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to this crucial module. Until now, we've solved linear systems by hand, but how do computers do it with a million equations? Enter 'Numerical Methods'. For the exam, focus on four pillars: First, LU-Decomposition; remember it's vastly faster than finding the inverse (costs 1/3 the flops). Second, the Power Method; ensure you grasp 'dominant eigenvalue' (largest absolute value) and why we scale vectors to prevent overflow. Third, Adjacency Matrices; remember the main diagonal is zeros, forming the basis of Google's PageRank. Finally, the crown jewel: SVD. Always remember that singular values come from A^T A, not A directly. On the exam, don't fall into the trap of computing the inverse if asked for the most efficient solving method—always choose LU. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. حتى الآن، كنا نحل الأنظمة الخطية يدوياً، ولكن كيف تفعل الحواسيب ذلك عندما يكون لدينا مليون معادلة؟ هنا تتدخل 'الطرق العددية'. ركزوا جيداً للامتحان على أربعة محاور: أولاً، تحليل LU؛ تذكروا أنه أسرع بكثير من إيجاد المعكوس (تكلفته ثلث تكلفة المعكوس بالفلوبس). ثانياً، طريقة القوة؛ تأكدوا من فهمكم لمعنى 'القيمة الذاتية السائدة' (الأكبر كقيمة مطلقة) وكيف نستخدم التسوية لمنع الأرقام من الانفجار. ثالثاً، مصفوفات التجاور؛ تذكروا أن القطر الرئيسي أصفار، وهي أساس خوارزمية PageRank لجوجل. وأخيراً، جوهرة التاج: SVD. تذكروا دائماً أن القيم المفردة تأتي من المصفوفة \(A^T A\) وليس من A مباشرة. في الامتحان، لا تقعوا في فخ حساب المعكوس إذا طلب منكم حل النظام بكفاءة، واستخدموا LU دائماً. بالتوفيق!</template>
+    <template class="content-en">Welcome, future engineers, to this crucial module. Until now, we've solved linear systems by hand, but how do computers do it with a million equations? Enter 'Numerical Methods'. For the exam, focus on four pillars: First, LU-Decomposition; remember it's vastly faster than finding the inverse (costs 1/3 the flops). Second, the Power Method; ensure you grasp 'dominant eigenvalue' (largest absolute value) and why we scale vectors to prevent overflow. Third, Adjacency Matrices; remember the main diagonal is zeros, forming the basis of Google's PageRank. Finally, the crown jewel: SVD. Always remember that singular values come from \(A^T A\), not A directly. On the exam, don't fall into the trap of computing the inverse if asked for the most efficient solving method—always choose LU. Good luck!</template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -604,8 +604,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأن تحليل LU يتطلب عمليات حسابية (Flops) أقل بكثير. تحليل LU يكلف حوالي (2/3)n^3، بينما إيجاد المعكوس يكلف 2n^3. المعكوس أبطأ بثلاث مرات وأكثر عرضة للأخطاء العددية.</template>
-          <template class="content-en">Because LU requires significantly fewer flops. LU costs about (2/3)n^3, while the inverse costs 2n^3. The inverse is 3x slower and more prone to numerical errors.</template>
+          <template class="content-ar">لأن تحليل LU يتطلب عمليات حسابية (Flops) أقل بكثير. تحليل LU يكلف حوالي \((2/3)n^3\)، بينما إيجاد المعكوس يكلف \(2n^3\). المعكوس أبطأ بثلاث مرات وأكثر عرضة للأخطاء العددية.</template>
+          <template class="content-en">Because LU requires significantly fewer flops. LU costs about \((2/3)n^3\), while the inverse costs \(2n^3\). The inverse is 3x slower and more prone to numerical errors.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -689,8 +689,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">نحسب أولاً القيم الذاتية للمصفوفة A^T A، ثم نأخذ الجذر التربيعي الموجب لكل منها.</template>
-          <template class="content-en">We first compute the eigenvalues of the matrix A^T A, then take the positive square root of each.</template>
+          <template class="content-ar">نحسب أولاً القيم الذاتية للمصفوفة \(A^T A\)، ثم نأخذ الجذر التربيعي الموجب لكل منها.</template>
+          <template class="content-en">We first compute the eigenvalues of the matrix \(A^T A\), then take the positive square root of each.</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -706,8 +706,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لا، لأنها تُعرّف كجذور تربيعية للقيم الذاتية للمصفوفة A^T A (والتي تكون دائماً غير سالبة).</template>
-          <template class="content-en">No, because they are defined as the square roots of the eigenvalues of A^T A (which are always non-negative).</template>
+          <template class="content-ar">لا، لأنها تُعرّف كجذور تربيعية للقيم الذاتية للمصفوفة \(A^T A\) (والتي تكون دائماً غير سالبة).</template>
+          <template class="content-en">No, because they are defined as the square roots of the eigenvalues of \(A^T A\) (which are always non-negative).</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -749,8 +749,8 @@
     <div class="accordion-item">
       <button class="accordion-trigger">
         <span data-bilingual>
-          <template class="content-ar">ما هي العلاقة بين الفضاء الصفري لـ A والفضاء الصفري لـ A^T A؟</template>
-          <template class="content-en">What is the relationship between the null space of A and the null space of A^T A?</template>
+          <template class="content-ar">ما هي العلاقة بين الفضاء الصفري لـ A والفضاء الصفري لـ \(A^T A\)؟</template>
+          <template class="content-en">What is the relationship between the null space of A and the null space of \(A^T A\)?</template>
           <span class="content-target">ما هي العلاقة بين الفضاء الصفري لـ A والفضاء الصفري لـ A^T A؟</span>
         </span>
         <i class="fa-solid fa-chevron-down chevron"></i>
@@ -886,8 +886,8 @@
         "en": "To find an approximation to the dominant eigenvalue and its corresponding eigenvector."
       },
       "example": {
-        "ar": "توليد سلسلة من المتجهات x_k التي تقترب من المتجه الذاتي السائد.",
-        "en": "Generating a sequence of vectors x_k that converge to the dominant eigenvector."
+        "ar": "توليد سلسلة من المتجهات \\(x_k\\) التي تقترب من المتجه الذاتي السائد.",
+        "en": "Generating a sequence of vectors \\(x_k\\) that converge to the dominant eigenvector."
       }
     }
   },
@@ -933,8 +933,8 @@
     },
     "back": {
       "definition": {
-        "ar": "حوالي (2/3)n^3 فلوبس.",
-        "en": "Approximately (2/3)n^3 flops."
+        "ar": "حوالي \\((2/3)n^3\\) فلوبس.",
+        "en": "Approximately \\((2/3)n^3\\) flops."
       },
       "example": {
         "ar": "نفس تكلفة المرحلة الأمامية للحذف الغاوسي-جوردان.",
@@ -945,13 +945,13 @@
   {
     "id": 11,
     "front": {
-      "ar": "ما هي التكلفة التقريبية لإيجاد معكوس مصفوفة A^-1؟",
-      "en": "What is the approximate cost of finding the inverse matrix A^-1?"
+      "ar": "ما هي التكلفة التقريبية لإيجاد معكوس مصفوفة \\(A^{-1}\\)؟",
+      "en": "What is the approximate cost of finding the inverse matrix \\(A^{-1}\\)?"
     },
     "back": {
       "definition": {
-        "ar": "حوالي 2n^3 فلوبس.",
-        "en": "Approximately 2n^3 flops."
+        "ar": "حوالي \\(2n^3\\) فلوبس.",
+        "en": "Approximately \\(2n^3\\) flops."
       },
       "example": {
         "ar": "أغلى بثلاث مرات من تحليل LU.",
@@ -962,8 +962,8 @@
   {
     "id": 12,
     "front": {
-      "ar": "ما هي العلاقة بين الفضاء الصفري للمصفوفة A والمصفوفة A^T A؟",
-      "en": "What is the relationship between the null space of A and A^T A?"
+      "ar": "ما هي العلاقة بين الفضاء الصفري للمصفوفة A والمصفوفة \\(A^T A\\)؟",
+      "en": "What is the relationship between the null space of A and \\(A^T A\\)?"
     },
     "back": {
       "definition": {
@@ -979,8 +979,8 @@
   {
     "id": 13,
     "front": {
-      "ar": "ما هي طبيعة القيم الذاتية للمصفوفة A^T A؟",
-      "en": "What is the nature of the eigenvalues of A^T A?"
+      "ar": "ما هي طبيعة القيم الذاتية للمصفوفة \\(A^T A\\)؟",
+      "en": "What is the nature of the eigenvalues of \\(A^T A\\)?"
     },
     "back": {
       "definition": {
@@ -988,8 +988,8 @@
         "en": "Its eigenvalues are all nonnegative (greater than or equal to zero)."
       },
       "example": {
-        "ar": "لأن A^T A مصفوفة متماثلة وموجبة شبه معينة.",
-        "en": "Because A^T A is a symmetric positive semi-definite matrix."
+        "ar": "لأن \\(A^T A\\) مصفوفة متماثلة وموجبة شبه معينة.",
+        "en": "Because \\(A^T A\\) is a symmetric positive semi-definite matrix."
       }
     }
   },
@@ -1001,8 +1001,8 @@
     },
     "back": {
       "definition": {
-        "ar": "هي الجذور التربيعية للقيم الذاتية للمصفوفة A^T A.",
-        "en": "They are the square roots of the eigenvalues of A^T A."
+        "ar": "هي الجذور التربيعية للقيم الذاتية للمصفوفة \\(A^T A\\).",
+        "en": "They are the square roots of the eigenvalues of \\(A^T A\\)."
       },
       "example": {
         "ar": "σ_i = √λ_i",
@@ -1018,8 +1018,8 @@
     },
     "back": {
       "definition": {
-        "ar": "A = U Σ V^T",
-        "en": "A = U Σ V^T"
+        "ar": "\\(A = U Σ V^T\\)",
+        "en": "\\(A = U Σ V^T\\)"
       },
       "example": {
         "ar": "حيث U و V مصفوفتان متعامدتان، و Σ مصفوفة قطرية.",
@@ -1035,8 +1035,8 @@
     },
     "back": {
       "definition": {
-        "ar": "حوالي n^2 فلوبس.",
-        "en": "Approximately n^2 flops."
+        "ar": "حوالي \\(n^2\\) فلوبس.",
+        "en": "Approximately \\(n^2\\) flops."
       },
       "example": {
         "ar": "تكلفة منخفضة جداً مقارنة بالتحليل الأولي.",
@@ -1146,22 +1146,22 @@
     },
     "options": {
       "ar": [
-        "(2/3)n^3",
-        "n^2",
-        "2n^3",
-        "n^3"
+        "\\((2/3)n^3\\)",
+        "\\(n^2\\)",
+        "\\(2n^3\\)",
+        "\\(n^3\\)"
       ],
       "en": [
-        "(2/3)n^3",
-        "n^2",
-        "2n^3",
-        "n^3"
+        "\\((2/3)n^3\\)",
+        "\\(n^2\\)",
+        "\\(2n^3\\)",
+        "\\(n^3\\)"
       ]
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "إيجاد المعكوس يتطلب حوالي 2n^3 فلوبس، وهو أغلى بكثير من تحليل LU.",
-      "en": "Finding the inverse requires about 2n^3 flops, which is much more expensive than LU decomposition."
+      "ar": "إيجاد المعكوس يتطلب حوالي \\(2n^3\\) فلوبس، وهو أغلى بكثير من تحليل LU.",
+      "en": "Finding the inverse requires about \\(2n^3\\) flops, which is much more expensive than LU decomposition."
     },
     "hint": {
       "ar": "هي التكلفة الأعلى بين جميع العمليات المذكورة في الوحدة.",
@@ -1212,20 +1212,20 @@
       "ar": [
         "هي القيم الذاتية للمصفوفة A.",
         "هي الجذور التربيعية للقيم الذاتية للمصفوفة A.",
-        "هي القيم الذاتية للمصفوفة A^T A.",
-        "هي الجذور التربيعية للقيم الذاتية للمصفوفة A^T A."
+        "هي القيم الذاتية للمصفوفة \\(A^T A\\).",
+        "هي الجذور التربيعية للقيم الذاتية للمصفوفة \\(A^T A\\)."
       ],
       "en": [
         "They are the eigenvalues of A.",
         "They are the square roots of the eigenvalues of A.",
-        "They are the eigenvalues of A^T A.",
-        "They are the square roots of the eigenvalues of A^T A."
+        "They are the eigenvalues of \\(A^T A\\).",
+        "They are the square roots of the eigenvalues of \\(A^T A\\)."
       ]
     },
     "correctIndex": 3,
     "explanation": {
-      "ar": "القيم المفردة σ_i تُعرّف بأنها الجذور التربيعية للقيم الذاتية للمصفوفة A^T A.",
-      "en": "Singular values σ_i are defined as the square roots of the eigenvalues of A^T A."
+      "ar": "القيم المفردة σ_i تُعرّف بأنها الجذور التربيعية للقيم الذاتية للمصفوفة \\(A^T A\\).",
+      "en": "Singular values σ_i are defined as the square roots of the eigenvalues of \\(A^T A\\)."
     },
     "hint": {
       "ar": "تذكر أننا نأخذ الجذر التربيعي لمصفوفة معينة.",
@@ -1237,27 +1237,27 @@
   {
     "id": 6,
     "question": {
-      "ar": "أي من الخصائص التالية صحيحة للمصفوفتين A و A^T A؟",
-      "en": "Which of the following properties is true for matrices A and A^T A?"
+      "ar": "أي من الخصائص التالية صحيحة للمصفوفتين A و \\(A^T A\\)؟",
+      "en": "Which of the following properties is true for matrices A and \\(A^T A\\)?"
     },
     "options": {
       "ar": [
         "لهما قيم ذاتية مختلفة تماماً ولا توجد علاقة بينهما.",
         "لهما نفس الفضاء الصفري (Null space).",
-        "المصفوفة A دائماً مربعة بينما A^T A ليست كذلك.",
+        "المصفوفة A دائماً مربعة بينما \\(A^T A\\) ليست كذلك.",
         "لهما رتب (Ranks) مختلفة."
       ],
       "en": [
         "They have completely different eigenvalues with no relation.",
         "They have the same null space.",
-        "Matrix A is always square while A^T A is not.",
+        "Matrix A is always square while \\(A^T A\\) is not.",
         "They have different ranks."
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "حسب النظرية 9.5.1، المصفوفتان A و A^T A لهما نفس الفضاء الصفري، فضاء الصفوف، فضاء الأعمدة، والرتبة.",
-      "en": "According to Theorem 9.5.1, A and A^T A have the same null space, row space, column space, and rank."
+      "ar": "حسب النظرية 9.5.1، المصفوفتان A و \\(A^T A\\) لهما نفس الفضاء الصفري، فضاء الصفوف، فضاء الأعمدة، والرتبة.",
+      "en": "According to Theorem 9.5.1, A and \\(A^T A\\) have the same null space, row space, column space, and rank."
     },
     "hint": {
       "ar": "يتشاركان في العديد من الفضاءات الأساسية.",
@@ -1307,21 +1307,21 @@
     "options": {
       "ar": [
         "مصفوفتان مثلثيتان L و U.",
-        "مصفوفة متعامدة U، مصفوفة قطرية Σ، ومصفوفة متعامدة V^T.",
+        "مصفوفة متعامدة U، مصفوفة قطرية Σ، ومصفوفة متعامدة \\(V^T\\).",
         "مصفوفة قطرية D ومصفوفة قابلة للعكس P.",
         "مصفوفة متماثلة S ومصفوفة متعامدة Q."
       ],
       "en": [
         "Two triangular matrices L and U.",
-        "An orthogonal matrix U, a diagonal matrix Σ, and an orthogonal matrix V^T.",
+        "An orthogonal matrix U, a diagonal matrix Σ, and an orthogonal matrix \\(V^T\\).",
         "A diagonal matrix D and an invertible matrix P.",
         "A symmetric matrix S and an orthogonal matrix Q."
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "صيغة SVD هي A = U Σ V^T، حيث U و V متعامدتان و Σ قطرية.",
-      "en": "The SVD formula is A = U Σ V^T, where U and V are orthogonal and Σ is diagonal."
+      "ar": "صيغة SVD هي \\(A = U Σ V^T\\)، حيث U و V متعامدتان و Σ قطرية.",
+      "en": "The SVD formula is \\(A = U Σ V^T\\), where U and V are orthogonal and Σ is diagonal."
     },
     "hint": {
       "ar": "تذكر الحروف الثلاثة في الصيغة.",
@@ -1371,21 +1371,21 @@
     "options": {
       "ar": [
         "لأن تحليل LU لا يتطلب أي عمليات حسابية.",
-        "لأننا نحلل المصفوفة A مرة واحدة فقط، ثم نستخدم التعويض السريع (n^2 فلوبس) لكل متجه b.",
-        "لأن تحليل LU يجد المعكوس A^-1 بشكل أسرع.",
+        "لأننا نحلل المصفوفة A مرة واحدة فقط، ثم نستخدم التعويض السريع (\\(n^2\\) فلوبس) لكل متجه b.",
+        "لأن تحليل LU يجد المعكوس \\(A^{-1}\\) بشكل أسرع.",
         "لأن الحذف الغاوسي لا يعمل مع متجهات b المتعددة."
       ],
       "en": [
         "Because LU-decomposition requires zero arithmetic operations.",
-        "Because we factor A only once, then use fast substitution (n^2 flops) for each b vector.",
-        "Because LU-decomposition finds the inverse A^-1 faster.",
+        "Because we factor A only once, then use fast substitution (\\(n^2\\) flops) for each b vector.",
+        "Because LU-decomposition finds the inverse \\(A^{-1}\\) faster.",
         "Because Gaussian elimination does not work with multiple b vectors."
       ]
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "التحليل يتم مرة واحدة بتكلفة (2/3)n^3، وبعدها يكلف حل النظام لأي b جديد n^2 فلوبس فقط.",
-      "en": "Factorization is done once at (2/3)n^3 cost, and thereafter solving for any new b costs only n^2 flops."
+      "ar": "التحليل يتم مرة واحدة بتكلفة \\((2/3)n^3\\)، وبعدها يكلف حل النظام لأي b جديد \\(n^2\\) فلوبس فقط.",
+      "en": "Factorization is done once at \\((2/3)n^3\\) cost, and thereafter solving for any new b costs only \\(n^2\\) flops."
     },
     "hint": {
       "ar": "فكر في إعادة استخدام العمل الشاق الذي قمنا به في البداية.",
@@ -1402,8 +1402,8 @@
   <div class="vault-entry">
     <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
-      <template class="content-ar">الخطأ الشائع: الاعتقاد بأن إيجاد معكوس المصفوفة (A^-1) هو أفضل طريقة لحل النظام Ax = b برمجياً. الحقيقة: إيجاد المعكوس مكلف جداً (2n^3 فلوبس) وعرضة للأخطاء العددية. تحليل LU أسرع بثلاث مرات وأكثر استقراراً.</template>
-      <template class="content-en">Common Trap: Believing that finding the inverse (A^-1) is the best way to solve Ax = b programmatically. Fact: Finding the inverse is very expensive (2n^3 flops) and prone to numerical instability. LU decomposition is 3x faster and more stable.</template>
+      <template class="content-ar">الخطأ الشائع: الاعتقاد بأن إيجاد معكوس المصفوفة \((A^{-1})\) هو أفضل طريقة لحل النظام Ax = b برمجياً. الحقيقة: إيجاد المعكوس مكلف جداً (\(2n^3\) فلوبس) وعرضة للأخطاء العددية. تحليل LU أسرع بثلاث مرات وأكثر استقراراً.</template>
+      <template class="content-en">Common Trap: Believing that finding the inverse \((A^{-1})\) is the best way to solve Ax = b programmatically. Fact: Finding the inverse is very expensive (\(2n^3\) flops) and prone to numerical instability. LU decomposition is 3x faster and more stable.</template>
       <div class="content-target"></div>
     </div>
   </div>
@@ -1418,16 +1418,16 @@
   <div class="vault-entry">
     <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
     <div data-bilingual>
-      <template class="content-ar">في تحليل القيمة المفردة (SVD)، المصفوفة A^T A سحرية! حتى لو كانت A مستطيلة وعشوائية، فإن A^T A ستكون دائماً مربعة، متماثلة، وقيمها الذاتية موجبة أو صفر. هذا ما يجعل SVD ممكناً لأي مصفوفة في الوجود.</template>
-      <template class="content-en">In SVD, the matrix A^T A is magical! Even if A is rectangular and random, A^T A will always be square, symmetric, and have non-negative eigenvalues. This is what makes SVD possible for ANY matrix in existence.</template>
+      <template class="content-ar">في تحليل القيمة المفردة (SVD)، المصفوفة \(A^T A\) سحرية! حتى لو كانت A مستطيلة وعشوائية، فإن \(A^T A\) ستكون دائماً مربعة، متماثلة، وقيمها الذاتية موجبة أو صفر. هذا ما يجعل SVD ممكناً لأي مصفوفة في الوجود.</template>
+      <template class="content-en">In SVD, the matrix \(A^T A\) is magical! Even if A is rectangular and random, \(A^T A\) will always be square, symmetric, and have non-negative eigenvalues. This is what makes SVD possible for ANY matrix in existence.</template>
       <div class="content-target"></div>
     </div>
   </div>
   <div class="vault-entry">
     <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
     <div data-bilingual>
-      <template class="content-ar">الخطأ الشائع: الخلط بين القيم الذاتية للمصفوفة A والقيم المفردة لها. القيم المفردة (σ) هي الجذور التربيعية للقيم الذاتية للمصفوفة A^T A، وليست للمصفوفة A نفسها.</template>
-      <template class="content-en">Common Trap: Confusing the eigenvalues of A with its singular values. Singular values (σ) are the square roots of the eigenvalues of A^T A, NOT of A itself.</template>
+      <template class="content-ar">الخطأ الشائع: الخلط بين القيم الذاتية للمصفوفة A والقيم المفردة لها. القيم المفردة (σ) هي الجذور التربيعية للقيم الذاتية للمصفوفة \(A^T A\)، وليست للمصفوفة A نفسها.</template>
+      <template class="content-en">Common Trap: Confusing the eigenvalues of A with its singular values. Singular values (σ) are the square roots of the eigenvalues of \(A^T A\), NOT of A itself.</template>
       <div class="content-target"></div>
     </div>
   </div>

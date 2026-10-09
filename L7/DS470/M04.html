@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS470" data-module="4" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>أمن قواعد البيانات والبرمجيات الخبيثة · DS470 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS470" data-page-title-en="DS470">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M03.html" data-gh-next="M05.html" data-gh-card="../../hub/course.html?code=DS470"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#database-fundamentals" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في قواعد البيانات</template>
+        <template class="content-en">An Introduction to Databases</template>
+        <span class="content-target">مقدمة في قواعد البيانات</span>
+      </a>
+      <a href="#database-integrity" class="toc-link" data-bilingual>
+        <template class="content-ar">سلامة قواعد البيانات</template>
+        <template class="content-en">Database Integrity</template>
+        <span class="content-target">سلامة قواعد البيانات</span>
+      </a>
+      <a href="#access-control-auditability" class="toc-link" data-bilingual>
+        <template class="content-ar">التحكم في الوصول وقابلية التدقيق</template>
+        <template class="content-en">Access Control and Auditability</template>
+        <span class="content-target">التحكم في الوصول وقابلية التدقيق</span>
+      </a>
+      <a href="#data-disclosure-inference" class="toc-link" data-bilingual>
+        <template class="content-ar">كشف البيانات والاستدلال</template>
+        <template class="content-en">Data Disclosure and Inference</template>
+        <span class="content-target">كشف البيانات والاستدلال</span>
+      </a>
+      <a href="#inference-controls-differential-privacy" class="toc-link" data-bilingual>
+        <template class="content-ar">ضوابط الاستدلال والخصوصية التفاضلية</template>
+        <template class="content-en">Inference Controls and Differential Privacy</template>
+        <span class="content-target">ضوابط الاستدلال والخصوصية التفاضلية</span>
+      </a>
+      <a href="#multilevel-security-design" class="toc-link" data-bilingual>
+        <template class="content-ar">الأمن متعدد المستويات وتصميم قواعد البيانات</template>
+        <template class="content-en">Multilevel Data Security and Database Design</template>
+        <span class="content-target">الأمن متعدد المستويات وتصميم قواعد البيانات</span>
+      </a>
+      <a href="#malware-fundamentals" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات البرمجيات الخبيثة ومصطلحاتها</template>
+        <template class="content-en">Malware Fundamentals and Terminology</template>
+        <span class="content-target">أساسيات البرمجيات الخبيثة ومصطلحاتها</span>
+      </a>
+      <a href="#advanced-persistent-threats" class="toc-link" data-bilingual>
+        <template class="content-ar">التهديدات المستمرة المتقدمة (APTs)</template>
+        <template class="content-en">Advanced Persistent Threats (APTs)</template>
+        <span class="content-target">التهديدات المستمرة المتقدمة (APTs)</span>
+      </a>
+      <a href="#viruses" class="toc-link" data-bilingual>
+        <template class="content-ar">الفيروسات</template>
+        <template class="content-en">Viruses</template>
+        <span class="content-target">الفيروسات</span>
+      </a>
+      <a href="#worms-propagation" class="toc-link" data-bilingual>
+        <template class="content-ar">الديدان ونموذج انتشارها</template>
+        <template class="content-en">Worms and Propagation Model</template>
+        <span class="content-target">الديدان ونموذج انتشارها</span>
+      </a>
+      <a href="#client-side-vulnerabilities" class="toc-link" data-bilingual>
+        <template class="content-ar">ثغرات جانب العميل والتعليمات البرمجية المتنقلة</template>
+        <template class="content-en">Client-Side Vulnerabilities and Mobile Code</template>
+        <span class="content-target">ثغرات جانب العميل والتعليمات البرمجية المتنقلة</span>
+      </a>
+      <a href="#malware-payloads" class="toc-link" data-bilingual>
+        <template class="content-ar">حمولات البرمجيات الخبيثة (Payloads)</template>
+        <template class="content-en">Malware Payloads</template>
+        <span class="content-target">حمولات البرمجيات الخبيثة (Payloads)</span>
+      </a>
+      <a href="#malware-countermeasures" class="toc-link" data-bilingual>
+        <template class="content-ar">التدابير المضادة للبرمجيات الخبيثة</template>
+        <template class="content-en">Malware Countermeasures</template>
+        <span class="content-target">التدابير المضادة للبرمجيات الخبيثة</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 4</template>
+      <template class="content-en">Module 4</template>
+      <span class="content-target">الوحدة 4</span>
+    </span> · DS470
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">أمن قواعد البيانات والبرمجيات الخبيثة</h1>
+      <p class="hero-description">تغطي هذه الوحدة متطلبات أمن قواعد البيانات، هجمات الاستدلال، الخصوصية التفاضلية، بالإضافة إلى تحليل شامل لأنواع البرمجيات الخبيثة، آليات انتشارها، وطرق مكافحتها.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Database Security and Malware</h1>
+      <p class="hero-description">This module covers database security requirements, inference attacks, differential privacy, along with a comprehensive analysis of malware types, propagation mechanisms, and countermeasures.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن قواعد البيانات</span>
+      <span class="tag">البرمجيات الخبيثة</span>
+      <span class="tag">هجمات الاستدلال</span>
+      <span class="tag">الخصوصية التفاضلية</span>
+      <span class="tag">الفيروسات والديدان</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 90 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Database Security</span>
+      <span class="tag">Malware</span>
+      <span class="tag">Inference Attacks</span>
+      <span class="tag">Differential Privacy</span>
+      <span class="tag">Viruses and Worms</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 90 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>توضيح الحاجة إلى أمن قواعد البيانات بمعزل عن التدابير العادية المتخذة لأمن الحاسوب.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح الأنواع المختلفة لهجمات قواعد البيانات والتدابير المضادة لها.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم التشغيل الأساسي للبرمجيات الخبيثة المختلفة.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف بعض التدابير المضادة للبرمجيات الخبيثة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Illustrate the need for database security apart from ordinary measures taken for computer security.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the different types of database attacks and countermeasures.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the basic operation of different malware.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe some malware countermeasure.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="database-fundamentals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في قواعد البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> An Introduction to Databases</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قاعدة البيانات هي مجموعة منظمة من البيانات تديرها أنظمة متخصصة (DBMS) وتعتمد غالباً على النموذج العلائقي.</p></template>
+    <template class="content-en"><p>A database is an organized collection of data managed by a DBMS, often based on the relational model.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قاعدة البيانات هي مجموعة من البيانات ومجموعة من القواعد التي تنظم هذه البيانات من خلال تحديد علاقات معينة بينها. يتم تخزين عناصر البيانات في ملف حيث لا يهم المستخدم التنسيق المادي للملف.</p><ul><li><b>مسؤول قاعدة البيانات (DBA):</b> الشخص الذي يحدد القواعد التي تنظم البيانات ويتحكم في صلاحيات الوصول.</li><li><b><span class="smart-term" data-term-en="DBMS" data-ar="نظام إدارة قواعد البيانات" data-en-def="Database Management System; software that provides support for queries and management of databases.">نظام إدارة قواعد البيانات<span class="smart-term-tooltip"></span></span> (DBMS):</b> يوفر الدعم للاستعلامات والإدارة.</li><li><b>النموذج العلائقي:</b> تعتمد عليه معظم أنظمة DBMS الشائعة، حيث تتكون قاعدة البيانات من جداول تحتوي على سجلات (صفوف/Tuples) وحقول (أعمدة/Attributes).</li><li><b>لغة الاستعلام (SQL):</b> اللغة الأكثر شيوعاً، وأشهر أوامرها هو <code>SELECT</code> لاسترجاع البيانات.</li></ul></template>
+    <template class="content-en"><p>A database is a collection of data and a set of rules that organize the data by specifying certain relationships among the data. Data items are stored in a file where the physical format is of no concern to the user.</p><ul><li><b>Database Administrator:</b> The person who defines the rules and controls access.</li><li><b><span class="smart-term" data-term-en="DBMS" data-ar="نظام إدارة قواعد البيانات" data-en-def="Database Management System; software that provides support for queries and management of databases.">DBMS<span class="smart-term-tooltip"></span></span>:</b> Provides support for queries and management.</li><li><b>Relational Model:</b> Most popular DBMS are based on this, consisting of tables with named columns (attributes) and rows (<span class="smart-term" data-term-en="Tuple" data-ar="سجل / صف" data-en-def="A row in a relational database table.">tuple<span class="smart-term-tooltip"></span></span>s).</li><li><b>SQL:</b> The most common query language, with <code>SELECT</code> being the most popular command.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى أمن خاص بقواعد البيانات؟ لأن أنظمة التشغيل تدير الوصول على مستوى الملفات، بينما قواعد البيانات تتطلب تحكماً دقيقاً على مستوى السجلات أو حتى الحقول الفردية.</p><p>بالإضافة إلى ذلك، العلاقات المعقدة بين الجداول (مثل الربط بين جدول الأسماء وجدول الرموز البريدية) تخلق ثغرات أمنية محتملة لا يمكن لنظام التشغيل اكتشافها أو منعها.</p></template>
+    <template class="content-en"><p>Why do we need specific database security? Operating systems manage access at the file level, whereas databases require granular control at the record or even element level.</p><p>Furthermore, the complex relationships between tables (e.g., joining a names table with a zip code table) create potential security vulnerabilities that an OS cannot detect or prevent.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a diagram showing the Relational Database Model. Show two tables: 'NAME-ZIP' (Columns: Name, Address, City, State, Zip) and 'ZIP-AIRPORT' (Columns: Zip, Airport). Draw an arrow pointing from the 'Zip' column in the first table to the 'Zip' column in the second table to illustrate a relationship. Style: educational, dark background #0d1117, accent color #007bff, clear tabular layout. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-small" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        <!-- Main Title -->
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Relational Database Model</text>
+        <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نموذج قاعدة البيانات العلائقية</text>
+
+        <!-- Annotations: Column & Row -->
+        <path d="M 150 75 L 150 90" marker-end="url(#arrow-small)" stroke="var(--text-muted)" stroke-width="2" fill="none" />
+        <text x="150" y="65" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Column (Attribute)</text>
+        <text x="150" y="65" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">عمود (سمة)</text>
+
+        <path d="M 100 145 L 95 145 L 95 175 L 100 175" fill="none" stroke="var(--text-muted)" stroke-width="2" />
+        <text x="45" y="160" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Row (Tuple)</text>
+        <text x="45" y="160" text-anchor="middle" dominant-baseline="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">صف (سجل)</text>
+
+        <!-- Annotations: PK & FK -->
+        <path d="M 490 75 L 490 90" marker-end="url(#arrow-small)" stroke="var(--text-muted)" stroke-width="2" fill="none" />
+        <text x="490" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Foreign Key</text>
+        <text x="490" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مفتاح أجنبي</text>
+
+        <path d="M 665 75 L 665 90" marker-end="url(#arrow-small)" stroke="var(--text-muted)" stroke-width="2" fill="none" />
+        <text x="665" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Primary Key</text>
+        <text x="665" y="65" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مفتاح أساسي</text>
+
+        <!-- TABLE 1: NAME-ZIP -->
+        <g>
+            <!-- Backgrounds -->
+            <rect x="110" y="100" width="330" height="40" fill="var(--bg-elevated)" />
+            <rect x="440" y="100" width="100" height="40" fill="var(--brand-600)" />
+            <rect x="440" y="140" width="100" height="120" fill="var(--brand-500)" opacity="0.1" />
+            
+            <!-- Grid Lines -->
+            <rect x="110" y="100" width="430" height="160" fill="none" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="110" y1="140" x2="540" y2="140" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="110" y1="180" x2="540" y2="180" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="110" y1="220" x2="540" y2="220" stroke="var(--border-color)" stroke-width="1" />
+            
+            <line x1="190" y1="100" x2="190" y2="260" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="300" y1="100" x2="300" y2="260" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="380" y1="100" x2="380" y2="260" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="440" y1="100" x2="440" y2="260" stroke="var(--border-color)" stroke-width="1" />
+
+            <!-- Headers -->
+            <g font-size="15" font-weight="bold" dominant-baseline="middle">
+                <!-- English Headers -->
+                <text x="150" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Name</text>
+                <text x="245" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Address</text>
+                <text x="340" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">City</text>
+                <text x="410" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">State</text>
+                <text x="490" y="120" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Zip</text>
+                
+                <!-- Arabic Headers -->
+                <text x="150" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الاسم</text>
+                <text x="245" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">العنوان</text>
+                <text x="340" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">المدينة</text>
+                <text x="410" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">الولاية</text>
+                <text x="490" y="120" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">الرمز البريدي</text>
+            </g>
+
+            <!-- Data Rows -->
+            <g font-size="14" dominant-baseline="middle" fill="var(--text-secondary)">
+                <!-- Row 1 -->
+                <text x="150" y="160" text-anchor="middle" class="gsvg-en">John Doe</text>
+                <text x="150" y="160" text-anchor="middle" class="gsvg-ar">جون دو</text>
+                <text x="245" y="160" text-anchor="middle" class="gsvg-en">123 Main St</text>
+                <text x="245" y="160" text-anchor="middle" class="gsvg-ar">123 شارع رئيسي</text>
+                <text x="340" y="160" text-anchor="middle" class="gsvg-en">Boston</text>
+                <text x="340" y="160" text-anchor="middle" class="gsvg-ar">بوسطن</text>
+                <text x="410" y="160" text-anchor="middle" class="gsvg-en">MA</text>
+                <text x="410" y="160" text-anchor="middle" class="gsvg-ar">MA</text>
+                <text x="490" y="160" text-anchor="middle" class="gsvg-en">02101</text>
+                <text x="490" y="160" text-anchor="middle" class="gsvg-ar">02101</text>
+
+                <!-- Row 2 -->
+                <text x="150" y="200" text-anchor="middle" class="gsvg-en">Jane Smith</text>
+                <text x="150" y="200" text-anchor="middle" class="gsvg-ar">جين سميث</text>
+                <text x="245" y="200" text-anchor="middle" class="gsvg-en">456 Oak Ave</text>
+                <text x="245" y="200" text-anchor="middle" class="gsvg-ar">456 شارع البلوط</text>
+                <text x="340" y="200" text-anchor="middle" class="gsvg-en">Seattle</text>
+                <text x="340" y="200" text-anchor="middle" class="gsvg-ar">سياتل</text>
+                <text x="410" y="200" text-anchor="middle" class="gsvg-en">WA</text>
+                <text x="410" y="200" text-anchor="middle" class="gsvg-ar">WA</text>
+                <text x="490" y="200" text-anchor="middle" class="gsvg-en">98101</text>
+                <text x="490" y="200" text-anchor="middle" class="gsvg-ar">98101</text>
+
+                <!-- Row 3 -->
+                <text x="150" y="240" text-anchor="middle" class="gsvg-en">Ali Khan</text>
+                <text x="150" y="240" text-anchor="middle" class="gsvg-ar">علي خان</text>
+                <text x="245" y="240" text-anchor="middle" class="gsvg-en">789 Pine Rd</text>
+                <text x="245" y="240" text-anchor="middle" class="gsvg-ar">789 طريق الصنوبر</text>
+                <text x="340" y="240" text-anchor="middle" class="gsvg-en">Austin</text>
+                <text x="340" y="240" text-anchor="middle" class="gsvg-ar">أوستن</text>
+                <text x="410" y="240" text-anchor="middle" class="gsvg-en">TX</text>
+                <text x="410" y="240" text-anchor="middle" class="gsvg-ar">TX</text>
+                <text x="490" y="240" text-anchor="middle" class="gsvg-en">73301</text>
+                <text x="490" y="240" text-anchor="middle" class="gsvg-ar">73301</text>
+            </g>
+        </g>
+
+        <!-- TABLE 2: ZIP-AIRPORT -->
+        <g>
+            <!-- Backgrounds -->
+            <rect x="620" y="100" width="90" height="40" fill="var(--brand-600)" />
+            <rect x="710" y="100" width="90" height="40" fill="var(--bg-elevated)" />
+            <rect x="620" y="140" width="90" height="120" fill="var(--brand-500)" opacity="0.1" />
+            
+            <!-- Grid Lines -->
+            <rect x="620" y="100" width="180" height="160" fill="none" stroke="var(--border-color)" stroke-width="2" />
+            <line x1="620" y1="140" x2="800" y2="140" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="620" y1="180" x2="800" y2="180" stroke="var(--border-color)" stroke-width="1" />
+            <line x1="620" y1="220" x2="800" y2="220" stroke="var(--border-color)" stroke-width="1" />
+            
+            <line x1="710" y1="100" x2="710" y2="260" stroke="var(--border-color)" stroke-width="1" />
+
+            <!-- Headers -->
+            <g font-size="15" font-weight="bold" dominant-baseline="middle">
+                <text x="665" y="120" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-en">Zip</text>
+                <text x="665" y="120" text-anchor="middle" fill="var(--on-brand-hi)" class="gsvg-ar">الرمز البريدي</text>
+                
+                <text x="755" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-en">Airport</text>
+                <text x="755" y="120" text-anchor="middle" fill="var(--text-primary)" class="gsvg-ar">المطار</text>
+            </g>
+
+            <!-- Data Rows -->
+            <g font-size="14" dominant-baseline="middle" fill="var(--text-secondary)">
+                <!-- Row 1 -->
+                <text x="665" y="160" text-anchor="middle" class="gsvg-en">02101</text>
+                <text x="665" y="160" text-anchor="middle" class="gsvg-ar">02101</text>
+                <text x="755" y="160" text-anchor="middle" class="gsvg-en">BOS</text>
+                <text x="755" y="160" text-anchor="middle" class="gsvg-ar">BOS</text>
+
+                <!-- Row 2 -->
+                <text x="665" y="200" text-anchor="middle" class="gsvg-en">98101</text>
+                <text x="665" y="200" text-anchor="middle" class="gsvg-ar">98101</text>
+                <text x="755" y="200" text-anchor="middle" class="gsvg-en">SEA</text>
+                <text x="755" y="200" text-anchor="middle" class="gsvg-ar">SEA</text>
+
+                <!-- Row 3 -->
+                <text x="665" y="240" text-anchor="middle" class="gsvg-en">73301</text>
+                <text x="665" y="240" text-anchor="middle" class="gsvg-ar">73301</text>
+                <text x="755" y="240" text-anchor="middle" class="gsvg-en">AUS</text>
+                <text x="755" y="240" text-anchor="middle" class="gsvg-ar">AUS</text>
+            </g>
+        </g>
+
+        <!-- Relationship Arrow -->
+        <path d="M 540 120 L 612 120" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow)" fill="none" />
+        <text x="580" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Relates</text>
+        <text x="580" y="110" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">يرتبط</text>
+
+        <!-- Table Titles -->
+        <text x="325" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table: NAME-ZIP</text>
+        <text x="325" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول: الاسم-الرمز البريدي</text>
+        
+        <text x="710" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Table: ZIP-AIRPORT</text>
+        <text x="710" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الجدول: الرمز البريدي-المطار</text>
+
+        <!-- SQL Query Example -->
+        <text x="400" y="320" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Example SQL Query:</text>
+        <text x="400" y="320" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">مثال على استعلام SQL:</text>
+
+        <rect x="150" y="330" width="500" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        
+        <!-- SQL Text (Identical for both languages as it is code) -->
+        <text fill="var(--text-primary)" x="400" y="355" text-anchor="middle" dominant-baseline="middle" font-family="monospace, system-ui, sans-serif" font-size="16" class="gsvg-en">
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">SELECT</tspan> 
+            <tspan fill="var(--text-primary)">Airport</tspan> 
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">FROM</tspan> 
+            <tspan fill="var(--text-primary)">ZIP-AIRPORT</tspan> 
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">WHERE</tspan> 
+            <tspan fill="var(--text-primary)">Zip = '02101';</tspan>
+        </text>
+        <text fill="var(--text-primary)" x="400" y="355" text-anchor="middle" dominant-baseline="middle" font-family="monospace, system-ui, sans-serif" font-size="16" class="gsvg-ar">
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">SELECT</tspan> 
+            <tspan fill="var(--text-primary)">Airport</tspan> 
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">FROM</tspan> 
+            <tspan fill="var(--text-primary)">ZIP-AIRPORT</tspan> 
+            <tspan fill="var(--brand-ink-strong)" font-weight="bold">WHERE</tspan> 
+            <tspan fill="var(--text-primary)">Zip = '02101';</tspan>
+        </text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف التحكم في الوصول في نظام التشغيل عن التحكم في الوصول في نظام إدارة قواعد البيانات (DBMS)؟</template>
+      <template class="content-en">How does access control in an Operating System differ from access control in a DBMS?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نظام التشغيل يتحكم في الوصول إلى الملفات ككل، بينما DBMS يجب أن يتحكم في الوصول على مستوى أدق مثل الجداول، السجلات، أو حتى العناصر الفردية داخل السجل.</p></template>
+      <template class="content-en"><p>An OS controls access to entire files, whereas a DBMS must control access at a much finer granularity, such as tables, records, or even individual elements within a record.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="database-integrity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> سلامة قواعد البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Database Integrity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>سلامة قاعدة البيانات تعني ضمان دقة البيانات وحمايتها من التلف، وتشمل السلامة المادية، المنطقية، والعنصرية، والمرجعية.</p></template>
+    <template class="content-en"><p>Database integrity ensures data accuracy and protection from corruption, encompassing physical, logical, element, and referential integrity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لكي تعمل قاعدة البيانات كمستودع مركزي موثوق، يجب حماية البيانات من التلف (السماح للمصرح لهم فقط بالتحديث) والتعافي من المشاكل المادية (النسخ الاحتياطي وسجلات المعاملات).</p><ol><li><b>سلامة العنصر (Element Integrity):</b> ضمان صحة عناصر البيانات (مثل: يجب أن يكون الحقل رقمياً). يتم فرضها غالباً بواسطة المشغلات (Triggers).</li><li><b><span class="smart-term" data-term-en="Two-Phase Update" data-ar="التحديث ثنائي الطور" data-en-def="A protocol ensuring that a transaction is either fully completed or fully rolled back, maintaining database integrity.">التحديث ثنائي الطور<span class="smart-term-tooltip"></span></span> (Two-Phase Update):</b> لضمان تنفيذ مجموعة من العمليات إما بالكامل أو عدم تنفيذها إطلاقاً (عمليات ذرية). المرحلة 1: جمع المعلومات دون تحديث (حقول الظل). المرحلة 2: جعل التغييرات دائمة.</li><li><b>التحكم في التزامن (Concurrency Control):</b> يمنع فقدان التحديثات عندما يقوم مستخدمان بتعديل نفس المتغير في نفس الوقت.</li><li><b><span class="smart-term" data-term-en="Referential Integrity" data-ar="السلامة المرجعية" data-en-def="A property ensuring that relationships between tables remain consistent; no dangling foreign keys.">السلامة المرجعية<span class="smart-term-tooltip"></span></span> (Referential Integrity):</b> تضمن عدم وجود مفاتيح أجنبية معلقة (Dangling foreign keys). لكل مفتاح أجنبي في جدول، يجب أن يكون هناك إدخال مطابق للمفتاح الأساسي في الجدول الآخر.</li></ol></template>
+    <template class="content-en"><p>For a database to serve as a trusted central repository, data must be protected against corruption (only authorized updates) and physical problems (backups, transaction logs).</p><ol><li><b>Element Integrity:</b> Ensures correctness of data elements (e.g., must be numeric). Typically enforced by triggers.</li><li><b><span class="smart-term" data-term-en="Two-Phase Update" data-ar="التحديث ثنائي الطور" data-en-def="A protocol ensuring that a transaction is either fully completed or fully rolled back, maintaining database integrity.">Two-Phase Update<span class="smart-term-tooltip"></span></span>:</b> Ensures a set of operations are performed as atomic operations (all or nothing). Phase 1: gather info (shadow fields). Phase 2: make changes permanent.</li><li><b>Concurrency Control:</b> Prevents lost updates when multiple users modify the same variable simultaneously.</li><li><b><span class="smart-term" data-term-en="Referential Integrity" data-ar="السلامة المرجعية" data-en-def="A property ensuring that relationships between tables remain consistent; no dangling foreign keys.">Referential Integrity<span class="smart-term-tooltip"></span></span>:</b> Ensures there are no dangling foreign keys. Every foreign key must match an existing primary key in the referenced table.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التحديث ثنائي الطور ضروري لمنع انتهاكات السلامة. على سبيل المثال، في التحويلات البنكية، إذا تم سحب الأموال من حساب ولم يتم إيداعها في الآخر بسبب عطل، ستفقد البيانات سلامتها.</p><p>التعديلات المتزامنة تمثل تحدياً كبيراً. إذا قرأ المستخدم (أ) والمستخدم (ب) المتغير (س)، ثم كتب (أ) قيمة جديدة، وبعدها كتب (ب) قيمة جديدة، فإن تحديث (أ) سيضيع. لذلك يجب تنفيذ العمليات كعمليات ذرية (Atomic).</p><p>حقول الظل (Shadow fields) وسجلات التغيير (Change logs) تستخدم للتراجع عن التغييرات الخاطئة، لكنها تتطلب مساحة تخزين إضافية.</p></template>
+    <template class="content-en"><p>Two-Phase Update is critical to prevent integrity violations. For example, in a bank transfer, if money is withdrawn but not deposited due to a crash, integrity is lost.</p><p>Concurrent modifications pose a major challenge. If A and B read X, A writes X, then B writes X, A's update is lost. Thus, A and B must be performed as atomic operations.</p><p>Shadow fields and change logs are used to undo erroneous changes, though they require additional database space.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا فشل نظام إدارة قواعد البيانات في تطبيق التحكم في التزامن (Concurrency Control)؟</template>
+      <template class="content-en">What happens if a DBMS fails to implement Concurrency Control?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيؤدي ذلك إلى فقدان التحديثات (Lost Updates) وتلف البيانات، حيث يمكن لمعاملة أن تكتب فوق تغييرات معاملة أخرى تمت في نفس الوقت.</p></template>
+      <template class="content-en"><p>It leads to lost updates and data corruption, as one transaction might overwrite the changes made concurrently by another transaction.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="access-control-auditability" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التحكم في الوصول وقابلية التدقيق</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Access Control and Auditability</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التحكم في الوصول في قواعد البيانات معقد ويتطلب سجلات تدقيق لتتبع من قام بالوصول إلى البيانات الحساسة.</p></template>
+    <template class="content-en"><p>Database access control is complex and requires audit logs to track who accessed sensitive data retroactively.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التحكم في الوصول في قواعد البيانات أصعب من أنظمة التشغيل لأنه قد يتطلب التحكم على مستوى العلاقة، السجل، أو العنصر، ويشمل عمليات متعددة (SELECT, INSERT, UPDATE, DROP).</p><p><b><span class="smart-term" data-term-en="Auditability" data-ar="قابلية التدقيق" data-en-def="The ability to keep an audit log of all database accesses to retroactively identify unauthorized access.">قابلية التدقيق<span class="smart-term-tooltip"></span></span> (Auditability):</b></p><ul><li>الاحتفاظ بسجل تدقيق (Audit log) لجميع عمليات الوصول (قراءة وكتابة).</li><li>يسمح بتحديد المستخدمين الذين وصلوا إلى بيانات محظورة بأثر رجعي (مثل: ضابط شرطة يبحث في سجل جنائي كخدمة لصديق).</li><li>يجب اتخاذ قرار بشأن دقة التسجيل (Granularity): هل يجب تسجيل نتائج استعلام SELECT؟</li></ul><p><b>مشكلة الكفاءة:</b> التحكم في الوصول يواجه مشكلة كفاءة في وجود آلاف السجلات التي يتكون كل منها من عشرات العناصر.</p></template>
+    <template class="content-en"><p>Access control is more difficult than OS access control because it might have to control access at the relation, record, or element level, covering many operations (SELECT, INSERT, UPDATE, DROP).</p><p><b><span class="smart-term" data-term-en="Auditability" data-ar="قابلية التدقيق" data-en-def="The ability to keep an audit log of all database accesses to retroactively identify unauthorized access.">Auditability<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>Keep an audit log of all database accesses (read and write).</li><li>Allows retroactive identification of users who accessed forbidden data (e.g., unauthorized medical personnel looking at celebrity records).</li><li>Must decide about the <span class="smart-term" data-term-en="Granularity" data-ar="مستوى الدقة / التفصيل" data-en-def="The level of detail at which data or access is controlled and logged (e.g., table level vs. element level).">granularity<span class="smart-term-tooltip"></span></span> of logging (e.g., should SELECT results be logged?).</li></ul><p><b>Efficiency Problem:</b> Access control faces efficiency issues in the presence of thousands of records, each consisting of dozens of elements.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العلاقات بين كائنات قاعدة البيانات تجعل من الممكن تعلم معلومات حساسة دون الوصول إليها مباشرة، وهو ما يُعرف بـ "مشكلة الاستدلال" (Inference problem).</p><p>قد يضطر نظام التحكم في الوصول إلى النظر في الاستعلامات السابقة أو نوع الاستعلام، لأن الاستعلام الحالي، جنباً إلى جنب مع الاستعلامات السابقة، يمكن أن يكشف معلومات حساسة (الاستعلام التكراري).</p><p>قواعد البيانات تسهل المشاركة، لكن التوافر (Availability) قد يتأثر إذا أراد عدة مستخدمين الوصول إلى نفس السجل، مما يتطلب حظر الوصول حتى ينهي المستخدم الآخر تحديث السجل.</p></template>
+    <template class="content-en"><p>Relationships between database objects make it possible to learn sensitive information without directly accessing it, known as the "Inference problem".</p><p>Access control might need to consider past queries, because a current query combined with past ones could reveal sensitive information (iterative querying).</p><p>Databases facilitate sharing, but availability can suffer if multiple users want to access the same record, requiring the system to block access until the other user finishes updating.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تسجيل نتائج استعلام SELECT تحدياً في سجلات التدقيق؟</template>
+      <template class="content-en">Why is logging the results of a SELECT query a challenge in audit logs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يستهلك مساحة تخزين هائلة ويؤثر على أداء النظام (الكفاءة) نظراً لحجم البيانات التي يتم استرجاعها باستمرار.</p></template>
+      <template class="content-en"><p>Because it consumes massive storage space and impacts system performance (efficiency) due to the sheer volume of data constantly being retrieved.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="data-disclosure-inference" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> كشف البيانات والاستدلال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Data Disclosure and Inference</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاستدلال هو استنتاج بيانات حساسة من خلال استعلامات تبدو غير حساسة، ويمثل صراعاً بين أمن البيانات ودقة النتائج.</p></template>
+    <template class="content-en"><p>Inference is the derivation of sensitive data from supposedly non-sensitive queries, representing a conflict between security and precision.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>أنواع كشف البيانات:</b></p><ul><li><b>البيانات الدقيقة (Exact data):</b> كشف القيمة الفعلية.</li><li><b>الحدود (Bounds):</b> معرفة أن القيمة الحساسة تقع بين حدين (L و H)، ويمكن تضييق النطاق بالبحث الثنائي.</li><li><b>النتيجة السلبية (Negative result):</b> معرفة أن شخصاً ليس لديه صفر إدانات جنائية هي معلومة حساسة بحد ذاتها.</li><li><b>الوجود (Existence):</b> مجرد معرفة وجود بيانات معينة قد يكون حساساً.</li><li><b>القيمة المحتملة (Probable value):</b> البيانات الحساسة لها قيمة x باحتمال y.</li></ul><p><b>هجمات الاستدلال (Inference Attacks):</b></p><ul><li><b>الهجوم المباشر:</b> إصدار استعلام يعطي بيانات حساسة مباشرة (قد يتم تمويه الاستعلام لخداع DBMS).</li><li><b>الهجوم غير المباشر:</b> استنتاج بيانات حساسة من نتائج إحصائية (مثل هجمات Sum, Count, Mean, Median).</li><li><b><span class="smart-term" data-term-en="Tracker Attack" data-ar="هجوم المتتبع" data-en-def="An attack that uses a combination of allowed queries to deduce the result of a forbidden query.">هجوم المتتبع<span class="smart-term-tooltip"></span></span> (Tracker Attack):</b> استخدام استعلامات مسموحة رياضياً لاستنتاج نتيجة استعلام محظور.</li></ul></template>
+    <template class="content-en"><p><b>Types of Data Disclosure:</b></p><ul><li><b>Exact data:</b> Revealing the actual value.</li><li><b>Bounds:</b> Knowing a sensitive value is between L and H (can use binary search to narrow).</li><li><b>Negative result:</b> Knowing someone does not have zero felony convictions is sensitive.</li><li><b>Existence:</b> Knowing of the existence of some data can be sensitive.</li><li><b>Probable value:</b> Sensitive data has value x with probability y.</li></ul><p><b><span class="smart-term" data-term-en="Inference Attack" data-ar="هجوم الاستدلال" data-en-def="Derivation of sensitive data from supposedly non-sensitive data or statistical results.">Inference Attack<span class="smart-term-tooltip"></span></span>s:</b></p><ul><li><b>Direct attack:</b> Issuing a query that directly yields sensitive data (might obfuscate query to fool DBMS).</li><li><b>Indirect attack:</b> Inferring sensitive data from statistical results (Sum, Count, Mean, Median).</li><li><b><span class="smart-term" data-term-en="Tracker Attack" data-ar="هجوم المتتبع" data-en-def="An attack that uses a combination of allowed queries to deduce the result of a forbidden query.">Tracker attack<span class="smart-term-tooltip"></span></span>:</b> Using mathematically allowed queries to deduce the result of a forbidden query.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>الأمن مقابل الدقة (Security vs. Precision):</b> الأمن يقتضي حظر أي استعلام يصل إلى بيانات حساسة، حتى لو كانت النتيجة المجمعة غير حساسة. الدقة تقتضي أن تكشف النتيجة المجمعة أكبر قدر ممكن من البيانات غير الحساسة. هذا التوازن هو جوهر تصميم قواعد البيانات الإحصائية.</p><p><b>هجوم المتتبع (Tracker Attack):</b> إذا كان النظام يرفض الإجابة على استعلام C لأنه يطابق عدداً قليلاً جداً (أقل من k) أو كبيراً جداً (أكثر من N-k) من السجلات، يمكن للمهاجم استخدام استعلام متتبع T يطابق بين 2k و N-2k سجل. باستخدام مخططات فن (Venn diagrams) والجبر الخطي، يمكن للمهاجم حساب نتيجة C الممنوعة من خلال استعلامات T المسموحة.</p></template>
+    <template class="content-en"><p><b>Security vs. Precision:</b> Security forbids any queries that access sensitive data, even if the aggregated result is no longer sensitive. Precision dictates that the aggregated result should reveal as much non-sensitive data as possible. Balancing these is the core of statistical database design.</p><p><b>Tracker Attacks:</b> Assume a DBMS refuses query C because it matches fewer than k or more than N-k records. A tracker T is a query matching between 2k and N-2k records. Using Venn diagrams and simple logic, an attacker can compute the forbidden q(C) using multiple allowed queries involving T.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة هجوم المتتبع لحساب استعلام محظور C باستخدام استعلام متتبع T، حيث S هي مجموعة كل السجلات.</strong></template>
+      <template class="content-en"><strong>Tracker attack formula to compute a forbidden query C using a tracker query T, where S is the set of all records.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$q(C) = q(C \lor T) + q(C \lor \neg T) - q(S)$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create a diagram illustrating 'Security vs. Precision' in databases. Draw concentric circles. The outermost circle is 'Least Sensitive' (Freely Disclosed). Moving inwards: 'May Be Inferred', 'Cannot Be Inferred', 'Concealed-Not Disclosed'. The innermost circle is 'Most Sensitive'. Draw a diagonal line representing the tradeoff: one end points to 'Reveal for Maximum Precision', the other to 'Conceal for Maximum Security'. Style: educational, dark background #0d1117, accent colors #007bff and #ff4444. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 960 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+  <defs>
+    <!-- Arrowhead for the diagonal tradeoff line -->
+    <marker id="arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- CONCENTRIC CIRCLES (Security vs Precision) -->
+  <!-- ========================================== -->
+  
+  <!-- Level 1: Least Sensitive -->
+  <circle cx="480" cy="300" r="280" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="480" y="55" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Least Sensitive (Freely Disclosed)</text>
+  <text x="480" y="55" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">الأقل حساسية (متاح بحرية)</text>
+
+  <!-- Level 2: May Be Inferred -->
+  <circle cx="480" cy="300" r="225" fill="var(--bg-elevated)" stroke="var(--brand-300)" stroke-width="2" />
+  <text x="480" y="110" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">May Be Inferred</text>
+  <text x="480" y="110" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">يمكن استنتاجه</text>
+
+  <!-- Level 3: Cannot Be Inferred -->
+  <circle cx="480" cy="300" r="170" fill="var(--brand-800)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="480" y="165" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Cannot Be Inferred</text>
+  <text x="480" y="165" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">لا يمكن استنتاجه</text>
+
+  <!-- Level 4: Concealed - Not Disclosed -->
+  <circle cx="480" cy="300" r="115" fill="var(--brand-600)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="480" y="220" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Concealed - Not Disclosed</text>
+  <text x="480" y="220" font-size="13" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">مخفي - غير مفصح عنه</text>
+
+  <!-- Level 5: Most Sensitive -->
+  <circle cx="480" cy="300" r="60" fill="var(--brand-400)" stroke="var(--brand-300)" stroke-width="2" />
+  <text x="480" y="305" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Most Sensitive</text>
+  <text x="480" y="305" font-size="13" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">الأكثر حساسية</text>
+
+  <!-- ========================================== -->
+  <!-- DIAGONAL TRADEOFF LINE & LABELS            -->
+  <!-- ========================================== -->
+  
+  <!-- Bottom-Left Segment (Points to Conceal) -->
+  <line x1="430" y1="350" x2="340" y2="440" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,6" marker-end="url(#arrow-end)" />
+  
+  <!-- Top-Right Segment (Points to Reveal) -->
+  <line x1="530" y1="250" x2="620" y2="160" stroke="var(--brand-500)" stroke-width="3" stroke-dasharray="6,6" marker-end="url(#arrow-end)" />
+
+  <!-- Bottom-Left Label -->
+  <rect x="230" y="442" width="220" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="340" y="465" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">Conceal for Max Security</text>
+  <text x="340" y="465" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">إخفاء لأقصى أمان</text>
+
+  <!-- Top-Right Label -->
+  <rect x="510" y="122" width="220" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="620" y="145" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">Reveal for Max Precision</text>
+  <text x="620" y="145" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">كشف لأقصى دقة</text>
+
+  <!-- ========================================== -->
+  <!-- LEFT PANEL: Types of Data Disclosure       -->
+  <!-- ========================================== -->
+  <rect x="20" y="80" width="210" height="440" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="125" y="110" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Data Disclosure</text>
+  <text x="125" y="110" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">كشف البيانات</text>
+  
+  <line x1="40" y1="125" x2="210" y2="125" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- Item 1 -->
+  <text x="125" y="150" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Exact</text>
+  <text x="125" y="150" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">دقيق</text>
+  <text x="125" y="170" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Revealing actual value</text>
+  <text x="125" y="170" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">كشف القيمة الفعلية</text>
+
+  <!-- Item 2 -->
+  <text x="125" y="210" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Bounds</text>
+  <text x="125" y="210" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">حدود</text>
+  <text x="125" y="230" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Value is between L and H</text>
+  <text x="125" y="230" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">القيمة بين حدين</text>
+
+  <!-- Item 3 -->
+  <text x="125" y="270" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Negative Result</text>
+  <text x="125" y="270" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">نتيجة سلبية</text>
+  <text x="125" y="290" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Knowing it is not X</text>
+  <text x="125" y="290" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">معرفة أنها ليست X</text>
+
+  <!-- Item 4 -->
+  <text x="125" y="330" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Existence</text>
+  <text x="125" y="330" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وجود</text>
+  <text x="125" y="350" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Knowing data exists</text>
+  <text x="125" y="350" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">معرفة وجود البيانات</text>
+
+  <!-- Item 5 -->
+  <text x="125" y="390" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Probable Value</text>
+  <text x="125" y="390" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">قيمة محتملة</text>
+  <text x="125" y="410" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Value X with probability Y</text>
+  <text x="125" y="410" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">قيمة X باحتمال Y</text>
+
+  <!-- ========================================== -->
+  <!-- RIGHT PANEL: Inference Attacks             -->
+  <!-- ========================================== -->
+  <rect x="730" y="80" width="210" height="440" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="835" y="110" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Inference Attacks</text>
+  <text x="835" y="110" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">هجمات الاستدلال</text>
+  
+  <line x1="750" y1="125" x2="920" y2="125" stroke="var(--border-color)" stroke-width="1" />
+
+  <!-- Item 1 -->
+  <text x="835" y="180" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Direct Attack</text>
+  <text x="835" y="180" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">هجوم مباشر</text>
+  <text x="835" y="200" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Yields sensitive data</text>
+  <text x="835" y="200" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">يكشف بيانات حساسة مباشرة</text>
+
+  <!-- Item 2 -->
+  <text x="835" y="270" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Indirect Attack</text>
+  <text x="835" y="270" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">هجوم غير مباشر</text>
+  <text x="835" y="290" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">From statistical results</text>
+  <text x="835" y="290" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">استنتاج من الإحصائيات</text>
+
+  <!-- Item 3 -->
+  <text x="835" y="360" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Tracker Attack</text>
+  <text x="835" y="360" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">هجوم المتتبع</text>
+  <text x="835" y="380" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Using allowed queries</text>
+  <text x="835" y="380" font-size="13" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">باستخدام استعلامات مسموحة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لاستعلام المجموع (SUM) أن يسرب بيانات حساسة؟</template>
+      <template class="content-en">How can a SUM query leak sensitive data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إذا كان المجموع يغطي سجلاً واحداً فقط، أو إذا كان المهاجم يستطيع التحكم في مجموعة السجلات المشمولة (مثلاً: مجموع رواتب الجميع ناقص مجموع رواتب الجميع باستثناء شخص واحد).</p></template>
+      <template class="content-en"><p>It leaks sensitive data if the sum covers only one record, or if the attacker can control the set of covered records (e.g., SUM of all salaries minus SUM of all salaries except one person).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="inference-controls-differential-privacy" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> ضوابط الاستدلال والخصوصية التفاضلية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Inference Controls and Differential Privacy</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لمنع الاستدلال، نستخدم تقنيات مثل حجب البيانات، التشويش العشوائي، والخصوصية التفاضلية التي تضمن عدم تأثر النتيجة بوجود فرد واحد.</p></template>
+    <template class="content-en"><p>To prevent inference, we use techniques like suppression, random perturbation, and differential privacy, which ensures results don't depend on a single individual.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>ضوابط هجمات الاستدلال الإحصائي:</b></p><ul><li><b>الكبت (Suppression):</b> إخفاء البيانات الحساسة من النتيجة.</li><li><b>الإخفاء (Concealing):</b> تقديم إجابة قريبة من القيمة الفعلية، ولكن ليست دقيقة.</li><li><b>قاعدة n-item k-percent:</b> إذا كانت مجموعة فرعية من n سجل مسؤولة عن أكثر من k بالمائة من النتيجة، يتم حذف هذه السجلات من النتيجة.</li><li><b>الاضطراب العشوائي (Random data perturbation):</b> إضافة أو طرح خطأ عشوائي صغير لكل قيمة قبل حساب النتيجة، مع الحفاظ على الخصائص الإحصائية.</li><li><b>تحليل الاستعلام (Query analysis):</b> الاحتفاظ بتاريخ استعلامات المستخدم لمراقبة الاستدلالات المحتملة (مكلف ويفشل مع المستخدمين المتواطئين).</li></ul><p><b><span class="smart-term" data-term-en="Differential Privacy" data-ar="الخصوصية التفاضلية" data-en-def="A system for publicly sharing information about a dataset by describing the patterns of groups within the dataset while withholding information about individuals in the dataset.">الخصوصية التفاضلية<span class="smart-term-tooltip"></span></span> (Differential Privacy):</b></p><ul><li>يجب ألا تعتمد الاستجابة للاستعلام على وجود (أو عدم وجود) فرد في مجموعة البيانات.</li><li>يتم تحقيقها عادةً عن طريق إضافة ضوضاء (Noise) إلى نتيجة الاستعلام قبل إصدارها.</li></ul></template>
+    <template class="content-en"><p><b>Controls for Statistical Inference Attacks:</b></p><ul><li><b>Suppression:</b> Suppress sensitive data from the result.</li><li><b>Concealing:</b> Answer is close to actual value, but not exactly.</li><li><b>n-item k-percent rule:</b> If a subset of n records is responsible for over k percent of the result, omit the n records.</li><li><b>Random <span class="smart-term" data-term-en="Data Perturbation" data-ar="اضطراب البيانات" data-en-def="Adding random noise to data values to protect privacy while maintaining overall statistical properties.">data perturbation<span class="smart-term-tooltip"></span></span>:</b> Add/subtract small random error to/from each value before computing result (maintains statistical properties).</li><li><b>Query analysis:</b> Maintain history of user queries (costly, fails for colluding users).</li></ul><p><b><span class="smart-term" data-term-en="Differential Privacy" data-ar="الخصوصية التفاضلية" data-en-def="A system for publicly sharing information about a dataset by describing the patterns of groups within the dataset while withholding information about individuals in the dataset.">Differential Privacy<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>The response to a query should not depend on an individual (not) being part of the dataset.</li><li>Typically achieved by adding noise to the result of a query before releasing it.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخصوصية التفاضلية توفر ضماناً رياضياً قوياً. يقال إن الاستعلام K يتمتع بخصوصية تفاضلية ϵ (Epsilon) إذا كان لأي مجموعتي بيانات D و D' تختلفان في صف واحد على الأكثر، فإن احتمال أن يكون لـ K(D) مخرجات معينة هو على الأكثر e^ϵ ضعف احتمال أن يكون لـ K(D') نفس المخرجات.</p><p>تجميع البيانات (Data Aggregation) يرتبط ارتباطاً وثيقاً بالاستدلال واستخراج البيانات (Data Mining). يمكن أن يحدث التجميع خارج نظام إدارة قواعد البيانات (مثل تحدث أشخاص بصلاحيات مختلفة مع بعضهم البعض)، مما يجعل السيطرة عليه صعبة للغاية.</p></template>
+    <template class="content-en"><p>Differential privacy provides a strong mathematical guarantee. A query K has ϵ-differential privacy if for all datasets D and D′ differing in at most one row, the probability that K(D) has a particular output is at most e^ϵ times the probability that K(D′) has this output.</p><p>Data Aggregation is related to inference and data mining. Aggregation can take place outside of a DBMS (e.g., people with different access rights talking to each other), making it extremely difficult to control.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>تعريف الخصوصية التفاضلية ϵ، حيث تضمن أن مخرجات الاستعلام لا تتغير بشكل كبير عند إضافة أو إزالة فرد واحد.</strong></template>
+      <template class="content-en"><strong>Definition of ϵ-differential privacy, ensuring query outputs don't change significantly when a single individual is added or removed.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$P(K(D) \in S) \le e^\epsilon P(K(D') \in S)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر تحليل الاستعلام (Query analysis) حلاً غير كافٍ لمنع هجمات الاستدلال؟</template>
+      <template class="content-en">Why is query analysis an insufficient solution to prevent inference attacks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه مكلف حسابياً ويتطلب تخزين تاريخ طويل، والأهم أنه يفشل إذا تواطأ عدة مستخدمين (Colluding users) لجمع أجزاء مختلفة من البيانات.</p></template>
+      <template class="content-en"><p>Because it is computationally costly, requires storing long histories, and most importantly, it fails if multiple users collude to gather different pieces of data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multilevel-security-design" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الأمن متعدد المستويات وتصميم قواعد البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Multilevel Data Security and Database Design</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="MLS (Multilevel Security)" data-ar="الأمن متعدد المستويات" data-en-def="A system where a database contains data of two or more sensitivities, and access is granted based on user clearance.">الأمن متعدد المستويات<span class="smart-term-tooltip"></span></span> (MLS) يتعامل مع بيانات ذات حساسيات مختلفة، ويتم تنفيذه عبر واجهات أمامية موثوقة أو طرق عرض (Views).</p></template>
+    <template class="content-en"><p>Multilevel Data Security (MLS) handles data of varying sensitivities, implemented via trusted front-ends or Views.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>أمن البيانات متعدد المستويات (MLS):</b> تحتوي قاعدة البيانات على بيانات ذات حساسيات مختلفة، ويُسمح لبعض المستخدمين بالوصول إلى بيانات لا يُسمح للآخرين بها. المناهج تشمل الفصل التشفيري، الإضافات لتصفية النتائج، والفصل الافتراضي.</p><p><b>تصميم قواعد البيانات الآمنة:</b></p><ul><li><b>الواجهة الأمامية الموثوقة (Trusted Front-end):</b> تصادق على المستخدم، تمرر الاستعلام لـ DBMS، وتزيل البيانات غير المصرح بها من النتيجة (غير فعالة إذا تم إسقاط معظم البيانات).</li><li><b>المرشحات التبادلية (Commutative Filters):</b> تعيد كتابة استعلام المستخدم وفقاً لتصنيفه قبل إرساله إلى DBMS (تستفيد من قدرات DBMS وتتخلص من البيانات الممنوعة مبكراً).</li><li><b>قواعد البيانات الموزعة/المتحدة:</b> توجيه الاستعلام فقط إلى قواعد البيانات التي يمكن للمستخدم الوصول إليها (معقد ولا يتوسع جيداً).</li><li><b>طرق العرض (Views):</b> قاعدة بيانات منطقية تمثل مجموعة فرعية من قاعدة بيانات أخرى. تستخدم لإخفاء السمات/الصفوف التي لا يُسمح للمستخدم بالوصول إليها.</li></ul></template>
+    <template class="content-en"><p><b>Multilevel Data Security (MLS):</b> A database contains data of two or more sensitivities; some users are allowed access to data others are not. Approaches include cryptographic separation, add-ons to filter results, and virtual separation.</p><p><b>Design of Secure Databases:</b></p><ul><li><b>Trusted Front-end:</b> Authenticates user, forwards query, and removes forbidden data items from the result (inefficient if many items are dropped).</li><li><b>Commutative Filters:</b> Re-writes user query according to classification before sending to DBMS (benefits from DBMS processing, discards forbidden data early).</li><li><b>Distributed/Federated Databases:</b> Forwards query only to databases the user can access (complex, doesn't scale well).</li><li><b>Views:</b> A logical database representing a subset of another database. Used for access control to hide attributes/rows.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بسبب النفقات العامة (Overhead) العالية المرتبطة بأساليب MLS (مثل التشفير والفصل الافتراضي)، لم ينتج عن أي منها منتج تجاري ناجح.</p><p>تعتبر طرق العرض (Views) الأداة الأكثر عملية وشيوعاً في أنظمة قواعد البيانات الحديثة لتطبيق التحكم في الوصول، حيث توفر طبقة تجريد تمنع المستخدم من رؤية الهيكل الأساسي أو البيانات المحظورة.</p><p>في سياق استخراج البيانات (Data Mining)، تبرز تحديات أمنية مثل السرية (استنتاج معلومات حساسة من الأنماط)، السلامة (أخطاء البيانات)، والتوافر (عدم توافق قواعد البيانات المختلفة).</p></template>
+    <template class="content-en"><p>Because of the high overhead involved in all MLS approaches (like cryptographic or virtual separation), none of them has ever resulted in a successful commercial product.</p><p>Views are the most practical and widely used tool in modern DBMS for access control, providing an abstraction layer that prevents users from seeing the underlying structure or forbidden data.</p><p>In Data Mining, security problems arise such as Confidentiality (derivation of sensitive info from patterns), Integrity (mistakes in data), and Availability (incompatibility of databases).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>الأمن (Security)</th><th>الدقة (Precision)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الهدف الأساسي</template>
+          <template class="content-en">Primary Goal</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حظر أي استعلام يصل إلى بيانات حساسة</template>
+          <template class="content-en">Forbid any queries that access sensitive data</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الكشف عن أكبر قدر ممكن من البيانات غير الحساسة</template>
+          <template class="content-en">Reveal as much non-sensitive data as possible</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع النتائج المجمعة</template>
+          <template class="content-en">Handling Aggregated Results</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">قد يحظرها حتى لو لم تكن حساسة بحد ذاتها</template>
+          <template class="content-en">May forbid even if aggregated result is no longer sensitive</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يسمح بها لتعظيم الفائدة الإحصائية</template>
+          <template class="content-en">Allows them to maximize statistical utility</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر المرشحات التبادلية (Commutative Filters) أكثر كفاءة من الواجهة الأمامية الموثوقة التقليدية؟</template>
+      <template class="content-en">Why are Commutative Filters more efficient than a traditional Trusted Front-end?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تعدل الاستعلام قبل تنفيذه، مما يجعل DBMS يسترجع فقط البيانات المسموحة، بدلاً من استرجاع كمية هائلة من البيانات ثم التخلص منها في الواجهة الأمامية.</p></template>
+      <template class="content-en"><p>Because they rewrite the query before execution, making the DBMS retrieve only allowed data, rather than retrieving massive amounts of data and dropping it at the front-end.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="malware-fundamentals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> أساسيات البرمجيات الخبيثة ومصطلحاتها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Malware Fundamentals and Terminology</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>البرمجيات الخبيثة هي برامج تُدرج سراً لتهديد سرية أو سلامة أو توافر النظام، وتصنف إلى طفيلية (تحتاج مضيف) ومستقلة.</p></template>
+    <template class="content-en"><p>Malware is a program inserted covertly to compromise system confidentiality, integrity, or availability, classified into parasitic (needs host) and independent.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُعرّف NIST البرمجيات الخبيثة بأنها برنامج يُدرج في نظام، عادةً بشكل سري، بقصد المساس بسرية أو سلامة أو توافر بيانات الضحية أو تطبيقاته أو نظام تشغيله.</p><p><b>تصنيف البرمجيات الخبيثة:</b></p><ul><li><b>برامج تحتاج إلى مضيف (Parasitic):</b> مثل الفيروسات، القنابل المنطقية، والأبواب الخلفية.</li><li><b>برامج مستقلة (Independent):</b> مثل الديدان (Worms) والروبوتات (Bots).</li><li><b>تتكاثر (Replicating):</b> الفيروسات والديدان.</li><li><b>لا تتكاثر:</b> أحصنة طروادة والبريد المزعج.</li></ul><p><b>مصطلحات هامة:</b></p><ul><li><b><span class="smart-term" data-term-en="Logic Bomb" data-ar="القنبلة المنطقية" data-en-def="Malicious code set to execute when a specific condition is met.">القنبلة المنطقية<span class="smart-term-tooltip"></span></span> (Logic bomb):</b> "تنفجر" عند حدوث شرط معين.</li><li><b>حصان طروادة (Trojan horse):</b> يزيف أو يحتوي على وظائف إضافية خفية.</li><li><b>الباب الخلفي (Backdoor):</b> يسمح بالوصول غير المصرح به.</li><li><b>مجموعة أدوات الجذر (Rootkit):</b> أدوات اختراق متطورة للحصول على وصول بمستوى الجذر (Root).</li></ul></template>
+    <template class="content-en"><p>NIST defines malware as a program inserted into a system, usually covertly, with the intent of compromising the confidentiality, integrity, or availability of the victim's data, applications, or OS.</p><p><b>Classification:</b></p><ul><li><b>Need a host program (Parasitic):</b> Viruses, <span class="smart-term" data-term-en="Logic Bomb" data-ar="القنبلة المنطقية" data-en-def="Malicious code set to execute when a specific condition is met.">logic bomb<span class="smart-term-tooltip"></span></span>s, backdoors.</li><li><b>Independent programs:</b> Worms, bots.</li><li><b>Replicating:</b> Viruses, worms.</li><li><b>Non-replicating:</b> Trojans, spam.</li></ul><p><b>Terminology:</b></p><ul><li><b>Logic bomb:</b> "Explodes" when a condition occurs.</li><li><b>Trojan horse:</b> Fakes/contains additional functionality.</li><li><b>Backdoor:</b> Allows unauthorized access.</li><li><b>Rootkit:</b> Sophisticated hacker tools to gain root-level access.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تاريخياً، كان تطوير البرمجيات الخبيثة يتطلب مهارة تقنية عالية. لكن ظهور مجموعات أدوات الهجوم (Crimeware toolkits) مثل Zeus و Angler في التسعينيات والألفينيات سهّل إنشاء ونشر البرمجيات الخبيثة بشكل كبير.</p><p>هذه الأدوات تولد متغيرات (Variants) جديدة باستمرار، مما يطرح مشاكل ضخمة لأنظمة الدفاع التي تعتمد على التوقيعات (Signatures).</p><p>مصادر الهجوم تنوعت لتشمل</p><ul><li><strong>مهاجمين بدوافع سياسية</strong>،</li><li><strong>مجرمين</strong>،</li><li><strong>عصابات الجريمة المنظمة</strong>،</li><li><strong>ووكالات حكومية وطنية</strong>.</li></ul></template>
+    <template class="content-en"><p>Initially, malware development required technical skill. The development of attack toolkits ("<span class="smart-term" data-term-en="Crimeware" data-ar="برمجيات الجريمة" data-en-def="Attack toolkits that lower the technical barrier for creating and deploying malware.">crimeware<span class="smart-term-tooltip"></span></span>") like Zeus and Angler significantly assisted in creation and deployment.</p><p>These toolkits generate variants that pose massive problems for signature-based defending systems.</p><p>Attack sources have diversified to include politically motivated attackers, criminals, organized crime, and national government agencies.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الفرق الأساسي بين الفيروس والدودة (Worm) من حيث التصنيف؟</template>
+      <template class="content-en">What is the primary difference between a Virus and a Worm in terms of classification?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الفيروس هو برنامج طفيلي يحتاج إلى برنامج مضيف ليعمل، بينما الدودة هي برنامج مستقل قائم بذاته.</p></template>
+      <template class="content-en"><p>A virus is parasitic and requires a host program to run, whereas a worm is an independent, self-contained program.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="advanced-persistent-threats" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التهديدات المستمرة المتقدمة (APTs)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Advanced Persistent Threats (APTs)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هجمات APT هي هجمات ممولة جيداً، مستهدفة، ومصممة للبقاء متخفية لفترات طويلة لسرقة البيانات أو تخريب البنية التحتية.</p></template>
+    <template class="content-en"><p>APTs are well-resourced, targeted attacks designed to remain stealthy over extended periods to steal data or disrupt infrastructure.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>خصائص APTs:</b></p><ul><li><b>متقدمة (Advanced):</b> يستخدم المهاجمون مجموعة واسعة من تقنيات التطفل والبرمجيات الخبيثة.</li><li><b>مستمرة (Persistent):</b> هجمات مصممة ضد هدف مختار لتعظيم فرص النجاح والبقاء لفترة طويلة.</li><li><b>تهديدات (Threats):</b> نتيجة لمهاجمين منظمين وممولين جيداً (غالباً برعاية دول).</li></ul><p><b>الهدف والتقنيات:</b></p><ul><li>تتراوح الأهداف من سرقة الملكية الفكرية إلى التخريب المادي للبنية التحتية (مثل دودة Stuxnet).</li><li>تستخدم تقنيات مثل الهندسة الاجتماعية، <span class="smart-term" data-term-en="Spear-phishing" data-ar="التصيد الرمحي" data-en-def="An email or electronic communications scam targeted towards a specific individual, organization or business.">التصيد الرمحي<span class="smart-term-tooltip"></span></span> (Spear-phishing)، والتنزيل التلقائي (Drive-by-downloads).</li><li>بمجرد الوصول الأولي، يتم استخدام أدوات هجوم من المستوى التالي للحفاظ على الوصول وتوسيعه.</li></ul></template>
+    <template class="content-en"><p><b>Characteristics of APTs:</b></p><ul><li><b>Advanced:</b> Attackers use a wide variety of intrusion technologies and malware.</li><li><b>Persistent:</b> Determined attacks against a chosen target to maximize success and maintain long-term access.</li><li><b>Threats:</b> Result of organized, capable, and well-funded attackers (often state-sponsored).</li></ul><p><b>Aim and Techniques:</b></p><ul><li>Aims vary from IP theft to physical disruption of infrastructure (e.g., Stuxnet).</li><li>Techniques include social engineering, <span class="smart-term" data-term-en="Spear-phishing" data-ar="التصيد الرمحي" data-en-def="An email or electronic communications scam targeted towards a specific individual, organization or business.">spear-phishing<span class="smart-term-tooltip"></span></span>, and drive-by-downloads.</li><li>Once initial access is gained, next-tier attack tools are used to maintain and extend access.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تختلف APTs عن الهجمات التقليدية (مثل الديدان العشوائية) في اختيارها الدقيق للأهداف وجهود التطفل الخفية (Stealthy) على مدى فترات طويلة. المهاجم لا يهتم بإصابة ملايين الأجهزة، بل باختراق شبكة شركة معينة أو منشأة حكومية.</p><p>أمثلة بارزة تشمل هجمات</p><ul><li><strong>Aurora</strong>،</li><li><strong>RSA</strong>،</li><li><strong>APT1</strong>،</li><li><strong>و Stuxnet</strong> (الذي استهدف أنظمة التحكم الصناعية).</li></ul></template>
+    <template class="content-en"><p>APTs differ from traditional attacks (like random worms) by their careful target selection and stealthy intrusion efforts over extended periods. The attacker doesn't want to infect millions of PCs; they want to breach a specific corporate or government network.</p><p>High-profile examples include Aurora, RSA, APT1, and Stuxnet (which targeted industrial control systems).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تستخدم هجمات APT عادةً ديدان سريعة الانتشار (Fast-spreading worms)؟</template>
+      <template class="content-en">Why do APT attacks typically not use fast-spreading worms?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الديدان سريعة الانتشار تثير ضجة كبيرة وتلفت انتباه أنظمة كشف التطفل (IDS)، بينما هدف APT هو البقاء متخفياً (Stealthy) لأطول فترة ممكنة.</p></template>
+      <template class="content-en"><p>Because fast-spreading worms are noisy and trigger Intrusion Detection Systems (IDS), whereas the goal of an APT is to remain stealthy and undetected for as long as possible.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="viruses" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الفيروسات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Viruses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الفيروس هو برنامج طفيلي يرفق نفسه ببرنامج آخر، ويمر بأربع مراحل: الكمون، الانتشار، التحفيز، والتنفيذ.</p></template>
+    <template class="content-en"><p>A virus is a parasitic software that attaches to a program, going through four phases: Dormant, Propagation, Triggering, and Execution.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الفيروس هو قطعة من البرامج تصيب البرامج الأخرى عن طريق تعديلها لتشمل نسخة من الفيروس، بحيث يتم تنفيذه سراً عند تشغيل البرنامج المضيف. وهو خاص بنظام التشغيل والأجهزة.</p><p><b>مراحل الفيروس:</b></p><ol><li><b>الكمون (Dormant):</b> خامل.</li><li><b>الانتشار (Propagation):</b> ينسخ نفسه إلى برامج أخرى.</li><li><b>التحفيز (Triggering):</b> يتم تنشيطه لأداء وظائفه.</li><li><b>التنفيذ (Execution):</b> يتم تنفيذ الوظيفة (الحمولة).</li></ol><p><b>مكونات الفيروس:</b> آلية العدوى (تمكن النسخ)، المحفز (الحدث الذي ينشط الحمولة)، والحمولة (ما يفعله الفيروس).</p><p><b>تصنيف الفيروسات حسب الإخفاء:</b></p><ul><li><b>مشفر (Encrypted):</b> المفتاح مخزن في الفيروس.</li><li><b>خفي (Stealth):</b> يخفي نفسه (مثل الضغط).</li><li><b>متعدد الأشكال (Polymorphic):</b> يعيد إنشاء نفسه بتوقيع (Signature) مختلف في كل مرة.</li><li><b>متحول (Metamorphic):</b> يعيد إنشاء نفسه بتوقيع وسلوك مختلفين.</li></ul></template>
+    <template class="content-en"><p>A virus is a piece of software that infects programs by modifying them to include a copy of the virus, executing secretly when the host is run. It is specific to OS and hardware.</p><p><b>Phases:</b></p><ol><li><b>Dormant:</b> idle.</li><li><b>Propagation:</b> copies itself to other programs.</li><li><b>Triggering:</b> activated to perform functions.</li><li><b>Execution:</b> the function is performed.</li></ol><p><b>Components:</b> Infection mechanism (enables replication), Trigger (event that activates payload), Payload (what it does).</p><p><b>Classification by concealment:</b></p><ul><li><b>Encrypted:</b> key stored in virus.</li><li><b>Stealth:</b> hides itself (e.g., compression).</li><li><b>Polymorphic:</b> recreates with a different "signature".</li><li><b>Metamorphic:</b> recreates with different signature AND behavior.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فيروسات الماكرو (Macro Viruses) أصبحت شائعة جداً في منتصف التسعينيات لأنها مستقلة عن المنصة (Platform independent)، تصيب المستندات (مثل ملفات Office)، وتنتشر بسهولة. تستغل قدرات البرمجة (مثل Basic) المدمجة في التطبيقات.</p><p>التدابير المضادة للفيروسات تتطلب الكشف، التحديد، والإزالة. إذا تم الكشف عن الفيروس ولكن تعذر تحديده أو إزالته، يجب التخلص من البرنامج المصاب واستبداله.</p><p>الفيروسات المتحولة (Metamorphic) هي الأصعب في الاكتشاف لأنها تعيد كتابة الكود الخاص بها بالكامل، مما يجعل برامج مكافحة الفيروسات المعتمدة على التوقيعات غير مجدية.</p></template>
+    <template class="content-en"><p>Macro viruses became very common in the mid-1990s because they are platform-independent, infect documents (like Office files), and spread easily by exploiting macro capabilities (often Basic).</p><p>Countermeasures require detection, identification, and removal. If detected but cannot be identified/removed, the infected program must be discarded and replaced.</p><p><span class="smart-term" data-term-en="Metamorphic Virus" data-ar="فيروس متحول" data-en-def="A virus that changes both its signature and its behavior/code structure every time it replicates.">Metamorphic virus<span class="smart-term-tooltip"></span></span>es are the hardest to detect because they completely rewrite their code, rendering signature-based antivirus programs useless.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر فيروسات الماكرو خطيرة رغم أنها لا تصيب الملفات التنفيذية (EXE)؟</template>
+      <template class="content-en">Why are macro viruses dangerous even though they don't infect executable (EXE) files?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تصيب المستندات التي يتم مشاركتها بكثرة بين المستخدمين، وتعمل عبر منصات مختلفة (Windows, Mac) طالما أن التطبيق (مثل Word) يدعم الماكرو.</p></template>
+      <template class="content-en"><p>Because they infect highly shared documents and are platform-independent, working across different OSs as long as the application (like Word) supports macros.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worms-propagation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الديدان ونموذج انتشارها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Worms and Propagation Model</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الدودة هي برنامج مستقل ينسخ نفسه عبر الشبكات مستغلاً الثغرات، وينتشر بسرعة هائلة وفقاً لنموذج وبائي.</p></template>
+    <template class="content-en"><p>A worm is an independent program that replicates across networks by exploiting vulnerabilities, spreading rapidly according to an epidemic model.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الدودة (Worm) هي برنامج متكاثر ينتشر عبر الشبكة (باستخدام البريد الإلكتروني، التنفيذ عن بعد، تسجيل الدخول عن بعد). لها مراحل مشابهة للفيروس (كمون، انتشار، تحفيز، تنفيذ).</p><p>في مرحلة الانتشار، تبحث الدودة عن أنظمة أخرى، تتصل بها، تنسخ نفسها إليها وتعمل. قد تتنكر كعملية نظام (System process).</p><p><b>نموذج انتشار الدودة (النموذج الوبائي الكلاسيكي):</b></p><ul><li>I(t): عدد الأجهزة المصابة في الوقت t.</li><li>S(t): عدد الأجهزة المعرضة للإصابة (غير مصابة بعد).</li><li>β: معدل حدوث العدوى.</li><li>N: حجم المجتمع (N = I(t) + S(t)).</li></ul><p><b>حالة تكنولوجيا الديدان:</b> متعددة المنصات، متعددة الاستغلال (Multi-exploit)، انتشار فائق السرعة، متعددة الأشكال/متحولة، وتستغل ثغرات يوم الصفر (Zero-day exploits).</p></template>
+    <template class="content-en"><p>A worm is a replicating program that propagates over the net (using email, remote exec, remote login). It has phases like a virus (dormant, propagation, triggering, execution).</p><p>In the propagation phase, it searches for other systems, connects to them, copies itself, and runs. It may disguise itself as a system process.</p><p><b>Worm Propagation Model (Classic Epidemic Model):</b></p><ul><li>I(t) = no. of infected individuals at time t.</li><li>S(t) = no. of susceptible individuals at time t.</li><li>β = rate at which infection occurs.</li><li>N = population size, N = I(t) + S(t).</li></ul><p><b>State of Worm Tech:</b> Multiplatform, multi-exploit, ultrafast spreading, polymorphic/metamorphic, and utilizes <span class="smart-term" data-term-en="Zero-day exploit" data-ar="استغلال ثغرة يوم الصفر" data-en-def="Exploiting an unknown vulnerability that is only discovered by the network community when the attack is launched.">zero-day exploit<span class="smart-term-tooltip"></span></span>s.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>دودة موريس (Morris Worm) عام 1988 هي واحدة من أشهر الديدان، استغلت ثغرات في أنظمة UNIX (مثل بروتوكول finger و sendmail) وتسببت في خسائر بالملايين.</p><p>منحنى انتشار الدودة يأخذ شكل حرف S (Logistic curve):</p><ul><li><strong>يبدأ بمرحلة بداية بطيئة (Slow start)</strong>،</li><li><strong>ثم مرحلة انتشار سريع (Fast spread)</strong> حيث يرتفع عدد الإصابات بشكل أسي،</li><li><strong>وأخيراً مرحلة نهاية بطيئة (Slow finish)</strong> عندما تقل الأجهزة القابلة للإصابة.</li></ul><p>التدابير المضادة تشمل</p><ul><li><strong>تصفية فحص الديدان بناءً على التوقيع</strong>،</li><li><strong>احتواء الدودة بناءً على الفلتر أو تصنيف الحمولة</strong>،</li><li><strong>والحد من معدل حركة المرور الصادرة (Rate limiting)</strong>.</li></ul></template>
+    <template class="content-en"><p>The Morris Worm (1988) is one of the best known, exploiting UNIX bugs (finger protocol, sendmail) and causing millions in damage.</p><p>The worm propagation curve is S-shaped (logistic):</p><ul><li><strong>a slow start phase</strong>,</li><li><strong>a fast spread phase (exponential growth)</strong>,</li><li><strong>and a slow finish phase</strong> as susceptible hosts run out.</li></ul><p>Countermeasures include</p><ul><li><strong>signature-based scan filtering</strong>,</li><li><strong>filter/payload-based containment</strong>,</li><li><strong>and <span class="smart-term" data-term-en="Rate limiting" data-ar="تحديد المعدل" data-en-def="A worm countermeasure that limits outgoing traffic when a threshold is met to slow down propagation.">rate limiting<span class="smart-term-tooltip"></span></span>/halting outgoing traffic</strong> when a threshold is met.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>المعادلة التفاضلية للنموذج الوبائي الكلاسيكي لانتشار الديدان.</strong></template>
+      <template class="content-en"><strong>Differential equation for the classic epidemic model of worm propagation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\frac{dI(t)}{dt} = \beta I(t) S(t)$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Create a line graph showing the 'Worm Propagation Model'. X-axis is 'Time', Y-axis is 'Rate of infection' (0 to 1.0). Draw two curves. Curve 1 (Fraction of hosts infected) starts at 0, grows exponentially (S-curve), and plateaus at 1.0. Curve 2 (Fraction of hosts not infected) starts at 1.0, decays exponentially, and plateaus at 0. Label three phases at the top: 'Slow start phase', 'Fast spread phase', 'Slow finish phase'. Style: educational, dark background #0d1117, accent colors #00ff00 (infected) and #ff0000 (not infected). -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Fast Spread Phase Highlight -->
+  <rect x="250" y="140" width="300" height="300" fill="var(--brand-500)" opacity="0.05" />
+
+  <!-- Grid Lines -->
+  <line x1="100" y1="140" x2="700" y2="140" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="100" y1="290" x2="700" y2="290" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4,4" />
+
+  <!-- Phase Dividers -->
+  <line x1="250" y1="140" x2="250" y2="440" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="6,4" />
+  <line x1="550" y1="140" x2="550" y2="440" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Worm Propagation Model</text>
+  <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">نموذج انتشار الدودة</text>
+
+  <!-- Legend -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-primary)">
+    <!-- Infected I(t) -->
+    <line x1="140" y1="70" x2="170" y2="70" stroke="var(--brand-500)" stroke-width="4" />
+    <text x="225" y="75" text-anchor="middle" class="gsvg-en">Infected I(t)</text>
+    <text x="225" y="75" text-anchor="middle" class="gsvg-ar">المصابة I(t)</text>
+
+    <!-- Susceptible S(t) -->
+    <line x1="330" y1="70" x2="360" y2="70" stroke="var(--brand-300)" stroke-width="4" stroke-dasharray="6,3" />
+    <text x="435" y="75" text-anchor="middle" class="gsvg-en">Susceptible S(t)</text>
+    <text x="435" y="75" text-anchor="middle" class="gsvg-ar">المعرضة S(t)</text>
+
+    <!-- Total N -->
+    <text x="640" y="75" text-anchor="middle" fill="var(--text-muted)" class="gsvg-en">Total Hosts N = I(t) + S(t)</text>
+    <text x="640" y="75" text-anchor="middle" fill="var(--text-muted)" class="gsvg-ar">إجمالي الأجهزة N = I(t) + S(t)</text>
+  </g>
+
+  <!-- Phase Labels -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)">
+    <text x="175" y="120" text-anchor="middle" class="gsvg-en">Slow start phase</text>
+    <text x="175" y="120" text-anchor="middle" class="gsvg-ar">مرحلة البداية البطيئة</text>
+
+    <text x="400" y="120" text-anchor="middle" class="gsvg-en">Fast spread phase</text>
+    <text x="400" y="120" text-anchor="middle" class="gsvg-ar">مرحلة الانتشار السريع</text>
+
+    <text x="625" y="120" text-anchor="middle" class="gsvg-en">Slow finish phase</text>
+    <text x="625" y="120" text-anchor="middle" class="gsvg-ar">مرحلة النهاية البطيئة</text>
+  </g>
+
+  <!-- Axes -->
+  <line x1="100" y1="440" x2="720" y2="440" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)" />
+  <line x1="100" y1="440" x2="100" y2="120" stroke="var(--text-secondary)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Axis Labels -->
+  <text x="400" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Time (t)</text>
+  <text x="400" y="485" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الزمن (t)</text>
+
+  <g transform="translate(45, 290) rotate(-90)">
+    <text x="0" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Rate of infection</text>
+    <text x="0" y="0" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">معدل الإصابة</text>
+  </g>
+
+  <!-- Y-Axis Ticks -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" text-anchor="end">
+    <text x="90" y="145">1.0</text>
+    <text x="90" y="295">0.5</text>
+    <text x="90" y="445">0.0</text>
+  </g>
+
+  <!-- Curves -->
+  <!-- Susceptible S(t) -->
+  <path d="M 100 140 C 450 140, 350 440, 700 440" fill="none" stroke="var(--brand-300)" stroke-width="4" stroke-dasharray="8,4" />
+  
+  <!-- Infected I(t) -->
+  <path d="M 100 440 C 450 440, 350 140, 700 140" fill="none" stroke="var(--brand-500)" stroke-width="4" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر استغلال "يوم الصفر" (Zero-day) خطيراً جداً عند استخدامه بواسطة دودة؟</template>
+      <template class="content-en">Why is a zero-day exploit so dangerous when used by a worm?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه لا يوجد تصحيح (Patch) أو توقيع (Signature) متاح للدفاع ضد الثغرة وقت إطلاق الدودة، مما يسمح لها بالانتشار السريع دون عوائق.</p></template>
+      <template class="content-en"><p>Because there is no patch or signature available to defend against the vulnerability at the time the worm is launched, allowing it to spread rapidly unhindered.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="client-side-vulnerabilities" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> ثغرات جانب العميل والتعليمات البرمجية المتنقلة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Client-Side Vulnerabilities and Mobile Code</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تستغل الهجمات الحديثة متصفحات المستخدمين عبر تقنيات مثل التنزيل التلقائي، هجمات حفرة المياه، واختطاف النقرات.</p></template>
+    <template class="content-en"><p>Modern attacks exploit user browsers via techniques like drive-by-downloads, watering-hole attacks, and clickjacking.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التعليمات البرمجية المتنقلة (Mobile Code):</b> برامج تُنقل من نظام بعيد إلى نظام محلي وتُنفذ عليه (مثل JavaScript, ActiveX). يمكن أن تعمل كوكيل للفيروسات وأحصنة طروادة.</p><p><b>ثغرات جانب العميل:</b></p><ul><li><b><span class="smart-term" data-term-en="Drive-by-download" data-ar="التنزيل التلقائي" data-en-def="Malware infection that occurs simply by visiting a compromised website, without the user actively clicking download.">التنزيل التلقائي<span class="smart-term-tooltip"></span></span> (Drive-by-downloads):</b> يستغل ثغرات المتصفح والإضافات عندما يزور المستخدم موقعاً يتحكم فيه المهاجم.</li><li><b>هجمات حفرة المياه (Watering-Hole Attacks):</b> يدرس المهاجم المواقع التي يزورها الضحايا المستهدفون، يكتشف ثغراتها، يخترقها، وينتظر زيارة الضحية.</li><li><b>الإعلانات الخبيثة (Malvertising):</b> يدفع المهاجم لوضع إعلانات تحتوي على برمجيات خبيثة في مواقع شرعية.</li><li><b><span class="smart-term" data-term-en="Clickjacking" data-ar="اختطاف النقرات" data-en-def="A UI redress attack where an attacker uses transparent layers to trick a user into clicking on a button or link on another page.">اختطاف النقرات<span class="smart-term-tooltip"></span></span> (Clickjacking / UI Redress):</b> وضع زر شفاف فوق زر شرعي لخداع المستخدم للنقر على رابط خفي، أو اختطاف ضغطات المفاتيح (Keystrokes) إلى إطار غير مرئي.</li></ul></template>
+    <template class="content-en"><p><b>Mobile Code:</b> Programs transmitted from a remote system to a local system and executed there (e.g., JavaScript, ActiveX). Can act as agents for viruses and Trojans.</p><p><b>Client-Side Vulnerabilities:</b></p><ul><li><b><span class="smart-term" data-term-en="Drive-by-download" data-ar="التنزيل التلقائي" data-en-def="Malware infection that occurs simply by visiting a compromised website, without the user actively clicking download.">Drive-by-download<span class="smart-term-tooltip"></span></span>s:</b> Exploits browser/plugin vulnerabilities when a user visits a compromised website.</li><li><b>Watering-Hole Attacks:</b> Attacker studies intended victims, compromises the websites they frequently visit, and waits for them to visit.</li><li><b>Malvertising:</b> Attacker pays for ads on legitimate sites that incorporate malware.</li><li><b><span class="smart-term" data-term-en="Clickjacking" data-ar="اختطاف النقرات" data-en-def="A UI redress attack where an attacker uses transparent layers to trick a user into clicking on a button or link on another page.">Clickjacking<span class="smart-term-tooltip"></span></span> (UI Redress):</b> Placing a transparent button over a legitimate one to trick users, or hijacking keystrokes into an invisible frame.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهندسة الاجتماعية (Social Engineering) تلعب دوراً كبيراً هنا، حيث يتم خداع المستخدمين للمساعدة في اختراق أنظمتهم. البريد المزعج (Spam) هو ناقل رئيسي للبرمجيات الخبيثة ويستخدم في هجمات التصيد (Phishing).</p><p>التصيد الرمحي (Spear Phishing) أكثر خطورة لأنه يستهدف شخصاً بعينه؛ يدرس المهاجم الهدف بعناية ويصيغ رسالة بريد إلكتروني تبدو موثوقة جداً.</p><p>ديدان الهواتف المحمولة تنتشر عبر البلوتوث أو رسائل MMS (مثل CommWarrior)، ويمكنها تعطيل الهاتف أو إرسال رسائل مكلفة.</p></template>
+    <template class="content-en"><p>Social Engineering plays a huge role, tricking users to assist in compromising their own systems. Spam is a significant carrier of malware and used for phishing.</p><p>Spear Phishing is highly dangerous as it targets a specific individual; the attacker studies the target and crafts a highly convincing email.</p><p>Mobile phone worms spread via Bluetooth or MMS (e.g., CommWarrior), capable of disabling the phone or sending costly messages.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا سُمي هجوم "حفرة المياه" بهذا الاسم؟</template>
+      <template class="content-en">Why is the "Watering-Hole" attack named this way?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تشبيهاً بالحيوانات المفترسة في الطبيعة التي تنتظر فريستها عند حفرة المياه التي تعتاد الشرب منها، بدلاً من مطاردتها.</p></template>
+      <template class="content-en"><p>It is an analogy to predators in nature that wait for their prey at a watering hole they frequently visit, rather than hunting them down.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="malware-payloads" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">12</span> حمولات البرمجيات الخبيثة (Payloads)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">12</span> Malware Payloads</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الحمولة هي الإجراء الخبيث الذي ينفذه البرنامج بعد الإصابة، مثل تدمير البيانات، التشفير لطلب فدية، أو فتح أبواب خلفية.</p></template>
+    <template class="content-en"><p>The payload is the malicious action the malware performs after infection, such as data destruction, ransomware encryption, or opening backdoors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بمجرد تنشيط البرمجيات الخبيثة، فإن القلق التالي هو الحمولة (Payload) التي تحملها:</p><ul><li><b>فساد النظام (System Corruption):</b><ul><li><b>تدمير البيانات:</b> مثل فيروس تشيرنوبيل الذي يكتب أصفاراً على القرص الصلب.</li><li><b><span class="smart-term" data-term-en="Ransomware" data-ar="برامج الفدية" data-en-def="Malware that encrypts user data and demands payment in order to access the key needed to recover the information.">برامج الفدية<span class="smart-term-tooltip"></span></span> (Ransomware):</b> تشفر بيانات المستخدم وتطلب الدفع للوصول إلى المفتاح.</li><li><b>أضرار مادية:</b> مثل دودة Stuxnet التي أتلفت أنظمة التحكم الصناعية.</li></ul></li><li><b>وكلاء الهجوم (Attack Agents - Bots):</b> السيطرة على الجهاز لاستخدامه في هجمات حجب الخدمة الموزعة (DDoS)، إرسال البريد المزعج، أو سرقة حركة المرور (Botnet).</li><li><b>سرقة المعلومات:</b> عبر مسجلات المفاتيح (Keyloggers) وبرامج التجسس (Spyware).</li><li><b>التخفي (Stealth):</b><ul><li><b>الباب الخلفي (Backdoor):</b> نقطة دخول سرية تتجاوز إجراءات الأمان.</li><li><b><span class="smart-term" data-term-en="Rootkit" data-ar="مجموعة أدوات الجذر" data-en-def="A set of hidden programs installed to acquire administrative access and hide their existence by subverting OS reporting mechanisms.">مجموعة أدوات الجذر<span class="smart-term-tooltip"></span></span> (Rootkit):</b> برامج مخفية للحصول على وصول إداري، تخفي وجودها عن طريق تخريب آليات إعداد التقارير في نظام التشغيل.</li></ul></li></ul></template>
+    <template class="content-en"><p>Once malware is activated, the next concern is its payload:</p><ul><li><b>System Corruption:</b><ul><li><b>Data Destruction:</b> e.g., Chernobyl virus overwriting the hard drive with zeroes.</li><li><b><span class="smart-term" data-term-en="Ransomware" data-ar="برامج الفدية" data-en-def="Malware that encrypts user data and demands payment in order to access the key needed to recover the information.">Ransomware<span class="smart-term-tooltip"></span></span>:</b> Encrypts user data and demands payment for the key.</li><li><b>Real-World Damage:</b> e.g., Stuxnet corrupting industrial control systems.</li></ul></li><li><b>Attack Agents (Bots):</b> Taking over the computer to launch DDoS attacks, spam, or sniff traffic (Botnet).</li><li><b>Information Theft:</b> Via Keyloggers and Spyware.</li><li><b>Stealth:</b><ul><li><b>Backdoor (Trapdoor):</b> Secret entry point bypassing security.</li><li><b><span class="smart-term" data-term-en="Rootkit" data-ar="مجموعة أدوات الجذر" data-en-def="A set of hidden programs installed to acquire administrative access and hide their existence by subverting OS reporting mechanisms.">Rootkit<span class="smart-term-tooltip"></span></span>:</b> Hidden programs to acquire administrative access, hiding existence by subverting OS report mechanisms.</li></ul></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مجموعات أدوات الجذر (Rootkits) خطيرة بشكل خاص لأنها لا تعتمد على الثغرات الأمنية بمجرد تثبيتها، بل تقوم بتعديل نواة نظام التشغيل (Kernel) أو هياكل البيانات الأساسية لإخفاء العمليات والملفات ومفاتيح التسجيل الخاصة بها. يمكن أن تكون مستمرة (تنجو من إعادة التشغيل) أو تعتمد على الذاكرة فقط.</p><p>برامج الفدية الحديثة تستخدم تشفير المفتاح العام (Public-key encryption) بمفاتيح كبيرة جداً، مما يجعل استعادة البيانات دون دفع الفدية (أو امتلاك نسخ احتياطية غير متصلة بالشبكة) أمراً شبه مستحيل رياضياً.</p></template>
+    <template class="content-en"><p>Rootkits are particularly dangerous because, once installed, they don't rely on vulnerabilities. They modify the OS kernel or core data structures to hide their processes, files, and registry keys. They can be persistent (survive reboot) or memory-based.</p><p>Modern ransomware uses public-key encryption with very large keys, making data recovery without paying the ransom (or having offline backups) mathematically near-impossible.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف الباب الخلفي (Backdoor) عن مجموعة أدوات الجذر (Rootkit)؟</template>
+      <template class="content-en">How does a Backdoor differ from a Rootkit?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الباب الخلفي هو مجرد نقطة دخول سرية للنظام، بينما مجموعة أدوات الجذر هي مجموعة برامج مصممة لإخفاء وجود المهاجم والحفاظ على صلاحيات الإدارة (Root) عن طريق التلاعب بنظام التشغيل نفسه.</p></template>
+      <template class="content-en"><p>A backdoor is simply a secret entry point into a system, whereas a rootkit is a suite of tools designed to hide the attacker's presence and maintain root privileges by subverting the OS itself.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="malware-countermeasures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">13</span> التدابير المضادة للبرمجيات الخبيثة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">13</span> Malware Countermeasures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أفضل دفاع هو الوقاية، ولكن عند فشلها نعتمد على برامج مكافحة الفيروسات، تحليل وضع الحماية (Sandbox)، وحظر السلوك.</p></template>
+    <template class="content-en"><p>Prevention is the best defense, but when it fails, we rely on antivirus software, sandbox analysis, and behavior blocking.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>عناصر الوقاية:</b> السياسة، الوعي، التخفيف من الثغرات، والتخفيف من التهديدات. إذا فشلت الوقاية، نلجأ إلى: الكشف، التحديد، والإزالة.</p><p><b>أجيال برامج مكافحة الفيروسات:</b></p><ol><li><b>الجيل الأول (الماسحات البسيطة):</b> تتطلب توقيعاً (Signature) للبرامج الخبيثة (مقتصرة على البرامج المعروفة).</li><li><b>الجيل الثاني (الماسحات الاستدلالية - Heuristic):</b> تستخدم قواعد للبحث عن الحالات المحتملة، أو التحقق من السلامة.</li><li><b>الجيل الثالث (فخاخ النشاط - Activity traps):</b> برامج مقيمة في الذاكرة تحدد البرامج الخبيثة من خلال أفعالها وليس بنيتها.</li><li><b>الجيل الرابع (حماية كاملة الميزات):</b> حزم تجمع بين التقنيات السابقة والتحكم في الوصول.</li></ol><p><b><span class="smart-term" data-term-en="Sandbox Analysis" data-ar="تحليل وضع الحماية" data-en-def="Running potentially malicious code inside an isolated, emulated environment to observe its behavior safely.">تحليل وضع الحماية<span class="smart-term-tooltip"></span></span> (Sandbox Analysis):</b> تشغيل الكود المشبوه داخل بيئة محاكاة أو آلة افتراضية لمراقبة سلوكه دون الإضرار بالنظام الحقيقي (يساعد في كشف الفيروسات المتحولة).</p></template>
+    <template class="content-en"><p><b>Elements of prevention:</b> Policy, Awareness, Vulnerability mitigation, Threat mitigation. If prevention fails: Detection, Identification, Removal.</p><p><b>Antivirus Generations:</b></p><ol><li><b>First gen (simple scanners):</b> Require a malware signature (limited to known malware).</li><li><b>Second gen (<span class="smart-term" data-term-en="Heuristic Scanner" data-ar="الماسح الاستدلالي" data-en-def="Antivirus technology that uses rules and algorithms to look for commands which may indicate malicious intent, rather than relying on exact signatures.">heuristic scanner<span class="smart-term-tooltip"></span></span>s):</b> Uses rules to search for probable instances, or integrity checking.</li><li><b>Third gen (activity traps):</b> Memory-resident programs identify malware by actions rather than structure.</li><li><b>Fourth gen (full-featured):</b> Packages combining various techniques and access control.</li></ol><p><b><span class="smart-term" data-term-en="Sandbox Analysis" data-ar="تحليل وضع الحماية" data-en-def="Running potentially malicious code inside an isolated, emulated environment to observe its behavior safely.">Sandbox Analysis<span class="smart-term-tooltip"></span></span>:</b> Running potentially malicious code inside an emulated sandbox or VM to closely observe its behavior without threatening the real system (enables detection of metamorphic malware).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><ul><li><b>برامج حظر السلوك المستندة إلى المضيف (Host-Based Behavior-Blocking):</b> تتكامل مع نظام التشغيل وتراقب سلوك البرنامج في الوقت الفعلي لحظر الإجراءات الخبيثة. العيب الرئيسي: نظراً لأن الكود يجب أن يعمل على الجهاز المستهدف لتحديد سلوكه، فقد يتسبب في ضرر قبل اكتشافه وحظره.</li><li><b>نهج المسح المحيطي (Perimeter Scanning):</b> استخدام برامج مكافحة الفيروسات في جدران الحماية (Firewalls) وأنظمة كشف التطفل (IDS). يشمل<ul><li><strong>شاشات الدخول (Ingress)</strong> على حدود الشبكة،</li><li><strong>وشاشات الخروج (Egress)</strong> لمراقبة حركة المرور الصادرة.</li></ul></li></ul></template>
+    <template class="content-en"><p><b>Host-Based Behavior-Blocking Software:</b> Integrates with the host OS to monitor behavior in real-time and block malicious actions. Shortcoming: Because the code must run on the target machine before behaviors are identified, it can cause harm before being blocked.</p><p><b>Perimeter Scanning Approaches:</b> Including AV in firewalls and IDS. Uses Ingress monitors (at the border entering the network) and Egress monitors (monitoring outgoing traffic to catch internal infections calling out).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو التحدي التصميمي الرئيسي في تحليل وضع الحماية (Sandbox)؟</template>
+      <template class="content-en">What is a major design challenge in Sandbox Analysis?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تحديد المدة التي يجب أن يستمر فيها تشغيل الكود (التفسير)، حيث قد تبرمج البرمجيات الخبيثة نفسها للبقاء خاملة لفترة طويلة داخل الـ Sandbox لتجنب الاكتشاف.</p></template>
+      <template class="content-en"><p>Determining how long to run each interpretation, as malware might be programmed to remain dormant for a long time inside the sandbox to evade detection.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه المراجعة السريعة للوحدة الرابعة. هذه الوحدة تنقسم إلى شقين رئيسيين: أمن قواعد البيانات، والبرمجيات الخبيثة. في الشق الأول، تذكروا دائماً أن قواعد البيانات تحتاج حماية خاصة تتجاوز نظام التشغيل لأنها تحتوي على علاقات معقدة. ركزوا جداً على 'هجمات الاستدلال' (Inference Attacks) وكيف يمكن للمهاجم استنتاج راتبك من خلال استعلامات إحصائية بريئة ظاهرياً (مثل هجوم المتتبع). الحل الحديث لذلك هو 'الخصوصية التفاضلية'. في الشق الثاني، البرمجيات الخبيثة، الامتحان يحب المقارنات! اعرفوا الفرق الدقيق بين الفيروس (يحتاج مضيف) والدودة (مستقلة وتنتشر كالوباء). لا تخلطوا بين الـ Rootkit (الذي يخفي نفسه بتعديل نظام التشغيل) والـ Backdoor (مجرد باب خلفي). وأخيراً، افهموا لماذا تعتبر هجمات APT خطيرة: إنها هادئة، ممولة جيداً، وتبقى في نظامك لسنوات. ركزوا على هذه المفاهيم وستكونون في أمان تام في الامتحان!</template>
+    <template class="content-en">Welcome everyone to this quick review of Module 4. This module is split into two main parts: Database Security and Malware. For the first part, always remember that databases need specific protection beyond the OS because of their complex relationships. Focus heavily on 'Inference Attacks' and how an attacker can deduce your salary through seemingly innocent statistical queries (like the Tracker Attack). The modern solution to this is 'Differential Privacy'. In the second part, Malware, the exam loves comparisons! Know the exact difference between a Virus (needs a host) and a Worm (independent, spreads like an epidemic). Don't confuse a Rootkit (hides by modifying the OS) with a Backdoor (just a secret entry). Finally, understand why APTs are so dangerous: they are quiet, well-funded, and stay in your system for years. Focus on these concepts and you'll do great on the exam!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي بصلاحيات نظام التشغيل لحماية قاعدة البيانات؟</template>
+          <template class="content-en">Why can't we just rely on OS permissions to protect a database?</template>
+          <span class="content-target">لماذا لا نكتفي بصلاحيات نظام التشغيل لحماية قاعدة البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن نظام التشغيل يتعامل مع قاعدة البيانات كملف واحد كبير. نحن نحتاج إلى تحكم دقيق (Granular) على مستوى الجداول، السجلات، وحتى الحقول الفردية، وهو ما يوفره DBMS فقط.</template>
+          <template class="content-en">Because the OS treats the database as one large file. We need granular control at the level of tables, records, and even individual fields, which only a DBMS can provide.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة الاستدلال (Inference Problem) باختصار؟</template>
+          <template class="content-en">What is the Inference Problem in short?</template>
+          <span class="content-target">ما هي مشكلة الاستدلال (Inference Problem) باختصار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي قدرة المهاجم على استنتاج معلومات سرية (مثل راتب شخص) من خلال طرح أسئلة عامة ومسموحة (مثل متوسط رواتب قسم معين).</template>
+          <template class="content-en">It is the attacker's ability to deduce confidential information (like a person's salary) by asking general, allowed questions (like the average salary of a specific department).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل التحديث ثنائي الطور (Two-Phase Update) مشكلة انقطاع الكهرباء أثناء معاملة بنكية؟</template>
+          <template class="content-en">How does Two-Phase Update solve the issue of a power outage during a bank transaction?</template>
+          <span class="content-target">كيف يحل التحديث ثنائي الطور (Two-Phase Update) مشكلة انقطاع الكهرباء أثناء معاملة بنكية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يضمن أن العملية 'ذرية' (Atomic). في المرحلة الأولى يجهز كل التغييرات في حقول ظل، وفي المرحلة الثانية يطبقها دفعة واحدة. إذا انقطعت الكهرباء في المرحلة الأولى، لا يتغير شيء. إما أن تكتمل العملية 100% أو تُلغى 100%.</template>
+          <template class="content-en">It ensures the operation is 'atomic'. In phase 1, it prepares all changes in shadow fields, and in phase 2, it applies them all at once. If power fails in phase 1, nothing changes. It's either 100% complete or 100% rolled back.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو هجوم المتتبع (Tracker Attack)؟</template>
+          <template class="content-en">What is a Tracker Attack?</template>
+          <span class="content-target">ما هو هجوم المتتبع (Tracker Attack)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا منعتك قاعدة البيانات من الاستعلام عن مجموعة صغيرة جداً من السجلات، يمكنك استخدام استعلام 'متتبع' يطابق مجموعة كبيرة مسموحة، ثم تستخدم الجبر البسيط لطرح المجموعات من بعضها للوصول للبيانات المحظورة.</template>
+          <template class="content-en">If the database blocks you from querying a very small set of records, you use a 'tracker' query that matches a large, allowed set, then use simple algebra to subtract sets from each other to reach the forbidden data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا فشلت أنظمة الأمن متعدد المستويات (MLS) تجارياً؟</template>
+          <template class="content-en">Why did Multilevel Security (MLS) systems fail commercially?</template>
+          <span class="content-target">لماذا فشلت أنظمة الأمن متعدد المستويات (MLS) تجارياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب النفقات العامة (Overhead) الهائلة. فصل البيانات وتشفيرها بناءً على مستويات الأمان جعل قواعد البيانات بطيئة جداً ومعقدة في الإدارة.</template>
+          <template class="content-en">Due to massive overhead. Separating and encrypting data based on security levels made databases extremely slow and complex to manage.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين الفيروس متعدد الأشكال (Polymorphic) والمتحول (Metamorphic)؟</template>
+          <template class="content-en">What is the difference between a Polymorphic and a Metamorphic virus?</template>
+          <span class="content-target">ما هو الفرق بين الفيروس متعدد الأشكال (Polymorphic) والمتحول (Metamorphic)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">متعدد الأشكال يغير شكله الخارجي (التوقيع/التشفير) لكن الكود الداخلي ثابت. المتحول يعيد كتابة الكود الداخلي بالكامل في كل مرة، مما يجعله أصعب بكثير في الاكتشاف.</template>
+          <template class="content-en">Polymorphic changes its outer appearance (signature/encryption) but the internal code is static. Metamorphic completely rewrites its internal code every time, making it much harder to detect.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر هجمات APT مرعبة للشركات الكبرى؟</template>
+          <template class="content-en">Why are APT attacks terrifying for large corporations?</template>
+          <span class="content-target">لماذا تعتبر هجمات APT مرعبة للشركات الكبرى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها لا تهدف للتخريب السريع. المهاجمون (غالباً دول) يخترقون الشبكة بهدوء، ويبقون متخفين لشهور أو سنوات لسرقة أسرار صناعية دون أن يلاحظهم أحد.</template>
+          <template class="content-en">Because they don't aim for quick destruction. Attackers (often nation-states) breach the network quietly and remain stealthy for months or years to steal industrial secrets unnoticed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل هجوم اختطاف النقرات (Clickjacking)؟</template>
+          <template class="content-en">How does a Clickjacking attack work?</template>
+          <span class="content-target">كيف يعمل هجوم اختطاف النقرات (Clickjacking)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يضع المهاجم طبقة شفافة غير مرئية فوق موقع شرعي. عندما تظن أنك تنقر على زر 'تشغيل الفيديو'، أنت في الواقع تنقر على الزر المخفي الذي قد يحذف حسابك أو يرسل أموالاً.</template>
+          <template class="content-en">The attacker places an invisible transparent layer over a legitimate site. When you think you are clicking 'Play Video', you are actually clicking the hidden button that might delete your account or send money.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي خطورة الـ Rootkit مقارنة بالبرمجيات الخبيثة العادية؟</template>
+          <template class="content-en">What is the danger of a Rootkit compared to regular malware?</template>
+          <span class="content-target">ما هي خطورة الـ Rootkit مقارنة بالبرمجيات الخبيثة العادية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الـ Rootkit يعدل نواة نظام التشغيل (Kernel) نفسه. لذلك، إذا سأل برنامج مكافحة الفيروسات نظام التشغيل 'هل هناك ملفات خبيثة؟'، سيكذب نظام التشغيل ويقول 'لا'، لأن الـ Rootkit تلاعب بآلية الإبلاغ.</template>
+          <template class="content-en">A Rootkit modifies the OS Kernel itself. So, if the antivirus asks the OS 'Are there malicious files?', the OS will lie and say 'No', because the Rootkit subverted the reporting mechanism.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لم تعد برامج مكافحة الفيروسات من الجيل الأول (الماسحات البسيطة) مفيدة اليوم؟</template>
+          <template class="content-en">Why are first-generation antivirus programs (simple scanners) no longer useful today?</template>
+          <span class="content-target">لماذا لم تعد برامج مكافحة الفيروسات من الجيل الأول (الماسحات البسيطة) مفيدة اليوم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تعتمد على 'التوقيعات' (Signatures) المعروفة مسبقاً. اليوم، البرمجيات الخبيثة تتغير باستمرار (متحولة) وتستخدم ثغرات 'يوم الصفر' التي لا يوجد لها توقيع بعد.</template>
+          <template class="content-en">Because they rely on pre-known 'signatures'. Today, malware constantly changes (metamorphic) and uses 'zero-day' exploits for which no signature exists yet.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "نظام إدارة قواعد البيانات (DBMS)",
+      "en": "DBMS"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج يوفر الدعم للاستعلامات وإدارة قواعد البيانات.",
+        "en": "Software that provides support for queries and management of databases."
+      },
+      "example": {
+        "ar": "MySQL, Oracle, SQL Server.",
+        "en": "MySQL, Oracle, SQL Server."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "التحديث ثنائي الطور (Two-Phase Update)",
+      "en": "Two-Phase Update"
+    },
+    "back": {
+      "definition": {
+        "ar": "بروتوكول يضمن تنفيذ مجموعة من العمليات إما بالكامل أو عدم تنفيذها إطلاقاً للحفاظ على السلامة.",
+        "en": "A protocol ensuring a set of operations are performed entirely or not at all to maintain integrity."
+      },
+      "example": {
+        "ar": "استخدام حقول الظل لجمع التغييرات قبل جعلها دائمة.",
+        "en": "Using shadow fields to gather changes before making them permanent."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "السلامة المرجعية (Referential Integrity)",
+      "en": "Referential Integrity"
+    },
+    "back": {
+      "definition": {
+        "ar": "تضمن عدم وجود مفاتيح أجنبية معلقة في قاعدة البيانات.",
+        "en": "Ensures there are no dangling foreign keys in the database."
+      },
+      "example": {
+        "ar": "لكل رمز بريدي في جدول الأسماء، يجب أن يكون هناك إدخال في جدول الرموز البريدية.",
+        "en": "For each zip in NAME-ZIP, there must be an entry in ZIP-AIRPORT."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "هجوم الاستدلال (Inference Attack)",
+      "en": "Inference Attack"
+    },
+    "back": {
+      "definition": {
+        "ar": "استنتاج بيانات حساسة من بيانات يُفترض أنها غير حساسة.",
+        "en": "Derivation of sensitive data from supposedly non-sensitive data."
+      },
+      "example": {
+        "ar": "استخدام استعلامات المجموع (SUM) والعدد (COUNT) لمعرفة راتب شخص معين.",
+        "en": "Using SUM and COUNT queries to figure out a specific person's salary."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "هجوم المتتبع (Tracker Attack)",
+      "en": "Tracker Attack"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام استعلامات مسموحة رياضياً لاستنتاج نتيجة استعلام محظور بواسطة DBMS.",
+        "en": "Using mathematically allowed queries to deduce the result of a query forbidden by the DBMS."
+      },
+      "example": {
+        "ar": "استخدام استعلام يطابق بين 2k و N-2k سجل للالتفاف على قيود الحجم.",
+        "en": "Using a query matching between 2k and N-2k records to bypass size restrictions."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "الخصوصية التفاضلية (Differential Privacy)",
+      "en": "Differential Privacy"
+    },
+    "back": {
+      "definition": {
+        "ar": "ضمان ألا تعتمد الاستجابة للاستعلام على وجود فرد معين في مجموعة البيانات، غالباً بإضافة ضوضاء.",
+        "en": "Ensuring a query response doesn't depend on an individual being in the dataset, often by adding noise."
+      },
+      "example": {
+        "ar": "إضافة قيمة عشوائية صغيرة لمتوسط الرواتب قبل عرضه.",
+        "en": "Adding a small random value to the average salary before displaying it."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "طرق العرض (Views)",
+      "en": "Views"
+    },
+    "back": {
+      "definition": {
+        "ar": "قاعدة بيانات منطقية تمثل مجموعة فرعية من قاعدة بيانات أخرى، تستخدم للتحكم في الوصول.",
+        "en": "A logical database representing a subset of another database, used for access control."
+      },
+      "example": {
+        "ar": "إخفاء عمود الراتب عن الموظفين العاديين باستخدام View.",
+        "en": "Hiding the salary column from regular employees using a View."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "البرمجيات الخبيثة (Malware)",
+      "en": "Malware"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج يُدرج سراً بقصد المساس بسرية أو سلامة أو توافر النظام.",
+        "en": "A program inserted covertly with the intent of compromising system confidentiality, integrity, or availability."
+      },
+      "example": {
+        "ar": "الفيروسات، الديدان، أحصنة طروادة.",
+        "en": "Viruses, worms, Trojans."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "القنبلة المنطقية (Logic Bomb)",
+      "en": "Logic Bomb"
+    },
+    "back": {
+      "definition": {
+        "ar": "كود خبيث ينفجر (ينشط) عند حدوث شرط معين.",
+        "en": "Malicious code that 'explodes' (activates) when a specific condition occurs."
+      },
+      "example": {
+        "ar": "حذف الملفات إذا لم يقم المبرمج بتسجيل الدخول لمدة 30 يوماً.",
+        "en": "Deleting files if the programmer hasn't logged in for 30 days."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "التهديد المستمر المتقدم (APT)",
+      "en": "APT"
+    },
+    "back": {
+      "definition": {
+        "ar": "هجوم ممول جيداً ومستمر يستهدف جهة معينة ويبقى متخفياً لفترات طويلة.",
+        "en": "A well-resourced, persistent attack targeting a specific entity and remaining stealthy over extended periods."
+      },
+      "example": {
+        "ar": "هجوم Stuxnet على المنشآت النووية.",
+        "en": "The Stuxnet attack on nuclear facilities."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "فيروس متعدد الأشكال (Polymorphic Virus)",
+      "en": "Polymorphic Virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يعيد إنشاء نفسه بتوقيع مختلف في كل مرة لتجنب الاكتشاف.",
+        "en": "A virus that recreates itself with a different signature each time to evade detection."
+      },
+      "example": {
+        "ar": "تغيير كود التشفير الخاص به مع الحفاظ على نفس الحمولة.",
+        "en": "Changing its encryption routine while keeping the same payload."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "فيروس متحول (Metamorphic Virus)",
+      "en": "Metamorphic Virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يغير توقيعه وسلوكه (بنية الكود) بالكامل عند النسخ.",
+        "en": "A virus that completely changes its signature and behavior (code structure) upon replication."
+      },
+      "example": {
+        "ar": "إعادة كتابة الكود الخاص به باستخدام تعليمات مختلفة تؤدي نفس الغرض.",
+        "en": "Rewriting its own code using different instructions that achieve the same goal."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "الدودة (Worm)",
+      "en": "Worm"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج خبيث مستقل ينسخ نفسه وينتشر عبر الشبكات.",
+        "en": "An independent malicious program that replicates and propagates over networks."
+      },
+      "example": {
+        "ar": "دودة WannaCry التي انتشرت عالمياً.",
+        "en": "The WannaCry worm that spread globally."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "التنزيل التلقائي (Drive-by-download)",
+      "en": "Drive-by-download"
+    },
+    "back": {
+      "definition": {
+        "ar": "إصابة تحدث بمجرد زيارة موقع ويب مخترق، دون نقر المستخدم على تحميل.",
+        "en": "Infection occurring simply by visiting a compromised website, without the user clicking download."
+      },
+      "example": {
+        "ar": "استغلال ثغرة في متصفح الضحية عند تحميل صفحة الويب.",
+        "en": "Exploiting a vulnerability in the victim's browser when the webpage loads."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "اختطاف النقرات (Clickjacking)",
+      "en": "Clickjacking"
+    },
+    "back": {
+      "definition": {
+        "ar": "خداع المستخدم للنقر على زر مخفي أو رابط غير مرئي فوق صفحة شرعية.",
+        "en": "Tricking a user into clicking a hidden button or invisible link overlaid on a legitimate page."
+      },
+      "example": {
+        "ar": "استخدام طبقات شفافة في إطارات (iframes).",
+        "en": "Using transparent layers in iframes."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "برامج الفدية (Ransomware)",
+      "en": "Ransomware"
+    },
+    "back": {
+      "definition": {
+        "ar": "برمجيات خبيثة تشفر بيانات المستخدم وتطلب الدفع لاستعادتها.",
+        "en": "Malware that encrypts user data and demands payment to recover it."
+      },
+      "example": {
+        "ar": "استخدام تشفير المفتاح العام لغلق الملفات الشخصية.",
+        "en": "Using public-key encryption to lock personal files."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "مجموعة أدوات الجذر (Rootkit)",
+      "en": "Rootkit"
+    },
+    "back": {
+      "definition": {
+        "ar": "برامج مخفية للحصول على وصول إداري وتخريب آليات تقارير نظام التشغيل لإخفاء وجودها.",
+        "en": "Hidden programs to acquire admin access and subvert OS reporting mechanisms to hide their existence."
+      },
+      "example": {
+        "ar": "تعديل النواة (Kernel) لإخفاء العمليات الخبيثة من مدير المهام.",
+        "en": "Modifying the Kernel to hide malicious processes from the Task Manager."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "تحليل وضع الحماية (Sandbox Analysis)",
+      "en": "Sandbox Analysis"
+    },
+    "back": {
+      "definition": {
+        "ar": "تشغيل كود مشبوه في بيئة معزولة لمراقبة سلوكه بأمان.",
+        "en": "Running suspicious code in an isolated environment to observe its behavior safely."
+      },
+      "example": {
+        "ar": "تشغيل ملف تنفيذي داخل آلة افتراضية لمعرفة ما إذا كان سيعدل التسجيل.",
+        "en": "Running an executable inside a VM to see if it modifies the registry."
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "الماسح الاستدلالي (Heuristic Scanner)",
+      "en": "Heuristic Scanner"
+    },
+    "back": {
+      "definition": {
+        "ar": "الجيل الثاني من مضادات الفيروسات، يبحث عن قواعد وسلوكيات محتملة بدلاً من التوقيعات الدقيقة.",
+        "en": "Second-gen AV that searches for probable rules and behaviors rather than exact signatures."
+      },
+      "example": {
+        "ar": "الاشتباه في ملف لأنه يحاول تعديل ملفات النظام الأساسية.",
+        "en": "Flagging a file because it attempts to modify core system files."
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "هجوم حفرة المياه (Watering-Hole Attack)",
+      "en": "Watering-Hole Attack"
+    },
+    "back": {
+      "definition": {
+        "ar": "اختراق موقع ويب يزوره الهدف بشكل متكرر لانتظار إصابته.",
+        "en": "Compromising a website frequently visited by the target to wait for their infection."
+      },
+      "example": {
+        "ar": "اختراق منتدى خاص بموظفي شركة معينة لنشر برمجيات خبيثة لهم.",
+        "en": "Hacking a forum specific to a company's employees to distribute malware to them."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الآليات التالية تستخدم لضمان تنفيذ مجموعة من العمليات في قاعدة البيانات كعمليات ذرية (إما كلها أو لا شيء)؟",
+      "en": "Which of the following mechanisms is used to ensure a set of operations in a database are performed as atomic operations (all or nothing)?"
+    },
+    "options": {
+      "ar": [
+        "الخصوصية التفاضلية",
+        "التحديث ثنائي الطور (Two-Phase Update)",
+        "هجوم المتتبع",
+        "المرشحات التبادلية"
+      ],
+      "en": [
+        "Differential Privacy",
+        "Two-Phase Update",
+        "Tracker Attack",
+        "Commutative Filters"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التحديث ثنائي الطور يجمع التغييرات في المرحلة الأولى ويجعلها دائمة في المرحلة الثانية لضمان السلامة.",
+      "en": "Two-Phase Update gathers changes in phase 1 and makes them permanent in phase 2 to ensure integrity."
+    },
+    "hint": {
+      "ar": "فكر في المراحل المتعددة لتأكيد المعاملة.",
+      "en": "Think about multiple phases to commit a transaction."
+    },
+    "difficulty": "medium",
+    "conceptId": "database-integrity"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الهدف من هجوم المتتبع (Tracker Attack) في قواعد البيانات؟",
+      "en": "What is the goal of a Tracker Attack in databases?"
+    },
+    "options": {
+      "ar": [
+        "تدمير السجلات المادية",
+        "تجاوز كلمات المرور",
+        "استنتاج نتيجة استعلام محظور باستخدام استعلامات مسموحة",
+        "إضافة ضوضاء إلى البيانات"
+      ],
+      "en": [
+        "Destroying physical records",
+        "Bypassing passwords",
+        "Deducing the result of a forbidden query using allowed queries",
+        "Adding noise to the data"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هجوم المتتبع يستخدم الجبر المنطقي واستعلامات مسموحة (تطابق عدداً مقبولاً من السجلات) لحساب نتيجة استعلام تم حظره.",
+      "en": "A tracker attack uses logic and allowed queries (matching an acceptable number of records) to calculate the result of a blocked query."
+    },
+    "hint": {
+      "ar": "يتتبع المهاجم البيانات من خلال تجميع أجزاء مسموحة.",
+      "en": "The attacker tracks data by combining allowed pieces."
+    },
+    "difficulty": "hard",
+    "conceptId": "data-disclosure-inference"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "كيف تحقق الخصوصية التفاضلية (Differential Privacy) أهدافها عادةً؟",
+      "en": "How is Differential Privacy typically achieved?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق تشفير قاعدة البيانات بالكامل",
+        "عن طريق إضافة ضوضاء (Noise) إلى نتيجة الاستعلام قبل إصدارها",
+        "عن طريق منع جميع استعلامات SELECT",
+        "عن طريق استخدام التحديث ثنائي الطور"
+      ],
+      "en": [
+        "By encrypting the entire database",
+        "By adding noise to the result of a query before releasing it",
+        "By blocking all SELECT queries",
+        "By using Two-Phase Update"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخصوصية التفاضلية تضيف ضوضاء محسوبة رياضياً للنتائج بحيث لا يمكن تحديد ما إذا كان فرد معين موجوداً في مجموعة البيانات أم لا.",
+      "en": "Differential privacy adds mathematically calculated noise to results so it cannot be determined if a specific individual is in the dataset."
+    },
+    "hint": {
+      "ar": "تعتمد على إخفاء الدقة المطلقة.",
+      "en": "It relies on obscuring absolute precision."
+    },
+    "difficulty": "medium",
+    "conceptId": "inference-controls-differential-privacy"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من تقنيات تصميم قواعد البيانات الآمنة تعتمد على إنشاء قاعدة بيانات منطقية تمثل مجموعة فرعية من قاعدة بيانات أخرى للتحكم في الوصول؟",
+      "en": "Which secure database design technique relies on creating a logical database representing a subset of another database for access control?"
+    },
+    "options": {
+      "ar": [
+        "الواجهة الأمامية الموثوقة",
+        "المرشحات التبادلية",
+        "طرق العرض (Views)",
+        "قواعد البيانات الموزعة"
+      ],
+      "en": [
+        "Trusted Front-end",
+        "Commutative Filters",
+        "Views",
+        "Distributed Databases"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "طرق العرض (Views) تخفي الأعمدة أو الصفوف التي لا يُسمح للمستخدم برؤيتها، وتوفر طبقة تجريد آمنة.",
+      "en": "Views hide columns or rows a user is not allowed to see, providing a secure abstraction layer."
+    },
+    "hint": {
+      "ar": "إنها طريقة لـ 'رؤية' جزء فقط من البيانات.",
+      "en": "It's a way to 'see' only a part of the data."
+    },
+    "difficulty": "easy",
+    "conceptId": "multilevel-security-design"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين الفيروس والدودة (Worm)؟",
+      "en": "What is the main difference between a Virus and a Worm?"
+    },
+    "options": {
+      "ar": [
+        "الفيروس يتكاثر، بينما الدودة لا تتكاثر",
+        "الفيروس يحتاج إلى برنامج مضيف، بينما الدودة برنامج مستقل",
+        "الدودة تصيب قطاع التشغيل (Boot sector) فقط",
+        "الفيروس ينتشر عبر الشبكات تلقائياً دون تدخل"
+      ],
+      "en": [
+        "A virus replicates, while a worm does not",
+        "A virus needs a host program, while a worm is an independent program",
+        "A worm only infects the boot sector",
+        "A virus spreads across networks automatically without intervention"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الفيروسات هي برامج طفيلية تتطلب مضيفاً، بينما الديدان هي برامج قائمة بذاتها تنتشر عبر الشبكات.",
+      "en": "Viruses are parasitic and require a host, whereas worms are self-contained programs that propagate over networks."
+    },
+    "hint": {
+      "ar": "فكر في الطفيليات مقابل الكائنات المستقلة.",
+      "en": "Think about parasites vs. independent entities."
+    },
+    "difficulty": "medium",
+    "conceptId": "malware-fundamentals"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من الخصائص التالية تميز التهديدات المستمرة المتقدمة (APTs) عن الهجمات العادية؟",
+      "en": "Which of the following characteristics distinguishes Advanced Persistent Threats (APTs) from regular attacks?"
+    },
+    "options": {
+      "ar": [
+        "الانتشار العشوائي السريع لإصابة أكبر عدد ممكن",
+        "الاعتماد فقط على فيروسات الماكرو",
+        "اختيار دقيق للهدف وجهود تطفل خفية لفترات طويلة",
+        "عدم الحاجة إلى تمويل أو تنظيم"
+      ],
+      "en": [
+        "Rapid random spreading to infect as many as possible",
+        "Relying solely on macro viruses",
+        "Careful target selection and stealthy intrusion efforts over extended periods",
+        "No need for funding or organization"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هجمات APT مصممة لتكون خفية ومستهدفة ومستمرة لفترات طويلة لسرقة البيانات أو التخريب، وليست عشوائية.",
+      "en": "APTs are designed to be stealthy, targeted, and persistent over long periods for data theft or disruption, not random."
+    },
+    "hint": {
+      "ar": "الكلمات المفتاحية هي 'مستمرة' و 'متقدمة'.",
+      "en": "The keywords are 'Persistent' and 'Advanced'."
+    },
+    "difficulty": "medium",
+    "conceptId": "advanced-persistent-threats"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي نوع من الفيروسات يغير توقيعه (Signature) وسلوكه بالكامل في كل مرة ينسخ فيها نفسه؟",
+      "en": "Which type of virus completely changes its signature and behavior every time it copies itself?"
+    },
+    "options": {
+      "ar": [
+        "الفيروس الخفي (Stealth)",
+        "الفيروس المشفر (Encrypted)",
+        "الفيروس متعدد الأشكال (Polymorphic)",
+        "الفيروس المتحول (Metamorphic)"
+      ],
+      "en": [
+        "Stealth virus",
+        "Encrypted virus",
+        "Polymorphic virus",
+        "Metamorphic virus"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الفيروس المتحول (Metamorphic) يغير كلاً من التوقيع والسلوك، بينما متعدد الأشكال يغير التوقيع فقط.",
+      "en": "A Metamorphic virus changes both signature and behavior, whereas a polymorphic virus only changes its signature."
+    },
+    "hint": {
+      "ar": "إنه يتحول بالكامل، ليس فقط في الشكل.",
+      "en": "It transforms completely, not just in shape."
+    },
+    "difficulty": "hard",
+    "conceptId": "viruses"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو الهجوم الذي يدرس فيه المهاجم المواقع التي يزورها الضحايا المستهدفون، ثم يخترق تلك المواقع وينتظرهم؟",
+      "en": "What is the attack where the attacker studies websites visited by intended victims, compromises them, and waits?"
+    },
+    "options": {
+      "ar": [
+        "اختطاف النقرات (Clickjacking)",
+        "هجوم حفرة المياه (Watering-Hole Attack)",
+        "التصيد الرمحي (Spear-phishing)",
+        "الإعلانات الخبيثة (Malvertising)"
+      ],
+      "en": [
+        "Clickjacking",
+        "Watering-Hole Attack",
+        "Spear-phishing",
+        "Malvertising"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هجوم حفرة المياه يعتمد على تلويث موقع يثق به الضحية ويزوره بانتظام.",
+      "en": "A Watering-Hole attack relies on poisoning a site the victim trusts and visits regularly."
+    },
+    "hint": {
+      "ar": "مثل الحيوان المفترس الذي ينتظر فريسته عند مصدر المياه.",
+      "en": "Like a predator waiting for prey at a water source."
+    },
+    "difficulty": "easy",
+    "conceptId": "client-side-vulnerabilities"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي الوظيفة الأساسية لمجموعة أدوات الجذر (Rootkit)؟",
+      "en": "What is the primary function of a Rootkit?"
+    },
+    "options": {
+      "ar": [
+        "تشفير الملفات لطلب فدية",
+        "إرسال رسائل بريد مزعج (Spam)",
+        "الحصول على وصول إداري وإخفاء وجودها عن طريق تخريب آليات نظام التشغيل",
+        "نسخ نفسها عبر الشبكة باستخدام ثغرات يوم الصفر"
+      ],
+      "en": [
+        "Encrypting files for ransom",
+        "Sending spam emails",
+        "Acquiring administrative access and hiding its existence by subverting OS mechanisms",
+        "Replicating across the network using zero-day exploits"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الـ Rootkit مصمم للتخفي العميق داخل نظام التشغيل للحفاظ على صلاحيات الجذر (Root) دون أن يتم اكتشافه.",
+      "en": "A Rootkit is designed for deep stealth within the OS to maintain root privileges undetected."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بالوصول إلى 'الجذر' والتخفي.",
+      "en": "It's about 'root' access and stealth."
+    },
+    "difficulty": "medium",
+    "conceptId": "malware-payloads"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "إلى أي جيل تنتمي برامج مكافحة الفيروسات التي تحدد البرامج الخبيثة من خلال أفعالها (فخاخ النشاط) وليس بنيتها؟",
+      "en": "To which generation do antivirus programs belong that identify malware by its actions (activity traps) rather than its structure?"
+    },
+    "options": {
+      "ar": [
+        "الجيل الأول",
+        "الجيل الثاني",
+        "الجيل الثالث",
+        "الجيل الرابع"
+      ],
+      "en": [
+        "First generation",
+        "Second generation",
+        "Third generation",
+        "Fourth generation"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الجيل الثالث يعتمد على فخاخ النشاط (Activity traps) المقيمة في الذاكرة لمراقبة السلوك.",
+      "en": "The third generation relies on memory-resident activity traps to monitor behavior."
+    },
+    "hint": {
+      "ar": "الجيل الأول توقيعات، الثاني استدلالي، الثالث...",
+      "en": "First is signatures, second is heuristic, third is..."
+    },
+    "difficulty": "hard",
+    "conceptId": "malware-countermeasures"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التحكم في الوصول الخاص بنظام التشغيل (OS Access Control) كافٍ لحماية قواعد البيانات. هذا خطأ فادح، لأن نظام التشغيل لا يفهم الهيكل الداخلي لقاعدة البيانات (الجداول، السجلات، العلاقات) ولا يمكنه منع هجمات الاستدلال.</template>
+    <template class="content-en">Believing that OS Access Control is sufficient to protect databases. This is a fatal flaw, as the OS does not understand the internal structure of the database (tables, records, relationships) and cannot prevent inference attacks.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في هجمات الاستدلال، التوازن بين 'الأمن' و 'الدقة' هو لعبة صفرية (Zero-sum game). كلما زادت دقة البيانات الإحصائية التي تقدمها، زادت احتمالية تسريب بيانات حساسة. الخصوصية التفاضلية هي الحل الرياضي الحديث لهذه المعضلة.</template>
+    <template class="content-en">In inference attacks, the balance between 'Security' and 'Precision' is a zero-sum game. The more precise the statistical data you provide, the higher the chance of leaking sensitive data. Differential privacy is the modern mathematical solution to this dilemma.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الجوهري بين الفيروس والدودة: الفيروس طفيلي (يحتاج إلى ملف تنفيذي أو مستند ليختبئ فيه وينتظر المستخدم لتشغيله)، بينما الدودة مستقلة (تبحث بنشاط عن ثغرات في الشبكة وتنتقل وتنفذ نفسها دون تدخل المستخدم).</template>
+    <template class="content-en">The fundamental difference between a Virus and a Worm: A virus is parasitic (needs an executable or document to hide in and waits for the user to run it), while a worm is independent (actively scans for network vulnerabilities, moves, and executes itself without user intervention).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الفيروس متعدد الأشكال (Polymorphic) والمتحول (Metamorphic). المتعدد الأشكال يغير 'توقيعه' (مثل التشفير) لكن الكود الأساسي يبقى كما هو. المتحول يعيد كتابة الكود الخاص به بالكامل (يغير سلوكه وبنيته)، مما يجعله كابوساً لبرامج مكافحة الفيروسات.</template>
+    <template class="content-en">Confusing Polymorphic and Metamorphic viruses. Polymorphic changes its 'signature' (e.g., encryption) but the core code remains the same. Metamorphic completely rewrites its own code (changes behavior and structure), making it a nightmare for AV software.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">هجمات APT (التهديدات المستمرة المتقدمة) لا تهدف إلى إحداث فوضى سريعة. هدفها هو 'التخفي' (Stealth) و 'الاستمرار' (Persistence). المهاجم يريد البقاء في شبكتك لسنوات لسرقة الملكية الفكرية ببطء دون إطلاق أي إنذارات.</template>
+    <template class="content-en">APT (Advanced Persistent Threat) attacks do not aim for quick chaos. Their goal is 'Stealth' and 'Persistence'. The attacker wants to stay in your network for years to slowly exfiltrate intellectual property without triggering any alarms.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M03.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M05.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

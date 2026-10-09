@@ -260,8 +260,6 @@
     var h = el('h3', 'gsf-card-h');
     h.appendChild(el('i', 'fa-solid fa-table-columns'));
     h.appendChild(el('span', null, L('التصميم', 'Design')));
-    var sub = el('small', 'mt-hnote');
-    h.appendChild(sub);
     sec.appendChild(h);
     var grid = el('div', 'mt-dgrid');
     sec.appendChild(grid);
@@ -282,15 +280,12 @@
       grid.appendChild(b);
     });
     function mark() {
-      var cur = curDesign(), on = null;
+      var cur = curDesign();
       tiles.forEach(function (b) {
         var is = b.__id === cur;
         b.classList.toggle('is-on', is);
         b.setAttribute('aria-checked', is ? 'true' : 'false');
-        if (is) on = b;
       });
-      var d = DESIGNS.filter(function (x) { return x.id === cur; })[0] || DESIGNS[0];
-      sub.textContent = '· ' + L(d.note[0], d.note[1]);
     }
     mark();
     sec.__mark = mark;
@@ -437,6 +432,363 @@
     return sec;
   }
 
+  var SKINS = [
+    { id: 'garden',  ar: 'Garden',       en: 'Garden',            note: ['التصميمُ الأساسيّ', 'The core design'] },
+    { id: 'hunter',  ar: 'عقد الصيّاد',  en: 'Hunter’s Contract', note: ['دفترُ مهامّ في لعبة', 'A game quest journal'] },
+    { id: 'planner', ar: 'المخطّط',      en: 'Planner',           note: ['دفترٌ مفتوحٌ على صفحتين', 'An open two-page planner'] },
+    { id: 'bento',   ar: 'بنتو',         en: 'Bento',             note: ['مربّعاتٌ بأحجامٍ ومرسًى عائم', 'Sized tiles and a floating dock'] },
+    { id: 'editor',  ar: 'المحرّر',      en: 'Editor',            note: ['محرّرُ كودٍ لطلاب الحاسب', 'A code editor for CS students'] },
+    { id: 'manga',   ar: 'مانغا',        en: 'Manga',             note: ['لوحاتُ قصّةٍ مصوّرة', 'Comic panels'] },
+    { id: 'sugar',   ar: 'سكّر',         en: 'Sugar',             note: ['قطعٌ طريّةٌ وزهرةٌ تنمو', 'Soft clay and a growing flower'] },
+    { id: 'andalus', ar: 'أندلس',        en: 'Andalus',           note: ['أقواسٌ ونقشٌ ثمانيّ', 'Arches and eight-point stars'] },
+    { id: 'quiet',   ar: 'هادئ',         en: 'Quiet',             note: ['جملةٌ واحدةٌ ولا إطارات', 'One sentence, no frames'] },
+    { id: 'dexter',  ar: 'شريحة الدم',   en: 'Blood Slide',       note: ['مختبرُ أدلّةٍ في ليل ميامي', 'A forensic lab on a Miami night'] },
+    { id: 'witcher', ar: 'الذئب الأبيض', en: 'White Wolf',        note: ['عقودٌ مسمّرةٌ وأوراقُ لعب', 'Nailed contracts and a hand of cards'] },
+    { id: 'saudi',   ar: 'همّة طويق',    en: 'Tuwaiq',            note: ['شرفاتٌ نجديّةٌ وسدو', 'Najdi crenellations and Sadu weave'] },
+    { id: 'rain',    ar: 'مطر النيون',   en: 'Neon Rain',         note: ['زجاجُ مقهًى ومطرٌ حقيقيّ', 'Café glass and real rain'] },
+    { id: 'abyss',   ar: 'الأعماق المضيئة', en: 'Glowing Depths', note: ['غطسةٌ بمصباح غوّاص', 'A dive with a diver’s lamp'] },
+    { id: 'departures', ar: 'صالة المغادرة', en: 'Departures',    note: ['لوحةُ رحلاتٍ تتقلّب حروفُها', 'A split-flap departures board'] },
+    { id: 'lofi',    ar: 'غرفة المذاكرة', en: 'Study Room',       note: ['مكتبٌ ليليٌّ ومصباح', 'A night desk and a lamp'] },
+    { id: 'album',   ar: 'قيد التشغيل',  en: 'Now Playing',       note: ['الفصلُ ألبومٌ يدور', 'The semester as a spinning album'] }
+  ];
+  function curSkin() { return (window.GardenTint && GardenTint.skin) ? GardenTint.skin() : 'garden'; }
+  function thumb(id) { return _base + 'shared/skins/thumbs/' + id + '-' + (document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark') + '.webp'; }
+  function skinSection() {
+    var sec = el('section', 'mt-sec mt-sec--skin');
+    var h = el('h3', 'gsf-card-h');
+    h.appendChild(el('i', 'fa-solid fa-wand-magic-sparkles'));
+    h.appendChild(el('span', null, L('الجلد', 'Skin')));
+    sec.appendChild(h);
+    var grid = el('div', 'mt-dgrid mt-skgrid');
+    sec.appendChild(grid);
+    var tiles = [];
+    SKINS.forEach(function (s) {
+      var b = el('button', 'mt-dtile mt-sktile');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitemradio');
+      var pv = el('span', 'mt-pv mt-skpv mt-skpv--' + s.id);
+      pv.setAttribute('aria-hidden', 'true');
+      var im = document.createElement('img');
+      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async';
+      im.__id = s.id;
+      im.src = thumb(s.id);
+      im.addEventListener('error', function () { im.remove(); });
+      pv.appendChild(im);
+      b.appendChild(pv);
+      b.appendChild(el('b', 'mt-dname', L(s.ar, s.en)));
+      b.appendChild(el('span', 'mt-dnote', L(s.note[0], s.note[1])));
+      b.addEventListener('click', function () { if (window.GardenTint && GardenTint.setSkin) GardenTint.setSkin(s.id === 'garden' ? '' : s.id); mark(); });
+      b.__id = s.id;
+      tiles.push(b);
+      grid.appendChild(b);
+    });
+    function mark() {
+      var cur = curSkin();
+      tiles.forEach(function (b) {
+        var is = b.__id === cur;
+        b.classList.toggle('is-on', is);
+        b.setAttribute('aria-checked', is ? 'true' : 'false');
+      });
+    }
+    mark();
+    try {
+      new MutationObserver(function () {
+        grid.querySelectorAll('img').forEach(function (im) { if (im.__id) { var u = thumb(im.__id); if (im.src.indexOf(u) < 0) im.src = u; } });
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    } catch (e) {}
+    sec.__mark = mark;
+    return sec;
+  }
+
+  var BGS = [
+    { id: 'none',    ar: 'بلا خلفيّة',  en: 'None' },
+    { id: 'color',   ar: 'لون',         en: 'Colour' },
+    { id: 'mesh',    ar: 'تدرّجٌ حيّ',  en: 'Living gradient' },
+    { id: 'waves',   ar: 'أمواج',       en: 'Waves' },
+    { id: 'pixels',  ar: 'بكسلات',      en: 'Pixels' },
+    { id: 'photo',   ar: 'صورة',        en: 'Photo' },
+    { id: 'pattern', ar: 'نقش',         en: 'Pattern' }
+  ];
+  var BG_PATS = [['stars', 'نجمةٌ ثمانيّة', 'Eight-point star'], ['flower', 'زهرةُ الدوائر', 'Circle flower'], ['scales', 'حراشف', 'Scales'],
+    ['hex', 'خليّةُ نحل', 'Honeycomb'], ['circuit', 'دارةٌ إلكترونيّة', 'Circuit'], ['topo', 'خطوطُ كنتور', 'Contours'],
+    ['chevron', 'متعرّج', 'Zigzag'], ['diamonds', 'معيّنات', 'Diamonds'], ['plus', 'علاماتُ جمع', 'Plus signs'],
+    ['dots', 'نقاط', 'Dots'], ['grid', 'شبكة', 'Grid'], ['lines', 'خطوطٌ مائلة', 'Diagonal lines']];
+  function patSheet() {
+    if (document.querySelector('link[data-garden-skin="bg"]')) return;
+    var l = document.createElement('link');
+    l.rel = 'stylesheet'; l.href = _base + 'shared/skins/bg.css';
+    l.setAttribute('data-garden-skin', 'bg');
+    document.head.appendChild(l);
+  }
+  function curBg() { return (window.GardenTint && GardenTint.bg) ? GardenTint.bg() : null; }
+  function setBg(b) { if (window.GardenTint && GardenTint.setBg) GardenTint.setBg(b); }
+  function needBg(cb) {
+    if (window.GardenBg) { cb(); return; }
+    var s = document.createElement('script');
+    s.src = _base + 'shared/skins/bg.js';
+    s.onload = s.onerror = function () { cb(); };
+    document.head.appendChild(s);
+  }
+  function bgSection() {
+    var sec = el('section', 'mt-sec mt-sec--bg');
+    var h = el('h3', 'gsf-card-h');
+    h.appendChild(el('i', 'fa-solid fa-image'));
+    h.appendChild(el('span', null, L('الخلفيّة', 'Background')));
+    sec.appendChild(h);
+    var grid = el('div', 'mt-bggrid');
+    sec.appendChild(grid);
+    var more = el('div', 'mt-bgx');
+    sec.appendChild(more);
+    var tiles = [];
+    BGS.forEach(function (o) {
+      var b = el('button', 'mt-bgtile');
+      b.type = 'button';
+      b.setAttribute('role', 'menuitemradio');
+      var pv = el('span', 'mt-bgpv mt-bgpv--' + o.id);
+      pv.setAttribute('aria-hidden', 'true');
+      if (o.id === 'waves') { pv.appendChild(el('i')); pv.appendChild(el('i')); }
+      b.appendChild(pv);
+      b.appendChild(el('span', 'mt-bgname', L(o.ar, o.en)));
+      b.addEventListener('click', function () {
+        var c = curBg() || {};
+        if (o.id !== 'photo') shown = '';
+        if (o.id === 'none') setBg(null);
+        else if (o.id === 'photo') { if (c.type !== 'photo') paintMore('photo'); }
+        else setBg({ type: o.id, k: o.id === 'color' ? (c.k || (c.u ? undefined : 'page')) : undefined, u: o.id === 'color' ? c.u : undefined, p: o.id === 'pattern' ? (c.p || 'stars') : undefined });
+        mark();
+      });
+      b.__id = o.id;
+      tiles.push(b);
+      grid.appendChild(b);
+    });
+    var shown = '';
+    function chip(label, on, fn) {
+      var b = el('button', 'gsf-chip' + (on ? ' on' : ''), label);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.addEventListener('click', fn);
+      return b;
+    }
+    function paintMore(kind) {
+      shown = kind;
+      more.textContent = '';
+      var c = curBg() || {};
+      if (kind === 'color') {
+        var row = el('div', 'mt-bgcols');
+        more.appendChild(row);
+        more.appendChild(el('small', 'mt-bgmsg', L('ألوانٌ مولَّدةٌ لهذا الجلد ووضعِه — وكلُّ لونٍ يتبدّل بمقابله إن غيّرتَ الوضع.', 'Colours generated for this skin and mode — each one follows you to its counterpart when the mode changes.')));
+        needBg(function () {
+          if (!window.GardenBg || !GardenBg.palette) return;
+          GardenBg.palette().forEach(function (o) {
+            var on = c.k ? c.k === o.k : (!c.u && !c.k && o.k === 'page');
+            var sw = el('button', 'mt-bgcol' + (on ? ' is-on' : ''));
+            sw.type = 'button';
+            sw.style.background = o.hex;
+            sw.title = L(o.ar, o.en);
+            sw.setAttribute('aria-label', L(o.ar, o.en));
+            sw.setAttribute('aria-pressed', on ? 'true' : 'false');
+            sw.addEventListener('click', function () { setBg({ type: 'color', k: o.k }); mark(); });
+            row.appendChild(sw);
+          });
+          var pick = document.createElement('input');
+          pick.type = 'color';
+          pick.className = 'mt-bgpick' + (c.u ? ' is-on' : '');
+          pick.value = /^#[0-9a-f]{6}$/i.test(c.u || '') ? c.u : '#7c6cf0';
+          pick.title = L('لونٌ من اختيارك — يُضبط سطوعُه على الصفحة', 'Your own colour — its brightness is matched to the page');
+          pick.setAttribute('aria-label', L('لونٌ من اختيارك', 'Your own colour'));
+          pick.addEventListener('change', function () { setBg({ type: 'color', u: pick.value }); mark(); });
+          row.appendChild(pick);
+        });
+      } else if (kind === 'pattern') {
+        patSheet();
+        var pg = el('div', 'mt-bgpats');
+        BG_PATS.forEach(function (p) {
+          var b = el('button', 'mt-bgpat' + ((c.p || 'stars') === p[0] ? ' is-on' : ''));
+          b.type = 'button';
+          b.setAttribute('aria-pressed', (c.p || 'stars') === p[0] ? 'true' : 'false');
+          var sw = el('span', 'mt-bgpat-sw');
+          sw.setAttribute('aria-hidden', 'true');
+          sw.appendChild(el('i', 'mt-bgpat-m mt-bgpat--' + p[0]));
+          b.appendChild(sw);
+          b.appendChild(el('span', 'mt-bgpat-n', L(p[1], p[2])));
+          b.addEventListener('click', function () { var o = curBg() || {}; setBg({ type: 'pattern', p: p[0], o: o.o, s: o.s, z: o.z, m: o.m }); mark(); });
+          pg.appendChild(b);
+        });
+        more.appendChild(pg);
+        var tuneP = el('div', 'mt-bgtune mt-bgtune--pat');
+        [['o', 'الوضوح', 'Clarity', 4, 100, 28, '--gbg-po', function (v) { return (v / 200).toFixed(3); }],
+         ['s', 'التشبّع', 'Saturation', 0, 100, 35, '--gbg-ps', function (v) { return v + '%'; }],
+         ['z', 'الحجم', 'Size', 50, 220, 100, '--gbg-pz', function (v) { return (v / 100).toFixed(2); }]].forEach(function (k) {
+          var lab = el('label', 'mt-bgdim');
+          lab.appendChild(el('span', null, L(k[1], k[2])));
+          var r = document.createElement('input');
+          r.type = 'range'; r.min = String(k[3]); r.max = String(k[4]); r.step = '1';
+          r.value = String(isFinite(+c[k[0]]) && c[k[0]] !== undefined && c[k[0]] !== null ? +c[k[0]] : k[5]);
+          r.addEventListener('input', function () { document.documentElement.style.setProperty(k[6], k[7](+r.value)); });
+          r.addEventListener('change', function () { var o = curBg(); if (!o || o.type !== 'pattern') return; o[k[0]] = +r.value; setBg(o); });
+          lab.appendChild(r);
+          tuneP.appendChild(lab);
+        });
+        more.appendChild(tuneP);
+        var mv = el('div', 'gsf-chips mt-bgmove');
+        mv.setAttribute('role', 'group');
+        mv.setAttribute('aria-label', L('حركةُ النقش', 'Pattern motion'));
+        [['', 'ثابت', 'Still'], ['drift', 'ينساب', 'Drifting'], ['breathe', 'يتنفّس', 'Breathing']].forEach(function (k) {
+          mv.appendChild(chip(L(k[1], k[2]), (c.m || '') === k[0], function () { var o = curBg(); if (!o || o.type !== 'pattern') return; if (k[0]) o.m = k[0]; else delete o.m; setBg(o); paintMore('pattern'); }));
+        });
+        more.appendChild(mv);
+      } else if (kind === 'photo') {
+        photoPane(c);
+      }
+    }
+    function photoPane(c) {
+      var acts = el('div', 'mt-bgacts');
+      var file = document.createElement('input');
+      file.type = 'file'; file.accept = 'image/*'; file.hidden = true;
+      var up = el('button', 'gsf-btn');
+      up.type = 'button';
+      up.appendChild(el('i', 'fa-solid fa-upload'));
+      up.appendChild(el('span', null, L('صورةٌ من جهازي', 'A photo from my device')));
+      up.addEventListener('click', function () { file.click(); });
+      var msg = el('small', 'mt-bgmsg');
+      file.addEventListener('change', function () {
+        var f = file.files && file.files[0];
+        if (!f) return;
+        msg.textContent = L('تُجهَّز الصورة…', 'Preparing the photo…');
+        needBg(function () {
+          if (!window.GardenBg) { msg.textContent = L('تعذّر تحميلُ أداة الخلفيّة.', 'Could not load the background tool.'); return; }
+          GardenBg.saveLocal(f).then(function () {
+            var o = curBg() || {};
+            setBg({ type: 'photo', src: 'local', dim: o.dim != null ? o.dim : 45, blur: o.blur || 0 });
+            msg.textContent = L('تمّ — الصورةُ محفوظةٌ في هذا الجهاز.', 'Done — the photo is saved on this device.');
+            mark();
+          }, function () { msg.textContent = L('تعذّرت قراءةُ الصورة — جرّبْ صورةً أخرى.', 'That image could not be read — try another one.'); });
+        });
+      });
+      acts.appendChild(up);
+      acts.appendChild(file);
+      more.appendChild(acts);
+
+      var form = el('form', 'mt-bgq');
+      var q = document.createElement('input');
+      q.type = 'search'; q.className = 'gsf-in';
+      q.placeholder = L('ابحثْ في Unsplash بالإنجليزيّة: mountains, sea, night…', 'Search Unsplash: mountains, sea, night…');
+      q.setAttribute('aria-label', L('بحثُ الصور', 'Photo search'));
+      var go = el('button', 'gsf-btn');
+      go.type = 'submit';
+      go.appendChild(el('i', 'fa-solid fa-images'));
+      go.appendChild(el('span', null, L('ابحث', 'Search')));
+      form.appendChild(q); form.appendChild(go);
+      more.appendChild(form);
+      var gridP = el('div', 'mt-bgphotos');
+      more.appendChild(gridP);
+      more.appendChild(msg);
+      var E = window.GardenEndpoints, base = (E && E.unsplash) || '';
+      function load(term) {
+        if (!base) { msg.textContent = L('خدمةُ الصور غيرُ متاحةٍ هنا.', 'The photo service is not available here.'); return; }
+        msg.textContent = L('يُبحث…', 'Searching…');
+        fetch(base + (term ? '/s?q=' + encodeURIComponent(term) + '&' : '/r?') + 'page=1', { mode: 'cors' })
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(function (d) {
+            gridP.textContent = '';
+            var list = (d && d.photos) || [];
+            msg.textContent = list.length ? '' : L('لا نتائج — جرّبْ كلمةً أخرى.', 'Nothing found — try another word.');
+            list.slice(0, 12).forEach(function (p) {
+              var b = el('button', 'mt-bgph');
+              b.type = 'button';
+              b.style.background = p.color || '#333';
+              b.setAttribute('aria-label', p.alt || L('صورة', 'Photo'));
+              var im = document.createElement('img');
+              im.src = p.thumb; im.alt = ''; im.loading = 'lazy'; im.referrerPolicy = 'no-referrer';
+              b.appendChild(im);
+              b.addEventListener('click', function () {
+                if (p.dl) { try { fetch(base + '/d?u=' + encodeURIComponent(p.dl), { mode: 'cors' }); } catch (e) {} }
+                var o = curBg() || {};
+                setBg({ type: 'photo', src: 'unsplash', url: p.full, by: p.by || '', byLink: p.byLink || '', dim: o.dim != null ? o.dim : 45, blur: o.blur || 0 });
+                mark();
+              });
+              gridP.appendChild(b);
+            });
+          })['catch'](function () { msg.textContent = L('تعذّر الوصولُ إلى خدمة الصور — تحقّقْ من اتّصالك.', 'The photo service is unreachable — check your connection.'); });
+      }
+      form.addEventListener('submit', function (e) { e.preventDefault(); load(q.value.trim()); });
+      load('');
+
+      var tune = el('div', 'mt-bgtune');
+      var dimL = el('label', 'mt-bgdim');
+      dimL.appendChild(el('span', null, L('تعتيمٌ لوضوح النصّ', 'Dim for readable text')));
+      var dim = document.createElement('input');
+      dim.type = 'range'; dim.min = '0'; dim.max = '80'; dim.step = '5';
+      dim.value = String(c.dim != null ? c.dim : 45);
+      dim.addEventListener('change', function () { var o = curBg(); if (o && o.type === 'photo') { o.dim = +dim.value; setBg(o); } });
+      dimL.appendChild(dim);
+      tune.appendChild(dimL);
+      tune.appendChild(chip(L('ضبابٌ خفيف', 'Soft blur'), !!(+c.blur), function () {
+        var o = curBg(); if (!o || o.type !== 'photo') return;
+        o.blur = +o.blur ? 0 : 8; setBg(o); paintMore('photo'); mark();
+      }));
+      more.appendChild(tune);
+    }
+    function mark() {
+      var c = curBg(), cur = c ? c.type : 'none';
+      tiles.forEach(function (b) {
+        var on = b.__id === cur || (b.__id === 'photo' && shown === 'photo');
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      if (cur === 'color' || cur === 'pattern') paintMore(cur);
+      else if (cur === 'photo') { if (shown !== 'photo') paintMore('photo'); }
+      else if (shown !== 'photo') { shown = ''; more.textContent = ''; }
+    }
+    mark();
+    sec.__mark = mark;
+    return sec;
+  }
+
+  /*@3.MOTJ.37*/
+  function fold(secs, sc) {
+    secs.forEach(function (sec, i) {
+      var h = sec.querySelector('.gsf-card-h');
+      if (!h) return;
+      var b = el('button', 'mt-acc');
+      b.type = 'button';
+      var p = el('div', 'mt-acc-p');
+      p.id = 'mt-acc-' + sc + '-' + i;
+      b.setAttribute('aria-controls', p.id);
+      Array.prototype.slice.call(h.childNodes).forEach(function (n) {
+        if (n.classList && n.classList.contains('mt-seg')) p.appendChild(n); else b.appendChild(n);
+      });
+      var v = el('span', 'mt-acc-v');
+      b.appendChild(v);
+      var ch = el('b', 'mt-acc-chev');
+      ch.setAttribute('aria-hidden', 'true');
+      b.appendChild(ch);
+      h.appendChild(b);
+      while (h.nextSibling) p.appendChild(h.nextSibling);
+      sec.appendChild(p);
+      function val() {
+        var on = p.querySelector('.is-on'), n = on && on.querySelector('.mt-dname, .mt-tname, .mt-bgname, .mt-fname');
+        v.textContent = n ? n.textContent : '';
+      }
+      var m = sec.__mark;
+      sec.__mark = function () { if (m) m(); val(); };
+      p.addEventListener('click', function () { setTimeout(val, 0); });
+      val();
+      sec.__acc = function (open) {
+        p.hidden = !open;
+        b.setAttribute('aria-expanded', open ? 'true' : 'false');
+        sec.classList.toggle('is-open', open);
+      };
+      sec.__acc(i === 0);
+      b.addEventListener('click', function () {
+        var open = p.hidden;
+        secs.forEach(function (s) { if (s.__acc) s.__acc(false); });
+        sec.__acc(open);
+        if (open) { try { sec.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+      });
+    });
+  }
+
   /*@3.MOTJ.9*/
   /*@3.MOTJ.35*/
   function needTint(cb) {
@@ -505,6 +857,7 @@
     reset.addEventListener('click', function () {
       var sc = scope();
       if (sc === 'module') chooseDesign('garden');
+      else if (window.GardenTint) { if (GardenTint.setSkin) GardenTint.setSkin(''); if (GardenTint.setBg) GardenTint.setBg(null); }
       choose('garden', sc);
       chooseFont('garden', 'ar', sc);
       chooseFont('garden', 'lat', sc);
@@ -529,8 +882,9 @@
               'For course and module pages — you’ll see it when you open a course; anything you leave follows the site look.'));
       resetT.textContent = sc === 'site' ? L('أعِدِ المظهرَ الأصليّ', 'Back to the original look') : L('أعِدْها كالموقع', 'Back to the site look');
       body.textContent = '';
-      secs = sc === 'module' ? [designSection(), themeSection(), fontSection()] : [themeSection(), fontSection()];
+      secs = sc === 'module' ? [designSection(), themeSection(), fontSection()] : [skinSection(), bgSection(), themeSection(), fontSection()];
       secs.forEach(function (s) { body.appendChild(s); });
+      fold(secs, sc);
     }
     build();
 
@@ -545,6 +899,6 @@
   window.GardenModuleTheme = {
     open: open, close: close, current: current, choose: choose, THEMES: THEMES,
     currentFont: currentFont, chooseFont: chooseFont, FONTS: FONTS, FONTS_LAT: FONTS_LAT,
-    DESIGNS: DESIGNS, design: curDesign, chooseDesign: chooseDesign
+    DESIGNS: DESIGNS, design: curDesign, chooseDesign: chooseDesign, SKINS: SKINS, BGS: BGS
   };
 })();

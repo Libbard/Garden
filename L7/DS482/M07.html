@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="7" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الشبكات العصبية الخطية للتصنيف (انحدار سوفت ماكس) · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M06.html" data-gh-next="M08.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#classification-vs-regression" class="toc-link" data-bilingual>
+        <template class="content-ar">مشكلة التصنيف والترميز الأحادي الساخن (One-Hot Encoding)</template>
+        <template class="content-en">Classification Problem and One-Hot Encoding</template>
+        <span class="content-target">مشكلة التصنيف والترميز الأحادي الساخن (One-Hot Encoding)</span>
+      </a>
+      <a href="#softmax-network-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">بنية شبكة سوفت ماكس (Softmax Network Architecture)</template>
+        <template class="content-en">Softmax Network Architecture</template>
+        <span class="content-target">بنية شبكة سوفت ماكس (Softmax Network Architecture)</span>
+      </a>
+      <a href="#softmax-operation" class="toc-link" data-bilingual>
+        <template class="content-ar">عملية سوفت ماكس (Softmax Operation)</template>
+        <template class="content-en">Softmax Operation</template>
+        <span class="content-target">عملية سوفت ماكس (Softmax Operation)</span>
+      </a>
+      <a href="#cross-entropy-loss" class="toc-link" data-bilingual>
+        <template class="content-ar">دالة الخسارة: الإنتروبيا المتقاطعة (Cross-Entropy Loss)</template>
+        <template class="content-en">Loss Function: Cross-Entropy Loss</template>
+        <span class="content-target">دالة الخسارة: الإنتروبيا المتقاطعة (Cross-Entropy Loss)</span>
+      </a>
+      <a href="#information-theory-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات نظرية المعلومات (الإنتروبيا والمفاجأة)</template>
+        <template class="content-en">Information Theory Basics (Entropy and Surprisal)</template>
+        <span class="content-target">أساسيات نظرية المعلومات (الإنتروبيا والمفاجأة)</span>
+      </a>
+      <a href="#fashion-mnist-dataset" class="toc-link" data-bilingual>
+        <template class="content-ar">مجموعة بيانات تصنيف الصور (Fashion-MNIST)</template>
+        <template class="content-en">The Image Classification Dataset (Fashion-MNIST)</template>
+        <span class="content-target">مجموعة بيانات تصنيف الصور (Fashion-MNIST)</span>
+      </a>
+      <a href="#implementation-and-numerical-stability" class="toc-link" data-bilingual>
+        <template class="content-ar">التنفيذ والاستقرار العددي (خدعة LogSumExp)</template>
+        <template class="content-en">Implementation and Numerical Stability (LogSumExp Trick)</template>
+        <span class="content-target">التنفيذ والاستقرار العددي (خدعة LogSumExp)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 7</template>
+      <template class="content-en">Module 7</template>
+      <span class="content-target">الوحدة 7</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الشبكات العصبية الخطية للتصنيف (انحدار سوفت ماكس)</h1>
+      <p class="hero-description">تغطي هذه الوحدة مفاهيم التصنيف باستخدام الشبكات العصبية الخطية، بما في ذلك دالة سوفت ماكس (Softmax)، دالة خسارة الإنتروبيا المتقاطعة (Cross-Entropy)، نظرية المعلومات، والتعامل مع مجموعة بيانات Fashion-MNIST، بالإضافة إلى التنفيذ البرمجي من الصفر وباستخدام واجهات برمجة التطبيقات عالية المستوى.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Linear Neural Networks for Classification (Softmax Regression)</h1>
+      <p class="hero-description">This module covers classification concepts using linear neural networks, including the Softmax function, Cross-Entropy loss, Information Theory basics, handling the Fashion-MNIST dataset, and implementation both from scratch and using high-level APIs.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">التصنيف</span>
+      <span class="tag">سوفت ماكس</span>
+      <span class="tag">الإنتروبيا المتقاطعة</span>
+      <span class="tag">نظرية المعلومات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Classification</span>
+      <span class="tag">Softmax</span>
+      <span class="tag">Cross-Entropy</span>
+      <span class="tag">Information Theory</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم مفهوم دالة سوفت ماكس (Softmax) وكيفية تحويل القيم الخام (Logits) إلى احتمالات.</span></li>
+      <li><span class="obj-icon">✦</span><span>التعامل مع مجموعات بيانات الصور مثل Fashion-MNIST وتجهيزها للتدريب.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ انحدار سوفت ماكس (Softmax Regression) من الصفر برمجياً.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام واجهات برمجة التطبيقات عالية المستوى (High-level APIs) لتنفيذ نماذج التصنيف بكفاءة واستقرار عددي.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Learn about the concept of the Softmax function and how it converts logits into probabilities.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn to deal with image datasets like Fashion-MNIST and prepare them for training.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn to implement Softmax Regression from scratch.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement classification models concisely using high-level APIs with numerical stability.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="classification-vs-regression" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مشكلة التصنيف والترميز الأحادي الساخن (One-Hot Encoding)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Classification Problem and One-Hot Encoding</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التصنيف يجيب على سؤال 'أي واحد؟' بدلاً من 'كم المقدار؟' في الانحدار، ويستخدم الترميز الأحادي الساخن لتمثيل الفئات التي لا تمتلك ترتيباً طبيعياً.</p></template>
+    <template class="content-en"><p>Classification answers 'which one?' instead of 'how much?' (regression), using one-hot encoding to represent categories without natural ordering.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الممارسة العملية، نهتم غالباً بالتصنيف لتعيين أمثلة إلى فئات (مثل: هل هذه الصورة لقطة أم كلب؟). يمكن أن تكون التعيينات صلبة (Hard assignments) أو مرنة (Soft assignments) لتقييم احتمالية كل فئة.</p><p>لتمثيل التسميات (Labels) التي لا تحتوي على ترتيب طبيعي، نستخدم <b><span class="smart-term" data-term-en="One-hot encoding" data-ar="الترميز الأحادي الساخن" data-en-def="A vector representation where the target class is 1 and all others are 0.">الترميز الأحادي الساخن<span class="smart-term-tooltip"></span></span> (One-hot encoding)</b>. وهو متجه يحتوي على عدد من المكونات يساوي عدد الفئات. يتم تعيين المكون المطابق لفئة المثيل إلى 1، وتعيين جميع المكونات الأخرى إلى 0.</p><p>على سبيل المثال، إذا كان لدينا الفئات 'قطة'، 'دجاجة'، و'كلب'، فإن التسمية $y$ ستكون متجهاً ثلاثي الأبعاد:</p><ul><li><strong>(1,0,0)</strong> للقطة،</li><li><strong>(0,1,0)</strong> للدجاجة،</li><li>و<strong>(0,0,1)</strong> للكلب.</li></ul></template>
+    <template class="content-en"><p>In practice, we are often interested in classification to assign examples to categories (e.g., is this image a cat or a dog?). Assignments can be hard (exact category) or soft (assessing the probability of each category).</p><p>To represent labels that do not have natural orderings, we use <b><span class="smart-term" data-term-en="One-hot encoding" data-ar="الترميز الأحادي الساخن" data-en-def="A vector representation where the target class is 1 and all others are 0.">one-hot encoding<span class="smart-term-tooltip"></span></span></b>. This is a vector with as many components as we have categories. The component corresponding to a particular instance's category is set to 1 and all other components are set to 0.</p><p>For example, with categories 'cat', 'chicken', and 'dog', a label $y$ would be a 3D vector:</p><ul><li><strong>(1,0,0)</strong> for 'cat',</li><li><strong>(0,1,0)</strong> for 'chicken',</li><li>and <strong>(0,0,1)</strong> for 'dog'.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا نستخدم أرقاماً صحيحة (1، 2، 3) للفئات؟</p><p>لأن ذلك يفرض ترتيباً رياضياً غير موجود في الواقع (الكلب ليس 'أكبر' من القطة). الترميز الأحادي الساخن يزيل هذا الافتراض الخاطئ.</p><p>في الشبكات العصبية، يسمح لنا هذا التمثيل بمقارنة مخرجات النموذج (التي ستكون توزيعاً احتمالياً) مباشرة مع التسمية الحقيقية باستخدام مقاييس مثل الإنتروبيا المتقاطعة.</p></template>
+    <template class="content-en"><p>Why not use integers (1, 2, 3) for categories?</p><p>Because it imposes a mathematical ordering that doesn't exist (a dog is not 'greater' than a cat). One-hot encoding removes this false assumption.</p><p>In neural networks, this representation allows us to directly compare the model's output (which will be a probability distribution) with the true label using metrics like cross-entropy.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>مجموعة المتجهات الممكنة للترميز الأحادي الساخن لثلاث فئات.</strong></template>
+      <template class="content-en"><strong>The set of possible one-hot encoded vectors for three categories.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$y \in \{(1,0,0), (0,1,0), (0,0,1)\}$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Regression</th><th>Classification</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع السؤال المُجاب</template>
+          <template class="content-en">Question Answered</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كم المقدار؟ / كم العدد؟ (How much? / How many?)</template>
+          <template class="content-en">How much? / How many?</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أي واحد؟ (Which one?)</template>
+          <template class="content-en">Which one?</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طبيعة المخرجات</template>
+          <template class="content-en">Output Nature</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قيم مستمرة (مثل السعر، عدد الأيام)</template>
+          <template class="content-en">Continuous values (e.g., price, days)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">فئات منفصلة (مثل قطة، كلب، بريد مزعج)</template>
+          <template class="content-en">Discrete categories (e.g., cat, dog, spam)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمنا الانحدار الخطي العادي للتنبؤ بفئات مشفرة كأرقام (1، 2، 3)؟</template>
+      <template class="content-en">What happens if we use standard linear regression to predict categories encoded as integers (1, 2, 3)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيفترض النموذج وجود علاقة ترتيبية ومسافات متساوية بين الفئات، مما يؤدي إلى معاقبة التنبؤات بشكل غير منطقي (مثلاً، التنبؤ بـ 1 بدلاً من 3 سيعتبر خطأ أكبر من التنبؤ بـ 2 بدلاً من 3، حتى لو كانت الفئات مستقلة تماماً).</p></template>
+      <template class="content-en"><p>The model would assume an ordinal relationship and equal distances between categories, penalizing predictions illogically (e.g., predicting 1 instead of 3 would be a 'larger' error than predicting 2 instead of 3, even if the classes are completely independent).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="softmax-network-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> بنية شبكة سوفت ماكس (Softmax Network Architecture)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Softmax Network Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>انحدار سوفت ماكس هو شبكة عصبية ذات طبقة واحدة متصلة بالكامل (Fully-connected)، تنتج مخرجات متعددة (Logits) بناءً على تحويل تآلفي (Affine transformation) للمدخلات.</p></template>
+    <template class="content-en"><p>Softmax regression is a single-layer, fully-connected neural network that produces multiple outputs (logits) based on an affine transformation of the inputs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتقدير الاحتمالات الشرطية المرتبطة بجميع الفئات الممكنة، نحتاج إلى نموذج ذو مخرجات متعددة، مخرج واحد لكل فئة. سيتوافق كل مخرج مع دالة تآلفية (Affine function) خاصة به.</p><p>إذا كان لدينا 4 ميزات (Features) و 3 فئات مخرجات، سنحتاج إلى 12 وزناً (Weights) و 3 انحيازات (Biases). نحسب هذه القيم الخام (Logits) $o_1, o_2, o_3$ لكل مدخل كالتالي:</p><ul><li>$o_1 = x_1w_{11} + x_2w_{12} + x_3w_{13} + x_4w_{14} + b_1$</li><li>$o_2 = x_1w_{21} + x_2w_{22} + x_3w_{23} + x_4w_{24} + b_2$</li><li>$o_3 = x_1w_{31} + x_2w_{32} + x_3w_{33} + x_4w_{34} + b_3$</li></ul><p>يمكن التعبير عن ذلك باستخدام تدوين الجبر الخطي: $\mathbf{o} = \mathbf{W}\mathbf{x} + \mathbf{b}$.</p></template>
+    <template class="content-en"><p>To estimate the conditional probabilities associated with all possible classes, we need a model with multiple outputs, one per class. Each output will correspond to its own affine function.</p><p>If we have 4 features and 3 possible output categories, we need 12 scalars for weights and 3 scalars for biases. We compute these three <span class="smart-term" data-term-en="Logits" data-ar="اللوجيتس (القيم الخام)" data-en-def="The raw, unnormalized predictions generated by the linear layer before applying the softmax function.">logits<span class="smart-term-tooltip"></span></span>, $o_1, o_2$, and $o_3$, for each input:</p><ul><li>$o_1 = x_1w_{11} + x_2w_{12} + x_3w_{13} + x_4w_{14} + b_1$</li><li>$o_2 = x_1w_{21} + x_2w_{22} + x_3w_{23} + x_4w_{24} + b_2$</li><li>$o_3 = x_1w_{31} + x_2w_{32} + x_3w_{33} + x_4w_{34} + b_3$</li></ul><p>We can use linear algebra notation: $\mathbf{o} = \mathbf{W}\mathbf{x} + \mathbf{b}$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُعرف هذه البنية بأنها طبقة متصلة بالكامل (Fully-connected layer) لأن كل عقدة إدخال متصلة بكل عقدة إخراج. على الرغم من أن دالة سوفت ماكس غير خطية، إلا أن المخرجات (Logits) تتحدد بتحويل خطي (تآلفي)، لذا يُعتبر انحدار سوفت ماكس نموذجاً خطياً.</p><p>لتحسين الكفاءة الحسابية والاستفادة من وحدات معالجة الرسومات (GPUs)، نقوم بإجراء حسابات متجهة للدفعات الصغيرة (Minibatches). إذا كانت مصفوفة المدخلات $\mathbf{X}$ بحجم $n \times d$، والأوزان $\mathbf{W}$ بحجم $d \times q$، فإن $\mathbf{O} = \mathbf{X}\mathbf{W} + \mathbf{b}$ ستكون مصفوفة بحجم $n \times q$.</p></template>
+    <template class="content-en"><p>This architecture is described as a fully-connected layer because every input node is connected to every output node. Although softmax is a nonlinear function, the outputs of softmax regression are still determined by an <span class="smart-term" data-term-en="Affine transformation" data-ar="التحويل التآلفي" data-en-def="A linear transformation followed by a translation (adding a bias).">affine transformation<span class="smart-term-tooltip"></span></span> of input features. Thus, softmax regression is a linear model.</p><p>To improve computational efficiency and take advantage of GPUs, we carry out vector calculations for minibatches of data. If input matrix $\mathbf{X}$ is $n \times d$, and weights $\mathbf{W}$ are $d \times q$, then $\mathbf{O} = \mathbf{X}\mathbf{W} + \mathbf{b}$ results in an $n \times q$ matrix.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حساب اللوجيتس لدُفعة صغيرة (Minibatch) باستخدام ضرب المصفوفات.</strong></template>
+      <template class="content-en"><strong>Computing logits for a minibatch using matrix multiplication.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\mathbf{O} = \mathbf{X}\mathbf{W} + \mathbf{b}$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A neural network diagram showing a single-layer fully-connected network. Input layer has 4 nodes labeled x1, x2, x3, x4. Output layer has 3 nodes labeled o1, o2, o3. Every input node is connected to every output node with directed arrows (edges). Style: educational, dark background #0d1117, accent color #58a6ff, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Definitions for Arrow Markers -->
+    <defs>
+        <marker id="arrow" markerUnits="userSpaceOnUse" viewBox="0 -5 10 10" refX="32" refY="0" markerWidth="10" markerHeight="10" orient="auto">
+            <path d="M0,-4 L8,0 L0,4 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Softmax Network Architecture</text>
+    <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية شبكة سوفت ماكس</text>
+
+    <!-- Connections (Edges) -->
+    <g id="edges" stroke="var(--brand-500)" stroke-width="1.5" opacity="0.4">
+        <!-- From x1 -->
+        <line x1="200" y1="80" x2="600" y2="120" marker-end="url(#arrow)"/>
+        <line x1="200" y1="80" x2="600" y2="200" marker-end="url(#arrow)"/>
+        <line x1="200" y1="80" x2="600" y2="280" marker-end="url(#arrow)"/>
+        
+        <!-- From x2 -->
+        <line x1="200" y1="160" x2="600" y2="120" marker-end="url(#arrow)"/>
+        <line x1="200" y1="160" x2="600" y2="200" marker-end="url(#arrow)"/>
+        <line x1="200" y1="160" x2="600" y2="280" marker-end="url(#arrow)"/>
+        
+        <!-- From x3 -->
+        <line x1="200" y1="240" x2="600" y2="120" marker-end="url(#arrow)"/>
+        <line x1="200" y1="240" x2="600" y2="200" marker-end="url(#arrow)"/>
+        <line x1="200" y1="240" x2="600" y2="280" marker-end="url(#arrow)"/>
+        
+        <!-- From x4 -->
+        <line x1="200" y1="320" x2="600" y2="120" marker-end="url(#arrow)"/>
+        <line x1="200" y1="320" x2="600" y2="200" marker-end="url(#arrow)"/>
+        <line x1="200" y1="320" x2="600" y2="280" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Center Label for Weights -->
+    <g id="center-label">
+        <rect x="310" y="185" width="180" height="30" rx="15" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+        <text x="400" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">12 Weights, 3 Biases</text>
+        <text x="400" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">12 وزناً، 3 تحيزات</text>
+    </g>
+
+    <!-- Input Nodes -->
+    <g id="input-nodes">
+        <!-- x1 -->
+        <circle cx="200" cy="80" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="200" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">x<tspan dy="4" font-size="12">1</tspan></text>
+        
+        <!-- x2 -->
+        <circle cx="200" cy="160" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="200" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">x<tspan dy="4" font-size="12">2</tspan></text>
+        
+        <!-- x3 -->
+        <circle cx="200" cy="240" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="200" y="245" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">x<tspan dy="4" font-size="12">3</tspan></text>
+        
+        <!-- x4 -->
+        <circle cx="200" cy="320" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="200" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)">x<tspan dy="4" font-size="12">4</tspan></text>
+    </g>
+
+    <!-- Output Nodes -->
+    <g id="output-nodes">
+        <!-- o1 -->
+        <circle cx="600" cy="120" r="25" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="600" y="125" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-lo)">o<tspan dy="4" font-size="12">1</tspan></text>
+        <text x="635" y="125" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-muted)">+ b<tspan dy="4" font-size="11">1</tspan></text>
+        
+        <!-- o2 -->
+        <circle cx="600" cy="200" r="25" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="600" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-lo)">o<tspan dy="4" font-size="12">2</tspan></text>
+        <text x="635" y="205" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-muted)">+ b<tspan dy="4" font-size="11">2</tspan></text>
+        
+        <!-- o3 -->
+        <circle cx="600" cy="280" r="25" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="600" y="285" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-lo)">o<tspan dy="4" font-size="12">3</tspan></text>
+        <text x="635" y="285" text-anchor="start" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-muted)">+ b<tspan dy="4" font-size="11">3</tspan></text>
+    </g>
+
+    <!-- Bottom Labels and Equation -->
+    <g id="bottom-labels">
+        <!-- Input Layer Label -->
+        <text x="200" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Input Layer (4 features)</text>
+        <text x="200" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">طبقة الإدخال (4 ميزات)</text>
+
+        <!-- Output Layer Label -->
+        <text x="600" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Output Layer (3 classes)</text>
+        <text x="600" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">طبقة الإخراج (3 فئات)</text>
+
+        <!-- Equation Box -->
+        <rect x="320" y="345" width="160" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+        <text x="400" y="371" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">o = Wx + b</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكننا تفسير اللوجيتس (Logits) مباشرة كاحتمالات؟</template>
+      <template class="content-en">Why CANNOT we interpret the logits directly as probabilities?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن اللوجيتس لا تخضع لقيود الاحتمالات: فهي لا تجمع إلى 1، ويمكن أن تأخذ قيماً سالبة اعتماداً على المدخلات، مما ينتهك البديهيات الأساسية للاحتمال.</p></template>
+      <template class="content-en"><p>Because nothing constrains these numbers to sum to 1, and depending on the inputs, they can take negative values, violating basic axioms of probability.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="softmax-operation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> عملية سوفت ماكس (Softmax Operation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Softmax Operation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقوم دالة سوفت ماكس بتحويل القيم الخام (Logits) إلى توزيع احتمالي صالح عن طريق رفعها للأس (لضمان الإيجابية) ثم قسمتها على مجموعها (لضمان أن المجموع يساوي 1).</p></template>
+    <template class="content-en"><p>The softmax operation transforms raw logits into a valid probability distribution by exponentiating them (ensuring non-negativity) and dividing by their sum (ensuring they sum to 1).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتفسير مخرجاتنا كاحتمالات، يجب أن نضمن أنها غير سالبة ومجموعها يساوي 1. لتحقيق ذلك مع الحفاظ على قابلية النموذج للاشتقاق (Differentiable)، نستخدم دالة سوفت ماكس:</p><ol><li>نقوم برفع كل قيمة خام (Logit) للأس (باستخدام الدالة الأسية $\exp$) لضمان عدم وجود قيم سالبة.</li><li>نقسم كل قيمة على مجموع كل القيم الأسية (لضمان أن مجموع الاحتمالات يساوي 1).</li></ol><p>المعادلة هي: $\hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$</p><p>من السهل ملاحظة أن $\hat{y}_1 + \hat{y}_2 + \dots = 1$ وأن $0 \le \hat{y}_j \le 1$.</p></template>
+    <template class="content-en"><p>To interpret our outputs as probabilities, we must guarantee they are nonnegative and sum up to 1. To transform logits while requiring the model remains differentiable, we use the softmax function:</p><ol><li>We first exponentiate each logit (ensuring non-negativity).</li><li>Then divide by their sum (ensuring that they sum to 1).</li></ol><p>The equation is: $\hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$</p><p>It is easy to see that $\hat{y}_1 + \hat{y}_2 + \dots = 1$ with $0 \le \hat{y}_j \le 1$ for all $j$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>خاصية هامة لدالة سوفت ماكس هي أنها <b>لا تغير الترتيب</b> بين القيم الخام (Logits). أي أن $\text{argmax}_j \hat{y}_j = \text{argmax}_j o_j$. لذلك، أثناء التنبؤ، يمكننا اختيار الفئة الأكثر احتمالاً بناءً على اللوجيتس مباشرة دون الحاجة لحساب سوفت ماكس.</p><p>الهدف من التدريب هو تشجيع النموذج على تقدير الاحتمالات بصدق، وهي خاصية تسمى <b><span class="smart-term" data-term-en="Calibration" data-ar="المعايرة" data-en-def="A property where the predicted probabilities faithfully represent the true likelihood of the events (e.g., if it predicts 0.5, it is correct 50% of the time).">المعايرة<span class="smart-term-tooltip"></span></span> (Calibration)</b>. المقام في معادلة سوفت ماكس يُسمى أحياناً <span class="smart-term" data-term-en="Partition function" data-ar="دالة التقسيم" data-en-def="The denominator in the softmax function that normalizes the exponentiated values.">دالة التقسيم<span class="smart-term-tooltip"></span></span> (Partition function).</p></template>
+    <template class="content-en"><p>An important property of the softmax operation is that it <b>does not change the ordering</b> among the logits $o$. Therefore, during prediction we can still pick out the most likely class by: $\text{argmax}_j \hat{y}_j = \text{argmax}_j o_j$.</p><p>We need a training objective that encourages the model to estimate faithfully probabilities, a property called <b><span class="smart-term" data-term-en="Calibration" data-ar="المعايرة" data-en-def="A property where the predicted probabilities faithfully represent the true likelihood of the events (e.g., if it predicts 0.5, it is correct 50% of the time).">calibration<span class="smart-term-tooltip"></span></span></b>. The denominator in the softmax equation is also sometimes called the <span class="smart-term" data-term-en="Partition function" data-ar="دالة التقسيم" data-en-def="The denominator in the softmax function that normalizes the exponentiated values.">partition function<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة سوفت ماكس لتحويل اللوجيتس إلى احتمالات.</strong></template>
+      <template class="content-en"><strong>Softmax function to convert logits into probabilities.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{y}_j = \frac{\exp(o_j)}{\sum_k \exp(o_k)}$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def softmax(X):
+    X_exp = np.exp(X)
+    partition = X_exp.sum(1, keepdims=True)
+    return X_exp / partition  # Broadcasting applied here</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت دالة سوفت ماكس لا تغير ترتيب القيم، فلماذا نستخدمها أصلاً بدلاً من استخدام اللوجيتس مباشرة؟</template>
+      <template class="content-en">If the softmax function does not change the ordering of the values, why do we use it at all instead of just using the logits directly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نحتاج سوفت ماكس أثناء التدريب لحساب دالة الخسارة (الإنتروبيا المتقاطعة) التي تتطلب توزيعاً احتمالياً صالحاً لمقارنته مع التسميات الحقيقية. أما في مرحلة الاستدلال (التنبؤ النهائي)، فيمكننا فعلاً الاكتفاء باللوجيتس لاختيار الفئة الفائزة.</p></template>
+      <template class="content-en"><p>We need softmax during training to compute the loss function (cross-entropy), which requires a valid probability distribution to compare against the true labels. During inference (final prediction), we can indeed just use the logits to pick the winning class.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="cross-entropy-loss" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> دالة الخسارة: الإنتروبيا المتقاطعة (Cross-Entropy Loss)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Loss Function: Cross-Entropy Loss</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإنتروبيا المتقاطعة هي دالة الخسارة الأكثر شيوعاً للتصنيف، وتقيس مدى اختلاف التوزيع الاحتمالي المتوقع عن التوزيع الحقيقي (الترميز الأحادي الساخن).</p></template>
+    <template class="content-en"><p>Cross-entropy is the most common loss function for classification, measuring the difference between the predicted probability distribution and the true distribution (one-hot encoded).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>نعتمد على <b><span class="smart-term" data-term-en="Maximum Likelihood Estimation (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a probability distribution by maximizing a likelihood function.">تقدير الاحتمالية القصوى<span class="smart-term-tooltip"></span></span> (Maximum Likelihood Estimation)</b>. نريد تعظيم احتمالية الفئات الفعلية وفقاً لنموذجنا. هذا يعادل تقليل اللوغاريتم السالب للاحتمالية (Negative log-likelihood).</p><p>بما أن التسمية $y$ هي متجه أحادي الساخن (One-hot)، فإن المجموع عبر جميع إحداثياته يختفي باستثناء حد واحد (الفئة الصحيحة). دالة الخسارة لزوج من التسمية $y$ والتنبؤ $\hat{y}$ هي:</p><p>$l(y, \hat{y}) = - \sum_{j=1}^q y_j \log \hat{y}_j$</p><p>بما أن جميع $\hat{y}_j$ هي احتمالات (بين 0 و 1)، فإن اللوغاريتم الخاص بها لا يكون أكبر من 0 أبداً. لا يمكن تقليل الخسارة أكثر إذا توقعنا التسمية الفعلية بيقين تام (أي $\hat{y}_j = 1$).</p></template>
+    <template class="content-en"><p>We rely on <b><span class="smart-term" data-term-en="Maximum Likelihood Estimation (MLE)" data-ar="تقدير الاحتمالية القصوى" data-en-def="A method of estimating the parameters of a probability distribution by maximizing a likelihood function.">maximum likelihood estimation (MLE)<span class="smart-term-tooltip"></span></span></b>. We want to maximize the probability of the actual classes according to our model, which is equivalent to minimizing the negative log-likelihood.</p><p>Since $y$ is a one-hot vector, the sum over all its coordinates vanishes for all but one term (the true class). The loss function for any pair of label $y$ and model prediction $\hat{y}$ is:</p><p>$l(y, \hat{y}) = - \sum_{j=1}^q y_j \log \hat{y}_j$</p><p>Since all $\hat{y}_j$ are predicted probabilities, their logarithm is never larger than 0. The loss cannot be minimized further if we correctly predict the actual label with certainty (i.e., $\hat{y}_j = 1$).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند دمج دالة سوفت ماكس مع الإنتروبيا المتقاطعة وحساب المشتقة بالنسبة لأي قيمة خام (Logit) $o_j$، نحصل على نتيجة أنيقة جداً:</p><p>$\partial_{o_j} l(y, \hat{y}) = \text{softmax}(\mathbf{o})_j - y_j = \hat{y}_j - y_j$</p><p>بعبارة أخرى، المشتقة هي ببساطة الفرق بين الاحتمال الذي عينه النموذج وما حدث بالفعل (التسمية الحقيقية). هذا يجعل عملية التدرج (Gradient) مستقرة وفعالة جداً.</p></template>
+    <template class="content-en"><p>When plugging the softmax definition into the cross-entropy loss and taking the derivative with respect to any logit $o_j$, we get a very elegant result:</p><p>$\partial_{o_j} l(y, \hat{y}) = \text{softmax}(\mathbf{o})_j - y_j = \hat{y}_j - y_j$</p><p>In other words, the derivative is simply the difference between the probability assigned by our model and what actually happened (the true label).</p><p>This makes the gradient computation highly efficient and stable.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الإنتروبيا المتقاطعة.</strong></template>
+      <template class="content-en"><strong>Cross-Entropy Loss equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$l(y, \hat{y}) = - \sum_{j=1}^q y_j \log \hat{y}_j$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def cross_entropy(y_hat, y):
+    return - np.log(y_hat[range(len(y_hat)), y])</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكن أن تصل خسارة الإنتروبيا المتقاطعة إلى الصفر المطلق في الممارسة العملية؟</template>
+      <template class="content-en">Why can't the cross-entropy loss reach absolute zero in practice?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>للوصول إلى خسارة صفر، يجب أن يتوقع النموذج الاحتمال 1.0 للفئة الصحيحة. بسبب طبيعة دالة سوفت ماكس (التي تستخدم الدالة الأسية)، يتطلب الوصول إلى احتمال 1.0 أن تكون قيمة اللوجيت (Logit) للفئة الصحيحة لا نهائية (Infinity)، وهو أمر مستحيل حسابياً. كما أن وجود ضوضاء في البيانات يمنع التصنيف المثالي.</p></template>
+      <template class="content-en"><p>To reach zero loss, the model must predict a probability of exactly 1.0 for the correct class. Due to the softmax function (which uses exponentials), reaching 1.0 requires the logit for the correct class to be positive infinity, which is computationally impossible. Also, label noise prevents perfect classification.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="information-theory-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> أساسيات نظرية المعلومات (الإنتروبيا والمفاجأة)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Information Theory Basics (Entropy and Surprisal)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتعامل نظرية المعلومات مع ضغط البيانات. <b>الإنتروبيا</b> تقيس كمية المعلومات في التوزيع، و<b>المفاجأة</b> تقيس مدى استغرابنا من وقوع حدث معين.</p></template>
+    <template class="content-en"><p>Information theory deals with data compression. <b>Entropy</b> quantifies the information content in a distribution, and <b>surprisal</b> measures how unexpected an event is.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الفكرة المركزية في نظرية المعلومات هي تحديد كمية المعلومات في البيانات، مما يضع حداً أقصى لقدرتنا على ضغطها. هذه الكمية تسمى <b><span class="smart-term" data-term-en="Entropy" data-ar="الإنتروبيا" data-en-def="A measure of the unpredictability or information content of a probability distribution.">الإنتروبيا<span class="smart-term-tooltip"></span></span> (Entropy)</b> لتوزيع $P$، وتُحسب كالتالي:</p><p>$H[P] = \sum_j -P(j) \log P(j)$</p><p>إذا كان من السهل دائماً التنبؤ بالحدث التالي، فإن البيانات سهلة الضغط. إذا لم نتمكن من التنبؤ بشكل مثالي، فقد نتفاجأ أحياناً.</p><p>تكون مفاجأتنا أكبر عندما نخصص للحدث احتمالاً أقل. حدد كلود شانون <b><span class="smart-term" data-term-en="Surprisal" data-ar="المفاجأة" data-en-def="Quantified as -log P(j), it measures how unexpected an event j is.">المفاجأة<span class="smart-term-tooltip"></span></span> (Surprisal)</b> بـ $-\log P(j)$.</p><p>الإنتروبيا هي ببساطة 'المفاجأة المتوقعة' (Expected surprisal).</p></template>
+    <template class="content-en"><p>The central idea in information theory is to quantify the information content in data, placing a hard limit on our ability to compress it. This quantity is called the <b><span class="smart-term" data-term-en="Entropy" data-ar="الإنتروبيا" data-en-def="A measure of the unpredictability or information content of a probability distribution.">entropy<span class="smart-term-tooltip"></span></span></b> of a distribution $P$:</p><p>$H[P] = \sum_j -P(j) \log P(j)$</p><p>If it is always easy to predict the next token, the data is easy to compress. If we cannot perfectly predict, we might be surprised. Our surprise is greater when we assigned an event lower probability. Claude Shannon quantified <b><span class="smart-term" data-term-en="Surprisal" data-ar="المفاجأة" data-en-def="Quantified as -log P(j), it measures how unexpected an event j is.">surprisal<span class="smart-term-tooltip"></span></span></b> as $-\log P(j)$.</p><p>Entropy is simply the expected surprisal.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ما هي <b>الإنتروبيا المتقاطعة (Cross-Entropy)</b> إذن؟ إنها المفاجأة المتوقعة لمراقب يمتلك احتمالات ذاتية $Q$ عند رؤية بيانات تم إنشاؤها فعلياً وفقاً للاحتمالات الحقيقية $P$.</p><p>يتم تحقيق أدنى إنتروبيا متقاطعة ممكنة عندما يكون $P = Q$. في هذه الحالة، الإنتروبيا المتقاطعة تساوي الإنتروبيا الأصلية $H(P)$.</p><p>لذلك، تقليل الإنتروبيا المتقاطعة في التعلم الآلي يعادل تقليل مفاجأتنا (وبالتالي عدد البتات المطلوبة) لتوصيل التسميات الحقيقية.</p></template>
+    <template class="content-en"><p>What is <b>cross-entropy</b> then? It is the expected surprisal of an observer with subjective probabilities $Q$ upon seeing data that were actually generated according to true probabilities $P$.</p><p>The lowest possible cross-entropy is achieved when $P = Q$. In this case, the cross-entropy from $P$ to $Q$ is $H(P)$.</p><p>In short, minimizing the cross-entropy objective is equivalent to minimizing our surprisal (and thus the number of bits) required to communicate the labels.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الإنتروبيا لشانون.</strong></template>
+      <template class="content-en"><strong>Shannon Entropy equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$H[P] = \sum_j -P(j) \log P(j)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان احتمال وقوع حدث هو 100%، فما هي قيمة المفاجأة (Surprisal) لهذا الحدث؟</template>
+      <template class="content-en">If the probability of an event occurring is 100%, what is the surprisal value for this event?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>صفر. لأن -log(1) = 0. إذا كنت متأكداً تماماً من وقوع الحدث، فلن تتفاجأ على الإطلاق عند حدوثه.</p></template>
+      <template class="content-en"><p>Zero. Because -log(1) = 0. If you are absolutely certain an event will happen, you experience no surprise when it does.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="fashion-mnist-dataset" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مجموعة بيانات تصنيف الصور (Fashion-MNIST)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> The Image Classification Dataset (Fashion-MNIST)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مجموعة بيانات Fashion-MNIST هي مجموعة قياسية لتصنيف الملابس تتكون من صور رمادية بحجم 28x28 بكسل، وتُستخدم كبديل أكثر تعقيداً لمجموعة MNIST التقليدية.</p></template>
+    <template class="content-en"><p>Fashion-MNIST is a standard apparel classification dataset of 28x28 grayscale images, used as a more complex alternative to the traditional MNIST dataset.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعد مجموعة MNIST (للأرقام المكتوبة بخط اليد) مستخدمة على نطاق واسع، لكن النماذج البسيطة تحقق فيها دقة تتجاوز 95%، مما يجعلها غير مناسبة للتمييز بين النماذج القوية والضعيفة. لذلك نركز على <b>Fashion-MNIST</b>.</p><ul><li>تتكون من صور من 10 فئات (قميص، بنطال، حذاء، إلخ).</li><li>تحتوي على 60,000 صورة للتدريب و 10,000 صورة للاختبار.</li><li>كل صورة بحجم 28 × 28 بكسل، وهي صور ذات تدرج رمادي (قناة لونية واحدة).</li></ul><p>نستخدم محمل البيانات (Data Loader) المدمج لقراءة دفعات صغيرة (Minibatches) من البيانات بكفاءة، مع خلط الأمثلة عشوائياً أثناء التدريب.</p></template>
+    <template class="content-en"><p>The MNIST dataset (handwritten digits) is widely used, but simple models achieve >95% accuracy, making it unsuitable for distinguishing between strong and weak models. We focus on the comparatively complex <b>Fashion-MNIST</b>.</p><ul><li>Consists of images from 10 categories (t-shirt, trousers, sneaker, etc.).</li><li>Contains 60,000 training images and 10,000 test images.</li><li>Each image is 28 x 28 pixels, grayscale (1 channel).</li></ul><p>We use built-in data iterators to read <span class="smart-term" data-term-en="Minibatch" data-ar="الدفعة الصغيرة" data-en-def="A small subset of the training dataset used to compute the gradient and update weights in one iteration.">minibatch<span class="smart-term-tooltip"></span></span>es of data efficiently, randomly shuffling the examples for the training data iterator.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند إدخال هذه الصور إلى نموذج خطي (مثل انحدار سوفت ماكس)، يجب 'تسطيح' (Flatten) الصورة ثنائية الأبعاد (28x28) إلى متجه أحادي البعد بطول 784 ميزة (Feature). في هذه المرحلة، نتعامل مع كل موقع بكسل كميزة مستقلة، مما يعني أن النموذج الخطي يتجاهل البنية المكانية (Spatial structure) للصورة.</p><p>تُعد مكررات البيانات (Data iterators) مكوناً أساسياً للأداء الفعال، حيث تستغل الحوسبة عالية الأداء لتجنب إبطاء حلقة التدريب.</p></template>
+    <template class="content-en"><p>When feeding these images into a linear model (like softmax regression), the 2D image (28x28) must be 'flattened' into a 1D vector of length 784 features. For now, we treat each pixel location as just another feature, meaning the linear model ignores the spatial structure of the image.</p><p>Data iterators are a key component for efficient performance, exploiting high-performance computing to avoid slowing down the training loop.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>mnist_train = gluon.data.vision.FashionMNIST(train=True)
+mnist_test = gluon.data.vision.FashionMNIST(train=False)
+# Flattening example:
+num_inputs = 784 # 28 * 28</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو العيب الرئيسي في تسطيح (Flattening) صورة 28x28 إلى متجه 784 للشبكات العصبية الخطية؟</template>
+      <template class="content-en">What is the main drawback of flattening a 28x28 image into a 784 vector for linear neural networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التسطيح يدمر العلاقات المكانية بين البكسلات المتجاورة. النموذج الخطي لا يعرف أن البكسل رقم 1 قريب مكانياً من البكسل رقم 29 (الذي يقع تحته مباشرة في الصورة الأصلية).</p></template>
+      <template class="content-en"><p>Flattening destroys the spatial relationships between adjacent pixels. The linear model does not know that pixel 1 is spatially close to pixel 29 (which is directly below it in the original image).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="implementation-and-numerical-stability" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التنفيذ والاستقرار العددي (خدعة LogSumExp)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Implementation and Numerical Stability (LogSumExp Trick)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حساب سوفت ماكس برمجياً بشكل مباشر قد يؤدي إلى مشاكل عدم استقرار عددي (Overflow/Underflow). تستخدم أطر العمل خدعة رياضية لدمج سوفت ماكس مع الإنتروبيا المتقاطعة لتجنب هذه المشاكل.</p></template>
+    <template class="content-en"><p>Computing softmax naively can lead to numerical instability (overflow/underflow). Frameworks use a mathematical trick combining softmax and cross-entropy to avoid this.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند تنفيذ سوفت ماكس من الصفر، نقوم بحساب $\exp(o_j)$. إذا كانت قيمة $o_j$ كبيرة جداً، فإن الدالة الأسية ستنتج رقماً ضخماً يتجاوز قدرة الحاسوب على تخزينه (Overflow). وإذا كانت سالبة جداً، ستصبح صفراً (Underflow)، مما يؤدي إلى القسمة على صفر أو حساب $\log(0)$ لاحقاً.</p><p>لحسن الحظ، نحن نحسب الدالة الأسية فقط لنأخذ اللوغاريتم الخاص بها لاحقاً عند حساب خسارة الإنتروبيا المتقاطعة. من خلال دمج هاتين العمليتين معاً، يمكننا تجنب حساب $\exp(o_j)$ بشكل مباشر بفضل الإلغاء الرياضي في $\log(\exp(\cdot))$.</p><p>تُعرف هذه التقنية باسم <b><span class="smart-term" data-term-en="LogSumExp trick" data-ar="خدعة LogSumExp" data-en-def="A mathematical technique used in machine learning to compute the logarithm of the sum of exponentials in a numerically stable way.">خدعة LogSumExp<span class="smart-term-tooltip"></span></span></b>، وهي مدمجة في دوال الخسارة الجاهزة مثل <code>SoftmaxCrossEntropyLoss</code>.</p></template>
+    <template class="content-en"><p>When implementing softmax from scratch, we compute $\exp(o_j)$. If $o_j$ is very large, the exponential produces a massive number causing numerical overflow. If it's very negative, it becomes zero (underflow), leading to division by zero or computing $\log(0)$ later.</p><p>Fortunately, we compute exponentials ultimately to take their log (when calculating cross-entropy loss). By combining these two operators, we avoid calculating $\exp(o_j)$ directly due to the canceling in $\log(\exp(\cdot))$.</p><p>This technique is known as the <b><span class="smart-term" data-term-en="LogSumExp trick" data-ar="خدعة LogSumExp" data-en-def="A mathematical technique used in machine learning to compute the logarithm of the sum of exponentials in a numerically stable way.">LogSumExp trick<span class="smart-term-tooltip"></span></span></b>, and it is built into high-level loss functions like <code>SoftmaxCrossEntropyLoss</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعادلة المدمجة تبدو كالتالي:</p><p>$\log(\hat{y}_j) = \log\left(\frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) = o_j - \log\left(\sum_k \exp(o_k)\right)$</p><p>هذا يمنع الحاجة إلى حساب $\exp(o_j)$ في البسط.</p><p>للتعامل مع المقام، يتم طرح الحد الأقصى لقيمة اللوجيتس من جميع اللوجيتس قبل أخذ الدالة الأسية، مما يضمن أن أكبر قيمة يتم رفعها للأس هي 0 (حيث $\exp(0)=1$)، مما يمنع الـ Overflow تماماً.</p><p>لذلك، في الممارسة العملية، نمرر دائماً اللوجيتس (القيم الخام) مباشرة إلى دالة الخسارة المدمجة بدلاً من تمرير الاحتمالات المحسوبة يدوياً.</p></template>
+    <template class="content-en"><p>The combined equation looks like this:</p><p>$\log(\hat{y}_j) = \log\left(\frac{\exp(o_j)}{\sum_k \exp(o_k)}\right) = o_j - \log\left(\sum_k \exp(o_k)\right)$</p><p>This avoids computing $\exp(o_j)$ in the numerator. To handle the denominator, the maximum logit value is subtracted from all logits before exponentiation, ensuring the largest exponentiated value is $\exp(0)=1$, completely preventing overflow.</p><p>Therefore, in practice, we always pass the raw logits directly to the combined loss function rather than passing manually computed probabilities.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الأساس الرياضي لخدعة LogSumExp.</strong></template>
+      <template class="content-en"><strong>Mathematical basis for the LogSumExp trick.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\log(\hat{y}_j) = o_j - \log\left(\sum_k \exp(o_k)\right)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># High-level API implementation avoids numerical instability
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
+# We pass logits directly to the loss function, NOT softmax probabilities.</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا استخدمنا واجهة برمجة تطبيقات عالية المستوى (High-level API)، هل يجب علينا إضافة طبقة Softmax في نهاية الشبكة العصبية أثناء التدريب؟</template>
+      <template class="content-en">If we use a high-level API, should we add a Softmax layer at the end of the neural network during training?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، يجب ألا تفعل ذلك. دالة الخسارة المدمجة (مثل SoftmaxCrossEntropyLoss) تتوقع استقبال اللوجيتس (القيم الخام) مباشرة وتقوم هي بتطبيق سوفت ماكس داخلياً بطريقة مستقرة عددياً.</p></template>
+      <template class="content-en"><p>No, you should not. The combined loss function (like SoftmaxCrossEntropyLoss) expects to receive raw logits directly and applies softmax internally in a numerically stable way.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. لقد انتقلنا الآن من التنبؤ بالأرقام (الانحدار) إلى اتخاذ القرارات (التصنيف). تخيل أنك تبني عقلاً لفرز الصور؛ لا يكفي أن يعطيك رقماً عشوائياً، بل يجب أن يخبرك 'أنا واثق بنسبة 90% أن هذه قطة'. هنا يأتي دور بطلتنا: دالة Softmax. إنها الساحر الذي يحول الأرقام الخام (Logits) إلى احتمالات أنيقة ومفهومة. لكن تذكروا الفخ الأكبر في الامتحان وفي الحياة العملية: لا تحسبوا Softmax يدوياً أبداً عند التدريب! الحواسيب تكره الأرقام الأسية الضخمة (Overflow). بدلاً من ذلك، نستخدم 'خدعة LogSumExp' التي تدمج Softmax مع دالة الخسارة (Cross-Entropy) في خطوة واحدة آمنة. لقد رأينا أيضاً كيف نستخدم مجموعة Fashion-MNIST كملعب تدريب لنا. ركزوا جيداً على فهم لماذا نستخدم الترميز الأحادي الساخن (One-hot)، ولماذا مشتقة الخسارة بسيطة جداً (التوقع ناقص الحقيقة). هذه المفاهيم هي حجر الأساس لكل ما سنبنيه لاحقاً في التعلم العميق. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this crucial module. We have now transitioned from predicting numbers (regression) to making decisions (classification). Imagine building a brain to sort images; it's not enough to output a random number, it needs to say 'I am 90% sure this is a cat.' Enter our hero: the Softmax function. It's the magician that turns raw numbers (logits) into neat, understandable probabilities. But remember the biggest trap for the exam and in practice: NEVER compute Softmax manually during training! Computers hate massive exponential numbers (overflow). Instead, we use the 'LogSumExp trick' which combines Softmax with the loss function (Cross-Entropy) in one safe step. We also saw how to use the Fashion-MNIST dataset as our training playground. Focus heavily on understanding why we use One-hot encoding, and why the loss derivative is so beautifully simple (prediction minus reality). These concepts are the bedrock of everything we will build later in deep learning. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الترميز الأحادي الساخن (One-hot encoding) بدلاً من الأرقام الصحيحة للفئات؟</template>
+          <template class="content-en">Why do we use One-hot encoding instead of integers for categories?</template>
+          <span class="content-target">لماذا نستخدم الترميز الأحادي الساخن (One-hot encoding) بدلاً من الأرقام الصحيحة للفئات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الأرقام الصحيحة تفرض علاقة ترتيبية (Ordinal relationship) غير موجودة في الواقع. مثلاً، إذا رمزنا القطة بـ 1 والكلب بـ 2 والطائر بـ 3، سيفترض النموذج أن الطائر 'أكبر' من القطة، وأن المسافة بين القطة والطائر ضعف المسافة بين القطة والكلب. الترميز الأحادي الساخن يعامل كل فئة ككيان مستقل تماماً.</template>
+          <template class="content-en">Because integers impose an ordinal relationship that doesn't exist in reality. For example, if cat=1, dog=2, bird=3, the model assumes a bird is 'greater' than a cat, and the distance between cat and bird is twice that of cat and dog. One-hot encoding treats each category as a completely independent entity.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور دالة Softmax بالضبط؟</template>
+          <template class="content-en">What exactly is the role of the Softmax function?</template>
+          <span class="content-target">ما هو دور دالة Softmax بالضبط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">دورها هو تحويل مخرجات النموذج الخام (التي يمكن أن تكون سالبة ولا تجمع إلى 1) إلى توزيع احتمالي صالح. تفعل ذلك برفع القيم للأس (لجعلها موجبة) ثم قسمتها على مجموعها (لجعل المجموع 1).</template>
+          <template class="content-en">Its role is to convert the raw model outputs (which can be negative and don't sum to 1) into a valid probability distribution. It does this by exponentiating the values (making them positive) and dividing by their sum (making them sum to 1).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم دالة الخطأ التربيعي المتوسط (MSE) في التصنيف كما فعلنا في الانحدار؟</template>
+          <template class="content-en">Why don't we use Mean Squared Error (MSE) for classification like we did in regression?</template>
+          <span class="content-target">لماذا لا نستخدم دالة الخطأ التربيعي المتوسط (MSE) في التصنيف كما فعلنا في الانحدار؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن MSE تفترض أن البيانات تتبع توزيعاً غاوسياً (طبيعياً) وتُعاقب الأخطاء بناءً على المسافة. في التصنيف، نحن نتعامل مع احتمالات وتوزيعات فئوية. الإنتروبيا المتقاطعة (Cross-Entropy) هي المقياس الطبيعي (المشتق من تقدير الاحتمالية القصوى) لقياس الفرق بين توزيعين احتماليين.</template>
+          <template class="content-en">Because MSE assumes data follows a Gaussian distribution and penalizes errors based on distance. In classification, we deal with probabilities and categorical distributions. Cross-Entropy is the natural metric (derived from Maximum Likelihood Estimation) to measure the difference between two probability distributions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني 'المعايرة' (Calibration) في نماذج التصنيف؟</template>
+          <template class="content-en">What does 'Calibration' mean in classification models?</template>
+          <span class="content-target">ماذا تعني 'المعايرة' (Calibration) في نماذج التصنيف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المعايرة تعني أن الاحتمالات التي يتوقعها النموذج تعكس الواقع بصدق. إذا توقع النموذج احتمال 0.5 (50%) لفئة معينة في 100 صورة، فيجب أن تنتمي 50 صورة منها بالفعل لتلك الفئة.</template>
+          <template class="content-en">Calibration means the probabilities predicted by the model faithfully reflect reality. If the model predicts a 0.5 (50%) probability for a certain class across 100 images, exactly 50 of those images should actually belong to that class.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة عدم الاستقرار العددي في Softmax وكيف نحلها؟</template>
+          <template class="content-en">What is the numerical instability issue in Softmax and how do we solve it?</template>
+          <span class="content-target">ما هي مشكلة عدم الاستقرار العددي في Softmax وكيف نحلها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المشكلة هي الـ Overflow؛ حساب الدالة الأسية لأرقام كبيرة ينتج قيماً تتجاوز ذاكرة الحاسوب. نحلها باستخدام 'خدعة LogSumExp'، حيث ندمج حساب Softmax مع اللوغاريتم الموجود في دالة الخسارة، ونطرح أكبر قيمة من جميع اللوجيتس قبل حساب الأس.</template>
+          <template class="content-en">The issue is Overflow; computing the exponential of large numbers produces values exceeding computer memory. We solve it using the 'LogSumExp trick', combining Softmax with the logarithm in the loss function, and subtracting the maximum logit from all logits before exponentiation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم Fashion-MNIST بدلاً من MNIST العادية؟</template>
+          <template class="content-en">Why do we use Fashion-MNIST instead of regular MNIST?</template>
+          <span class="content-target">لماذا نستخدم Fashion-MNIST بدلاً من MNIST العادية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مجموعة MNIST (الأرقام) أصبحت سهلة جداً؛ حتى النماذج البسيطة جداً تحقق فيها دقة تفوق 95%. Fashion-MNIST (الملابس) أكثر تعقيداً قليلاً، مما يجعلها معياراً أفضل لاختبار ومقارنة قوة الخوارزميات المختلفة.</template>
+          <template class="content-en">The MNIST dataset (digits) has become too easy; even very simple models achieve >95% accuracy. Fashion-MNIST (apparel) is slightly more complex, making it a better benchmark to test and compare the strength of different algorithms.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني الإنتروبيا (Entropy) بكلمات بسيطة؟</template>
+          <template class="content-en">What does Entropy mean in simple words?</template>
+          <span class="content-target">ماذا تعني الإنتروبيا (Entropy) بكلمات بسيطة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الإنتروبيا هي مقياس لـ 'المفاجأة المتوقعة' أو مقدار عدم اليقين في البيانات. إذا كانت البيانات متوقعة ومكررة، فالإنتروبيا منخفضة. إذا كانت عشوائية تماماً ولا يمكن التنبؤ بها، فالإنتروبيا عالية.</template>
+          <template class="content-en">Entropy is a measure of 'expected surprisal' or the amount of uncertainty in data. If data is predictable and repetitive, entropy is low. If it is completely random and unpredictable, entropy is high.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحسب دقة النموذج (Accuracy) برمجياً؟</template>
+          <template class="content-en">How do we compute model Accuracy programmatically?</template>
+          <span class="content-target">كيف نحسب دقة النموذج (Accuracy) برمجياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدم دالة <code>argmax</code> على مخرجات النموذج لمعرفة الفئة ذات الاحتمال الأعلى. ثم نقارن هذا التوقع مع التسمية الحقيقية (Label). نجمع عدد التطابقات الصحيحة ونقسمها على العدد الإجمالي للأمثلة.</template>
+          <template class="content-en">We use the <code>argmax</code> function on the model's outputs to find the class with the highest probability. We then compare this prediction with the true label. We sum the number of correct matches and divide by the total number of examples.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل نحتاج إلى حساب Softmax أثناء مرحلة الاستدلال (Inference) لاختيار الفئة الفائزة؟</template>
+          <template class="content-en">Do we need to compute Softmax during inference to pick the winning class?</template>
+          <span class="content-target">هل نحتاج إلى حساب Softmax أثناء مرحلة الاستدلال (Inference) لاختيار الفئة الفائزة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا. دالة Softmax تحافظ على الترتيب (Monotonically increasing). الفئة التي تمتلك أعلى قيمة خام (Logit) ستظل تمتلك أعلى احتمال بعد Softmax. لذا يمكننا ببساطة تطبيق <code>argmax</code> على اللوجيتس مباشرة لتوفير الوقت.</template>
+          <template class="content-en">No. The Softmax function preserves ordering (it is monotonically increasing). The class with the highest raw logit will still have the highest probability after Softmax. So we can simply apply <code>argmax</code> directly to the logits to save time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أهمية مكررات البيانات (Data Iterators) في التعلم العميق؟</template>
+          <template class="content-en">What is the importance of Data Iterators in deep learning?</template>
+          <span class="content-target">ما هي أهمية مكررات البيانات (Data Iterators) في التعلم العميق؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مكررات البيانات تقوم بتحميل البيانات في دفعات صغيرة (Minibatches) وتخلطها عشوائياً بكفاءة عالية. بدونها، سنضطر لتحميل مجموعة البيانات بأكملها في الذاكرة (مما قد يسبب انهيار النظام) أو قراءتها ببطء شديد مما يعطل وحدة المعالجة المركزية (GPU).</template>
+          <template class="content-en">Data iterators load data in minibatches and shuffle them randomly with high efficiency. Without them, we would have to load the entire dataset into memory (potentially crashing the system) or read it so slowly that it bottlenecks the GPU.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الفرق الرئيسي بين الانحدار (Regression) والتصنيف (Classification) من حيث الهدف؟",
+      "en": "What is the main difference between Regression and Classification in terms of objective?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الانحدار يتنبأ بكمية (كم المقدار؟)، بينما التصنيف يتنبأ بفئة (أي واحد؟).",
+        "en": "Regression predicts a quantity (how much?), while classification predicts a category (which one?)."
+      },
+      "example": {
+        "ar": "الانحدار: التنبؤ بسعر منزل. التصنيف: تحديد ما إذا كانت الصورة لقطة أم كلب.",
+        "en": "Regression: Predicting house price. Classification: Identifying if an image is a cat or dog."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الترميز الأحادي الساخن (One-hot encoding)؟",
+      "en": "What is One-hot encoding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متجه يحتوي على أصفار في كل مكان باستثناء المكون المطابق للفئة الصحيحة، والذي يتم تعيينه إلى 1.",
+        "en": "A vector with zeros everywhere except for the component corresponding to the correct category, which is set to 1."
+      },
+      "example": {
+        "ar": "إذا كانت الفئات (قطة، كلب، طائر)، فإن القطة تُمثل بـ (1, 0, 0).",
+        "en": "If categories are (cat, dog, bird), cat is represented as (1, 0, 0)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي اللوجيتس (Logits) في سياق الشبكات العصبية؟",
+      "en": "What are Logits in the context of neural networks?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي المخرجات الخام غير المُسواة (Unnormalized) للنموذج الخطي قبل تمريرها عبر دالة التنشيط (مثل Softmax).",
+        "en": "The raw, unnormalized outputs of the linear model before being passed through an activation function (like Softmax)."
+      },
+      "example": {
+        "ar": "القيم الناتجة من المعادلة $o = Wx + b$.",
+        "en": "The values resulting from the equation $o = Wx + b$."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هما الشرطان اللذان تحققهما دالة سوفت ماكس (Softmax) لتكوين توزيع احتمالي صالح؟",
+      "en": "What two conditions does the Softmax function satisfy to form a valid probability distribution?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1. جميع المخرجات غير سالبة (بين 0 و 1). 2. مجموع جميع المخرجات يساوي 1.",
+        "en": "1. All outputs are non-negative (between 0 and 1). 2. The sum of all outputs equals 1."
+      },
+      "example": {
+        "ar": "المخرجات [0.1, 0.7, 0.2] صالحة لأنها موجبة ومجموعها 1.",
+        "en": "Outputs [0.1, 0.7, 0.2] are valid because they are positive and sum to 1."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "كيف تحافظ دالة سوفت ماكس على الترتيب (Ordering)؟",
+      "en": "How does the Softmax function preserve ordering?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أكبر قيمة خام (Logit) ستنتج دائماً أكبر احتمال بعد تطبيق سوفت ماكس.",
+        "en": "The largest raw logit will always produce the largest probability after applying softmax."
+      },
+      "example": {
+        "ar": "$\\text{argmax}_j \\hat{y}_j = \\text{argmax}_j o_j$",
+        "en": "$\\text{argmax}_j \\hat{y}_j = \\text{argmax}_j o_j$"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي دالة الخسارة الأكثر شيوعاً لمشاكل التصنيف؟",
+      "en": "What is the most commonly used loss function for classification problems?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خسارة الإنتروبيا المتقاطعة (Cross-Entropy Loss).",
+        "en": "Cross-Entropy Loss."
+      },
+      "example": {
+        "ar": "تُحسب كـ $-\\sum y_j \\log \\hat{y}_j$.",
+        "en": "Calculated as $-\\sum y_j \\log \\hat{y}_j$."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو المبدأ الإحصائي الذي تُشتق منه خسارة الإنتروبيا المتقاطعة؟",
+      "en": "From which statistical principle is the cross-entropy loss derived?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقدير الاحتمالية القصوى (Maximum Likelihood Estimation - MLE).",
+        "en": "Maximum Likelihood Estimation (MLE)."
+      },
+      "example": {
+        "ar": "تقليل الإنتروبيا المتقاطعة يعادل تعظيم احتمالية البيانات المرصودة.",
+        "en": "Minimizing cross-entropy is equivalent to maximizing the likelihood of the observed data."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي مشتقة خسارة الإنتروبيا المتقاطعة (مع سوفت ماكس) بالنسبة للوجيت $o_j$؟",
+      "en": "What is the derivative of cross-entropy loss (with softmax) with respect to logit $o_j$?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي ببساطة الفرق بين الاحتمال المتوقع والتسمية الحقيقية: $\\hat{y}_j - y_j$.",
+        "en": "It is simply the difference between the predicted probability and the true label: $\\hat{y}_j - y_j$."
+      },
+      "example": {
+        "ar": "إذا توقع النموذج 0.8 والفئة الحقيقية هي 1، فإن المشتقة هي -0.2.",
+        "en": "If the model predicts 0.8 and the true class is 1, the derivative is -0.2."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ماذا تقيس الإنتروبيا (Entropy) في نظرية المعلومات؟",
+      "en": "What does Entropy measure in information theory?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقيس كمية المعلومات أو مستوى عدم اليقين (المفاجأة المتوقعة) في توزيع احتمالي.",
+        "en": "It measures the amount of information or the level of uncertainty (expected surprisal) in a probability distribution."
+      },
+      "example": {
+        "ar": "البيانات التي يسهل التنبؤ بها لها إنتروبيا منخفضة.",
+        "en": "Data that is easy to predict has low entropy."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يتم تعريف المفاجأة (Surprisal) لحدث $j$ رياضياً؟",
+      "en": "How is Surprisal for an event $j$ defined mathematically?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُعرف بـ $-\\log P(j)$.",
+        "en": "Defined as $-\\log P(j)$."
+      },
+      "example": {
+        "ar": "كلما قل الاحتمال $P(j)$، زادت قيمة المفاجأة عند وقوع الحدث.",
+        "en": "The lower the probability $P(j)$, the higher the surprisal when the event occurs."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي مجموعة بيانات Fashion-MNIST؟",
+      "en": "What is the Fashion-MNIST dataset?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة بيانات لتصنيف الصور تحتوي على 70,000 صورة رمادية بحجم 28x28 لـ 10 فئات من الملابس.",
+        "en": "An image classification dataset containing 70,000 28x28 grayscale images of 10 apparel categories."
+      },
+      "example": {
+        "ar": "تُستخدم كبديل أصعب لمجموعة أرقام MNIST التقليدية.",
+        "en": "Used as a harder drop-in replacement for the traditional MNIST digits dataset."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "لماذا نقوم بتسطيح (Flatten) الصور قبل إدخالها في انحدار سوفت ماكس؟",
+      "en": "Why do we flatten images before feeding them into softmax regression?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن النماذج الخطية القياسية تتطلب متجهاً أحادي البعد كمدخل، حيث يُعامل كل بكسل كميزة مستقلة.",
+        "en": "Because standard linear models require a 1D vector as input, treating each pixel as an independent feature."
+      },
+      "example": {
+        "ar": "صورة 28x28 تتحول إلى متجه بطول 784.",
+        "en": "A 28x28 image becomes a vector of length 784."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هي المشكلة العددية التي قد تحدث عند حساب سوفت ماكس برمجياً بشكل مباشر؟",
+      "en": "What numerical issue can occur when computing softmax naively in code?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الطففان العددي (Overflow) بسبب حساب الدالة الأسية $\\exp()$ لأرقام كبيرة جداً.",
+        "en": "Numerical overflow due to computing the exponential $\\exp()$ of very large numbers."
+      },
+      "example": {
+        "ar": "$\\exp(1000)$ سينتج قيمة تتجاوز سعة التخزين (Infinity).",
+        "en": "$\\exp(1000)$ will result in a value exceeding storage capacity (Infinity)."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي خدعة LogSumExp؟",
+      "en": "What is the LogSumExp trick?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية رياضية تدمج حساب سوفت ماكس مع الإنتروبيا المتقاطعة لتجنب حساب الدالة الأسية المباشرة للقيم الكبيرة، مما يضمن الاستقرار العددي.",
+        "en": "A mathematical technique combining softmax and cross-entropy computation to avoid direct exponentiation of large values, ensuring numerical stability."
+      },
+      "example": {
+        "ar": "تُستخدم داخلياً في دوال مثل <code>SoftmaxCrossEntropyLoss</code>.",
+        "en": "Used internally in functions like <code>SoftmaxCrossEntropyLoss</code>."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يتم حساب دقة التصنيف (Classification Accuracy)؟",
+      "en": "How is Classification Accuracy calculated?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي نسبة التنبؤات الصحيحة إلى إجمالي عدد التنبؤات.",
+        "en": "It is the ratio of correct predictions to the total number of predictions."
+      },
+      "example": {
+        "ar": "إذا توقع النموذج 8 صور بشكل صحيح من أصل 10، فالدقة هي 80%.",
+        "en": "If the model predicts 8 images correctly out of 10, the accuracy is 80%."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل الخاصية الأساسية لمخرجات دالة سوفت ماكس (Softmax)؟",
+      "en": "Which of the following represents the fundamental property of the Softmax function outputs?"
+    },
+    "options": {
+      "ar": [
+        "مجموعها يساوي صفر.",
+        "يمكن أن تحتوي على قيم سالبة.",
+        "مجموعها يساوي 1 وجميع القيم غير سالبة.",
+        "تغير ترتيب القيم الخام (Logits)."
+      ],
+      "en": [
+        "They sum to zero.",
+        "They can contain negative values.",
+        "They sum to 1 and all values are non-negative.",
+        "They change the ordering of the raw logits."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة سوفت ماكس تحول القيم إلى توزيع احتمالي صالح، مما يعني أن جميع القيم يجب أن تكون موجبة ومجموعها يساوي 1.",
+      "en": "The softmax function converts values into a valid probability distribution, meaning all values must be positive and sum to 1."
+    },
+    "hint": {
+      "ar": "تذكر بديهيات الاحتمال.",
+      "en": "Remember the axioms of probability."
+    },
+    "difficulty": "easy",
+    "conceptId": "softmax-operation"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "إذا كان لدينا 5 فئات، ما هو طول المتجه المستخدم في الترميز الأحادي الساخن (One-hot encoding)؟",
+      "en": "If we have 5 categories, what is the length of the vector used in One-hot encoding?"
+    },
+    "options": {
+      "ar": [
+        "1",
+        "4",
+        "5",
+        "10"
+      ],
+      "en": [
+        "1",
+        "4",
+        "5",
+        "10"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الترميز الأحادي الساخن يستخدم متجهاً بطول يساوي عدد الفئات المتاحة.",
+      "en": "One-hot encoding uses a vector with a length equal to the number of available categories."
+    },
+    "hint": {
+      "ar": "كل فئة تحتاج إلى مكان (مكون) خاص بها في المتجه.",
+      "en": "Each category needs its own spot (component) in the vector."
+    },
+    "difficulty": "easy",
+    "conceptId": "classification-vs-regression"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي مشتقة دالة خسارة الإنتروبيا المتقاطعة (مع سوفت ماكس) بالنسبة للوجيت $o_j$؟",
+      "en": "What is the derivative of the cross-entropy loss (with softmax) with respect to the logit $o_j$?"
+    },
+    "options": {
+      "ar": [
+        "$\\hat{y}_j + y_j$",
+        "$\\hat{y}_j - y_j$",
+        "$\\log(\\hat{y}_j)$",
+        "$\\exp(o_j)$"
+      ],
+      "en": [
+        "$\\hat{y}_j + y_j$",
+        "$\\hat{y}_j - y_j$",
+        "$\\log(\\hat{y}_j)$",
+        "$\\exp(o_j)$"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المشتقة هي ببساطة الفرق بين الاحتمال المتوقع $\\hat{y}_j$ والتسمية الحقيقية $y_j$.",
+      "en": "The derivative is simply the difference between the predicted probability $\\hat{y}_j$ and the true label $y_j$."
+    },
+    "hint": {
+      "ar": "إنها تمثل 'الخطأ' المباشر في التنبؤ.",
+      "en": "It represents the direct 'error' in the prediction."
+    },
+    "difficulty": "medium",
+    "conceptId": "cross-entropy-loss"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "لماذا نفضل استخدام مجموعة بيانات Fashion-MNIST بدلاً من MNIST لتقييم خوارزميات التصنيف؟",
+      "en": "Why do we prefer using the Fashion-MNIST dataset instead of MNIST to evaluate classification algorithms?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تحتوي على صور ملونة.",
+        "لأنها أصغر حجماً وأسرع في التدريب.",
+        "لأن MNIST سهلة جداً والنماذج البسيطة تحقق فيها دقة عالية جداً.",
+        "لأن Fashion-MNIST لا تتطلب تسطيح (Flattening) الصور."
+      ],
+      "en": [
+        "Because it contains color images.",
+        "Because it is smaller and faster to train.",
+        "Because MNIST is too easy and simple models achieve very high accuracy on it.",
+        "Because Fashion-MNIST does not require flattening images."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مجموعة MNIST سهلة لدرجة أن النماذج البسيطة تحقق دقة >95%، مما يجعل من الصعب التمييز بين النماذج القوية والضعيفة.",
+      "en": "MNIST is so easy that simple models achieve >95% accuracy, making it hard to distinguish between strong and weak models."
+    },
+    "hint": {
+      "ar": "فكر في مستوى التحدي الذي تقدمه البيانات للنموذج.",
+      "en": "Think about the level of challenge the data presents to the model."
+    },
+    "difficulty": "medium",
+    "conceptId": "fashion-mnist-dataset"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الغرض الرئيسي من 'خدعة LogSumExp' في التعلم العميق؟",
+      "en": "What is the main purpose of the 'LogSumExp trick' in deep learning?"
+    },
+    "options": {
+      "ar": [
+        "تسريع عملية التدريب عن طريق تقليل عدد المعلمات.",
+        "تجنب عدم الاستقرار العددي (Overflow/Underflow) عند حساب سوفت ماكس.",
+        "تحسين دقة النموذج على بيانات الاختبار.",
+        "تحويل الصور ثنائية الأبعاد إلى متجهات أحادية البعد."
+      ],
+      "en": [
+        "Speeding up training by reducing the number of parameters.",
+        "Avoiding numerical instability (overflow/underflow) when computing softmax.",
+        "Improving model accuracy on test data.",
+        "Converting 2D images into 1D vectors."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تُستخدم هذه الخدعة لدمج حساب سوفت ماكس مع الإنتروبيا المتقاطعة لتجنب حساب الدالة الأسية المباشرة للقيم الكبيرة جداً.",
+      "en": "This trick is used to combine softmax and cross-entropy computation to avoid direct exponentiation of very large values."
+    },
+    "hint": {
+      "ar": "ماذا يحدث إذا قمت بحساب $\\exp(1000)$ في بايثون؟",
+      "en": "What happens if you compute $\\exp(1000)$ in Python?"
+    },
+    "difficulty": "hard",
+    "conceptId": "implementation-and-numerical-stability"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في نظرية المعلومات، ماذا تمثل القيمة $-\\log P(j)$؟",
+      "en": "In information theory, what does the value $-\\log P(j)$ represent?"
+    },
+    "options": {
+      "ar": [
+        "الإنتروبيا (Entropy)",
+        "المفاجأة (Surprisal)",
+        "الاحتمالية القصوى (Maximum Likelihood)",
+        "اللوجيت (Logit)"
+      ],
+      "en": [
+        "Entropy",
+        "Surprisal",
+        "Maximum Likelihood",
+        "Logit"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حدد كلود شانون المفاجأة (Surprisal) لحدث ما بـ $-\\log P(j)$، وهي تزداد كلما قل احتمال الحدث.",
+      "en": "Claude Shannon quantified the surprisal of an event as $-\\log P(j)$, which increases as the event's probability decreases."
+    },
+    "hint": {
+      "ar": "الإنتروبيا هي 'القيمة المتوقعة' لهذا المقياس.",
+      "en": "Entropy is the 'expected value' of this metric."
+    },
+    "difficulty": "medium",
+    "conceptId": "information-theory-basics"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "إذا كانت مصفوفة المدخلات $X$ بحجم $n \\times d$، ومصفوفة الأوزان $W$ بحجم $d \\times q$، فما هو حجم مصفوفة اللوجيتس $O$؟",
+      "en": "If the input matrix $X$ has shape $n \\times d$, and the weight matrix $W$ has shape $d \\times q$, what is the shape of the logits matrix $O$?"
+    },
+    "options": {
+      "ar": [
+        "$n \\times d$",
+        "$d \\times q$",
+        "$n \\times q$",
+        "$q \\times n$"
+      ],
+      "en": [
+        "$n \\times d$",
+        "$d \\times q$",
+        "$n \\times q$",
+        "$q \\times n$"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "حسب قواعد ضرب المصفوفات، ضرب مصفوفة $n \\times d$ في مصفوفة $d \\times q$ ينتج مصفوفة بحجم $n \\times q$.",
+      "en": "According to matrix multiplication rules, multiplying an $n \\times d$ matrix by a $d \\times q$ matrix results in an $n \\times q$ matrix."
+    },
+    "hint": {
+      "ar": "تذكر قاعدة الأبعاد الداخلية في ضرب المصفوفات.",
+      "en": "Remember the inner dimensions rule in matrix multiplication."
+    },
+    "difficulty": "easy",
+    "conceptId": "softmax-network-architecture"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "لماذا لا يمكننا تحسين (Optimize) دقة التصنيف (Accuracy) مباشرة باستخدام النزول الاشتقاقي (Gradient Descent)؟",
+      "en": "Why can't we optimize Classification Accuracy directly using Gradient Descent?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تتطلب وقتاً طويلاً للحساب.",
+        "لأنها دالة غير قابلة للاشتقاق (Not differentiable).",
+        "لأنها تعطي قيماً سالبة.",
+        "لأنها تعتمد على الترميز الأحادي الساخن."
+      ],
+      "en": [
+        "Because it takes too long to compute.",
+        "Because it is not a differentiable function.",
+        "Because it gives negative values.",
+        "Because it relies on one-hot encoding."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الدقة تعتمد على قرارات صلبة (صح أو خطأ)، مما يجعلها دالة متدرجة (Step function) غير قابلة للاشتقاق، وبالتالي لا يمكن استخدامها مع النزول الاشتقاقي. بدلاً من ذلك نستخدم الإنتروبيا المتقاطعة كبديل قابل للاشتقاق.",
+      "en": "Accuracy relies on hard decisions (right or wrong), making it a step function that is not differentiable, and thus unusable with gradient descent. We use cross-entropy as a differentiable surrogate."
+    },
+    "hint": {
+      "ar": "النزول الاشتقاقي يتطلب حساب الميل (المنحدر) عند كل نقطة.",
+      "en": "Gradient descent requires calculating the slope at every point."
+    },
+    "difficulty": "hard",
+    "conceptId": "cross-entropy-loss"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من العبارات التالية صحيحة حول دالة سوفت ماكس؟",
+      "en": "Which of the following statements is true about the softmax function?"
+    },
+    "options": {
+      "ar": [
+        "تغير الترتيب النسبي للقيم المدخلة.",
+        "تحافظ على الترتيب النسبي للقيم المدخلة.",
+        "تُستخدم فقط في مشاكل الانحدار.",
+        "تُنتج دائماً قيماً أكبر من 1."
+      ],
+      "en": [
+        "It changes the relative ordering of the input values.",
+        "It preserves the relative ordering of the input values.",
+        "It is only used in regression problems.",
+        "It always produces values greater than 1."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة سوفت ماكس لا تغير الترتيب بين اللوجيتس. القيمة الأكبر قبل سوفت ماكس ستظل صاحبة الاحتمال الأكبر بعد سوفت ماكس.",
+      "en": "The softmax function does not change the ordering among the logits. The largest value before softmax will still have the highest probability after softmax."
+    },
+    "hint": {
+      "ar": "فكر في تأثير الدالة الأسية المتزايدة باستمرار.",
+      "en": "Think about the effect of the monotonically increasing exponential function."
+    },
+    "difficulty": "medium",
+    "conceptId": "softmax-operation"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "عند استخدام واجهات برمجة التطبيقات عالية المستوى (High-level APIs) مثل <code>gluon.loss.SoftmaxCrossEntropyLoss</code>، ماذا يجب أن نمرر كمدخلات للدالة؟",
+      "en": "When using high-level APIs like <code>gluon.loss.SoftmaxCrossEntropyLoss</code>, what should we pass as inputs to the function?"
+    },
+    "options": {
+      "ar": [
+        "الاحتمالات المحسوبة يدوياً باستخدام سوفت ماكس.",
+        "القيم الخام (Logits) مباشرة دون تطبيق سوفت ماكس.",
+        "الصور الأصلية قبل التسطيح.",
+        "فقط التسميات الحقيقية (Labels)."
+      ],
+      "en": [
+        "Manually computed probabilities using softmax.",
+        "Raw logits directly without applying softmax.",
+        "Original images before flattening.",
+        "Only the true labels."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لتجنب عدم الاستقرار العددي، تتوقع هذه الدوال المدمجة استقبال اللوجيتس مباشرة، وتقوم هي بتطبيق سوفت ماكس والإنتروبيا المتقاطعة معاً بطريقة آمنة (باستخدام LogSumExp).",
+      "en": "To avoid numerical instability, these combined functions expect to receive raw logits directly, applying softmax and cross-entropy together safely (using LogSumExp)."
+    },
+    "hint": {
+      "ar": "تذكر خدعة LogSumExp ولماذا تم دمج الدالتين.",
+      "en": "Remember the LogSumExp trick and why the two functions were combined."
+    },
+    "difficulty": "hard",
+    "conceptId": "implementation-and-numerical-stability"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تطبيق دالة Softmax يدوياً ثم تمرير النتيجة إلى دالة Cross-Entropy هو فخ شائع. هذا يؤدي إلى عدم استقرار عددي (Overflow/Underflow) بسبب الدالة الأسية. استخدم دائماً الدوال المدمجة في أطر العمل (مثل SoftmaxCrossEntropyLoss) التي تستقبل اللوجيتس مباشرة.</template>
+    <template class="content-en">Applying Softmax manually and then passing the result to a Cross-Entropy function is a common trap. This leads to numerical instability (overflow/underflow) due to the exponential function. Always use built-in combined functions (like SoftmaxCrossEntropyLoss) that take logits directly.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">دالة Softmax لا تغير الترتيب. $\text{argmax}_j \hat{y}_j = \text{argmax}_j o_j$. لذلك في مرحلة الاستدلال (Inference)، يمكنك توفير الموارد الحسابية وتخطي حساب Softmax تماماً، واختيار الفئة ذات اللوجيت الأعلى مباشرة.</template>
+    <template class="content-en">Softmax preserves ordering. $\text{argmax}_j \hat{y}_j = \text{argmax}_j o_j$. Therefore, during inference, you can save computational resources and skip the Softmax calculation entirely, directly picking the class with the highest logit.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مشتقة الإنتروبيا المتقاطعة مع سوفت ماكس أنيقة جداً: $\hat{y}_j - y_j$. هذا يعني أن التدرج (Gradient) الذي يوجه التعلم هو ببساطة 'الخطأ' المباشر بين ما توقعه النموذج وما كان يجب أن يتوقعه. هذا يجعل التدريب مستقراً جداً.</template>
+    <template class="content-en">The derivative of cross-entropy with softmax is beautifully simple: $\hat{y}_j - y_j$. This means the gradient driving the learning is simply the direct 'error' between what the model predicted and what it should have predicted. This makes training very stable.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">محاولة تحسين 'الدقة' (Accuracy) مباشرة باستخدام النزول الاشتقاقي مستحيلة لأن الدقة دالة غير قابلة للاشتقاق (Not differentiable). نحن نستخدم الإنتروبيا المتقاطعة كبديل (Surrogate) قابل للاشتقاق لتحسين النموذج.</template>
+    <template class="content-en">Trying to optimize 'Accuracy' directly using gradient descent is impossible because accuracy is not differentiable. We use cross-entropy as a differentiable surrogate to optimize the model.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تقليل الإنتروبيا المتقاطعة (Cross-Entropy) يعادل رياضياً تعظيم تقدير الاحتمالية القصوى (Maximum Likelihood Estimation) للبيانات المرصودة. كلاهما يهدف إلى جعل التوزيع المتوقع للنموذج مطابقاً للتوزيع الحقيقي للبيانات.</template>
+    <template class="content-en">Minimizing Cross-Entropy is mathematically equivalent to maximizing the Maximum Likelihood Estimation (MLE) of the observed data. Both aim to make the model's predicted distribution match the true data distribution.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M06.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M08.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

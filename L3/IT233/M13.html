@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT233" data-module="13" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>بنى مجموعة التعليمات (ISA) · IT233 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT233" data-page-title-en="IT233">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M12.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=IT233"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#isa-overview" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في بنى مجموعة التعليمات</template>
+        <template class="content-en">Introduction to Instruction Set Architectures</template>
+        <span class="content-target">مقدمة في بنى مجموعة التعليمات</span>
+      </a>
+      <a href="#zero-address-machines" class="toc-link" data-bilingual>
+        <template class="content-ar">الآلات صفرية العنوان (0-Address Machines)</template>
+        <template class="content-en">0-Address Machines (Stack)</template>
+        <span class="content-target">الآلات صفرية العنوان (0-Address Machines)</span>
+      </a>
+      <a href="#one-address-machines" class="toc-link" data-bilingual>
+        <template class="content-ar">الآلات أحادية العنوان (1-Address Machines)</template>
+        <template class="content-en">1-Address Machines (Accumulator)</template>
+        <span class="content-target">الآلات أحادية العنوان (1-Address Machines)</span>
+      </a>
+      <a href="#two-address-machines" class="toc-link" data-bilingual>
+        <template class="content-ar">الآلات ثنائية العنوان (2-Address Machines)</template>
+        <template class="content-en">2-Address Machines &amp; 1½-Address</template>
+        <span class="content-target">الآلات ثنائية العنوان (2-Address Machines)</span>
+      </a>
+      <a href="#three-address-machines" class="toc-link" data-bilingual>
+        <template class="content-ar">الآلات ثلاثية العنوان (3-Address Machines)</template>
+        <template class="content-en">3-Address Machines</template>
+        <span class="content-target">الآلات ثلاثية العنوان (3-Address Machines)</span>
+      </a>
+      <a href="#isa-comparison" class="toc-link" data-bilingual>
+        <template class="content-ar">مقارنة بنى مجموعة التعليمات</template>
+        <template class="content-en">ISA Comparison &amp; Memory Access</template>
+        <span class="content-target">مقارنة بنى مجموعة التعليمات</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 13</template>
+      <template class="content-en">Module 13</template>
+      <span class="content-target">الوحدة 13</span>
+    </span> · IT233
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">بنى مجموعة التعليمات (ISA)</h1>
+      <p class="hero-description">دراسة تفصيلية لبنى مجموعة التعليمات المختلفة بناءً على عدد المعاملات الصريحة (0، 1، 2، و 3 عناوين)، مع مقارنة شاملة لعدد الوصول للذاكرة وحجم التعليمات.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Instruction Set Architectures (ISA)</h1>
+      <p class="hero-description">A detailed study of different Instruction Set Architectures based on the number of explicit operands (0, 1, 2, and 3 addresses), with a comprehensive comparison of memory accesses and instruction sizes.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بنية الحاسوب</span>
+      <span class="tag">مجموعة التعليمات</span>
+      <span class="tag">المكدس</span>
+      <span class="tag">المراكم</span>
+      <span class="tag">الوصول للذاكرة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Computer Architecture</span>
+      <span class="tag">Instruction Set</span>
+      <span class="tag">Stack</span>
+      <span class="tag">Accumulator</span>
+      <span class="tag">Memory Access</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 30 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم كيف تحدد بنية مجموعة التعليمات (ISA) تنسيق التعليمات ولغة التجميع.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين الآلات ذات العناوين 0، 1، 2، و 3 من حيث كيفية التعامل مع المعاملات.</span></li>
+      <li><span class="obj-icon">✦</span><span>حساب عدد مرات الوصول إلى الذاكرة (Memory References) لكل نوع من أنواع البنى.</span></li>
+      <li><span class="obj-icon">✦</span><span>مقارنة كفاءة البنى المختلفة من حيث إجمالي البتات التي يتم الوصول إليها (تعليمات وبيانات).</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand how the Instruction Set Architecture (ISA) determines instruction formats and assembly language.</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between 0, 1, 2, and 3-address machines in terms of operand handling.</span></li>
+      <li><span class="obj-icon">✦</span><span>Calculate the number of memory references for each type of architecture.</span></li>
+      <li><span class="obj-icon">✦</span><span>Compare the efficiency of different architectures in terms of total bits accessed (instructions and data).</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="isa-overview" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في بنى مجموعة التعليمات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to Instruction Set Architectures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بنية مجموعة التعليمات (ISA) هي التي تحدد تنسيق التعليمات، وبالتالي تحدد لغة التجميع الخاصة بالمعالج. تخيلها كالقواعد النحوية للغة التي يتحدث بها المعالج.</p></template>
+    <template class="content-en"><p>The ISA determines the instruction formats and therefore the assembly language. Think of it as the grammar of the language the processor speaks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تحدد <span class="smart-term" data-term-en="ISA (Instruction Set Architecture)" data-ar="بنية مجموعة التعليمات" data-en-def="Determines instruction formats and the assembly language of a machine.">بنية مجموعة التعليمات<span class="smart-term-tooltip"></span></span> (ISA) كيفية صياغة التعليمات التي ينفذها المعالج. تعتمد هذه البنى بشكل أساسي على <b>عدد المعاملات الصريحة (Explicit Operands)</b> في التعليمة الواحدة.</p><p>الأنواع الأربعة الأساسية هي:</p><ol><li>آلات صفرية العنوان (0-address) وتعتمد على المكدس (Stack).</li><li>آلات أحادية العنوان (1-address) وتعتمد على المراكم (Accumulator).</li><li>آلات ثنائية العنوان (2-address).</li><li>آلات ثلاثية العنوان (3-address).</li></ol><p>يؤثر اختيار نوع الـ ISA بشكل كبير على عدد مرات الوصول إلى الذاكرة أثناء تنفيذ البرامج.</p></template>
+    <template class="content-en"><p>The Instruction Set Architecture (ISA) determines the format of instructions and the assembly language. These architectures are primarily based on the <b>number of explicit operands</b> in a single instruction.</p><p>The four basic types are:</p><ol><li>0-address machines (Stack-based).</li><li>1-address machines (Accumulator-based).</li><li>2-address machines.</li><li>3-address machines.</li></ol><p>The choice of ISA dramatically affects the number of times memory is accessed during program execution.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تصميم الـ ISA هو توازن بين تعقيد الأجهزة (Hardware) وكفاءة البرمجيات (Software). كلما زاد عدد العناوين في التعليمة، أصبحت التعليمة أطول (تحتاج بتات أكثر)، لكن عدد التعليمات الإجمالي لتنفيذ مهمة معينة يقل.</p><p>على العكس، الآلات ذات العناوين الأقل (مثل المكدس) تمتلك تعليمات قصيرة جداً، لكنها تتطلب كتابة عدد أكبر من التعليمات لإنجاز نفس المهمة.</p><p>هذا التوازن هو جوهر النقاش التاريخي بين معماريات RISC (تعليمات بسيطة وكثيرة) و CISC (تعليمات معقدة وقليلة).</p></template>
+    <template class="content-en"><p>ISA design is a trade-off between hardware complexity and software efficiency. As the number of addresses per instruction increases, the instruction length grows (requires more bits), but the total number of instructions needed for a task decreases.</p><p>Conversely, machines with fewer addresses (like stack machines) have very short instructions, but require a larger number of instructions to accomplish the same task.</p><p>This trade-off is the core of the historical debate between RISC (many simple instructions) and CISC (few complex instructions) architectures.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يؤثر تقليل عدد المعاملات الصريحة في التعليمة على حجم البرنامج الكلي في الذاكرة؟</template>
+      <template class="content-en">How does reducing the number of explicit operands in an instruction affect the overall program size in memory?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تقليل المعاملات يجعل التعليمة الواحدة أقصر (تستهلك مساحة أقل)، لكنه يتطلب استخدام عدد أكبر من التعليمات لإنجاز نفس العملية الحسابية، مما قد يؤدي في النهاية إلى زيادة الحجم الكلي للبرنامج أو زيادة عدد مرات جلب التعليمات من الذاكرة.</p></template>
+      <template class="content-en"><p>Reducing operands makes a single instruction shorter (takes less space), but it requires using a larger number of instructions to perform the same calculation, which may ultimately increase the total program size or the number of instruction fetches from memory.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="zero-address-machines" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الآلات صفرية العنوان (0-Address Machines)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> 0-Address Machines (Stack)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>آلات تعتمد على المكدس (Stack)، حيث تكون جميع المعاملات للعمليات الثنائية ضمنية (موجودة مسبقاً في المكدس). التعليمات الوحيدة التي تشير للذاكرة هي PUSH و POP.</p></template>
+    <template class="content-en"><p>Stack-based machines where all operands for binary operations are implicit on the stack. Only push/pop instructions reference memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الآلات صفرية العنوان، لا تحتوي تعليمات العمليات الحسابية (مثل ADD أو MUL) على أي عناوين لمعاملات. بدلاً من ذلك، تفترض هذه التعليمات أن المعاملات موجودة في أعلى <span class="smart-term" data-term-en="Stack" data-ar="المكدس" data-en-def="A LIFO (Last-In, First-Out) data structure used implicitly in 0-address machines for operands.">المكدس<span class="smart-term-tooltip"></span></span> (Stack).</p><p>التعليمات الوحيدة التي تحتوي على عناوين صريحة للذاكرة هي تعليمات النقل: <code>PUSH</code> (لجلب قيمة من الذاكرة للمكدس) و <code>POP</code> (لحفظ قيمة من المكدس إلى الذاكرة).</p><p><b>مثال تطبيقي:</b> حساب المعادلة <code>a = a * b + c - d * e</code></p><ol><li><code>PUSH A</code> (وصول للذاكرة: 1)</li><li><code>PUSH B</code> (وصول للذاكرة: 1)</li><li><code>MUL</code> (وصول للذاكرة: 0) -> المكدس الآن يحتوي على: a * b</li><li><code>PUSH C</code> (وصول للذاكرة: 1)</li><li><code>PUSH D</code> (وصول للذاكرة: 1)</li><li><code>PUSH E</code> (وصول للذاكرة: 1)</li><li><code>MUL</code> (وصول للذاكرة: 0) -> المكدس يحتوي على: d * e, c, a * b</li><li><code>SUB</code> (وصول للذاكرة: 0) -> المكدس يحتوي على: c - (d * e), a * b</li><li><code>ADD</code> (وصول للذاكرة: 0) -> المكدس يحتوي على: a * b + (c - (d * e))</li><li><code>POP A</code> (وصول للذاكرة: 1)</li></ol><p>إجمالي عدد مرات الوصول للذاكرة (Data Memory Refs) هو 6 مرات.</p></template>
+    <template class="content-en"><p>In 0-address machines, arithmetic instructions (like ADD or MUL) do not contain any operand addresses. Instead, they implicitly assume the operands are at the top of the <span class="smart-term" data-term-en="Stack" data-ar="المكدس" data-en-def="A LIFO (Last-In, First-Out) data structure used implicitly in 0-address machines for operands.">stack<span class="smart-term-tooltip"></span></span>.</p><p>The only instructions that explicitly reference memory are data transfer instructions: <code>PUSH</code> (to bring a value from memory to the stack) and <code>POP</code> (to save a value from the stack to memory).</p><p><b>Worked Example:</b> Calculating <code>a = a * b + c - d * e</code></p><ol><li><code>PUSH A</code> (Memory Refs: 1)</li><li><code>PUSH B</code> (Memory Refs: 1)</li><li><code>MUL</code> (Memory Refs: 0) -> Stack: a * b</li><li><code>PUSH C</code> (Memory Refs: 1)</li><li><code>PUSH D</code> (Memory Refs: 1)</li><li><code>PUSH E</code> (Memory Refs: 1)</li><li><code>MUL</code> (Memory Refs: 0) -> Stack: d * e, c, a * b</li><li><code>SUB</code> (Memory Refs: 0) -> Stack: c - (d * e), a * b</li><li><code>ADD</code> (Memory Refs: 0) -> Stack: a * b + (c - (d * e))</li><li><code>POP A</code> (Memory Refs: 1)</li></ol><p>Total data memory references is 6.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تعتبر عمليات المكدس (مثل ADD و MUL) ذات 0 وصول للذاكرة؟ لأن المكدس في هذه الآلات يُنفذ عادةً كمجموعة من المسجلات السريعة جداً (Fast Registers) داخل المعالج نفسه، مما يقلل من الرحلات البطيئة إلى الذاكرة الرئيسية.</p><p>هذا التصميم يجعل تقييم التعبيرات الرياضية المعقدة (باستخدام التدوين البولندي العكسي Reverse Polish Notation) فعالاً للغاية ومباشراً للمترجمات (Compilers).</p><p>ومع ذلك، العيب الرئيسي هو أن البرنامج يتطلب عدداً كبيراً من التعليمات (10 تعليمات في المثال السابق)، مما يعني زيادة في عدد مرات جلب التعليمات (Instruction Fetches) من الذاكرة.</p></template>
+    <template class="content-en"><p>Why do stack operations (like ADD and MUL) have 0 memory references? Because in a stack-based machine, the stack is typically implemented as a set of very fast registers within the CPU, minimizing slow trips to main memory.</p><p>This design makes evaluating complex mathematical expressions (using Reverse Polish Notation) highly efficient and straightforward for compilers to generate.</p><p>However, the main drawback is that the program requires a large number of instructions (10 instructions in the previous example), which means an increase in the number of instruction fetches from memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a sequence diagram showing a stack data structure evolving over time. Show 4 states of the stack corresponding to the calculation 'a = a * b + c - d * e'. State 1: Stack has 'a' and 'b'. State 2: Stack has 'a*b'. State 3: Stack has 'a*b', 'c', 'd', 'e'. State 4: Stack has 'a*b + (c - d*e)'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 440" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">0-Address Machine: Stack Evolution</text>
+    <text x="400" y="35" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">آلة صفرية العناوين: تطور المكدس</text>
+
+    <!-- Target Equation Box -->
+    <rect x="250" y="55" width="300" height="36" rx="18" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="79" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">Target: a = a * b + c - d * e</text>
+    <text x="400" y="79" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)">الهدف: a = a * b + c - d * e</text>
+
+    <!-- ================= STATE 1 ================= -->
+    <!-- Stack Container -->
+    <path d="M 65 160 L 65 330 L 155 330 L 155 160" fill="none" stroke="var(--border-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Stack Items -->
+    <rect x="70" y="290" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="110" y="313" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">a</text>
+    
+    <rect x="70" y="250" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="110" y="273" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">b</text>
+
+    <!-- TOS Indicator -->
+    <text x="60" y="272" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">TOS →</text>
+    <text x="60" y="272" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">القمة ←</text>
+
+    <!-- State Labels -->
+    <text x="110" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">State 1</text>
+    <text x="110" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">الحالة 1</text>
+    
+    <text x="110" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">PUSH A, B</text>
+    <text x="110" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">دفع A, B</text>
+    
+    <text x="110" y="398" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Mem Refs: 2</text>
+    <text x="110" y="398" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">مراجع الذاكرة: 2</text>
+
+    <!-- Transition 1 -->
+    <line x1="165" y1="250" x2="225" y2="250" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-head)" />
+    <text x="195" y="240" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">MUL</text>
+    <text x="195" y="240" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">ضرب</text>
+
+
+    <!-- ================= STATE 2 ================= -->
+    <!-- Stack Container -->
+    <path d="M 235 160 L 235 330 L 325 330 L 325 160" fill="none" stroke="var(--border-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Stack Items -->
+    <rect x="240" y="290" width="80" height="35" rx="4" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="280" y="313" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)">a * b</text>
+
+    <!-- TOS Indicator -->
+    <text x="230" y="312" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">TOS →</text>
+    <text x="230" y="312" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">القمة ←</text>
+
+    <!-- State Labels -->
+    <text x="280" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">State 2</text>
+    <text x="280" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">الحالة 2</text>
+    
+    <text x="280" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Execute MUL</text>
+    <text x="280" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تنفيذ ضرب</text>
+    
+    <text x="280" y="398" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Mem Refs: 0</text>
+    <text x="280" y="398" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">مراجع الذاكرة: 0</text>
+
+    <!-- Transition 2 -->
+    <line x1="335" y1="250" x2="395" y2="250" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-head)" />
+    <text x="365" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">PUSH C</text>
+    <text x="365" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">دفع C</text>
+    <text x="365" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">PUSH D</text>
+    <text x="365" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">دفع D</text>
+    <text x="365" y="240" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">PUSH E</text>
+    <text x="365" y="240" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">دفع E</text>
+
+
+    <!-- ================= STATE 3 ================= -->
+    <!-- Stack Container -->
+    <path d="M 405 160 L 405 330 L 495 330 L 495 160" fill="none" stroke="var(--border-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Stack Items -->
+    <rect x="410" y="290" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="450" y="313" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">a * b</text>
+    
+    <rect x="410" y="250" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="450" y="273" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">c</text>
+    
+    <rect x="410" y="210" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="450" y="233" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">d</text>
+    
+    <rect x="410" y="170" width="80" height="35" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="450" y="193" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">e</text>
+
+    <!-- TOS Indicator -->
+    <text x="400" y="192" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">TOS →</text>
+    <text x="400" y="192" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">القمة ←</text>
+
+    <!-- State Labels -->
+    <text x="450" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">State 3</text>
+    <text x="450" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">الحالة 3</text>
+    
+    <text x="450" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">PUSH C, D, E</text>
+    <text x="450" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">دفع C, D, E</text>
+    
+    <text x="450" y="398" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Mem Refs: 3</text>
+    <text x="450" y="398" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">مراجع الذاكرة: 3</text>
+
+    <!-- Transition 3 -->
+    <line x1="505" y1="250" x2="570" y2="250" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-head)" />
+    <text x="537.5" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">MUL</text>
+    <text x="537.5" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">ضرب</text>
+    <text x="537.5" y="225" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">SUB</text>
+    <text x="537.5" y="225" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">طرح</text>
+    <text x="537.5" y="240" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">ADD</text>
+    <text x="537.5" y="240" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)">جمع</text>
+
+
+    <!-- ================= STATE 4 ================= -->
+    <!-- Stack Container -->
+    <path d="M 580 160 L 580 330 L 760 330 L 760 160" fill="none" stroke="var(--border-color)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Stack Items -->
+    <rect x="585" y="290" width="170" height="35" rx="4" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="670" y="313" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)">a*b + (c - d*e)</text>
+
+    <!-- TOS Indicator -->
+    <text x="575" y="312" text-anchor="end" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">TOS →</text>
+    <text x="575" y="312" text-anchor="end" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--brand-ink)">القمة ←</text>
+
+    <!-- State Labels -->
+    <text x="670" y="360" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">State 4</text>
+    <text x="670" y="360" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">الحالة 4</text>
+    
+    <text x="670" y="380" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Execute Operations</text>
+    <text x="670" y="380" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تنفيذ العمليات</text>
+    
+    <text x="670" y="398" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">Mem Refs: 0</text>
+    <text x="670" y="398" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">مراجع الذاكرة: 0</text>
+
+    <!-- Footer Legend -->
+    <text x="400" y="425" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Total Data Memory References: 6 (PUSH/POP only)</text>
+    <text x="400" y="425" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">إجمالي مراجع ذاكرة البيانات: 6 (عمليات الدفع والسحب فقط)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان المكدس يقلل من الوصول للذاكرة للبيانات، فلماذا لا تستخدم جميع المعالجات الحديثة بنية 0-عنوان؟</template>
+      <template class="content-en">If the stack minimizes data memory accesses, why don't all modern processors use a 0-address architecture?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كثرة التعليمات المطلوبة (PUSH/POP لكل معامل) تزيد من عنق الزجاجة في جلب التعليمات (Instruction Fetch Bottleneck). المعالجات الحديثة تفضل استخدام مسجلات متعددة الأغراض لتقليل كل من جلب التعليمات والوصول لبيانات الذاكرة.</p></template>
+      <template class="content-en"><p>Because the high number of instructions required (PUSH/POP for every operand) increases the instruction fetch bottleneck. Modern processors prefer general-purpose registers to minimize both instruction fetches and data memory accesses.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="one-address-machines" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الآلات أحادية العنوان (1-Address Machines)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> 1-Address Machines (Accumulator)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>آلات تعتمد على المُرَاكِم (Accumulator)، حيث يعمل المراكم كمصدر ووجهة ضمنية في نفس الوقت، بينما يتم تحديد المصدر الثاني صراحةً في التعليمة.</p></template>
+    <template class="content-en"><p>Accumulator-based machines where the accumulator is an implicit source and destination. The second source is explicit in the instruction.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الآلات أحادية العنوان، تحتوي التعليمة على عنوان واحد فقط (Opcode + Addr). المعامل الآخر يكون دائماً مسجلاً خاصاً يُسمى <b><span class="smart-term" data-term-en="Accumulator" data-ar="المراكم" data-en-def="A central register in a 1-address machine that acts as both an implicit source and the destination for operations.">المراكم<span class="smart-term-tooltip"></span></span> (Accumulator)</b>.</p><p>نتيجة أي عملية حسابية يتم تخزينها تلقائياً في المراكم، مما يجعله المصدر الأول والوجهة النهائية في آن واحد.</p><p><b>مثال تطبيقي:</b> حساب المعادلة <code>a = a * b + c - d * e</code></p><ol><li><code>LOAD A</code> (وصول للذاكرة: 1) -> المراكم = a</li><li><code>MUL B</code> (وصول للذاكرة: 1) -> المراكم = a * b</li><li><code>ADD C</code> (وصول للذاكرة: 1) -> المراكم = a * b + c</li><li><code>STORE T1</code> (وصول للذاكرة: 1) -> حفظ النتيجة المؤقتة في الذاكرة</li><li><code>LOAD D</code> (وصول للذاكرة: 1) -> المراكم = d</li><li><code>MUL E</code> (وصول للذاكرة: 1) -> المراكم = d * e</li><li><code>STORE T2</code> (وصول للذاكرة: 1) -> حفظ النتيجة المؤقتة في الذاكرة</li><li><code>LOAD T1</code> (وصول للذاكرة: 1) -> المراكم = a * b + c</li><li><code>SUB T2</code> (وصول للذاكرة: 1) -> المراكم = (a * b + c) - (d * e)</li><li><code>STORE A</code> (وصول للذاكرة: 1) -> حفظ النتيجة النهائية في a</li></ol><p>إجمالي عدد مرات الوصول للذاكرة (Data Memory Refs) هو 10 مرات (لا يشمل جلب التعليمات).</p></template>
+    <template class="content-en"><p>In 1-address machines, the instruction contains only one address (Opcode + Addr). The other operand is always a special register called the <b><span class="smart-term" data-term-en="Accumulator" data-ar="المراكم" data-en-def="A central register in a 1-address machine that acts as both an implicit source and the destination for operations.">Accumulator<span class="smart-term-tooltip"></span></span></b>.</p><p>The result of any arithmetic operation is automatically stored in the accumulator, making it both the first source and the final destination simultaneously.</p><p><b>Worked Example:</b> Calculating <code>a = a * b + c - d * e</code></p><ol><li><code>LOAD A</code> (Memory Refs: 1) -> Acc = a</li><li><code>MUL B</code> (Memory Refs: 1) -> Acc = a * b</li><li><code>ADD C</code> (Memory Refs: 1) -> Acc = a * b + c</li><li><code>STORE T1</code> (Memory Refs: 1) -> Save temp result to memory</li><li><code>LOAD D</code> (Memory Refs: 1) -> Acc = d</li><li><code>MUL E</code> (Memory Refs: 1) -> Acc = d * e</li><li><code>STORE T2</code> (Memory Refs: 1) -> Save temp result to memory</li><li><code>LOAD T1</code> (Memory Refs: 1) -> Acc = a * b + c</li><li><code>SUB T2</code> (Memory Refs: 1) -> Acc = (a * b + c) - (d * e)</li><li><code>STORE A</code> (Memory Refs: 1) -> Save final result to a</li></ol><p>Total data memory references is 10 (not including instruction fetch).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشكلة الرئيسية في بنية المراكم هي الحاجة المتكررة لحفظ النتائج المؤقتة (مثل T1 و T2 في المثال) في الذاكرة الرئيسية ثم إعادة تحميلها لاحقاً. هذا يسمى (Spilling).</p><p>بما أن هناك مسجلاً واحداً فقط للعمليات (المراكم)، فإنه يمثل عنق زجاجة (Bottleneck). كل عملية يجب أن تمر من خلاله، مما يمنع تنفيذ عمليات متعددة بالتوازي ويزيد من حركة البيانات بين المعالج والذاكرة (10 مرات وصول للذاكرة في مثالنا مقارنة بـ 6 في المكدس).</p></template>
+    <template class="content-en"><p>The main problem with the accumulator architecture is the frequent need to save temporary results (like T1 and T2 in the example) to main memory and reload them later. This is known as spilling.</p><p>Since there is only one register for operations (the accumulator), it acts as a bottleneck. Every operation must pass through it, preventing parallel execution of multiple operations and increasing data traffic between the CPU and memory (10 memory accesses in our example compared to 6 in the stack machine).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Block diagram showing a CPU with a single 'Accumulator' register connected to an ALU. Show an instruction format box with [Opcode | Addr]. Show an arrow from Memory to ALU (explicit operand) and an arrow from Accumulator to ALU (implicit operand), with the ALU output looping back to the Accumulator. Style: educational, dark background #0d1117, accent color #10b981, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Arrowhead for solid lines -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        <!-- Arrowhead for dashed lines -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Diagram Title -->
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">1-Address Machine Architecture (Accumulator)</text>
+    <text x="400" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">معمارية العنوان الواحد (المُراكِم)</text>
+
+    <!-- ========================================== -->
+    <!-- CPU SECTION                                -->
+    <!-- ========================================== -->
+    <g id="cpu-block">
+        <!-- CPU Bounding Box -->
+        <rect x="360" y="70" width="420" height="340" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6 4"/>
+        <text x="570" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Central Processing Unit (CPU)</text>
+        <text x="570" y="100" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">وحدة المعالجة المركزية (CPU)</text>
+
+        <!-- Accumulator Register -->
+        <rect x="440" y="130" width="200" height="60" rx="8" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="540" y="166" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Accumulator</text>
+        <text x="540" y="166" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">المُراكِم (Accumulator)</text>
+
+        <!-- ALU (Arithmetic Logic Unit) -->
+        <polygon points="480,250 530,250 540,270 550,250 600,250 570,330 510,330" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="540" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">ALU</text>
+        <text x="540" y="305" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">وحدة الحساب والمنطق</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- MEMORY & INSTRUCTION SECTION               -->
+    <!-- ========================================== -->
+    <g id="memory-instruction-block">
+        <!-- Instruction Format Box -->
+        <rect x="40" y="80" width="260" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <path d="M 40 86 A 6 6 0 0 1 46 80 L 140 80 L 140 130 L 46 130 A 6 6 0 0 1 40 124 Z" fill="var(--brand-500)"/>
+        <line x1="140" y1="80" x2="140" y2="130" stroke="var(--brand-500)" stroke-width="2"/>
+        
+        <text x="90" y="111" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Opcode</text>
+        <text x="90" y="111" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">العملية</text>
+        
+        <text x="220" y="111" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Address</text>
+        <text x="220" y="111" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">العنوان</text>
+
+        <!-- Main Memory Box -->
+        <rect x="40" y="200" width="260" height="180" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="170" y="228" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Main Memory</text>
+        <text x="170" y="228" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الذاكرة الرئيسية</text>
+
+        <!-- Memory Cells Lines -->
+        <line x1="40" y1="240" x2="300" y2="240" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="40" y1="280" x2="300" y2="280" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="40" y1="320" x2="300" y2="320" stroke="var(--border-color)" stroke-width="1"/>
+        <line x1="40" y1="360" x2="300" y2="360" stroke="var(--border-color)" stroke-width="1"/>
+
+        <!-- Active Memory Cell (Operand) -->
+        <rect x="40" y="280" width="260" height="40" fill="var(--brand-500)"/>
+        <text x="170" y="306" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Operand Data</text>
+        <text x="170" y="306" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">بيانات المعامل</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- DATA PATHS & ARROWS                        -->
+    <!-- ========================================== -->
+    <g id="data-paths">
+        <!-- Address Bus (Instruction to Memory) -->
+        <path d="M 220 130 L 220 190" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-dashed)"/>
+        <text x="160" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Address Bus</text>
+        <text x="160" y="165" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">ناقل العناوين</text>
+
+        <!-- Explicit Operand (Memory to ALU) -->
+        <path d="M 300 300 L 400 300 L 400 220 L 500 220 L 500 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="400" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Explicit Operand</text>
+        <text x="400" y="290" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">معامل صريح</text>
+
+        <!-- Implicit Operand (Accumulator to ALU) -->
+        <path d="M 540 190 L 540 210 L 580 210 L 580 240" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="640" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Implicit Operand</text>
+        <text x="640" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">معامل ضمني</text>
+
+        <!-- Result Loop (ALU back to Accumulator) -->
+        <path d="M 540 330 L 540 370 L 700 370 L 700 100 L 540 100 L 540 120" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="745" y="250" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Result</text>
+        <text x="745" y="250" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">النتيجة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا احتاجت الآلة أحادية العنوان إلى متغيرات مؤقتة (T1, T2) بينما لم تحتجها الآلة صفرية العنوان؟</template>
+      <template class="content-en">Why did the 1-address machine need temporary variables (T1, T2) while the 0-address machine did not?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الآلة أحادية العنوان تمتلك مسجلاً واحداً فقط (المراكم) لحفظ البيانات، فإذا أردنا حساب جزء آخر من المعادلة، يجب إفراغ المراكم وحفظ قيمته في الذاكرة. بينما المكدس يمكنه الاحتفاظ بعدة قيم مؤقتة فوق بعضها البعض.</p></template>
+      <template class="content-en"><p>Because the 1-address machine has only one register (the accumulator) to hold data. To calculate another part of the equation, the accumulator must be emptied and its value saved to memory. The stack, however, can hold multiple temporary values on top of each other.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="two-address-machines" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الآلات ثنائية العنوان (2-Address Machines)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> 2-Address Machines &amp; 1½-Address</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتوي التعليمة على عنوانين لمصدرين، أحدهما يعمل أيضاً كوجهة للنتيجة. يمكن أن تكون العناوين في الذاكرة أو في المسجلات (مما يخلق بنية 1.5 عنوان).</p></template>
+    <template class="content-en"><p>The instruction contains two source addresses, one of which also serves as the destination. Addresses can be in memory or registers (creating a 1½-address architecture).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الآلات ثنائية العنوان، يحدد تنسيق التعليمة عنوانين (Opcode + Addr1 + Addr2). العنوان الأول (Addr1) يعمل كمصدر أول وكوجهة نهائية للنتيجة.</p><p><b>مثال تطبيقي (عمليات من ذاكرة إلى ذاكرة):</b> حساب <code>a = a * b + c - d * e</code></p><ol><li><code>MOVE T1, A</code> (وصول: 2) -> T1 = a</li><li><code>MUL T1, B</code> (وصول: 3) -> T1 = T1 * b</li><li><code>ADD T1, C</code> (وصول: 3) -> T1 = T1 + c</li><li><code>MOVE T2, D</code> (وصول: 2) -> T2 = d</li><li><code>MUL T2, E</code> (وصول: 3) -> T2 = T2 * e</li><li><code>SUB T1, T2</code> (وصول: 3) -> T1 = T1 - T2</li><li><code>MOVE A, T1</code> (وصول: 2) -> a = T1</li></ol><p>إجمالي الوصول للذاكرة هنا كارثي: 18 مرة!</p><p><b>الحل: بنية 1½ عنوان (Load/Store Architecture):</b><br>ماذا لو كانت T1 و T2 مسجلات (Registers) بدلاً من مواقع في الذاكرة؟</p><ol><li><code>MOVE R1, A</code> (وصول: 1)</li><li><code>MUL R1, B</code> (وصول: 1)</li><li><code>ADD R1, C</code> (وصول: 1)</li><li><code>MOVE R2, D</code> (وصول: 1)</li><li><code>MUL R2, E</code> (وصول: 1)</li><li><code>SUB R1, R2</code> (وصول: 0)</li><li><code>MOVE A, R1</code> (وصول: 1)</li></ol><p>استخدام المسجلات يقلل الوصول للذاكرة إلى 6 مرات فقط.</p></template>
+    <template class="content-en"><p>In 2-address machines, the instruction format specifies two addresses (Opcode + Addr1 + Addr2). The first address (Addr1) acts as both the first source and the final destination.</p><p><b>Worked Example (Memory-to-Memory operations):</b> Calculating <code>a = a * b + c - d * e</code></p><ol><li><code>MOVE T1, A</code> (Refs: 2) -> T1 = a</li><li><code>MUL T1, B</code> (Refs: 3) -> T1 = T1 * b</li><li><code>ADD T1, C</code> (Refs: 3) -> T1 = T1 + c</li><li><code>MOVE T2, D</code> (Refs: 2) -> T2 = d</li><li><code>MUL T2, E</code> (Refs: 3) -> T2 = T2 * e</li><li><code>SUB T1, T2</code> (Refs: 3) -> T1 = T1 - T2</li><li><code>MOVE A, T1</code> (Refs: 2) -> a = T1</li></ol><p>Total memory accesses here is massive: 18 times!</p><p><b>The Solution: <span class="smart-term" data-term-en="1½-Address Machine" data-ar="آلة 1.5 عنوان" data-en-def="An architecture where instructions typically specify one register and one memory address, forming the basis of Load/Store architectures.">1½-Address Machine<span class="smart-term-tooltip"></span></span> (<span class="smart-term" data-term-en="Load/Store Architecture" data-ar="بنية التحميل/التخزين" data-en-def="An architecture where only specific instructions (load/store) access memory, while arithmetic operations only use registers.">Load/Store Architecture<span class="smart-term-tooltip"></span></span>):</b><br>What if T1 and T2 were registers instead of memory locations?</p><ol><li><code>MOVE R1, A</code> (Refs: 1)</li><li><code>MUL R1, B</code> (Refs: 1)</li><li><code>ADD R1, C</code> (Refs: 1)</li><li><code>MOVE R2, D</code> (Refs: 1)</li><li><code>MUL R2, E</code> (Refs: 1)</li><li><code>SUB R1, R2</code> (Refs: 0)</li><li><code>MOVE A, R1</code> (Refs: 1)</li></ol><p>Using registers cuts memory references down to just 6.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العمليات من ذاكرة إلى ذاكرة (Memory-to-Memory) في البنية ثنائية العنوان بطيئة جداً لأن تعليمة واحدة مثل <code>MUL T1, B</code> تتطلب جلب T1 من الذاكرة، وجلب B من الذاكرة، وإجراء الضرب، ثم كتابة النتيجة مرة أخرى في T1 في الذاكرة (3 عمليات وصول للبيانات).</p><p>ظهور بنية 1.5 عنوان (حيث يكون أحد المعاملات مسجلاً والآخر عنوان ذاكرة) مهد الطريق لمعماريات RISC الحديثة (Load/Store)، حيث يتم فصل عمليات الذاكرة تماماً عن العمليات الحسابية، مما يسمح بتسريع المعالج بشكل كبير.</p></template>
+    <template class="content-en"><p>Memory-to-memory operations in a 2-address architecture are very slow because a single instruction like <code>MUL T1, B</code> requires fetching T1 from memory, fetching B from memory, performing the multiplication, and then writing the result back to T1 in memory (3 data accesses).</p><p>The emergence of the 1.5-address architecture (where one operand is a register and the other is a memory address) paved the way for modern RISC (Load/Store) architectures, where memory operations are completely separated from arithmetic operations, allowing for significant CPU acceleration.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Show the instruction format for a 2-address machine: [Opcode | Addr1 | Addr2]. Draw an arrow pointing from Addr1 with a label 'Addr1 is both source and destination'. Style: educational, dark background #0d1117, accent color #f59e0b, viewBox 0 0 800 200, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-neutral" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--border-color)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">2-Address Instruction Format</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">صيغة التعليمة ثنائية العنوان</text>
+
+  <!-- Instruction Fields -->
+  <!-- Opcode -->
+  <g>
+    <rect x="171" y="80" width="150" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="246" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Opcode</text>
+    <text x="246" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">رمز العملية</text>
+  </g>
+
+  <!-- Addr1 (Highlighted) -->
+  <g>
+    <rect x="325" y="80" width="150" height="60" rx="6" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Addr1</text>
+    <text x="400" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">العنوان 1</text>
+  </g>
+
+  <!-- Addr2 -->
+  <g>
+    <rect x="479" y="80" width="150" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="554" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Addr2</text>
+    <text x="554" y="116" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">العنوان 2</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 246 140 C 246 160, 171 160, 171 178" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-neutral)" />
+  <path d="M 400 140 L 400 177" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-brand)" />
+  <path d="M 554 140 C 554 160, 629 160, 629 178" fill="none" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow-neutral)" />
+
+  <!-- Explanatory Labels -->
+  <!-- Opcode Label -->
+  <g>
+    <rect x="111" y="180" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="171" y="206" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Operation</text>
+    <text x="171" y="206" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">العملية</text>
+  </g>
+
+  <!-- Addr1 Label (Highlighted) -->
+  <g>
+    <rect x="240" y="180" width="320" height="44" rx="22" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="208" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Addr1 is both source and destination</text>
+    <text x="400" y="208" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">العنوان 1 هو المصدر والوجهة معاً</text>
+  </g>
+
+  <!-- Addr2 Label -->
+  <g>
+    <rect x="569" y="180" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="629" y="206" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Source 2</text>
+    <text x="629" y="206" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">المصدر 2</text>
+  </g>
+
+  <!-- Example Equation -->
+  <text x="400" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-muted)" class="gsvg-en">e.g., Addr1 ← Addr1 + Addr2</text>
+  <text x="400" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-muted)" class="gsvg-ar">مثال: العنوان 1 ← العنوان 1 + العنوان 2</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا سُميت البنية التي تستخدم مسجلاً وذاكرة بـ '1.5 عنوان' بدلاً من '2 عنوان'؟</template>
+      <template class="content-en">Why is the architecture that uses one register and one memory address called '1.5 address' instead of '2 address'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن عنوان المسجل يحتاج إلى عدد بتات قليل جداً (مثلاً 3 بتات لـ 8 مسجلات) مقارنة بعنوان الذاكرة الكامل (مثلاً 15 أو 32 بت). لذا فهو يعتبر 'نصف عنوان' من حيث الحجم والتكلفة.</p></template>
+      <template class="content-en"><p>Because a register address requires very few bits (e.g., 3 bits for 8 registers) compared to a full memory address (e.g., 15 or 32 bits). Thus, it is considered a 'half address' in terms of size and cost.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="three-address-machines" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الآلات ثلاثية العنوان (3-Address Machines)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> 3-Address Machines</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحتوي التعليمة على ثلاثة عناوين صريحة: وجهة واحدة ومصدرين. توفر أقصى مرونة ولكنها تتطلب تعليمات طويلة جداً.</p></template>
+    <template class="content-en"><p>The instruction contains three explicit addresses: one destination and two sources. It offers maximum flexibility but requires very long instructions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الآلات ثلاثية العنوان، يحدد تنسيق التعليمة ثلاثة عناوين منفصلة (Opcode + Dst + Src1 + Src2). هذا يعني أن الوجهة مستقلة تماماً عن المصادر.</p><p><b>مثال تطبيقي (عمليات من ذاكرة إلى ذاكرة):</b> حساب <code>a = a * b + c - d * e</code></p><ol><li><code>MPY T1, A, B</code> (وصول: 3) -> T1 = A * B</li><li><code>ADD T1, T1, C</code> (وصول: 3) -> T1 = T1 + C</li><li><code>MPY T2, D, E</code> (وصول: 3) -> T2 = D * E</li><li><code>SUB A, T1, T2</code> (وصول: 3) -> A = T1 - T2</li></ol><p>إجمالي الوصول للذاكرة: 12 مرة. عدد التعليمات قليل جداً (4 فقط).</p><p><b>ماذا لو استخدمنا المسجلات (Registers)؟</b></p><ol><li><code>MPY R1, A, B</code> (وصول: 2)</li><li><code>ADD R1, R1, C</code> (وصول: 1)</li><li><code>MPY R2, D, E</code> (وصول: 2)</li><li><code>SUB A, R1, R2</code> (وصول: 1)</li></ol><p>إجمالي الوصول للذاكرة ينخفض إلى 6 مرات فقط. استخدام المسجلات العامة (General Purpose Registers) يحدث فرقاً جوهرياً.</p></template>
+    <template class="content-en"><p>In 3-address machines, the instruction format specifies three separate addresses (Opcode + Dst + Src1 + Src2). This means the destination is completely independent of the sources.</p><p><b>Worked Example (Memory-to-Memory operations):</b> Calculating <code>a = a * b + c - d * e</code></p><ol><li><code>MPY T1, A, B</code> (Refs: 3) -> T1 = A * B</li><li><code>ADD T1, T1, C</code> (Refs: 3) -> T1 = T1 + C</li><li><code>MPY T2, D, E</code> (Refs: 3) -> T2 = D * E</li><li><code>SUB A, T1, T2</code> (Refs: 3) -> A = T1 - T2</li></ol><p>Total memory accesses: 12. The number of instructions is very small (only 4).</p><p><b>What if we used registers?</b></p><ol><li><code>MPY R1, A, B</code> (Refs: 2)</li><li><code>ADD R1, R1, C</code> (Refs: 1)</li><li><code>MPY R2, D, E</code> (Refs: 2)</li><li><code>SUB A, R1, R2</code> (Refs: 1)</li></ol><p>Total memory accesses drops to just 6. Using general-purpose registers makes a substantial difference.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>البنية ثلاثية العنوان هي الأكثر طبيعية للمبرمجين والمترجمات لأنها تحاكي المعادلات الرياضية المباشرة (Z = X + Y). لا يوجد تدمير للبيانات الأصلية (Destructive Operations) كما يحدث في البنية ثنائية العنوان.</p><p>العيب القاتل لهذه البنية هو طول التعليمة. إذا كان عنوان الذاكرة 15 بت، فإن تعليمة واحدة ستحتاج إلى (5 بت للعملية + 15 + 15 + 15) = 50 بت! هذا يستهلك مساحة هائلة من الذاكرة وعرض النطاق الترددي (Bandwidth) لجلب التعليمات.</p><p>لذلك، البنى ثلاثية العنوان الحديثة (مثل ARM) تستخدم المسجلات حصرياً للعمليات الحسابية (3 مسجلات = 3 + 3 + 3 = 9 بتات فقط للعناوين)، وتستخدم تعليمات Load/Store منفصلة للوصول للذاكرة.</p></template>
+    <template class="content-en"><p>The 3-address architecture is the most natural for programmers and compilers because it mimics direct mathematical equations (Z = X + Y). There are no <span class="smart-term" data-term-en="Destructive Operation" data-ar="عملية مدمرة" data-en-def="An operation where the result overwrites one of the original source operands (common in 2-address machines).">destructive operation<span class="smart-term-tooltip"></span></span>s as seen in 2-address architectures.</p><p>The fatal flaw of this architecture is the instruction length. If a memory address is 15 bits, a single instruction would need (5 bits for opcode + 15 + 15 + 15) = 50 bits! This consumes massive memory space and instruction fetch bandwidth.</p><p>Therefore, modern 3-address architectures (like ARM) use registers exclusively for arithmetic operations (3 registers = 3 + 3 + 3 = 9 bits only for addresses), and use separate Load/Store instructions to access memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show the instruction format for a 3-address machine: [Opcode | Dst | Src1 | Src2]. Style: educational, dark background #0d1117, accent color #8b5cf6, viewBox 0 0 800 200, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)" />
+        </marker>
+    </defs>
+
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">3-Address Instruction Format</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">صيغة تعليمة ثلاثية العناوين</text>
+
+    <!-- Instruction Format Box -->
+    <g transform="translate(0, 60)">
+        <!-- Base Elevated Background -->
+        <rect x="100" y="0" width="600" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+        
+        <!-- Opcode Highlight Background -->
+        <path d="M106 0 L250 0 L250 60 L106 60 Q100 60 100 54 L100 6 Q100 0 106 0 Z" fill="url(#brandGradient)" />
+        
+        <!-- Dividers -->
+        <line x1="250" y1="0" x2="250" y2="60" stroke="var(--brand-500)" stroke-width="2" />
+        <line x1="400" y1="0" x2="400" y2="60" stroke="var(--brand-500)" stroke-width="2" />
+        <line x1="550" y1="0" x2="550" y2="60" stroke="var(--brand-500)" stroke-width="2" />
+
+        <!-- Box Labels -->
+        <text x="175" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Opcode</text>
+        <text x="175" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">رمز العملية</text>
+
+        <text x="325" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Dst</text>
+        <text x="325" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الوجهة</text>
+
+        <text x="475" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Src1</text>
+        <text x="475" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المصدر 1</text>
+
+        <text x="625" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Src2</text>
+        <text x="625" y="36" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المصدر 2</text>
+    </g>
+
+    <!-- Pointers -->
+    <line x1="175" y1="145" x2="175" y2="125" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" />
+    <line x1="325" y1="145" x2="325" y2="125" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" />
+    <line x1="475" y1="145" x2="475" y2="125" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" />
+    <line x1="625" y1="145" x2="625" y2="125" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" />
+
+    <!-- Descriptions -->
+    <text x="175" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Operation</text>
+    <text x="175" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">العملية</text>
+
+    <text x="325" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Destination Address</text>
+    <text x="325" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">عنوان الوجهة</text>
+
+    <text x="475" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Source 1 Address</text>
+    <text x="475" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">عنوان المصدر 1</text>
+
+    <text x="625" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Source 2 Address</text>
+    <text x="625" y="165" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">عنوان المصدر 2</text>
+
+    <!-- Example -->
+    <text x="400" y="192" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Example: MPY T1, A, B  (T1 ← A × B)</text>
+    <text x="400" y="192" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">مثال: MPY T1, A, B  (T1 ← A × B)</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف حلت معالجات RISC الحديثة مشكلة طول التعليمة في البنية ثلاثية العنوان؟</template>
+      <template class="content-en">How did modern RISC processors solve the instruction length problem in 3-address architectures?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال قصر العناوين الثلاثة على المسجلات فقط (Registers) بدلاً من الذاكرة. عنوان المسجل صغير جداً (مثلاً 5 بت لـ 32 مسجل)، مما يسمح بوضع 3 عناوين مسجلات بالإضافة إلى كود العملية (Opcode) داخل تعليمة واحدة قياسية بحجم 32 بت.</p></template>
+      <template class="content-en"><p>By restricting the three addresses to registers only instead of memory. A register address is very small (e.g., 5 bits for 32 registers), allowing 3 register addresses plus the opcode to fit easily within a standard 32-bit instruction.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="isa-comparison" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مقارنة بنى مجموعة التعليمات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> ISA Comparison &amp; Memory Access</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مقارنة شاملة توضح أن بنية 1.5 عنوان (RISC) وبنية 3 عناوين مع المسجلات (CISC) هما الأكثر كفاءة من حيث تقليل إجمالي البتات المنقولة بين المعالج والذاكرة.</p></template>
+    <template class="content-en"><p>A comprehensive comparison showing that 1.5-address (RISC) and 3-address with registers (CISC) are the most efficient in minimizing total bits transferred between CPU and memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتقييم أي بنية هي الأفضل، يجب حساب إجمالي البتات التي يتم الوصول إليها (حجم التعليمات + حجم البيانات). بافتراض:</p><ul><li>8 مسجلات (تحتاج 3 بت للعنوان).</li><li>32 كود عملية Op-codes (تحتاج 5 بت).</li><li>عناوين الذاكرة 15 بت.</li><li>الأعداد الصحيحة 16 بت.</li></ul><p><b>نتائج المقارنة لحساب المعادلة السابقة:</b></p><ol><li><b>0-address:</b> 10 تعليمات (200 بت) + 6 بيانات (96 بت) = <b>296 بت</b>.</li><li><b>1-address:</b> 10 تعليمات (200 بت) + 10 بيانات (160 بت) = <b>360 بت</b>.</li><li><b>1½-address:</b> 7 تعليمات (161 بت) + 6 بيانات (96 بت) = <b>257 بت</b>.</li><li><b>2-address:</b> 7 تعليمات (245 بت) + 18 بيانات (288 بت) = <b>519 بت</b> (الأسوأ).</li><li><b>3-address:</b> 4 تعليمات (200 بت) + 12 بيانات (192 بت) = <b>392 بت</b>.</li><li><b>3-address (regs):</b> 4 تعليمات (152 بت) + 6 بيانات (96 بت) = <b>248 بت</b> (الأفضل).</li></ol><p><b>الفائزان الواضحان:</b> 1½-address (يمثل RISC) و 3-address مع المسجلات (يمثل CISC).</p></template>
+    <template class="content-en"><p>To evaluate which architecture is best, we must calculate the total bits accessed (instruction size + data size). Assuming:</p><ul><li>8 registers (3 bits per address).</li><li>32 op-codes (5 bits).</li><li>15-bit memory addresses.</li><li>16-bit integers.</li></ul><p><b>Comparison results for the previous equation:</b></p><ol><li><b>0-address:</b> 10 inst (200 bits) + 6 data (96 bits) = <b>296 bits</b>.</li><li><b>1-address:</b> 10 inst (200 bits) + 10 data (160 bits) = <b>360 bits</b>.</li><li><b>1½-address:</b> 7 inst (161 bits) + 6 data (96 bits) = <b>257 bits</b>.</li><li><b>2-address:</b> 7 inst (245 bits) + 18 data (288 bits) = <b>519 bits</b> (Worst).</li><li><b>3-address:</b> 4 inst (200 bits) + 12 data (192 bits) = <b>392 bits</b>.</li><li><b>3-address (regs):</b> 4 inst (152 bits) + 6 data (96 bits) = <b>248 bits</b> (Best).</li></ol><p><b>Two clear winners:</b> 1½-address (RISC) and 3-address with registers (CISC).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه المقارنة تسلط الضوء على عنق زجاجة فون نيومان (Von Neumann Bottleneck). المعالج سريع جداً، لكن جلب التعليمات والبيانات من الذاكرة بطيء. البنية الأفضل هي التي تقلل حركة المرور (Traffic) على ناقل الذاكرة (Memory Bus).</p><p>نلاحظ أن استخدام المسجلات (Registers) هو العامل الحاسم في تحسين الأداء في جميع البنى. المسجلات تعمل كذاكرة تخزين مؤقت (Cache) سريعة جداً داخل المعالج، مما يلغي الحاجة للوصول المتكرر للذاكرة الرئيسية البطيئة.</p></template>
+    <template class="content-en"><p>This comparison highlights the Von Neumann Bottleneck. The CPU is very fast, but fetching instructions and data from memory is slow. The best architecture is the one that minimizes traffic on the memory bus.</p><p>We observe that the use of registers is the critical factor in improving performance across all architectures. Registers act as an ultra-fast cache inside the CPU, eliminating the need for repeated access to slow main memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة حساب إجمالي البتات المنقولة لتقييم كفاءة الـ ISA.</strong></template>
+      <template class="content-en"><strong>Formula to calculate total bits transferred to evaluate ISA efficiency.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{Total Bits} = (\text{Number of Instructions} \times \text{Instruction Size}) + (\text{Number of Data Accesses} \times \text{Data Size})$$</div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>0-address</th><th>1-address</th><th>1½-address</th><th>2-address</th><th>3-address</th><th>3-address (regs)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">إجمالي بتات التعليمات</template>
+          <template class="content-en">Total Instruction Bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">200 بت</template>
+          <template class="content-en">200 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">200 بت</template>
+          <template class="content-en">200 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">161 بت</template>
+          <template class="content-en">161 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">245 بت</template>
+          <template class="content-en">245 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">200 بت</template>
+          <template class="content-en">200 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">152 بت</template>
+          <template class="content-en">152 bits</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">إجمالي بتات البيانات (الوصول للذاكرة)</template>
+          <template class="content-en">Total Data Bits (Memory Access)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">96 بت</template>
+          <template class="content-en">96 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">160 بت</template>
+          <template class="content-en">160 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">96 بت</template>
+          <template class="content-en">96 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">288 بت</template>
+          <template class="content-en">288 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">192 بت</template>
+          <template class="content-en">192 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">96 بت</template>
+          <template class="content-en">96 bits</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الإجمالي الكلي للبتات</template>
+          <template class="content-en">Grand Total Bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">296 بت</template>
+          <template class="content-en">296 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">360 بت</template>
+          <template class="content-en">360 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">257 بت</template>
+          <template class="content-en">257 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">519 بت</template>
+          <template class="content-en">519 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">392 بت</template>
+          <template class="content-en">392 bits</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">248 بت</template>
+          <template class="content-en">248 bits</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا كانت البنية ثنائية العنوان (بدون مسجلات) هي الأسوأ في المقارنة؟</template>
+      <template class="content-en">Why was the 2-address architecture (without registers) the worst in the comparison?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كل تعليمة حسابية تتطلب جلب معاملين من الذاكرة وكتابة النتيجة مرة أخرى في الذاكرة، بالإضافة إلى حجم التعليمة الكبير الذي يحتوي على عنوانين كاملين للذاكرة، مما ضاعف حركة المرور بشكل هائل.</p></template>
+      <template class="content-en"><p>Because every arithmetic instruction requires fetching two operands from memory and writing the result back to memory, in addition to the large instruction size containing two full memory addresses, which massively multiplied the traffic.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل. في هذه الوحدة، نغوص في قلب المعالج لنتعرف على 'لغته الأم' وكيفية تصميمها، وهو ما نسميه بنية مجموعة التعليمات (ISA). تخيل أنك تصمم لغة تخاطب بها آلة حاسبة عملاقة. هل ستعطيها أوامر قصيرة جداً ولكن كثيرة العدد (مثل المكدس 0-عنوان)؟ أم ستعطيها أوامر طويلة ومفصلة تنجز الكثير بخطوة واحدة (مثل 3-عناوين)؟
+
+الامتحان سيركز بشكل كبير على قدرتك على التمييز بين هذه البنى الأربعة. تذكر دائماً: المكدس (0) يعتمد على الضمنية، المراكم (1) هو مسجل وحيد يعمل كعنق زجاجة، البنية الثنائية (2) تدمر المعامل الأول، والثلاثية (3) مرنة ولكن تعليماتها ضخمة.
+
+السر الذي أريدك أن تأخذه معك للامتحان ولحياتك المهنية هو: 'المسجلات هي المنقذ'. استخدام المسجلات (كما في بنية 1.5 عنوان) هو ما جعل الحواسيب الحديثة سريعة جداً، لأنها تقلل من رحلاتنا البطيئة إلى الذاكرة الرئيسية. ركزوا على جدول المقارنة الأخير، فهو يلخص كل شيء بالأرقام!</template>
+    <template class="content-en">Welcome, future engineers. In this module, we dive into the heart of the processor to understand its 'mother tongue' and how it's designed, which we call the Instruction Set Architecture (ISA). Imagine designing a language to speak to a giant calculator. Would you give it very short but numerous commands (like the 0-address stack)? Or long, detailed commands that do a lot in one step (like 3-address)?
+
+The exam will heavily focus on your ability to differentiate between these four architectures. Always remember: the Stack (0) relies on implicitness, the Accumulator (1) is a single register acting as a bottleneck, the 2-address architecture destroys the first operand, and the 3-address is flexible but has huge instructions.
+
+The secret I want you to take to the exam and your career is: 'Registers are the saviors'. Using registers (as in the 1.5-address architecture) is what made modern computers so fast, because they minimize our slow trips to main memory. Focus on the final comparison table; it summarizes everything in numbers!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العامل الأساسي الذي يحدد نوع بنية مجموعة التعليمات (ISA)؟</template>
+          <template class="content-en">What is the primary factor that determines the type of Instruction Set Architecture (ISA)?</template>
+          <span class="content-target">ما هو العامل الأساسي الذي يحدد نوع بنية مجموعة التعليمات (ISA)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عدد المعاملات الصريحة (Explicit Operands) في التعليمة الواحدة (0، 1، 2، أو 3).</template>
+          <template class="content-en">The number of explicit operands in a single instruction (0, 1, 2, or 3).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا تحتاج تعليمة ADD في آلة المكدس إلى أي عناوين؟</template>
+          <template class="content-en">Why doesn't the ADD instruction in a stack machine need any addresses?</template>
+          <span class="content-target">لماذا لا تحتاج تعليمة ADD في آلة المكدس إلى أي عناوين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تفترض ضمنياً أن المعاملين موجودان في أعلى المكدس، وتقوم بسحبهما، جمعهما، ثم دفع النتيجة مرة أخرى للمكدس.</template>
+          <template class="content-en">Because it implicitly assumes the two operands are at the top of the stack, pops them, adds them, and pushes the result back onto the stack.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو المراكم (Accumulator) وما دوره؟</template>
+          <template class="content-en">What is the Accumulator and what is its role?</template>
+          <span class="content-target">ما هو المراكم (Accumulator) وما دوره؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو مسجل وحيد في الآلة أحادية العنوان، يعمل كمصدر أول للعملية الحسابية ووجهة لتخزين النتيجة في نفس الوقت.</template>
+          <template class="content-en">It is a single register in a 1-address machine that acts as both the first source for an arithmetic operation and the destination for the result.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المشكلة الرئيسية في العمليات من ذاكرة إلى ذاكرة في البنية ثنائية العنوان؟</template>
+          <template class="content-en">What is the main problem with memory-to-memory operations in a 2-address architecture?</template>
+          <span class="content-target">ما هي المشكلة الرئيسية في العمليات من ذاكرة إلى ذاكرة في البنية ثنائية العنوان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تتطلب عدداً كبيراً جداً من مرات الوصول للذاكرة (قراءة المعاملين وكتابة النتيجة)، مما يبطئ النظام بشكل كبير.</template>
+          <template class="content-en">They require a very high number of memory accesses (reading two operands and writing the result), which significantly slows down the system.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف حلت بنية 1.5 عنوان مشكلة الوصول للذاكرة؟</template>
+          <template class="content-en">How did the 1.5-address architecture solve the memory access problem?</template>
+          <span class="content-target">كيف حلت بنية 1.5 عنوان مشكلة الوصول للذاكرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام المسجلات (Registers) للعمليات الحسابية، وقصر الوصول للذاكرة على تعليمات التحميل والتخزين (Load/Store) فقط.</template>
+          <template class="content-en">By using registers for arithmetic operations and restricting memory access to only Load and Store instructions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الميزة الرئيسية للآلة ثلاثية العنوان؟</template>
+          <template class="content-en">What is the main advantage of a 3-address machine?</template>
+          <span class="content-target">ما هي الميزة الرئيسية للآلة ثلاثية العنوان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">توفر مرونة قصوى وتحاكي المعادلات الرياضية بشكل مباشر دون تدمير المعاملات الأصلية، وتتطلب عدداً قليلاً من التعليمات.</template>
+          <template class="content-en">It provides maximum flexibility, directly mimics mathematical equations without destroying original operands, and requires a small number of instructions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب القاتل للآلة ثلاثية العنوان إذا استخدمت الذاكرة فقط؟</template>
+          <template class="content-en">What is the fatal flaw of a 3-address machine if it uses only memory?</template>
+          <span class="content-target">ما هو العيب القاتل للآلة ثلاثية العنوان إذا استخدمت الذاكرة فقط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">طول التعليمة يصبح كبيراً جداً (مثلاً 50 بت) لاحتوائها على 3 عناوين ذاكرة كاملة، مما يستهلك مساحة الذاكرة.</template>
+          <template class="content-en">The instruction length becomes very large (e.g., 50 bits) because it contains 3 full memory addresses, consuming memory space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في المقارنة، لماذا تفوقت بنية 3-عناوين (مسجلات) على البقية؟</template>
+          <template class="content-en">In the comparison, why did the 3-address (registers) architecture outperform the rest?</template>
+          <span class="content-target">في المقارنة، لماذا تفوقت بنية 3-عناوين (مسجلات) على البقية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها جمعت بين قلة عدد التعليمات (4 فقط) واستخدام عناوين مسجلات قصيرة جداً، مما قلل إجمالي البتات المنقولة إلى الحد الأدنى.</template>
+          <template class="content-en">Because it combined a low number of instructions (only 4) with very short register addresses, minimizing the total transferred bits.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا نعني بـ 'عملية مدمرة' (Destructive Operation) في بنية 2-عنوان؟</template>
+          <template class="content-en">What do we mean by a 'destructive operation' in a 2-address architecture?</template>
+          <span class="content-target">ماذا نعني بـ 'عملية مدمرة' (Destructive Operation) في بنية 2-عنوان؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعني أن نتيجة العملية يتم كتابتها فوق أحد المعاملين الأصليين، مما يؤدي إلى مسح قيمته السابقة.</template>
+          <template class="content-en">It means the result of the operation is written over one of the original operands, erasing its previous value.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل الوصول للمكدس يعتبر وصولاً للذاكرة الرئيسية؟</template>
+          <template class="content-en">Is accessing the stack considered accessing main memory?</template>
+          <span class="content-target">هل الوصول للمكدس يعتبر وصولاً للذاكرة الرئيسية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، في الآلات الحديثة، يُنفذ المكدس كمسجلات سريعة داخل المعالج، لذا عمليات المكدس الداخلية لا تتطلب وصولاً للذاكرة الرئيسية.</template>
+          <template class="content-en">No, in modern machines, the stack is implemented as fast registers inside the CPU, so internal stack operations do not require main memory access.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو دور بنية مجموعة التعليمات (ISA)؟",
+      "en": "What is the role of the Instruction Set Architecture (ISA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحدد تنسيق التعليمات ولغة التجميع الخاصة بالمعالج.",
+        "en": "It determines the instruction formats and the assembly language of the processor."
+      },
+      "example": {
+        "ar": "تحديد ما إذا كانت التعليمة تحتوي على 0، 1، 2، أو 3 عناوين.",
+        "en": "Determining whether an instruction has 0, 1, 2, or 3 addresses."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي الآلة صفرية العنوان (0-Address Machine)؟",
+      "en": "What is a 0-Address Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلة تعتمد على المكدس (Stack) حيث تكون معاملات العمليات الحسابية ضمنية.",
+        "en": "A stack-based machine where operands for arithmetic operations are implicit."
+      },
+      "example": {
+        "ar": "تعليمة ADD لا تأخذ معاملات، بل تجمع أعلى قيمتين في المكدس.",
+        "en": "The ADD instruction takes no operands; it adds the top two values on the stack."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي التعليمات الوحيدة التي تصل للذاكرة في آلة 0-عنوان؟",
+      "en": "What are the only instructions that access memory in a 0-address machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعليمات الدفع (PUSH) والسحب (POP).",
+        "en": "PUSH and POP instructions."
+      },
+      "example": {
+        "ar": "PUSH A تجلب القيمة من الذاكرة A إلى المكدس.",
+        "en": "PUSH A fetches the value from memory A to the stack."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي الآلة أحادية العنوان (1-Address Machine)؟",
+      "en": "What is a 1-Address Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلة تعتمد على المراكم (Accumulator) الذي يعمل كمصدر ووجهة ضمنية.",
+        "en": "An accumulator-based machine where the accumulator acts as an implicit source and destination."
+      },
+      "example": {
+        "ar": "تعليمة ADD X تجمع قيمة X مع المراكم وتخزن النتيجة في المراكم.",
+        "en": "ADD X adds the value of X to the accumulator and stores the result in the accumulator."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو المراكم (Accumulator)؟",
+      "en": "What is an Accumulator?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مسجل خاص في الآلات أحادية العنوان يحتفظ بالمعامل الأول ونتيجة العملية.",
+        "en": "A special register in 1-address machines that holds the first operand and the result of the operation."
+      },
+      "example": {
+        "ar": "في تعليمة MUL B، يتم ضرب B في المراكم والنتيجة توضع في المراكم.",
+        "en": "In MUL B, B is multiplied by the accumulator, and the result is placed in the accumulator."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هي الآلة ثنائية العنوان (2-Address Machine)؟",
+      "en": "What is a 2-Address Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلة تحتوي تعليماتها على عنوانين، أحدهما يعمل كمصدر ووجهة في نفس الوقت.",
+        "en": "A machine where instructions contain two addresses, one of which acts as both a source and a destination."
+      },
+      "example": {
+        "ar": "ADD T1, C تعني: T1 = T1 + C.",
+        "en": "ADD T1, C means: T1 = T1 + C."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي بنية 1.5 عنوان (1½-Address Machine)؟",
+      "en": "What is a 1½-Address Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متغير من الآلة ثنائية العنوان يستخدم مسجلاً وعنوان ذاكرة، وتُعرف ببنية التحميل/التخزين.",
+        "en": "A variant of the 2-address machine that uses one register and one memory address, known as a load/store architecture."
+      },
+      "example": {
+        "ar": "ADD R1, C (حيث R1 مسجل و C ذاكرة).",
+        "en": "ADD R1, C (where R1 is a register and C is memory)."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي الآلة ثلاثية العنوان (3-Address Machine)؟",
+      "en": "What is a 3-Address Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلة تحتوي تعليماتها على ثلاثة عناوين صريحة: وجهة واحدة ومصدرين.",
+        "en": "A machine where instructions contain three explicit addresses: one destination and two sources."
+      },
+      "example": {
+        "ar": "ADD T1, A, B تعني: T1 = A + B.",
+        "en": "ADD T1, A, B means: T1 = A + B."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "لماذا تعتبر العمليات من ذاكرة إلى ذاكرة في بنية 2-عنوان سيئة؟",
+      "en": "Why are memory-to-memory operations in a 2-address architecture bad?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنها تتطلب عدداً كبيراً جداً من مرات الوصول للذاكرة (جلب المعاملين وكتابة النتيجة).",
+        "en": "Because they require a very high number of memory accesses (fetching two operands and writing the result)."
+      },
+      "example": {
+        "ar": "تعليمة واحدة قد تتطلب 3 عمليات وصول للبيانات في الذاكرة.",
+        "en": "A single instruction might require 3 data memory accesses."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يقلل المكدس (Stack) من الوصول للذاكرة؟",
+      "en": "How does the stack reduce memory access?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن المكدس يُنفذ عادةً كمجموعة من المسجلات السريعة جداً داخل المعالج.",
+        "en": "Because the stack is typically implemented as a set of very fast registers inside the CPU."
+      },
+      "example": {
+        "ar": "عملية ADD في المكدس لا تتطلب أي وصول للذاكرة الرئيسية (0 memory refs).",
+        "en": "An ADD operation on the stack requires zero main memory references."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو العيب الرئيسي للآلة ثلاثية العنوان (بدون مسجلات)؟",
+      "en": "What is the main drawback of a 3-address machine (without registers)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طول التعليمة الكبير جداً الذي يستهلك مساحة الذاكرة وعرض النطاق الترددي.",
+        "en": "The very large instruction length which consumes memory space and bandwidth."
+      },
+      "example": {
+        "ar": "تعليمة بـ 3 عناوين ذاكرة قد تصل إلى 50 بت.",
+        "en": "An instruction with 3 memory addresses might reach 50 bits."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "أي البنى كانت الأفضل في تقليل إجمالي البتات المنقولة؟",
+      "en": "Which architectures were the best at minimizing total transferred bits?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بنية 1.5 عنوان (RISC) وبنية 3 عناوين مع المسجلات (CISC).",
+        "en": "1.5-address (RISC) and 3-address with registers (CISC)."
+      },
+      "example": {
+        "ar": "استخدام المسجلات قلل إجمالي البتات إلى 248 و 257 بت في المقارنة.",
+        "en": "Using registers reduced total bits to 248 and 257 bits in the comparison."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو المعامل الضمني (Implicit Operand)؟",
+      "en": "What is an Implicit Operand?"
+    },
+    "back": {
+      "definition": {
+        "ar": "معامل لا يُكتب صراحةً في التعليمة، بل يكون معروفاً مسبقاً بناءً على بنية الآلة.",
+        "en": "An operand that is not explicitly written in the instruction but is known beforehand based on the machine architecture."
+      },
+      "example": {
+        "ar": "المراكم في آلة 1-عنوان، أو قمة المكدس في آلة 0-عنوان.",
+        "en": "The accumulator in a 1-address machine, or the top of the stack in a 0-address machine."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي بنية التحميل/التخزين (Load/Store Architecture)؟",
+      "en": "What is a Load/Store Architecture?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بنية (مثل 1.5 عنوان) حيث التعليمات الوحيدة التي تصل للذاكرة هي Load و Store، وباقي العمليات تتم على المسجلات.",
+        "en": "An architecture (like 1.5-address) where the only instructions that access memory are Load and Store, and all other operations are performed on registers."
+      },
+      "example": {
+        "ar": "معالجات RISC الحديثة.",
+        "en": "Modern RISC processors."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يؤثر الـ ISA على عدد مرات الوصول للذاكرة؟",
+      "en": "How does the ISA affect the number of memory accesses?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يؤثر بشكل جذري؛ البنى التي تعتمد على الذاكرة بكثرة (مثل 2-عنوان) بطيئة، بينما البنى التي تستخدم المسجلات (مثل 1.5 عنوان) سريعة وتقلل الوصول للذاكرة.",
+        "en": "It affects it dramatically; memory-heavy architectures (like 2-address) are slow, while register-based architectures (like 1.5-address) are fast and minimize memory access."
+      },
+      "example": {
+        "ar": "نفس المعادلة تطلبت 18 وصولاً في 2-عنوان، و 6 فقط في 1.5 عنوان.",
+        "en": "The same equation required 18 accesses in 2-address, and only 6 in 1.5-address."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي بنية تعتمد على المراكم (Accumulator) كمصدر ووجهة ضمنية؟",
+      "en": "Which architecture relies on the Accumulator as an implicit source and destination?"
+    },
+    "options": {
+      "ar": [
+        "آلة 0-عنوان",
+        "آلة 1-عنوان",
+        "آلة 2-عنوان",
+        "آلة 3-عنوان"
+      ],
+      "en": [
+        "0-address machine",
+        "1-address machine",
+        "2-address machine",
+        "3-address machine"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الآلة أحادية العنوان تستخدم المراكم كمعامل ضمني دائم للعمليات الحسابية.",
+      "en": "The 1-address machine uses the accumulator as a permanent implicit operand for arithmetic operations."
+    },
+    "hint": {
+      "ar": "تحتوي التعليمة على عنوان واحد فقط.",
+      "en": "The instruction contains only one address."
+    },
+    "difficulty": "easy",
+    "conceptId": "one-address-machines"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "في الآلة صفرية العنوان (0-Address)، ما هي التعليمات التي تقوم بالوصول إلى الذاكرة؟",
+      "en": "In a 0-address machine, which instructions access memory?"
+    },
+    "options": {
+      "ar": [
+        "تعليمات الجمع والضرب (ADD, MUL)",
+        "تعليمات الدفع والسحب (PUSH, POP)",
+        "جميع التعليمات",
+        "لا توجد تعليمات تصل للذاكرة"
+      ],
+      "en": [
+        "ADD and MUL instructions",
+        "PUSH and POP instructions",
+        "All instructions",
+        "No instructions access memory"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "العمليات الحسابية تتم داخل المكدس (المسجلات)، بينما PUSH و POP هي المسؤولة عن نقل البيانات من وإلى الذاكرة.",
+      "en": "Arithmetic operations occur within the stack (registers), while PUSH and POP are responsible for moving data to and from memory."
+    },
+    "hint": {
+      "ar": "فكر في كيفية إدخال وإخراج البيانات من المكدس.",
+      "en": "Think about how data enters and leaves the stack."
+    },
+    "difficulty": "medium",
+    "conceptId": "zero-address-machines"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الاسم الآخر لبنية 1.5 عنوان (1½-Address)؟",
+      "en": "What is another name for the 1½-address architecture?"
+    },
+    "options": {
+      "ar": [
+        "بنية المكدس (Stack Architecture)",
+        "بنية المراكم (Accumulator Architecture)",
+        "بنية التحميل/التخزين (Load/Store Architecture)",
+        "بنية CISC"
+      ],
+      "en": [
+        "Stack Architecture",
+        "Accumulator Architecture",
+        "Load/Store Architecture",
+        "CISC Architecture"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بنية 1.5 عنوان تستخدم مسجلاً وعنوان ذاكرة، وهي الأساس لمعماريات التحميل/التخزين (RISC).",
+      "en": "The 1.5-address architecture uses a register and a memory address, forming the basis for Load/Store (RISC) architectures."
+    },
+    "hint": {
+      "ar": "تفصل بين عمليات الذاكرة والعمليات الحسابية.",
+      "en": "It separates memory operations from arithmetic operations."
+    },
+    "difficulty": "medium",
+    "conceptId": "two-address-machines"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "في تعليمة الآلة ثنائية العنوان (2-Address) مثل ADD T1, C، ماذا يمثل T1؟",
+      "en": "In a 2-address machine instruction like ADD T1, C, what does T1 represent?"
+    },
+    "options": {
+      "ar": [
+        "مصدر فقط",
+        "وجهة فقط",
+        "مصدر ووجهة في نفس الوقت",
+        "عنوان التعليمة التالية"
+      ],
+      "en": [
+        "Source only",
+        "Destination only",
+        "Both source and destination",
+        "Address of the next instruction"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في البنية ثنائية العنوان، العنوان الأول يعمل كمصدر أول للعملية وكوجهة لتخزين النتيجة.",
+      "en": "In a 2-address architecture, the first address acts as the first source for the operation and as the destination to store the result."
+    },
+    "hint": {
+      "ar": "العملية تدمر القيمة الأصلية لـ T1.",
+      "en": "The operation destroys the original value of T1."
+    },
+    "difficulty": "easy",
+    "conceptId": "two-address-machines"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "بناءً على المقارنة في المحاضرة، أي البنى التالية تطلبت أكبر عدد من مرات الوصول للذاكرة (Data Refs) لحساب المعادلة؟",
+      "en": "Based on the comparison in the lecture, which of the following architectures required the highest number of data memory accesses to calculate the equation?"
+    },
+    "options": {
+      "ar": [
+        "0-address",
+        "1-address",
+        "2-address (ذاكرة إلى ذاكرة)",
+        "3-address (مسجلات)"
+      ],
+      "en": [
+        "0-address",
+        "1-address",
+        "2-address (memory-to-memory)",
+        "3-address (registers)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "البنية ثنائية العنوان (ذاكرة إلى ذاكرة) تطلبت 18 وصولاً للذاكرة، وهو الأسوأ بين جميع البنى.",
+      "en": "The 2-address (memory-to-memory) architecture required 18 memory accesses, the worst among all architectures."
+    },
+    "hint": {
+      "ar": "كل تعليمة حسابية تقرأ مرتين وتكتب مرة في الذاكرة.",
+      "en": "Every arithmetic instruction reads twice and writes once to memory."
+    },
+    "difficulty": "medium",
+    "conceptId": "isa-comparison"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو العيب الرئيسي للآلة ثلاثية العنوان (3-Address) التي تستخدم عناوين الذاكرة فقط؟",
+      "en": "What is the main disadvantage of a 3-address machine that uses only memory addresses?"
+    },
+    "options": {
+      "ar": [
+        "تحتاج إلى عدد كبير جداً من التعليمات",
+        "طول التعليمة الواحدة كبير جداً",
+        "لا تدعم العمليات الحسابية المعقدة",
+        "تستخدم المكدس بشكل مفرط"
+      ],
+      "en": [
+        "Requires a very large number of instructions",
+        "The length of a single instruction is very large",
+        "Does not support complex arithmetic operations",
+        "Overuses the stack"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "احتواء التعليمة على 3 عناوين ذاكرة كاملة يجعل حجم التعليمة ضخماً (مثلاً 50 بت)، مما يستهلك الذاكرة.",
+      "en": "Containing 3 full memory addresses makes the instruction size huge (e.g., 50 bits), consuming memory."
+    },
+    "hint": {
+      "ar": "فكر في حجم البتات المطلوبة لتمثيل 3 عناوين ذاكرة.",
+      "en": "Think about the number of bits required to represent 3 memory addresses."
+    },
+    "difficulty": "medium",
+    "conceptId": "three-address-machines"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يتم تقليل الوصول للذاكرة في الآلات المعتمدة على المكدس (Stack)؟",
+      "en": "How is memory access reduced in stack-based machines?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام ذاكرة كاش (Cache) خارجية",
+        "بتنفيذ المكدس كمجموعة من المسجلات السريعة جداً",
+        "بتقليل عدد التعليمات في البرنامج",
+        "باستخدام عناوين ذاكرة قصيرة"
+      ],
+      "en": [
+        "By using external cache memory",
+        "By implementing the stack as a set of very fast registers",
+        "By reducing the number of instructions in the program",
+        "By using short memory addresses"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المكدس في هذه الآلات ليس في الذاكرة الرئيسية، بل هو مجموعة من المسجلات السريعة داخل المعالج، مما يجعل عمليات ADD و MUL لا تحتاج للوصول للذاكرة.",
+      "en": "The stack in these machines is not in main memory, but a set of fast registers inside the CPU, making ADD and MUL operations require zero memory access."
+    },
+    "hint": {
+      "ar": "أين يوجد المكدس فعلياً ليكون سريعاً؟",
+      "en": "Where is the stack physically located to be fast?"
+    },
+    "difficulty": "hard",
+    "conceptId": "zero-address-machines"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "في المقارنة النهائية، أي البنى حققت أقل إجمالي للبتات المنقولة (الأكثر كفاءة)؟",
+      "en": "In the final comparison, which architectures achieved the lowest total transferred bits (most efficient)?"
+    },
+    "options": {
+      "ar": [
+        "0-address و 1-address",
+        "2-address و 3-address (ذاكرة)",
+        "1.5-address و 3-address (مسجلات)",
+        "1-address و 2-address"
+      ],
+      "en": [
+        "0-address and 1-address",
+        "2-address and 3-address (memory)",
+        "1.5-address and 3-address (registers)",
+        "1-address and 2-address"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بنية 1.5 عنوان (257 بت) وبنية 3 عناوين مع المسجلات (248 بت) كانتا الفائزتين بفضل استخدامهما للمسجلات لتقليل الوصول للذاكرة.",
+      "en": "The 1.5-address (257 bits) and 3-address with registers (248 bits) were the winners due to their use of registers to reduce memory access."
+    },
+    "hint": {
+      "ar": "ابحث عن البنى التي تعتمد بشكل كبير على المسجلات (Registers).",
+      "en": "Look for architectures that rely heavily on registers."
+    },
+    "difficulty": "medium",
+    "conceptId": "isa-comparison"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما الذي تحدده بنية مجموعة التعليمات (ISA) بشكل أساسي؟",
+      "en": "What does the Instruction Set Architecture (ISA) primarily determine?"
+    },
+    "options": {
+      "ar": [
+        "سرعة المعالج بالميجاهرتز",
+        "تنسيق التعليمات ولغة التجميع",
+        "حجم القرص الصلب",
+        "نوع نظام التشغيل"
+      ],
+      "en": [
+        "Processor speed in MHz",
+        "Instruction formats and assembly language",
+        "Hard drive size",
+        "Type of operating system"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الـ ISA هي الواجهة بين الأجهزة والبرمجيات، وتحدد شكل التعليمات التي يفهمها المعالج.",
+      "en": "The ISA is the interface between hardware and software, determining the format of instructions the processor understands."
+    },
+    "hint": {
+      "ar": "تتعلق بكيفية كتابة البرامج للمعالج.",
+      "en": "It relates to how programs are written for the processor."
+    },
+    "difficulty": "easy",
+    "conceptId": "isa-overview"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في الآلة أحادية العنوان، أين يتم تخزين نتيجة عملية الجمع (ADD) تلقائياً؟",
+      "en": "In a 1-address machine, where is the result of an ADD operation automatically stored?"
+    },
+    "options": {
+      "ar": [
+        "في المكدس (Stack)",
+        "في الذاكرة الرئيسية",
+        "في المراكم (Accumulator)",
+        "في مسجل الأعلام (Flags Register)"
+      ],
+      "en": [
+        "In the Stack",
+        "In main memory",
+        "In the Accumulator",
+        "In the Flags Register"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المراكم هو الوجهة الضمنية لجميع العمليات الحسابية في الآلة أحادية العنوان.",
+      "en": "The accumulator is the implicit destination for all arithmetic operations in a 1-address machine."
+    },
+    "hint": {
+      "ar": "المسجل الوحيد المستخدم في هذه البنية.",
+      "en": "The single register used in this architecture."
+    },
+    "difficulty": "easy",
+    "conceptId": "one-address-machines"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">السر الحقيقي وراء كفاءة أي بنية تعليمات (ISA) ليس في عدد العناوين بحد ذاته، بل في مدى استخدامها للمسجلات (Registers) لتقليل الوصول البطيء للذاكرة الرئيسية.</template>
+    <template class="content-en">The real secret behind the efficiency of any ISA is not the number of addresses itself, but how heavily it uses registers to minimize slow accesses to main memory.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر: عندما نقول أن عملية ADD في المكدس لها (0) وصول للذاكرة، فهذا يخص 'البيانات' فقط. المعالج لا يزال بحاجة للوصول للذاكرة لجلب 'التعليمة' نفسها (Instruction Fetch).</template>
+    <template class="content-en">Trap: When we say an ADD operation on a stack has (0) memory accesses, this applies to 'data' only. The CPU still needs to access memory to fetch the 'instruction' itself (Instruction Fetch).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">بنية 1.5 عنوان هي الأساس الذي بُنيت عليه معالجات RISC الحديثة (مثل معالجات الهواتف الذكية ARM)، حيث يتم فصل عمليات الذاكرة (Load/Store) تماماً عن العمليات الحسابية.</template>
+    <template class="content-en">The 1.5-address architecture is the foundation upon which modern RISC processors (like ARM smartphone chips) are built, completely separating memory operations (Load/Store) from arithmetic operations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في البنية ثنائية العنوان، تذكر دائماً أن العملية 'مدمرة' (Destructive). تعليمة ADD T1, C ستمسح القيمة القديمة لـ T1 وتستبدلها بالنتيجة الجديدة.</template>
+    <template class="content-en">In a 2-address architecture, always remember that the operation is 'destructive'. The instruction ADD T1, C will erase the old value of T1 and replace it with the new result.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M12.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 3 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

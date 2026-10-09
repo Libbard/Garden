@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="12" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>النماذج المخصصة والتدريب باستخدام TensorFlow · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M11.html" data-gh-next="M13.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#tensorflow-overview-architecture" class="toc-link" data-bilingual>
+        <template class="content-ar">نظرة عامة على TensorFlow وبنيته</template>
+        <template class="content-en">TensorFlow Overview and Architecture</template>
+        <span class="content-target">نظرة عامة على TensorFlow وبنيته</span>
+      </a>
+      <a href="#tensors-and-variables" class="toc-link" data-bilingual>
+        <template class="content-ar">الموترات (Tensors) والمتغيرات (Variables)</template>
+        <template class="content-en">Tensors and Variables</template>
+        <span class="content-target">الموترات (Tensors) والمتغيرات (Variables)</span>
+      </a>
+      <a href="#custom-loss-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">دوال الخسارة المخصصة</template>
+        <template class="content-en">Custom Loss Functions</template>
+        <span class="content-target">دوال الخسارة المخصصة</span>
+      </a>
+      <a href="#custom-activations-initializers-constraints" class="toc-link" data-bilingual>
+        <template class="content-ar">دوال التنشيط، والمهيئات، والقيود المخصصة</template>
+        <template class="content-en">Custom Activation Functions, Initializers, and Constraints</template>
+        <span class="content-target">دوال التنشيط، والمهيئات، والقيود المخصصة</span>
+      </a>
+      <a href="#custom-metrics" class="toc-link" data-bilingual>
+        <template class="content-ar">المقاييس المخصصة (Custom Metrics)</template>
+        <template class="content-en">Custom Metrics</template>
+        <span class="content-target">المقاييس المخصصة (Custom Metrics)</span>
+      </a>
+      <a href="#custom-layers" class="toc-link" data-bilingual>
+        <template class="content-ar">الطبقات المخصصة (Custom Layers)</template>
+        <template class="content-en">Custom Layers</template>
+        <span class="content-target">الطبقات المخصصة (Custom Layers)</span>
+      </a>
+      <a href="#custom-models" class="toc-link" data-bilingual>
+        <template class="content-ar">النماذج المخصصة (Custom Models)</template>
+        <template class="content-en">Custom Models</template>
+        <span class="content-target">النماذج المخصصة (Custom Models)</span>
+      </a>
+      <a href="#losses-metrics-model-internals" class="toc-link" data-bilingual>
+        <template class="content-ar">الخسائر والمقاييس بناءً على الأجزاء الداخلية للنموذج</template>
+        <template class="content-en">Losses and Metrics Based on Model Internals</template>
+        <span class="content-target">الخسائر والمقاييس بناءً على الأجزاء الداخلية للنموذج</span>
+      </a>
+      <a href="#computing-gradients-autodiff" class="toc-link" data-bilingual>
+        <template class="content-ar">حساب التدرجات باستخدام التفاضل التلقائي (Autodiff)</template>
+        <template class="content-en">Computing Gradients Using Autodiff</template>
+        <span class="content-target">حساب التدرجات باستخدام التفاضل التلقائي (Autodiff)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 12</template>
+      <template class="content-en">Module 12</template>
+      <span class="content-target">الوحدة 12</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">النماذج المخصصة والتدريب باستخدام TensorFlow</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية بناء نماذج مخصصة، ودوال خسارة، ومقاييس، وطبقات باستخدام واجهة برمجة التطبيقات منخفضة المستوى في TensorFlow، بالإضافة إلى التحكم الكامل في حلقات التدريب وحساب التدرجات باستخدام Autodiff.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Custom Models and Training with TensorFlow</h1>
+      <p class="hero-description">This module covers building custom models, loss functions, metrics, and layers using TensorFlow's low-level API, as well as full control over training loops and gradient computation using Autodiff.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">تنسرفلو</span>
+      <span class="tag">النماذج المخصصة</span>
+      <span class="tag">حلقات التدريب</span>
+      <span class="tag">التفاضل التلقائي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">TensorFlow</span>
+      <span class="tag">Custom Models</span>
+      <span class="tag">Training Loops</span>
+      <span class="tag">Autodiff</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>بناء نماذج مخصصة وحلقات تدريب باستخدام واجهة برمجة التطبيقات منخفضة المستوى في TensorFlow.</span></li>
+      <li><span class="obj-icon">✦</span><span>استخدام واجهة بيانات TensorFlow (Data API) لتحميل ومعالجة مجموعات البيانات الكبيرة بكفاءة.</span></li>
+      <li><span class="obj-icon">✦</span><span>العمل مع تنسيق TFRecord لتخزين وإدارة مجموعات البيانات الكبيرة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Build custom models and training loops using TensorFlow's low-level API.</span></li>
+      <li><span class="obj-icon">✦</span><span>Utilize TensorFlow's Data API for efficient loading and preprocessing of large datasets.</span></li>
+      <li><span class="obj-icon">✦</span><span>Work with the TFRecord format for storing and managing large datasets.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="tensorflow-overview-architecture" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> نظرة عامة على TensorFlow وبنيته</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> TensorFlow Overview and Architecture</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>TensorFlow هي مكتبة قوية للحسابات العددية مصممة خصيصاً لتعلم الآلة واسع النطاق، توفر واجهات عالية ومنخفضة المستوى.</p></template>
+    <template class="content-en"><p>TensorFlow is a powerful numerical computation library tailored for large-scale ML, offering both high-level and low-level APIs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تم تطوير TensorFlow بواسطة فريق Google Brain وتم إصداره كمصدر مفتوح في عام 2015. تشمل ميزاته الأساسية:</p><ul><li>دعم GPU/TPU لتسريع العمليات الحسابية.</li><li><span class="smart-term" data-term-en="JIT Compiler" data-ar="مترجم JIT" data-en-def="Just-In-Time compiler that extracts, optimizes, and runs computation graphs efficiently.">مترجم JIT<span class="smart-term-tooltip"></span></span> (Just-In-Time) لاستخراج وتحسين وتشغيل الرسوم البيانية الحسابية بكفاءة.</li><li>دعم الحوسبة الموزعة عبر أجهزة وخوادم متعددة.</li><li><span class="smart-term" data-term-en="Autodiff" data-ar="التفاضل التلقائي" data-en-def="Automatic differentiation for backpropagation.">التفاضل التلقائي<span class="smart-term-tooltip"></span></span> (Autodiff) للانتشار العكسي.</li><li>تصدير الرسوم البيانية الحسابية للاستخدام عبر منصات مختلفة (مثل من Python إلى Java).</li></ul><p>ينقسم النظام إلى واجهات برمجة تطبيقات (APIs):</p><ul><li><b>واجهة عالية المستوى (tf.keras):</b> مناسبة لـ 95% من حالات الاستخدام (الانحدار، التصنيف) وتتكامل بسهولة مع معالجة البيانات.</li><li><b>واجهة منخفضة المستوى:</b> تستخدم لحلقات التدريب المخصصة، ومعالجة التدرجات، والتدريب بمتعدد المحسنات (multi-optimizer).</li></ul><p>يحتوي النظام البيئي على أدوات مثل TensorBoard للتصور، و TFX للإنتاج، و TF Hub للنماذج المدربة مسبقاً، و TF Lite للأجهزة المحمولة، و TF.js لمتصفحات الويب.</p></template>
+    <template class="content-en"><p>Developed by the Google Brain Team and open-sourced in 2015, TensorFlow's core features include:</p><ul><li>GPU/TPU support for accelerated computation.</li><li><span class="smart-term" data-term-en="JIT Compiler" data-ar="مترجم JIT" data-en-def="Just-In-Time compiler that extracts, optimizes, and runs computation graphs efficiently.">JIT Compiler<span class="smart-term-tooltip"></span></span> to extract, optimize, and run computation graphs efficiently.</li><li>Distributed computing support across multiple devices and servers.</li><li><span class="smart-term" data-term-en="Autodiff" data-ar="التفاضل التلقائي" data-en-def="Automatic differentiation for backpropagation.">Autodiff<span class="smart-term-tooltip"></span></span> for automatic differentiation and backpropagation.</li><li>Exporting computation graphs for cross-platform use.</li></ul><p>The API is divided into:</p><ul><li><b>High-Level API (tf.keras):</b> Suitable for 95% of use cases (regression, classification) and integrates with data preprocessing.</li><li><b>Low-Level API:</b> Used for custom training loops, gradient manipulation, and multi-optimizer training.</li></ul><p>The ecosystem includes TensorBoard (visualization), TFX (production), TF Hub (pretrained models), TF Lite (mobile), and TF.js (web).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تكمن قوة TensorFlow الحقيقية في قدرته على فصل تعريف الرسم البياني الحسابي عن تنفيذه، مما يسمح بتحسينات هائلة من خلال مترجم JIT.</p><p>الواجهة منخفضة المستوى ضرورية للباحثين الذين يحتاجون إلى التحكم الدقيق في كيفية تحديث الأوزان، أو عند تنفيذ خوارزميات تدريب غير قياسية لا تدعمها Keras بشكل افتراضي.</p></template>
+    <template class="content-en"><p>TensorFlow's true power lies in its ability to separate the definition of the computation graph from its execution, allowing for massive optimizations via the JIT compiler.</p><p>The low-level API is essential for researchers who need granular control over how weights are updated, or when implementing non-standard training algorithms not supported by Keras out-of-the-box.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a hierarchical architecture diagram of TensorFlow. Top layer: 'Your Python Code' (split into 95% pointing to Keras/Data API, and 5% pointing to Low-Level Python API). Middle layers: 'Keras' and 'Data API' side-by-side, below them 'Low-Level Python API (ops)', 'C++', 'Go'. Below that: 'Local/Distributed Execution Engine'. Bottom layer: 'CPU kernels', 'GPU kernels', 'TPU kernels'. Style: educational, dark background #0d1117, accent colors blue and orange, viewBox 0 0 800 500, clear text labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">TensorFlow Architecture</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">بنية تنسرفلو (TensorFlow)</text>
+
+    <!-- ==================== ARROWS ==================== -->
+    
+    <!-- Python to Low-Level (5%) -->
+    <path d="M 300 85 L 170 85 Q 160 85 160 95 L 160 255" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Python to Keras (95%) -->
+    <path d="M 360 110 L 310 155" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Python to Data API -->
+    <path d="M 440 110 L 490 155" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Keras to Low-Level -->
+    <path d="M 270 210 L 190 255" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Data API to C++ -->
+    <path d="M 490 210 L 420 255" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Low-Level to Execution Engine -->
+    <path d="M 160 310 L 160 355" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- C++ to Execution Engine -->
+    <path d="M 400 310 L 400 355" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Go to Execution Engine -->
+    <path d="M 560 310 L 560 355" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Execution Engine to CPU -->
+    <path d="M 200 420 L 200 465" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Execution Engine to GPU -->
+    <path d="M 400 420 L 400 465" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    
+    <!-- Execution Engine to TPU -->
+    <path d="M 600 420 L 600 465" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- ==================== ARROW LABELS ==================== -->
+    
+    <!-- 5% Label -->
+    <rect x="195" y="73" width="80" height="24" rx="4" fill="var(--bg-surface)" />
+    <text x="235" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">5% (Low)</text>
+    <text x="235" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">5% (منخفض)</text>
+
+    <!-- 95% Label -->
+    <rect x="295" y="120" width="80" height="24" rx="4" fill="var(--bg-surface)" />
+    <text x="335" y="137" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">95% (High)</text>
+    <text x="335" y="137" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">95% (عالي)</text>
+
+    <!-- ==================== NODES ==================== -->
+    
+    <!-- Layer 1: Python Code -->
+    <rect x="300" y="60" width="200" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="400" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Your Python Code</text>
+    <text x="400" y="90" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كود بايثون الخاص بك</text>
+
+    <!-- Layer 2: High-Level APIs -->
+    <!-- Keras -->
+    <rect x="200" y="160" width="180" height="50" rx="8" fill="url(#brand-grad)" />
+    <text x="290" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Keras API</text>
+    <text x="290" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">واجهة Keras</text>
+
+    <!-- Data API -->
+    <rect x="420" y="160" width="180" height="50" rx="8" fill="url(#brand-grad)" />
+    <text x="510" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Data API (tf.data)</text>
+    <text x="510" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">واجهة البيانات (tf.data)</text>
+
+    <!-- Layer 3: Low-Level APIs & Bindings -->
+    <!-- Low-Level Python -->
+    <rect x="60" y="260" width="200" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="160" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Low-Level Python API (ops)</text>
+    <text x="160" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">واجهة بايثون منخفضة المستوى</text>
+
+    <!-- C++ -->
+    <rect x="340" y="260" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">C++ API</text>
+    <text x="400" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">واجهة C++</text>
+
+    <!-- Go -->
+    <rect x="500" y="260" width="120" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="560" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Go API</text>
+    <text x="560" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">واجهة Go</text>
+
+    <!-- Layer 4: Execution Engine -->
+    <rect x="60" y="360" width="680" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="400" y="396" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Local / Distributed Execution Engine</text>
+    <text x="400" y="396" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">محرك التنفيذ المحلي / الموزع</text>
+
+    <!-- Layer 5: Hardware Kernels -->
+    <!-- CPU -->
+    <rect x="120" y="470" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="200" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">CPU Kernels</text>
+    <text x="200" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنوية المعالج (CPU)</text>
+
+    <!-- GPU -->
+    <rect x="320" y="470" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="400" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">GPU Kernels</text>
+    <text x="400" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنوية الرسوميات (GPU)</text>
+
+    <!-- TPU -->
+    <rect x="520" y="470" width="160" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="600" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">TPU Kernels</text>
+    <text x="600" y="500" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنوية موتر (TPU)</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>High-Level API (tf.keras)</th><th>Low-Level API</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حالات الاستخدام</template>
+          <template class="content-en">Use Cases</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مناسبة لـ 95% من الحالات (التصنيف، الانحدار)</template>
+          <template class="content-en">Suitable for 95% of cases (classification, regression)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حلقات التدريب المخصصة، معالجة التدرجات</template>
+          <template class="content-en">Custom training loops, gradient manipulation</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المرونة والتحكم</template>
+          <template class="content-en">Flexibility &amp; Control</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">محدودة بالبنى القياسية</template>
+          <template class="content-en">Limited to standard architectures</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تحكم كامل في التوترات والعمليات</template>
+          <template class="content-en">Full control over tensors and operations</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يكون من الضروري التخلي عن واجهة tf.keras واستخدام واجهة TensorFlow منخفضة المستوى؟</template>
+      <template class="content-en">When is it necessary to abandon the tf.keras API and use TensorFlow's low-level API?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عندما تحتاج إلى بناء حلقة تدريب مخصصة بالكامل، أو معالجة التدرجات يدوياً قبل تطبيقها، أو استخدام محسنات متعددة لأجزاء مختلفة من النموذج (مثل شبكات GANs).</p></template>
+      <template class="content-en"><p>When you need to build a fully custom training loop, manually manipulate gradients before applying them, or use multiple optimizers for different parts of a model (e.g., in GANs).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="tensors-and-variables" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الموترات (Tensors) والمتغيرات (Variables)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Tensors and Variables</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الموترات هي مصفوفات متعددة الأبعاد تشبه NumPy ولكنها تدعم مسرعات الأجهزة، بينما المتغيرات هي موترات قابلة للتحديث تُستخدم لتخزين أوزان النموذج.</p></template>
+    <template class="content-en"><p>Tensors are multidimensional arrays similar to NumPy but with hardware acceleration support, while Variables are updatable tensors used to store model weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يدور TensorFlow حول الموترات (Tensors)، والتي يمكن أن تحمل قيماً مفردة (Scalars) أو مصفوفات. لها شكل (shape) ونوع بيانات (dtype).</p><p><b>العمليات الرياضية:</b> تعمل بشكل مشابه لـ NumPy. يمكنك تقطيع الموترات (slicing)، وإجراء ضرب المصفوفات (<code>t @ tf.transpose(t)</code>)، وتطبيق دوال مثل <code>tf.square()</code> و <code>tf.reduce_mean()</code>. يتم دعم عوامل تشغيل Python القياسية (+، -، *).</p><p><b>التكامل مع NumPy:</b> يعمل TensorFlow بسلاسة مع مصفوفات NumPy. يمكنك تحويل مصفوفة NumPy إلى موتر باستخدام <code>tf.constant()</code> والعكس باستخدام <code>tensor.numpy()</code>. يجب الانتباه إلى أن NumPy يستخدم دقة 64-بت افتراضياً، بينما يستخدم TensorFlow دقة 32-بت.</p><p><b>المتغيرات (Variables):</b> على عكس الثوابت، يمكن تحديث المتغيرات بمرور الوقت باستخدام <code>tf.Variable()</code>. يتم تحديثها باستخدام طرق مثل <code>v.assign()</code>. تُستخدم بشكل أساسي لمعلمات النموذج التي يتم تحديثها بواسطة المحسنات (Optimizers).</p><p><b>هياكل بيانات إضافية:</b></p><ul><li>Sparse Tensors: للموترات التي تحتوي في الغالب على أصفار.</li><li>Tensor Arrays: قوائم من الموترات بحجم ثابت أو ديناميكي.</li><li>Ragged Tensors: قوائم من القوائم حيث قد تختلف الأشكال.</li><li>String Tensors: سلاسل بايت.</li><li>Queues: طوابير FIFO وطوابير الأولوية.</li></ul></template>
+    <template class="content-en"><p>TensorFlow revolves around tensors, which can hold scalars or arrays. They have a shape and a dtype.</p><p><b>Math Operations:</b> Work similarly to NumPy. You can slice tensors, perform matrix multiplication (<code>t @ tf.transpose(t)</code>), and apply functions like <code>tf.square()</code> and <code>tf.reduce_mean()</code>. Standard Python operators (+, -, *) are supported.</p><p><b>NumPy Integration:</b> TensorFlow works seamlessly with NumPy arrays. Convert NumPy to tensor via <code>tf.constant()</code> and vice versa via <code>tensor.numpy()</code>. Note precision differences: NumPy defaults to 64-bit, TensorFlow to 32-bit.</p><p><b>Variables:</b> Unlike constants, variables can be updated over time using <code>tf.Variable()</code>. They are updated using methods like <code>v.assign()</code>. They are primarily used for model parameters updated by optimizers.</p><p><b>Additional Data Structures:</b></p><ul><li><span class="smart-term" data-term-en="Sparse Tensors" data-ar="الموترات المتناثرة" data-en-def="Efficient data structures for tensors containing mostly zeros.">Sparse Tensors<span class="smart-term-tooltip"></span></span>: Efficient for mostly zero tensors.</li><li>Tensor Arrays: Lists of tensors with fixed/dynamic size.</li><li><span class="smart-term" data-term-en="Ragged Tensors" data-ar="الموترات المتعرجة" data-en-def="Lists of lists where shapes may vary, useful for unstructured data.">Ragged Tensors<span class="smart-term-tooltip"></span></span>: Lists of lists with varying shapes.</li><li>String Tensors: Byte strings.</li><li>Queues: FIFO, priority queues, etc.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين <code>tf.constant</code> و <code>tf.Variable</code> هو أن المتغيرات تحافظ على حالتها عبر عمليات تنفيذ الرسم البياني المتعددة، مما يجعلها ضرورية لعملية التعلم (تحديث الأوزان).</p><p>اختلاف الدقة (32-بت مقابل 64-بت) مهم جداً في تعلم الآلة؛ حيث توفر دقة 32-بت (أو حتى 16-بت) سرعة أكبر واستهلاكاً أقل للذاكرة على حساب دقة رياضية طفيفة، وهو أمر مقبول ومفضل في تدريب الشبكات العصبية.</p><p>تعتبر Ragged Tensors حاسمة عند التعامل مع بيانات غير منظمة مثل النصوص (جمل بأطوال مختلفة) دون الحاجة إلى حشو (Padding) مكلف للذاكرة.</p></template>
+    <template class="content-en"><p>The fundamental difference between <code>tf.constant</code> and <code>tf.Variable</code> is that variables maintain state across multiple graph executions, making them essential for the learning process (weight updates).</p><p>The precision difference (32-bit vs 64-bit) is crucial in ML; 32-bit (or 16-bit) provides faster computation and lower memory footprint at the cost of slight numerical precision, which is highly preferred in neural network training.</p><p>Ragged Tensors are critical when dealing with unstructured data like text (sentences of varying lengths) without requiring memory-expensive padding.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import tensorflow as tf
+import numpy as np
+
+# Tensor creation and math
+t = tf.constant([[1., 2., 3.], [4., 5., 6.]])
+matrix_mult = t @ tf.transpose(t)
+
+# NumPy interoperability
+np_array = np.array([2., 4., 5.])
+tensor_from_np = tf.constant(np_array)
+back_to_np = tensor_from_np.numpy()
+
+# Variables
+v = tf.Variable([[1., 2., 3.], [4., 5., 6.]])
+v.assign(2 * v) # Multiply by 2 and update
+v[0, 1].assign(42) # Update a single value</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يستخدم TensorFlow دقة 32-بت افتراضياً بينما يستخدم NumPy دقة 64-بت؟</template>
+      <template class="content-en">Why does TensorFlow use 32-bit precision by default while NumPy uses 64-bit?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن نماذج تعلم الآلة تتطلب عادةً عمليات حسابية سريعة ومعالجة كميات ضخمة من البيانات. دقة 32-بت تستهلك نصف الذاكرة وتعمل بشكل أسرع بكثير على وحدات معالجة الرسومات (GPUs) مقارنة بـ 64-بت، مع الحفاظ على دقة كافية لتقارب النماذج.</p></template>
+      <template class="content-en"><p>Because ML models typically require fast computations and processing massive amounts of data. 32-bit precision consumes half the memory and runs significantly faster on GPUs compared to 64-bit, while maintaining sufficient precision for model convergence.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-loss-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> دوال الخسارة المخصصة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Custom Loss Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تسمح دوال الخسارة المخصصة بتعديل كيفية تقييم النموذج لأخطاء التنبؤ، وهي مفيدة بشكل خاص للتعامل مع البيانات الصاخبة (Noisy Data) حيث تفشل الدوال القياسية.</p></template>
+    <template class="content-en"><p>Custom loss functions allow tailoring how a model evaluates prediction errors, especially useful for handling noisy data where standard functions fail.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في بعض الأحيان، لا تكون دوال الخسارة القياسية مثل MSE أو MAE مثالية. على سبيل المثال، دالة خسارة Huber (Huber Loss) أقل حساسية للقيم المتطرفة (Outliers) من MSE.</p><p><b>إنشاء دالة خسارة بسيطة:</b> يمكن تعريفها كدالة Python عادية تأخذ <code>y_true</code> و <code>y_pred</code> وتستخدم عمليات TensorFlow الحسابية لإرجاع الخسارة.</p><p><b>حفظ وتحميل النماذج:</b> عند حفظ نموذج بدالة خسارة مخصصة، يحفظ Keras اسم الدالة فقط. عند التحميل، يجب توفير الدالة عبر <code>custom_objects</code>.</p><p><b>الفئات الفرعية (Subclassing):</b> إذا كانت دالة الخسارة تحتوي على معلمات قابلة للتكوين (مثل العتبة في Huber Loss)، فلن يتم حفظها تلقائياً. الحل الأفضل هو إنشاء فئة فرعية من <code>keras.losses.Loss</code> وتنفيذ طريقتي <code>call()</code> لحساب الخسارة، و <code>get_config()</code> لحفظ المعلمات الفائقة (Hyperparameters) مع النموذج.</p></template>
+    <template class="content-en"><p>Sometimes standard losses like MSE or MAE are not optimal. For example, <span class="smart-term" data-term-en="Huber Loss" data-ar="خسارة هوبر" data-en-def="A loss function that is less sensitive to outliers than squared error loss, combining MSE and MAE.">Huber Loss<span class="smart-term-tooltip"></span></span> is less sensitive to outliers than MSE.</p><p><b>Creating a simple loss:</b> Can be defined as a regular Python function taking <code>y_true</code> and <code>y_pred</code>, using TF operations to return the loss.</p><p><b>Saving and Loading:</b> When saving a model with a custom loss, Keras only saves the function name. Upon loading, you must provide the function via <code>custom_objects</code>.</p><p><b>Subclassing:</b> If your loss function has configurable parameters (like the threshold in Huber Loss), they won't automatically save. The best practice is to subclass <code>keras.losses.Loss</code> and implement <code>call()</code> for the computation and <code>get_config()</code> to save hyperparameters with the model.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>tf.where</code> داخل دالة الخسارة المخصصة (كما في Huber Loss) يسمح بتطبيق منطق شرطي (Conditional Logic) دون كسر الرسم البياني الحسابي أو إعاقة التفاضل التلقائي.</p><p>طريقة <code>get_config()</code> ضرورية لضمان قابلية نقل النموذج (Portability). بدونها، ستحتاج إلى إعادة تعريف المعلمات الدقيقة يدوياً في كل مرة تقوم فيها بتحميل النموذج في بيئة جديدة.</p></template>
+    <template class="content-en"><p>Using <code>tf.where</code> inside a custom loss (like Huber Loss) allows applying conditional logic without breaking the computation graph or hindering automatic differentiation.</p><p>The <code>get_config()</code> method is essential for model portability. Without it, you would need to manually redefine the exact parameters every time you load the model in a new environment.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import tensorflow as tf
+from tensorflow import keras
+
+# Subclassing Loss for configurable parameters
+class HuberLoss(keras.losses.Loss):
+    def __init__(self, threshold=1.0, **kwargs):
+        self.threshold = threshold
+        super().__init__(**kwargs)
+        
+    def call(self, y_true, y_pred):
+        error = y_true - y_pred
+        is_small_error = tf.abs(error) &lt; self.threshold
+        squared_loss = tf.square(error) / 2
+        linear_loss = self.threshold * tf.abs(error) - self.threshold**2 / 2
+        return tf.where(is_small_error, squared_loss, linear_loss)
+        
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, "threshold": self.threshold}
+
+# Loading model with custom object
+# model = keras.models.load_model("model.h5", custom_objects={"HuberLoss": HuberLoss})</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا قمت بتحميل نموذج يحتوي على دالة خسارة مخصصة دون تمرير قاموس <code>custom_objects</code>؟</template>
+      <template class="content-en">What happens if you load a model containing a custom loss function without passing the <code>custom_objects</code> dictionary?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيطرح Keras خطأ (ValueError) لأنه سيجد اسم دالة الخسارة في ملف النموذج المحفوظ ولكنه لن يعرف كيفية تنفيذها أو العثور على تعريفها في بيئة Python الحالية.</p></template>
+      <template class="content-en"><p>Keras will throw a ValueError because it will find the name of the loss function in the saved model file but won't know how to execute it or find its definition in the current Python environment.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-activations-initializers-constraints" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> دوال التنشيط، والمهيئات، والقيود المخصصة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Custom Activation Functions, Initializers, and Constraints</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك تخصيص كيفية تنشيط الخلايا العصبية، وكيفية تعيين الأوزان الأولية، وفرض قيود معينة على الأوزان أثناء التدريب.</p></template>
+    <template class="content-en"><p>You can customize how neurons activate, how initial weights are set, and enforce specific conditions on weights during training.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر TensorFlow مرونة لتجاوز المكونات القياسية:</p><ul><li><b>دوال التنشيط المخصصة (Custom Activations):</b> تحدد كيفية تنشيط الخلايا العصبية. يمكنك كتابة دالة بسيطة باستخدام عمليات <code>tf.math</code> (مثل <code>my_softplus</code>).</li><li><b>المهيئات المخصصة (Custom Initializers):</b> تحدد الأوزان الأولية للطبقات. على سبيل المثال، إنشاء مهيئ Glorot مخصص باستخدام <code>tf.random.normal</code> بناءً على شكل المدخلات والمخرجات.</li><li><b>القيود المخصصة (Custom Constraints):</b> تضمن استيفاء الأوزان لشروط معينة (مثل الأوزان غير السالبة). يتم تطبيقها بعد كل خطوة تحسين باستخدام دوال مثل <code>tf.where</code> لفرض القيد.</li></ul></template>
+    <template class="content-en"><p>TensorFlow provides flexibility to go beyond standard components:</p><ul><li><b>Custom Activations:</b> Determine how neurons activate. You can write a simple function using <code>tf.math</code> operations (e.g., <code>my_softplus</code>).</li><li><b>Custom Initializers:</b> Set initial weights for layers. For example, creating a custom Glorot initializer using <code>tf.random.normal</code> based on input/output shapes.</li><li><b>Custom Constraints:</b> Ensure weights meet certain conditions (e.g., non-negative weights). Applied after each optimization step using functions like <code>tf.where</code> to enforce the constraint.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر القيود المخصصة مفيدة جداً في سيناريوهات محددة، مثل فرض أوزان موجبة فقط في طبقات معينة لضمان قابلية التفسير (Interpretability) أو لمنع التدرجات من الانفجار في بنيات معينة.</p><p>عند كتابة هذه الدوال المخصصة، يجب التأكد من استخدام عمليات TensorFlow (<code>tf.*</code>) بدلاً من عمليات Python القياسية أو NumPy، لضمان إمكانية تتبعها بواسطة <code>GradientTape</code> وإدراجها في الرسم البياني الحسابي.</p></template>
+    <template class="content-en"><p>Custom constraints are highly useful in specific scenarios, such as enforcing only positive weights in certain layers to ensure interpretability or to prevent gradients from exploding in specific architectures.</p><p>When writing these custom functions, it is crucial to use TensorFlow operations (<code>tf.*</code>) instead of standard Python or NumPy operations, ensuring they can be tracked by <code>GradientTape</code> and included in the computation graph.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Custom Activation
+def my_softplus(z):
+    return tf.math.log(tf.exp(z) + 1.0)
+
+# Custom Initializer
+def my_glorot_initializer(shape, dtype=tf.float32):
+    stddev = tf.sqrt(2. / (shape[0] + shape[1]))
+    return tf.random.normal(shape, stddev=stddev, dtype=dtype)
+
+# Custom Constraint (Non-negative weights)
+def my_positive_weights(weights):
+    return tf.where(weights &lt; 0., tf.zeros_like(weights), weights)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يتم تطبيق دالة القيد (Constraint) أثناء عملية التدريب؟</template>
+      <template class="content-en">When is the constraint function applied during the training process?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم تطبيق دالة القيد مباشرة بعد أن يقوم المحسن (Optimizer) بتحديث الأوزان بناءً على التدرجات، وذلك لضمان أن الأوزان الجديدة تلتزم بالقواعد المحددة.</p></template>
+      <template class="content-en"><p>The constraint function is applied immediately after the optimizer updates the weights based on the gradients, ensuring the new weights adhere to the specified rules.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-metrics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> المقاييس المخصصة (Custom Metrics)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Custom Metrics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم المقاييس لتقييم أداء النموذج (للتفسير البشري) ولا يشترط أن تكون قابلة للاشتقاق، على عكس دوال الخسارة التي تُستخدم لتحديث الأوزان.</p></template>
+    <template class="content-en"><p>Metrics are used to evaluate model performance (for human interpretability) and do not need to be differentiable, unlike loss functions which are used to update weights.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الخسائر مقابل المقاييس:</b> تُستخدم الخسائر بواسطة خوارزمية الانحدار المتدرج (Gradient Descent) ويجب أن تكون قابلة للاشتقاق. المقاييس تُستخدم للتقييم ويمكن أن تكون غير قابلة للاشتقاق.</p><p><b>المقاييس ذات الحالة (Stateful Metrics):</b> بالنسبة للمقاييس التي تتطلب التتبع عبر دفعات متعددة (Batches) مثل الدقة (Precision) أو الاستدعاء (Recall)، نحتاج إلى مقاييس متدفقة (Streaming). يتم ذلك عن طريق إنشاء فئة فرعية من <code>keras.metrics.Metric</code>.</p><p><b>تنفيذ مقياس مخصص:</b> يتطلب الفئة الفرعية تنفيذ الطرق التالية:</p><ol><li><code>__init__</code>: لإنشاء متغيرات الحالة (مثل <code>total</code> و <code>count</code>) باستخدام <code>self.add_weight()</code>.</li><li><code>update_state</code>: لتحديث متغيرات الحالة بناءً على الدفعة الحالية من التنبؤات.</li><li><code>result</code>: لحساب وإرجاع النتيجة النهائية للمقياس.</li><li><code>get_config</code>: لحفظ أي معلمات فائقة.</li></ol></template>
+    <template class="content-en"><p><b>Losses vs. Metrics:</b> Losses are used by Gradient Descent and must be differentiable. Metrics are used for evaluation and can be non-differentiable.</p><p><b><span class="smart-term" data-term-en="Stateful Metric" data-ar="مقياس ذو حالة" data-en-def="A metric that maintains internal state variables across batches to compute an accurate cumulative result for an entire epoch.">Stateful Metric<span class="smart-term-tooltip"></span></span>s:</b> For metrics that require tracking over multiple batches (like precision), we need streaming (stateful) metrics. This is done by subclassing <code>keras.metrics.Metric</code>.</p><p><b>Implementing a Custom Metric:</b> Subclassing requires implementing:</p><ol><li><code>__init__</code>: To create state variables (e.g., <code>total</code>, <code>count</code>) using <code>self.add_weight()</code>.</li><li><code>update_state</code>: To update state variables based on the current batch of predictions.</li><li><code>result</code>: To compute and return the final metric result.</li><li><code>get_config</code>: To save any hyperparameters.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى مقاييس ذات حالة (Stateful)؟ إذا قمنا بحساب المقياس لكل دفعة (Batch) بشكل مستقل ثم أخذنا المتوسط، فقد نحصل على نتيجة رياضية خاطئة لبعض المقاييس (مثل الدقة Precision). يجب أن يتتبع المقياس الإجماليات التراكمية (الإيجابيات الحقيقية، الإيجابيات الخاطئة) عبر جميع الدفعات قبل حساب النتيجة النهائية في نهاية الحقبة (Epoch).</p></template>
+    <template class="content-en"><p>Why do we need stateful metrics? If we calculate a metric for each batch independently and then average them, we might get mathematically incorrect results for certain metrics (like Precision). The metric must track cumulative totals (True Positives, False Positives) across all batches before computing the final result at the end of the epoch.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class HuberMetric(keras.metrics.Metric):
+    def __init__(self, threshold=1.0, **kwargs):
+        super().__init__(**kwargs)
+        self.threshold = threshold
+        self.huber_fn = create_huber(threshold)
+        self.total = self.add_weight("total", initializer="zeros")
+        self.count = self.add_weight("count", initializer="zeros")
+        
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        metric = self.huber_fn(y_true, y_pred)
+        self.total.assign_add(tf.reduce_sum(metric))
+        self.count.assign_add(tf.cast(tf.size(y_true), tf.float32))
+        
+    def result(self):
+        return self.total / self.count
+        
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, "threshold": self.threshold}</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Losses (الخسائر)</th><th>Metrics (المقاييس)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الغرض الأساسي</template>
+          <template class="content-en">Primary Purpose</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تحديث أوزان النموذج عبر الانحدار المتدرج</template>
+          <template class="content-en">Update model weights via Gradient Descent</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تقييم أداء النموذج للتفسير البشري</template>
+          <template class="content-en">Evaluate model performance for human interpretability</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">قابلية الاشتقاق (Differentiability)</template>
+          <template class="content-en">Differentiability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يجب أن تكون قابلة للاشتقاق</template>
+          <template class="content-en">Must be differentiable</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يمكن أن تكون غير قابلة للاشتقاق</template>
+          <template class="content-en">Can be non-differentiable</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الغرض من استخدام <code>self.add_weight()</code> داخل دالة <code>__init__</code> للمقياس المخصص؟</template>
+      <template class="content-en">What is the purpose of using <code>self.add_weight()</code> inside the <code>__init__</code> method of a custom metric?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يُستخدم لإنشاء متغيرات حالة (مثل المجموع والعدد) التي يحتفظ بها TensorFlow ويقوم بتحديثها عبر الدفعات المختلفة دون إعادة تعيينها، مما يسمح بحساب المقياس التراكمي.</p></template>
+      <template class="content-en"><p>It is used to create state variables (like total and count) that TensorFlow maintains and updates across different batches without resetting them, allowing for the calculation of a cumulative metric.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-layers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الطبقات المخصصة (Custom Layers)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Custom Layers</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن إنشاء طبقات مخصصة إما كطبقات عديمة الحالة (Stateless) باستخدام <code>Lambda</code>، أو كطبقات ذات حالة (Stateful) تحتوي على أوزان قابلة للتدريب عن طريق إنشاء فئة فرعية من <code>keras.layers.Layer</code>.</p></template>
+    <template class="content-en"><p>Custom layers can be created either as stateless layers using <code>Lambda</code>, or as stateful layers with trainable weights by subclassing <code>keras.layers.Layer</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الطبقات عديمة الحالة (Stateless Layers):</b> إذا كنت تحتاج فقط إلى تطبيق تحويل رياضي بسيط لا يحتوي على أوزان قابلة للتدريب، استخدم <code>keras.layers.Lambda</code>. هذا سريع وسهل ولا يتطلب إنشاء فئة فرعية. مثال: <code>Lambda(lambda x: tf.exp(x))</code>.</p><p><b>الطبقات ذات الحالة (Stateful Layers):</b> عند إنشاء طبقات تحتوي على أوزان قابلة للتدريب، يجب إنشاء فئة فرعية من <code>keras.layers.Layer</code> وتنفيذ الطرق التالية:</p><ol><li><code>__init__</code>: لحفظ المعلمات الفائقة (مثل عدد الوحدات).</li><li><code>build</code>: لإنشاء أوزان الطبقة (باستخدام <code>self.add_weight</code>). يتم استدعاؤها تلقائياً في المرة الأولى التي يتم فيها استخدام الطبقة، مما يسمح ب<span class="smart-term" data-term-en="Lazy Initialization" data-ar="التهيئة المتأخرة" data-en-def="The process of delaying the creation of layer weights until the input shape is known during the first forward pass.">التهيئة المتأخرة<span class="smart-term-tooltip"></span></span> (Lazy Initialization) بناءً على شكل المدخلات.</li><li><code>call</code>: لتنفيذ العمليات الحسابية للطبقة (المرور الأمامي).</li><li><code>compute_output_shape</code>: لإرجاع شكل مخرجات الطبقة.</li></ol></template>
+    <template class="content-en"><p><b>Stateless Layers:</b> If you only need to apply a simple mathematical transformation with no trainable weights, use <code>keras.layers.Lambda</code>. It's quick and doesn't require subclassing. Example: <code>Lambda(lambda x: tf.exp(x))</code>.</p><p><b>Stateful Layers:</b> When creating layers with trainable weights, subclass <code>keras.layers.Layer</code> and implement:</p><ol><li><code>__init__</code>: To save hyperparameters (e.g., number of units).</li><li><code>build</code>: To create the layer's weights (using <code>self.add_weight</code>). Called automatically the first time the layer is used, allowing <span class="smart-term" data-term-en="Lazy Initialization" data-ar="التهيئة المتأخرة" data-en-def="The process of delaying the creation of layer weights until the input shape is known during the first forward pass.">lazy initialization<span class="smart-term-tooltip"></span></span> based on input shape.</li><li><code>call</code>: To perform the layer's computations (forward pass).</li><li><code>compute_output_shape</code>: To return the shape of the layer's outputs.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفصل بين <code>__init__</code> و <code>build</code> هو تصميم ذكي في Keras. يسمح لك بتعريف الطبقة دون معرفة شكل المدخلات مسبقاً. عندما يتم تمرير البيانات لأول مرة، يستدعي Keras دالة <code>build</code> مع شكل المدخلات، مما يسمح بإنشاء مصفوفات الأوزان بالأبعاد الصحيحة ديناميكياً.</p></template>
+    <template class="content-en"><p>The separation between <code>__init__</code> and <code>build</code> is a smart design in Keras.</p><p>It allows you to define a layer without knowing the input shape in advance.</p><p>When data is passed for the first time, Keras calls <code>build</code> with the input shape, allowing weight matrices to be created with the correct dimensions dynamically.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class MyDense(keras.layers.Layer):
+    def __init__(self, units, activation=None, **kwargs):
+        super().__init__(**kwargs)
+        self.units = units
+        self.activation = keras.activations.get(activation)
+        
+    def build(self, batch_input_shape):
+        self.kernel = self.add_weight(
+            name="kernel",
+            shape=[batch_input_shape[-1], self.units],
+            initializer="glorot_normal")
+        self.bias = self.add_weight(
+            name="bias",
+            shape=[self.units],
+            initializer="zeros")
+        super().build(batch_input_shape) # Must be at the end
+        
+    def call(self, inputs):
+        return self.activation(tf.matmul(inputs, self.kernel) + self.bias)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم <code>super().build(batch_input_shape)</code> في نهاية دالة <code>build</code>؟</template>
+      <template class="content-en">Why do we use <code>super().build(batch_input_shape)</code> at the end of the <code>build</code> method?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يخبر هذا Keras أن الطبقة قد تم بناؤها بنجاح (يضبط السمة <code>built</code> على True)، مما يمنع استدعاء دالة <code>build</code> مرة أخرى في التمريرات اللاحقة.</p></template>
+      <template class="content-en"><p>It tells Keras that the layer has been successfully built (sets the <code>built</code> attribute to True), preventing the <code>build</code> method from being called again on subsequent passes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="custom-models" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> النماذج المخصصة (Custom Models)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Custom Models</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>من خلال إنشاء فئة فرعية من <code>keras.models.Model</code>، يمكنك بناء هياكل معقدة تحتوي على حلقات (Loops)، ومنطق شرطي، واتصالات متبقية (Residual Connections).</p></template>
+    <template class="content-en"><p>By subclassing <code>keras.models.Model</code>, you can build complex architectures containing loops, conditional logic, and residual connections.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر إنشاء فئة فرعية من <code>keras.models.Model</code> تحكماً كاملاً في بنية النموذج.</p><p>هذا مفيد للنماذج التي لا تتبع مساراً متسلسلاً بسيطاً.</p><ol><li><strong>مثال - الكتل المتبقية (Residual Blocks):</strong> يمكنك أولاً تعريف طبقة مخصصة تمثل كتلة (Block) تحتوي على عدة طبقات مخفية. في دالة <code>call</code> الخاصة بالكتلة، يمكنك إضافة المدخلات الأصلية إلى المخرجات (اتصال متبقي).</li><li><strong>تعريف النموذج:</strong> بعد ذلك، تقوم بإنشاء النموذج الرئيسي الذي يجمع هذه الكتل. في دالة <code>call</code> الخاصة بالنموذج، يمكنك استخدام حلقات <code>for</code> لتمرير البيانات عبر الكتل عدة مرات، مما يسهل تجربة تصميمات النماذج الجديدة.</li></ol></template>
+    <template class="content-en"><p>Subclassing <code>keras.models.Model</code> provides full control over the architecture.</p><p>This is useful for models that do not follow a simple sequential path.</p><ol><li><strong>Example - Residual Blocks:</strong> You can first define a custom layer representing a block containing multiple hidden layers. In the block's <code>call</code> method, you add the original inputs to the outputs (a <span class="smart-term" data-term-en="Residual Connection" data-ar="الاتصال المتبقي" data-en-def="A skip connection that bypasses some layers by adding the input of a block directly to its output, helping mitigate the vanishing gradient problem.">residual connection<span class="smart-term-tooltip"></span></span>).</li><li><strong>Model Definition:</strong> Next, you create the main model that assembles these blocks. In the model's <code>call</code> method, you can use <code>for</code> loops to pass data through blocks multiple times, facilitating experimentation with novel designs.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق بين <code>keras.layers.Layer</code> و <code>keras.models.Model</code> هو أن النموذج (Model) يمتلك وظائف إضافية مثل <code>compile()</code> و <code>fit()</code> و <code>evaluate()</code> و <code>save()</code>. الطبقات هي اللبنات الأساسية، والنماذج هي الحاوية القابلة للتدريب.</p><p>استخدام الحلقات (Loops) داخل دالة <code>call</code> يسمح بمشاركة الأوزان (Weight Sharing) إذا تم استدعاء نفس مثيل الطبقة (Layer Instance) عدة مرات، أو يسمح بتكرار الهيكل بسهولة.</p></template>
+    <template class="content-en"><p>The difference between <code>keras.layers.Layer</code> and <code>keras.models.Model</code> is that a Model has additional functionalities like <code>compile()</code>, <code>fit()</code>, <code>evaluate()</code>, and <code>save()</code>. Layers are the building blocks, and Models are the trainable containers.</p><p>Using loops inside the <code>call</code> method allows for weight sharing if the same layer instance is called multiple times, or allows for easy structural repetition.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class ResidualBlock(keras.layers.Layer):
+    def __init__(self, n_layers, n_neurons, **kwargs):
+        super().__init__(**kwargs)
+        self.hidden = [keras.layers.Dense(n_neurons, activation="elu") for _ in range(n_layers)]
+        
+    def call(self, inputs):
+        Z = inputs
+        for layer in self.hidden:
+            Z = layer(Z)
+        return inputs + Z # Residual connection
+
+class ResidualRegressor(keras.models.Model):
+    def __init__(self, output_dim, **kwargs):
+        super().__init__(**kwargs)
+        self.hidden1 = keras.layers.Dense(30, activation="elu")
+        self.block1 = ResidualBlock(2, 30)
+        self.out = keras.layers.Dense(output_dim)
+        
+    def call(self, inputs):
+        Z = self.hidden1(inputs)
+        for _ in range(3): # Loop through block
+            Z = self.block1(Z)
+        return self.out(Z)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Create a flowchart showing a Residual Model architecture. Top to bottom flow. Start with an arrow pointing to a 'Dense' box. Arrow down to a 'ResidualBlock' box. From this block, an arrow loops back to itself labeled 'x3'. Arrow down to another 'Dense' box. Next to this, show an expanded view of the 'ResidualBlock' inside a rounded rectangle: Input arrow goes into a 'Dense' box, then another 'Dense' box, then to a '+' (addition) node. A skip connection arrow goes from the input directly to the '+' node. Output from '+' node. Style: educational, dark background #0d1117, accent colors blue and orange, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Gradient for Residual Block -->
+    <linearGradient id="resGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Drop Shadow for Depth -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- ========================================== -->
+  <!-- ZOOM LINES (Connecting Main to Expanded)   -->
+  <!-- ========================================== -->
+  <path d="M 280 200 L 430 80" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6" />
+  <path d="M 280 250 L 430 480" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.6" />
+
+  <!-- ========================================== -->
+  <!-- LEFT COLUMN: MAIN MODEL ARCHITECTURE       -->
+  <!-- ========================================== -->
+
+  <!-- Input -->
+  <text x="200" y="50" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Input</text>
+  <text x="200" y="50" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">المدخلات</text>
+  <path d="M 200 60 L 200 92" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Dense Layer 1 -->
+  <rect x="120" y="100" width="160" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+  <text x="200" y="126" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Dense Layer</text>
+  <text x="200" y="126" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">طبقة كثيفة</text>
+  <path d="M 200 140 L 200 192" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Residual Block (Main) -->
+  <rect x="120" y="200" width="160" height="50" rx="8" fill="url(#resGrad)" filter="url(#shadow)" />
+  <text x="200" y="230" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Residual Block</text>
+  <text x="200" y="230" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">كتلة متبقية</text>
+  <path d="M 200 250 L 200 302" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Loop Arrow (x3) -->
+  <path d="M 280 225 L 325 225 Q 340 225 340 210 L 340 175 Q 340 160 325 160 L 235 160 Q 220 160 220 175 L 220 192" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <rect x="305" y="182" width="30" height="22" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="320" y="198" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">x3</text>
+  <text x="320" y="198" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold">x3</text>
+
+  <!-- Dense Layer 2 -->
+  <rect x="120" y="310" width="160" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+  <text x="200" y="336" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Dense Layer</text>
+  <text x="200" y="336" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">طبقة كثيفة</text>
+  <path d="M 200 350 L 200 412" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Output -->
+  <text x="200" y="435" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Output</text>
+  <text x="200" y="435" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">المخرجات</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT COLUMN: EXPANDED RESIDUAL BLOCK      -->
+  <!-- ========================================== -->
+
+  <!-- Bounding Box -->
+  <rect x="430" y="80" width="340" height="400" rx="16" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="8,6" filter="url(#shadow)" />
+  
+  <!-- Title -->
+  <text x="600" y="115" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Residual Block (Expanded)</text>
+  <text x="600" y="115" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">الكتلة المتبقية (عرض موسع)</text>
+
+  <!-- Block Input -->
+  <rect x="510" y="140" width="100" height="30" rx="15" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="560" y="160" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">x (Input)</text>
+  <text x="560" y="160" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">x (مدخل)</text>
+  <path d="M 560 170 L 560 202" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Expanded Dense 1 -->
+  <rect x="480" y="210" width="160" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="560" y="236" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Dense Layer</text>
+  <text x="560" y="236" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">طبقة كثيفة</text>
+  <path d="M 560 250 L 560 282" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Expanded Dense 2 -->
+  <rect x="480" y="290" width="160" height="40" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="560" y="316" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Dense Layer</text>
+  <text x="560" y="316" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">طبقة كثيفة</text>
+  <path d="M 560 330 L 560 362" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Add Node (+) -->
+  <circle cx="560" cy="390" r="20" fill="var(--brand-500)" filter="url(#shadow)" />
+  <text x="560" y="398" text-anchor="middle" fill="var(--on-brand-lo)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold">+</text>
+  <path d="M 560 410 L 560 432" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+  <!-- Block Output -->
+  <rect x="510" y="440" width="100" height="30" rx="15" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="560" y="460" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">F(x) + x</text>
+  <text x="560" y="460" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">F(x) + x</text>
+
+  <!-- Skip Connection -->
+  <!-- Split dot -->
+  <circle cx="560" cy="190" r="4" fill="var(--brand-500)" />
+  <!-- Path with rounded corners -->
+  <path d="M 560 190 L 695 190 Q 710 190 710 205 L 710 375 Q 710 390 695 390 L 588 390" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  
+  <!-- Skip Connection Label -->
+  <rect x="660" y="275" width="100" height="26" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="710" y="293" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Identity (x)</text>
+  <text x="710" y="293" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">تطابق (x)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في مثال <code>ResidualRegressor</code>، يتم استدعاء <code>self.block1</code> ثلاث مرات في حلقة. هل يتم إنشاء أوزان جديدة في كل مرة؟</template>
+      <template class="content-en">In the <code>ResidualRegressor</code> example, <code>self.block1</code> is called three times in a loop. Are new weights created each time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، نظراً لأنه يتم استخدام نفس المثيل (Instance) <code>self.block1</code>، فإن الأوزان تتم مشاركتها (Weight Sharing) عبر التكرارات الثلاثة.</p></template>
+      <template class="content-en"><p>No, because the same instance <code>self.block1</code> is used, the weights are shared across all three iterations.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="losses-metrics-model-internals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الخسائر والمقاييس بناءً على الأجزاء الداخلية للنموذج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Losses and Metrics Based on Model Internals</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكنك إضافة خسائر ومقاييس تعتمد على الحالات الداخلية للنموذج (مثل مخرجات الطبقات المخفية) لفرض التنظيم (Regularization) أو مراقبة سلوكيات معينة.</p></template>
+    <template class="content-en"><p>You can add losses and metrics based on the internal states of the model (like hidden layer outputs) to enforce regularization or monitor specific behaviors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لا تقتصر الخسائر على مقارنة التنبؤ النهائي بالهدف. يمكنك تعريف خسائر مخصصة باستخدام مكونات النموذج الداخلية:</p><ul><li><b>الأوزان:</b> لتنظيم معلمات النموذج لمنع التجهيز الزائد (Overfitting).</li><li><b>الطبقات المخفية:</b> لتشجيع سلوكيات معينة.</li></ul><p><b>مثال - إعادة بناء المدخلات (Reconstruction Loss):</b> يمكن إضافة طبقة كثيفة (Dense) فوق الطبقات المخفية لمحاولة إعادة بناء المدخلات الأصلية. هذا يجبر النموذج على استخراج والاحتفاظ بالأنماط ذات المغزى في البيانات طوال معالجتها.</p><p>يتم إضافة هذه الخسارة الإضافية باستخدام طريقة <code>self.add_loss()</code> داخل دالة <code>call</code>. وبالمثل، يمكن تتبع هذا الخطأ كمقياس باستخدام <code>self.add_metric()</code>.</p></template>
+    <template class="content-en"><p>Losses are not limited to comparing the final prediction with the target. You can define custom losses using internal model components:</p><ul><li><b>Weights:</b> Regularizing parameters to prevent overfitting.</li><li><b>Hidden Layers:</b> Encouraging specific behaviors.</li></ul><p><b>Example - <span class="smart-term" data-term-en="Reconstruction Loss" data-ar="خسارة إعادة البناء" data-en-def="An auxiliary loss that penalizes the model if it cannot accurately reconstruct its original inputs from its internal representations.">Reconstruction Loss<span class="smart-term-tooltip"></span></span>:</b> A Dense layer can be added on top of hidden layers to attempt to reconstruct the original inputs. This forces the model to extract and retain meaningful patterns throughout its processing.</p><p>This auxiliary loss is added using the <code>self.add_loss()</code> method inside the <code>call</code> function. Similarly, this error can be tracked as a metric using <code>self.add_metric()</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند استخدام <code>self.add_loss()</code>، يقوم Keras تلقائياً بجمع هذه الخسارة الداخلية مع الخسارة الرئيسية للنموذج (التي تم تمريرها في <code>compile</code>) أثناء التدريب. يتم ضرب الخسارة الداخلية عادةً بعامل تحجيم (Scaling Factor) مثل 0.05 لضمان عدم طغيانها على الخسارة الرئيسية.</p><p>تُعد هذه التقنية أساسية في بنيات مثل أجهزة التشفير التلقائي (Autoencoders) والشبكات التوليدية.</p></template>
+    <template class="content-en"><p>When using <code>self.add_loss()</code>, Keras automatically adds this internal loss to the model's main loss (passed in <code>compile</code>) during training. The internal loss is usually multiplied by a scaling factor (e.g., 0.05) to ensure it doesn't dominate the main task loss.</p><p>This technique is foundational in architectures like Autoencoders and generative networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def call(self, inputs):
+    Z = inputs
+    for layer in self.hidden:
+        Z = layer(Z)
+        
+    # Reconstruct inputs from hidden layer outputs
+    reconstruction = self.reconstruct(Z) 
+    recon_loss = tf.reduce_mean(tf.square(reconstruction - inputs))
+    
+    # Add scaled reconstruction loss to model's total loss
+    self.add_loss(0.05 * recon_loss) 
+    
+    # Add metric to monitor it
+    self.add_metric(recon_loss, name="reconstruction_error")
+    
+    return self.out(Z)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نضرب خسارة إعادة البناء في عامل صغير (مثل 0.05) قبل إضافتها باستخدام <code>add_loss</code>؟</template>
+      <template class="content-en">Why do we multiply the reconstruction loss by a small factor (like 0.05) before adding it with <code>add_loss</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الهدف الأساسي للنموذج هو التنبؤ بالمخرجات الصحيحة (الخسارة الرئيسية). خسارة إعادة البناء هي مجرد أداة تنظيم (Regularization). إذا كانت كبيرة جداً، سيركز النموذج على إعادة بناء المدخلات ويتجاهل مهمته الأساسية.</p></template>
+      <template class="content-en"><p>Because the primary goal of the model is to predict the correct output (main loss). The reconstruction loss is just a regularization tool. If it's too large, the model will focus on reconstructing inputs and ignore its primary task.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="computing-gradients-autodiff" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> حساب التدرجات باستخدام التفاضل التلقائي (Autodiff)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Computing Gradients Using Autodiff</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم TensorFlow <span class="smart-term" data-term-en="GradientTape" data-ar="شريط التدرج" data-en-def="A TensorFlow API for automatic differentiation; it records operations to compute gradients later.">شريط التدرج<span class="smart-term-tooltip"></span></span> <code>tf.GradientTape</code> لتسجيل العمليات تلقائياً وحساب التدرجات (المشتقات) بدقة وكفاءة، وهو أمر حيوي للانتشار العكسي.</p></template>
+    <template class="content-en"><p>TensorFlow uses <code>tf.GradientTape</code> to automatically record operations and compute gradients (derivatives) accurately and efficiently, which is vital for backpropagation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التفاضل التلقائي (Autodiff) هو ميزة رئيسية في TensorFlow. بدلاً من اشتقاق الصيغ الرياضية للتدرجات يدوياً، يقوم TensorFlow بذلك نيابة عنك.</p><p><b>كيف يعمل:</b> تفتح كتلة <code>with tf.GradientTape() as tape:</code>. أي عمليات حسابية تتضمن متغيرات (Variables) داخل هذه الكتلة يتم تسجيلها على "الشريط". بعد ذلك، تطلب من الشريط حساب التدرج للنتيجة بالنسبة للمتغيرات باستخدام <code>tape.gradient(target, sources)</code>.</p><p><b><span class="smart-term" data-term-en="Persistent Tape" data-ar="الشريط المستمر" data-en-def="A GradientTape that allows multiple calls to the gradient() method without releasing resources immediately.">الشريط المستمر<span class="smart-term-tooltip"></span></span> (Persistent Tape):</b> افتراضياً، يتم مسح الشريط بمجرد استدعاء <code>tape.gradient()</code>. إذا كنت بحاجة إلى حساب تدرجات متعددة (مثلاً، تدرجات لنتائج مختلفة)، يجب إنشاء شريط مستمر <code>tf.GradientTape(persistent=True)</code>. يجب عليك حذف الشريط يدوياً <code>del tape</code> بعد الانتهاء لتحرير الذاكرة.</p></template>
+    <template class="content-en"><p>Automatic differentiation (autodiff) is a key feature in TensorFlow. Instead of manually deriving mathematical formulas for gradients, TensorFlow does it for you.</p><p><b>How it works:</b> You open a <code>with tf.GradientTape() as tape:</code> block. Any computations involving Variables inside this block are recorded on the "tape". You then ask the tape to compute the gradient of the target with respect to the sources using <code>tape.gradient(target, sources)</code>.</p><p><b><span class="smart-term" data-term-en="Persistent Tape" data-ar="الشريط المستمر" data-en-def="A GradientTape that allows multiple calls to the gradient() method without releasing resources immediately.">Persistent Tape<span class="smart-term-tooltip"></span></span>:</b> By default, the tape is consumed (erased) once <code>tape.gradient()</code> is called. If you need to compute multiple gradients (e.g., gradients of different targets), you must create a persistent tape <code>tf.GradientTape(persistent=True)</code>. You must manually delete the tape <code>del tape</code> afterward to free memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يتتبع <code>GradientTape</code> العمليات التي تتضمن <code>tf.Variable</code> فقط بشكل افتراضي. إذا حاولت حساب التدرج بالنسبة لـ <code>tf.constant</code>، سيعود بنتيجة <code>None</code> ما لم تخبر الشريط صراحةً بمراقبته باستخدام <code>tape.watch(constant_tensor)</code>.</p><p>هذه الآلية هي أساس حلقات التدريب المخصصة، حيث تحسب التدرجات يدوياً ثم تمررها إلى المحسن (Optimizer) باستخدام <code>optimizer.apply_gradients()</code>.</p></template>
+    <template class="content-en"><p><code>GradientTape</code> only tracks operations involving <code>tf.Variable</code> by default. If you try to compute a gradient with respect to a <code>tf.constant</code>, it will return <code>None</code> unless you explicitly tell the tape to watch it using <code>tape.watch(constant_tensor)</code>.</p><p>This mechanism is the foundation of custom training loops, where you manually compute gradients and then pass them to the optimizer using <code>optimizer.apply_gradients()</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>w1, w2 = tf.Variable(5.), tf.Variable(3.)
+
+# Standard Tape
+with tf.GradientTape() as tape:
+    z = 3 * w1 ** 2 + 2 * w1 * w2
+gradients = tape.gradient(z, [w1, w2])
+
+# Persistent Tape
+with tf.GradientTape(persistent=True) as tape:
+    y = w1 ** 2
+    z = w2 ** 3
+grad_y = tape.gradient(y, w1)
+grad_z = tape.gradient(z, w2)
+del tape # Free resources</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا نسيت استخدام <code>del tape</code> مع شريط تدرج مستمر (Persistent Tape) داخل حلقة التدريب؟</template>
+      <template class="content-en">What happens if you forget to use <code>del tape</code> with a persistent GradientTape inside a training loop?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيؤدي ذلك إلى تسرب الذاكرة (Memory Leak). سيستمر الشريط في الاحتفاظ بجميع العمليات المسجلة في الذاكرة، مما سيؤدي في النهاية إلى نفاد ذاكرة النظام (OOM) وتوقف البرنامج.</p></template>
+      <template class="content-en"><p>It will cause a memory leak. The tape will continue to hold all recorded operations in memory, eventually leading to an Out Of Memory (OOM) error and crashing the program.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المتقدمة. حتى الآن، كنا نستخدم Keras كصندوق أسود مريح، ولكن في العالم الحقيقي، وخاصة في الأبحاث، ستحتاجون إلى كسر هذا الصندوق. ركزوا جيداً على كيفية إنشاء 'فئات فرعية' (Subclassing) لكل شيء: دوال الخسارة، المقاييس، الطبقات، والنماذج. تذكروا دائماً أن دالة <code>get_config()</code> هي تذكرتكم لحفظ النماذج المخصصة بنجاح. في الامتحان، أتوقع منكم فهم دور <code>build()</code> في التهيئة المتأخرة للأوزان، ولماذا نحتاج إلى مقاييس ذات حالة (Stateful) لتتبع الأداء عبر الدفعات. وأخيراً، <code>GradientTape</code> هو قلب التفاضل التلقائي؛ افهموا متى يكون مستمراً (Persistent) وكيف تحررون الذاكرة. هذه الوحدة تنقلكم من مستخدمين لمكتبات تعلم الآلة إلى مهندسين قادرين على بناء خوارزمياتكم الخاصة.</template>
+    <template class="content-en">Welcome friends to this advanced module. Until now, we've used Keras as a convenient black box, but in the real world, especially in research, you need to break that box open. Focus heavily on how to 'subclass' everything: losses, metrics, layers, and models. Always remember that <code>get_config()</code> is your ticket to successfully saving custom models. For the exam, I expect you to understand the role of <code>build()</code> in lazy weight initialization, and why we need stateful metrics to track performance across batches. Finally, <code>GradientTape</code> is the heart of autodiff; understand when it needs to be persistent and how to free memory. This module transitions you from ML library users to engineers capable of building your own algorithms.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نلجأ إلى الواجهة منخفضة المستوى في TensorFlow بدلاً من الاكتفاء بـ tf.keras؟</template>
+          <template class="content-en">Why do we resort to the low-level API in TensorFlow instead of just sticking with tf.keras?</template>
+          <span class="content-target">لماذا نلجأ إلى الواجهة منخفضة المستوى في TensorFlow بدلاً من الاكتفاء بـ tf.keras؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نلجأ إليها عندما نحتاج إلى تحكم دقيق غير متوفر في Keras، مثل بناء حلقات تدريب مخصصة بالكامل، أو معالجة التدرجات يدوياً قبل تطبيقها، أو عند تدريب نماذج معقدة تتطلب محسنات متعددة (مثل GANs).</template>
+          <template class="content-en">We resort to it when we need fine-grained control not available in Keras, such as building fully custom training loops, manually manipulating gradients before applying them, or training complex models that require multiple optimizers (like GANs).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أهمية دالة <code>get_config()</code> عند إنشاء مكونات مخصصة؟</template>
+          <template class="content-en">What is the importance of the <code>get_config()</code> method when creating custom components?</template>
+          <span class="content-target">ما هي أهمية دالة <code>get_config()</code> عند إنشاء مكونات مخصصة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدون <code>get_config()</code>، لن يتمكن Keras من حفظ المعلمات الفائقة (Hyperparameters) الخاصة بالمكون المخصص عند حفظ النموذج. هذه الدالة تضمن إمكانية إعادة بناء المكون بنفس الإعدادات عند تحميل النموذج لاحقاً.</template>
+          <template class="content-en">Without <code>get_config()</code>, Keras won't be able to save the hyperparameters of the custom component when saving the model. This method ensures the component can be reconstructed with the exact same settings when the model is loaded later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف المقياس ذو الحالة (Stateful Metric) عن المقياس العادي؟</template>
+          <template class="content-en">How does a Stateful Metric differ from a regular metric?</template>
+          <span class="content-target">كيف يختلف المقياس ذو الحالة (Stateful Metric) عن المقياس العادي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المقياس العادي يحسب النتيجة لدفعة واحدة فقط. المقياس ذو الحالة يحتفظ بمتغيرات داخلية (مثل المجموع الكلي) يتم تحديثها عبر دفعات متعددة، مما يسمح بحساب دقيق للمقياس على مستوى الحقبة (Epoch) بأكملها.</template>
+          <template class="content-en">A regular metric calculates the result for a single batch. A stateful metric maintains internal variables (like a running total) that are updated across multiple batches, allowing for an accurate calculation of the metric over the entire epoch.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل إنشاء الأوزان في دالة <code>build()</code> بدلاً من <code>__init__()</code> في الطبقات المخصصة؟</template>
+          <template class="content-en">Why do we prefer creating weights in the <code>build()</code> method rather than <code>__init__()</code> in custom layers?</template>
+          <span class="content-target">لماذا نفضل إنشاء الأوزان في دالة <code>build()</code> بدلاً من <code>__init__()</code> في الطبقات المخصصة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأننا في <code>__init__()</code> غالباً لا نعرف شكل (Shape) البيانات المدخلة. دالة <code>build()</code> يتم استدعاؤها تلقائياً عند تمرير البيانات لأول مرة، مما يوفر شكل المدخلات ويسمح بإنشاء مصفوفات الأوزان بالأبعاد الصحيحة (التهيئة المتأخرة).</template>
+          <template class="content-en">Because in <code>__init__()</code> we often don't know the shape of the input data. The <code>build()</code> method is called automatically when data is passed for the first time, providing the input shape and allowing weight matrices to be created with the correct dimensions (lazy initialization).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الاتصال المتبقي (Residual Connection) وكيف يتم تنفيذه؟</template>
+          <template class="content-en">What is a Residual Connection and how is it implemented?</template>
+          <span class="content-target">ما هو الاتصال المتبقي (Residual Connection) وكيف يتم تنفيذه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تقنية لتخطي بعض الطبقات عن طريق إضافة المدخلات الأصلية لكتلة من الطبقات مباشرة إلى مخرجاتها. يتم تنفيذه في دالة <code>call()</code> ببساطة عن طريق إرجاع <code>inputs + outputs</code>.</template>
+          <template class="content-en">It is a technique to skip some layers by adding the original inputs of a block of layers directly to its outputs. It is implemented in the <code>call()</code> method simply by returning <code>inputs + outputs</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفائدة من إضافة خسارة إعادة البناء (Reconstruction Loss) للنموذج؟</template>
+          <template class="content-en">What is the benefit of adding a Reconstruction Loss to a model?</template>
+          <span class="content-target">ما الفائدة من إضافة خسارة إعادة البناء (Reconstruction Loss) للنموذج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعمل كآلية تنظيم (Regularization). تجبر النموذج على الاحتفاظ بالمعلومات المهمة من المدخلات عبر طبقاته المخفية، مما يمنعه من مجرد حفظ بيانات التدريب ويحسن قدرته على التعميم.</template>
+          <template class="content-en">It acts as a regularization mechanism. It forces the model to retain important information from the inputs across its hidden layers, preventing it from just memorizing training data and improving generalization.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يعمل <code>tf.GradientTape</code>؟</template>
+          <template class="content-en">How does <code>tf.GradientTape</code> work?</template>
+          <span class="content-target">كيف يعمل <code>tf.GradientTape</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم بتسجيل جميع العمليات الحسابية التي تتضمن متغيرات (Variables) داخل كتلته. بعد ذلك، يمكن استخدام هذا السجل لحساب التدرجات (المشتقات) للنتائج بالنسبة لتلك المتغيرات تلقائياً.</template>
+          <template class="content-en">It records all computational operations involving Variables inside its block. This record can then be used to automatically compute the gradients (derivatives) of the results with respect to those variables.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب استخدام <code>persistent=True</code> مع شريط التدرج؟</template>
+          <template class="content-en">When must you use <code>persistent=True</code> with a GradientTape?</template>
+          <span class="content-target">متى يجب استخدام <code>persistent=True</code> مع شريط التدرج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما تحتاج إلى استدعاء دالة <code>tape.gradient()</code> أكثر من مرة واحدة (مثلاً لحساب التدرجات لنتائج مختلفة). بدونها، يتم مسح الشريط بعد الاستدعاء الأول.</template>
+          <template class="content-en">When you need to call the <code>tape.gradient()</code> function more than once (e.g., to compute gradients for different targets). Without it, the tape is erased after the first call.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الخطر المرتبط باستخدام شريط تدرج مستمر (Persistent Tape)؟</template>
+          <template class="content-en">What is the danger associated with using a persistent GradientTape?</template>
+          <span class="content-target">ما هو الخطر المرتبط باستخدام شريط تدرج مستمر (Persistent Tape)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">إذا لم تقم بحذفه يدوياً باستخدام <code>del tape</code> بعد الانتهاء من حساب التدرجات، فسيحتفظ بجميع العمليات في الذاكرة، مما يؤدي إلى تسرب الذاكرة وتوقف البرنامج.</template>
+          <template class="content-en">If you do not manually delete it using <code>del tape</code> after finishing gradient computations, it will keep all operations in memory, leading to a memory leak and program crash.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يتتبع <code>GradientTape</code> الثوابت (<code>tf.constant</code>) افتراضياً؟</template>
+          <template class="content-en">Does <code>GradientTape</code> track constants (<code>tf.constant</code>) by default?</template>
+          <span class="content-target">هل يتتبع <code>GradientTape</code> الثوابت (<code>tf.constant</code>) افتراضياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا، يتتبع المتغيرات (<code>tf.Variable</code>) فقط. لتتبع الثوابت، يجب إخبار الشريط صراحةً بمراقبتها باستخدام <code>tape.watch()</code>.</template>
+          <template class="content-en">No, it only tracks Variables (<code>tf.Variable</code>). To track constants, you must explicitly tell the tape to watch them using <code>tape.watch()</code>.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الغرض الأساسي من مترجم JIT في TensorFlow؟",
+      "en": "What is the primary purpose of the JIT Compiler in TensorFlow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخراج وتحسين وتشغيل الرسوم البيانية الحسابية بكفاءة.",
+        "en": "To extract, optimize, and run computation graphs efficiently."
+      },
+      "example": {
+        "ar": "تسريع تنفيذ العمليات الرياضية المعقدة على GPU.",
+        "en": "Speeding up the execution of complex math operations on a GPU."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو الفرق الرئيسي بين <code>tf.constant</code> و <code>tf.Variable</code>؟",
+      "en": "What is the main difference between <code>tf.constant</code> and <code>tf.Variable</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الثوابت لا يمكن تغييرها، بينما المتغيرات قابلة للتحديث بمرور الوقت (تُستخدم للأوزان).",
+        "en": "Constants cannot be changed, while Variables can be updated over time (used for weights)."
+      },
+      "example": {
+        "ar": "<code>v.assign(2 * v)</code> تعمل مع المتغيرات فقط.",
+        "en": "<code>v.assign(2 * v)</code> works only with Variables."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي دقة البيانات (Precision) الافتراضية في TensorFlow مقارنة بـ NumPy؟",
+      "en": "What is the default data precision in TensorFlow compared to NumPy?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم TensorFlow دقة 32-بت افتراضياً، بينما يستخدم NumPy دقة 64-بت.",
+        "en": "TensorFlow uses 32-bit precision by default, while NumPy uses 64-bit."
+      },
+      "example": {
+        "ar": "تحويل مصفوفة NumPy إلى موتر قد يتطلب الانتباه لتغيير الدقة لتوفير الذاكرة.",
+        "en": "Converting a NumPy array to a tensor might require attention to precision changes to save memory."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "متى نستخدم Ragged Tensors؟",
+      "en": "When do we use Ragged Tensors?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عند التعامل مع قوائم من القوائم حيث تختلف الأشكال (بيانات غير منظمة).",
+        "en": "When dealing with lists of lists where shapes may vary (unstructured data)."
+      },
+      "example": {
+        "ar": "تمثيل جمل نصية بأطوال مختلفة دون استخدام الحشو (Padding).",
+        "en": "Representing text sentences of varying lengths without padding."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "لماذا نستخدم دالة خسارة Huber (Huber Loss) بدلاً من MSE؟",
+      "en": "Why use Huber Loss instead of MSE?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنها أقل حساسية للقيم المتطرفة (Outliers) في مجموعات البيانات الصاخبة.",
+        "en": "Because it is less sensitive to outliers in noisy datasets."
+      },
+      "example": {
+        "ar": "تتصرف مثل MSE للأخطاء الصغيرة، ومثل MAE للأخطاء الكبيرة.",
+        "en": "It acts like MSE for small errors, and like MAE for large errors."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف تضمن حفظ المعلمات الفائقة لدالة خسارة مخصصة عند حفظ النموذج؟",
+      "en": "How do you ensure hyperparameters of a custom loss are saved when saving the model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق إنشاء فئة فرعية من <code>keras.losses.Loss</code> وتنفيذ طريقة <code>get_config()</code>.",
+        "en": "By subclassing <code>keras.losses.Loss</code> and implementing the <code>get_config()</code> method."
+      },
+      "example": {
+        "ar": "إرجاع قاموس يحتوي على قيمة العتبة (threshold) في <code>get_config()</code>.",
+        "en": "Returning a dictionary containing the threshold value in <code>get_config()</code>."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الغرض من <code>custom_objects</code> عند تحميل نموذج Keras؟",
+      "en": "What is the purpose of <code>custom_objects</code> when loading a Keras model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لتزويد Keras بتعريفات الدوال أو الفئات المخصصة التي تم استخدامها أثناء التدريب.",
+        "en": "To provide Keras with the definitions of custom functions or classes used during training."
+      },
+      "example": {
+        "ar": "<code>load_model('model.h5', custom_objects={'huber_fn': huber_fn})</code>",
+        "en": "<code>load_model('model.h5', custom_objects={'huber_fn': huber_fn})</code>"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو الفرق الأساسي بين الخسارة (Loss) والمقياس (Metric)؟",
+      "en": "What is the fundamental difference between a Loss and a Metric?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الخسارة تستخدم لتحديث الأوزان ويجب أن تكون قابلة للاشتقاق، المقياس يستخدم للتقييم ولا يشترط اشتقاقه.",
+        "en": "Loss is used to update weights and must be differentiable; Metric is for evaluation and doesn't need to be differentiable."
+      },
+      "example": {
+        "ar": "MSE هي خسارة، الدقة (Accuracy) هي مقياس.",
+        "en": "MSE is a loss, Accuracy is a metric."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي المقاييس ذات الحالة (Stateful Metrics)؟",
+      "en": "What are Stateful Metrics?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقاييس تتتبع المتغيرات التراكمية عبر دفعات متعددة لحساب نتيجة دقيقة في نهاية الحقبة.",
+        "en": "Metrics that track cumulative variables across multiple batches to compute an accurate result at the end of an epoch."
+      },
+      "example": {
+        "ar": "تتبع إجمالي الإيجابيات الحقيقية لحساب الدقة (Precision).",
+        "en": "Tracking total true positives to calculate Precision."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "متى تستخدم <code>keras.layers.Lambda</code>؟",
+      "en": "When do you use <code>keras.layers.Lambda</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما تحتاج إلى إنشاء طبقة مخصصة بسيطة عديمة الحالة (بدون أوزان قابلة للتدريب).",
+        "en": "When you need to create a simple stateless custom layer (no trainable weights)."
+      },
+      "example": {
+        "ar": "<code>Lambda(lambda x: tf.exp(x))</code>",
+        "en": "<code>Lambda(lambda x: tf.exp(x))</code>"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "في طبقة مخصصة ذات حالة، ما هو الغرض من دالة <code>build()</code>؟",
+      "en": "In a stateful custom layer, what is the purpose of the <code>build()</code> method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لإنشاء أوزان الطبقة ديناميكياً بمجرد معرفة شكل المدخلات (التهيئة المتأخرة).",
+        "en": "To dynamically create the layer's weights once the input shape is known (lazy initialization)."
+      },
+      "example": {
+        "ar": "استخدام <code>self.add_weight()</code> داخل <code>build()</code>.",
+        "en": "Using <code>self.add_weight()</code> inside <code>build()</code>."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "كيف تنفذ اتصالاً متبقياً (Residual Connection) في نموذج مخصص؟",
+      "en": "How do you implement a residual connection in a custom model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق إضافة المدخلات الأصلية إلى مخرجات الطبقات المخفية داخل دالة <code>call()</code>.",
+        "en": "By adding the original inputs to the output of the hidden layers inside the <code>call()</code> method."
+      },
+      "example": {
+        "ar": "<code>return inputs + Z</code>",
+        "en": "<code>return inputs + Z</code>"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو الغرض من <code>self.add_loss()</code> داخل النموذج المخصص؟",
+      "en": "What is the purpose of <code>self.add_loss()</code> inside a custom model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لإضافة خسائر تعتمد على الحالات الداخلية للنموذج (مثل خسارة إعادة البناء) لأغراض التنظيم.",
+        "en": "To add losses based on internal model states (like reconstruction loss) for regularization purposes."
+      },
+      "example": {
+        "ar": "إجبار الطبقات المخفية على الاحتفاظ بالمعلومات لإعادة بناء المدخلات.",
+        "en": "Forcing hidden layers to retain information to reconstruct inputs."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي وظيفة <code>tf.GradientTape</code>؟",
+      "en": "What is the function of <code>tf.GradientTape</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تسجيل العمليات الحسابية تلقائياً لحساب التدرجات (المشتقات) لاحقاً.",
+        "en": "To automatically record computational operations to calculate gradients (derivatives) later."
+      },
+      "example": {
+        "ar": "يستخدم في حلقات التدريب المخصصة لتحديث الأوزان.",
+        "en": "Used in custom training loops to update weights."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "متى تحتاج إلى تعيين <code>persistent=True</code> في <code>GradientTape</code>؟",
+      "en": "When do you need to set <code>persistent=True</code> in <code>GradientTape</code>?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما تحتاج إلى استدعاء طريقة <code>gradient()</code> عدة مرات على نفس الشريط.",
+        "en": "When you need to call the <code>gradient()</code> method multiple times on the same tape."
+      },
+      "example": {
+        "ar": "حساب تدرجات لنتائج مختلفة، ويجب استخدام <code>del tape</code> بعدها.",
+        "en": "Computing gradients for different targets, and you must use <code>del tape</code> afterward."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من واجهات برمجة التطبيقات التالية في TensorFlow تُستخدم عادةً لإنشاء حلقات تدريب مخصصة ومعالجة التدرجات؟",
+      "en": "Which of the following TensorFlow APIs is typically used for creating custom training loops and manipulating gradients?"
+    },
+    "options": {
+      "ar": [
+        "واجهة tf.keras عالية المستوى",
+        "واجهة برمجة التطبيقات منخفضة المستوى (Low-Level API)",
+        "TensorBoard",
+        "TensorFlow Lite"
+      ],
+      "en": [
+        "High-Level tf.keras API",
+        "Low-Level API",
+        "TensorBoard",
+        "TensorFlow Lite"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "توفر الواجهة منخفضة المستوى التحكم الدقيق المطلوب لمعالجة التدرجات وحلقات التدريب المخصصة، بينما تُستخدم tf.keras للحالات القياسية.",
+      "en": "The low-level API provides the granular control needed for gradient manipulation and custom training loops, whereas tf.keras is for standard cases."
+    },
+    "hint": {
+      "ar": "فكر في مستوى التحكم المطلوب للوصول إلى التدرجات مباشرة.",
+      "en": "Think about the level of control needed to access gradients directly."
+    },
+    "difficulty": "easy",
+    "conceptId": "tensorflow-overview-architecture"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو نوع البيانات الافتراضي الذي يستخدمه TensorFlow للموترات، ولماذا؟",
+      "en": "What is the default data type used by TensorFlow for tensors, and why?"
+    },
+    "options": {
+      "ar": [
+        "64-بت، لتوفير أقصى دقة رياضية.",
+        "32-بت، لتسريع الحسابات وتقليل استهلاك الذاكرة.",
+        "16-بت، لأنه متوافق مع جميع وحدات المعالجة المركزية.",
+        "8-بت، لضغط النماذج."
+      ],
+      "en": [
+        "64-bit, to provide maximum mathematical precision.",
+        "32-bit, to accelerate computations and reduce memory footprint.",
+        "16-bit, because it is compatible with all CPUs.",
+        "8-bit, for model compression."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يستخدم TensorFlow دقة 32-بت افتراضياً (على عكس NumPy الذي يستخدم 64-بت) لأن نماذج تعلم الآلة تستفيد من الحسابات الأسرع واستهلاك الذاكرة الأقل دون الحاجة إلى دقة 64-بت.",
+      "en": "TensorFlow uses 32-bit precision by default (unlike NumPy's 64-bit) because ML models benefit from faster computations and lower memory usage without needing 64-bit precision."
+    },
+    "hint": {
+      "ar": "تعلم الآلة يفضل السرعة والكفاءة على الدقة العشرية القصوى.",
+      "en": "Machine learning prefers speed and efficiency over extreme decimal precision."
+    },
+    "difficulty": "medium",
+    "conceptId": "tensors-and-variables"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "عند حفظ نموذج يحتوي على دالة خسارة مخصصة لها معلمات فائقة (مثل العتبة)، ما هي أفضل ممارسة لضمان حفظ هذه المعلمات؟",
+      "en": "When saving a model with a custom loss function that has hyperparameters (like a threshold), what is the best practice to ensure these parameters are saved?"
+    },
+    "options": {
+      "ar": [
+        "استخدام دالة Python عادية وتمرير المعلمات كمتغيرات عامة (Global Variables).",
+        "إنشاء فئة فرعية من keras.losses.Loss وتنفيذ طريقة get_config().",
+        "حفظ المعلمات في ملف نصي منفصل.",
+        "الاعتماد على Keras لحفظ جميع المتغيرات المحلية تلقائياً."
+      ],
+      "en": [
+        "Use a regular Python function and pass parameters as global variables.",
+        "Subclass keras.losses.Loss and implement the get_config() method.",
+        "Save the parameters in a separate text file.",
+        "Rely on Keras to automatically save all local variables."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تنفيذ طريقة get_config() في فئة فرعية يسمح لـ Keras بتسلسل (Serialize) المعلمات الفائقة وحفظها مع بنية النموذج.",
+      "en": "Implementing the get_config() method in a subclass allows Keras to serialize the hyperparameters and save them with the model architecture."
+    },
+    "hint": {
+      "ar": "كيف تخبر Keras بتكوين (Configuration) الكائن المخصص؟",
+      "en": "How do you tell Keras about the configuration of the custom object?"
+    },
+    "difficulty": "medium",
+    "conceptId": "custom-loss-functions"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "لماذا نحتاج إلى مقاييس ذات حالة (Stateful Metrics) بدلاً من حساب المقياس لكل دفعة وأخذ المتوسط؟",
+      "en": "Why do we need Stateful Metrics instead of calculating the metric for each batch and taking the average?"
+    },
+    "options": {
+      "ar": [
+        "لأن أخذ المتوسط يستهلك ذاكرة أكبر.",
+        "لأن بعض المقاييس (مثل الدقة Precision) لا يمكن حسابها رياضياً بشكل صحيح عن طريق متوسط الدفعات.",
+        "لأن المقاييس ذات الحالة أسرع في التنفيذ على GPU.",
+        "لأن Keras لا يدعم حساب المقاييس لكل دفعة."
+      ],
+      "en": [
+        "Because taking the average consumes more memory.",
+        "Because some metrics (like Precision) cannot be mathematically computed correctly by averaging batches.",
+        "Because stateful metrics execute faster on the GPU.",
+        "Because Keras does not support calculating metrics per batch."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المقاييس مثل الدقة (Precision) والاستدعاء (Recall) تتطلب تتبع الإجماليات (مثل الإيجابيات الحقيقية) عبر جميع الدفعات؛ متوسط نسب الدفعات سيعطي نتيجة خاطئة.",
+      "en": "Metrics like Precision and Recall require tracking totals (like true positives) across all batches; averaging batch ratios will yield an incorrect result."
+    },
+    "hint": {
+      "ar": "فكر في كيفية حساب الكسر الإجمالي من كسور متعددة بأحجام مختلفة.",
+      "en": "Think about how an overall fraction is calculated from multiple fractions of different sizes."
+    },
+    "difficulty": "hard",
+    "conceptId": "custom-metrics"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في الطبقات المخصصة ذات الحالة (Stateful Layers)، ما هو الغرض من طريقة <code>build()</code>؟",
+      "en": "In custom stateful layers, what is the purpose of the <code>build()</code> method?"
+    },
+    "options": {
+      "ar": [
+        "تنفيذ العمليات الحسابية للطبقة (المرور الأمامي).",
+        "حفظ المعلمات الفائقة للطبقة.",
+        "إنشاء أوزان الطبقة ديناميكياً بناءً على شكل المدخلات.",
+        "حساب شكل مخرجات الطبقة."
+      ],
+      "en": [
+        "To perform the layer's computations (forward pass).",
+        "To save the layer's hyperparameters.",
+        "To dynamically create the layer's weights based on the input shape.",
+        "To compute the shape of the layer's outputs."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تسمح طريقة build() بالتهيئة المتأخرة (Lazy Initialization)، حيث يتم إنشاء الأوزان فقط عندما يتم تمرير البيانات لأول مرة ويُعرف شكل المدخلات.",
+      "en": "The build() method allows for lazy initialization, where weights are created only when data is passed for the first time and the input shape is known."
+    },
+    "hint": {
+      "ar": "متى تعرف الطبقة عدد المدخلات التي ستتلقاها؟",
+      "en": "When does the layer know how many inputs it will receive?"
+    },
+    "difficulty": "medium",
+    "conceptId": "custom-layers"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "إذا كنت ترغب في تطبيق تحويل رياضي بسيط (مثل الدالة الأسية) كطبقة بدون أوزان قابلة للتدريب، فما هي أفضل طريقة؟",
+      "en": "If you want to apply a simple mathematical transformation (like the exponential function) as a layer with no trainable weights, what is the best approach?"
+    },
+    "options": {
+      "ar": [
+        "إنشاء فئة فرعية من keras.models.Model.",
+        "استخدام keras.layers.Lambda.",
+        "إنشاء فئة فرعية من keras.layers.Layer وتنفيذ دالة build().",
+        "استخدام tf.Variable."
+      ],
+      "en": [
+        "Subclass keras.models.Model.",
+        "Use keras.layers.Lambda.",
+        "Subclass keras.layers.Layer and implement the build() function.",
+        "Use tf.Variable."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "طبقة Lambda مصممة خصيصاً لتغليف الدوال البسيطة عديمة الحالة كطبقات في Keras دون الحاجة إلى إنشاء فئات فرعية معقدة.",
+      "en": "The Lambda layer is specifically designed to wrap simple stateless functions as Keras layers without the need for complex subclassing."
+    },
+    "hint": {
+      "ar": "ابحث عن الطبقة التي تأخذ دالة مجهولة (Anonymous function).",
+      "en": "Look for the layer that takes an anonymous function."
+    },
+    "difficulty": "easy",
+    "conceptId": "custom-layers"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف يتم تنفيذ الاتصال المتبقي (Residual Connection) داخل دالة <code>call</code> لنموذج مخصص؟",
+      "en": "How is a residual connection implemented inside the <code>call</code> method of a custom model?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق ضرب المدخلات في المخرجات.",
+        "عن طريق إضافة المدخلات الأصلية إلى مخرجات الطبقات المخفية.",
+        "عن طريق تجاهل الطبقات المخفية تماماً.",
+        "عن طريق استخدام دالة تنشيط مخصصة."
+      ],
+      "en": [
+        "By multiplying the inputs with the outputs.",
+        "By adding the original inputs to the outputs of the hidden layers.",
+        "By ignoring the hidden layers entirely.",
+        "By using a custom activation function."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الاتصال المتبقي يتخطى بعض الطبقات عن طريق إضافة المدخلات الأصلية للكتلة مباشرة إلى مخرجاتها (مثال: return inputs + Z).",
+      "en": "A residual connection skips some layers by adding the original inputs of the block directly to its outputs (e.g., return inputs + Z)."
+    },
+    "hint": {
+      "ar": "فكر في عملية الجمع (+).",
+      "en": "Think about the addition (+) operation."
+    },
+    "difficulty": "medium",
+    "conceptId": "custom-models"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو الغرض من إضافة خسارة إعادة البناء (Reconstruction Loss) بناءً على الطبقات المخفية للنموذج؟",
+      "en": "What is the purpose of adding a Reconstruction Loss based on the model's hidden layers?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة سرعة التدريب.",
+        "لإجبار النموذج على استخراج والاحتفاظ بالأنماط ذات المغزى كشكل من أشكال التنظيم (Regularization).",
+        "لتقليل حجم النموذج في الذاكرة.",
+        "للسماح للنموذج باستخدام دقة 64-بت."
+      ],
+      "en": [
+        "To increase training speed.",
+        "To force the model to extract and retain meaningful patterns as a form of regularization.",
+        "To reduce the model's memory footprint.",
+        "To allow the model to use 64-bit precision."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تعمل خسارة إعادة البناء كمنظم يمنع النموذج من مجرد حفظ البيانات، ويجبره على الحفاظ على تمثيلات مفيدة للمدخلات عبر طبقاته.",
+      "en": "Reconstruction loss acts as a regularizer that prevents the model from just memorizing data, forcing it to maintain useful representations of the inputs across its layers."
+    },
+    "hint": {
+      "ar": "إنها تقنية لمنع التجهيز الزائد (Overfitting).",
+      "en": "It is a technique to prevent overfitting."
+    },
+    "difficulty": "medium",
+    "conceptId": "losses-metrics-model-internals"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما الذي يجب عليك فعله إذا كنت بحاجة إلى حساب تدرجات متعددة باستخدام نفس مثيل <code>tf.GradientTape</code>؟",
+      "en": "What must you do if you need to compute multiple gradients using the same <code>tf.GradientTape</code> instance?"
+    },
+    "options": {
+      "ar": [
+        "استدعاء tape.gradient() عدة مرات دون أي تغييرات.",
+        "إنشاء الشريط مع تعيين persistent=True وحذفه يدوياً بعد الاستخدام.",
+        "استخدام tf.constant بدلاً من tf.Variable.",
+        "إيقاف تشغيل التفاضل التلقائي."
+      ],
+      "en": [
+        "Call tape.gradient() multiple times without any changes.",
+        "Create the tape with persistent=True and manually delete it after use.",
+        "Use tf.constant instead of tf.Variable.",
+        "Turn off automatic differentiation."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "افتراضياً، يتم مسح الشريط بعد الاستدعاء الأول لـ gradient(). لحساب تدرجات متعددة، يجب استخدام persistent=True، ويجب استخدام del tape لاحقاً لمنع تسرب الذاكرة.",
+      "en": "By default, the tape is consumed after the first call to gradient(). To compute multiple gradients, you must use persistent=True, and you must use del tape later to prevent memory leaks."
+    },
+    "hint": {
+      "ar": "الشريط الافتراضي يستخدم مرة واحدة فقط.",
+      "en": "The default tape is single-use only."
+    },
+    "difficulty": "hard",
+    "conceptId": "computing-gradients-autodiff"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أثناء استخدام <code>tf.GradientTape</code>، هل يتم تتبع العمليات التي تتضمن <code>tf.constant</code> تلقائياً؟",
+      "en": "While using <code>tf.GradientTape</code>, are operations involving <code>tf.constant</code> tracked automatically?"
+    },
+    "options": {
+      "ar": [
+        "نعم، يتم تتبع جميع العمليات تلقائياً.",
+        "لا، يتم تتبع tf.Variable فقط بشكل افتراضي.",
+        "نعم، ولكن فقط إذا كانت الدقة 64-بت.",
+        "لا، لا يمكن تتبع الثوابت أبداً."
+      ],
+      "en": [
+        "Yes, all operations are tracked automatically.",
+        "No, only tf.Variable is tracked by default.",
+        "Yes, but only if the precision is 64-bit.",
+        "No, constants can never be tracked."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتتبع GradientTape المتغيرات (Variables) فقط بشكل افتراضي. لتتبع الثوابت، يجب استخدام tape.watch(constant_tensor) صراحةً.",
+      "en": "GradientTape only tracks Variables by default. To track constants, you must explicitly use tape.watch(constant_tensor)."
+    },
+    "hint": {
+      "ar": "الشريط يهتم فقط بالأشياء التي تتغير (تتعلم) افتراضياً.",
+      "en": "The tape only cares about things that change (learn) by default."
+    },
+    "difficulty": "medium",
+    "conceptId": "computing-gradients-autodiff"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تمرير <code>custom_objects</code> عند تحميل نموذج محفوظ يحتوي على مكونات مخصصة (مثل دالة خسارة). سيؤدي هذا إلى فشل التحميل لأن Keras يحفظ الأسماء فقط وليس الكود البرمجي.</template>
+    <template class="content-en">Forgetting to pass <code>custom_objects</code> when loading a saved model that contains custom components (like a loss function). This will cause loading to fail because Keras only saves names, not the source code.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التهيئة المتأخرة (Lazy Initialization) في الطبقات المخصصة: لا تقم بإنشاء الأوزان في <code>__init__</code>. بدلاً من ذلك، قم بإنشائها في <code>build()</code> لأن Keras سيمرر شكل المدخلات تلقائياً إلى هذه الدالة في أول تمرير للبيانات.</template>
+    <template class="content-en">Lazy Initialization in custom layers: Do not create weights in <code>__init__</code>. Instead, create them in <code>build()</code> because Keras will automatically pass the input shape to this method on the first data pass.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>tf.GradientTape(persistent=True)</code> ونسيان كتابة <code>del tape</code> في نهاية الحلقة. هذا الفخ الكلاسيكي سيؤدي إلى تسرب الذاكرة وانهيار البرنامج (OOM).</template>
+    <template class="content-en">Using <code>tf.GradientTape(persistent=True)</code> and forgetting to write <code>del tape</code> at the end of the loop. This classic trap will cause a memory leak and crash the program (OOM).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق بين الخسارة والمقياس: الخسارة توجه عملية التعلم (يجب أن تكون قابلة للاشتقاق)، بينما المقياس يوجه فهمك لأداء النموذج (لا يشترط أن يكون قابلاً للاشتقاق).</template>
+    <template class="content-en">The difference between Loss and Metric: Loss guides the learning process (must be differentiable), while Metric guides your understanding of model performance (does not need to be differentiable).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>super().build(batch_input_shape)</code> في نهاية دالة <code>build</code> للطبقة المخصصة أمر إلزامي لإخبار Keras بأن الطبقة جاهزة للاستخدام.</template>
+    <template class="content-en">Using <code>super().build(batch_input_shape)</code> at the end of a custom layer's <code>build</code> method is mandatory to tell Keras that the layer is ready for use.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M11.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M13.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

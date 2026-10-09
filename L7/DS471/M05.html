@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS471" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>آلات المتجهات الداعمة (SVMs) · DS471 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS471" data-page-title-en="DS471">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=DS471"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#svm-introduction-linear" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة في آلات المتجهات الداعمة والتصنيف الخطي</template>
+        <template class="content-en">Introduction to SVMs and Linear Classification</template>
+        <span class="content-target">مقدمة في آلات المتجهات الداعمة والتصنيف الخطي</span>
+      </a>
+      <a href="#feature-scaling-sensitivity" class="toc-link" data-bilingual>
+        <template class="content-ar">حساسية قياس الميزات (Feature Scaling)</template>
+        <template class="content-en">Feature Scaling Sensitivity</template>
+        <span class="content-target">حساسية قياس الميزات (Feature Scaling)</span>
+      </a>
+      <a href="#hard-vs-soft-margin" class="toc-link" data-bilingual>
+        <template class="content-ar">التصنيف بالهامش الصلب مقابل الهامش المرن (المعامل C)</template>
+        <template class="content-en">Hard vs. Soft Margin Classification (Hyperparameter C)</template>
+        <span class="content-target">التصنيف بالهامش الصلب مقابل الهامش المرن (المعامل C)</span>
+      </a>
+      <a href="#nonlinear-svm-polynomial-features" class="toc-link" data-bilingual>
+        <template class="content-ar">التصنيف غير الخطي والميزات متعددة الحدود</template>
+        <template class="content-en">Nonlinear SVM Classification and Polynomial Features</template>
+        <span class="content-target">التصنيف غير الخطي والميزات متعددة الحدود</span>
+      </a>
+      <a href="#kernel-trick-polynomial" class="toc-link" data-bilingual>
+        <template class="content-ar">خدعة النواة (Kernel Trick) والنواة متعددة الحدود</template>
+        <template class="content-en">The Kernel Trick and Polynomial Kernel</template>
+        <span class="content-target">خدعة النواة (Kernel Trick) والنواة متعددة الحدود</span>
+      </a>
+      <a href="#gaussian-rbf-kernel" class="toc-link" data-bilingual>
+        <template class="content-ar">نواة دالة الأساس الشعاعي الغاوسية (Gaussian RBF)</template>
+        <template class="content-en">Gaussian RBF Kernel and Similarity Features</template>
+        <span class="content-target">نواة دالة الأساس الشعاعي الغاوسية (Gaussian RBF)</span>
+      </a>
+      <a href="#primal-vs-dual-form" class="toc-link" data-bilingual>
+        <template class="content-ar">الشكل الأولي مقابل الشكل المزدوج (Primal vs. Dual Form)</template>
+        <template class="content-en">Primal vs. Dual Form</template>
+        <span class="content-target">الشكل الأولي مقابل الشكل المزدوج (Primal vs. Dual Form)</span>
+      </a>
+      <a href="#maximum-margin-functional-geometric" class="toc-link" data-bilingual>
+        <template class="content-ar">تصنيف الهامش الأقصى (الهامش الوظيفي والهندسي)</template>
+        <template class="content-en">Maximum Margin Classification (Functional vs. Geometric)</template>
+        <span class="content-target">تصنيف الهامش الأقصى (الهامش الوظيفي والهندسي)</span>
+      </a>
+      <a href="#optimization-smo" class="toc-link" data-bilingual>
+        <template class="content-ar">مشكلة التحسين وخوارزمية SMO</template>
+        <template class="content-en">Optimization Problem and SMO Algorithm</template>
+        <span class="content-target">مشكلة التحسين وخوارزمية SMO</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · DS471
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">آلات المتجهات الداعمة (SVMs)</h1>
+      <p class="hero-description">دراسة شاملة لآلات المتجهات الداعمة، تشمل التصنيف الخطي وغير الخطي، خدعة النواة (Kernel Trick)، الهامش الأقصى، والتعقيد الحسابي.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Support Vector Machines (SVMs)</h1>
+      <p class="hero-description">Comprehensive study of Support Vector Machines, including linear and nonlinear classification, the Kernel Trick, maximum margin, and computational complexity.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تعلم الآلة</span>
+      <span class="tag">التصنيف</span>
+      <span class="tag">آلات المتجهات الداعمة</span>
+      <span class="tag">خدعة النواة</span>
+      <span class="tag">تحسين النماذج</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Machine Learning</span>
+      <span class="tag">Classification</span>
+      <span class="tag">Support Vector Machines</span>
+      <span class="tag">Kernel Trick</span>
+      <span class="tag">Model Optimization</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>مقارنة الانحدار اللوجستي وآلات المتجهات الداعمة في مهام التصنيف.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ آلة المتجهات الداعمة باستخدام مكتبة scikit-learn وضبط معاملاتها الفائقة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح مفهوم تصنيف الهامش الأقصى ودور النوى (Kernels) في آلات المتجهات الداعمة.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Compare and contrast logistic regression and support vector machines for classification tasks.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement a support vector machine using scikit-learn and tune its hyperparameters.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the concept of maximum margin classification and the role of kernels in SVMs.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="svm-introduction-linear" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> مقدمة في آلات المتجهات الداعمة والتصنيف الخطي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Introduction to SVMs and Linear Classification</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>آلات المتجهات الداعمة تبحث عن أفضل خط (أو مستوى فائق) يفصل بين الفئات بحيث يكون الهامش (المسافة بين الفئات) أوسع ما يمكن، مثل رسم أوسع شارع ممكن بين حيين.</p></template>
+    <template class="content-en"><p>SVMs find the optimal hyperplane that separates classes with the maximum possible margin, akin to drawing the widest possible street between two neighborhoods.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>آلات <span class="smart-term" data-term-en="Support Vectors" data-ar="المتجهات الداعمة" data-en-def="Data points that lie closest to the hyperplane and influence its position.">المتجهات الداعمة<span class="smart-term-tooltip"></span></span> (SVMs) هي نماذج تعلم خاضعة للإشراف تُستخدم للتصنيف والانحدار واكتشاف القيم المتطرفة. تعمل بشكل فعال جداً مع مجموعات البيانات المعقدة ولكن الصغيرة إلى المتوسطة الحجم.</p><p>المفاهيم الأساسية تشمل:</p><ul><li><b><span class="smart-term" data-term-en="Hyperplane" data-ar="المستوى الفائق" data-en-def="A decision boundary that separates different classes in the feature space.">المستوى الفائق<span class="smart-term-tooltip"></span></span> (Hyperplane):</b> حدود القرار التي تفصل بين الفئات المختلفة.</li><li><b>المتجهات الداعمة (Support Vectors):</b> نقاط البيانات الأقرب إلى المستوى الفائق والتي تؤثر بشكل مباشر على موقعه واتجاهه.</li><li><b>الهامش (Margin):</b> المسافة بين المستوى الفائق وأقرب المتجهات الداعمة من أي فئة. الهدف الأساسي لـ SVM هو تعظيم هذا الهامش.</li></ul></template>
+    <template class="content-en"><p>Support Vector Machines (SVMs) are supervised learning models used for classification, regression, and outlier detection. They are particularly effective for complex but small- to medium-sized datasets.</p><p>Key concepts include:</p><ul><li><b><span class="smart-term" data-term-en="Hyperplane" data-ar="المستوى الفائق" data-en-def="A decision boundary that separates different classes in the feature space.">Hyperplane<span class="smart-term-tooltip"></span></span>:</b> A decision boundary that separates different classes.</li><li><b><span class="smart-term" data-term-en="Support Vectors" data-ar="المتجهات الداعمة" data-en-def="Data points that lie closest to the hyperplane and influence its position.">Support Vectors<span class="smart-term-tooltip"></span></span>:</b> Data points that lie closest to the hyperplane and influence its position and orientation.</li><li><b>Margin:</b> The distance between the hyperplane and the closest support vectors from either class. SVM aims to maximize this margin.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نسعى لتعظيم الهامش؟ تعظيم الهامش يعزز قدرة النموذج على التعميم (Generalization) على البيانات الجديدة غير المرئية، مما يقلل من خطر التجهيز الزائد (Overfitting).</p><p>من الخصائص الفريدة لـ SVM أن حدود القرار تعتمد كلياً على المتجهات الداعمة فقط. إضافة أو إزالة نقاط بيانات أخرى بعيدة عن الهامش لا يغير النموذج إطلاقاً.</p></template>
+    <template class="content-en"><p>Why maximize the margin? Maximizing the margin enhances the model's ability to generalize to new, unseen data, thereby reducing the risk of overfitting.</p><p>A unique property of SVMs is that the decision boundary is entirely determined by the support vectors. Adding or removing other data points that are far from the margin does not change the model at all.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة حدود القرار (المستوى الفائق) في التصنيف الخطي.</strong></template>
+      <template class="content-en"><strong>Equation of the decision boundary (hyperplane) in linear classification.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$w \cdot x + b = 0$$</div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A 2D scatter plot showing two classes of points (e.g., blue squares and green triangles). A solid line (hyperplane) separates them. Two dashed lines parallel to the solid line touch the closest points of each class. These closest points are highlighted as 'Support Vectors'. The distance between the dashed lines is labeled 'Margin'. Style: educational, dark background #0d1117, accent colors blue and green, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Standard Arrowhead -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--text-muted)" />
+        </marker>
+        
+        <!-- Brand Colored Arrowhead for Highlights -->
+        <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 2 L 10 5 L 0 8 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Data Point Shapes -->
+        <circle id="circ" cx="0" cy="0" r="6" fill="var(--brand-500)" />
+        <rect id="sq" x="-6" y="-6" width="12" height="12" fill="var(--bg-elevated)" stroke="var(--text-secondary)" stroke-width="2" />
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Axes -->
+    <line x1="50" y1="380" x2="770" y2="380" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="50" y1="380" x2="50" y2="30" stroke="var(--border-color)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Axis Labels -->
+    <text x="720" y="365" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Feature X₁</text>
+    <text x="720" y="365" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الميزة X₁</text>
+    
+    <text x="40" y="90" text-anchor="middle" transform="rotate(-90 40 90)" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Feature X₂</text>
+    <text x="40" y="90" text-anchor="middle" transform="rotate(-90 40 90)" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الميزة X₂</text>
+
+    <!-- Margins (Dashed Lines) -->
+    <!-- Margin 1 (Class 1 side): y = -x + 570 -->
+    <line x1="190" y1="380" x2="540" y2="30" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="8,6" />
+    <!-- Margin 2 (Class 2 side): y = -x + 730 -->
+    <line x1="350" y1="380" x2="700" y2="30" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="8,6" />
+
+    <!-- Optimal Hyperplane (Solid Line): y = -x + 650 -->
+    <line x1="270" y1="380" x2="620" y2="30" stroke="var(--text-primary)" stroke-width="3" />
+
+    <!-- Data Points: Class 1 (Circles) -->
+    <use href="#circ" x="320" y="250" /> <!-- Support Vector 1 -->
+    <use href="#circ" x="450" y="120" /> <!-- Support Vector 2 -->
+    <use href="#circ" x="250" y="200" />
+    <use href="#circ" x="300" y="150" />
+    <use href="#circ" x="350" y="100" />
+    <use href="#circ" x="400" y="50" />
+    <use href="#circ" x="200" y="280" />
+    <use href="#circ" x="280" y="220" />
+    <use href="#circ" x="380" y="140" />
+    <use href="#circ" x="480" y="60" />
+    <use href="#circ" x="220" y="150" />
+    <use href="#circ" x="320" y="80" />
+    <use href="#circ" x="260" y="100" />
+    <use href="#circ" x="180" y="220" />
+    <use href="#circ" x="150" y="300" />
+    <use href="#circ" x="120" y="250" />
+    <use href="#circ" x="160" y="160" />
+
+    <!-- Data Points: Class 2 (Squares) -->
+    <use href="#sq" x="480" y="250" /> <!-- Support Vector 3 -->
+    <use href="#sq" x="550" y="180" /> <!-- Support Vector 4 -->
+    <use href="#sq" x="500" y="300" />
+    <use href="#sq" x="550" y="250" />
+    <use href="#sq" x="600" y="200" />
+    <use href="#sq" x="650" y="150" />
+    <use href="#sq" x="450" y="350" />
+    <use href="#sq" x="520" y="280" />
+    <use href="#sq" x="620" y="160" />
+    <use href="#sq" x="680" y="100" />
+    <use href="#sq" x="580" y="320" />
+    <use href="#sq" x="650" y="250" />
+    <use href="#sq" x="700" y="200" />
+    <use href="#sq" x="720" y="280" />
+    <use href="#sq" x="750" y="150" />
+
+    <!-- Support Vector Highlights -->
+    <circle cx="320" cy="250" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2" />
+    <circle cx="450" cy="120" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2" />
+    <circle cx="480" cy="250" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2" />
+    <circle cx="550" cy="180" r="14" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2" />
+
+    <!-- Margin Arrows -->
+    <line x1="430" y1="180" x2="412" y2="162" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+    <line x1="470" y1="220" x2="488" y2="238" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-brand)" />
+
+    <!-- Margin Label -->
+    <rect x="410" y="188" width="80" height="24" fill="var(--bg-surface)" rx="4" />
+    <text x="450" y="205" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Margin</text>
+    <text x="450" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">الهامش</text>
+
+    <!-- Annotations: Support Vectors (Class 1) -->
+    <line x1="345" y1="50" x2="322" y2="235" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-brand)" />
+    <line x1="355" y1="50" x2="440" y2="110" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-brand)" />
+    <text x="350" y="40" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Support Vectors</text>
+    <text x="350" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">متجهات الدعم</text>
+
+    <!-- Annotations: Support Vectors (Class 2) -->
+    <line x1="590" y1="340" x2="490" y2="265" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-brand)" />
+    <line x1="605" y1="340" x2="555" y2="195" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-brand)" />
+    <text x="600" y="355" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Support Vectors</text>
+    <text x="600" y="355" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">متجهات الدعم</text>
+
+    <!-- Annotation: Optimal Hyperplane -->
+    <line x1="680" y1="50" x2="585" y2="65" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow)" />
+    <text x="680" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Optimal Hyperplane</text>
+    <text x="680" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">المستوى الفائق الأمثل</text>
+
+    <!-- Legend -->
+    <rect x="80" y="60" width="140" height="80" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" rx="6" />
+    
+    <use href="#circ" x="100" y="85" />
+    <text x="145" y="90" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Class 1</text>
+    <text x="145" y="90" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الفئة 1</text>
+    
+    <use href="#sq" x="100" y="115" />
+    <text x="145" y="120" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">Class 2</text>
+    <text x="145" y="120" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14">الفئة 2</text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>LinearSVC</th><th>SGDClassifier</th><th>SVC</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعقيد الزمني (Time Complexity)</template>
+          <template class="content-en">Time Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">O(m × n)</template>
+          <template class="content-en">O(m × n)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">O(m × n)</template>
+          <template class="content-en">O(m × n)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">O(m² × n) إلى O(m³ × n)</template>
+          <template class="content-en">O(m² × n) to O(m³ × n)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دعم خارج النواة (Out-of-core support)</template>
+          <template class="content-en">Out-of-core support</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">دعم خدعة النواة (Kernel trick)</template>
+          <template class="content-en">Kernel trick support</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث لنموذج SVM إذا قمنا بإزالة جميع نقاط التدريب باستثناء المتجهات الداعمة وأعدنا تدريب النموذج؟</template>
+      <template class="content-en">What happens to the SVM model if we remove all training points except the support vectors and retrain the model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن يتغير النموذج على الإطلاق. حدود القرار في SVM تعتمد حصرياً على المتجهات الداعمة.</p></template>
+      <template class="content-en"><p>The model will not change at all. The decision boundary in an SVM is exclusively determined by the support vectors.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-scaling-sensitivity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> حساسية قياس الميزات (Feature Scaling)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Feature Scaling Sensitivity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية SVM حساسة جداً لاختلاف مقاييس الميزات؛ إذا لم يتم توحيد المقاييس، سيميل حدود القرار نحو الميزة ذات المقياس الأصغر.</p></template>
+    <template class="content-en"><p>SVMs are highly sensitive to the scales of features; if unscaled, the decision boundary will be skewed towards the feature with the smaller scale.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد آلات المتجهات الداعمة على حساب المسافات بين نقاط البيانات لتعظيم الهامش. إذا كانت الميزات ذات مقاييس مختلفة (مثلاً، ميزة تتراوح بين 0 و 1 وأخرى بين 0 و 1000)، فإن الميزة ذات النطاق الأكبر ستهيمن على حسابات المسافة.</p><p>يؤدي هذا إلى حدود قرار مشوهة (Skewed) لا تفصل البيانات بشكل مثالي. لذلك، من الضروري استخدام أدوات مثل <code>StandardScaler</code> من مكتبة Scikit-Learn لتطبيع (Normalize) مقاييس الميزات قبل تطبيق SVM.</p></template>
+    <template class="content-en"><p>Support Vector Machines rely on calculating distances between data points to maximize the margin. If features have different scales (e.g., one feature ranges from 0 to 1 and another from 0 to 1000), the feature with the larger range will dominate the distance calculations.</p><p>This leads to a skewed decision boundary that does not separate the data optimally. Therefore, it is essential to use tools like Scikit-Learn’s <code>StandardScaler</code> to normalize feature scales before applying SVM.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>رياضياً، يحاول SVM تقليل معيار متجه الأوزان $||w||$. إذا كانت الميزة $x_1$ لها قيم كبيرة جداً مقارنة بـ $x_2$، فإن الوزن المقابل $w_1$ سيكون صغيراً جداً لتعويض ذلك، مما يجعل الهامش موازياً تقريباً لمحور $x_1$.</p><p>التطبيع يضمن أن جميع الميزات تساهم بشكل متساوٍ في دالة التكلفة، مما يؤدي إلى هامش متوازن يعكس الأهمية الحقيقية لكل ميزة.</p></template>
+    <template class="content-en"><p>Mathematically, SVM tries to minimize the norm of the weight vector $||w||$. If feature $x_1$ has very large values compared to $x_2$, the corresponding weight $w_1$ will be very small to compensate, making the margin almost parallel to the $x_1$ axis.</p><p>Scaling ensures that all features contribute equally to the cost function, resulting in a balanced margin that reflects the true importance of each feature.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل الانحدار الخطي (بدون تنظيم Regularization) حساس لقياس الميزات بنفس درجة حساسية SVM؟</template>
+      <template class="content-en">Is Linear Regression (without regularization) as sensitive to feature scaling as SVM?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، الانحدار الخطي العادي سيجد نفس التوقعات بغض النظر عن القياس (فقط الأوزان ستتغير لتعويض المقياس). لكن SVM يعتمد على المسافة الهندسية (الهامش)، لذا القياس يغير النموذج الفعلي.</p></template>
+      <template class="content-en"><p>No, standard Linear Regression will find the same predictions regardless of scaling (only the weights will change to compensate). SVM, however, relies on geometric distance (the margin), so scaling changes the actual model.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="hard-vs-soft-margin" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التصنيف بالهامش الصلب مقابل الهامش المرن (المعامل C)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Hard vs. Soft Margin Classification (Hyperparameter C)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الهامش الصلب لا يسمح بأي أخطاء تصنيفية وهو حساس للقيم المتطرفة، بينما الهامش المرن يسمح ببعض التجاوزات لإنشاء نموذج أكثر مرونة وقابلية للتعميم باستخدام المعامل C.</p></template>
+    <template class="content-en"><p>Hard margin allows no classification errors and is sensitive to outliers, whereas soft margin allows some violations to create a more flexible and generalizable model using hyperparameter C.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوجد نوعان رئيسيان من هوامش التصنيف في SVM:</p><ol><li><b>التصنيف ب<span class="smart-term" data-term-en="Hard Margin" data-ar="الهامش الصلب" data-en-def="SVM classification that strictly requires all data points to be outside the margin, with no errors allowed.">الهامش الصلب<span class="smart-term-tooltip"></span></span> (Hard Margin):</b> يتطلب أن تكون جميع مثيلات التدريب على الجانب الصحيح من الهامش. هذا النهج صارم جداً، ولا يعمل إلا إذا كانت البيانات قابلة للفصل خطياً تماماً، وهو شديد الحساسية للقيم المتطرفة (Outliers).</li><li><b>التصنيف ب<span class="smart-term" data-term-en="Soft Margin" data-ar="الهامش المرن" data-en-def="SVM classification that allows some data points to violate the margin to achieve better generalization.">الهامش المرن<span class="smart-term-tooltip"></span></span> (Soft Margin):</b> يسمح ببعض التصنيفات الخاطئة (انتهاكات الهامش) لإنشاء نموذج أكثر مرونة يمكنه التعامل مع البيانات الصاخبة والقيم المتطرفة.</li></ol><p>يتم التحكم في التوازن بين تعظيم الهامش وتقليل انتهاكات الهامش بواسطة <b>المعامل الفائق C</b>:</p><ul><li><b>C صغير:</b> يؤدي إلى هامش أوسع، ولكنه يسمح بمزيد من انتهاكات الهامش (نموذج أبسط، تحيز أعلى، تباين أقل).</li><li><b>C كبير:</b> يؤدي إلى هامش أضيق مع عدد أقل من انتهاكات الهامش (نموذج أكثر تعقيداً، تحيز أقل، تباين أعلى).</li></ul></template>
+    <template class="content-en"><p>There are two main types of margin classification in SVM:</p><ol><li><b><span class="smart-term" data-term-en="Hard Margin" data-ar="الهامش الصلب" data-en-def="SVM classification that strictly requires all data points to be outside the margin, with no errors allowed.">Hard Margin<span class="smart-term-tooltip"></span></span> Classification:</b> Requires all training instances to be on the correct side of the margin. This approach is rigid, only works if data is strictly linearly separable, and is highly sensitive to outliers.</li><li><b><span class="smart-term" data-term-en="Soft Margin" data-ar="الهامش المرن" data-en-def="SVM classification that allows some data points to violate the margin to achieve better generalization.">Soft Margin<span class="smart-term-tooltip"></span></span> Classification:</b> Allows some misclassifications (margin violations) to create a more flexible model that can handle noisy data and outliers better.</li></ol><p>The balance between maximizing the margin and minimizing margin violations is controlled by the <b>hyperparameter C</b>:</p><ul><li><b>Smaller C:</b> Leads to a wider margin but allows more margin violations (simpler model, higher bias, lower variance).</li><li><b>Larger C:</b> Leads to a narrower margin with fewer margin violations (more complex model, lower bias, higher variance).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يمثل المعامل C في جوهره مقلوب قوة التنظيم (Regularization). عندما يكون C كبيراً، فإننا نعاقب النموذج بشدة على كل نقطة تقع داخل الهامش أو على الجانب الخاطئ منه، مما يجبر الخوارزمية على تضييق الهامش لتجنب هذه العقوبات.</p><p>إذا كان نموذج SVM الخاص بك يعاني من التجهيز الزائد (Overfitting)، يمكنك محاولة تقليله عن طريق تقليل قيمة C.</p></template>
+    <template class="content-en"><p>The C parameter essentially acts as the inverse of regularization strength. When C is large, we heavily penalize the model for every point that falls inside the margin or on the wrong side of it, forcing the algorithm to narrow the margin to avoid these penalties.</p><p>If your SVM model is overfitting, you can try to regularize it by decreasing the value of C.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import LinearSVC
+
+# Create and train SVM model with Soft Margin (C=1)
+svm_clf = Pipeline([
+    ("scaler", StandardScaler()),
+    ("linear_svc", LinearSVC(C=1, loss="hinge")),
+])
+svm_clf.fit(X, y)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[2]: Two side-by-side plots showing Soft Margin SVM. Left plot: C=1 (low C), showing a very wide margin with several data points inside the margin (violations). Right plot: C=100 (high C), showing a much narrower margin with almost no points inside the margin. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead marker for annotations -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
+        </marker>
+        
+        <!-- Clip paths to keep margin backgrounds inside the plot areas -->
+        <clipPath id="clip-left">
+            <rect x="50" y="90" width="320" height="260" rx="8" />
+        </clipPath>
+        <clipPath id="clip-right">
+            <rect x="430" y="90" width="320" height="260" rx="8" />
+        </clipPath>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Soft Margin SVM: Effect of Hyperparameter C</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">آلة المتجهات الداعمة ذات الهامش المرن: تأثير المعلمة C</text>
+
+    <!-- ========================================== -->
+    <!-- LEFT PLOT: LOW C (Wide Margin, Violations) -->
+    <!-- ========================================== -->
+    
+    <!-- Plot Title -->
+    <text x="210" y="75" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Low C (e.g., C = 1)</text>
+    <text x="210" y="75" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">قيمة C منخفضة (مثال: C = 1)</text>
+
+    <!-- Plot Background -->
+    <rect x="50" y="90" width="320" height="260" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- Margin Area and Decision Boundary (Clipped) -->
+    <g clip-path="url(#clip-left)">
+        <!-- Margin Fill -->
+        <polygon points="50,290 370,60 370,180 50,410" fill="var(--brand-500)" opacity="0.1" />
+        
+        <!-- Upper Margin Line -->
+        <line x1="50" y1="290" x2="370" y2="60" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+        
+        <!-- Lower Margin Line -->
+        <line x1="50" y1="410" x2="370" y2="180" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+        
+        <!-- Decision Boundary -->
+        <line x1="50" y1="350" x2="370" y2="120" stroke="var(--text-primary)" stroke-width="2" />
+    </g>
+
+    <!-- Data Points: Class 1 (Circles) -->
+    <circle cx="280" cy="100" r="6" fill="var(--brand-500)" />
+    <circle cx="330" cy="110" r="6" fill="var(--brand-500)" />
+    <circle cx="350" cy="150" r="6" fill="var(--brand-500)" />
+    <circle cx="260" cy="120" r="6" fill="var(--brand-500)" />
+    <circle cx="240" cy="170" r="6" fill="var(--brand-500)" />
+    <circle cx="300" cy="190" r="6" fill="var(--brand-500)" />
+    <circle cx="310" cy="150" r="6" fill="var(--brand-500)" />
+    <circle cx="290" cy="130" r="6" fill="var(--brand-500)" />
+    <circle cx="340" cy="110" r="6" fill="var(--brand-500)" />
+    <circle cx="360" cy="160" r="6" fill="var(--brand-500)" />
+    <!-- Class 1 Violation (Wrong side of decision boundary) -->
+    <circle cx="170" cy="270" r="6" fill="var(--brand-500)" />
+
+    <!-- Data Points: Class 2 (Squares) -->
+    <rect x="85" y="315" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="135" y="325" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="105" y="275" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="155" y="335" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="175" y="285" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="125" y="235" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="115" y="295" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="145" y="275" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="95" y="335" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="165" y="315" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <!-- Class 2 Violation (Wrong side of decision boundary) -->
+    <rect x="265" y="155" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+
+    <!-- Annotations for Violations -->
+    <text x="130" y="120" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">Margin Violations</text>
+    <text x="130" y="120" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">تجاوزات الهامش</text>
+    
+    <path d="M 120 130 C 110 200, 140 260, 162 268" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)" />
+    <path d="M 140 115 C 200 110, 240 130, 262 152" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)" />
+
+    <!-- Subtitle -->
+    <text x="210" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Wider margin, more violations (High Bias)</text>
+    <text x="210" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">هامش أوسع، تجاوزات أكثر (انحياز عالٍ)</text>
+
+
+    <!-- ========================================== -->
+    <!-- RIGHT PLOT: HIGH C (Narrow Margin, Strict) -->
+    <!-- ========================================== -->
+
+    <!-- Plot Title -->
+    <text x="590" y="75" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">High C (e.g., C = 100)</text>
+    <text x="590" y="75" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">قيمة C مرتفعة (مثال: C = 100)</text>
+
+    <!-- Plot Background -->
+    <rect x="430" y="90" width="320" height="260" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- Margin Area and Decision Boundary (Clipped) -->
+    <g clip-path="url(#clip-right)">
+        <!-- Margin Fill -->
+        <polygon points="505,350 665,90 695,90 535,350" fill="var(--brand-500)" opacity="0.1" />
+        
+        <!-- Upper Margin Line -->
+        <line x1="505" y1="350" x2="665" y2="90" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+        
+        <!-- Lower Margin Line -->
+        <line x1="535" y1="350" x2="695" y2="90" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" />
+        
+        <!-- Decision Boundary -->
+        <line x1="520" y1="350" x2="680" y2="90" stroke="var(--text-primary)" stroke-width="2" />
+    </g>
+
+    <!-- Data Points: Class 1 (Circles) - Exact same relative positions as left plot -->
+    <circle cx="660" cy="100" r="6" fill="var(--brand-500)" />
+    <circle cx="710" cy="110" r="6" fill="var(--brand-500)" />
+    <circle cx="730" cy="150" r="6" fill="var(--brand-500)" />
+    <circle cx="640" cy="120" r="6" fill="var(--brand-500)" />
+    <circle cx="620" cy="170" r="6" fill="var(--brand-500)" />
+    <circle cx="680" cy="190" r="6" fill="var(--brand-500)" />
+    <circle cx="690" cy="150" r="6" fill="var(--brand-500)" />
+    <circle cx="670" cy="130" r="6" fill="var(--brand-500)" />
+    <circle cx="720" cy="110" r="6" fill="var(--brand-500)" />
+    <circle cx="740" cy="160" r="6" fill="var(--brand-500)" />
+    <!-- Former Violation, now correctly classified -->
+    <circle cx="550" cy="270" r="6" fill="var(--brand-500)" />
+
+    <!-- Data Points: Class 2 (Squares) - Exact same relative positions as left plot -->
+    <rect x="465" y="315" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="515" y="325" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="485" y="275" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="535" y="335" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="555" y="285" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="505" y="235" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="495" y="295" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="525" y="275" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="475" y="335" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <rect x="545" y="315" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <!-- Former Violation, now correctly classified -->
+    <rect x="645" y="155" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+
+    <!-- Annotations for Narrow Margin -->
+    <text x="500" y="130" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">Narrow Margin</text>
+    <text x="500" y="130" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)">هامش ضيق</text>
+    
+    <path d="M 500 140 C 500 180, 530 210, 555 218" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)" />
+
+    <!-- Subtitle -->
+    <text x="590" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Narrower margin, fewer violations (Low Bias)</text>
+    <text x="590" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">هامش أضيق، تجاوزات أقل (انحياز منخفض)</text>
+
+
+    <!-- ========================================== -->
+    <!-- BOTTOM LEGEND                              -->
+    <!-- ========================================== -->
+    
+    <!-- Class 1 -->
+    <circle cx="120" cy="435" r="6" fill="var(--brand-500)" />
+    <text x="160" y="440" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Class 1</text>
+    <text x="160" y="440" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">الفئة 1</text>
+
+    <!-- Class 2 -->
+    <rect x="230" y="430" width="10" height="10" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+    <text x="275" y="440" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Class 2</text>
+    <text x="275" y="440" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">الفئة 2</text>
+
+    <!-- Decision Boundary -->
+    <line x1="350" y1="435" x2="380" y2="435" stroke="var(--text-primary)" stroke-width="2" />
+    <text x="455" y="440" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Decision Boundary</text>
+    <text x="455" y="440" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">حد اتخاذ القرار</text>
+
+    <!-- Margin -->
+    <line x1="550" y1="435" x2="580" y2="435" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" />
+    <text x="630" y="440" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">Margin</text>
+    <text x="630" y="440" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-primary)">الهامش</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لديك مجموعة بيانات تحتوي على العديد من القيم المتطرفة (Outliers)، هل تفضل استخدام قيمة C كبيرة أم صغيرة؟</template>
+      <template class="content-en">If you have a dataset with many outliers, would you prefer to use a large or small value for C?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>قيمة C صغيرة. القيمة الصغيرة تسمح بانتهاكات الهامش، مما يمنع القيم المتطرفة من التأثير بشكل كبير على حدود القرار (يقلل التجهيز الزائد).</p></template>
+      <template class="content-en"><p>A small value for C. A small C allows for margin violations, preventing the outliers from heavily influencing the decision boundary (reduces overfitting).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="nonlinear-svm-polynomial-features" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> التصنيف غير الخطي والميزات متعددة الحدود</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Nonlinear SVM Classification and Polynomial Features</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عندما لا يمكن فصل البيانات بخط مستقيم، يمكننا إضافة ميزات جديدة (مثل تربيع الميزات الحالية) لتحويل البيانات إلى مساحة ذات أبعاد أعلى حيث تصبح قابلة للفصل خطياً.</p></template>
+    <template class="content-en"><p>When data cannot be separated by a straight line, we can add new features (like squaring existing ones) to project the data into a higher-dimensional space where it becomes linearly separable.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>العديد من مجموعات البيانات ليست قابلة للفصل خطياً (Linearly Separable)، مما يعني أنه لا يوجد خط مستقيم أو مستوى فائق يمكنه فصل الفئات.</p><p>للتعامل مع هذا، يمكننا إضافة المزيد من الميزات، مثل الميزات متعددة الحدود (Polynomial Features). من خلال إضافة هذه الميزات (مثلاً، إضافة $x_2 = x_1^2$ إلى مجموعة بيانات ذات ميزة واحدة $x_1$)، نقوم بتحويل مجموعة البيانات غير الخطية إلى مجموعة بيانات قابلة للفصل خطياً في مساحة ذات أبعاد أعلى.</p></template>
+    <template class="content-en"><p>Many datasets are not <span class="smart-term" data-term-en="Linearly Separable" data-ar="قابل للفصل خطياً" data-en-def="A dataset where classes can be completely separated by a single linear decision boundary (straight line or hyperplane).">linearly separable<span class="smart-term-tooltip"></span></span>, meaning a straight line (or hyperplane) cannot separate the classes.</p><p>To handle this, we can add more features, such as polynomial features. By adding these features (e.g., adding $x_2 = x_1^2$ to a 1D dataset with feature $x_1$), we transform a nonlinear dataset into a linearly separable one in a higher-dimensional space.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على الرغم من أن إضافة الميزات متعددة الحدود صراحةً باستخدام <code>PolynomialFeatures</code> يعمل بشكل جيد مع مجموعات البيانات البسيطة، إلا أنه يعاني من مشكلة الانفجار التوافقي (Combinatorial Explosion) عند التعامل مع مجموعات بيانات معقدة ذات ميزات عديدة، مما يجعل النموذج بطيئاً جداً ويتطلب ذاكرة هائلة.</p></template>
+    <template class="content-en"><p>While explicitly adding polynomial features using <code>PolynomialFeatures</code> works well for simple datasets, it suffers from a combinatorial explosion when dealing with complex datasets with many features, making the model extremely slow and memory-intensive.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>مثال على تعيين الميزات (Feature Mapping) إلى مساحة متعددة الحدود ذات أبعاد أعلى.</strong></template>
+      <template class="content-en"><strong>Example of feature mapping to a higher-dimensional polynomial space.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\phi(x) = (x_1, x_2, x_1^2, x_1 x_2, x_2^2)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.datasets import make_moons
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.svm import LinearSVC
+
+X, y = make_moons()
+polynomial_svm_clf = Pipeline([
+    ("poly_features", PolynomialFeatures(degree=3)),
+    ("scaler", StandardScaler()),
+    ("svm_clf", LinearSVC(C=10, loss="hinge"))
+])
+polynomial_svm_clf.fit(X, y)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[3]: Two plots demonstrating polynomial feature mapping. Left plot: 1D dataset on a single axis (x1) where blue and green points are mixed and cannot be separated by a single point. Right plot: 2D dataset where the y-axis is x2 = x1^2. The points now form a U-shape, and a straight horizontal red dashed line easily separates the blue and green points. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for axes -->
+        <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+        <!-- Arrowhead for transformation arrow -->
+        <marker id="transform-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- ========================================== -->
+    <!-- LEFT PLOT: 1D DATASET                      -->
+    <!-- ========================================== -->
+    <g id="left-plot">
+        <!-- Titles -->
+        <text x="200" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">1D Dataset (Not Linearly Separable)</text>
+        <text x="200" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مجموعة بيانات أحادية البعد (غير قابلة للفصل خطياً)</text>
+
+        <!-- X1 Axis -->
+        <line x1="40" y1="250" x2="360" y2="250" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <line x1="200" y1="245" x2="200" y2="255" stroke="var(--text-muted)" stroke-width="2" />
+        
+        <!-- Axis Labels -->
+        <text x="360" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">x₁</text>
+        <text x="360" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">x₁</text>
+        <text x="200" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">0</text>
+        <text x="200" y="275" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">0</text>
+
+        <!-- Class A Points (Outer) -->
+        <circle cx="70" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="95" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="120" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="280" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="305" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="330" cy="250" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+        <!-- Class B Points (Inner) -->
+        <circle cx="150" cy="250" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="175" cy="250" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="200" cy="250" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="225" cy="250" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="250" cy="250" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- TRANSFORMATION ARROW                       -->
+    <!-- ========================================== -->
+    <g id="transformation">
+        <line x1="365" y1="200" x2="435" y2="200" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#transform-arrow)" />
+        
+        <text x="400" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Map to 2D</text>
+        <text x="400" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تحويل لثنائي الأبعاد</text>
+        
+        <text x="400" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)" class="gsvg-en">x₂ = x₁²</text>
+        <text x="400" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--brand-ink)" class="gsvg-ar">x₂ = x₁²</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- RIGHT PLOT: 2D DATASET                     -->
+    <!-- ========================================== -->
+    <g id="right-plot">
+        <!-- Titles -->
+        <text x="600" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">2D Dataset (Linearly Separable)</text>
+        <text x="600" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مجموعة بيانات ثنائية الأبعاد (قابلة للفصل خطياً)</text>
+
+        <!-- Parabola Track (Educational Guide) -->
+        <path d="M 470 120 Q 600 520 730 120" fill="none" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+        <!-- X1 Axis -->
+        <line x1="440" y1="340" x2="760" y2="340" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+        <line x1="600" y1="335" x2="600" y2="345" stroke="var(--text-muted)" stroke-width="2" />
+        
+        <!-- Y Axis (x2) -->
+        <line x1="600" y1="360" x2="600" y2="80" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#axis-arrow)" />
+
+        <!-- Axis Labels -->
+        <text x="760" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">x₁</text>
+        <text x="760" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">x₁</text>
+        
+        <text x="600" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">x₂ = x₁²</text>
+        <text x="600" y="65" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">x₂ = x₁²</text>
+        
+        <text x="585" y="360" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-en">0</text>
+        <text x="585" y="360" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)" class="gsvg-ar">0</text>
+
+        <!-- Linear Separator (Hyperplane) -->
+        <line x1="450" y1="265" x2="750" y2="265" stroke="var(--brand-400)" stroke-width="3" stroke-dasharray="8,4" />
+        <text x="600" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Linear Separator</text>
+        <text x="600" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">فاصل خطي</text>
+
+        <!-- Class A Points (Outer mapped to higher y) -->
+        <circle cx="470" cy="120" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="495" cy="190" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="520" cy="244" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="680" cy="244" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="705" cy="190" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="730" cy="120" r="7" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+        <!-- Class B Points (Inner mapped to lower y) -->
+        <circle cx="550" cy="290" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="575" cy="313" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="600" cy="320" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="625" cy="313" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+        <circle cx="650" cy="290" r="7" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="2" />
+    </g>
+
+    <!-- ========================================== -->
+    <!-- LEGEND                                     -->
+    <!-- ========================================== -->
+    <g id="legend">
+        <!-- Class A -->
+        <circle cx="260" cy="420" r="7" fill="var(--brand-500)" />
+        <text x="310" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Class A</text>
+        <text x="310" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">الفئة أ</text>
+
+        <!-- Class B -->
+        <circle cx="460" cy="420" r="7" fill="var(--text-primary)" />
+        <text x="510" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Class B</text>
+        <text x="510" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">الفئة ب</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي المشكلة الرئيسية في استخدام <code>PolynomialFeatures</code> مع درجة (degree) عالية جداً؟</template>
+      <template class="content-en">What is the main problem with using <code>PolynomialFeatures</code> with a very high degree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يؤدي إلى إنشاء عدد هائل من الميزات الجديدة، مما يسبب بطء شديد في التدريب، استهلاك كبير للذاكرة، وخطر عالي للتجهيز الزائد (Overfitting).</p></template>
+      <template class="content-en"><p>It creates a massive number of new features, leading to very slow training, high memory consumption, and a high risk of overfitting.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="kernel-trick-polynomial" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> خدعة النواة (Kernel Trick) والنواة متعددة الحدود</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> The Kernel Trick and Polynomial Kernel</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خدعة النواة هي سحر رياضي يسمح لـ SVM بالعمل في مساحات ذات أبعاد عالية جداً دون الحاجة إلى حساب أو تخزين تلك الأبعاد فعلياً، مما يوفر وقتاً وذاكرة هائلين.</p></template>
+    <template class="content-en"><p>The kernel trick is mathematical magic that allows SVMs to operate in highly dimensional spaces without actually computing or storing those dimensions, saving massive time and memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدلاً من إضافة الميزات متعددة الحدود صراحةً، نستخدم <b><span class="smart-term" data-term-en="Kernel Trick" data-ar="خدعة النواة" data-en-def="A method to compute the dot product of mapped feature vectors without explicitly mapping them to a higher-dimensional space.">خدعة النواة<span class="smart-term-tooltip"></span></span> (Kernel Trick)</b>. تسمح هذه الخدعة لـ SVM بالعمل في مساحة ذات أبعاد عالية دون حساب إحداثيات البيانات في تلك المساحة بشكل صريح.</p><p><b>دالة النواة (Kernel Function):</b> هي دالة $K(x,z)$ تُرجع نفس القيمة التي كان سيعطيها حاصل الضرب النقطي (Dot Product) لمتجهات الميزات المعينة $\phi(x)$ و $\phi(z)$ في المساحة عالية الأبعاد.</p><p>النواة متعددة الحدود (Polynomial Kernel) شائعة الاستخدام في معالجة اللغات الطبيعية وتسمح بنمذجة العلاقات غير الخطية بكفاءة.</p></template>
+    <template class="content-en"><p>Instead of explicitly adding polynomial features, we use the <b><span class="smart-term" data-term-en="Kernel Trick" data-ar="خدعة النواة" data-en-def="A method to compute the dot product of mapped feature vectors without explicitly mapping them to a higher-dimensional space.">kernel trick<span class="smart-term-tooltip"></span></span></b>. This trick allows the SVM to operate in a high-dimensional space without explicitly computing the coordinates of the data in that space.</p><p><b>Kernel Function:</b> A function $K(x,z)$ that returns the same value as the dot product of the mapped feature vectors $\phi(x)$ and $\phi(z)$ in the higher-dimensional space.</p><p>The Polynomial Kernel is commonly used in natural language processing and allows for modeling nonlinear relationships efficiently.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتمد خدعة النواة على حقيقة أن خوارزمية التحسين في SVM (في شكلها المزدوج - Dual Form) تتطلب فقط حساب حاصل الضرب النقطي بين أزواج من نقاط البيانات، وليس النقاط نفسها.</p><p>مثال: إذا كان $x = (1, 2)$ و $z = (2, 3)$، فإن النواة $K(x,z) = (x \cdot z + 1)^2$ تعطي القيمة 49 مباشرة، وهي نفس النتيجة التي سنحصل عليها إذا قمنا بتعيين $x$ و $z$ إلى مساحة ذات 5 أبعاد ثم حسبنا حاصل الضرب النقطي بينهما، ولكن النواة تفعل ذلك بعملية حسابية أبسط بكثير.</p></template>
+    <template class="content-en"><p>The kernel trick relies on the fact that the SVM optimization algorithm (in its Dual Form) only requires the computation of the dot product between pairs of data points, not the points themselves.</p><p>Example: Given $x = (1, 2)$ and $z = (2, 3)$, the kernel $K(x,z) = (x \cdot z + 1)^2$ directly yields 49. This is the exact same result we would get if we mapped $x$ and $z$ to a 5-dimensional space and then computed their dot product, but the kernel does it with a much simpler calculation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة دالة النواة متعددة الحدود، حيث d هي الدرجة.</strong></template>
+      <template class="content-en"><strong>Equation of the Polynomial Kernel function, where d is the degree.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$K(x, z) = (x \cdot z + 1)^d$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+poly_kernel_svm_clf = Pipeline([
+    ("scaler", StandardScaler()),
+    ("svm_clf", SVC(kernel="poly", degree=3, coef0=1, C=5))
+])
+poly_kernel_svm_clf.fit(X, y)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر خدعة النواة ضرورية عند استخدام نواة RBF (التي تعين البيانات إلى مساحة ذات أبعاد لا نهائية)؟</template>
+      <template class="content-en">Why is the kernel trick absolutely necessary when using the RBF kernel (which maps data to an infinite-dimensional space)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه من المستحيل حساب أو تخزين متجهات ذات أبعاد لا نهائية في الذاكرة. خدعة النواة تحسب النتيجة مباشرة دون الحاجة للتعامل مع هذه الأبعاد اللانهائية.</p></template>
+      <template class="content-en"><p>Because it is impossible to compute or store infinite-dimensional vectors in memory. The kernel trick computes the result directly without ever needing to deal with those infinite dimensions.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="gaussian-rbf-kernel" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> نواة دالة الأساس الشعاعي الغاوسية (Gaussian RBF)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Gaussian RBF Kernel and Similarity Features</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نواة RBF تقيس مدى تشابه كل نقطة بيانات مع نقاط مرجعية (Landmarks)، مما يخلق حدود قرار دائرية أو غير منتظمة تلتف حول البيانات المعقدة.</p></template>
+    <template class="content-en"><p>The RBF kernel measures how similar each data point is to specific landmarks, creating circular or irregular decision boundaries that wrap around complex data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقنية أخرى لمعالجة البيانات غير الخطية هي إضافة ميزات التشابه (Similarity Features). يتم حساب هذه الميزات باستخدام دالة تشابه تقيس مدى تشابه كل مثيل مع معلم معين (Landmark).</p><p>بدلاً من إضافة هذه الميزات يدوياً، نستخدم <b>نواة <span class="smart-term" data-term-en="Gaussian RBF" data-ar="دالة الأساس الشعاعي الغاوسية" data-en-def="A popular kernel function used in SVMs that measures similarity based on distance from landmarks.">دالة الأساس الشعاعي الغاوسية<span class="smart-term-tooltip"></span></span> (Gaussian RBF Kernel)</b> للقيام بذلك بكفاءة. تعتبر هذه النواة الخيار الأول الجيد لمعظم المشاكل غير الخطية.</p><p>تحتوي نواة RBF على معامل فائق مهم وهو <b>$\gamma$ (جاما)</b>:</p><ul><li><b>$\gamma$ كبير:</b> يجعل منحنى الجرس أضيق، مما يقلل من نطاق تأثير كل نقطة. حدود القرار تصبح غير منتظمة وتلتف بشدة حول النقاط الفردية (خطر التجهيز الزائد).</li><li><b>$\gamma$ صغير:</b> يجعل منحنى الجرس أوسع، مما يزيد من نطاق التأثير. حدود القرار تصبح أكثر سلاسة (خطر النقص في التجهيز).</li></ul></template>
+    <template class="content-en"><p>Another technique for handling nonlinear data is adding similarity features. These are computed using a similarity function that measures how much each instance resembles a particular landmark.</p><p>Instead of adding these manually, we use the <b>Gaussian Radial Basis Function (RBF) kernel</b> to do it efficiently. This is generally a good first choice for most nonlinear problems.</p><p>The RBF kernel has a crucial hyperparameter, <b>$\gamma$ (gamma)</b>:</p><ul><li><b>Large $\gamma$:</b> Makes the bell curve narrower, reducing the range of influence of each point. The decision boundary becomes irregular and wiggles around individual instances (risk of overfitting).</li><li><b>Small $\gamma$:</b> Makes the bell curve wider, increasing the range of influence. The decision boundary becomes smoother (risk of underfitting).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعمل المعاملان $\gamma$ و $C$ معاً للتحكم في تعقيد النموذج. إذا كان النموذج يعاني من التجهيز الزائد (Overfitting)، يجب تقليل كل من $\gamma$ و $C$. وإذا كان يعاني من النقص في التجهيز (Underfitting)، يجب زيادتهما.</p><p>رياضياً، تقوم نواة RBF بتعيين البيانات إلى مساحة ذات أبعاد لا نهائية، مما يجعلها قادرة نظرياً على ملاءمة أي مجموعة بيانات تدريبية بشكل مثالي.</p></template>
+    <template class="content-en"><p>The hyperparameters $\gamma$ and $C$ work together to control model complexity. If your model is overfitting, you should reduce both $\gamma$ and $C$. If it is underfitting, you should increase them.</p><p>Mathematically, the RBF kernel maps data into an infinite-dimensional space, making it theoretically capable of perfectly fitting any training dataset.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة نواة Gaussian RBF، حيث تقيس المسافة المربعة بين x و z مضروبة في سالب جاما.</strong></template>
+      <template class="content-en"><strong>Equation of the Gaussian RBF kernel, measuring the squared distance between x and z scaled by negative gamma.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$K(x, z) = \exp(-\gamma ||x - z||^2)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+rbf_kernel_svm_clf = Pipeline([
+    ("scaler", StandardScaler()),
+    ("svm_clf", SVC(kernel="rbf", gamma=5, C=0.001))
+])
+rbf_kernel_svm_clf.fit(X, y)</code></pre>
+  </div>
+
+  <!-- DIAGRAM[4]: A 2x2 grid of plots showing the effect of Gamma and C on an RBF SVM. Top-left: gamma=0.1, C=0.001 (smooth boundary, underfitting). Top-right: gamma=0.1, C=1000 (smooth but tighter boundary). Bottom-left: gamma=5, C=0.001 (irregular boundary). Bottom-right: gamma=5, C=1000 (highly irregular boundary wrapping tightly around individual points, overfitting). Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg viewBox="0 0 800 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Grid Pattern for Plots -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.3" />
+    </pattern>
+
+    <!-- Shared Data Points for all 4 plots -->
+    <g id="data-points">
+      <!-- Class 2 (Outer Cluster) - Squares -->
+      <rect x="76" y="56" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="116" y="46" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="176" y="41" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="226" y="56" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="256" y="96" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="246" y="146" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="216" y="186" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="166" y="196" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="106" y="186" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="66" y="146" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="56" y="96" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="86" y="176" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="236" y="176" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="36" y="136" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="136" y="26" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="276" y="126" width="8" height="8" fill="var(--text-muted)" />
+      <rect x="196" y="206" width="8" height="8" fill="var(--text-muted)" />
+      <!-- Noise Class 2 (Inside Class 1) -->
+      <rect x="161" y="121" width="8" height="8" fill="var(--text-muted)" />
+
+      <!-- Class 1 (Inner Cluster) - Circles -->
+      <circle cx="130" cy="100" r="4.5" fill="var(--brand-500)" />
+      <circle cx="150" cy="90" r="4.5" fill="var(--brand-500)" />
+      <circle cx="170" cy="95" r="4.5" fill="var(--brand-500)" />
+      <circle cx="140" cy="115" r="4.5" fill="var(--brand-500)" />
+      <circle cx="160" cy="110" r="4.5" fill="var(--brand-500)" />
+      <circle cx="180" cy="120" r="4.5" fill="var(--brand-500)" />
+      <circle cx="150" cy="135" r="4.5" fill="var(--brand-500)" />
+      <circle cx="170" cy="140" r="4.5" fill="var(--brand-500)" />
+      <circle cx="190" cy="105" r="4.5" fill="var(--brand-500)" />
+      <circle cx="150" cy="125" r="4.5" fill="var(--brand-500)" />
+      <!-- Noise Class 1 (Outside Class 1) -->
+      <circle cx="210" cy="150" r="4.5" fill="var(--brand-500)" />
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text class="gsvg-en" x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">Effect of Gamma (γ) and C on RBF SVM</text>
+  <text class="gsvg-ar" x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">تأثير غاما (γ) و C على آلة المتجهات الداعمة بنواة RBF</text>
+
+  <!-- Legend -->
+  <g transform="translate(0, 70)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">
+    <!-- Class 1 -->
+    <circle cx="210" cy="-5" r="5" fill="var(--brand-500)" />
+    <text class="gsvg-en" x="250" y="0" text-anchor="middle" fill="var(--text-secondary)">Class 1</text>
+    <text class="gsvg-ar" x="250" y="0" text-anchor="middle" fill="var(--text-secondary)">الفئة 1</text>
+    
+    <!-- Class 2 -->
+    <rect x="325" y="-10" width="10" height="10" fill="var(--text-muted)" />
+    <text class="gsvg-en" x="375" y="0" text-anchor="middle" fill="var(--text-secondary)">Class 2</text>
+    <text class="gsvg-ar" x="375" y="0" text-anchor="middle" fill="var(--text-secondary)">الفئة 2</text>
+    
+    <!-- Decision Boundary -->
+    <line x1="450" y1="-5" x2="480" y2="-5" stroke="var(--brand-500)" stroke-width="2" />
+    <text class="gsvg-en" x="550" y="0" text-anchor="middle" fill="var(--text-secondary)">Decision Boundary</text>
+    <text class="gsvg-ar" x="550" y="0" text-anchor="middle" fill="var(--text-secondary)">حد اتخاذ القرار</text>
+  </g>
+
+  <!-- Plot 1: Top-Left (Underfitting) -->
+  <g transform="translate(60, 110)">
+    <!-- Plot Background & Grid -->
+    <rect x="0" y="0" width="320" height="220" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="8" />
+    <rect x="0" y="0" width="320" height="220" fill="url(#grid)" rx="8" />
+    
+    <!-- Decision Boundary -->
+    <path d="M 20 180 Q 160 160 300 60" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
+    
+    <!-- Data Points -->
+    <use href="#data-points" />
+    
+    <!-- Hyperparameters Label -->
+    <rect x="10" y="10" width="140" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" opacity="0.9" />
+    <text x="80" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">γ = 0.1, C = 0.001</text>
+
+    <!-- Annotation -->
+    <path d="M 220 170 L 250 110" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text class="gsvg-en" x="220" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Underfitting</text>
+    <text class="gsvg-ar" x="220" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">نقص التخصيص</text>
+  </g>
+
+  <!-- Plot 2: Top-Right (Good Fit) -->
+  <g transform="translate(420, 110)">
+    <!-- Plot Background & Grid -->
+    <rect x="0" y="0" width="320" height="220" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="8" />
+    <rect x="0" y="0" width="320" height="220" fill="url(#grid)" rx="8" />
+    
+    <!-- Decision Boundary -->
+    <path d="M 110 115 C 110 60, 210 60, 210 115 C 210 170, 110 170, 110 115 Z" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
+    
+    <!-- Data Points -->
+    <use href="#data-points" />
+    
+    <!-- Hyperparameters Label -->
+    <rect x="10" y="10" width="140" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" opacity="0.9" />
+    <text x="80" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">γ = 0.1, C = 1000</text>
+  </g>
+
+  <!-- Plot 3: Bottom-Left (High Gamma, Low C) -->
+  <g transform="translate(60, 380)">
+    <!-- Plot Background & Grid -->
+    <rect x="0" y="0" width="320" height="220" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="8" />
+    <rect x="0" y="0" width="320" height="220" fill="url(#grid)" rx="8" />
+    
+    <!-- Decision Boundary -->
+    <path d="M 125 110 C 125 80, 195 80, 195 110 C 195 140, 125 140, 125 110 Z" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
+    
+    <!-- Data Points -->
+    <use href="#data-points" />
+    
+    <!-- Hyperparameters Label -->
+    <rect x="10" y="10" width="140" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" opacity="0.9" />
+    <text x="80" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">γ = 5, C = 0.001</text>
+  </g>
+
+  <!-- Plot 4: Bottom-Right (Overfitting) -->
+  <g transform="translate(420, 380)">
+    <!-- Plot Background & Grid -->
+    <rect x="0" y="0" width="320" height="220" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="8" />
+    <rect x="0" y="0" width="320" height="220" fill="url(#grid)" rx="8" />
+    
+    <!-- Decision Boundary (Highly irregular, wrapping points) -->
+    <path d="M 125 100 Q 150 80 175 90 Q 195 100 195 115 Q 200 130 215 145 Q 225 160 205 155 Q 185 150 175 145 Q 160 145 150 140 Q 157 120 165 115 Q 150 110 135 120 Q 120 125 125 100 Z" fill="none" stroke="var(--brand-500)" stroke-width="2.5" />
+    
+    <!-- Data Points -->
+    <use href="#data-points" />
+    
+    <!-- Hyperparameters Label -->
+    <rect x="10" y="10" width="140" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" opacity="0.9" />
+    <text x="80" y="30" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">γ = 5, C = 1000</text>
+
+    <!-- Annotation -->
+    <path d="M 260 170 L 220 150" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <text class="gsvg-en" x="260" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">Overfitting</text>
+    <text class="gsvg-ar" x="260" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">فرط التخصيص</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تختار النواة المناسبة لمشكلتك؟</template>
+      <template class="content-en">How do you choose the right kernel for your problem?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ابدأ دائماً بالنواة الخطية (LinearSVC) خاصة إذا كانت البيانات ضخمة. إذا لم تكن كبيرة جداً، جرب نواة RBF. جرب نوى أخرى فقط إذا كان لديك وقت أو بيانات ذات بنية خاصة (مثل النصوص).</p></template>
+      <template class="content-en"><p>Always start with a linear kernel (LinearSVC), especially for large datasets. If the dataset isn't too large, try the Gaussian RBF kernel. Experiment with other kernels only if you have time or specialized data structures (like text).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="primal-vs-dual-form" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الشكل الأولي مقابل الشكل المزدوج (Primal vs. Dual Form)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Primal vs. Dual Form</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن حل مشكلة تحسين SVM بطريقتين: الشكل الأولي (يركز على الميزات) والشكل المزدوج (يركز على العلاقات بين نقاط البيانات، وهو ما يسمح باستخدام خدعة النواة).</p></template>
+    <template class="content-en"><p>The SVM optimization problem can be solved in two ways: the Primal form (focuses on features) and the Dual form (focuses on relationships between data points, which enables the kernel trick).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الرياضيات، يمكن صياغة مشاكل التحسين المقيدة بطريقتين:</p><ol><li><b><span class="smart-term" data-term-en="Primal Form" data-ar="الشكل الأولي" data-en-def="The original formulation of the optimization problem, scaling with the number of features.">الشكل الأولي<span class="smart-term-tooltip"></span></span> (Primal Form):</b> يحسب حاصل الضرب النقطي لمعلمات النموذج (الأوزان) ومتجه ميزات مثيل الاختبار. تعقيده يعتمد على عدد الميزات.</li><li><b><span class="smart-term" data-term-en="Dual Form" data-ar="الشكل المزدوج" data-en-def="An alternative formulation of the optimization problem that scales with the number of instances and allows the kernel trick.">الشكل المزدوج<span class="smart-term-tooltip"></span></span> (Dual Form):</b> يحسب حاصل الضرب النقطي لمثيلات التدريب ومتجه ميزات مثيل الاختبار.</li></ol><p><b>أهمية الشكل المزدوج:</b> الشكل المزدوج هو ما يسمح لنا باستغلال خصائص حاصل الضرب النقطي لتطبيق <b>خدعة النواة (Kernel Trick)</b>. هذا يمكننا من التعامل مع الفئات غير القابلة للفصل خطياً عن طريق تعيين الميزات إلى مساحات ذات أبعاد أعلى دون تكلفة حسابية باهظة.</p></template>
+    <template class="content-en"><p>In mathematics, constrained optimization problems can be formulated in two ways:</p><ol><li><b><span class="smart-term" data-term-en="Primal Form" data-ar="الشكل الأولي" data-en-def="The original formulation of the optimization problem, scaling with the number of features.">Primal Form<span class="smart-term-tooltip"></span></span>:</b> Computes the inner product of the model parameters (weights) and the test instance's feature vector. Its complexity depends on the number of features.</li><li><b><span class="smart-term" data-term-en="Dual Form" data-ar="الشكل المزدوج" data-en-def="An alternative formulation of the optimization problem that scales with the number of instances and allows the kernel trick.">Dual Form<span class="smart-term-tooltip"></span></span>:</b> Computes the inner product of the training instances and the test instance's feature vector.</li></ol><p><b>Importance of Dual Form:</b> The dual form allows us to exploit the properties of the inner product to apply the <b>Kernel Trick</b>. This enables handling linearly inseparable classes by mapping features to higher-dimensional spaces without the massive computational cost.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>متى نستخدم أيهما؟ الشكل الأولي يكون أسرع عندما يكون عدد مثيلات التدريب أكبر بكثير من عدد الميزات. بينما الشكل المزدوج يكون أسرع عندما يكون عدد الميزات أكبر من عدد مثيلات التدريب، وهو إلزامي إذا أردنا استخدام خدعة النواة.</p></template>
+    <template class="content-en"><p>When to use which? The primal form is faster when the number of training instances is much larger than the number of features. The dual form is faster when the number of features is larger than the number of training instances, and it is mandatory if we want to use the kernel trick.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الشكل المزدوج للتنبؤ، حيث يتم حساب حاصل الضرب النقطي بين نقطة التدريب xi ونقطة الاختبار x.</strong></template>
+      <template class="content-en"><strong>Dual form equation for prediction, computing the dot product between training point xi and test point x.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$f(x) = \sum_{i=1}^{N} \alpha_i y_i (x_i \cdot x) + b$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في معادلة الشكل المزدوج، ما هي قيمة $\alpha_i$ لمعظم نقاط التدريب؟</template>
+      <template class="content-en">In the dual form equation, what is the value of $\alpha_i$ for most training points?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تكون صفرًا. النقاط الوحيدة التي لها $\alpha_i > 0$ هي المتجهات الداعمة (Support Vectors).</p></template>
+      <template class="content-en"><p>It is zero. The only points that have $\alpha_i > 0$ are the support vectors.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="maximum-margin-functional-geometric" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> تصنيف الهامش الأقصى (الهامش الوظيفي والهندسي)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Maximum Margin Classification (Functional vs. Geometric)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الهامش الوظيفي يقيس مدى ثقتنا في التنبؤ، بينما الهامش الهندسي هو المسافة المادية الفعلية بين نقطة البيانات وحدود القرار.</p></template>
+    <template class="content-en"><p>The functional margin measures our confidence in a prediction, while the geometric margin is the actual physical distance between a data point and the decision boundary.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>فهم تصنيف الهامش الأقصى يتطلب التمييز بين نوعين من الهوامش:</p><ul><li><b><span class="smart-term" data-term-en="Functional Margin" data-ar="الهامش الوظيفي" data-en-def="A measure of prediction confidence; equal to 1 for support vectors.">الهامش الوظيفي<span class="smart-term-tooltip"></span></span> (Functional Margin):</b> هو مقياس للثقة لكل مثيل. كلما كانت النقطة أبعد عن حدود القرار، زادت الثقة في تصنيفها. بالنسبة للمتجهات الداعمة، الهامش الوظيفي يساوي 1.</li><li><b><span class="smart-term" data-term-en="Geometric Margin" data-ar="الهامش الهندسي" data-en-def="The actual physical distance from a point to the decision boundary, calculated as the normalized functional margin.">الهامش الهندسي<span class="smart-term-tooltip"></span></span> (Geometric Margin):</b> هو العرض الأقصى للنطاق الذي يفصل بين المتجهات الداعمة. بعبارة أخرى، هو الهامش الوظيفي بعد تطبيعه (Normalized) بواسطة معيار متجه الأوزان $||w||$.</li></ul><p>الهدف من SVM هو تعظيم الهامش الهندسي.</p></template>
+    <template class="content-en"><p>Understanding maximum margin classification requires distinguishing between two types of margins:</p><ul><li><b><span class="smart-term" data-term-en="Functional Margin" data-ar="الهامش الوظيفي" data-en-def="A measure of prediction confidence; equal to 1 for support vectors.">Functional Margin<span class="smart-term-tooltip"></span></span>:</b> A measure of confidence for each instance. The farther a point is from the decision boundary, the higher the confidence in its classification. For support vectors, the functional margin is equal to 1.</li><li><b><span class="smart-term" data-term-en="Geometric Margin" data-ar="الهامش الهندسي" data-en-def="The actual physical distance from a point to the decision boundary, calculated as the normalized functional margin.">Geometric Margin<span class="smart-term-tooltip"></span></span>:</b> The maximum width of the band that separates the support vectors. In other words, it is the normalized functional margin (divided by the norm of the weight vector $||w||$).</li></ul><p>The goal of SVM is to maximize the geometric margin.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج الهامش الهندسي؟ الهامش الوظيفي يمكن تغييره ببساطة عن طريق ضرب الأوزان $w$ والتحيز $b$ في ثابت، دون تغيير حدود القرار الفعلية. التطبيع بواسطة $||w||$ (للحصول على الهامش الهندسي) يحل هذه المشكلة ويعطينا المسافة الحقيقية الثابتة.</p></template>
+    <template class="content-en"><p>Why do we need the geometric margin? The functional margin can be artificially increased simply by scaling the weights $w$ and bias $b$ by a constant, without actually changing the decision boundary. Normalizing by $||w||$ (to get the geometric margin) fixes this and gives us the true, invariant physical distance.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الهامش الهندسي، وهي الهامش الوظيفي مقسوماً على معيار متجه الأوزان.</strong></template>
+      <template class="content-en"><strong>Equation for the geometric margin, which is the functional margin divided by the norm of the weight vector.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{\gamma}_i = \frac{y_i(w \cdot x_i + b)}{||w||}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمنا بضرب جميع الأوزان (w) والتحيز (b) في 10، ماذا يحدث للهامش الوظيفي والهامش الهندسي؟</template>
+      <template class="content-en">If we multiply all weights (w) and bias (b) by 10, what happens to the functional margin and the geometric margin?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الهامش الوظيفي سيتضاعف 10 مرات. الهامش الهندسي سيبقى كما هو (لأن الزيادة في البسط ستلغى مع الزيادة في المقام ||w||).</p></template>
+      <template class="content-en"><p>The functional margin will increase by a factor of 10. The geometric margin will remain exactly the same (because the increase in the numerator is canceled out by the increase in the denominator ||w||).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="optimization-smo" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> مشكلة التحسين وخوارزمية SMO</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Optimization Problem and SMO Algorithm</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تدريب SVM هو عملية رياضية للبحث عن أقل قيمة لدالة محدبة (Convex)، مما يضمن العثور على أفضل حل عالمي واحد دون التعثر في حلول محلية، وغالباً ما تُحل باستخدام خوارزمية SMO.</p></template>
+    <template class="content-en"><p>Training an SVM is a mathematical process of finding the minimum of a convex function, guaranteeing a single best global solution without getting stuck in local optima, often solved using the SMO algorithm.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الهدف الأساسي لـ SVM هو تعظيم الهامش الهندسي. يتم صياغة هذا كـ <b>مشكلة تحسين مقيدة (Constrained Optimization Problem)</b>:</p><p>تقليل $\frac{1}{2} ||w||^2$ بشرط أن يكون $y_i(w \cdot x_i + b) \ge 1$ لجميع النقاط.</p><ul><li><b><span class="smart-term" data-term-en="Convexity" data-ar="التحدب" data-en-def="A property of a mathematical function ensuring that any local minimum is also the global minimum.">التحدب<span class="smart-term-tooltip"></span></span> (Convexity):</b> مشكلة التحسين هذه محدبة، مما يضمن وجود حد أدنى عالمي واحد (Single Global Minimum). لا توجد حدود دنيا محلية يمكن أن تعلق فيها الخوارزمية.</li><li><b>خوارزمية SMO (Sequential Minimal Optimization):</b> هي خوارزمية تُستخدم لحل مشكلة البرمجة التربيعية لـ SVMs بكفاءة. تقوم بتقسيم مشكلة التحسين الكبيرة إلى مشاكل فرعية أصغر يمكن حلها تحليلياً.</li></ul></template>
+    <template class="content-en"><p>The primary goal of SVM is to maximize the geometric margin. This is formulated as a <b>Constrained Optimization Problem</b>:</p><p>Minimize $\frac{1}{2} ||w||^2$ subject to $y_i(w \cdot x_i + b) \ge 1$ for all points.</p><ul><li><b><span class="smart-term" data-term-en="Convexity" data-ar="التحدب" data-en-def="A property of a mathematical function ensuring that any local minimum is also the global minimum.">Convexity<span class="smart-term-tooltip"></span></span>:</b> This optimization problem is convex, ensuring a single global minimum. There are no local minima for the algorithm to get stuck in.</li><li><b><span class="smart-term" data-term-en="SMO (Sequential Minimal Optimization)" data-ar="التحسين الأدنى المتسلسل" data-en-def="An algorithm for solving the quadratic programming problem that arises during the training of support vector machines.">SMO (Sequential Minimal Optimization)<span class="smart-term-tooltip"></span></span>:</b> An algorithm used to efficiently solve the quadratic programming problem for SVMs. It breaks down the large optimization problem into smaller subproblems that are solved analytically.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نقلل $||w||^2$ بدلاً من تعظيم $\frac{1}{||w||}$؟ لأن تقليل $||w||^2$ (وهي دالة تربيعية) أسهل بكثير رياضياً وحسابياً، ولها مشتقات لطيفة ومستقرة، مما يسمح باستخدام أدوات البرمجة التربيعية (Quadratic Programming) القياسية.</p></template>
+    <template class="content-en"><p>Why minimize $||w||^2$ instead of maximizing $\frac{1}{||w||}$? Because minimizing $||w||^2$ (a quadratic function) is mathematically and computationally much easier, has nice and stable derivatives, and allows the use of standard Quadratic Programming (QP) solvers.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>صياغة مشكلة التحسين المقيدة لـ SVM (الهامش الصلب).</strong></template>
+      <template class="content-en"><strong>Formulation of the constrained optimization problem for SVM (Hard Margin).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\min_w \frac{1}{2} ||w||^2 \quad \text{subject to} \quad y_i(w \cdot x_i + b) \ge 1$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي الميزة الرئيسية لكون دالة التكلفة في SVM محدبة (Convex) مقارنة بالشبكات العصبية؟</template>
+      <template class="content-en">What is the main advantage of the SVM cost function being convex compared to Neural Networks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التحدب يضمن أن خوارزمية التحسين ستجد دائماً الحل الأمثل العالمي (Global Minimum). الشبكات العصبية غير محدبة وقد تعلق في حلول محلية (Local Minima) دون المستوى الأمثل.</p></template>
+      <template class="content-en"><p>Convexity guarantees that the optimization algorithm will always find the global optimal solution. Neural networks are non-convex and can get stuck in sub-optimal local minima.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في واحدة من أقوى خوارزميات تعلم الآلة الكلاسيكية: آلات المتجهات الداعمة (SVM). ليلة الامتحان، أريدكم أن تتخيلوا SVM كمهندس مرور يحاول رسم أوسع شارع ممكن (الهامش) بين حيين (الفئات). النقاط التي تلامس حافة الشارع هي 'المتجهات الداعمة' - وهي النقاط الوحيدة التي تهم! تذكروا دائماً فخ المقاييس: يجب توحيد البيانات (Scaling) وإلا سيميل الشارع نحو الميزة الأكبر. ركزوا جيداً على المعامل C: C صغير يعني شارع واسع متسامح مع الأخطاء (يمنع Overfitting)، و C كبير يعني شارع ضيق صارم. أما السحر الحقيقي فهو 'خدعة النواة' (Kernel Trick)؛ عندما لا يمكن رسم شارع مستقيم، نستخدم النوى (مثل RBF) لطي الفضاء نفسه ورسم حدود دائرية معقدة دون تكلفة حسابية إضافية. راجعوا الفرق بين الشكل الأولي والمزدوج، وتذكروا أن التحدب (Convexity) هو ما يضمن لنا حلاً مثالياً واحداً. بالتوفيق!</template>
+    <template class="content-en">Welcome friends to one of the most powerful classical machine learning algorithms: Support Vector Machines (SVM). For the exam, imagine SVM as a traffic engineer trying to draw the widest possible street (the margin) between two neighborhoods (the classes). The points touching the edge of the street are the 'Support Vectors' - they are the only points that matter! Always remember the scaling trap: you must standardize data (Scaling) or the street will skew towards the largest feature. Focus heavily on hyperparameter C: a small C means a wide, forgiving street (prevents Overfitting), and a large C means a strict, narrow street. The real magic is the 'Kernel Trick'; when a straight street won't work, we use kernels (like RBF) to fold space itself and draw complex boundaries without extra computational cost. Review the difference between Primal and Dual forms, and remember that Convexity guarantees us a single optimal solution. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">دكتورة، متى يجب أن أستخدم LinearSVC ومتى أستخدم SVC مع نواة RBF؟</template>
+          <template class="content-en">Professor, when should I use LinearSVC and when should I use SVC with an RBF kernel?</template>
+          <span class="content-target">دكتورة، متى يجب أن أستخدم LinearSVC ومتى أستخدم SVC مع نواة RBF؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سؤال ممتاز. ابدأ دائماً بـ LinearSVC لأنه سريع جداً ويتوسع بشكل جيد مع البيانات الضخمة (O(m x n)). إذا كانت بياناتك معقدة وغير قابلة للفصل بخط مستقيم، وحجم البيانات ليس ضخماً جداً (لأن SVC بطيء مع البيانات الكبيرة \(O(m^2 x n)\))، فانتقل إلى SVC مع نواة RBF.</template>
+          <template class="content-en">Excellent question. Always start with LinearSVC because it is very fast and scales well with large datasets (O(m x n)). If your data is complex and not linearly separable, and the dataset size isn't massive (because SVC is slow with large data \(O(m^2 x n)\)), then switch to SVC with an RBF kernel.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا نسيت استخدام StandardScaler قبل SVM؟</template>
+          <template class="content-en">What happens if I forget to use StandardScaler before SVM?</template>
+          <span class="content-target">ماذا يحدث إذا نسيت استخدام StandardScaler قبل SVM؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هذا فخ كلاسيكي في الامتحان! SVM يحاول تعظيم المسافة (الهامش). إذا كانت ميزة 'الراتب' تتراوح بالآلاف وميزة 'العمر' بالعشرات، فإن 'الراتب' سيهيمن تماماً على حساب المسافة، وسيتجاهل النموذج 'العمر' تقريباً. حدود القرار ستكون مشوهة تماماً.</template>
+          <template class="content-en">That's a classic exam trap! SVM tries to maximize distance (the margin). If a 'Salary' feature ranges in thousands and 'Age' in tens, 'Salary' will completely dominate the distance calculation, and the model will almost ignore 'Age'. The decision boundary will be completely skewed.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">أنا دائماً أخلط بين تأثير C وتأثير جاما (Gamma). كيف أحفظهما؟</template>
+          <template class="content-en">I always confuse the effect of C and Gamma. How can I memorize them?</template>
+          <span class="content-target">أنا دائماً أخلط بين تأثير C وتأثير جاما (Gamma). كيف أحفظهما؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">فكر في C كـ 'الصرامة' (Strictness): C كبير = صارم جداً (هامش ضيق، لا أخطاء). فكر في جاما كـ 'التركيز المحلي' (Local Focus): جاما كبيرة = تركيز شديد على النقاط الفردية (حدود متعرجة). كلاهما إذا كان كبيراً جداً يؤدي إلى التجهيز الزائد (Overfitting).</template>
+          <template class="content-en">Think of C as 'Strictness': Large C = very strict (narrow margin, no errors). Think of Gamma as 'Local Focus': Large Gamma = intense focus on individual points (wiggly boundaries). If either is too large, it leads to Overfitting.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو بالضبط 'الشكل المزدوج' (Dual Form) ولماذا نهتم به؟</template>
+          <template class="content-en">What exactly is the 'Dual Form' and why do we care about it?</template>
+          <span class="content-target">ما هو بالضبط 'الشكل المزدوج' (Dual Form) ولماذا نهتم به؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الشكل المزدوج هو إعادة صياغة رياضية لمشكلة التحسين. نهتم به لسببين: أولاً، يكون أسرع إذا كان عدد الميزات أكبر من عدد العينات. ثانياً (وهو الأهم)، هو الذي يسمح لنا بتطبيق 'خدعة النواة' لأن المعادلة تعتمد فقط على حاصل الضرب النقطي بين العينات.</template>
+          <template class="content-en">The Dual Form is a mathematical reformulation of the optimization problem. We care for two reasons: First, it's faster if the number of features is greater than the number of samples. Second (and most importantly), it's what allows us to apply the 'Kernel Trick' because the equation relies only on the dot product between samples.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن لـ SVM أن يعلق في حل محلي سيء (Local Minimum) مثل الشبكات العصبية؟</template>
+          <template class="content-en">Can SVM get stuck in a bad local minimum like neural networks?</template>
+          <span class="content-target">هل يمكن لـ SVM أن يعلق في حل محلي سيء (Local Minimum) مثل الشبكات العصبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لا! وهذا من أجمل خصائص SVM. دالة التكلفة الخاصة به 'محدبة' (Convex)، مما يعني رياضياً أنها تشبه الوعاء ولها قاع واحد فقط. خوارزمية التحسين (مثل SMO) ستجد دائماً هذا القاع (الحل الأمثل العالمي).</template>
+          <template class="content-en">No! And this is one of the most beautiful properties of SVM. Its cost function is 'Convex', meaning mathematically it looks like a bowl and has only one bottom. The optimization algorithm (like SMO) will always find this bottom (the global optimal solution).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الهامش الوظيفي والهامش الهندسي؟</template>
+          <template class="content-en">What is the difference between the functional margin and the geometric margin?</template>
+          <span class="content-target">ما الفرق بين الهامش الوظيفي والهامش الهندسي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الهامش الوظيفي هو مجرد رقم يمثل ثقتنا، ويمكن التلاعب به بضرب الأوزان في ثابت. الهامش الهندسي هو المسافة المادية الحقيقية (بالسنتيمترات إذا صح التعبير!)، ونحصل عليه بقسمة الهامش الوظيفي على طول متجه الأوزان (التطبيع). SVM يهدف لتعظيم الهامش الهندسي.</template>
+          <template class="content-en">The functional margin is just a number representing confidence, and it can be manipulated by multiplying weights by a constant. The geometric margin is the true physical distance (in centimeters, so to speak!), obtained by dividing the functional margin by the length of the weight vector (normalization). SVM aims to maximize the geometric margin.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعمل خدعة النواة (Kernel Trick) دون إضافة ميزات فعلياً؟</template>
+          <template class="content-en">How does the Kernel Trick work without actually adding features?</template>
+          <span class="content-target">كيف تعمل خدعة النواة (Kernel Trick) دون إضافة ميزات فعلياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تخيل أنك تريد حساب المسافة بين مدينتين على خريطة ثلاثية الأبعاد، لكن لديك خريطة ثنائية الأبعاد فقط. دالة النواة هي معادلة رياضية تعطيك المسافة ثلاثية الأبعاد مباشرة باستخدام الإحداثيات ثنائية الأبعاد فقط، دون الحاجة لبناء مجسم ثلاثي الأبعاد. إنها توفر حسابات هائلة.</template>
+          <template class="content-en">Imagine wanting to calculate the distance between two cities on a 3D map, but you only have a 2D map. A kernel function is a mathematical equation that gives you the 3D distance directly using only the 2D coordinates, without needing to build a 3D model. It saves massive computation.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي خوارزمية SMO ولماذا نستخدمها؟</template>
+          <template class="content-en">What is the SMO algorithm and why do we use it?</template>
+          <span class="content-target">ما هي خوارزمية SMO ولماذا نستخدمها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">SMO (التحسين الأدنى المتسلسل) هي الخوارزمية التي تحل مشكلة الرياضيات المعقدة وراء SVM. بدلاً من محاولة حل المشكلة الكبيرة دفعة واحدة، تقوم SMO بتقسيمها إلى أزواج صغيرة من المتغيرات وتحلها بسرعة كبيرة خطوة بخطوة.</template>
+          <template class="content-en">SMO (Sequential Minimal Optimization) is the algorithm that solves the complex math problem behind SVM. Instead of trying to solve the massive problem all at once, SMO breaks it down into small pairs of variables and solves them very quickly step-by-step.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كان لدي بيانات قابلة للفصل خطياً تماماً، هل أستخدم الهامش الصلب أم المرن؟</template>
+          <template class="content-en">If I have perfectly linearly separable data, should I use Hard or Soft margin?</template>
+          <span class="content-target">إذا كان لدي بيانات قابلة للفصل خطياً تماماً، هل أستخدم الهامش الصلب أم المرن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نظرياً يمكنك استخدام الهامش الصلب. لكن عملياً، نفضل دائماً الهامش المرن (Soft Margin) حتى لو كانت البيانات قابلة للفصل. لماذا؟ لأن الهامش الصلب قد يختار حدود قرار قريبة جداً من النقاط بسبب نقطة متطرفة واحدة. الهامش المرن يتجاهل هذه النقطة المتطرفة ويعطيك حدوداً أكثر أماناً للبيانات المستقبلية.</template>
+          <template class="content-en">Theoretically, you can use Hard Margin. But practically, we almost always prefer Soft Margin even if data is separable. Why? Because Hard Margin might choose a decision boundary very close to points just because of one outlier. Soft margin ignores that outlier and gives you a safer boundary for future data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يمكن استخدام SVM للانحدار (Regression) أم للتصنيف فقط؟</template>
+          <template class="content-en">Can SVM be used for Regression, or only Classification?</template>
+          <span class="content-target">هل يمكن استخدام SVM للانحدار (Regression) أم للتصنيف فقط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يمكن استخدامه للانحدار ويسمى SVR (Support Vector Regression). الفكرة تنعكس: بدلاً من محاولة إبقاء النقاط خارج الشارع (الهامش)، يحاول SVR احتواء أكبر عدد ممكن من النقاط داخل الشارع!</template>
+          <template class="content-en">Yes, it can be used for regression and is called SVR (Support Vector Regression). The idea is reversed: instead of trying to keep points outside the street (margin), SVR tries to fit as many points as possible inside the street!</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو المستوى الفائق (Hyperplane) في سياق SVM؟",
+      "en": "What is a Hyperplane in the context of SVM?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حدود القرار التي تفصل بين الفئات المختلفة في مساحة الميزات.",
+        "en": "A decision boundary that separates different classes in the feature space."
+      },
+      "example": {
+        "ar": "في مساحة ثنائية الأبعاد، المستوى الفائق هو مجرد خط مستقيم.",
+        "en": "In a 2D space, a hyperplane is simply a straight line."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي المتجهات الداعمة (Support Vectors)؟",
+      "en": "What are Support Vectors?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقاط البيانات التي تقع أقرب إلى المستوى الفائق وتؤثر بشكل مباشر على موقعه واتجاهه.",
+        "en": "Data points that lie closest to the hyperplane and directly influence its position and orientation."
+      },
+      "example": {
+        "ar": "النقاط التي تقع بالضبط على حافة الهامش.",
+        "en": "The points that lie exactly on the edge of the margin."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "لماذا تعتبر آلات المتجهات الداعمة حساسة لقياس الميزات (Feature Scaling)؟",
+      "en": "Why are SVMs sensitive to Feature Scaling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنها تعتمد على حساب المسافات لتعظيم الهامش. الميزات ذات المقاييس الأكبر ستهيمن على حدود القرار.",
+        "en": "Because they rely on calculating distances to maximize the margin. Features with larger scales will dominate the decision boundary."
+      },
+      "example": {
+        "ar": "يجب استخدام StandardScaler قبل تطبيق SVM.",
+        "en": "You must use StandardScaler before applying SVM."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو التصنيف بالهامش الصلب (Hard Margin)؟",
+      "en": "What is Hard Margin Classification?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نهج يتطلب أن تكون جميع مثيلات التدريب على الجانب الصحيح من الهامش، ولا يسمح بأي أخطاء.",
+        "en": "An approach that requires all training instances to be on the correct side of the margin, allowing no errors."
+      },
+      "example": {
+        "ar": "يعمل فقط مع البيانات القابلة للفصل خطياً تماماً وحساس جداً للقيم المتطرفة.",
+        "en": "Only works with perfectly linearly separable data and is highly sensitive to outliers."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو التصنيف بالهامش المرن (Soft Margin)؟",
+      "en": "What is Soft Margin Classification?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نهج يسمح ببعض التصنيفات الخاطئة (انتهاكات الهامش) لإنشاء نموذج أكثر مرونة.",
+        "en": "An approach that allows some misclassifications (margin violations) to create a more flexible model."
+      },
+      "example": {
+        "ar": "يستخدم للتعامل مع البيانات الصاخبة والقيم المتطرفة.",
+        "en": "Used to handle noisy data and outliers."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف يؤثر المعامل C الصغير على نموذج SVM؟",
+      "en": "How does a small C hyperparameter affect an SVM model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يؤدي إلى هامش أوسع، ولكنه يسمح بمزيد من انتهاكات الهامش (نموذج أبسط، يقلل التجهيز الزائد).",
+        "en": "Leads to a wider margin but allows more margin violations (simpler model, reduces overfitting)."
+      },
+      "example": {
+        "ar": "استخدم C صغير إذا كان النموذج يعاني من Overfitting.",
+        "en": "Use a small C if the model is overfitting."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "كيف يؤثر المعامل C الكبير على نموذج SVM؟",
+      "en": "How does a large C hyperparameter affect an SVM model?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يؤدي إلى هامش أضيق مع عدد أقل من انتهاكات الهامش (نموذج أكثر تعقيداً، قد يؤدي إلى التجهيز الزائد).",
+        "en": "Leads to a narrower margin with fewer margin violations (more complex model, may lead to overfitting)."
+      },
+      "example": {
+        "ar": "استخدم C كبير إذا كان النموذج يعاني من Underfitting.",
+        "en": "Use a large C if the model is underfitting."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي خدعة النواة (Kernel Trick)؟",
+      "en": "What is the Kernel Trick?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة رياضية لحساب حاصل الضرب النقطي في مساحة عالية الأبعاد دون الحاجة إلى تحويل البيانات فعلياً إلى تلك المساحة.",
+        "en": "A mathematical method to compute the dot product in a high-dimensional space without explicitly transforming the data into that space."
+      },
+      "example": {
+        "ar": "يوفر قوة حسابية هائلة عند استخدام النوى متعددة الحدود أو RBF.",
+        "en": "Saves massive computational power when using Polynomial or RBF kernels."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هي نواة RBF (Gaussian Radial Basis Function)؟",
+      "en": "What is the Gaussian RBF Kernel?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة نواة تقيس التشابه بين نقطتي بيانات بناءً على المسافة بينهما، وتستخدم للتعامل مع البيانات غير الخطية.",
+        "en": "A kernel function that measures similarity between two data points based on their distance, used for handling nonlinear data."
+      },
+      "example": {
+        "ar": "تنشئ حدود قرار يمكن أن تلتف حول مجموعات البيانات المعقدة.",
+        "en": "Creates decision boundaries that can wrap around complex data clusters."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يؤثر المعامل جاما (γ) الكبير في نواة RBF؟",
+      "en": "How does a large Gamma (γ) affect the RBF kernel?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجعل نطاق تأثير كل نقطة صغيراً، مما يؤدي إلى حدود قرار غير منتظمة تلتف بشدة حول النقاط (خطر التجهيز الزائد).",
+        "en": "Makes the range of influence of each point small, leading to highly irregular decision boundaries wrapping tightly around points (risk of overfitting)."
+      },
+      "example": {
+        "ar": "قلل جاما إذا كان النموذج يحفظ بيانات التدريب.",
+        "en": "Decrease gamma if the model is memorizing the training data."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو الشكل الأولي (Primal Form) في تحسين SVM؟",
+      "en": "What is the Primal Form in SVM optimization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الصياغة الأصلية لمشكلة التحسين التي تعتمد على حساب حاصل الضرب النقطي لمعلمات النموذج والميزات.",
+        "en": "The original formulation of the optimization problem that relies on computing the inner product of model parameters and features."
+      },
+      "example": {
+        "ar": "يعتمد تعقيده على عدد الميزات (n).",
+        "en": "Its complexity depends on the number of features (n)."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الشكل المزدوج (Dual Form) في تحسين SVM؟",
+      "en": "What is the Dual Form in SVM optimization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صياغة بديلة تعتمد على حساب حاصل الضرب النقطي بين مثيلات التدريب، وهي ضرورية لاستخدام خدعة النواة.",
+        "en": "An alternative formulation relying on the inner product between training instances, essential for using the kernel trick."
+      },
+      "example": {
+        "ar": "يعتمد تعقيده على عدد مثيلات التدريب (m).",
+        "en": "Its complexity depends on the number of training instances (m)."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو الهامش الوظيفي (Functional Margin)؟",
+      "en": "What is the Functional Margin?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقياس لثقة النموذج في التنبؤ لكل مثيل. قيمته 1 للمتجهات الداعمة.",
+        "en": "A measure of the model's confidence in the prediction for each instance. Its value is 1 for support vectors."
+      },
+      "example": {
+        "ar": "يمكن تغييره بتغيير مقياس الأوزان دون تغيير حدود القرار.",
+        "en": "Can be changed by scaling weights without changing the decision boundary."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الهامش الهندسي (Geometric Margin)؟",
+      "en": "What is the Geometric Margin?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المسافة المادية الفعلية بين نقطة البيانات وحدود القرار (الهامش الوظيفي مطبعاً بمعيار الأوزان).",
+        "en": "The actual physical distance between a data point and the decision boundary (functional margin normalized by weight norm)."
+      },
+      "example": {
+        "ar": "الهدف من SVM هو تعظيم هذا الهامش.",
+        "en": "The goal of SVM is to maximize this margin."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هي خوارزمية SMO؟",
+      "en": "What is the SMO algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية التحسين الأدنى المتسلسل، تُستخدم لحل مشكلة البرمجة التربيعية لـ SVM بكفاءة عن طريق تقسيمها لمشاكل أصغر.",
+        "en": "Sequential Minimal Optimization, an algorithm used to efficiently solve the SVM quadratic programming problem by breaking it into smaller problems."
+      },
+      "example": {
+        "ar": "تحل المشاكل الفرعية تحليلياً.",
+        "en": "Solves the subproblems analytically."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يصف بشكل أفضل 'المتجهات الداعمة' في نموذج SVM؟",
+      "en": "Which of the following best describes 'Support Vectors' in an SVM model?"
+    },
+    "options": {
+      "ar": [
+        "جميع نقاط البيانات في مجموعة التدريب.",
+        "نقاط البيانات التي تم تصنيفها بشكل خاطئ.",
+        "نقاط البيانات الأقرب إلى المستوى الفائق والتي تحدد موقعه.",
+        "الميزات التي لها أعلى تباين."
+      ],
+      "en": [
+        "All data points in the training set.",
+        "The data points that are misclassified.",
+        "The data points closest to the hyperplane that determine its position.",
+        "The features that have the highest variance."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المتجهات الداعمة هي النقاط الحرجة التي تقع على حافة الهامش. إذا قمت بإزالتها، سيتغير موقع المستوى الفائق.",
+      "en": "Support vectors are the critical points that lie on the edge of the margin. If you remove them, the position of the hyperplane will change."
+    },
+    "hint": {
+      "ar": "تذكر الكلمة 'داعمة' - إنها تدعم حدود القرار.",
+      "en": "Remember the word 'support' - they support the decision boundary."
+    },
+    "difficulty": "easy",
+    "conceptId": "svm-introduction-linear"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "لماذا من الضروري تطبيق Feature Scaling (مثل StandardScaler) قبل تدريب نموذج SVM؟",
+      "en": "Why is it essential to apply Feature Scaling (like StandardScaler) before training an SVM model?"
+    },
+    "options": {
+      "ar": [
+        "لأن SVM لا يمكنه التعامل مع القيم السالبة.",
+        "لأن الميزات ذات المقاييس الأكبر ستهيمن على حسابات المسافة، مما يشوه حدود القرار.",
+        "لتحويل البيانات غير الخطية إلى بيانات خطية.",
+        "لتقليل عدد المتجهات الداعمة."
+      ],
+      "en": [
+        "Because SVM cannot handle negative values.",
+        "Because features with larger scales will dominate distance calculations, skewing the decision boundary.",
+        "To transform non-linear data into linear data.",
+        "To reduce the number of support vectors."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "SVM يعتمد على المسافة الهندسية. إذا كانت إحدى الميزات تتراوح من 0-1000 والأخرى من 0-1، فإن الميزة الأكبر ستتحكم في الهامش بالكامل.",
+      "en": "SVM relies on geometric distance. If one feature ranges from 0-1000 and another from 0-1, the larger feature will completely control the margin."
+    },
+    "hint": {
+      "ar": "فكر في كيفية حساب المسافة بين نقطتين.",
+      "en": "Think about how the distance between two points is calculated."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-scaling-sensitivity"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "إذا كان نموذج SVM الخاص بك يعاني من التجهيز الزائد (Overfitting)، فماذا يجب أن تفعل بالمعامل C؟",
+      "en": "If your SVM model is suffering from overfitting, what should you do with the C hyperparameter?"
+    },
+    "options": {
+      "ar": [
+        "زيادة قيمة C.",
+        "تقليل قيمة C.",
+        "تغيير النواة إلى خطية.",
+        "C لا يؤثر على التجهيز الزائد."
+      ],
+      "en": [
+        "Increase the value of C.",
+        "Decrease the value of C.",
+        "Change the kernel to linear.",
+        "C does not affect overfitting."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقليل C يسمح بمزيد من انتهاكات الهامش (Soft Margin أوسع)، مما يجعل النموذج أبسط وأقل عرضة للتجهيز الزائد.",
+      "en": "Decreasing C allows for more margin violations (wider soft margin), making the model simpler and less prone to overfitting."
+    },
+    "hint": {
+      "ar": "C الصغير يعني تسامحاً أكبر مع الأخطاء.",
+      "en": "Small C means higher tolerance for errors."
+    },
+    "difficulty": "medium",
+    "conceptId": "hard-vs-soft-margin"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هو الغرض الرئيسي من 'خدعة النواة' (Kernel Trick)؟",
+      "en": "What is the primary purpose of the 'Kernel Trick'?"
+    },
+    "options": {
+      "ar": [
+        "تسريع عملية قياس الميزات (Feature Scaling).",
+        "حساب حاصل الضرب النقطي في مساحة عالية الأبعاد دون تحويل البيانات فعلياً، لتوفير الموارد الحسابية.",
+        "تحويل مشكلة التصنيف إلى مشكلة انحدار.",
+        "إزالة القيم المتطرفة من مجموعة البيانات."
+      ],
+      "en": [
+        "To speed up the feature scaling process.",
+        "To compute the dot product in a high-dimensional space without explicitly transforming the data, saving computational resources.",
+        "To convert a classification problem into a regression problem.",
+        "To remove outliers from the dataset."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "خدعة النواة تسمح لـ SVM بالعمل في مساحات ذات أبعاد عالية جداً (أو حتى لا نهائية) بكفاءة حسابية عالية.",
+      "en": "The kernel trick allows SVMs to operate in very high (or even infinite) dimensional spaces with high computational efficiency."
+    },
+    "hint": {
+      "ar": "إنها 'خدعة' لأنها تتجنب القيام بالعمل الشاق المتمثل في تعيين الميزات.",
+      "en": "It's a 'trick' because it avoids doing the hard work of feature mapping."
+    },
+    "difficulty": "hard",
+    "conceptId": "kernel-trick-polynomial"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "في نواة RBF، ماذا يحدث إذا قمت بتعيين قيمة كبيرة جداً للمعامل جاما (γ)؟",
+      "en": "In the RBF kernel, what happens if you set a very large value for the Gamma (γ) hyperparameter?"
+    },
+    "options": {
+      "ar": [
+        "يصبح النموذج خطياً تماماً.",
+        "تصبح حدود القرار واسعة وسلسة جداً (Underfitting).",
+        "يصبح نطاق تأثير كل نقطة صغيراً، وتلتف حدود القرار بشدة حول النقاط الفردية (Overfitting).",
+        "يتم تجاهل المعامل C."
+      ],
+      "en": [
+        "The model becomes perfectly linear.",
+        "The decision boundary becomes very wide and smooth (Underfitting).",
+        "The range of influence of each point becomes small, and the decision boundary wiggles tightly around individual points (Overfitting).",
+        "The C hyperparameter is ignored."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "جاما الكبيرة تعني أن منحنى الجرس ضيق، لذا فإن النقطة تؤثر فقط على المنطقة القريبة جداً منها، مما يؤدي إلى حدود قرار معقدة جداً وتجهيز زائد.",
+      "en": "A large gamma means the bell curve is narrow, so a point only influences the area very close to it, leading to highly complex decision boundaries and overfitting."
+    },
+    "hint": {
+      "ar": "جاما الكبيرة = تأثير محلي ضيق.",
+      "en": "Large gamma = narrow local influence."
+    },
+    "difficulty": "medium",
+    "conceptId": "gaussian-rbf-kernel"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي فئة في Scikit-Learn تدعم 'خدعة النواة' (Kernel Trick)؟",
+      "en": "Which Scikit-Learn class supports the 'Kernel Trick'?"
+    },
+    "options": {
+      "ar": [
+        "LinearSVC",
+        "SGDClassifier",
+        "SVC",
+        "جميع ما سبق"
+      ],
+      "en": [
+        "LinearSVC",
+        "SGDClassifier",
+        "SVC",
+        "All of the above"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "فقط فئة SVC تدعم خدعة النواة. LinearSVC و SGDClassifier مخصصان للتصنيف الخطي فقط.",
+      "en": "Only the SVC class supports the kernel trick. LinearSVC and SGDClassifier are strictly for linear classification."
+    },
+    "hint": {
+      "ar": "راجع جدول المقارنة للتعقيد الحسابي.",
+      "en": "Check the computational complexity comparison table."
+    },
+    "difficulty": "easy",
+    "conceptId": "svm-sklearn-classes"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو الفرق الرئيسي بين الهامش الوظيفي والهامش الهندسي؟",
+      "en": "What is the main difference between the functional margin and the geometric margin?"
+    },
+    "options": {
+      "ar": [
+        "الهامش الوظيفي يستخدم للنوى غير الخطية، والهندسي للخطية.",
+        "الهامش الهندسي هو الهامش الوظيفي مطبعاً (Normalized) بمعيار متجه الأوزان ليمثل المسافة المادية الحقيقية.",
+        "الهامش الوظيفي يقيس المسافة، بينما الهندسي يقيس الثقة.",
+        "لا يوجد فرق، هما اسمان لنفس المفهوم."
+      ],
+      "en": [
+        "Functional margin is used for non-linear kernels, geometric for linear.",
+        "Geometric margin is the functional margin normalized by the weight vector norm to represent true physical distance.",
+        "Functional margin measures distance, while geometric measures confidence.",
+        "There is no difference, they are names for the same concept."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الهامش الوظيفي يمكن تغييره بتغيير مقياس الأوزان، بينما الهامش الهندسي ثابت ويمثل المسافة الفعلية في الفضاء.",
+      "en": "The functional margin can be changed by scaling the weights, while the geometric margin is invariant and represents the actual distance in space."
+    },
+    "hint": {
+      "ar": "الهندسة تتعلق بالمسافات المادية.",
+      "en": "Geometry is about physical distances."
+    },
+    "difficulty": "hard",
+    "conceptId": "maximum-margin-functional-geometric"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "لماذا نفضل استخدام 'الشكل المزدوج' (Dual Form) في تحسين SVM؟",
+      "en": "Why do we prefer to use the 'Dual Form' in SVM optimization?"
+    },
+    "options": {
+      "ar": [
+        "لأنه أسرع دائماً من الشكل الأولي.",
+        "لأنه يسمح لنا بتطبيق خدعة النواة (Kernel Trick) للتعامل مع البيانات غير الخطية.",
+        "لأنه لا يتطلب قياس الميزات (Feature Scaling).",
+        "لأنه يمنع التجهيز الزائد تلقائياً."
+      ],
+      "en": [
+        "Because it is always faster than the primal form.",
+        "Because it allows us to apply the Kernel Trick to handle non-linear data.",
+        "Because it does not require feature scaling.",
+        "Because it automatically prevents overfitting."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الشكل المزدوج يعتمد على حاصل الضرب النقطي بين نقاط البيانات، وهو الشرط الأساسي لاستخدام دوال النواة.",
+      "en": "The dual form relies on the dot product between data points, which is the fundamental requirement for using kernel functions."
+    },
+    "hint": {
+      "ar": "الشكل المزدوج يفتح الباب أمام 'السحر' الرياضي.",
+      "en": "The dual form opens the door to mathematical 'magic'."
+    },
+    "difficulty": "medium",
+    "conceptId": "primal-vs-dual-form"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي خوارزمية SMO؟",
+      "en": "What is the SMO algorithm?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية لتقليل أبعاد البيانات قبل استخدام SVM.",
+        "خوارزمية تحسين تُستخدم لحل مشكلة البرمجة التربيعية لتدريب SVM بكفاءة.",
+        "نوع من دوال النواة المستخدمة للنصوص.",
+        "مقياس لتقييم أداء نموذج SVM."
+      ],
+      "en": [
+        "An algorithm for dimensionality reduction before using SVM.",
+        "An optimization algorithm used to efficiently solve the quadratic programming problem for training SVMs.",
+        "A type of kernel function used for text.",
+        "A metric for evaluating SVM model performance."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "SMO (Sequential Minimal Optimization) تقوم بتقسيم مشكلة التحسين الكبيرة لـ SVM إلى مشاكل فرعية صغيرة يمكن حلها بسرعة.",
+      "en": "SMO (Sequential Minimal Optimization) breaks down the large SVM optimization problem into smaller subproblems that can be solved quickly."
+    },
+    "hint": {
+      "ar": "حرف O يرمز إلى Optimization (تحسين).",
+      "en": "The O stands for Optimization."
+    },
+    "difficulty": "easy",
+    "conceptId": "optimization-smo"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي الخاصية الرياضية لمشكلة تحسين SVM التي تضمن عدم تعثر الخوارزمية في حلول محلية (Local Minima)؟",
+      "en": "What mathematical property of the SVM optimization problem ensures the algorithm doesn't get stuck in local minima?"
+    },
+    "options": {
+      "ar": [
+        "الخطية (Linearity)",
+        "التحدب (Convexity)",
+        "التعامد (Orthogonality)",
+        "التناظر (Symmetry)"
+      ],
+      "en": [
+        "Linearity",
+        "Convexity",
+        "Orthogonality",
+        "Symmetry"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مشكلة تحسين SVM هي مشكلة محدبة (Convex)، مما يعني أن لها حداً أدنى عالمياً واحداً فقط.",
+      "en": "The SVM optimization problem is convex, meaning it has only one single global minimum."
+    },
+    "hint": {
+      "ar": "شكل يشبه الوعاء.",
+      "en": "A bowl-like shape."
+    },
+    "difficulty": "medium",
+    "conceptId": "optimization-smo"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تطبيق StandardScaler قبل تدريب SVM. خوارزمية SVM تعتمد على المسافات، وإذا لم يتم توحيد المقاييس، فإن الميزات ذات القيم الكبيرة ستدمر حدود القرار.</template>
+    <template class="content-en">Forgetting to apply StandardScaler before training an SVM. SVM relies on distances, and if scales are not standardized, features with large values will ruin the decision boundary.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن قيمة C الكبيرة تعني هامشاً أكبر. العكس هو الصحيح! C الكبير يعني عقوبة كبيرة على الأخطاء، مما يجبر النموذج على تضييق الهامش (مما قد يسبب Overfitting).</template>
+    <template class="content-en">Thinking that a large C value means a larger margin. The opposite is true! A large C means a heavy penalty for errors, forcing the model to narrow the margin (potentially causing Overfitting).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">خدعة النواة (Kernel Trick) لا تقوم فعلياً بتحويل البيانات إلى أبعاد أعلى. إنها مجرد اختصار رياضي يحسب النتيجة كما لو تم التحويل، مما يوفر وقتاً وذاكرة هائلين.</template>
+    <template class="content-en">The Kernel Trick does not actually transform data into higher dimensions. It is merely a mathematical shortcut that computes the result as if the transformation happened, saving massive time and memory.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المتجهات الداعمة هي النقاط الوحيدة التي تهم. بمجرد تدريب النموذج، يمكنك حذف جميع نقاط البيانات الأخرى ولن يتغير النموذج إطلاقاً.</template>
+    <template class="content-en">Support vectors are the only points that matter. Once the model is trained, you can delete all other data points and the model will not change at all.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">التحدب (Convexity) هو ما يجعل SVM قوياً رياضياً. على عكس الشبكات العصبية التي قد تعلق في حلول سيئة، SVM يضمن دائماً العثور على أفضل حل ممكن (Global Minimum).</template>
+    <template class="content-en">Convexity is what makes SVM mathematically robust. Unlike neural networks that might get stuck in bad solutions, SVM always guarantees finding the best possible solution (Global Minimum).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

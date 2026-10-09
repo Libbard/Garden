@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT363" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>إدارة شبكات SNMPv1: نماذج الاتصال والنماذج الوظيفية · IT363 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT363" data-page-title-en="IT363">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=IT363"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#snmp-system-architecture-messages" class="toc-link" data-bilingual>
+        <template class="content-ar">بنية نظام SNMP والرسائل</template>
+        <template class="content-en">SNMP System Architecture and Messages</template>
+        <span class="content-target">بنية نظام SNMP والرسائل</span>
+      </a>
+      <a href="#snmp-traps" class="toc-link" data-bilingual>
+        <template class="content-ar">فخاخ SNMP (Traps)</template>
+        <template class="content-en">SNMP Traps</template>
+        <span class="content-target">فخاخ SNMP (Traps)</span>
+      </a>
+      <a href="#administrative-model-community" class="toc-link" data-bilingual>
+        <template class="content-ar">النموذج الإداري والمجتمع</template>
+        <template class="content-en">Administrative Model and Community</template>
+        <span class="content-target">النموذج الإداري والمجتمع</span>
+      </a>
+      <a href="#protocol-entities-pdu" class="toc-link" data-bilingual>
+        <template class="content-ar">كيانات البروتوكول ووحدة بيانات البروتوكول (PDU)</template>
+        <template class="content-en">Protocol Entities and PDU</template>
+        <span class="content-target">كيانات البروتوكول ووحدة بيانات البروتوكول (PDU)</span>
+      </a>
+      <a href="#lexicographic-order-get-next" class="toc-link" data-bilingual>
+        <template class="content-ar">الترتيب المعجمي وعملية Get-Next-Request</template>
+        <template class="content-en">Lexicographic Order and Get-Next-Request</template>
+        <span class="content-target">الترتيب المعجمي وعملية Get-Next-Request</span>
+      </a>
+      <a href="#snmp-mib-functional-model" class="toc-link" data-bilingual>
+        <template class="content-ar">قاعدة معلومات الإدارة (MIB) والنموذج الوظيفي</template>
+        <template class="content-en">SNMP MIB and Functional Model</template>
+        <span class="content-target">قاعدة معلومات الإدارة (MIB) والنموذج الوظيفي</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · IT363
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">إدارة شبكات SNMPv1: نماذج الاتصال والنماذج الوظيفية</h1>
+      <p class="hero-description">يغطي هذا الوحدة بنية رسائل SNMPv1، نموذج الإدارة المجتمعي، أنواع الفخاخ (Traps)، الترتيب المعجمي، وعمليات Get-Next-Request.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">SNMPv1 Network Management: Communication and Functional Models</h1>
+      <p class="hero-description">This module covers SNMPv1 message architecture, the community-based administrative model, trap types, lexicographic ordering, and Get-Next-Request operations.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">إدارة الشبكات</span>
+      <span class="tag">SNMPv1</span>
+      <span class="tag">الترتيب المعجمي</span>
+      <span class="tag">الفخاخ (Traps)</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Management</span>
+      <span class="tag">SNMPv1</span>
+      <span class="tag">Lexicographic Order</span>
+      <span class="tag">Traps</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم نموذج الاتصال في SNMP بما في ذلك الهيكل الإداري والرسائل.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل الهيكل الإداري القائم على المجتمع، سياسات الوصول، وعرض MIB.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحديد مواصفات بروتوكول SNMP وعملياته المختلفة مثل Get و Set و Trap.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق الترتيب المعجمي لفهم كيفية عمل Get-Next-Request في تصفح MIB.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the SNMP communication model including administrative structure and messages.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze the community-based administrative structure, access policies, and MIB views.</span></li>
+      <li><span class="obj-icon">✦</span><span>Identify SNMP protocol specifications and its various operations like Get, Set, and Trap.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply lexicographic ordering to understand how Get-Next-Request works in MIB traversal.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="snmp-system-architecture-messages" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> بنية نظام SNMP والرسائل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> SNMP System Architecture and Messages</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد SNMP على معمارية المدير والوكيل (Manager-Agent) لتبادل 5 أنواع أساسية من الرسائل عبر بروتوكول UDP.</p></template>
+    <template class="content-en"><p>SNMP relies on a Manager-Agent architecture to exchange 5 basic types of messages over UDP.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون معمارية إدارة شبكات SNMP من مدير (Manager) ووكيل (Agent) يتواصلان عبر وسيط مادي باستخدام مكدس بروتوكولات (PHY, DLC, IP, UDP, SNMP). هناك 5 رسائل أساسية في SNMPv1:</p><ul><li><b>Get-Request:</b> يرسلها المدير لطلب بيانات من الوكيل.</li><li><b>Get-Next-Request:</b> يرسلها المدير لطلب بيانات الكائن المدار (MO) التالي للكائن المحدد.</li><li><b>Set-Request:</b> يرسلها المدير لتهيئة أو تغيير قيمة عنصر في الشبكة.</li><li><b>Get-Response:</b> يستجيب بها الوكيل ببيانات لطلبات Get و Set من المدير.</li><li><b>Trap:</b> إنذار (Alarm) يتم إنشاؤه وإرساله بواسطة الوكيل إلى المدير.</li></ul><p>اتجاه الرسائل: 3 رسائل تصدر من المدير (Get, GetNext, Set) ورسالتان تصدران من الوكيل (Response, Trap).</p></template>
+    <template class="content-en"><p>The SNMP network management architecture consists of a Manager and an Agent communicating over a physical medium using a protocol stack (PHY, DLC, IP, UDP, SNMP). There are 5 basic messages in SNMPv1:</p><ul><li><b>Get-Request:</b> Sent by manager requesting data from agent.</li><li><b><span class="smart-term" data-term-en="Get-Next-Request" data-ar="طلب الحصول على التالي" data-en-def="A message sent by the manager to request data on the next managed object in the MIB tree.">Get-Next-Request<span class="smart-term-tooltip"></span></span>:</b> Sent by manager requesting data on the next MO (managed object) to the one specified.</li><li><b>Set-Request:</b> Initializes or changes the value of network element.</li><li><b>Get-Response:</b> Agent responds with data for 'get and set' requests from the manager.</li><li><b>Trap:</b> Alarm generated by an agent.</li></ul><p>Direction of messages: 3 from manager (Get, GetNext, Set) and 2 from agent (Response, Trap).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تم تصميم SNMP ليكون خفيف الوزن، ولذلك يستخدم بروتوكول UDP غير الموثوق بدلاً من TCP. هذا يقلل من العبء على أجهزة الشبكة، خاصة أثناء حالات الفشل.</p><p>تعتبر رسالة Get-Next-Request مفيدة جداً عندما يمكن أن يكون للواجهة عناوين متعددة مرتبطة بصف معين، أو في جدول توجيه الموجه (Router) الذي يحتوي على قيم (نسخ) متعددة لكل كائن.</p><p>في مثل هذه الحالات، تقوم رسالة Get-Next-Request بالحصول على قيمة النسخة التالية من الكائن دون الحاجة لمعرفة المعرف الدقيق (OID) مسبقاً.</p></template>
+    <template class="content-en"><p>SNMP is designed to be lightweight, hence it uses the connectionless UDP protocol instead of TCP. This minimizes overhead on network devices, especially during network failures.</p><p>The get-next request is very useful when an interface could have multiple addresses associated with a given row, also in routing table of a router, which has multiples values (instances) for each object.</p><p>In such situations, get-next-request obtains the value of the next instance of the object without needing to know the exact OID beforehand.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Two large vertical rectangles representing 'SNMP Manager' (left) and 'SNMP Agent' (right). Inside each, show a protocol stack from top to bottom: Application, SNMP, UDP, IP, DLC, PHY. Draw 5 directed arrows between the Application layers: 3 arrows pointing left-to-right labeled 'Get-Request', 'GetNext-Request', 'Set-Request'. 2 arrows pointing right-to-left labeled 'Get-Response', 'Trap'. Connect the PHY layers at the bottom with a horizontal line labeled 'Physical Medium'. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 Z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- SNMP Manager Container (Left) -->
+    <rect x="40" y="30" width="220" height="490" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="150" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-primary)" class="gsvg-en">SNMP Manager</text>
+    <text x="150" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-primary)" class="gsvg-ar">مدير SNMP</text>
+
+    <!-- SNMP Manager Protocol Stack -->
+    <g>
+        <!-- Application -->
+        <rect x="60" y="80" width="180" height="180" rx="6" fill="var(--brand-800)"/>
+        <text x="150" y="175" text-anchor="middle" font-size="16" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">Application</text>
+        <text x="150" y="175" text-anchor="middle" font-size="16" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">التطبيق</text>
+
+        <!-- SNMP -->
+        <rect x="60" y="265" width="180" height="40" rx="6" fill="var(--brand-700)"/>
+        <text x="150" y="291" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">SNMP</text>
+        <text x="150" y="291" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">SNMP</text>
+
+        <!-- UDP -->
+        <rect x="60" y="310" width="180" height="40" rx="6" fill="var(--brand-600)"/>
+        <text x="150" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">UDP</text>
+        <text x="150" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">UDP</text>
+
+        <!-- IP -->
+        <rect x="60" y="355" width="180" height="40" rx="6" fill="var(--brand-500)"/>
+        <text x="150" y="381" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">IP</text>
+        <text x="150" y="381" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">IP</text>
+
+        <!-- DLC -->
+        <rect x="60" y="400" width="180" height="40" rx="6" fill="var(--brand-400)"/>
+        <text x="150" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">DLC</text>
+        <text x="150" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">DLC</text>
+
+        <!-- PHY -->
+        <rect x="60" y="445" width="180" height="40" rx="6" fill="var(--brand-300)"/>
+        <text x="150" y="471" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">PHY</text>
+        <text x="150" y="471" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">PHY</text>
+    </g>
+
+    <!-- SNMP Agent Container (Right) -->
+    <rect x="640" y="30" width="220" height="490" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="750" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-primary)" class="gsvg-en">SNMP Agent</text>
+    <text x="750" y="65" text-anchor="middle" font-size="18" font-weight="700" fill="var(--text-primary)" class="gsvg-ar">وكيل SNMP</text>
+
+    <!-- SNMP Agent Protocol Stack -->
+    <g>
+        <!-- Application -->
+        <rect x="660" y="80" width="180" height="180" rx="6" fill="var(--brand-800)"/>
+        <text x="750" y="175" text-anchor="middle" font-size="16" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">Application</text>
+        <text x="750" y="175" text-anchor="middle" font-size="16" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">التطبيق</text>
+
+        <!-- SNMP -->
+        <rect x="660" y="265" width="180" height="40" rx="6" fill="var(--brand-700)"/>
+        <text x="750" y="291" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">SNMP</text>
+        <text x="750" y="291" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">SNMP</text>
+
+        <!-- UDP -->
+        <rect x="660" y="310" width="180" height="40" rx="6" fill="var(--brand-600)"/>
+        <text x="750" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-en">UDP</text>
+        <text x="750" y="336" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-hi)" class="gsvg-ar">UDP</text>
+
+        <!-- IP -->
+        <rect x="660" y="355" width="180" height="40" rx="6" fill="var(--brand-500)"/>
+        <text x="750" y="381" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">IP</text>
+        <text x="750" y="381" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">IP</text>
+
+        <!-- DLC -->
+        <rect x="660" y="400" width="180" height="40" rx="6" fill="var(--brand-400)"/>
+        <text x="750" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">DLC</text>
+        <text x="750" y="426" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">DLC</text>
+
+        <!-- PHY -->
+        <rect x="660" y="445" width="180" height="40" rx="6" fill="var(--brand-300)"/>
+        <text x="750" y="471" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-en">PHY</text>
+        <text x="750" y="471" text-anchor="middle" font-size="15" font-weight="700" fill="var(--on-brand-lo)" class="gsvg-ar">PHY</text>
+    </g>
+
+    <!-- SNMP Messages (Arrows between Application Layers) -->
+    <g>
+        <!-- Get-Request (Manager -> Agent) -->
+        <line x1="265" y1="110" x2="630" y2="110" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="450" y="103" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Get-Request</text>
+        <text x="450" y="103" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">طلب الحصول (Get)</text>
+
+        <!-- GetNext-Request (Manager -> Agent) -->
+        <line x1="265" y1="140" x2="630" y2="140" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="450" y="133" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">GetNext-Request</text>
+        <text x="450" y="133" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">طلب التالي (GetNext)</text>
+
+        <!-- Set-Request (Manager -> Agent) -->
+        <line x1="265" y1="170" x2="630" y2="170" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="450" y="163" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Set-Request</text>
+        <text x="450" y="163" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">طلب التعيين (Set)</text>
+
+        <!-- Get-Response (Agent -> Manager) -->
+        <line x1="635" y1="200" x2="270" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="450" y="193" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Get-Response</text>
+        <text x="450" y="193" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">استجابة (Response)</text>
+
+        <!-- Trap (Agent -> Manager) -->
+        <line x1="635" y1="230" x2="270" y2="230" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="450" y="223" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Trap</text>
+        <text x="450" y="223" text-anchor="middle" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">فخ (Trap)</text>
+    </g>
+
+    <!-- Physical Medium Connection -->
+    <g>
+        <line x1="260" y1="465" x2="640" y2="465" stroke="var(--brand-400)" stroke-width="4" stroke-dasharray="8 6"/>
+        <text x="450" y="455" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-primary)" class="gsvg-en">Physical Medium</text>
+        <text x="450" y="455" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-primary)" class="gsvg-ar">الوسط المادي</text>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Get-Request</th><th>Get-Next-Request</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">معرفة OID</template>
+          <template class="content-en">OID Knowledge</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يتطلب معرفة OID الدقيق للكائن.</template>
+          <template class="content-en">Requires exact OID of the object.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يتطلب معرفة OID الدقيق للكيان التالي.</template>
+          <template class="content-en">Does not require exact OID of the next entity.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعامل مع الجداول الديناميكية</template>
+          <template class="content-en">Handling Dynamic Tables</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صعب، يجب معرفة عدد الصفوف والمؤشرات مسبقاً.</template>
+          <template class="content-en">Difficult, must know row count and indices beforehand.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ممتاز، يكتشف الصفوف ديناميكياً حتى نهاية الجدول.</template>
+          <template class="content-en">Excellent, dynamically discovers rows until table ends.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الاستخدام الشائع</template>
+          <template class="content-en">Common Use Case</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قراءة قيم مفردة (Scalars).</template>
+          <template class="content-en">Reading single scalar values.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">مسح شجرة MIB (MIB Walk) وقراءة الجداول.</template>
+          <template class="content-en">MIB Walk and reading tables.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يرسل الوكيل (Agent) رسالة Get-Response رداً على رسالة Set-Request؟</template>
+      <template class="content-en">Why does the Agent send a Get-Response message in reply to a Set-Request?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لتأكيد أن عملية التعيين (Set) قد تمت بنجاح، ولإرجاع القيمة الجديدة التي تم تعيينها أو للإبلاغ عن أي خطأ حدث أثناء محاولة التغيير.</p></template>
+      <template class="content-en"><p>To confirm that the Set operation was successful, returning the newly set value, or to report any error that occurred during the modification attempt.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="snmp-traps" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> فخاخ SNMP (Traps)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> SNMP Traps</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الفخاخ هي رسائل غير متزامنة يرسلها الوكيل لتنبيه المدير بوقوع حدث مهم، وتنقسم إلى فخاخ عامة وخاصة.</p></template>
+    <template class="content-en"><p>Traps are asynchronous messages sent by the agent to alert the manager of a significant event, categorized into generic and specific traps.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحتوي SNMPv1 على 7 أنواع من الفخاخ العامة (Generic Traps) المحددة كأرقام صحيحة (INTEGER):</p><ol><li><b>coldStart(0):</b> كيان البروتوكول المرسل يعيد تشغيل نفسه؛ قد يتم تغيير تكوين الوكيل.</li><li><b>warmStart(1):</b> كيان البروتوكول المرسل يعيد تشغيل نفسه؛ لم يتم تغيير تكوين الوكيل.</li><li><b>linkDown(2):</b> فشل في أحد روابط الاتصال.</li><li><b>linkUp(3):</b> أحد الروابط أصبح متاحاً للعمل.</li><li><b>authenticationFailure(4):</b> فشل في المصادقة (مثل استخدام اسم مجتمع خاطئ).</li><li><b>egpNeighborLoss(5):</b> فقدان جار في بروتوكول EGP.</li><li><b>enterpriseSpecific(6):</b> فخ خاص بالمؤسسة (Specific trap).</li></ol><p>بالإضافة إلى ذلك، توجد فخاخ خاصة (Specific traps) للقياسات الخاصة مثل الإحصائيات. وتحتوي رسالة الفخ على طابع زمني (Time stamp) يشير إلى الوقت المنقضي منذ آخر إعادة تهيئة.</p></template>
+    <template class="content-en"><p>SNMPv1 defines 7 generic traps specified by enumerated INTEGER:</p><ol><li><b><span class="smart-term" data-term-en="coldStart" data-ar="بدء التشغيل البارد" data-en-def="A trap indicating the agent is reinitializing and its configuration may have been altered.">coldStart<span class="smart-term-tooltip"></span></span>(0):</b> Sending protocol entity is reinitializing itself; agent's configuration or protocol entity implementation may be altered.</li><li><b><span class="smart-term" data-term-en="warmStart" data-ar="بدء التشغيل الدافئ" data-en-def="A trap indicating the agent is reinitializing but its configuration remains unaltered.">warmStart<span class="smart-term-tooltip"></span></span>(1):</b> Sending protocol entity is reinitializing itself; agent configuration or protocol entity implementation not altered.</li><li><b>linkDown(2):</b> Failure of one of the communication links.</li><li><b>linkUp(3):</b> One of the links has come up.</li><li><b>authenticationFailure(4):</b> Authentication failure.</li><li><b>egpNeighborLoss(5):</b> Loss of EGP neighbor.</li><li><b>enterpriseSpecific(6):</b> Enterprise-specific trap.</li></ol><p>Additionally, there are Specific traps for special measurements such as statistics. A trap message includes a Time stamp indicating the time since the last initialization.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين coldStart و warmStart يكمن في حالة التكوين (Configuration).</p><ul><li><strong>في coldStart،</strong> لا يمكن للمدير الوثوق بأن الإعدادات السابقة لا تزال كما هي،</li><li><strong>بينما في warmStart،</strong> يضمن الوكيل أن الإعدادات لم تتغير.</li></ul><p>الفخ enterpriseSpecific(6) يفتح المجال لمصنعي الأجهزة (مثل Cisco أو Juniper) لإنشاء تنبيهات مخصصة لأجهزتهم لا يغطيها المعيار الأساسي لـ SNMP.</p></template>
+    <template class="content-en"><p>The core difference between coldStart and warmStart lies in the configuration state.</p><ul><li><strong>In a coldStart,</strong> the manager cannot trust that previous settings remain intact,</li><li><strong>whereas in a warmStart,</strong> the agent guarantees the configuration is unaltered.</li></ul><p>The enterpriseSpecific(6) trap allows hardware vendors (like Cisco or Juniper) to create custom alerts for their devices that are not covered by the standard SNMP generic traps.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قام شخص بمحاولة قراءة بيانات من موجه (Router) باستخدام كلمة مرور (Community String) خاطئة، أي فخ سيتم إرساله؟</template>
+      <template class="content-en">If someone attempts to read data from a router using an incorrect Community String, which trap will be sent?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم إرسال فخ authenticationFailure(4).</p></template>
+      <template class="content-en"><p>The authenticationFailure(4) trap will be sent.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="administrative-model-community" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> النموذج الإداري والمجتمع</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Administrative Model and Community</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد SNMPv1 على نموذج 'المجتمع' (Community) لتوفير مصادقة بسيطة وتحديد صلاحيات الوصول (Profile) للمديرين والوكلاء.</p></template>
+    <template class="content-en"><p>SNMPv1 relies on a 'Community' model to provide simple authentication and define access privileges (Profile) for managers and agents.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعتمد النموذج الإداري على <span class="smart-term" data-term-en="Community Profile" data-ar="ملف تعريف المجتمع" data-en-def="The combination of a MIB view and an SNMP access mode assigned to a community.">ملف تعريف المجتمع<span class="smart-term-tooltip"></span></span> (Community Profile) والسياسة (Policy). يتكون من كيانات تطبيق SNMP (المدير والوكيل) وكيانات بروتوكول SNMP (معالجات PDU).</p><p><b>المجتمع (Community):</b> هو اقتران بين كياني تطبيق (مدير ووكيل). يمكن لتطبيقين في نفس المجتمع التواصل مع بعضهما. يمكن أن يكون للتطبيق أسماء مجتمع متعددة. الاتصال في SNMPv1 غير آمن (لا يوجد تشفير).</p><p><b>ملف تعريف المجتمع (Community Profile):</b> يتكون من عرض MIB (MIB View) + وضع الوصول (Access Mode).</p><ul><li><b>عرض MIB:</b> تتم برمجة الوكيل لعرض مجموعة فرعية فقط من الكائنات المدارة.</li><li><b>وضع الوصول:</b> يتم تعيين وضع وصول لكل اسم مجتمع (READ-ONLY, READ-WRITE, write-only, not-accessible).</li></ul><p><b>سياسة الوصول بالوكالة (Proxy Access Policy):</b> يُمكّن الوكيل الوكيل (Proxy Agent) عناصر الشبكة التي لا تدعم SNMP من إدارتها بواسطة مدير SNMP (مثل شبكة X.25).</p></template>
+    <template class="content-en"><p>The Administrative Model is based on <span class="smart-term" data-term-en="Community Profile" data-ar="ملف تعريف المجتمع" data-en-def="The combination of a MIB view and an SNMP access mode assigned to a community.">community profile<span class="smart-term-tooltip"></span></span> and policy. It consists of SNMP application entities (Manager and agent) and SNMP protocol entities (PDU handlers).</p><p><b>Community:</b> Pairing of two application entities. Two applications in the same community communicate with each other. An application could have multiple community names. Communication is not secured in SNMPv1 (no encryption).</p><p><b>Community Profile:</b> MIB view + SNMP access mode.</p><ul><li><b>MIB view:</b> An agent is programmed to view only a subset of managed objects of a network element.</li><li><b>Access mode:</b> Each community name is assigned an access mode (READ-ONLY, READ-WRITE, write-only, not-accessible).</li></ul><p><b>Proxy Access Policy:</b> A <span class="smart-term" data-term-en="Proxy Agent" data-ar="الوكيل الوكيل (الوسيط)" data-en-def="An agent that acts on behalf of non-SNMP devices, translating SNMP requests into the device&#x27;s native protocol.">Proxy agent<span class="smart-term-tooltip"></span></span> enables non-SNMP community elements to be managed by an SNMP manager (e.g., an X.25 network).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تحدد العمليات المسموح بها على كائن معين من خلال تقاطع ملف تعريف المجتمع ووضع الوصول الخاص بالكائن نفسه. على سبيل المثال، إذا كان الكائن 'not-accessible' (مثل الجداول وإدخالات الجداول)، فلا يمكن إجراء أي عملية عليه بغض النظر عن صلاحيات المجتمع.</p><p>الوكيل الوكيل (Proxy Agent) يعمل كمترجم؛ فهو يستقبل طلبات SNMP، ويترجمها إلى البروتوكول الأصلي للجهاز غير المدعوم، ثم يعيد صياغة الاستجابة إلى تنسيق SNMP للمدير.</p></template>
+    <template class="content-en"><p>Operations on an object are determined by the community profile AND the access mode of the object itself. For example, some objects, such as tables and table entries, are 'not-accessible', meaning no operation can be performed on them regardless of the community's privileges.</p><p>The Proxy Agent acts as a translator; it receives SNMP requests, translates them into the native protocol of the non-SNMP device, and then formats the response back into SNMP for the manager.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: A hierarchical diagram showing 'SNMP Agent' at the top. Below it, two boxes labeled 'READ-ONLY' and 'READ-WRITE' representing SNMP Access Mode. Below these, four boxes representing MIB Access: 'not-accessible' (Object 1), 'read-only' (Object 2), 'write-only' (Object 3), and 'read-write' (Object 4). Draw arrows showing how the Agent's access mode maps to the objects based on their MIB access. Style: educational, dark background #0d1117, accent color #10b981, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">SNMP Access Mode to MIB Access Mapping</text>
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تعيين وضع وصول SNMP إلى وصول MIB</text>
+
+    <!-- Separator Line for MIB View -->
+    <line x1="40" y1="338" x2="760" y2="338" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="6 6" />
+    <text x="400" y="330" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Managed Objects (MIB View)</text>
+    <text x="400" y="330" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">الكائنات المدارة (عرض MIB)</text>
+
+    <!-- Agent to Access Modes Arrows -->
+    <path d="M 350 110 C 350 145, 240 145, 240 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 450 110 C 450 145, 560 145, 560 175" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- RO to Objects Arrows -->
+    <path d="M 220 230 C 220 290, 290 310, 290 375" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 260 230 C 260 320, 666 280, 666 375" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- RW to Objects Arrows -->
+    <path d="M 520 230 C 520 320, 322 280, 322 375" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 560 230 C 560 290, 494 310, 494 375" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 600 230 C 600 290, 698 310, 698 375" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Arrow Labels -->
+    <!-- RO -> Obj 2 -->
+    <g transform="translate(255, 300)">
+        <rect x="-30" y="-12" width="60" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Read</text>
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قراءة</text>
+    </g>
+
+    <!-- RO -> Obj 4 -->
+    <g transform="translate(348, 283)">
+        <rect x="-30" y="-12" width="60" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Read</text>
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قراءة</text>
+    </g>
+
+    <!-- RW -> Obj 2 -->
+    <g transform="translate(477, 283)">
+        <rect x="-30" y="-12" width="60" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Read</text>
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قراءة</text>
+    </g>
+
+    <!-- RW -> Obj 3 -->
+    <g transform="translate(527, 300)">
+        <rect x="-30" y="-12" width="60" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Write</text>
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">كتابة</text>
+    </g>
+
+    <!-- RW -> Obj 4 -->
+    <g transform="translate(649, 300)">
+        <rect x="-45" y="-12" width="90" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Read / Write</text>
+        <text x="0" y="4" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">قراءة / كتابة</text>
+    </g>
+
+    <!-- SNMP Agent Node -->
+    <rect x="300" y="60" width="200" height="50" rx="8" fill="url(#agentGrad)" />
+    <text x="400" y="91" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">SNMP Agent</text>
+    <text x="400" y="91" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">وكيل SNMP</text>
+
+    <!-- Access Mode Nodes -->
+    <!-- READ-ONLY -->
+    <rect x="150" y="180" width="180" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="240" y="211" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">READ-ONLY</text>
+    <text x="240" y="211" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قراءة فقط (READ-ONLY)</text>
+
+    <!-- READ-WRITE -->
+    <rect x="470" y="180" width="180" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="560" y="211" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">READ-WRITE</text>
+    <text x="560" y="211" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قراءة وكتابة (READ-WRITE)</text>
+
+    <!-- MIB Object Nodes -->
+    <!-- Object 1 -->
+    <rect x="48" y="380" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4 4" />
+    <text x="118" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Object 1</text>
+    <text x="118" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">كائن 1</text>
+    <text x="118" y="425" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-en">not-accessible</text>
+    <text x="118" y="425" text-anchor="middle" font-size="13" fill="var(--text-muted)" class="gsvg-ar">غير قابل للوصول</text>
+
+    <!-- Object 2 -->
+    <rect x="236" y="380" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="306" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Object 2</text>
+    <text x="306" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائن 2</text>
+    <text x="306" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">read-only</text>
+    <text x="306" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">قراءة فقط</text>
+
+    <!-- Object 3 -->
+    <rect x="424" y="380" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="494" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Object 3</text>
+    <text x="494" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائن 3</text>
+    <text x="494" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">write-only</text>
+    <text x="494" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">كتابة فقط</text>
+
+    <!-- Object 4 -->
+    <rect x="612" y="380" width="140" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <text x="682" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Object 4</text>
+    <text x="682" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائن 4</text>
+    <text x="682" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">read-write</text>
+    <text x="682" y="425" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">قراءة وكتابة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان وكيل SNMP يمتلك صلاحية READ-WRITE، هل يمكنه تعديل كائن حالته 'read-only'؟</template>
+      <template class="content-en">If an SNMP agent has READ-WRITE access mode, can it modify an object whose access mode is 'read-only'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن العملية المسموحة تتحدد بناءً على الأقل تقييداً بين صلاحية المجتمع وحالة الكائن. الكائن 'read-only' لا يقبل التعديل.</p></template>
+      <template class="content-en"><p>No, because the permitted operation is determined by the most restrictive condition between the community profile and the object's access mode. A 'read-only' object cannot be modified.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="protocol-entities-pdu" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> كيانات البروتوكول ووحدة بيانات البروتوكول (PDU)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Protocol Entities and PDU</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم تغليف رسائل SNMP داخل حزم UDP، وتتكون الرسالة من إصدار، اسم مجتمع، ووحدة بيانات البروتوكول (PDU).</p></template>
+    <template class="content-en"><p>SNMP messages are encapsulated in UDP datagrams, consisting of a Version, Community name, and a Protocol Data Unit (PDU).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم إنجاز الاتصال بين كيانات البروتوكول باستخدام رسائل مغلفة في مخطط بيانات UDP (UDP datagram). تتكون رسالة SNMP من:</p><ul><li>معرف الإصدار (Version identifier)</li><li>اسم المجتمع (Community name)</li><li>وحدة بيانات البروتوكول (PDU)</li></ul><p>يتم استقبال كيان بروتوكول SNMP على المنفذ 161، باستثناء رسائل الفخ (Trap) التي يتم استقبالها على المنفذ 162.</p><p><b>هيكل Get and Set PDU:</b> يحتوي على PDU Type، RequestID (لتتبع الرسائل)، ErrorStatus (قيمة غير صفرية تشير لخطأ)، ErrorIndex (رقم VarBind الذي حدث فيه الخطأ)، وقائمة VarBindList (أزواج من اسم المتغير وقيمته).</p><p><b>هيكل Trap PDU:</b> يحتوي على Enterprise، Agent Address، Generic Trap Type، Specific Trap Type، و Timestamp.</p></template>
+    <template class="content-en"><p>Communication among protocol entities is accomplished using messages encapsulated in a UDP datagram. An SNMP message consists of:</p><ul><li>Version identifier</li><li>Community name</li><li>Protocol Data Unit (PDU)</li></ul><p>The SNMP protocol entity is received on port 161, except for traps which are received on port 162.</p><p><b>Get and Set PDU Structure:</b> Contains PDU Type, <span class="smart-term" data-term-en="RequestID" data-ar="معرف الطلب" data-en-def="A unique identifier used to track a message and match a response to its corresponding request.">RequestID<span class="smart-term-tooltip"></span></span> (to track messages), ErrorStatus (non-zero indicates error), ErrorIndex (No. of <span class="smart-term" data-term-en="VarBind" data-ar="ربط المتغير" data-en-def="The pairing of a variable (Managed Object) and its value within an SNMP PDU.">VarBind<span class="smart-term-tooltip"></span></span> where the first error occurred), and VarBindList (pairing of variable name and value).</p><p><b>Trap PDU Structure:</b> Contains Enterprise, Agent Address, Generic Trap Type, Specific Trap Type, and Timestamp.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عملية التغليف (Encapsulation) تتم بإضافة ترويسة التطبيق (Version + Community) إلى PDU لتشكيل SNMP PDU. ثم تضاف ترويسة UDP لتشكيل Transport PDU، ثم ترويسة IP لتشكيل Network PDU، وأخيراً ترويسة DLC للإرسال عبر الوسيط المادي.</p><p>حقل RequestID حيوي جداً لأن بروتوكول UDP لا يضمن وصول الرسائل أو ترتيبها. يستخدم المدير هذا المعرف لمطابقة الاستجابات (Get-Response) مع الطلبات الأصلية (Get-Request).</p><p>حقل ErrorIndex يحدد بدقة أي متغير (VarBind) في القائمة تسبب في الخطأ (مثلاً: 1 يعني المتغير الأول، 5 يعني الخامس).</p></template>
+    <template class="content-en"><p>The encapsulation process involves adding the application header (Version + Community) to the data PDU to form the SNMP PDU.</p><p>Then the UDP header is added (Transport PDU), followed by the IP header (Network PDU), and finally the DLC header for physical transmission.</p><p>The RequestID field is crucial because UDP is connectionless and does not guarantee delivery or order. The manager uses this ID to match incoming Get-Responses to their original Get-Requests.</p><p>The ErrorIndex precisely identifies which VarBind in the list caused the error (e.g., 1 means the first VarBind, 5 means the fifth).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A block diagram showing the encapsulation of an SNMP message. Top row: 'Data'. Second row: 'Application Header' (containing 'Version' and 'Community') + 'SNMP PDU'. Third row: 'UDP Header' + 'Application PDU'. Fourth row: 'IP Header' + 'Transport PDU'. Bottom row: 'DLC Header' + 'Network PDU'. Show downward arrows indicating how each layer encapsulates the layer above it. Style: educational, dark background #0d1117, accent color #8b5cf6, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <linearGradient id="header-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-600)" />
+            <stop offset="100%" stop-color="var(--brand-800)" />
+        </linearGradient>
+        <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="700" fill="var(--text-primary)" class="gsvg-en">SNMP Message Encapsulation</text>
+    <text x="400" y="35" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="700" fill="var(--text-primary)" class="gsvg-ar">تغليف رسالة SNMP</text>
+
+    <!-- Encapsulation Background Polygons -->
+    <polygon points="410,110 770,110 750,150 430,150" fill="var(--brand-500)" opacity="0.08" />
+    <polygon points="270,190 750,190 730,230 290,230" fill="var(--brand-500)" opacity="0.08" />
+    <polygon points="190,270 730,270 710,310 210,310" fill="var(--brand-500)" opacity="0.08" />
+    <polygon points="110,350 710,350 690,390 130,390" fill="var(--brand-500)" opacity="0.08" />
+
+    <!-- Encapsulation Dashed Lines with Arrows -->
+    <g stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4,4" fill="none" marker-end="url(#arrow)">
+        <!-- R1 to R2 -->
+        <path d="M 410 110 L 430 150" />
+        <path d="M 770 110 L 750 150" />
+        <!-- R2 to R3 -->
+        <path d="M 270 190 L 290 230" />
+        <path d="M 750 190 L 730 230" />
+        <!-- R3 to R4 -->
+        <path d="M 190 270 L 210 310" />
+        <path d="M 730 270 L 710 310" />
+        <!-- R4 to R5 -->
+        <path d="M 110 350 L 130 390" />
+        <path d="M 710 350 L 690 390" />
+    </g>
+
+    <!-- Bracket for App Header -->
+    <path d="M 270 146 v -4 q 0 -2 2 -2 h 76 q 2 0 2 -2 v -2 m 0 2 q 0 2 2 2 h 76 q 2 0 2 2 v 4" fill="none" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="350" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Application Header</text>
+    <text x="350" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">ترويسة التطبيق</text>
+
+    <!-- Row 1: Data -->
+    <g>
+        <rect x="410" y="70" width="360" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        <text x="590" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Data</text>
+        <text x="590" y="95" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">البيانات</text>
+    </g>
+
+    <!-- Row 2: Application Header + SNMP PDU -->
+    <g>
+        <rect x="270" y="150" width="70" height="40" rx="4" fill="url(#header-grad)" stroke="var(--brand-500)" stroke-width="1.5" />
+        <text x="305" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">Version</text>
+        <text x="305" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">الإصدار</text>
+
+        <rect x="340" y="150" width="90" height="40" rx="4" fill="url(#header-grad)" stroke="var(--brand-500)" stroke-width="1.5" />
+        <text x="385" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">Community</text>
+        <text x="385" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">المجتمع</text>
+
+        <rect x="430" y="150" width="320" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        <text x="590" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">SNMP PDU</text>
+        <text x="590" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">وحدة بيانات SNMP</text>
+    </g>
+
+    <!-- Row 3: UDP Header + Application PDU -->
+    <g>
+        <rect x="190" y="230" width="100" height="40" rx="4" fill="url(#header-grad)" stroke="var(--brand-500)" stroke-width="1.5" />
+        <text x="240" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">UDP Header</text>
+        <text x="240" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">ترويسة UDP</text>
+
+        <rect x="290" y="230" width="440" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        <text x="510" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Application PDU</text>
+        <text x="510" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">وحدة بيانات التطبيق</text>
+    </g>
+
+    <!-- Port Note -->
+    <text x="240" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-muted)" class="gsvg-en">Port 161 / 162</text>
+    <text x="240" y="290" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-muted)" class="gsvg-ar">المنفذ 161 / 162</text>
+
+    <!-- Row 4: IP Header + Transport PDU -->
+    <g>
+        <rect x="110" y="310" width="100" height="40" rx="4" fill="url(#header-grad)" stroke="var(--brand-500)" stroke-width="1.5" />
+        <text x="160" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">IP Header</text>
+        <text x="160" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">ترويسة IP</text>
+
+        <rect x="210" y="310" width="500" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        <text x="460" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Transport PDU</text>
+        <text x="460" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">وحدة بيانات النقل</text>
+    </g>
+
+    <!-- Row 5: DLC Header + Network PDU -->
+    <g>
+        <rect x="30" y="390" width="100" height="40" rx="4" fill="url(#header-grad)" stroke="var(--brand-500)" stroke-width="1.5" />
+        <text x="80" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">DLC Header</text>
+        <text x="80" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">ترويسة DLC</text>
+
+        <rect x="130" y="390" width="560" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        <text x="410" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Network PDU</text>
+        <text x="410" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">وحدة بيانات الشبكة</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تستخدم رسائل Trap منفذاً مختلفاً (162) عن باقي رسائل SNMP (161)؟</template>
+      <template class="content-en">Why do Trap messages use a different port (162) than other SNMP messages (161)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لفصل حركة مرور التنبيهات غير المتزامنة (Traps) عن حركة مرور الطلبات والاستجابات العادية، مما يسمح لنظام الإدارة بإعطاء أولوية ومعالجة مستقلة للإنذارات الحرجة.</p></template>
+      <template class="content-en"><p>To separate asynchronous alert traffic (Traps) from normal request/response polling traffic, allowing the management system to prioritize and process critical alarms independently.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="lexicographic-order-get-next" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الترتيب المعجمي وعملية Get-Next-Request</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Lexicographic Order and Get-Next-Request</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يستخدم SNMP الترتيب المعجمي (Lexicographic Order) لاجتياز شجرة MIB، مما يسمح باكتشاف الكائنات ديناميكياً باستخدام Get-Next-Request.</p></template>
+    <template class="content-en"><p>SNMP uses Lexicographic Order to traverse the MIB tree, allowing dynamic discovery of objects using Get-Next-Request.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>إجراء <span class="smart-term" data-term-en="Lexicographic Order" data-ar="الترتيب المعجمي" data-en-def="A method of ordering OIDs in a MIB tree similar to alphabetical order, evaluating from left to right.">الترتيب المعجمي<span class="smart-term-tooltip"></span></span>:</b></p><ol><li>ابدأ بالرقم الموجود في أقصى اليسار كمركز أول.</li><li>قبل زيادة الترتيب في المركز الأول، حدد أقل رقم في المركز الثاني.</li><li>استمر في العملية حتى يتم التقاط أقل رقم في المركز الأخير.</li><li>قم بزيادة الترتيب في المركز الأخير حتى يتم التقاط جميع الأرقام فيه.</li><li>تراجع إلى المركز قبل الأخير وكرر العملية.</li><li>استمر في التقدم للمركز الأول حتى يتم ترتيب جميع الأرقام.</li></ol><p>مثال على الترتيب المعجمي للأرقام: 1، 1118، 115، 126، 15، 2، 22، 250، 2509، 3، 321، 34، 9.</p><p><b>مزايا استخدام Get-Next-Request:</b></p><ul><li>لا نحتاج لمعرفة معرف الكائن (OID) للكيان التالي.</li><li>في حالة الكائنات المجمعة (الجداول)، يتغير عدد الصفوف ديناميكياً. تحل هذه الرسالة مشكلة عدم معرفة عدد الصفوف.</li><li>يمكن استخدامها لبناء شجرة MIB بالكامل (MIB Walk) من أي عقدة لأي عقدة.</li></ul></template>
+    <template class="content-en"><p><b>Procedure for <span class="smart-term" data-term-en="Lexicographic Order" data-ar="الترتيب المعجمي" data-en-def="A method of ordering OIDs in a MIB tree similar to alphabetical order, evaluating from left to right.">Lexicographic order<span class="smart-term-tooltip"></span></span>ing:</b></p><ol><li>Start with leftmost digit as first position.</li><li>Before increasing the order in the first position, select the lowest digit in the second position.</li><li>Continue the process till the lowest digit in the last position is captured.</li><li>Increase the order in the last position until all the digits in the last position are captured.</li><li>Move back to the last but one position and repeat the process.</li><li>Continue advancing to the first position until all the numbers are ordered.</li></ol><p>Example of Lexicographic order: 1, 1118, 115, 126, 15, 2, 22, 250, 2509, 3, 321, 34, 9.</p><p><b>Advantages of using get-next-request:</b></p><ul><li>We do not need to know the object identifier (OID) for the next entity.</li><li>In the case of an aggregate object (tables), the number of rows is dynamically changing. The get-next-request resolves the problem of not knowing how many rows exist.</li><li>We can use this to build a MIB tree by repeating the request from any node to any node. This is called a <span class="smart-term" data-term-en="MIB Walk" data-ar="مسح MIB" data-en-def="The process of sequentially retrieving all data from a MIB tree using repeated Get-Next-Request operations.">MIB walk<span class="smart-term-tooltip"></span></span>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الترتيب المعجمي يشبه الترتيب الأبجدي في القواميس ولكن للأرقام. يتم تقييم العقدة بناءً على مسارها الكامل في الشجرة (OID). هذا يضمن أن يتم قراءة جميع أعمدة الصف الأول في الجدول قبل الانتقال للصف الثاني (أو العكس حسب هيكلة الجدول في MIB).</p><p>عند استخدام Get-Next-Request لقراءة جدول، يرسل المدير الطلب بمتغيرات تمثل أعمدة الجدول. يستجيب الوكيل بقيم الصف الأول. يستخدم المدير هذه الاستجابة كطلب تالي للحصول على الصف الثاني، وهكذا حتى يرجع الوكيل كائناً ينتمي لمجموعة أخرى (مثل IpForwarding)، حينها يعرف المدير أن الجدول قد انتهى.</p></template>
+    <template class="content-en"><p>Lexicographic ordering is similar to alphabetical dictionary sorting but applied to OID numbers. A node is evaluated based on its full path in the tree. This ensures a systematic depth-first traversal of the MIB tree.</p><p>When using Get-Next-Request to read a table, the manager sends a request with variables representing the table's columns.</p><p>The agent responds with the first row's values. The manager uses this response as the next request to get the second row, and so on, until the agent returns an object belonging to the next MIB group (e.g., IpForwarding), signaling the end of the table.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: A tree diagram illustrating Lexicographic Order. Root node at top. Branches to nodes 1, 2, 3, 9. Under node 1, branches to 1 and 2. Under 1.1, branches to 5 and 18. Under 1.2, branch to 6. Under node 2, branches to 2 and 10. Under 2.10, branch to 9. Under node 3, branches to 4 and 21. Show a dashed line tracing the depth-first lexicographic traversal path through these nodes. Style: educational, dark background #0d1117, accent color #f59e0b, viewBox 0 0 800 500. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg viewBox="0 0 900 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" text-anchor="middle">
+    <text x="450" y="40" class="gsvg-en">Lexicographic Order (MIB Walk)</text>
+    <text x="450" y="40" class="gsvg-ar">الترتيب المعجمي (مسار MIB)</text>
+  </g>
+
+  <!-- Tree Edges (Solid) -->
+  <g stroke="var(--border-color)" stroke-width="2" fill="none">
+    <!-- Root to Level 1 -->
+    <path d="M 450,108 L 160,172" />
+    <path d="M 450,108 L 400,172" />
+    <path d="M 450,108 L 620,172" />
+    <path d="M 450,108 L 820,172" />
+    
+    <!-- Level 1 to Level 2 -->
+    <path d="M 160,208 L 100,272" />
+    <path d="M 160,208 L 240,272" />
+    <path d="M 400,208 L 340,272" />
+    <path d="M 400,208 L 460,272" />
+    <path d="M 620,208 L 560,272" />
+    <path d="M 620,208 L 680,272" />
+    
+    <!-- Level 2 to Level 3 -->
+    <path d="M 100,308 L 50,372" />
+    <path d="M 100,308 L 150,372" />
+    <path d="M 240,308 L 240,372" />
+    <path d="M 460,308 L 460,372" />
+  </g>
+
+  <!-- Traversal Edges (Dashed with Arrows) -->
+  <g stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#arrow)">
+    <path d="M 420,108 C 300,120 140,120 140,172" />
+    <path d="M 140,208 C 120,230 80,230 80,272" />
+    <path d="M 80,308 C 60,330 30,330 30,372" />
+    <path d="M 82,390 C 95,410 105,410 118,390" />
+    <path d="M 182,390 C 210,390 215,350 215,308" />
+    <path d="M 240,308 C 260,330 260,350 240,372" />
+    <path d="M 272,390 C 330,390 380,300 380,208" />
+    <path d="M 380,208 C 360,230 320,230 320,272" />
+    <path d="M 372,290 C 390,310 410,310 428,290" />
+    <path d="M 460,308 C 480,330 480,350 460,372" />
+    <path d="M 492,390 C 550,390 600,300 600,208" />
+    <path d="M 600,208 C 580,230 540,230 540,272" />
+    <path d="M 592,290 C 610,310 630,310 648,290" />
+    <path d="M 712,290 C 760,290 800,250 800,208" />
+  </g>
+
+  <!-- Nodes -->
+  <g stroke="var(--brand-500)" stroke-width="2">
+    <!-- Root Node -->
+    <rect x="410" y="72" width="80" height="36" rx="18" fill="var(--brand-500)" />
+    
+    <!-- Level 1 Nodes -->
+    <rect x="128" y="172" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="368" y="172" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="588" y="172" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="788" y="172" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    
+    <!-- Level 2 Nodes -->
+    <rect x="68" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="208" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="308" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="428" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="528" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="648" y="272" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    
+    <!-- Level 3 Nodes -->
+    <rect x="18" y="372" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="118" y="372" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="208" y="372" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+    <rect x="428" y="372" width="64" height="36" rx="18" fill="var(--bg-elevated)" />
+  </g>
+
+  <!-- Node Labels -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">
+    <!-- Root Label -->
+    <g fill="var(--on-brand-lo)">
+      <text x="450" y="96" class="gsvg-en">Root</text>
+      <text x="450" y="96" class="gsvg-ar">الجذر</text>
+    </g>
+    
+    <!-- Other Node Labels -->
+    <g fill="var(--text-primary)">
+      <text x="160" y="196">1</text>
+      <text x="400" y="196">2</text>
+      <text x="620" y="196">3</text>
+      <text x="820" y="196">9</text>
+      
+      <text x="100" y="296">1.1</text>
+      <text x="240" y="296">1.2</text>
+      <text x="340" y="296">2.2</text>
+      <text x="460" y="296">2.10</text>
+      <text x="560" y="296">3.4</text>
+      <text x="680" y="296">3.21</text>
+      
+      <text x="50" y="396">1.1.5</text>
+      <text x="150" y="396">1.1.18</text>
+      <text x="240" y="396">1.2.6</text>
+      <text x="460" y="396">2.10.9</text>
+    </g>
+  </g>
+
+  <!-- Traversal Sequence Indicators -->
+  <g>
+    <!-- Circles -->
+    <g fill="var(--brand-500)">
+      <circle cx="280" cy="120" r="11" />
+      <circle cx="110" cy="240" r="11" />
+      <circle cx="55" cy="340" r="11" />
+      <circle cx="100" cy="405" r="11" />
+      <circle cx="205" cy="360" r="11" />
+      <circle cx="255" cy="340" r="11" />
+      <circle cx="340" cy="320" r="11" />
+      <circle cx="350" cy="240" r="11" />
+      <circle cx="400" cy="305" r="11" />
+      <circle cx="475" cy="340" r="11" />
+      <circle cx="560" cy="320" r="11" />
+      <circle cx="570" cy="240" r="11" />
+      <circle cx="620" cy="305" r="11" />
+      <circle cx="765" cy="260" r="11" />
+    </g>
+    
+    <!-- Numbers -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle">
+      <text x="280" y="124">1</text>
+      <text x="110" y="244">2</text>
+      <text x="55" y="344">3</text>
+      <text x="100" y="409">4</text>
+      <text x="205" y="364">5</text>
+      <text x="255" y="344">6</text>
+      <text x="340" y="324">7</text>
+      <text x="350" y="244">8</text>
+      <text x="400" y="309">9</text>
+      <text x="475" y="344">10</text>
+      <text x="560" y="324">11</text>
+      <text x="570" y="244">12</text>
+      <text x="620" y="309">13</text>
+      <text x="765" y="264">14</text>
+    </g>
+  </g>
+
+  <!-- Legend -->
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">
+    <!-- Legend Item 1 -->
+    <path d="M 220,505 L 270,505" stroke="var(--border-color)" stroke-width="2" fill="none" />
+    <text x="350" y="510" text-anchor="middle" class="gsvg-en">Tree Structure</text>
+    <text x="350" y="510" text-anchor="middle" class="gsvg-ar">هيكل الشجرة</text>
+    
+    <!-- Legend Item 2 -->
+    <path d="M 480,505 L 530,505" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" fill="none" marker-end="url(#arrow)" />
+    <text x="630" y="510" text-anchor="middle" class="gsvg-en">Get-Next-Request Path</text>
+    <text x="630" y="510" text-anchor="middle" class="gsvg-ar">مسار طلب العنصر التالي</text>
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">رتب الأرقام التالية ترتيباً معجمياً: 5, 512, 52, 6, 10</template>
+      <template class="content-en">Order the following numbers lexicographically: 5, 512, 52, 6, 10</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>10, 5, 512, 52, 6</p></template>
+      <template class="content-en"><p>10, 5, 512, 52, 6</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="snmp-mib-functional-model" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> قاعدة معلومات الإدارة (MIB) والنموذج الوظيفي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> SNMP MIB and Functional Model</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يحتوي SNMPv1 MIB على العديد من الكائنات التي تم إهمالها لاحقاً، بينما يعتمد النموذج الوظيفي على مجالات الإدارة الخمسة (FCAPS).</p></template>
+    <template class="content-en"><p>The SNMPv1 MIB contains many objects that were later deprecated, while its functional model relies on the five management areas (FCAPS).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>SNMP MIB:</b> يحتوي SNMPv1 MIB على عدد كبير جداً من الكائنات التي لم تكن مستخدمة فعلياً في التطبيقات العملية. ونتيجة لذلك، قام إصدار SNMPv2 بإلغاء (obsolete) وإهمال (deprecate) عدد كبير منها لتبسيط قاعدة المعلومات.</p><p><b>النموذج الوظيفي (Functional Model):</b> على الرغم من أن SNMPv1 لا يحدد النموذج الوظيفي بشكل رسمي، إلا أن التطبيقات تُبنى ضمن سياسة الوصول القائمة على المجتمع لتنفيذ وظائف الإدارة الأساسية:</p><ul><li>إدارة الأعطال (Fault management)</li><li>إدارة التكوين (Configuration management)</li><li>إدارة المحاسبة (Accounting management)</li><li>إدارة الأداء (Performance management)</li><li>إدارة الأمن (Security management)</li></ul></template>
+    <template class="content-en"><p><b>SNMP MIB:</b> SNMPv1 MIB has too many objects that are not used in practical scenarios. Consequently, SNMPv2 obsoleted and deprecated a large number of them to streamline the management information base.</p><p><b>Functional Model:</b> Although SNMPv1 does not formally define the functional model, applications are built in the community-based access policy of the SNMP administrative model to implement core functions:</p><ul><li>Fault management</li><li>Configuration management</li><li>Accounting management</li><li>Performance management</li><li>Security management</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عدم وجود تعريف رسمي للنموذج الوظيفي في SNMPv1 يعني أن البروتوكول يوفر فقط الآلية (Get, Set, Trap)، ويترك مسؤولية تفسير هذه البيانات واستخدامها (مثل رسم الرسوم البيانية للأداء أو إصدار تذاكر الأعطال) لتطبيق مدير الشبكة (NMS).</p><p>مجالات الإدارة الخمسة تُعرف اختصاراً بـ FCAPS، وهي معيار ISO لإدارة الشبكات، وتُطبق باستخدام أدوات SNMP.</p></template>
+    <template class="content-en"><p>The lack of a formal functional model definition in SNMPv1 means the protocol only provides the mechanism (Get, Set, Trap). The responsibility of interpreting and utilizing this data (e.g., graphing performance or generating fault tickets) is left entirely to the Network Management System (NMS) application.</p><p>The five management areas are commonly known by the acronym <span class="smart-term" data-term-en="FCAPS" data-ar="نموذج FCAPS" data-en-def="An acronym for Fault, Configuration, Accounting, Performance, and Security management.">FCAPS<span class="smart-term-tooltip"></span></span>, which is the ISO network management standard, implemented practically using SNMP tools.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي من وظائف FCAPS يعتمد بشكل كبير على رسائل Trap؟</template>
+      <template class="content-en">Which of the FCAPS functions relies heavily on Trap messages?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>إدارة الأعطال (Fault management)، لأن الفخاخ تنبه المدير فور حدوث مشكلة (مثل انقطاع رابط).</p></template>
+      <template class="content-en"><p>Fault management, because traps immediately alert the manager when an issue occurs (like a link going down).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه المراجعة السريعة للوحدة الخامسة. ركزوا معي جيداً، فهذه الوحدة هي قلب بروتوكول SNMP. في الامتحان، يجب أن تميزوا بوضوح بين الرسائل الخمس: المدير يطلب (Get, GetNext, Set) والوكيل يرد (Response) أو يطلق إنذاراً (Trap). تذكروا أن SNMPv1 بسيط جداً، فهو يعتمد على 'المجتمع' (Community) للمصادقة، وهو غير مشفر إطلاقاً! نقطة أخرى حاسمة للامتحان هي 'الترتيب المعجمي' (Lexicographic Order)؛ تذكروا دائماً أنه يعامل الأرقام كالنصوص (115 يأتي قبل 2)، وهذا هو الأساس الذي تعتمد عليه رسالة Get-Next-Request لاكتشاف الجداول التي لا نعرف حجمها. أخيراً، لا تنسوا الفخاخ السبعة (Traps) والفرق الجوهري بين coldStart و warmStart. راجعوا هذه النقاط وستكونون مستعدين تماماً للتفوق!</template>
+    <template class="content-en">Welcome, future engineers, to this quick review of Module 5. Pay close attention, as this module is the heart of the SNMP protocol. For the exam, you must clearly distinguish between the five messages: the Manager requests (Get, GetNext, Set) and the Agent replies (Response) or triggers an alarm (Trap). Remember that SNMPv1 is very simple; it relies on the 'Community' for authentication, which is completely unencrypted! Another critical exam topic is 'Lexicographic Order'; always remember it treats numbers like text (115 comes before 2), which is the foundation for Get-Next-Request to discover tables of unknown sizes. Finally, don't forget the seven generic Traps and the core difference between coldStart and warmStart. Review these points, and you'll be perfectly prepared to ace the exam!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الرسائل التي يرسلها المدير (Manager) في SNMPv1؟</template>
+          <template class="content-en">What messages does the Manager send in SNMPv1?</template>
+          <span class="content-target">ما هي الرسائل التي يرسلها المدير (Manager) في SNMPv1؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يرسل المدير ثلاث رسائل: Get-Request، Get-Next-Request، و Set-Request.</template>
+          <template class="content-en">The manager sends three messages: Get-Request, Get-Next-Request, and Set-Request.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تحديد صلاحيات الوصول في SNMPv1؟</template>
+          <template class="content-en">How are access privileges determined in SNMPv1?</template>
+          <span class="content-target">كيف يتم تحديد صلاحيات الوصول في SNMPv1؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال ملف تعريف المجتمع (Community Profile) الذي يجمع بين عرض MIB (MIB View) ووضع الوصول (Access Mode).</template>
+          <template class="content-en">Through the Community Profile, which combines the MIB View and the Access Mode.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور الوكيل الوكيل (Proxy Agent)؟</template>
+          <template class="content-en">What is the role of a Proxy Agent?</template>
+          <span class="content-target">ما هو دور الوكيل الوكيل (Proxy Agent)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعمل كوسيط لإدارة الأجهزة التي لا تدعم بروتوكول SNMP، حيث يترجم طلبات SNMP إلى البروتوكول الأصلي للجهاز.</template>
+          <template class="content-en">It acts as an intermediary to manage non-SNMP devices, translating SNMP requests into the device's native protocol.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم Get-Next-Request بدلاً من Get-Request عند قراءة الجداول؟</template>
+          <template class="content-en">Why use Get-Next-Request instead of Get-Request when reading tables?</template>
+          <span class="content-target">لماذا نستخدم Get-Next-Request بدلاً من Get-Request عند قراءة الجداول؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الجداول ديناميكية وقد لا نعرف عدد صفوفها أو مؤشراتها الدقيقة. Get-Next-Request تجلب العنصر التالي تلقائياً.</template>
+          <template class="content-en">Because tables are dynamic and we might not know their exact row count or indices. Get-Next-Request automatically fetches the next item.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين المنفذ 161 والمنفذ 162؟</template>
+          <template class="content-en">What is the difference between port 161 and port 162?</template>
+          <span class="content-target">ما الفرق بين المنفذ 161 والمنفذ 162؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المنفذ 161 يُستخدم لاستقبال رسائل SNMP العادية (الطلبات والاستجابات)، بينما المنفذ 162 مخصص حصرياً لاستقبال رسائل الفخ (Traps).</template>
+          <template class="content-en">Port 161 is used to receive standard SNMP messages (requests/responses), while port 162 is dedicated exclusively to receiving Traps.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يعني الترتيب المعجمي (Lexicographic Order) في SNMP؟</template>
+          <template class="content-en">What does Lexicographic Order mean in SNMP?</template>
+          <span class="content-target">ماذا يعني الترتيب المعجمي (Lexicographic Order) في SNMP؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو ترتيب معرفات الكائنات (OIDs) من اليسار إلى اليمين كأنها نصوص، مما يسمح باجتياز شجرة MIB بشكل منهجي.</template>
+          <template class="content-en">It is the ordering of OIDs from left to right as if they were text, allowing systematic traversal of the MIB tree.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو حقل RequestID وما أهميته؟</template>
+          <template class="content-en">What is the RequestID field and why is it important?</template>
+          <span class="content-target">ما هو حقل RequestID وما أهميته؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو رقم فريد يوضع في الطلب ويعاد في الاستجابة، وأهميته تكمن في ربط الاستجابات بطلباتها الأصلية لأن بروتوكول UDP لا يضمن الترتيب.</template>
+          <template class="content-en">It is a unique number placed in the request and returned in the response. It's important for matching responses to their original requests since UDP doesn't guarantee order.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين coldStart و warmStart؟</template>
+          <template class="content-en">What is the difference between coldStart and warmStart?</template>
+          <span class="content-target">ما الفرق بين coldStart و warmStart؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">كلاهما يعني إعادة تشغيل الوكيل، لكن coldStart يشير إلى احتمال تغير الإعدادات، بينما warmStart يؤكد أن الإعدادات لم تتغير.</template>
+          <template class="content-en">Both mean the agent reinitialized, but coldStart indicates settings may have changed, while warmStart confirms settings are unaltered.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو VarBindList؟</template>
+          <template class="content-en">What is a VarBindList?</template>
+          <span class="content-target">ما هو VarBindList؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي قائمة داخل رسالة SNMP تحتوي على أزواج من المتغيرات (الكائنات المدارة) وقيمها.</template>
+          <template class="content-en">It is a list within an SNMP message containing pairs of variables (managed objects) and their values.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحدد المدير (Manager) نهاية الجدول عند استخدام Get-Next-Request؟</template>
+          <template class="content-en">How does the Manager determine the end of a table when using Get-Next-Request?</template>
+          <span class="content-target">كيف يحدد المدير (Manager) نهاية الجدول عند استخدام Get-Next-Request؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عندما ترجع استجابة الوكيل كائناً ينتمي إلى مجموعة MIB التالية (خارج نطاق الجدول الحالي)، يدرك المدير أن الجدول قد انتهى.</template>
+          <template class="content-en">When the agent's response returns an object belonging to the next MIB group (outside the current table's scope), the manager knows the table has ended.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي رسالة Get-Request؟",
+      "en": "What is a Get-Request message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رسالة يرسلها المدير لطلب بيانات محددة من الوكيل.",
+        "en": "A message sent by the manager requesting specific data from the agent."
+      },
+      "example": {
+        "ar": "طلب قيمة sysDescr.0 لمعرفة وصف النظام.",
+        "en": "Requesting sysDescr.0 to get the system description."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي رسالة Set-Request؟",
+      "en": "What is a Set-Request message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "رسالة يرسلها المدير لتهيئة أو تغيير قيمة عنصر في الشبكة.",
+        "en": "A message sent by the manager to initialize or change the value of a network element."
+      },
+      "example": {
+        "ar": "تغيير اسم النظام (sysName).",
+        "en": "Changing the system name (sysName)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هو الفخ (Trap) في SNMP؟",
+      "en": "What is a Trap in SNMP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إنذار غير متزامن يتم إنشاؤه وإرساله بواسطة الوكيل إلى المدير عند وقوع حدث مهم.",
+        "en": "An asynchronous alarm generated and sent by an agent to the manager when a significant event occurs."
+      },
+      "example": {
+        "ar": "إرسال فخ linkDown عند انقطاع كابل الشبكة.",
+        "en": "Sending a linkDown trap when a network cable is disconnected."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو فخ coldStart؟",
+      "en": "What is the coldStart trap?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فخ يشير إلى أن الوكيل يعيد تشغيل نفسه وأن تكوينه ربما يكون قد تغير.",
+        "en": "A trap indicating the agent is reinitializing and its configuration may have been altered."
+      },
+      "example": {
+        "ar": "إعادة تشغيل الموجه بعد انقطاع التيار الكهربائي.",
+        "en": "Rebooting a router after a power failure."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هو فخ warmStart؟",
+      "en": "What is the warmStart trap?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فخ يشير إلى أن الوكيل يعيد تشغيل نفسه ولكن تكوينه لم يتغير.",
+        "en": "A trap indicating the agent is reinitializing but its configuration is not altered."
+      },
+      "example": {
+        "ar": "إعادة تشغيل خدمة SNMP برمجياً دون تغيير الإعدادات.",
+        "en": "Soft restarting the SNMP service without changing settings."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو المجتمع (Community) في SNMPv1؟",
+      "en": "What is a Community in SNMPv1?"
+    },
+    "back": {
+      "definition": {
+        "ar": "اقتران بين كياني تطبيق (مدير ووكيل) يعمل كآلية مصادقة بسيطة.",
+        "en": "A pairing of two application entities (manager and agent) acting as a simple authentication mechanism."
+      },
+      "example": {
+        "ar": "استخدام كلمة 'public' كاسم مجتمع للقراءة فقط.",
+        "en": "Using 'public' as a read-only community string."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "مما يتكون ملف تعريف المجتمع (Community Profile)؟",
+      "en": "What makes up a Community Profile?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتكون من عرض MIB (MIB View) ووضع الوصول (Access Mode).",
+        "en": "It consists of a MIB view and an SNMP access mode."
+      },
+      "example": {
+        "ar": "مجتمع يرى فقط بيانات الواجهات (MIB View) بصلاحية القراءة فقط (Access Mode).",
+        "en": "A community that only sees interface data (MIB View) with read-only rights (Access Mode)."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي وظيفة الوكيل الوكيل (Proxy Agent)؟",
+      "en": "What is the function of a Proxy Agent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يُمكّن عناصر الشبكة التي لا تدعم SNMP من إدارتها بواسطة مدير SNMP عبر ترجمة البروتوكولات.",
+        "en": "Enables non-SNMP network elements to be managed by an SNMP manager by translating protocols."
+      },
+      "example": {
+        "ar": "إدارة شبكة X.25 قديمة باستخدام مدير SNMP حديث.",
+        "en": "Managing a legacy X.25 network using a modern SNMP manager."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "أي بروتوكول نقل يستخدمه SNMP؟",
+      "en": "Which transport protocol does SNMP use?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم بروتوكول UDP (مخطط بيانات المستخدم).",
+        "en": "It uses the UDP (User Datagram Protocol)."
+      },
+      "example": {
+        "ar": "تغليف رسائل SNMP داخل UDP Datagrams.",
+        "en": "Encapsulating SNMP messages inside UDP Datagrams."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي المنافذ (Ports) المستخدمة في SNMP؟",
+      "en": "What ports are used in SNMP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المنفذ 161 للرسائل العادية، والمنفذ 162 لرسائل الفخ (Traps).",
+        "en": "Port 161 for general messages, and Port 162 for Traps."
+      },
+      "example": {
+        "ar": "يستمع المدير على المنفذ 162 لتلقي التنبيهات.",
+        "en": "The manager listens on port 162 to receive alerts."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو VarBind؟",
+      "en": "What is a VarBind?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هو اقتران بين اسم المتغير (الكائن المدار) وقيمته داخل رسالة SNMP.",
+        "en": "The pairing of a variable name (Managed Object) and its value within an SNMP message."
+      },
+      "example": {
+        "ar": "sysName.0 = 'Router-A'",
+        "en": "sysName.0 = 'Router-A'"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما فائدة حقل RequestID؟",
+      "en": "What is the purpose of the RequestID field?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يُستخدم لتتبع الرسائل ومطابقة الاستجابة (Get-Response) مع الطلب الأصلي.",
+        "en": "Used to track messages and match a response (Get-Response) with its original request."
+      },
+      "example": {
+        "ar": "طلب برقم 4 سيستقبل استجابة تحمل نفس الرقم 4.",
+        "en": "A request with ID 4 will receive a response bearing the same ID 4."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ماذا يمثل حقل ErrorIndex؟",
+      "en": "What does the ErrorIndex field represent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى رقم الـ VarBind في القائمة الذي حدث فيه الخطأ الأول.",
+        "en": "Indicates the number of the VarBind in the list where the first error occurred."
+      },
+      "example": {
+        "ar": "إذا كان ErrorIndex = 2، فالخطأ في المتغير الثاني.",
+        "en": "If ErrorIndex = 2, the error is in the second variable."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الترتيب المعجمي (Lexicographic Order)؟",
+      "en": "What is Lexicographic Order?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لترتيب الأرقام (OIDs) تبدأ من الرقم في أقصى اليسار، وتُستخدم لاجتياز شجرة MIB.",
+        "en": "A method of ordering numbers (OIDs) starting from the leftmost digit, used to traverse the MIB tree."
+      },
+      "example": {
+        "ar": "الرقم 115 يأتي قبل 2.",
+        "en": "The number 115 comes before 2."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو مسح MIB (MIB Walk)؟",
+      "en": "What is a MIB Walk?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية بناء أو قراءة شجرة MIB بالكامل عن طريق تكرار إرسال رسائل Get-Next-Request.",
+        "en": "The process of building or reading the entire MIB tree by repeatedly sending Get-Next-Request messages."
+      },
+      "example": {
+        "ar": "استخدام أداة snmpwalk لجلب كل بيانات الموجه.",
+        "en": "Using the snmpwalk tool to fetch all router data."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "لماذا نستخدم Get-Next-Request مع الجداول؟",
+      "en": "Why use Get-Next-Request with tables?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن عدد صفوف الجدول يتغير ديناميكياً، وهذه الرسالة تجلب الصف التالي دون الحاجة لمعرفة مؤشره الدقيق.",
+        "en": "Because table row counts change dynamically, and this message fetches the next row without needing its exact index."
+      },
+      "example": {
+        "ar": "قراءة جدول التوجيه الذي تتغير مساراته باستمرار.",
+        "en": "Reading a routing table whose routes change constantly."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "ما هي مجالات الإدارة الخمسة (FCAPS)؟",
+      "en": "What are the five management areas (FCAPS)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إدارة الأعطال، التكوين، المحاسبة، الأداء، والأمن.",
+        "en": "Fault, Configuration, Accounting, Performance, and Security management."
+      },
+      "example": {
+        "ar": "مراقبة استهلاك الباندويث (الأداء).",
+        "en": "Monitoring bandwidth usage (Performance)."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "هل يوفر SNMPv1 تشفيراً للبيانات؟",
+      "en": "Does SNMPv1 provide data encryption?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، الاتصال في SNMPv1 غير آمن ولا يوجد به تشفير.",
+        "en": "No, communication in SNMPv1 is not secured and has no encryption."
+      },
+      "example": {
+        "ar": "يتم إرسال اسم المجتمع (Community string) كنص صريح.",
+        "en": "The community string is sent in plaintext."
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "ماذا يعني أن الكائن 'not-accessible'؟",
+      "en": "What does it mean if an object is 'not-accessible'?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعني أنه لا يمكن إجراء أي عملية (Get أو Set) عليه، بغض النظر عن صلاحيات المجتمع.",
+        "en": "It means no operation (Get or Set) can be performed on it, regardless of community privileges."
+      },
+      "example": {
+        "ar": "الجداول (Tables) وإدخالات الجداول (Table entries) غالباً ما تكون غير قابلة للوصول المباشر.",
+        "en": "Tables and table entries are often not directly accessible."
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "ما هو فخ authenticationFailure؟",
+      "en": "What is the authenticationFailure trap?"
+    },
+    "back": {
+      "definition": {
+        "ar": "فخ يرسله الوكيل عند فشل محاولة مصادقة، مثل استخدام اسم مجتمع غير صحيح.",
+        "en": "A trap sent by the agent when an authentication attempt fails, such as using an incorrect community name."
+      },
+      "example": {
+        "ar": "محاولة اختراق باستخدام كلمة مرور افتراضية.",
+        "en": "A hacking attempt using a default password."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من الرسائل التالية يتم إرسالها من الوكيل (Agent) إلى المدير (Manager)؟",
+      "en": "Which of the following messages is sent from the Agent to the Manager?"
+    },
+    "options": {
+      "ar": [
+        "Get-Request",
+        "Set-Request",
+        "Get-Next-Request",
+        "Trap"
+      ],
+      "en": [
+        "Get-Request",
+        "Set-Request",
+        "Get-Next-Request",
+        "Trap"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "رسائل Trap و Get-Response هي الوحيدة التي تصدر من الوكيل إلى المدير.",
+      "en": "Trap and Get-Response are the only messages sent from the agent to the manager."
+    },
+    "hint": {
+      "ar": "تذكر الرسائل غير المتزامنة التي تنبه بوجود مشكلة.",
+      "en": "Think of asynchronous messages that alert about an issue."
+    },
+    "difficulty": "easy",
+    "conceptId": "snmp-system-architecture-messages"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو المنفذ الافتراضي الذي يستقبل عليه مدير SNMP رسائل الفخ (Traps)؟",
+      "en": "What is the default port on which the SNMP manager receives Traps?"
+    },
+    "options": {
+      "ar": [
+        "161",
+        "162",
+        "80",
+        "21"
+      ],
+      "en": [
+        "161",
+        "162",
+        "80",
+        "21"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتم استقبال رسائل SNMP العادية على المنفذ 161، بينما تُستقبل الفخاخ على المنفذ 162.",
+      "en": "Normal SNMP messages are received on port 161, while traps are received on port 162."
+    },
+    "hint": {
+      "ar": "إنه الرقم الأكبر بين منفذي SNMP.",
+      "en": "It's the higher number of the two SNMP ports."
+    },
+    "difficulty": "easy",
+    "conceptId": "protocol-entities-pdu"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "أي فخ (Trap) يشير إلى أن الوكيل أعاد تشغيل نفسه مع احتمال تغير إعداداته؟",
+      "en": "Which trap indicates that the agent has reinitialized itself and its configuration may have been altered?"
+    },
+    "options": {
+      "ar": [
+        "warmStart",
+        "coldStart",
+        "linkDown",
+        "enterpriseSpecific"
+      ],
+      "en": [
+        "warmStart",
+        "coldStart",
+        "linkDown",
+        "enterpriseSpecific"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "coldStart يعني إعادة تشغيل مع احتمال تغير الإعدادات، بينما warmStart يعني إعادة تشغيل دون تغير الإعدادات.",
+      "en": "coldStart means reinitialization with possible config changes, while warmStart means no config changes."
+    },
+    "hint": {
+      "ar": "فكر في التشغيل من نقطة الصفر.",
+      "en": "Think of starting from scratch."
+    },
+    "difficulty": "medium",
+    "conceptId": "snmp-traps"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "مما يتكون ملف تعريف المجتمع (Community Profile)؟",
+      "en": "What constitutes a Community Profile?"
+    },
+    "options": {
+      "ar": [
+        "اسم المجتمع وكلمة المرور",
+        "عرض MIB ووضع الوصول",
+        "عنوان IP والمنفذ",
+        "المدير والوكيل"
+      ],
+      "en": [
+        "Community name and password",
+        "MIB view and Access mode",
+        "IP address and Port",
+        "Manager and Agent"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ملف تعريف المجتمع يحدد ما يمكن رؤيته (MIB view) وما يمكن فعله (Access mode).",
+      "en": "A community profile defines what can be seen (MIB view) and what can be done (Access mode)."
+    },
+    "hint": {
+      "ar": "يتعلق بالرؤية والصلاحيات.",
+      "en": "It relates to visibility and permissions."
+    },
+    "difficulty": "medium",
+    "conceptId": "administrative-model-community"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الترتيب المعجمي الصحيح للأرقام التالية: 2, 15, 115, 3؟",
+      "en": "What is the correct lexicographic order for the following numbers: 2, 15, 115, 3?"
+    },
+    "options": {
+      "ar": [
+        "2, 3, 15, 115",
+        "115, 15, 2, 3",
+        "115, 15, 3, 2",
+        "15, 115, 2, 3"
+      ],
+      "en": [
+        "2, 3, 15, 115",
+        "115, 15, 2, 3",
+        "115, 15, 3, 2",
+        "15, 115, 2, 3"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الترتيب المعجمي يقارن الأرقام من اليسار لليمين كأنها نصوص. 115 يبدأ بـ 1، ثم 15 يبدأ بـ 1، ثم 2، ثم 3.",
+      "en": "Lexicographic order compares numbers left-to-right like text. 115 starts with 1, then 15 starts with 1, then 2, then 3."
+    },
+    "hint": {
+      "ar": "عامل الأرقام كأنها كلمات في قاموس.",
+      "en": "Treat the numbers like words in a dictionary."
+    },
+    "difficulty": "hard",
+    "conceptId": "lexicographic-order-get-next"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي الرسالة الأفضل لقراءة جدول تتغير عدد صفوفه باستمرار؟",
+      "en": "Which message is best for reading a table whose number of rows changes constantly?"
+    },
+    "options": {
+      "ar": [
+        "Get-Request",
+        "Set-Request",
+        "Get-Next-Request",
+        "Trap"
+      ],
+      "en": [
+        "Get-Request",
+        "Set-Request",
+        "Get-Next-Request",
+        "Trap"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "Get-Next-Request تجلب العنصر التالي في الشجرة، مما يسمح باجتياز الجداول دون معرفة عدد الصفوف مسبقاً.",
+      "en": "Get-Next-Request fetches the next item in the tree, allowing table traversal without knowing the row count in advance."
+    },
+    "hint": {
+      "ar": "تبحث عن 'التالي'.",
+      "en": "You are looking for the 'next' one."
+    },
+    "difficulty": "medium",
+    "conceptId": "lexicographic-order-get-next"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي حقل في رسالة SNMP يُستخدم لمطابقة الاستجابة مع الطلب الأصلي؟",
+      "en": "Which field in an SNMP message is used to match a response with its original request?"
+    },
+    "options": {
+      "ar": [
+        "ErrorIndex",
+        "VarBind",
+        "RequestID",
+        "Community"
+      ],
+      "en": [
+        "ErrorIndex",
+        "VarBind",
+        "RequestID",
+        "Community"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "RequestID هو معرف فريد يرسله المدير ويعيده الوكيل في الاستجابة لربط الطلبات بالاستجابات.",
+      "en": "RequestID is a unique identifier sent by the manager and returned by the agent to link requests to responses."
+    },
+    "hint": {
+      "ar": "معرف الطلب.",
+      "en": "ID of the request."
+    },
+    "difficulty": "easy",
+    "conceptId": "protocol-entities-pdu"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هي وظيفة الوكيل الوكيل (Proxy Agent)؟",
+      "en": "What is the function of a Proxy Agent?"
+    },
+    "options": {
+      "ar": [
+        "تشفير رسائل SNMP",
+        "إدارة الأجهزة التي لا تدعم SNMP",
+        "تخزين بيانات MIB بشكل دائم",
+        "توليد رسائل Trap فقط"
+      ],
+      "en": [
+        "Encrypting SNMP messages",
+        "Managing non-SNMP devices",
+        "Storing MIB data permanently",
+        "Generating Trap messages only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الوكيل الوكيل يعمل كمترجم بين مدير SNMP والأجهزة التي تستخدم بروتوكولات أخرى غير SNMP.",
+      "en": "A proxy agent acts as a translator between an SNMP manager and devices using non-SNMP protocols."
+    },
+    "hint": {
+      "ar": "يعمل كوسيط للأجهزة القديمة.",
+      "en": "Acts as a middleman for legacy devices."
+    },
+    "difficulty": "medium",
+    "conceptId": "administrative-model-community"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "إذا كان ErrorIndex = 3 في رسالة Get-Response، ماذا يعني ذلك؟",
+      "en": "If ErrorIndex = 3 in a Get-Response message, what does it mean?"
+    },
+    "options": {
+      "ar": [
+        "حدث خطأ في الشبكة من النوع 3",
+        "الخطأ حدث في المتغير (VarBind) الثالث في القائمة",
+        "الوكيل أعاد التشغيل 3 مرات",
+        "الطلب تم رفضه 3 مرات"
+      ],
+      "en": [
+        "A network error of type 3 occurred",
+        "The error occurred in the third VarBind in the list",
+        "The agent rebooted 3 times",
+        "The request was rejected 3 times"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ErrorIndex يشير إلى موقع المتغير (VarBind) الذي تسبب في الخطأ داخل قائمة المتغيرات.",
+      "en": "ErrorIndex points to the position of the VarBind that caused the error within the variable list."
+    },
+    "hint": {
+      "ar": "يشير إلى فهرس (Index) في قائمة.",
+      "en": "It points to an index in a list."
+    },
+    "difficulty": "medium",
+    "conceptId": "protocol-entities-pdu"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من التالي ليس من ضمن مجالات الإدارة الخمسة (FCAPS)؟",
+      "en": "Which of the following is NOT one of the five management areas (FCAPS)?"
+    },
+    "options": {
+      "ar": [
+        "إدارة الأعطال (Fault)",
+        "إدارة التكوين (Configuration)",
+        "إدارة التوجيه (Routing)",
+        "إدارة الأداء (Performance)"
+      ],
+      "en": [
+        "Fault management",
+        "Configuration management",
+        "Routing management",
+        "Performance management"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "FCAPS تتكون من: Fault, Configuration, Accounting, Performance, Security. التوجيه ليس جزءاً منها.",
+      "en": "FCAPS stands for Fault, Configuration, Accounting, Performance, Security. Routing is not part of it."
+    },
+    "hint": {
+      "ar": "تذكر اختصار FCAPS.",
+      "en": "Remember the acronym FCAPS."
+    },
+    "difficulty": "easy",
+    "conceptId": "snmp-mib-functional-model"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يخطئ الكثيرون في الاعتقاد أن SNMPv1 يوفر اتصالاً آمناً. تذكر أن اسم المجتمع (Community String) يُرسل كنص صريح (Plaintext) ولا يوجد أي تشفير في الإصدار الأول.</template>
+    <template class="content-en">Many mistakenly believe SNMPv1 provides secure communication. Remember that the Community String is sent in plaintext and there is NO encryption in version 1.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الترتيب المعجمي (Lexicographic Order) هو السر وراء قدرة SNMP على قراءة الجداول الديناميكية. يتم ترتيب الأرقام من اليسار لليمين (مثل 115 قبل 2)، مما يسمح باجتياز الشجرة بشكل عمقي (Depth-first).</template>
+    <template class="content-en">Lexicographic Order is the secret behind SNMP's ability to read dynamic tables. Numbers are ordered left-to-right (e.g., 115 comes before 2), allowing a depth-first traversal of the tree.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">حقل ErrorIndex لا يحتوي على كود الخطأ، بل يحتوي على 'مؤشر' (Index) يخبرك أي متغير (VarBind) في طلبك هو الذي تسبب في المشكلة. كود الخطأ الفعلي موجود في ErrorStatus.</template>
+    <template class="content-en">The ErrorIndex field does not contain the error code; it contains an 'index' telling you WHICH variable (VarBind) in your request caused the problem. The actual error code is in ErrorStatus.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين coldStart و warmStart. كلاهما يعني إعادة تشغيل الوكيل، لكن coldStart يعني أن الإعدادات ربما تغيرت (تحذير أكبر)، بينما warmStart يضمن بقاء الإعدادات كما هي.</template>
+    <template class="content-en">Don't confuse coldStart and warmStart. Both mean the agent rebooted, but coldStart means settings might have changed (higher alert), while warmStart guarantees settings remained the same.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 6 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

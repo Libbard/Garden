@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT233" data-module="10" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الإدخال والإخراج (I/O) · IT233 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT233" data-page-title-en="IT233">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M09.html" data-gh-next="M11.html" data-gh-card="../../hub/course.html?code=IT233"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#io-requirements-interfaces" class="toc-link" data-bilingual>
+        <template class="content-ar">متطلبات وواجهات الإدخال/الإخراج</template>
+        <template class="content-en">I/O Requirements and Interfaces</template>
+        <span class="content-target">متطلبات وواجهات الإدخال/الإخراج</span>
+      </a>
+      <a href="#programmed-io" class="toc-link" data-bilingual>
+        <template class="content-ar">الإدخال/الإخراج المبرمج (Programmed I/O)</template>
+        <template class="content-en">Programmed I/O</template>
+        <span class="content-target">الإدخال/الإخراج المبرمج (Programmed I/O)</span>
+      </a>
+      <a href="#interrupts-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">المقاطعات (Interrupts)</template>
+        <template class="content-en">Interrupts</template>
+        <span class="content-target">المقاطعات (Interrupts)</span>
+      </a>
+      <a href="#interrupt-processing-methods" class="toc-link" data-bilingual>
+        <template class="content-ar">طرق معالجة المقاطعات (Vectored vs Polled)</template>
+        <template class="content-en">Interrupt Processing Methods</template>
+        <span class="content-target">طرق معالجة المقاطعات (Vectored vs Polled)</span>
+      </a>
+      <a href="#direct-memory-access-dma" class="toc-link" data-bilingual>
+        <template class="content-ar">الوصول المباشر للذاكرة (DMA)</template>
+        <template class="content-en">Direct Memory Access (DMA)</template>
+        <span class="content-target">الوصول المباشر للذاكرة (DMA)</span>
+      </a>
+      <a href="#io-module-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">وظائف وحدة الإدخال/الإخراج</template>
+        <template class="content-en">I/O Module Functions</template>
+        <span class="content-target">وظائف وحدة الإدخال/الإخراج</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 10</template>
+      <template class="content-en">Module 10</template>
+      <span class="content-target">الوحدة 10</span>
+    </span> · IT233
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الإدخال والإخراج (I/O)</h1>
+      <p class="hero-description">دراسة معمارية الإدخال والإخراج في الحاسب، بما في ذلك الإدخال/الإخراج المبرمج، المقاطعات، والوصول المباشر للذاكرة (DMA).</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Input / Output (I/O)</h1>
+      <p class="hero-description">Study of computer I/O architecture, including Programmed I/O, Interrupts, and Direct Memory Access (DMA).</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">معمارية الحاسب</span>
+      <span class="tag">الإدخال والإخراج</span>
+      <span class="tag">المقاطعات</span>
+      <span class="tag">الوصول المباشر للذاكرة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Computer Architecture</span>
+      <span class="tag">I/O</span>
+      <span class="tag">Interrupts</span>
+      <span class="tag">DMA</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم النموذج الأساسي ومتطلبات واجهات الإدخال والإخراج.</span></li>
+      <li><span class="obj-icon">✦</span><span>التمييز بين تقنيات الإدخال والإخراج: المبرمج، الموجه بالمقاطعة، والوصول المباشر للذاكرة.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح دورة المقاطعة وكيفية معالجة وحدة المعالجة المركزية للمقاطعات المتعددة.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف آلية عمل الوصول المباشر للذاكرة (DMA) ودور وحدة الإدخال/الإخراج.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the basic model and requirements of I/O interfaces.</span></li>
+      <li><span class="obj-icon">✦</span><span>Differentiate between I/O techniques: Programmed, Interrupt-Driven, and DMA.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the interrupt cycle and how the CPU handles multiple interrupts.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the mechanism of Direct Memory Access (DMA) and the role of the I/O module.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="io-requirements-interfaces" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> متطلبات وواجهات الإدخال/الإخراج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> I/O Requirements and Interfaces</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>واجهات الإدخال/الإخراج هي المترجم الذي يربط بين المعالج السريع جداً والأجهزة الطرفية البطيئة والمتنوعة.</p></template>
+    <template class="content-en"><p>I/O interfaces act as translators bridging the gap between the ultra-fast CPU and diverse, slower peripheral devices.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد سرعة المعالجة بشكل أساسي على قدرة عمليات الإدخال/الإخراج على مواكبة المعالج. تتطلب أنظمة الإدخال/الإخراج ما يلي:</p><ul><li>وسيلة لعنونة الأجهزة الطرفية المختلفة.</li><li>طريقة للأجهزة لبدء الاتصال مع وحدة المعالجة المركزية (CPU).</li><li>وسيلة فعالة لنقل البيانات مباشرة بين الإدخال/الإخراج والذاكرة للكميات الكبيرة.</li><li>نواقل (Buses) تدعم معدلات نقل بيانات عالية.</li><li>وسائل للتعامل مع أجهزة ذات متطلبات تحكم مختلفة تماماً.</li></ul><p>تعتبر واجهات الإدخال/الإخراج ضرورية بسبب اختلاف التنسيقات، عدم التوافق في السرعة (مما يجعل المزامنة صعبة)، واختلاف طبيعة البيانات (تدفق مستمر مقابل دفعات).</p></template>
+    <template class="content-en"><p>Processing speed is determined primarily by the ability of I/O operations to stay ahead of the processor. I/O requirements include:</p><ul><li>Means for addressing different <span class="smart-term" data-term-en="Peripheral Device" data-ar="الجهاز الطرفي" data-en-def="External devices connected to the computer, like keyboards, mice, and printers.">peripheral device<span class="smart-term-tooltip"></span></span>s.</li><li>A way for peripheral devices to initiate communication with the CPU.</li><li>An efficient means of transferring data directly between I/O and memory for large transfers.</li><li>Buses that support high data transfer rates.</li><li>Means for handling devices with extremely different control requirements.</li></ul><p><span class="smart-term" data-term-en="I/O Interface" data-ar="واجهة الإدخال/الإخراج" data-en-def="Hardware that connects the CPU/memory to peripheral devices, handling speed and format differences.">I/O Interface<span class="smart-term-tooltip"></span></span>s are necessary because of different formats required by devices, speed incompatibilities making synchronization difficult, and the difference between bursts of data vs. streaming data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بدون واجهات الإدخال/الإخراج، ستضطر وحدة المعالجة المركزية للتعامل مع الإشارات الكهربائية والتوقيتات الخاصة بكل جهاز على حدة، مما يجعل تصميم المعالج مستحيلاً.</p><p>تقوم الواجهة بتوفير التخزين المؤقت (Buffering) لحل مشكلة عدم التوافق في السرعة، حيث تستقبل البيانات البطيئة من الجهاز وترسلها كدفعة سريعة للمعالج، والعكس صحيح.</p></template>
+    <template class="content-en"><p>Without I/O interfaces, the CPU would have to handle the specific electrical signals and timings of every single peripheral, making CPU design impossibly complex.</p><p>The interface provides buffering to solve speed incompatibilities, receiving slow data from a device and sending it as a fast burst to the CPU, or vice versa.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Block diagram showing a Simple I/O Configuration. Three blocks connected horizontally: 'CPU' connected to 'I/O module', which is connected to 'I/O device'. Use clean educational style, dark background #0d1117, accent color #007acc. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="io-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-600)" />
+      <stop offset="100%" stop-color="var(--brand-800)" />
+    </linearGradient>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow-head" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-tail" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto">
+      <path d="M10,0 L0,5 L10,10 Z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Simple I/O Configuration</text>
+  <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">تكوين الإدخال/الإخراج البسيط</text>
+
+  <!-- Connections (Buses) -->
+  <!-- CPU to I/O Module -->
+  <line x1="230" y1="150" x2="310" y2="150" stroke="var(--brand-500)" stroke-width="4" marker-start="url(#arrow-tail)" marker-end="url(#arrow-head)" />
+  <!-- I/O Module to I/O Device -->
+  <line x1="490" y1="150" x2="570" y2="150" stroke="var(--brand-500)" stroke-width="4" marker-start="url(#arrow-tail)" marker-end="url(#arrow-head)" />
+
+  <!-- Connection Labels -->
+  <text x="270" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">System Bus</text>
+  <text x="270" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">ناقل النظام</text>
+
+  <text x="530" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">External Link</text>
+  <text x="530" y="130" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">رابط خارجي</text>
+
+  <!-- Block 1: CPU -->
+  <rect x="60" y="90" width="160" height="120" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="140" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">CPU</text>
+  <text x="140" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المعالج (CPU)</text>
+  <text x="140" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--text-secondary)" class="gsvg-en">Processor</text>
+  <text x="140" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--text-secondary)" class="gsvg-ar">وحدة المعالجة المركزية</text>
+
+  <!-- Block 2: I/O Module (Highlighted) -->
+  <rect x="320" y="90" width="160" height="120" rx="12" fill="url(#io-grad)" stroke="var(--brand-600)" stroke-width="2" />
+  <text x="400" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">I/O Module</text>
+  <text x="400" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">وحدة الإدخال/الإخراج</text>
+  <text x="400" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-en">Interface / Controller</text>
+  <text x="400" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--on-brand-hi)" opacity="0.9" class="gsvg-ar">واجهة / متحكم</text>
+
+  <!-- Block 3: I/O Device -->
+  <rect x="580" y="90" width="160" height="120" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="660" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">I/O Device</text>
+  <text x="660" y="145" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">جهاز طرفي</text>
+  <text x="660" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--text-secondary)" class="gsvg-en">Peripheral</text>
+  <text x="660" y="170" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="normal" fill="var(--text-secondary)" class="gsvg-ar">معدات الإدخال/الإخراج</text>
+
+  <!-- Bottom Section: Key Requirements -->
+  <rect x="60" y="250" width="680" height="120" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" stroke-dasharray="6 4" />
+  
+  <text x="400" y="280" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Key I/O Requirements &amp; Interface Functions</text>
+  <text x="400" y="280" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">متطلبات الإدخال/الإخراج ووظائف الواجهة</text>
+
+  <!-- Requirement 1 -->
+  <circle cx="180" cy="320" r="14" fill="var(--brand-500)" />
+  <text x="180" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+  <text x="180" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Speed Synchronization</text>
+  <text x="180" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">مزامنة السرعة</text>
+
+  <!-- Requirement 2 -->
+  <circle cx="400" cy="320" r="14" fill="var(--brand-500)" />
+  <text x="400" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">2</text>
+  <text x="400" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Data Formatting</text>
+  <text x="400" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">تنسيق البيانات</text>
+
+  <!-- Requirement 3 -->
+  <circle cx="620" cy="320" r="14" fill="var(--brand-500)" />
+  <text x="620" y="325" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">3</text>
+  <text x="620" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">Device Addressing</text>
+  <text x="620" y="350" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">عنونة الأجهزة</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Programmed I/O</th><th>Interrupt-Driven I/O</th><th>DMA</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مشاركة المعالج (CPU Involvement)</template>
+          <template class="content-en">CPU Involvement</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالية جداً (ينتظر باستمرار)</template>
+          <template class="content-en">Very High (Busy waiting)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسطة (يتدخل فقط عند الجاهزية)</template>
+          <template class="content-en">Medium (Intervenes only when ready)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفضة جداً (تهيئة فقط)</template>
+          <template class="content-en">Very Low (Initialization only)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حجم البيانات المناسب</template>
+          <template class="content-en">Suitable Data Size</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">كلمات مفردة / بطيء</template>
+          <template class="content-en">Single words / Slow</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كلمات مفردة / أحداث</template>
+          <template class="content-en">Single words / Events</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كتل بيانات ضخمة</template>
+          <template class="content-en">Large blocks of data</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يتم توصيل لوحة المفاتيح مباشرة بوحدة المعالجة المركزية بدون واجهة إدخال/إخراج؟</template>
+      <template class="content-en">Why isn't a keyboard connected directly to the CPU without an I/O interface?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المعالج يعمل بسرعات هائلة (جيجاهرتز) بينما لوحة المفاتيح بطيئة جداً (100 بت/ثانية). الواجهة تقوم بتخزين النقرات مؤقتاً وتنسيقها قبل إرسالها للمعالج.</p></template>
+      <template class="content-en"><p>Because the CPU operates at massive speeds (GHz) while a keyboard is very slow (100 bps). The interface buffers the keystrokes and formats them before sending them to the CPU.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="programmed-io" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الإدخال/الإخراج المبرمج (Programmed I/O)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Programmed I/O</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طريقة يقوم فيها المعالج بالإشراف المباشر على نقل كل كلمة بيانات، مما يجعله مشغولاً بالانتظار.</p></template>
+    <template class="content-en"><p>A method where the CPU directly supervises the transfer of every single word of data, keeping it busy waiting.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في <span class="smart-term" data-term-en="Programmed I/O" data-ar="الإدخال/الإخراج المبرمج" data-en-def="I/O technique where the CPU executes a program that gives it direct control of the I/O operation.">الإدخال/الإخراج المبرمج<span class="smart-term-tooltip"></span></span>، يتم نقل كلمة واحدة (One word) لكل تعليمة إدخال/إخراج. تتطلب هذه العملية دورة جلب/تنفيذ (Fetch/Execute) كاملة لكل كلمة.</p><p>خطوات العمل:</p><ol><li>تنفذ وحدة المعالجة المركزية تعليمة الإدخال (مثال: INPUT 24).</li><li>يتم نسخ العنوان إلى سجل عنوان الإدخال/الإخراج.</li><li>تتعرف وحدة الإدخال/الإخراج على العنوان وتستقبل البيانات في مخزنها المؤقت (Buffer).</li><li>يتم نسخ البيانات من المخزن المؤقت إلى المجمع (Accumulator) في المعالج.</li></ol><p>الاستخدام الأساسي لهذه الطريقة هو مع الأجهزة البطيئة جداً مثل لوحات المفاتيح، أو للتواصل مع وحدات الإدخال/الإخراج لتهيئة عمليات متقدمة مثل DMA.</p></template>
+    <template class="content-en"><p>In <span class="smart-term" data-term-en="Programmed I/O" data-ar="الإدخال/الإخراج المبرمج" data-en-def="I/O technique where the CPU executes a program that gives it direct control of the I/O operation.">Programmed I/O<span class="smart-term-tooltip"></span></span>, there is a one-word transfer per I/O instruction. This requires a full instruction fetch/execute cycle for every word transferred.</p><p>Steps:</p><ol><li>CPU executes an INPUT instruction (e.g., INPUT 24).</li><li>The address is copied to the I/O address register.</li><li>The I/O module recognizes the address and holds data in its buffer.</li><li>Data is copied from the buffer to the CPU's <span class="smart-term" data-term-en="Accumulator" data-ar="المُجَمِّع" data-en-def="A general-purpose register in the CPU where intermediate arithmetic and logic results are stored, often used in Programmed I/O.">accumulator<span class="smart-term-tooltip"></span></span>/register.</li></ol><p>Its primary use is for very slow devices like keyboards, or for communicating with I/O modules to set up advanced operations like DMA.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العيب القاتل لهذه الطريقة هو إهدار وقت المعالج (Busy Waiting أو Polling). المعالج يظل يسأل الجهاز باستمرار 'هل أنت جاهز؟' بدلاً من تنفيذ برامج أخرى.</p><p>لا تصلح هذه الطريقة لنقل كتل كبيرة من البيانات (مثل الأقراص الصلبة) لأنها ستؤدي إلى شلل كامل في أداء النظام.</p></template>
+    <template class="content-en"><p>The fatal flaw of this method is CPU time wastage (Busy Waiting or Polling). The CPU constantly asks the device 'Are you ready?' instead of executing other programs.</p><p>This method is entirely unsuitable for large block transfers (like hard drives) because it would completely paralyze system performance.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: Diagram showing Programmed I/O steps. CPU block with an Accumulator and I/O address register connected via a bus to an I/O module (keyboard). Show data flowing from keyboard buffer to the CPU accumulator. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif" dir="ltr">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--brand-500)"/>
+        </marker>
+        <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="35" text-anchor="middle" class="gsvg-en" font-size="22" font-weight="bold" fill="var(--text-primary)">Programmed I/O: Data Transfer</text>
+    <text x="400" y="35" text-anchor="middle" class="gsvg-ar" font-size="22" font-weight="bold" fill="var(--text-primary)">الإدخال والإخراج المبرمج: نقل البيانات</text>
+
+    <!-- CPU Block -->
+    <rect x="20" y="70" width="220" height="340" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="130" y="100" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">CPU</text>
+    <text x="130" y="100" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">وحدة المعالجة المركزية</text>
+
+    <!-- Accumulator -->
+    <rect x="40" y="120" width="180" height="60" rx="6" fill="url(#brandGrad)"/>
+    <text x="130" y="145" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-hi)">Accumulator</text>
+    <text x="130" y="145" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-hi)">المركم</text>
+    <text x="130" y="165" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--on-brand-hi)">[ Data Word ]</text>
+    <text x="130" y="165" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--on-brand-hi)">[ كلمة البيانات ]</text>
+
+    <!-- I/O Address Register -->
+    <rect x="40" y="320" width="180" height="60" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="130" y="345" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">I/O Address Register</text>
+    <text x="130" y="345" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">مسجل عناوين الإدخال/الإخراج</text>
+    <text x="130" y="365" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">[ Port 24 ]</text>
+    <text x="130" y="365" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">[ المنفذ 24 ]</text>
+
+    <!-- System Bus -->
+    <rect x="300" y="70" width="40" height="340" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="320" y="240" text-anchor="middle" transform="rotate(-90, 320, 240)" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">System Bus</text>
+    <text x="320" y="240" text-anchor="middle" transform="rotate(-90, 320, 240)" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">ناقل النظام</text>
+
+    <!-- I/O Module Block -->
+    <rect x="400" y="70" width="220" height="340" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="510" y="100" text-anchor="middle" class="gsvg-en" font-size="16" font-weight="bold" fill="var(--text-primary)">I/O Module</text>
+    <text x="510" y="100" text-anchor="middle" class="gsvg-ar" font-size="16" font-weight="bold" fill="var(--text-primary)">وحدة الإدخال والإخراج</text>
+
+    <!-- I/O Buffer -->
+    <rect x="420" y="120" width="180" height="60" rx="6" fill="url(#brandGrad)"/>
+    <text x="510" y="145" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--on-brand-hi)">I/O Buffer</text>
+    <text x="510" y="145" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--on-brand-hi)">مخزن الإدخال/الإخراج</text>
+    <text x="510" y="165" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--on-brand-hi)">[ Data Word ]</text>
+    <text x="510" y="165" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--on-brand-hi)">[ كلمة البيانات ]</text>
+
+    <!-- Address Decoder -->
+    <rect x="420" y="320" width="180" height="60" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+    <text x="510" y="345" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Address Decoder</text>
+    <text x="510" y="345" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">محلل العناوين</text>
+    <text x="510" y="365" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">[ Recognizes 24 ]</text>
+    <text x="510" y="365" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">[ يتعرف على 24 ]</text>
+
+    <!-- Keyboard Block -->
+    <rect x="680" y="120" width="100" height="60" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    <text x="730" y="145" text-anchor="middle" class="gsvg-en" font-size="15" font-weight="bold" fill="var(--text-primary)">Keyboard</text>
+    <text x="730" y="145" text-anchor="middle" class="gsvg-ar" font-size="15" font-weight="bold" fill="var(--text-primary)">لوحة مفاتيح</text>
+    <text x="730" y="165" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">(Slow I/O)</text>
+    <text x="730" y="165" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">(إدخال بطيء)</text>
+
+    <!-- Arrows & Paths -->
+    <!-- Data Bus (Step 4) -->
+    <path d="M 420 150 L 350 150" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <path d="M 290 150 L 230 150" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="260" y="170" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Data Bus</text>
+    <text x="260" y="170" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">ناقل البيانات</text>
+
+    <!-- Address Bus (Step 2) -->
+    <path d="M 220 350 L 290 350" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <path d="M 350 350 L 410 350" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+    <text x="380" y="375" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Address Bus</text>
+    <text x="380" y="375" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">ناقل العناوين</text>
+
+    <!-- Control Bus -->
+    <path d="M 240 240 L 290 240" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <path d="M 350 240 L 390 240" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <text x="265" y="230" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Control (Read)</text>
+    <text x="265" y="230" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">تحكم (قراءة)</text>
+
+    <!-- Keyboard to Buffer (Step 3) -->
+    <path d="M 680 150 L 610 150" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)"/>
+
+    <!-- Step Indicators (Circles) -->
+    <!-- Step 1 -->
+    <circle cx="130" cy="240" r="14" fill="var(--brand-500)"/>
+    <text x="130" y="245" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+    <text x="130" y="270" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--brand-ink)">INPUT 24</text>
+    <text x="130" y="270" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--brand-ink)">INPUT 24</text>
+
+    <!-- Step 2 -->
+    <circle cx="380" cy="325" r="14" fill="var(--brand-500)"/>
+    <text x="380" y="330" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">2</text>
+
+    <!-- Step 3 -->
+    <circle cx="645" cy="125" r="14" fill="var(--brand-500)"/>
+    <text x="645" y="130" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">3</text>
+
+    <!-- Step 4 -->
+    <circle cx="260" cy="125" r="14" fill="var(--brand-500)"/>
+    <text x="260" y="130" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">4</text>
+
+    <!-- Legend -->
+    <rect x="20" y="430" width="760" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    
+    <!-- Legend Step 1 -->
+    <circle cx="115" cy="455" r="14" fill="var(--brand-500)"/>
+    <text x="115" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">1</text>
+    <text x="115" y="485" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">Instruction Fetch</text>
+    <text x="115" y="505" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">CPU executes INPUT 24</text>
+    <text x="115" y="485" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">جلب التعليمة</text>
+    <text x="115" y="505" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">المعالج ينفذ INPUT 24</text>
+
+    <!-- Legend Step 2 -->
+    <circle cx="305" cy="455" r="14" fill="var(--brand-500)"/>
+    <text x="305" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">2</text>
+    <text x="305" y="485" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">Address Decode</text>
+    <text x="305" y="505" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Address 24 sent to I/O</text>
+    <text x="305" y="485" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">تحليل العنوان</text>
+    <text x="305" y="505" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">إرسال العنوان 24 للوحدة</text>
+
+    <!-- Legend Step 3 -->
+    <circle cx="495" cy="455" r="14" fill="var(--brand-500)"/>
+    <text x="495" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">3</text>
+    <text x="495" y="485" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">Data Buffering</text>
+    <text x="495" y="505" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Data held in I/O buffer</text>
+    <text x="495" y="485" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">تخزين البيانات</text>
+    <text x="495" y="505" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">حفظ البيانات في المخزن</text>
+
+    <!-- Legend Step 4 -->
+    <circle cx="685" cy="455" r="14" fill="var(--brand-500)"/>
+    <text x="685" y="460" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--on-brand-lo)">4</text>
+    <text x="685" y="485" text-anchor="middle" class="gsvg-en" font-size="14" font-weight="bold" fill="var(--text-primary)">Data Transfer</text>
+    <text x="685" y="505" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--text-secondary)">Copied to Accumulator</text>
+    <text x="685" y="485" text-anchor="middle" class="gsvg-ar" font-size="14" font-weight="bold" fill="var(--text-primary)">نقل البيانات</text>
+    <text x="685" y="505" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--text-secondary)">النسخ إلى المركم</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان الإدخال المبرمج سيئاً للأداء، فلماذا لا يزال يُستخدم لتهيئة أجهزة DMA؟</template>
+      <template class="content-en">If Programmed I/O is bad for performance, why is it still used to initialize DMA controllers?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تهيئة DMA تتطلب إرسال بضع كلمات فقط (العنوان، الحجم، الأمر). الإدخال المبرمج بسيط ومناسب جداً لنقل هذه الكمية الضئيلة من البيانات قبل أن يتولى DMA العمل الثقيل.</p></template>
+      <template class="content-en"><p>Because initializing a DMA controller only requires sending a few words (address, size, command). Programmed I/O is simple and perfectly suited for this tiny data transfer before the DMA takes over the heavy lifting.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="interrupts-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> المقاطعات (Interrupts)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Interrupts</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>إشارة تجبر المعالج على إيقاف عمله الحالي مؤقتاً للتعامل مع حدث خارجي مهم، ثم العودة من حيث توقف.</p></template>
+    <template class="content-en"><p>A signal that forces the CPU to temporarily pause its current work to handle an important external event, then resume where it left off.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المقاطعة هي إشارة تتسبب في تغيير وحدة المعالجة المركزية لمسار التنفيذ الطبيعي للتعليمات. هذا يحرر المعالج من انتظار الأحداث.</p><p>مصطلحات هامة:</p><ul><li><b>خطوط المقاطعة (Interrupt lines):</b> خطوط تحكم خاصة متصلة بالمعالج.</li><li><b><span class="smart-term" data-term-en="Interrupt Handler" data-ar="معالج المقاطعة" data-en-def="A specific routine or program (often a device driver) executed by the CPU to process an interrupt.">معالج المقاطعة<span class="smart-term-tooltip"></span></span> (Interrupt handler):</b> البرنامج الذي يخدم المقاطعة (يُعرف أيضاً ببرنامج تشغيل الجهاز Device Driver).</li><li><b><span class="smart-term" data-term-en="Context" data-ar="السياق" data-en-def="The state of the CPU (registers, program counter) that must be saved before handling an interrupt.">السياق<span class="smart-term-tooltip"></span></span> (Context):</b> السجلات المحفوظة للبرنامج قبل انتقال التحكم لمعالج المقاطعة، مما يسمح للبرنامج بالاستئناف بدقة من حيث توقف.</li></ul><p>استخدامات المقاطعات تشمل: الإشعار بحدث خارجي، اكتمال عملية (مثل الطابعة جاهزة)، تخصيص وقت المعالج (Time sharing)، والأحداث غير الطبيعية (أخطاء الأجهزة).</p></template>
+    <template class="content-en"><p>An interrupt is a signal that causes the CPU to alter its normal flow of instruction execution. This frees the CPU from waiting for events.</p><p>Key Terminology:</p><ul><li><b>Interrupt lines:</b> Special hardware control lines to the CPU.</li><li><b><span class="smart-term" data-term-en="Interrupt Handler" data-ar="معالج المقاطعة" data-en-def="A specific routine or program (often a device driver) executed by the CPU to process an interrupt.">Interrupt handler<span class="smart-term-tooltip"></span></span>s:</b> The program that services the interrupt (also known as a device driver).</li><li><b><span class="smart-term" data-term-en="Context" data-ar="السياق" data-en-def="The state of the CPU (registers, program counter) that must be saved before handling an interrupt.">Context<span class="smart-term-tooltip"></span></span>:</b> Saved registers of a program before control is transferred, allowing the program to resume exactly where it left off.</li></ul><p>Uses of interrupts include: Notifying external events, signaling completion (printer ready), allocating CPU time (time sharing), and indicating abnormal events (hardware errors).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>حفظ 'السياق' هو الجزء الأكثر حرجاً. إذا لم يتم حفظ قيمة عداد البرنامج (PC) وسجلات البيانات بدقة في المكدس (Stack) أو كتلة تحكم العملية (PCB)، فلن يتمكن المعالج من العودة للبرنامج الأصلي وسينهار النظام.</p><p>المقاطعات البرمجية (Software Interrupts) تُستخدم أيضاً من قبل البرامج لطلب خدمات من نظام التشغيل (System Calls).</p></template>
+    <template class="content-en"><p>Saving the 'Context' is the most critical part. If the Program Counter (PC) and data registers are not accurately saved to the Stack or Process Control Block (PCB), the CPU cannot return to the original program, causing a crash.</p><p>Software Interrupts are also used by user programs to request services from the operating system (System Calls).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Flowchart of The Interrupt Cycle. Start -> Fetch Next Instruction -> Execute Instruction -> Check for Interrupt. If yes, Process Interrupt (Interrupts Disabled), then loop back to Fetch. If no, loop back to Fetch. Include a HALT state. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" text-anchor="middle">
+        
+        <!-- Title -->
+        <text x="400" y="30" class="gsvg-en" fill="var(--text-primary)" font-size="20" font-weight="bold">The Interrupt Cycle</text>
+        <text x="400" y="30" class="gsvg-ar" fill="var(--text-primary)" font-size="20" font-weight="bold">دورة المقاطعة</text>
+
+        <!-- ================= LINES & ARROWS ================= -->
+        
+        <!-- Start -> Fetch -->
+        <line x1="400" y1="80" x2="400" y2="102" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        
+        <!-- Fetch -> Execute -->
+        <line x1="400" y1="170" x2="400" y2="192" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        
+        <!-- Execute -> Halt? -->
+        <line x1="400" y1="260" x2="400" y2="282" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        
+        <!-- Halt? -> HALT (Yes) -->
+        <line x1="340" y1="320" x2="278" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="305" y="310" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="bold">Yes</text>
+        <text x="305" y="310" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">نعم</text>
+
+        <!-- Halt? -> Interrupt? (No) -->
+        <line x1="400" y1="350" x2="400" y2="372" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="415" y="365" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="bold">No</text>
+        <text x="415" y="365" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">لا</text>
+
+        <!-- Interrupt? -> Fetch (No Loop) -->
+        <path d="M 330 420 L 100 420 L 100 140 L 292 140" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linejoin="round" marker-end="url(#arrow)"/>
+        <text x="260" y="410" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="bold">No</text>
+        <text x="260" y="410" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">لا</text>
+
+        <!-- Interrupt? -> Process Interrupt (Yes) -->
+        <line x1="470" y1="420" x2="532" y2="420" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="505" y="410" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="bold">Yes</text>
+        <text x="505" y="410" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">نعم</text>
+
+        <!-- Process Interrupt -> Fetch (Return Loop) -->
+        <path d="M 740 420 L 770 420 L 770 140 L 508 140" stroke="var(--brand-500)" stroke-width="2" fill="none" stroke-linejoin="round" marker-end="url(#arrow)"/>
+
+        <!-- Annotation -> Process Interrupt -->
+        <line x1="640" y1="310" x2="640" y2="372" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="2" marker-end="url(#arrow)"/>
+
+
+        <!-- ================= NODES ================= -->
+
+        <!-- Start -->
+        <rect x="340" y="40" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="400" y="65" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">Start</text>
+        <text x="400" y="65" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">البداية</text>
+
+        <!-- Fetch Next Instruction -->
+        <rect x="300" y="110" width="200" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="400" y="146" class="gsvg-en" fill="var(--text-primary)" font-size="16">Fetch Next Instruction</text>
+        <text x="400" y="146" class="gsvg-ar" fill="var(--text-primary)" font-size="16">جلب التعليمة التالية</text>
+
+        <!-- Execute Instruction -->
+        <rect x="300" y="200" width="200" height="60" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="400" y="236" class="gsvg-en" fill="var(--text-primary)" font-size="16">Execute Instruction</text>
+        <text x="400" y="236" class="gsvg-ar" fill="var(--text-primary)" font-size="16">تنفيذ التعليمة</text>
+
+        <!-- Halt? -->
+        <polygon points="400,290 460,320 400,350 340,320" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="400" y="325" class="gsvg-en" fill="var(--text-primary)" font-size="15">Halt?</text>
+        <text x="400" y="325" class="gsvg-ar" fill="var(--text-primary)" font-size="15">توقف؟</text>
+
+        <!-- HALT -->
+        <rect x="150" y="300" width="120" height="40" rx="20" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="210" y="325" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="bold">HALT</text>
+        <text x="210" y="325" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="bold">توقف</text>
+
+        <!-- Interrupt? -->
+        <polygon points="400,380 470,420 400,460 330,420" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+        <text x="400" y="425" class="gsvg-en" fill="var(--text-primary)" font-size="15">Interrupt?</text>
+        <text x="400" y="425" class="gsvg-ar" fill="var(--text-primary)" font-size="15">مقاطعة؟</text>
+
+        <!-- Process Interrupt (Highlighted) -->
+        <rect x="540" y="380" width="200" height="80" rx="8" fill="var(--brand-500)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="640" y="415" class="gsvg-en" fill="var(--on-brand-lo)" font-size="16" font-weight="bold">Process Interrupt</text>
+        <text x="640" y="438" class="gsvg-en" fill="var(--on-brand-lo)" font-size="13">(Interrupts Disabled)</text>
+        <text x="640" y="415" class="gsvg-ar" fill="var(--on-brand-lo)" font-size="16" font-weight="bold">معالجة المقاطعة</text>
+        <text x="640" y="438" class="gsvg-ar" fill="var(--on-brand-lo)" font-size="13">(تعطيل المقاطعات)</text>
+
+        <!-- Annotation Box (Context Saving) -->
+        <rect x="550" y="250" width="180" height="60" rx="4" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-dasharray="4 4" stroke-width="2"/>
+        <text x="640" y="275" class="gsvg-en" fill="var(--text-secondary)" font-size="14">Saves CPU Context</text>
+        <text x="640" y="295" class="gsvg-en" fill="var(--text-secondary)" font-size="13">(Registers &amp; PC)</text>
+        <text x="640" y="275" class="gsvg-ar" fill="var(--text-secondary)" font-size="14">حفظ سياق المعالج</text>
+        <text x="640" y="295" class="gsvg-ar" fill="var(--text-secondary)" font-size="13">(السجلات وعداد البرنامج)</text>
+
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى يتحقق المعالج من وجود مقاطعة؟ أثناء تنفيذ التعليمة أم بعدها؟</template>
+      <template class="content-en">When does the CPU check for an interrupt? During instruction execution or after?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتحقق المعالج من المقاطعات في نهاية دورة التنفيذ (بعد اكتمال تنفيذ التعليمة الحالية وقبل جلب التعليمة التالية) لضمان عدم ترك التعليمة في حالة غير مكتملة.</p></template>
+      <template class="content-en"><p>The CPU checks for interrupts at the end of the execute cycle (after the current instruction completes and before fetching the next one) to ensure instructions are not left in an incomplete state.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="interrupt-processing-methods" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> طرق معالجة المقاطعات (Vectored vs Polled)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Interrupt Processing Methods</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المقاطعة الموجهة تخبر المعالج فوراً بمكان المشكلة، بينما المقاطعة بالاقتراع تتطلب من المعالج سؤال كل جهاز لمعرفة من قاطع.</p></template>
+    <template class="content-en"><p>Vectored interrupts tell the CPU exactly where the issue is immediately, while <span class="smart-term" data-term-en="Polled Interrupt" data-ar="المقاطعة بالاقتراع" data-en-def="An interrupt method where the CPU must query each device to determine which one generated the interrupt.">Polled interrupt<span class="smart-term-tooltip"></span></span>s require the CPU to ask each device who interrupted.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>هناك طريقتان رئيسيتان لتحديد الجهاز الذي أصدر المقاطعة:</p><ol><li><b><span class="smart-term" data-term-en="Vectored Interrupt" data-ar="المقاطعة الموجهة" data-en-def="An interrupt that includes the address of the interrupting device, allowing the CPU to jump directly to the correct handler.">المقاطعة الموجهة<span class="smart-term-tooltip"></span></span> (Vectored Interrupt):</b> يتم تضمين عنوان الجهاز المقاطع (أو عنوان روتين الخدمة الخاص به) في إشارة المقاطعة نفسها. تتطلب هذه الطريقة أجهزة إضافية لتنفيذها ولكنها سريعة جداً.</li><li><b><span class="smart-term" data-term-en="Polled Interrupt" data-ar="المقاطعة بالاقتراع" data-en-def="An interrupt method where the CPU must query each device to determine which one generated the interrupt.">المقاطعة بالاقتراع<span class="smart-term-tooltip"></span></span> (Polling):</b> تشترك جميع الأجهزة في خط مقاطعة عام واحد. عندما تحدث مقاطعة، يقوم المعالج بتشغيل روتين اقتراع عام يسأل كل جهاز بالتسلسل لتحديد الجهاز المقاطع.</li></ol><p>في حالة المقاطعات المتعددة، يتم تعليق المقاطعات ذات الأولوية الأقل حتى تكتمل المقاطعات ذات الأولوية الأعلى.</p></template>
+    <template class="content-en"><p>There are two main methods to identify the interrupting device:</p><ol><li><b><span class="smart-term" data-term-en="Vectored Interrupt" data-ar="المقاطعة الموجهة" data-en-def="An interrupt that includes the address of the interrupting device, allowing the CPU to jump directly to the correct handler.">Vectored Interrupt<span class="smart-term-tooltip"></span></span>:</b> The address of the interrupting device (or its service routine) is included in the interrupt signal. This requires additional hardware to implement but is very fast.</li><li><b>Polling:</b> A general interrupt line is shared by all devices. When an interrupt occurs, the CPU runs a general polling routine to identify the device by checking them sequentially.</li></ol><p>In the case of multiple interrupts, lower priority interrupts are held until higher priority interrupts are complete.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المقاطعة الموجهة تستخدم جدولاً في الذاكرة يسمى (Interrupt Vector Table) يحتوي على عناوين برامج الخدمة. بمجرد استلام رقم المقاطعة، يقفز المعالج مباشرة للعنوان.</p><p>الاقتراع (Polling) بطيء وغير فعال في الأنظمة التي تحتوي على عدد كبير من الأجهزة، لأن المعالج قد يضطر لسؤال 10 أجهزة قبل أن يجد الجهاز الذي طلب المقاطعة.</p></template>
+    <template class="content-en"><p>Vectored interrupts use a table in memory called the Interrupt Vector Table, containing addresses of service routines. Upon receiving the interrupt number, the CPU jumps directly to the address.</p><p>Polling is slow and inefficient in systems with many devices, as the CPU might have to query 10 devices before finding the one that requested the interrupt.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Two side-by-side memory diagrams. Left: Vectored Interrupts showing 'Interrupt K occurs' pointing directly to 'Address of interrupt K' in memory, which jumps to 'Interrupt K service routine'. Right: Polled Interrupts showing 'Interrupt K occurs' pointing to a 'General interrupt polling routine', which then polls devices and eventually jumps to 'Interrupt K service routine'. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead for solid lines -->
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+    </marker>
+    <!-- Arrowhead for dashed lines -->
+    <marker id="arrowhead-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-400)"/>
+    </marker>
+    <!-- Gradient for Service Routines (Brand 600 to 800) -->
+    <linearGradient id="brand-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--brand-600)"/>
+      <stop offset="100%" stop-color="var(--brand-800)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Center Divider -->
+  <line x1="400" y1="80" x2="400" y2="480" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- ========================================== -->
+  <!-- LEFT SIDE: VECTORED INTERRUPTS             -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="200" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Vectored Interrupts</text>
+  <text x="200" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المقاطعات الموجهة</text>
+
+  <text x="200" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Hardware directly maps to vector</text>
+  <text x="200" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">العتاد يحدد المتجه مباشرة</text>
+
+  <!-- Trigger Box -->
+  <rect x="20" y="180" width="150" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="95" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Interrupt K occurs</text>
+  <text x="95" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">حدوث المقاطعة K</text>
+
+  <!-- Main Memory Block -->
+  <rect x="210" y="90" width="180" height="380" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="300" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Main Memory</text>
+  <text x="300" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الذاكرة الرئيسية</text>
+
+  <!-- Vector Table -->
+  <rect x="220" y="130" width="160" height="120" rx="6" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4"/>
+  <text x="300" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Vector Table</text>
+  <text x="300" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">جدول المتجهات</text>
+
+  <!-- Slot K (Highlighted) -->
+  <rect x="230" y="180" width="140" height="40" rx="4" fill="var(--brand-500)"/>
+  <text x="300" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Address of K</text>
+  <text x="300" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">عنوان K</text>
+
+  <!-- Service Routine K -->
+  <rect x="220" y="350" width="160" height="80" rx="6" fill="url(#brand-grad)"/>
+  <text x="300" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Service Routine K</text>
+  <text x="300" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">روتين خدمة K</text>
+
+  <!-- Arrows Left -->
+  <!-- Trigger to Vector Table -->
+  <line x1="170" y1="200" x2="225" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Vector Table to Service Routine -->
+  <line x1="300" y1="220" x2="300" y2="345" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="345" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">Jump to Address</text>
+  <text x="345" y="285" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">القفز للعنوان</text>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT SIDE: POLLED INTERRUPTS              -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="600" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Polled Interrupts</text>
+  <text x="600" y="40" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">المقاطعات بالاقتراع</text>
+
+  <text x="600" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-en">Software checks devices sequentially</text>
+  <text x="600" y="65" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" text-anchor="middle" class="gsvg-ar">البرمجيات تفحص الأجهزة بالتسلسل</text>
+
+  <!-- Trigger Box -->
+  <rect x="420" y="180" width="150" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+  <text x="495" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Interrupt K occurs</text>
+  <text x="495" y="205" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">حدوث المقاطعة K</text>
+
+  <!-- Main Memory Block -->
+  <rect x="610" y="90" width="180" height="380" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="700" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-en">Main Memory</text>
+  <text x="700" y="115" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-secondary)" text-anchor="middle" class="gsvg-ar">الذاكرة الرئيسية</text>
+
+  <!-- Polling Routine -->
+  <rect x="620" y="130" width="160" height="180" rx="6" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4"/>
+  <text x="700" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-en">Polling Routine</text>
+  <text x="700" y="155" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)" text-anchor="middle" class="gsvg-ar">روتين الاقتراع</text>
+
+  <!-- Check Device 1 -->
+  <rect x="630" y="170" width="140" height="30" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+  <text x="700" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-en">Check Device 1</text>
+  <text x="700" y="190" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-primary)" text-anchor="middle" class="gsvg-ar">فحص الجهاز 1</text>
+
+  <!-- Dots -->
+  <text x="700" y="225" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-muted)" text-anchor="middle">...</text>
+
+  <!-- Check Device K (Highlighted) -->
+  <rect x="630" y="240" width="140" height="40" rx="4" fill="var(--brand-500)"/>
+  <text x="700" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-en">Check Device K</text>
+  <text x="700" y="265" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--on-brand-lo)" text-anchor="middle" class="gsvg-ar">فحص الجهاز K</text>
+
+  <!-- Service Routine K -->
+  <rect x="620" y="350" width="160" height="80" rx="6" fill="url(#brand-grad)"/>
+  <text x="700" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-en">Service Routine K</text>
+  <text x="700" y="395" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" class="gsvg-ar">روتين خدمة K</text>
+
+  <!-- Arrows Right -->
+  <!-- Trigger to Polling Routine -->
+  <path d="M 570 200 C 595 200, 595 145, 615 145" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Internal Polling Flow -->
+  <line x1="700" y1="200" x2="700" y2="235" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4" marker-end="url(#arrowhead-dashed)"/>
+
+  <!-- Check K to Service Routine -->
+  <line x1="700" y1="280" x2="700" y2="345" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="745" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-en">Match → Jump</text>
+  <text x="745" y="315" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink-strong)" text-anchor="middle" class="gsvg-ar">تطابق ← قفز</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Vectored Interrupt</th><th>Polled Interrupt</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">السرعة في تحديد الجهاز</template>
+          <template class="content-en">Speed of Device Identification</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">سريعة جداً (مباشرة)</template>
+          <template class="content-en">Very Fast (Direct)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بطيئة (بحث متسلسل)</template>
+          <template class="content-en">Slow (Sequential search)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">متطلبات العتاد (Hardware)</template>
+          <template class="content-en">Hardware Requirements</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">معقدة (تتطلب خطوط إضافية)</template>
+          <template class="content-en">Complex (Requires extra lines)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بسيطة (خط مشترك)</template>
+          <template class="content-en">Simple (Shared line)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا حدثت مقاطعة من لوحة المفاتيح ومقاطعة من القرص الصلب في نفس الوقت؟</template>
+      <template class="content-en">What happens if a keyboard interrupt and a hard drive interrupt occur at the exact same time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تستخدم الأنظمة مستويات الأولوية (Priority levels). القرص الصلب عادة له أولوية أعلى لأنه ينقل بيانات أسرع وقد تفقد إذا لم تُعالج فوراً، لذا سيتم تعليق مقاطعة لوحة المفاتيح حتى تنتهي مقاطعة القرص.</p></template>
+      <template class="content-en"><p>Systems use priority levels. The hard drive usually has a higher priority because it transfers data faster and data might be lost if not handled immediately. The keyboard interrupt will be suspended until the disk interrupt completes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="direct-memory-access-dma" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الوصول المباشر للذاكرة (DMA)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Direct Memory Access (DMA)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>شريحة متخصصة تتولى مهمة نقل كتل ضخمة من البيانات بين الأجهزة والذاكرة دون إزعاج المعالج.</p></template>
+    <template class="content-en"><p>A specialized chip that takes over the job of transferring large blocks of data between devices and memory without bothering the CPU.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يُستخدم <span class="smart-term" data-term-en="DMA (Direct Memory Access)" data-ar="الوصول المباشر للذاكرة" data-en-def="A feature that allows hardware subsystems to access main system memory independently of the central processing unit.">الوصول المباشر للذاكرة<span class="smart-term-tooltip"></span></span> (DMA) لنقل كتل كبيرة من البيانات مباشرة من وإلى الذاكرة. في هذه العملية، لا تشارك وحدة المعالجة المركزية بنشاط في النقل نفسه.</p><p>لبدء DMA، يرسل المعالج المعلومات التالية لوحدة التحكم:</p><ol><li>موقع البيانات على جهاز الإدخال/الإخراج.</li><li>موقع البداية في الذاكرة الرئيسية.</li><li>حجم كتلة البيانات المراد نقلها.</li><li>نوع العملية (قراءة / كتابة).</li></ol><p>بمجرد التهيئة، تقوم وحدة تحكم DMA بنقل البيانات. عند اكتمال النقل بالكامل، ترسل وحدة DMA مقاطعة (Interrupt) للمعالج لإخباره بانتهاء المهمة.</p></template>
+    <template class="content-en"><p>Direct Memory Access (DMA) is used for transferring large blocks of data directly to and from memory. The CPU is not actively involved in the transfer itself.</p><p>To initiate DMA, the CPU sends the following information to the controller:</p><ol><li>Location of data on the I/O device.</li><li>The starting location in memory.</li><li>The size of the block to transfer.</li><li>Read/Write command.</li></ol><p>Once initialized, the DMA controller handles the transfer. Upon completion, the DMA controller sends an interrupt to the CPU.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الشروط المطلوبة لعمل DMA: يجب أن تكون واجهة الإدخال/الإخراج متصلة بالذاكرة، ويجب أن تكون قادرة على القراءة والكتابة في الذاكرة، ويجب تجنب التعارض بين المعالج ووحدة الإدخال/الإخراج على استخدام الناقل (Bus).</p><p>يتم حل التعارض غالباً باستخدام تقنية '<span class="smart-term" data-term-en="Cycle Stealing" data-ar="سرقة الدورات" data-en-def="A method used by DMA to transfer data by taking control of the system bus for a single clock cycle, pausing the CPU briefly.">سرقة الدورات<span class="smart-term-tooltip"></span></span>' (Cycle Stealing)، حيث يستعير DMA ناقل النظام لدورة واحدة لنقل كلمة، مما يبطئ المعالج قليلاً جداً ولكنه أفضل بكثير من الإدخال المبرمج.</p></template>
+    <template class="content-en"><p>Required conditions for DMA:</p><ul><li>The I/O interface and memory must be connected,</li><li>the I/O module must be capable of reading/writing to memory, and</li><li>conflicts between the CPU and I/O module over the system bus must be avoided.</li></ul><p>Conflicts are often resolved using '<span class="smart-term" data-term-en="Cycle Stealing" data-ar="سرقة الدورات" data-en-def="A method used by DMA to transfer data by taking control of the system bus for a single clock cycle, pausing the CPU briefly.">Cycle Stealing<span class="smart-term-tooltip"></span></span>', where the DMA borrows the system bus for one cycle to transfer a word, slightly slowing the CPU but vastly outperforming Programmed I/O.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Three-step diagram of DMA Initiation and Control. Step 1: CPU sends I/O instructions (address, size, read/write) to Disk Controller. Step 2: Disk Controller transfers Data directly to Memory. Step 3: Disk Controller sends Interrupt to CPU upon completion. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for DMA Controller -->
+    <linearGradient id="dma-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="var(--brand-800)"/>
+      <stop offset="100%" stop-color="var(--brand-600)"/>
+    </linearGradient>
+
+    <!-- Standard Arrowhead for Control Signals -->
+    <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 Z" fill="var(--brand-500)"/>
+    </marker>
+
+    <!-- Thick Arrowhead for Data Flow -->
+    <marker id="arrow-head-thick" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 Z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">DMA Initiation and Control</text>
+  <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">بدء والتحكم في الوصول المباشر للذاكرة (DMA)</text>
+
+  <!-- ========================================== -->
+  <!-- NODES                                      -->
+  <!-- ========================================== -->
+
+  <!-- CPU Node -->
+  <rect x="60" y="160" width="140" height="90" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="130" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">CPU</text>
+  <text x="130" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">المعالج (CPU)</text>
+
+  <!-- DMA Controller Node -->
+  <rect x="330" y="160" width="140" height="90" rx="12" fill="url(#dma-grad)" stroke="none"/>
+  <text x="400" y="200" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Disk Controller</text>
+  <text x="400" y="220" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-hi)">(with DMA)</text>
+  <text x="400" y="200" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">متحكم القرص</text>
+  <text x="400" y="220" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--on-brand-hi)">(مع DMA)</text>
+
+  <!-- Main Memory Node -->
+  <rect x="600" y="160" width="140" height="90" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="670" y="210" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Main Memory</text>
+  <text x="670" y="210" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">الذاكرة الرئيسية</text>
+
+  <!-- I/O Device (Disk) Node -->
+  <path d="M 330 340 L 330 395 A 70 15 0 0 0 470 395 L 470 340 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <ellipse cx="400" cy="340" rx="70" ry="15" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+  <text x="400" y="375" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">I/O Device (Disk)</text>
+  <text x="400" y="375" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">جهاز إدخال/إخراج</text>
+
+  <!-- ========================================== -->
+  <!-- ARROWS & CONNECTIONS                       -->
+  <!-- ========================================== -->
+
+  <!-- Step 1: CPU to DMA (Control Signal) -->
+  <path d="M 200 175 A 61 40 0 0 1 322 175" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-head)"/>
+  
+  <!-- Step 3: DMA to CPU (Control Signal) -->
+  <path d="M 330 235 A 61 40 0 0 1 208 235" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrow-head)"/>
+
+  <!-- Step 2: DMA to Memory (Data Flow) -->
+  <path d="M 470 205 L 590 205" fill="none" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-head-thick)"/>
+
+  <!-- Disk to DMA (Data Flow) -->
+  <path d="M 400 325 L 400 260" fill="none" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-head-thick)"/>
+
+  <!-- ========================================== -->
+  <!-- LABELS                                     -->
+  <!-- ========================================== -->
+
+  <!-- Step 1 Label -->
+  <text x="265" y="115" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">1. Initiate DMA</text>
+  <text x="265" y="135" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(Address, Size, R/W)</text>
+  
+  <text x="265" y="115" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">1. بدء DMA</text>
+  <text x="265" y="135" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(العنوان، الحجم، قراءة/كتابة)</text>
+
+  <!-- Step 2 Label -->
+  <text x="535" y="185" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">2. Direct Data Transfer</text>
+  <text x="535" y="185" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">2. نقل البيانات المباشر</text>
+
+  <!-- Step 3 Label -->
+  <text x="265" y="295" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">3. Interrupt</text>
+  <text x="265" y="315" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(Transfer Complete)</text>
+
+  <text x="265" y="295" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">3. مقاطعة</text>
+  <text x="265" y="315" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">(اكتمل النقل)</text>
+
+  <!-- Disk to DMA Label -->
+  <text x="460" y="295" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Data Stream</text>
+  <text x="460" y="295" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تدفق البيانات</text>
+
+  <!-- ========================================== -->
+  <!-- LEGEND                                     -->
+  <!-- ========================================== -->
+  <rect x="40" y="370" width="180" height="65" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+  
+  <!-- Legend: Control Signal -->
+  <path d="M 55 390 L 90 390" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
+  <text x="140" y="395" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Control Signal</text>
+  <text x="140" y="395" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">إشارة تحكم</text>
+
+  <!-- Legend: Data Flow -->
+  <path d="M 55 415 L 90 415" fill="none" stroke="var(--brand-500)" stroke-width="4"/>
+  <text x="140" y="420" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Data Flow</text>
+  <text x="140" y="420" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تدفق البيانات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل المعالج يتوقف تماماً عن العمل أثناء قيام DMA بنقل البيانات؟</template>
+      <template class="content-en">Does the CPU stop working completely while the DMA is transferring data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، المعالج يستمر في تنفيذ برامج أخرى. يتوقف فقط للحظات قصيرة جداً إذا احتاج هو و DMA لاستخدام ناقل النظام (System Bus) في نفس الوقت (سرقة الدورات).</p></template>
+      <template class="content-en"><p>No, the CPU continues executing other programs. It only pauses for very brief moments if both the CPU and DMA need to use the system bus at the exact same time (cycle stealing).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="io-module-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> وظائف وحدة الإدخال/الإخراج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> I/O Module Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>وحدة الإدخال/الإخراج هي المدير الوسيط الذي يفهم أوامر المعالج ويتحكم فيزيائياً في الجهاز الطرفي.</p></template>
+    <template class="content-en"><p>The I/O module is the middle-manager that understands CPU commands and physically controls the peripheral device.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقوم وحدة الإدخال/الإخراج (I/O Module) بالوظائف الحيوية التالية:</p><ul><li>تتعرف على الرسائل الموجهة إليها من المعالج وتقبل الأوامر.</li><li>توفر مخزناً مؤقتاً (Buffer) للاحتفاظ بالبيانات حتى يتم نقلها.</li><li>توفر السجلات وعناصر التحكم اللازمة لإجراء نقل مباشر للذاكرة (DMA).</li><li>تتحكم فيزيائياً في الجهاز الطرفي.</li><li>تنسخ البيانات من مخزنها المؤقت إلى الجهاز، أو من المعالج إلى مخزنها.</li><li>تتواصل مع وحدة المعالجة المركزية.</li></ul></template>
+    <template class="content-en"><p>The I/O Module performs the following vital functions:</p><ul><li>Recognizes messages from device(s) addressed to it and accepts commands from the CPU.</li><li>Provides a <span class="smart-term" data-term-en="Buffer" data-ar="المخزن المؤقت" data-en-def="A temporary storage area in the I/O module used to compensate for speed differences between the CPU and peripherals.">buffer<span class="smart-term-tooltip"></span></span> where data from memory can be held until transferred to the device.</li><li>Provides necessary registers and controls to perform a direct memory transfer (DMA).</li><li>Physically controls the device.</li><li>Copies data from its buffer to the device/from the CPU to its buffer.</li><li>Communicates with the CPU.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التجريد (Abstraction) هو الهدف الرئيسي هنا. المعالج لا يحتاج لمعرفة كيف تعمل إبر الطابعة أو كيف تدور أسطوانات القرص الصلب. المعالج يرسل أمر 'اكتب' لوحدة الإدخال/الإخراج، وهي تتولى التفاصيل الفيزيائية المعقدة.</p><p>الواجهة تنقسم عادة إلى قسمين: واجهة المعالج (CPU interface) التي تتحدث بلغة الناقل السريع، وواجهة الجهاز (Device interface) التي تتحدث بلغة الجهاز البطيئة والمحددة.</p></template>
+    <template class="content-en"><p>Abstraction is the main goal here. The CPU doesn't need to know how printer pins work or how hard drive platters spin. The CPU sends a 'write' command to the I/O module, which handles the complex physical details.</p><p>The interface is typically split into two: the CPU interface (speaking the fast bus language) and the Device interface (speaking the specific, slower device language).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: Block diagram of I/O Module Interfaces. CPU block connected to 'I/O module(s)' via 'CPU interface'. The 'I/O module(s)' is connected to 'I/O device' via 'Device interface'. Arrows show bidirectional communication. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <linearGradient id="io-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        
+        <marker id="arrow-right" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <marker id="arrow-left" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 1 L 2 5 L 10 9 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- CPU Block -->
+    <rect x="40" y="160" width="160" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="3"/>
+    <text x="120" y="268" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">CPU</text>
+    <text x="120" y="268" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">المعالج</text>
+
+    <!-- I/O Device Block -->
+    <rect x="800" y="160" width="160" height="200" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="3"/>
+    <text x="880" y="268" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">I/O Device</text>
+    <text x="880" y="268" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">جهاز الإدخال/الإخراج</text>
+
+    <!-- I/O Module Block (Highlighted) -->
+    <rect x="340" y="60" width="320" height="400" rx="16" fill="url(#io-grad)" stroke="var(--brand-500)" stroke-width="2"/>
+    
+    <!-- I/O Module Title -->
+    <text x="500" y="95" text-anchor="middle" class="gsvg-en" fill="var(--on-brand-hi)" font-size="20" font-weight="bold">I/O Module Functions</text>
+    <text x="500" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="20" font-weight="bold">وظائف وحدة الإدخال/الإخراج</text>
+
+    <!-- I/O Module Internal Functions -->
+    <!-- Box 1: Command Decoder -->
+    <rect x="360" y="117" width="280" height="46" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="500" y="145" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">Command Decoder</tspan> (Accepts CPU Commands)
+    </text>
+    <text x="500" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">محلل الأوامر</tspan> (استقبال أوامر المعالج)
+    </text>
+
+    <!-- Box 2: Data Buffer -->
+    <rect x="360" y="177" width="280" height="46" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="500" y="205" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">Data Buffer</tspan> (Holds &amp; Copies Data)
+    </text>
+    <text x="500" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">مخزن البيانات</tspan> (حفظ ونقل البيانات)
+    </text>
+
+    <!-- Box 3: DMA Logic -->
+    <rect x="360" y="237" width="280" height="46" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="500" y="265" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">DMA Logic</tspan> (Direct Memory Access)
+    </text>
+    <text x="500" y="265" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">منطق DMA</tspan> (الوصول المباشر للذاكرة)
+    </text>
+
+    <!-- Box 4: Device Controller -->
+    <rect x="360" y="297" width="280" height="46" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="500" y="325" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">Device Controller</tspan> (Physical Control)
+    </text>
+    <text x="500" y="325" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">متحكم الجهاز</tspan> (التحكم الفعلي)
+    </text>
+
+    <!-- Box 5: Message Logic -->
+    <rect x="360" y="357" width="280" height="46" rx="8" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1"/>
+    <text x="500" y="385" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">Message Logic</tspan> (Recognizes Messages)
+    </text>
+    <text x="500" y="385" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">
+        <tspan font-weight="bold">منطق الرسائل</tspan> (التعرف على الرسائل)
+    </text>
+
+    <!-- Interfaces (Bidirectional Arrows) -->
+    <!-- CPU Interface -->
+    <line x1="220" y1="260" x2="320" y2="260" stroke="var(--brand-500)" stroke-width="4" marker-start="url(#arrow-left)" marker-end="url(#arrow-right)"/>
+    <text x="270" y="245" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">CPU Interface</text>
+    <text x="270" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">واجهة المعالج</text>
+
+    <!-- Device Interface -->
+    <line x1="680" y1="260" x2="780" y2="260" stroke="var(--brand-500)" stroke-width="4" marker-start="url(#arrow-left)" marker-end="url(#arrow-right)"/>
+    <text x="730" y="245" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">Device Interface</text>
+    <text x="730" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">واجهة الجهاز</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تحتوي وحدة الإدخال/الإخراج على مخزن مؤقت (Buffer) خاص بها بدلاً من استخدام الذاكرة الرئيسية مباشرة؟</template>
+      <template class="content-en">Why does the I/O module have its own buffer instead of using main memory directly?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن سرعة الجهاز الطرفي بطيئة جداً. إذا استخدم الذاكرة مباشرة لكل بت، فسيشغل ناقل النظام لفترة طويلة. المخزن المؤقت يجمع البيانات ببطء ثم يرسلها للذاكرة كدفعة واحدة سريعة.</p></template>
+      <template class="content-en"><p>Because the peripheral is very slow. If it used main memory directly for every bit, it would tie up the system bus for a long time. The buffer collects data slowly, then sends it to memory in one fast burst.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في واحدة من أهم وحدات معمارية الحاسب. تخيلوا معي أن المعالج هو مدير تنفيذي عبقري وسريع جداً، والأجهزة الطرفية (مثل لوحة المفاتيح والقرص الصلب) هم موظفون بطيئون جداً. كيف نجعلهم يتواصلون دون أن نضيع وقت المدير؟ هنا تأتي تقنيات الإدخال والإخراج. بدأنا بـ 'الإدخال المبرمج'، وهو أسوأ سيناريو حيث يقف المدير فوق رأس الموظف ينتظره ليكتب كل حرف! ثم تطورنا إلى 'المقاطعات'، حيث يذهب المدير لعمله، وعندما يجهز الموظف يطرق الباب (Interrupt). وأخيراً، وصلنا للحل العبقري 'DMA'، حيث قمنا بتعيين مساعد خاص (وحدة تحكم) ينقل الملفات الضخمة للذاكرة دون إزعاج المدير على الإطلاق. في الامتحان، ركزوا جيداً على الفرق بين هذه التقنيات الثلاث، وتأكدوا من فهمكم لدورة المقاطعة وكيفية حفظ 'السياق'. بالتوفيق!</template>
+    <template class="content-en">Welcome, future engineers, to a crucial module in Computer Architecture. Imagine the CPU is a brilliant, ultra-fast CEO, and peripherals (keyboard, disk) are very slow employees. How do they communicate without wasting the CEO's time? That's what I/O techniques are for. We started with 'Programmed I/O', the worst-case scenario where the CEO stands over the employee waiting for every single letter! Then we evolved to 'Interrupts', where the CEO works, and the employee knocks on the door when ready. Finally, the genius solution 'DMA': hiring a dedicated assistant to move massive files to memory without bothering the CEO at all. For the exam, focus heavily on comparing these three techniques, and make sure you deeply understand the interrupt cycle and 'Context' saving. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر الإدخال/الإخراج المبرمج (Programmed I/O) غير فعال؟</template>
+          <template class="content-en">Why is Programmed I/O considered inefficient?</template>
+          <span class="content-target">لماذا نعتبر الإدخال/الإخراج المبرمج (Programmed I/O) غير فعال؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يجبر المعالج على الانتظار النشط (Busy Waiting)، حيث يظل المعالج يسأل الجهاز باستمرار عن جاهزيته لنقل كلمة واحدة، مما يمنعه من تنفيذ برامج أخرى مفيدة.</template>
+          <template class="content-en">Because it forces the CPU into Busy Waiting. The CPU constantly polls the device for readiness to transfer a single word, preventing it from executing other useful programs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور 'السياق' (Context) في عملية المقاطعة؟</template>
+          <template class="content-en">What is the role of 'Context' in the interrupt process?</template>
+          <span class="content-target">ما هو دور 'السياق' (Context) في عملية المقاطعة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">السياق هو حالة المعالج (مثل عداد البرنامج والسجلات) التي يجب حفظها قبل الانتقال لمعالجة المقاطعة، لضمان قدرة المعالج على العودة للبرنامج الأصلي واستئنافه بدقة.</template>
+          <template class="content-en">Context is the CPU state (like PC and registers) that must be saved before jumping to the interrupt handler, ensuring the CPU can accurately resume the original program later.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق الجوهري بين المقاطعة الموجهة (Vectored) والمقاطعة بالاقتراع (Polled)؟</template>
+          <template class="content-en">What is the fundamental difference between Vectored and Polled interrupts?</template>
+          <span class="content-target">ما الفرق الجوهري بين المقاطعة الموجهة (Vectored) والمقاطعة بالاقتراع (Polled)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المقاطعة الموجهة ترسل عنوان الجهاز المقاطع مباشرة للمعالج (سريعة وتحتاج عتاد إضافي). الاقتراع يتطلب من المعالج تشغيل برنامج لسؤال كل جهاز بالترتيب لمعرفة من قاطع (بطيئة وبسيطة).</template>
+          <template class="content-en">Vectored interrupts send the interrupting device's address directly to the CPU (fast, needs extra hardware). Polled requires the CPU to run a routine asking each device sequentially who interrupted (slow, simple).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يكون استخدام DMA ضرورياً؟</template>
+          <template class="content-en">When is the use of DMA essential?</template>
+          <span class="content-target">متى يكون استخدام DMA ضرورياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عند الحاجة لنقل كتل كبيرة جداً من البيانات (مثل القراءة من القرص الصلب أو الشبكة)، حيث أن استخدام المعالج لنقلها سيتسبب في شلل كامل لأداء النظام.</template>
+          <template class="content-en">When transferring very large blocks of data (like reading from a hard disk or network), as using the CPU for this would completely paralyze system performance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل يتدخل المعالج أبداً في عملية DMA؟</template>
+          <template class="content-en">Does the CPU ever intervene in a DMA operation?</template>
+          <span class="content-target">هل يتدخل المعالج أبداً في عملية DMA؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نعم، يتدخل في البداية فقط لإرسال أوامر التهيئة (العنوان، الحجم، نوع العملية)، ويتدخل في النهاية لاستقبال مقاطعة تفيد باكتمال النقل.</template>
+          <template class="content-en">Yes, it intervenes only at the beginning to send initialization commands (address, size, operation type), and at the end to receive a completion interrupt.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة المخزن المؤقت (Buffer) داخل وحدة الإدخال/الإخراج؟</template>
+          <template class="content-en">What is the function of the Buffer inside an I/O module?</template>
+          <span class="content-target">ما هي وظيفة المخزن المؤقت (Buffer) داخل وحدة الإدخال/الإخراج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعمل كوسيط لامتصاص الفارق الكبير في السرعة بين المعالج/الذاكرة السريعة جداً والجهاز الطرفي البطيء، حيث يجمع البيانات ببطء ثم يرسلها كدفعة سريعة.</template>
+          <template class="content-en">It acts as a mediator to absorb the massive speed difference between the ultra-fast CPU/Memory and the slow peripheral, collecting data slowly then sending it as a fast burst.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتعامل المعالج مع مقاطعتين تحدثان في نفس الوقت؟</template>
+          <template class="content-en">How does the CPU handle two interrupts occurring at the same time?</template>
+          <span class="content-target">كيف يتعامل المعالج مع مقاطعتين تحدثان في نفس الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يستخدم نظام الأولويات. المقاطعة ذات الأولوية الأعلى تُعالج أولاً، بينما يتم تعليق (Hold) المقاطعة ذات الأولوية الأقل حتى تنتهي الأولى.</template>
+          <template class="content-en">It uses a priority system. The higher priority interrupt is processed first, while the lower priority one is held (suspended) until the first one finishes.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في دورة المعالج، متى يتم التحقق من خطوط المقاطعة؟</template>
+          <template class="content-en">In the CPU cycle, when are the interrupt lines checked?</template>
+          <span class="content-target">في دورة المعالج، متى يتم التحقق من خطوط المقاطعة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يتم التحقق منها في نهاية دورة التنفيذ (Execute cycle) لكل تعليمة، وقبل البدء في جلب (Fetch) التعليمة التي تليها.</template>
+          <template class="content-en">They are checked at the end of the Execute cycle for each instruction, right before starting the Fetch cycle for the next one.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو معالج المقاطعة (Interrupt Handler)؟</template>
+          <template class="content-en">What is an Interrupt Handler?</template>
+          <span class="content-target">ما هو معالج المقاطعة (Interrupt Handler)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو برنامج خاص (يُعرف غالباً ببرنامج تشغيل الجهاز Device Driver) يتم استدعاؤه وتنفيذه بواسطة المعالج للتعامل مع سبب المقاطعة.</template>
+          <template class="content-en">It is a special program (often known as a Device Driver) that is called and executed by the CPU to deal with the cause of the interrupt.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا يمكن توصيل الأجهزة الطرفية مباشرة بناقل النظام (System Bus) بدون وحدة إدخال/إخراج؟</template>
+          <template class="content-en">Why can't peripherals be connected directly to the System Bus without an I/O module?</template>
+          <span class="content-target">لماذا لا يمكن توصيل الأجهزة الطرفية مباشرة بناقل النظام (System Bus) بدون وحدة إدخال/إخراج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بسبب الاختلافات الجذرية في تنسيق البيانات، والسرعات البطيئة للأجهزة، واختلاف متطلبات التحكم الكهربائية. وحدة الإدخال/الإخراج توفر التجريد والتوافق اللازمين.</template>
+          <template class="content-en">Because of drastic differences in data formats, slow device speeds, and varying electrical control requirements. The I/O module provides the necessary abstraction and compatibility.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الهدف الأساسي من واجهات الإدخال/الإخراج (I/O Interfaces)؟",
+      "en": "What is the primary purpose of I/O Interfaces?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حل مشاكل عدم التوافق في السرعة وتنسيق البيانات بين المعالج السريع والأجهزة الطرفية المتنوعة.",
+        "en": "To resolve speed incompatibilities and data format differences between the fast CPU and diverse peripherals."
+      },
+      "example": {
+        "ar": "تخزين بيانات لوحة المفاتيح البطيئة مؤقتاً قبل إرسالها للمعالج.",
+        "en": "Buffering slow keyboard data before sending it to the CPU."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "كيف يعمل الإدخال/الإخراج المبرمج (Programmed I/O)؟",
+      "en": "How does Programmed I/O work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقوم المعالج بتنفيذ تعليمة لكل كلمة بيانات، ويظل مشغولاً بالتحقق من جاهزية الجهاز (Busy Waiting).",
+        "en": "The CPU executes an instruction for every word of data and stays busy checking if the device is ready (Busy Waiting)."
+      },
+      "example": {
+        "ar": "استخدامه لقراءة ضغطات لوحة المفاتيح.",
+        "en": "Using it to read keyboard keystrokes."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي المقاطعة (Interrupt)؟",
+      "en": "What is an Interrupt?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إشارة تجبر المعالج على تغيير مسار التنفيذ الطبيعي للتعامل مع حدث خارجي، مما يحرره من الانتظار.",
+        "en": "A signal that forces the CPU to alter its normal execution flow to handle an external event, freeing it from waiting."
+      },
+      "example": {
+        "ar": "إشارة من الطابعة تفيد بأن الورق قد نفد.",
+        "en": "A signal from the printer indicating it is out of paper."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما المقصود بـ 'السياق' (Context) في المقاطعات؟",
+      "en": "What is meant by 'Context' in interrupts?"
+    },
+    "back": {
+      "definition": {
+        "ar": "السجلات المحفوظة للبرنامج (مثل عداد البرنامج PC) قبل انتقال التحكم لمعالج المقاطعة، لتتمكن من الاستئناف لاحقاً.",
+        "en": "The saved registers of a program (like the PC) before control transfers to the interrupt handler, allowing later resumption."
+      },
+      "example": {
+        "ar": "حفظ حالة لعبة فيديو عند وصول إشعار نظام.",
+        "en": "Saving the state of a video game when a system notification arrives."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "متى يتحقق المعالج من وجود مقاطعات؟",
+      "en": "When does the CPU check for interrupts?"
+    },
+    "back": {
+      "definition": {
+        "ar": "في نهاية دورة التنفيذ (Execute cycle) لكل تعليمة.",
+        "en": "At the end of the execute cycle for each instruction."
+      },
+      "example": {
+        "ar": "بعد الانتهاء من عملية جمع وقبل جلب التعليمة التالية.",
+        "en": "After finishing an addition operation and before fetching the next instruction."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما الفرق بين المقاطعة الموجهة (Vectored) والاقتراع (Polled)؟",
+      "en": "What is the difference between Vectored and Polled interrupts?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الموجهة تتضمن عنوان الجهاز المقاطع مباشرة، بينما الاقتراع يتطلب من المعالج سؤال كل جهاز لتحديد المصدر.",
+        "en": "Vectored includes the interrupting device's address directly, while Polled requires the CPU to query each device to find the source."
+      },
+      "example": {
+        "ar": "الموجهة كأن يتصل بك شخص ويظهر رقمه، الاقتراع كأن يرن جرس وعليك فتح كل الأبواب لتعرف من طرقه.",
+        "en": "Vectored is like caller ID; Polled is like a doorbell ringing and checking every door."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هو الوصول المباشر للذاكرة (DMA)؟",
+      "en": "What is Direct Memory Access (DMA)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لنقل كتل كبيرة من البيانات بين الأجهزة والذاكرة مباشرة دون تدخل نشط من المعالج.",
+        "en": "A method for transferring large blocks of data directly between devices and memory without active CPU involvement."
+      },
+      "example": {
+        "ar": "نقل ملف فيديو بحجم 1 جيجابايت من القرص الصلب إلى الذاكرة.",
+        "en": "Transferring a 1GB video file from the hard drive to memory."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هي المعلومات الأربعة التي يرسلها المعالج لبدء DMA؟",
+      "en": "What four pieces of information does the CPU send to initiate DMA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "موقع البيانات على الجهاز، موقع البداية في الذاكرة، حجم الكتلة، وأمر القراءة/الكتابة.",
+        "en": "Location on device, starting location in memory, block size, and read/write command."
+      },
+      "example": {
+        "ar": "اقرأ 500 بايت من القرص وضعها في الذاكرة عند العنوان 1024.",
+        "en": "Read 500 bytes from disk and put them in memory at address 1024."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "كيف يعرف المعالج أن عملية DMA قد اكتملت؟",
+      "en": "How does the CPU know a DMA operation is complete?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقوم وحدة تحكم DMA بإرسال مقاطعة (Interrupt) للمعالج عند الانتهاء.",
+        "en": "The DMA controller sends an interrupt to the CPU upon completion."
+      },
+      "example": {
+        "ar": "تنبيه صوتي عند انتهاء تحميل ملف.",
+        "en": "A notification sound when a file download finishes."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هي وظيفة المخزن المؤقت (Buffer) في وحدة الإدخال/الإخراج؟",
+      "en": "What is the function of a Buffer in an I/O module?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الاحتفاظ بالبيانات مؤقتاً لتعويض فارق السرعة بين الذاكرة السريعة والجهاز الطرفي البطيء.",
+        "en": "To temporarily hold data to compensate for the speed difference between fast memory and a slow peripheral."
+      },
+      "example": {
+        "ar": "تجميع بيانات الشبكة البطيئة قبل إرسالها كدفعة للذاكرة.",
+        "en": "Collecting slow network data before sending it as a burst to memory."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ماذا يحدث للمقاطعات ذات الأولوية الأقل إذا حدثت مقاطعة ذات أولوية أعلى؟",
+      "en": "What happens to lower priority interrupts if a higher priority interrupt occurs?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تعليقها (Held) حتى تكتمل معالجة المقاطعة ذات الأولوية الأعلى.",
+        "en": "They are held (suspended) until the higher priority interrupt is complete."
+      },
+      "example": {
+        "ar": "تأجيل مقاطعة لوحة المفاتيح لصالح مقاطعة القرص الصلب.",
+        "en": "Delaying a keyboard interrupt in favor of a hard disk interrupt."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو معالج المقاطعة (Interrupt Handler)؟",
+      "en": "What is an Interrupt Handler?"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج (غالباً برنامج تشغيل جهاز) ينفذه المعالج لخدمة طلب المقاطعة.",
+        "en": "A program (often a device driver) executed by the CPU to service the interrupt request."
+      },
+      "example": {
+        "ar": "البرنامج الذي يقرأ الحرف الذي تم ضغطه على لوحة المفاتيح.",
+        "en": "The routine that reads the specific key pressed on a keyboard."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "لماذا لا نستخدم الإدخال المبرمج (Programmed I/O) مع الأقراص الصلبة؟",
+      "en": "Why don't we use Programmed I/O with hard drives?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأنه ينقل كلمة واحدة في كل مرة ويشغل المعالج بالكامل، مما يجعله بطيئاً جداً لنقل كتل البيانات الكبيرة.",
+        "en": "Because it transfers one word at a time and ties up the CPU completely, making it too slow for large data blocks."
+      },
+      "example": {
+        "ar": "نقل ملف جيجابايت سيوقف النظام بأكمله عن العمل.",
+        "en": "Transferring a GB file would freeze the entire system."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي المقاطعة البرمجية (Software Interrupt)؟",
+      "en": "What is a Software Interrupt?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقاطعة يتم توليدها بواسطة برنامج (وليس جهاز) لطلب خدمة من نظام التشغيل أو للإبلاغ عن خطأ.",
+        "en": "An interrupt generated by a program (not hardware) to request an OS service or report an error."
+      },
+      "example": {
+        "ar": "القسمة على صفر تولد مقاطعة برمجية.",
+        "en": "Division by zero generates a software interrupt."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "كيف يساهم الإدخال/الإخراج في تخصيص الوقت (Time Sharing)؟",
+      "en": "How does I/O contribute to Time Sharing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم مقاطعات الساعة (Clock Interrupts) لإيقاف برنامج مؤقتاً ومنح المعالج لبرنامج آخر.",
+        "en": "Clock interrupts are used to suspend a program temporarily and give the CPU to another program."
+      },
+      "example": {
+        "ar": "نظام التشغيل يبدل بين المتصفح ومشغل الموسيقى كل بضعة أجزاء من الثانية.",
+        "en": "The OS switching between a browser and music player every few milliseconds."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من التقنيات التالية تجعل المعالج مشغولاً بالانتظار (Busy Waiting) أثناء عملية الإدخال/الإخراج؟",
+      "en": "Which of the following techniques keeps the CPU busy waiting during an I/O operation?"
+    },
+    "options": {
+      "ar": [
+        "الوصول المباشر للذاكرة (DMA)",
+        "الإدخال/الإخراج المبرمج (Programmed I/O)",
+        "المقاطعة الموجهة (Vectored Interrupt)",
+        "المقاطعة بالاقتراع (Polled Interrupt)"
+      ],
+      "en": [
+        "Direct Memory Access (DMA)",
+        "Programmed I/O",
+        "Vectored Interrupt",
+        "Polled Interrupt"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في الإدخال المبرمج، يقوم المعالج بفحص حالة الجهاز باستمرار لنقل كل كلمة، مما يهدر وقته.",
+      "en": "In Programmed I/O, the CPU constantly checks the device status to transfer each word, wasting its time."
+    },
+    "hint": {
+      "ar": "تذكر الطريقة التي تتطلب دورة جلب/تنفيذ كاملة لكل كلمة.",
+      "en": "Remember the method that requires a full fetch/execute cycle for every single word."
+    },
+    "difficulty": "easy",
+    "conceptId": "programmed-io"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من حفظ 'السياق' (Context) عند حدوث مقاطعة؟",
+      "en": "What is the primary purpose of saving the 'Context' when an interrupt occurs?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عمل جهاز الإدخال/الإخراج.",
+        "للسماح للبرنامج بالاستئناف بدقة من حيث توقف.",
+        "لمسح الذاكرة المؤقتة للمعالج.",
+        "لبدء عملية الوصول المباشر للذاكرة (DMA)."
+      ],
+      "en": [
+        "To speed up the I/O device.",
+        "To allow the program to resume exactly where it left off.",
+        "To clear the CPU cache.",
+        "To initiate a DMA transfer."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "السياق يحتوي على حالة السجلات وعداد البرنامج، وبدون حفظها لا يمكن للمعالج العودة للبرنامج الأصلي بعد خدمة المقاطعة.",
+      "en": "The context contains the state of registers and the PC. Without saving it, the CPU cannot return to the original program after servicing the interrupt."
+    },
+    "hint": {
+      "ar": "فكر في علامة مرجعية في كتاب.",
+      "en": "Think of a bookmark in a book."
+    },
+    "difficulty": "medium",
+    "conceptId": "interrupts-basics"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في أي مرحلة من دورة المعالج يتم التحقق من وجود مقاطعات؟",
+      "en": "At which stage of the CPU cycle are interrupts checked?"
+    },
+    "options": {
+      "ar": [
+        "قبل جلب التعليمة.",
+        "أثناء تنفيذ التعليمة.",
+        "بعد تنفيذ التعليمة وقبل جلب التالية.",
+        "فقط عند تشغيل الجهاز."
+      ],
+      "en": [
+        "Before fetching the instruction.",
+        "During instruction execution.",
+        "After executing the instruction and before fetching the next.",
+        "Only at system boot."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم التحقق من المقاطعات في نهاية دورة التنفيذ لضمان اكتمال التعليمة الحالية بشكل صحيح.",
+      "en": "Interrupts are checked at the end of the execute cycle to ensure the current instruction completes properly."
+    },
+    "hint": {
+      "ar": "المعالج لا يحب أن يُقاطع في منتصف عمله.",
+      "en": "The CPU doesn't like to be interrupted in the middle of a task."
+    },
+    "difficulty": "medium",
+    "conceptId": "interrupts-basics"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي طريقة مقاطعة تتضمن عنوان الجهاز المقاطع في الإشارة نفسها؟",
+      "en": "Which interrupt method includes the address of the interrupting device in the signal itself?"
+    },
+    "options": {
+      "ar": [
+        "المقاطعة بالاقتراع (Polled)",
+        "المقاطعة الموجهة (Vectored)",
+        "المقاطعة البرمجية (Software)",
+        "المقاطعة المقنعة (Maskable)"
+      ],
+      "en": [
+        "Polled Interrupt",
+        "Vectored Interrupt",
+        "Software Interrupt",
+        "Maskable Interrupt"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المقاطعة الموجهة (Vectored) توفر العنوان مباشرة، مما يلغي الحاجة للبحث عن الجهاز.",
+      "en": "Vectored interrupts provide the address directly, eliminating the need to search for the device."
+    },
+    "hint": {
+      "ar": "الكلمة تعني 'موجه' أو 'متجه'.",
+      "en": "The word implies 'directed' or 'pointing to'."
+    },
+    "difficulty": "easy",
+    "conceptId": "interrupt-processing-methods"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هي التقنية الأفضل لنقل كتل كبيرة من البيانات من القرص الصلب إلى الذاكرة؟",
+      "en": "What is the best technique for transferring large blocks of data from a hard drive to memory?"
+    },
+    "options": {
+      "ar": [
+        "الإدخال/الإخراج المبرمج",
+        "المقاطعة بالاقتراع",
+        "الوصول المباشر للذاكرة (DMA)",
+        "المقاطعة البرمجية"
+      ],
+      "en": [
+        "Programmed I/O",
+        "Polled Interrupt",
+        "Direct Memory Access (DMA)",
+        "Software Interrupt"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "DMA مصمم خصيصاً لنقل الكتل الكبيرة مباشرة للذاكرة دون إشغال المعالج.",
+      "en": "DMA is specifically designed to transfer large blocks directly to memory without tying up the CPU."
+    },
+    "hint": {
+      "ar": "ابحث عن التقنية التي تتجاوز المعالج.",
+      "en": "Look for the technique that bypasses the CPU."
+    },
+    "difficulty": "easy",
+    "conceptId": "direct-memory-access-dma"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما الذي لا يرسله المعالج لوحدة تحكم DMA عند تهيئتها؟",
+      "en": "What does the CPU NOT send to the DMA controller during initialization?"
+    },
+    "options": {
+      "ar": [
+        "موقع البداية في الذاكرة",
+        "حجم كتلة البيانات",
+        "البيانات الفعلية المراد نقلها",
+        "أمر القراءة أو الكتابة"
+      ],
+      "en": [
+        "Starting location in memory",
+        "Size of the data block",
+        "The actual data to be transferred",
+        "Read or Write command"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعالج يرسل فقط معلومات التحكم (العنوان، الحجم، الأمر). وحدة DMA هي من تقوم بجلب البيانات الفعلية.",
+      "en": "The CPU only sends control info (address, size, command). The DMA module fetches the actual data."
+    },
+    "hint": {
+      "ar": "إذا أرسل المعالج هذا الشيء، فلن يكون هناك فائدة من DMA.",
+      "en": "If the CPU sent this, there would be no point to having DMA."
+    },
+    "difficulty": "medium",
+    "conceptId": "direct-memory-access-dma"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "كيف تبلغ وحدة DMA المعالج بأنها انتهت من نقل البيانات؟",
+      "en": "How does the DMA module notify the CPU that it has finished transferring data?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق تغيير قيمة في الذاكرة الرئيسية.",
+        "عن طريق إرسال مقاطعة (Interrupt).",
+        "عن طريق إيقاف تشغيل ناقل النظام.",
+        "المعالج يقوم بالاقتراع (Polling) لمعرفة ذلك."
+      ],
+      "en": [
+        "By changing a value in main memory.",
+        "By sending an interrupt.",
+        "By shutting down the system bus.",
+        "The CPU polls to find out."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عند اكتمال النقل، ترسل وحدة DMA إشارة مقاطعة للمعالج ليعلم أن العملية تمت بنجاح.",
+      "en": "Upon completion, the DMA module sends an interrupt signal to the CPU so it knows the operation was successful."
+    },
+    "hint": {
+      "ar": "تستخدم نفس الآلية التي تستخدمها الأجهزة الأخرى لجذب انتباه المعالج.",
+      "en": "It uses the same mechanism other devices use to get the CPU's attention."
+    },
+    "difficulty": "easy",
+    "conceptId": "direct-memory-access-dma"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي مما يلي ليس من وظائف وحدة الإدخال/الإخراج (I/O Module)؟",
+      "en": "Which of the following is NOT a function of an I/O Module?"
+    },
+    "options": {
+      "ar": [
+        "توفير مخزن مؤقت (Buffer) للبيانات.",
+        "التحكم الفيزيائي في الجهاز الطرفي.",
+        "تنفيذ تعليمات البرامج الخاصة بالمستخدم.",
+        "التواصل مع وحدة المعالجة المركزية."
+      ],
+      "en": [
+        "Providing a data buffer.",
+        "Physically controlling the peripheral device.",
+        "Executing user program instructions.",
+        "Communicating with the CPU."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تنفيذ تعليمات البرامج هو وظيفة وحدة المعالجة المركزية (CPU)، وليس وحدة الإدخال/الإخراج.",
+      "en": "Executing program instructions is the job of the CPU, not the I/O module."
+    },
+    "hint": {
+      "ar": "وحدة الإدخال/الإخراج تدير الأجهزة، ولا تشغل التطبيقات.",
+      "en": "The I/O module manages hardware, it doesn't run applications."
+    },
+    "difficulty": "medium",
+    "conceptId": "io-module-functions"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ماذا يحدث إذا حدثت مقاطعة أثناء معالجة مقاطعة أخرى ذات أولوية أعلى؟",
+      "en": "What happens if an interrupt occurs while another higher-priority interrupt is being processed?"
+    },
+    "options": {
+      "ar": [
+        "يتم تجاهل المقاطعة الجديدة تماماً.",
+        "يتم تعليق المقاطعة الجديدة حتى تنتهي الحالية.",
+        "يتم إيقاف المقاطعة الحالية والبدء في الجديدة.",
+        "يتوقف النظام عن العمل."
+      ],
+      "en": [
+        "The new interrupt is completely ignored.",
+        "The new interrupt is held until the current one finishes.",
+        "The current interrupt is stopped to start the new one.",
+        "The system crashes."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المقاطعات ذات الأولوية الأقل يتم تعليقها (Held) ولا يتم تجاهلها، وتُعالج بعد انتهاء المقاطعة الأهم.",
+      "en": "Lower priority interrupts are held (suspended), not ignored, and are processed after the more important one finishes."
+    },
+    "hint": {
+      "ar": "الأولوية تحكم من يعمل أولاً، لكن لا أحد يُنسى.",
+      "en": "Priority dictates who goes first, but no one is forgotten."
+    },
+    "difficulty": "medium",
+    "conceptId": "interrupt-processing-methods"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "لماذا نحتاج إلى واجهات الإدخال/الإخراج (I/O Interfaces)؟",
+      "en": "Why do we need I/O Interfaces?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة سرعة المعالج.",
+        "لأن الأجهزة الطرفية تعمل بنفس سرعة وتنسيق المعالج.",
+        "لحل مشاكل عدم التوافق في السرعة وتنسيق البيانات بين المعالج والأجهزة.",
+        "لتقليل حجم الذاكرة المطلوبة."
+      ],
+      "en": [
+        "To increase CPU speed.",
+        "Because peripherals operate at the same speed and format as the CPU.",
+        "To resolve speed and data format incompatibilities between the CPU and devices.",
+        "To reduce the required memory size."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الواجهات تعمل كمترجم ومخزن مؤقت لحل الاختلافات الجذرية في السرعة وطبيعة البيانات بين المعالج والأجهزة.",
+      "en": "Interfaces act as translators and buffers to resolve the drastic differences in speed and data nature between the CPU and devices."
+    },
+    "hint": {
+      "ar": "المعالج يتحدث لغة سريعة جداً، والأجهزة تتحدث لغات بطيئة ومختلفة.",
+      "en": "The CPU speaks a very fast language, devices speak slow and different languages."
+    },
+    "difficulty": "easy",
+    "conceptId": "io-requirements-interfaces"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يعتقد الكثيرون أن DMA يعمل بدون أي تدخل من المعالج على الإطلاق. هذا خطأ! المعالج يجب أن يتدخل في البداية لتهيئة DMA (إرسال العنوان والحجم) ويتدخل في النهاية لاستقبال مقاطعة الاكتمال.</template>
+    <template class="content-en">Many think DMA operates with ZERO CPU involvement. This is a trap! The CPU MUST intervene at the start to initialize the DMA (send address/size) and at the end to receive the completion interrupt.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">المعالج لا يتحقق من المقاطعات في أي وقت عشوائي. التحقق يحدث فقط في 'نهاية' دورة تنفيذ التعليمة. هذا يضمن عدم ترك أي تعليمة في حالة نصف مكتملة مما قد يدمر البيانات.</template>
+    <template class="content-en">The CPU doesn't check for interrupts at random times. The check happens ONLY at the 'end' of an instruction's execute cycle. This ensures no instruction is left half-finished, which could corrupt data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">حفظ السياق (Context Saving) هو سر نجاح المقاطعات. إذا لم يتم حفظ قيمة عداد البرنامج (PC) بدقة قبل القفز لمعالج المقاطعة، فلن يعرف المعالج أبداً من أين يستأنف برنامجه الأصلي.</template>
+    <template class="content-en">Context Saving is the secret to successful interrupts. If the Program Counter (PC) isn't accurately saved before jumping to the handler, the CPU will never know where to resume its original program.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الإدخال المبرمج (Programmed I/O) والمقاطعة بالاقتراع (Polled Interrupt). الإدخال المبرمج هو طريقة لنقل البيانات حيث يسأل المعالج الجهاز باستمرار. الاقتراع هو طريقة لمعرفة 'من' طلب المقاطعة بعد حدوثها.</template>
+    <template class="content-en">Confusing Programmed I/O with Polled Interrupts. Programmed I/O is a data transfer method where the CPU constantly polls the device status. Polled Interrupt is a method to find out 'who' interrupted AFTER an interrupt occurs.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M09.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M11.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 3 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

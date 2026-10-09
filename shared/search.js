@@ -211,6 +211,58 @@
     return modUrlMap[code + '|' + m] || null;
   }
 
+  var API_CACHE = {}, API_KEYS = [];
+  function apiBase() {
+    try { var o = localStorage.getItem('garden_search_api'); if (o) return o.replace(/\/$/, ''); } catch (e) {}
+    return (window.GardenEndpoints && window.GardenEndpoints.publicData) || '';
+  }
+  function remote(q, o) {
+    o = o || {};
+    q = String(q || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    var base = apiBase();
+    if (!base) { needEndpoints(); return Promise.reject(new Error('no_endpoint')); }
+    var p = new URLSearchParams();
+    p.set('q', q);
+    p.set('lang', isAr() ? 'ar' : 'en');
+    ['type', 'course', 'level', 'in', 'off', 'lim'].forEach(function (k) {
+      if (o[k] != null && o[k] !== '') p.set(k, String(o[k]));
+    });
+    var key = p.toString();
+    if (API_CACHE[key]) return Promise.resolve(API_CACHE[key]);
+    var ctl = window.AbortController ? new AbortController() : null;
+    if (ctl && o.signal) o.signal.addEventListener('abort', function () { ctl.abort(); });
+    var t = setTimeout(function () { if (ctl) ctl.abort(); }, o.timeout || 2500);
+    return fetch(base + '/v1/search?' + key, ctl ? { signal: ctl.signal } : {})
+      .then(function (r) { if (!r.ok) throw new Error('http_' + r.status); return r.json(); })
+      .then(function (j) {
+        clearTimeout(t);
+        API_CACHE[key] = j; API_KEYS.push(key);
+        if (API_KEYS.length > 40) delete API_CACHE[API_KEYS.shift()];
+        return j;
+      }, function (e) { clearTimeout(t); throw e; });
+  }
+
+  var KIND_T = { course: 'course', plan: 'course', module: 'module', concept: 'concept', video: 'video',
+                 code: 'code', tool: 'tool', faculty: 'instructor', section: 'secs', note: 'note', slides: 'slides' };
+  function fromHit(h) {
+    var u = h.u || '', code = h.c || '', m = viewMajor();
+    if (m !== 'CS' && h.a && code) {
+      for (var i = 0; i < h.a.length; i++) {
+        var al = h.a[i];
+        if (String(al[0]).indexOf(m) !== 0) continue;
+        var at = u.indexOf(code + '/');
+        if (at >= 0) u = al[1] + u.slice(at + code.length + 1);
+        code = al[0];
+        break;
+      }
+    }
+    var jump = '';
+    if (h.sn && h.sn.a && !/^https?:/.test(u)) jump = u.replace(/#.*$/, '') + '#' + h.sn.a;
+    return { t: KIND_T[h.k] || 'concept', kind: h.k, code: code, m: h.m || 0,
+             ar: (h.t && h.t[0]) || (h.t && h.t[1]) || '', en: (h.t && h.t[1]) || (h.t && h.t[0]) || '',
+             url: u, jump: jump, th: h.th, sn: h.sn, x: h.x, remote: true };
+  }
+
   /*@3.SEAJ.42*/
   function searchMine(q) {
     var nq = norm(q);
@@ -395,6 +447,15 @@
     }
 
     try {
+      (JSON.parse(localStorage.getItem('notes_index') || '[]') || []).forEach(function (r) {
+        if (!r || !r.id || typeof r.d === 'number') return;
+        if (norm(r.t || '').indexOf(nq) === -1) return;
+        out.push({ t: 'note', code: (r.o && r.o.c) || '', ar: r.t, en: r.t,
+                   url: 'hub/notes.html?id=' + encodeURIComponent(r.id), score: 45 });
+      });
+    } catch (e) {}
+
+    try {
       (JSON.parse(localStorage.getItem('quick_notes') || '[]') || []).forEach(function (n) {
         if (!n || !n.body) return;
         if (norm(n.body).indexOf(nq) === -1) return;
@@ -482,13 +543,28 @@
     course:     ['<i class="fa-solid fa-book" aria-hidden="true"></i>', 'مواد', 'Courses'],
     task:       ['<i class="fa-solid fa-list-check" aria-hidden="true"></i>', 'مهامي وواجباتي', 'My tasks'],
     section:    ['<i class="fa-solid fa-layer-group" aria-hidden="true"></i>', 'شعبي', 'My sections'],
+    secs:       ['<i class="fa-solid fa-layer-group" aria-hidden="true"></i>', 'شعب', 'Sections'],
     instructor: ['<i class="fa-solid fa-chalkboard-user" aria-hidden="true"></i>', 'أساتذة', 'Instructors'],
     lab:        ['<i class="fa-solid fa-flask" aria-hidden="true"></i>', 'مختبرات', 'Labs'],
+    tool:       ['<i class="fa-solid fa-compass" aria-hidden="true"></i>', 'أدوات الموقع', 'Site tools'],
     module:     ['<i class="fa-solid fa-book-open" aria-hidden="true"></i>', 'وحدات', 'Modules'],
     concept:    ['<i class="fa-solid fa-lightbulb" aria-hidden="true"></i>', 'مفاهيم', 'Concepts'],
+    slides:     ['<i class="fa-solid fa-file-pdf" aria-hidden="true"></i>', 'عروض المحاضرات', 'Lecture slides'],
+    video:      ['<i class="fa-solid fa-circle-play" aria-hidden="true"></i>', 'فيديوهات', 'Videos'],
+    code:       ['<i class="fa-solid fa-code" aria-hidden="true"></i>', 'أمثلة كود', 'Code examples'],
     note:       ['<i class="fa-solid fa-note-sticky" aria-hidden="true"></i>', 'ملاحظاتي', 'My notes']
   };
-  var ORDER = ['crn', 'course', 'task', 'section', 'instructor', 'lab', 'module', 'concept', 'note'];
+  var ORDER = ['crn', 'course', 'task', 'section', 'secs', 'instructor', 'tool', 'lab', 'module', 'concept', 'slides', 'video', 'code', 'note'];
+
+  function markRanges(text, rs) {
+    var raw = String(text || ''), out = '', at = 0;
+    (rs || []).forEach(function (r) {
+      if (r[0] < at || r[1] > raw.length) return;
+      out += esc(raw.slice(at, r[0])) + '<mark>' + esc(raw.slice(r[0], r[1])) + '</mark>';
+      at = r[1];
+    });
+    return out + esc(raw.slice(at));
+  }
 
   function highlight(text, nq) {
     var n = norm(text);
@@ -507,11 +583,30 @@
 
     if (nq.length < MIN_CHARS) { close(); return; }
     results = search(q);
+    var rem = lastRemote && lastRemote.q === q ? lastRemote : null;
+    if (rem && rem.j) {
+      var seenU = {};
+      results.forEach(function (r) { if (r.e.url) seenU[r.e.url] = 1; });
+      rem.j.hits.forEach(function (h) {
+        var e = fromHit(h);
+        if (e.url && seenU[e.url]) return;
+        results.push({ e: e, score: h.s });
+      });
+    }
     active = -1;
+    var foot = '';
+    if (rem && rem.j && rem.j.total) {
+      foot = '<a class="gs-item gs-all" href="' + esc(allHref(q)) + '" role="option">' +
+        '<span class="gs-item-title">' + esc(tx('كلُّ النتائج (' + rem.j.total + ') في البحث المتقدّم',
+          'All ' + rem.j.total + ' results in advanced search')) + '</span></a>';
+    } else if (rem && rem.off) {
+      foot = '<div class="gs-note">' + esc(tx('دون اتصال: البحثُ في العناوين وحدَها',
+        'Offline: searching titles only')) + '</div>';
+    }
 
     if (!results.length) {
       panel.innerHTML = '<div class="gs-empty">' +
-        esc(tx('لا نتائج لـ «' + q + '»', 'No results for “' + q + '”')) + '</div>';
+        esc(tx('لا نتائج لـ «' + q + '»', 'No results for “' + q + '”')) + '</div>' + foot;
       open();
       return;
     }
@@ -532,13 +627,17 @@
       list.slice(0, GROUP_CAP).forEach(function (e) {
         var title = isAr() ? (e.ar || e.en) : (e.en || e.ar);
         var sub = subOf(e);
-        html += '<a class="gs-item" data-i="' + (idx++) + '" href="' + esc(hrefFor(e)) + '" role="option">' +
-          '<span class="gs-item-title">' + highlight(title, nq) + '</span>' +
-          (sub ? '<span class="gs-item-sub">' + esc(sub) + '</span>' : '') +
+        var th = e.th ? markRanges(title, e.th[isAr() ? (e.ar ? 0 : 1) : (e.en ? 1 : 0)]) : highlight(title, nq);
+        var snip = e.sn && e.sn.f !== 'ti' ? '<span class="gs-item-snip">' + (e.sn.pre ? '… ' : '') +
+          markRanges(e.sn.s, e.sn.h) + (e.sn.post ? ' …' : '') + '</span>' : '';
+        html += '<a class="gs-item" data-i="' + (idx++) + '" href="' + esc(hrefFor(e)) + '" role="option"' +
+          (/^https?:/.test(e.url || '') ? ' target="_blank" rel="noopener"' : '') + '>' +
+          '<span class="gs-item-title">' + th + '</span>' +
+          (sub ? '<span class="gs-item-sub">' + esc(sub) + '</span>' : '') + snip +
         '</a>';
       });
     });
-    panel.innerHTML = html;
+    panel.innerHTML = html + foot;
     open();
   }
 
@@ -566,6 +665,13 @@
       return e.code || tx('لا تقييمات بعد', 'no ratings yet');
     }
     if (e.t === 'lab') return tx('مختبر تفاعلي', 'Interactive lab') + (e.code ? ' · ' + e.code : '');
+    if (e.t === 'video') return (e.code ? e.code + (e.m ? ' · ' + tx('وحدة ' + e.m, 'Module ' + e.m) : '') + ' · ' : '') + ((e.x && e.x.ch) || 'YouTube');
+    if (e.t === 'code') return tx('مختبر اللغات', 'Languages lab') + ((e.x && e.x.lang) ? ' · ' + e.x.lang : '');
+    if (e.t === 'tool') return tx('في الموقع', 'On the site');
+    if (e.t === 'slides') return e.code + ((e.sn && /^p\d+$/.test(e.sn.a || '')) ? ' · ' + tx('الشريحة ' + e.sn.a.slice(1), 'slide ' + e.sn.a.slice(1)) : '');
+    if (e.t === 'secs') return 'CRN ' + ((e.x && e.x.crn) || '') + ((e.x && e.x.pf && e.x.pf.length) ? ' · ' + e.x.pf[0] : '');
+    if (e.kind === 'faculty') return (e.x && e.x.n) ? tx(e.x.n + ' شعبة', e.x.n + ' sections') : tx('أستاذ', 'Instructor');
+    if (e.kind === 'plan') return e.code + ' · ' + tx('من الخطط الدراسيّة', 'from study plans');
     if (e.m) return e.code + ' · ' + tx('وحدة ' + e.m, 'Module ' + e.m);
     return e.code || '';
   }
@@ -575,6 +681,8 @@
     if (/^(https?:)?\/\//.test(e.url)) return e.url;
     return ROOT + e.url;
   }
+
+  function allHref(q) { return ROOT + 'hub/search.html?q=' + encodeURIComponent(q); }
 
   function open() { if (panel) { panel.hidden = false; box.classList.add('gs-open'); input.setAttribute('aria-expanded', 'true'); } }
   function close() { if (panel) { panel.hidden = true; box.classList.remove('gs-open'); input.setAttribute('aria-expanded', 'false'); active = -1; } }
@@ -597,17 +705,33 @@
 
   /*@3.SEAJ.22*/
 
-  var timer = null;
+  var timer = null, seqN = 0, lastRemote = null, remoteCtl = null;
   function onInput() {
     clearTimeout(timer);
     var q = input.value;
-    timer = setTimeout(function () {
-      loadIndex().then(function () { render(q); });
-    }, 90);
+    timer = setTimeout(function () { run(q); }, 110);
+  }
+  function run(q) {
+    var my = ++seqN;
+    if (norm(q).length < MIN_CHARS) { close(); return; }
+    if (remoteCtl) remoteCtl.abort();
+    remoteCtl = window.AbortController ? new AbortController() : null;
+    remote(q, { lim: 30, signal: remoteCtl && remoteCtl.signal }).then(function (j) {
+      if (my !== seqN) return;
+      lastRemote = { q: q, j: j };
+      render(q);
+    }, function () {
+      if (my !== seqN) return;
+      lastRemote = { q: q, j: null, off: true };
+      loadIndex().then(function () { if (my === seqN) render(q); });
+    });
   }
 
   function onKey(e) {
     if (e.key === 'Escape') { close(); input.blur(); return; }
+    if (e.key === 'Enter' && (panel.hidden || active < 0) && norm(input.value).length >= MIN_CHARS) {
+      e.preventDefault(); location.href = allHref(input.value.trim()); return;
+    }
     if (panel.hidden) return;
     if (e.key === 'ArrowDown') { e.preventDefault(); setActive(active + 1); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(active - 1); }
@@ -629,7 +753,7 @@
     panel.setAttribute('role', 'listbox');
 
     /*@3.SEAJ.23*/
-    input.addEventListener('focus', function () { loadIndex(); }, { once: true });
+    input.addEventListener('focus', function () { if (!window.GardenEndpoints) needEndpoints(); }, { once: true });
     input.addEventListener('input', onInput);
     input.addEventListener('keydown', onKey);
 
@@ -696,7 +820,9 @@
   }
 
   /*@3.SEAJ.57*/
-  window.GardenSearch = { load: loadIndex, query: search, norm: norm, moduleUrl: moduleUrl };
+  window.GardenSearch = { load: loadIndex, query: search, norm: norm, moduleUrl: moduleUrl,
+                          remote: remote, fromHit: fromHit, mine: searchMine, viewMajor: viewMajor,
+                          markRanges: markRanges, root: ROOT };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

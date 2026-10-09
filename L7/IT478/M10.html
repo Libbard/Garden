@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="IT478" data-module="10" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>البرمجيات الخبيثة (Malware) · IT478 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="IT478" data-page-title-en="IT478">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M09.html" data-gh-next="M11.html" data-gh-card="../../hub/course.html?code=IT478"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#malware-classification" class="toc-link" data-bilingual>
+        <template class="content-ar">تصنيف البرمجيات الخبيثة: الانتشار والحمولة</template>
+        <template class="content-en">Malware Classification: Propagation and Payload</template>
+        <span class="content-target">تصنيف البرمجيات الخبيثة: الانتشار والحمولة</span>
+      </a>
+      <a href="#viruses-structure-phases" class="toc-link" data-bilingual>
+        <template class="content-ar">الفيروسات: الهيكلة والمراحل</template>
+        <template class="content-en">Viruses: Structure and Phases</template>
+        <span class="content-target">الفيروسات: الهيكلة والمراحل</span>
+      </a>
+      <a href="#virus-concealment-strategies" class="toc-link" data-bilingual>
+        <template class="content-ar">استراتيجيات إخفاء الفيروسات</template>
+        <template class="content-en">Virus Concealment Strategies</template>
+        <span class="content-target">استراتيجيات إخفاء الفيروسات</span>
+      </a>
+      <a href="#worms-and-target-discovery" class="toc-link" data-bilingual>
+        <template class="content-ar">الديدان واستراتيجيات اكتشاف الأهداف</template>
+        <template class="content-en">Worms and Target Discovery</template>
+        <span class="content-target">الديدان واستراتيجيات اكتشاف الأهداف</span>
+      </a>
+      <a href="#mobile-code-drive-by-spam" class="toc-link" data-bilingual>
+        <template class="content-ar">الكود المتنقل، التنزيلات التلقائية، والبريد المزعج</template>
+        <template class="content-en">Mobile Code, Drive-by-downloads, and Spam</template>
+        <span class="content-target">الكود المتنقل، التنزيلات التلقائية، والبريد المزعج</span>
+      </a>
+      <a href="#trojans" class="toc-link" data-bilingual>
+        <template class="content-ar">أحصنة طروادة (Trojans)</template>
+        <template class="content-en">Trojans</template>
+        <span class="content-target">أحصنة طروادة (Trojans)</span>
+      </a>
+      <a href="#payloads-system-corruption-bots" class="toc-link" data-bilingual>
+        <template class="content-ar">الحمولات: فساد النظام وعملاء الهجوم (البوتات)</template>
+        <template class="content-en">Payloads: System Corruption and Attack Agents (Bots)</template>
+        <span class="content-target">الحمولات: فساد النظام وعملاء الهجوم (البوتات)</span>
+      </a>
+      <a href="#payloads-stealthing-backdoors" class="toc-link" data-bilingual>
+        <template class="content-ar">الحمولات: التخفي والأبواب الخلفية</template>
+        <template class="content-en">Payloads: Stealthing and Backdoors</template>
+        <span class="content-target">الحمولات: التخفي والأبواب الخلفية</span>
+      </a>
+      <a href="#countermeasures-and-ddos" class="toc-link" data-bilingual>
+        <template class="content-ar">التدابير المضادة وهجمات حجب الخدمة الموزعة (DDoS)</template>
+        <template class="content-en">Countermeasures and DDoS Attacks</template>
+        <span class="content-target">التدابير المضادة وهجمات حجب الخدمة الموزعة (DDoS)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 10</template>
+      <template class="content-en">Module 10</template>
+      <span class="content-target">الوحدة 10</span>
+    </span> · IT478
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">البرمجيات الخبيثة (Malware)</h1>
+      <p class="hero-description">دراسة شاملة لأنواع البرمجيات الخبيثة، آليات انتشارها، الحمولات التي تنفذها، وطرق اكتشافها ومكافحتها.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Malicious Software (Malware)</h1>
+      <p class="hero-description">A comprehensive study of malware types, propagation mechanisms, payloads, and countermeasures.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">أمن الشبكات</span>
+      <span class="tag">البرمجيات الخبيثة</span>
+      <span class="tag">الفيروسات</span>
+      <span class="tag">الديدان</span>
+      <span class="tag">شبكات البوت</span>
+      <span class="tag">هجمات حجب الخدمة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Network Security</span>
+      <span class="tag">Malware</span>
+      <span class="tag">Viruses</span>
+      <span class="tag">Worms</span>
+      <span class="tag">Botnets</span>
+      <span class="tag">DDoS</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف ثلاث آليات رئيسية تستخدمها البرمجيات الخبيثة للانتشار.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم العمليات الأساسية للفيروسات، الديدان، وأحصنة طروادة.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف أربع فئات رئيسية لحمولات البرمجيات الخبيثة (Payloads).</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم التهديدات المختلفة التي تشكلها شبكات البوت، برامج التجسس، والجذور الخفية.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف بعض عناصر التدابير المضادة للبرمجيات الخبيثة وثلاثة مواقع لآليات اكتشافها.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe three broad mechanisms malware uses to propagate.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the basic operation of viruses, worms, and trojans.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe four broad categories of malware payloads.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the different threats posed by bots, spyware, and rootkits.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe some malware countermeasure elements and three locations for malware detection mechanisms.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="malware-classification" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> تصنيف البرمجيات الخبيثة: الانتشار والحمولة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Malware Classification: Propagation and Payload</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُصنف البرمجيات الخبيثة بناءً على كيفية انتشارها (Propagation) وما تفعله بعد الوصول للهدف (Payload).</p></template>
+    <template class="content-en"><p>Malware is classified based on how it spreads (Propagation) and what actions it performs once it reaches the target (Payload).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تصنيف البرمجيات الخبيثة إلى فئتين رئيسيتين:</p><ol><li><b>آليات الانتشار (Propagation mechanisms):</b> تشمل إصابة المحتوى القابل للتنفيذ (الفيروسات)، استغلال الثغرات البرمجية عبر الشبكة (الديدان والتنزيلات التلقائية)، وهجمات الهندسة الاجتماعية (أحصنة طروادة والتصيد الاحتيالي).</li><li><b>الحمولات (Payloads):</b> الإجراءات التي يتم تنفيذها بعد الوصول، مثل: الفساد النظامي، سرقة المعلومات (برامج التجسس، مسجلات لوحة المفاتيح)، التخفي (الأبواب الخلفية)، أو تحويل الجهاز إلى عميل هجوم (زومبي/بوت).</li></ol></template>
+    <template class="content-en"><p>Malware can be classified into two broad categories:</p><ol><li><b>Propagation mechanisms:</b> Include infection of existing executable content (viruses), exploit of software vulnerabilities over a network (worms, drive-by-downloads), and social engineering attacks (trojans, phishing).</li><li><b>Payloads:</b> Actions performed once a target is reached, such as system corruption, information theft (keyloggers, spyware), stealthing (backdoors, rootkits), or acting as an attack agent (zombie, bots).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تطور تطوير البرمجيات الخبيثة بشكل كبير. في البداية، كان يتطلب مهارات تقنية عالية، لكن ظهور أدوات إنشاء الفيروسات (Crimeware) في التسعينيات والعقد الأول من القرن الحادي والعشرين سمح حتى للمبتدئين بنشر البرمجيات الخبيثة.</p><p>تغيرت مصادر الهجوم من أفراد إلى مجموعات منظمة، مجرمين، وكالات حكومية، ومنظمات تبيع خدماتها، مما أدى إلى ظهور اقتصاد سري كبير لبيع أدوات الهجوم والمعلومات المسروقة.</p></template>
+    <template class="content-en"><p>The development of malware has evolved significantly. Initially requiring considerable technical skill, the advent of virus-creation toolkits (<span class="smart-term" data-term-en="Crimeware" data-ar="برمجيات الجريمة" data-en-def="Attack kits and toolkits that include a variety of propagation mechanisms and payload modules that even novices can use.">Crimeware<span class="smart-term-tooltip"></span></span>) in the 1990s and 2000s allowed even novices to deploy malware.</p><p>Attack sources have shifted from individuals to organized crime, politically motivated attackers, and national government agencies, creating a large underground economy involving the sale of attack kits and stolen information.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A flowchart showing Malware splitting into two main branches: 'Propagation' and 'Payload'. Under Propagation, list 'Viruses (Infection)', 'Worms (Vulnerability Exploit)', and 'Trojans (Social Engineering)'. Under Payload, list 'System Corruption', 'Attack Agent (Bots)', 'Information Theft', and 'Stealthing'. Style: educational, dark background #0d1117, accent color #007acc, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Gradient for Root Node -->
+    <linearGradient id="rootGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Subtle Drop Shadow -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    
+    <!-- ========================================== -->
+    <!-- PATHS & CONNECTIONS                        -->
+    <!-- ========================================== -->
+
+    <!-- Root to Level 1 (Propagation & Payload) -->
+    <path d="M 400 75 C 400 90, 220 90, 220 105" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <path d="M 400 75 C 400 90, 580 90, 580 105" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Left Spine (Propagation to Sub-nodes) -->
+    <path d="M 220 155 L 220 175 L 90 175 L 90 365" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Left Spine Arrows -->
+    <line x1="90" y1="225" x2="110" y2="225" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="90" y1="295" x2="110" y2="295" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="90" y1="365" x2="110" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Right Spine (Payload to Sub-nodes) -->
+    <path d="M 580 155 L 580 175 L 710 175 L 710 435" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+    
+    <!-- Right Spine Arrows -->
+    <line x1="710" y1="225" x2="690" y2="225" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="710" y1="295" x2="690" y2="295" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="710" y1="365" x2="690" y2="365" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="710" y1="435" x2="690" y2="435" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+
+    <!-- ========================================== -->
+    <!-- NODES (RECTANGLES)                         -->
+    <!-- ========================================== -->
+
+    <!-- Root Node -->
+    <rect x="280" y="25" width="240" height="50" rx="8" fill="url(#rootGrad)" filter="url(#shadow)" />
+
+    <!-- Level 1 Nodes -->
+    <rect x="100" y="105" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+    <rect x="460" y="105" width="240" height="50" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" filter="url(#shadow)" />
+
+    <!-- Level 2 Left Nodes (Propagation) -->
+    <rect x="110" y="200" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    <rect x="110" y="270" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    <rect x="110" y="340" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+
+    <!-- Level 2 Right Nodes (Payload) -->
+    <rect x="430" y="200" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    <rect x="430" y="270" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    <rect x="430" y="340" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+    <rect x="430" y="410" width="260" height="50" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" filter="url(#shadow)" />
+
+
+    <!-- ========================================== -->
+    <!-- TEXT LABELS (BILINGUAL)                    -->
+    <!-- ========================================== -->
+
+    <!-- Root Text -->
+    <text x="400" y="56" class="gsvg-en" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" text-anchor="middle">Malware Classification</text>
+    <text x="400" y="56" class="gsvg-ar" fill="var(--on-brand-hi)" font-size="18" font-weight="bold" text-anchor="middle">تصنيف البرمجيات الخبيثة</text>
+
+    <!-- Level 1 Texts -->
+    <text x="220" y="136" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold" text-anchor="middle">Propagation</text>
+    <text x="220" y="136" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold" text-anchor="middle">الانتشار (Propagation)</text>
+
+    <text x="580" y="136" class="gsvg-en" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold" text-anchor="middle">Payload</text>
+    <text x="580" y="136" class="gsvg-ar" fill="var(--brand-ink-strong)" font-size="16" font-weight="bold" text-anchor="middle">الحمولة (Payload)</text>
+
+    <!-- Level 2 Left Texts -->
+    <text x="240" y="230" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Viruses (Infection)</text>
+    <text x="240" y="230" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">الفيروسات (العدوى)</text>
+
+    <text x="240" y="300" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Worms (Vulnerability Exploit)</text>
+    <text x="240" y="300" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">الديدان (استغلال الثغرات)</text>
+
+    <text x="240" y="370" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Trojans (Social Engineering)</text>
+    <text x="240" y="370" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">أحصنة طروادة (الهندسة الاجتماعية)</text>
+
+    <!-- Level 2 Right Texts -->
+    <text x="560" y="230" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">System Corruption</text>
+    <text x="560" y="230" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">إفساد النظام</text>
+
+    <text x="560" y="300" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Attack Agent (Bots)</text>
+    <text x="560" y="300" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">عميل هجوم (Bots)</text>
+
+    <text x="560" y="370" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Information Theft</text>
+    <text x="560" y="370" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">سرقة المعلومات</text>
+
+    <text x="560" y="440" class="gsvg-en" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">Stealthing</text>
+    <text x="560" y="440" class="gsvg-ar" fill="var(--text-primary)" font-size="15" font-weight="500" text-anchor="middle">التخفي (Stealthing)</text>
+
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف غيّر ظهور 'برمجيات الجريمة' (Crimeware) مشهد التهديدات السيبرانية؟</template>
+      <template class="content-en">How did the emergence of 'Crimeware' change the cybersecurity threat landscape?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أدى إلى خفض حاجز الدخول للمهاجمين، مما سمح للأشخاص ذوي المهارات التقنية المحدودة بشن هجمات معقدة، وساهم في بناء اقتصاد سري لبيع هذه الأدوات.</p></template>
+      <template class="content-en"><p>It lowered the barrier to entry for attackers, allowing individuals with limited technical skills to launch complex attacks, and contributed to an underground economy selling these tools.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="viruses-structure-phases" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> الفيروسات: الهيكلة والمراحل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Viruses: Structure and Phases</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الفيروس هو جزء برمجي طفيلي يربط نفسه ببرنامج تنفيذي آخر، ويمر بأربع مراحل: الخمول، الانتشار، التحفيز، والتنفيذ.</p></template>
+    <template class="content-en"><p>A virus is a parasitic software fragment that attaches itself to executable content, passing through dormant, propagation, triggering, and execution phases.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون الفيروس من ثلاثة مكونات رئيسية:</p><ol><li><b>آلية العدوى (Infection mechanism):</b> الوسيلة التي ينتشر بها الفيروس (ناقل العدوى).</li><li><b>المحفز (Trigger):</b> الحدث أو الشرط الذي يحدد متى يتم تنشيط الحمولة (يُعرف أحيانًا ب<span class="smart-term" data-term-en="Logic Bomb" data-ar="القنبلة المنطقية" data-en-def="Code embedded in malware that is set to &#x27;explode&#x27; (execute its payload) when certain conditions are met.">القنبلة المنطقية<span class="smart-term-tooltip"></span></span>).</li><li><b>الحمولة (Payload):</b> ما يفعله الفيروس بخلاف الانتشار (قد يكون ضارًا أو مجرد نشاط ملحوظ).</li></ol><p>يمر الفيروس خلال دورة حياته بأربع مراحل:</p><ol><li><b>مرحلة الخمول (Dormant phase):</b> الفيروس موجود لكنه غير نشط.</li><li><b>مرحلة الانتشار (Propagation phase):</b> ينسخ الفيروس نفسه إلى برامج أو ملفات أخرى.</li><li><b>مرحلة التحفيز (Triggering phase):</b> يتم تنشيط الفيروس لأداء وظيفته.</li><li><b>مرحلة التنفيذ (Execution phase):</b> يتم تنفيذ الحمولة.</li></ol></template>
+    <template class="content-en"><p>A computer virus includes three main components:</p><ol><li><b>Infection mechanism:</b> The means by which a virus spreads or propagates (infection vector).</li><li><b>Trigger:</b> The event or condition that determines when the payload is activated (<span class="smart-term" data-term-en="Logic Bomb" data-ar="القنبلة المنطقية" data-en-def="Code embedded in malware that is set to &#x27;explode&#x27; (execute its payload) when certain conditions are met.">logic bomb<span class="smart-term-tooltip"></span></span>).</li><li><b>Payload:</b> What the virus does besides spreading (damage or benign activity).</li></ol><p>During its lifetime, a typical virus goes through four phases:</p><ol><li><b>Dormant phase:</b> The virus is idle.</li><li><b>Propagation phase:</b> The virus places a copy of itself into other programs or system areas.</li><li><b>Triggering phase:</b> The virus is activated to perform the function for which it was intended.</li><li><b>Execution phase:</b> The function (payload) is performed.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>معظم الفيروسات التي تصيب الملفات التنفيذية تكون مصممة خصيصًا لنظام تشغيل معين أو منصة أجهزة معينة، حيث تستغل تفاصيل ونقاط ضعف تلك الأنظمة.</p><p>في المقابل، <b>فيروسات الماكرو (Macro viruses)</b> تستهدف أنواعًا معينة من المستندات (مثل ملفات Word أو Excel) التي تدعم الأكواد البرمجية النصية (Scripting). هذا يجعلها مستقلة عن المنصة (Platform independent) وأكثر خطورة لأنها تنتشر بسهولة عبر مشاركة المستندات العادية، ولا يمكن لضوابط الوصول التقليدية لنظام الملفات منع انتشارها بفعالية.</p></template>
+    <template class="content-en"><p>Most viruses that infect executable files are specific to a particular operating system or hardware platform, taking advantage of specific system details and weaknesses.</p><p>In contrast, <b>Macro viruses</b> infect scripting code used to support active content in user documents. This makes them platform-independent and highly threatening because they spread easily through normal document sharing. Traditional file system access controls are of limited use against them since they infect user documents rather than system programs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر فيروسات الماكرو أكثر صعوبة في السيطرة عليها باستخدام ضوابط الوصول التقليدية؟</template>
+      <template class="content-en">Why are macro viruses more difficult to control using traditional access controls?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تصيب مستندات المستخدمين التي يتم مشاركتها بشكل شرعي ومستمر، بدلاً من ملفات النظام التنفيذية التي يمكن تقييد الوصول إليها بسهولة.</p></template>
+      <template class="content-en"><p>Because they infect user documents that are legitimately and frequently shared, rather than system executables which can be easily restricted.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="virus-concealment-strategies" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> استراتيجيات إخفاء الفيروسات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Virus Concealment Strategies</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تستخدم الفيروسات تقنيات مثل التشفير، التخفي، وتغيير الشكل (Polymorphic/Metamorphic) للتهرب من برامج مكافحة الفيروسات.</p></template>
+    <template class="content-en"><p>Viruses use techniques like encryption, stealth, polymorphism, and metamorphism to evade antivirus detection.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تصنف الفيروسات حسب استراتيجية الإخفاء إلى:</p><ol><li><b>الفيروس المشفر (Encrypted virus):</b> يقوم بإنشاء مفتاح تشفير عشوائي لتشفير الجزء الأكبر من الفيروس. عند التشغيل، يستخدم المفتاح لفك التشفير. نظرًا لتغير المفتاح في كل نسخة، لا يوجد نمط بتات ثابت يمكن اكتشافه.</li><li><b>الفيروس الخفي (Stealth virus):</b> مصمم خصيصًا لإخفاء نفسه بالكامل (ليس فقط الحمولة) من برامج مكافحة الفيروسات.</li><li><b>ال<span class="smart-term" data-term-en="Polymorphic virus" data-ar="فيروس متعدد الأشكال" data-en-def="A virus that mutates its signature with every infection to evade detection.">فيروس متعدد الأشكال<span class="smart-term-tooltip"></span></span> (Polymorphic virus):</b> يتحور مع كل إصابة، مما يجعل اكتشافه بواسطة 'توقيع الفيروس' (Signature) مستحيلاً.</li><li><b>الفيروس المتحول (Metamorphic virus):</b> يعيد كتابة نفسه بالكامل في كل تكرار. قد يغير سلوكه بالإضافة إلى مظهره، مما يزيد من صعوبة اكتشافه بشكل كبير.</li></ol></template>
+    <template class="content-en"><p>Viruses are classified by concealment strategy into:</p><ol><li><b>Encrypted virus:</b> Creates a random encryption key to encrypt the remainder of the virus. When invoked, it decrypts itself. Because the key changes per instance, there is no constant bit pattern to observe.</li><li><b>Stealth virus:</b> Explicitly designed to hide itself entirely (not just the payload) from antivirus software.</li><li><b><span class="smart-term" data-term-en="Polymorphic virus" data-ar="فيروس متعدد الأشكال" data-en-def="A virus that mutates its signature with every infection to evade detection.">Polymorphic virus<span class="smart-term-tooltip"></span></span>:</b> Mutates with every infection, making detection by the virus 'signature' impossible.</li><li><b><span class="smart-term" data-term-en="Metamorphic virus" data-ar="فيروس متحول" data-en-def="A virus that completely rewrites its own code at each iteration, potentially changing its behavior.">Metamorphic virus<span class="smart-term-tooltip"></span></span>:</b> Rewrites itself completely at each iteration. It may change its behavior as well as its appearance, greatly increasing the difficulty of detection.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الفرق الجوهري بين الفيروس متعدد الأشكال (Polymorphic) والمتحول (Metamorphic) يكمن في مستوى التغيير. الفيروس متعدد الأشكال يغير طريقة تشفيره أو مظهره السطحي، لكن الكود الأساسي يبقى كما هو بعد فك التشفير. أما الفيروس المتحول، فهو يعيد هيكلة الكود البرمجي الخاص به بالكامل (مثل تغيير ترتيب التعليمات أو استخدام تعليمات بديلة تؤدي نفس الغرض)، مما يجعله تحديًا هائلاً لأنظمة الاكتشاف القائمة على التوقيعات.</p></template>
+    <template class="content-en"><p>The core difference between Polymorphic and Metamorphic viruses lies in the depth of change. A polymorphic virus changes its encryption or superficial appearance, but the underlying decrypted code remains the same. A metamorphic virus completely restructures its own code (e.g., reordering instructions or using equivalent alternative instructions), making it a massive challenge for signature-based detection systems.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أيهما أصعب في الاكتشاف: الفيروس متعدد الأشكال أم الفيروس المتحول؟ ولماذا؟</template>
+      <template class="content-en">Which is harder to detect: a polymorphic virus or a metamorphic virus? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الفيروس المتحول (Metamorphic) أصعب، لأنه يعيد كتابة الكود البرمجي بالكامل ويغير هيكلته وسلوكه، بينما الفيروس متعدد الأشكال يغير فقط التشفير أو التوقيع الظاهري.</p></template>
+      <template class="content-en"><p>A metamorphic virus is harder to detect because it completely rewrites its underlying code structure and behavior, whereas a polymorphic virus only changes its encryption or superficial signature.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worms-and-target-discovery" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الديدان واستراتيجيات اكتشاف الأهداف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Worms and Target Discovery</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الدودة هي برنامج يبحث بنشاط عن أجهزة أخرى لإصابتها عبر الشبكة، وتستخدم استراتيجيات مسح مختلفة للعثور على ضحايا جدد.</p></template>
+    <template class="content-en"><p>A worm is a program that actively seeks out more machines to infect over a network, using various scanning strategies to find new victims.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الديدان (Worms) تستخدم وسائل للوصول إلى الأنظمة البعيدة مثل: البريد الإلكتروني، مشاركة الملفات، إمكانيات التنفيذ عن بُعد، وتسجيل الدخول عن بُعد. تمر الدودة بنفس مراحل الفيروس (خمول، انتشار، تحفيز، تنفيذ).</p><p>في مرحلة الانتشار، تقوم الدودة بـ <b>اكتشاف الأهداف (Target Discovery / Scanning)</b> باستخدام الاستراتيجيات التالية:</p><ol><li><b>عشوائي (Random):</b> فحص عناوين IP عشوائية. يولد هذا حجماً كبيراً من حركة مرور الشبكة مما قد يسبب انقطاعاً عاماً.</li><li><b>قائمة الأهداف (Hit list):</b> يجمع المهاجم مسبقاً قائمة بالآلات الضعيفة. يتم تزويد كل جهاز مصاب بجزء من القائمة لمسحها، مما يجعل فترة المسح قصيرة جداً وصعبة الاكتشاف.</li><li><b>طوبولوجي (Topological):</b> يستخدم المعلومات الموجودة على جهاز الضحية (مثل قوائم الاتصال) للعثور على مضيفين آخرين.</li><li><b>الشبكة الفرعية المحلية (Local subnet):</b> إذا أصيب جهاز خلف جدار حماية، فإنه يبحث عن أهداف داخل شبكته المحلية مستخدماً بنية عناوين الشبكة الفرعية.</li></ol></template>
+    <template class="content-en"><p>Worms use means to access remote systems such as: electronic mail, file sharing, remote execution, and remote login capabilities. A worm typically uses the same phases as a virus (dormant, propagation, triggering, execution).</p><p>In the propagation phase, a worm performs <b>Target Discovery (Scanning/Fingerprinting)</b> using these strategies:</p><ol><li><b>Random:</b> Probes random IP addresses. Produces a high volume of Internet traffic, causing generalized disruption.</li><li><b>Hit list:</b> Attacker compiles a long list of vulnerable machines. Each infected machine gets a portion of the list, resulting in a very short, hard-to-detect scanning period.</li><li><b>Topological:</b> Uses information contained on an infected victim machine (e.g., address books) to find more hosts.</li><li><b>Local subnet:</b> If a host behind a firewall is infected, it looks for targets in its own local network using the subnet address structure.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من أشهر الأمثلة التاريخية <b>دودة موريس (The Morris Worm)</b> التي أُطلقت عام 1988. صُممت للانتشار في أنظمة UNIX واستخدمت تقنيات متعددة للانتشار، مثل محاولة تسجيل الدخول كمستخدم شرعي، واستغلال ثغرة في بروتوكول UNIX finger، واستغلال باب خلفي (Trapdoor) في خيار تصحيح الأخطاء لعملية إرسال واستقبال البريد.</p><p>الفرق الرئيسي بين الدودة والفيروس هو أن الدودة برنامج مستقل لا يحتاج إلى إرفاق نفسه ببرنامج مضيف ليعمل.</p></template>
+    <template class="content-en"><p>A famous historical example is <b>The Morris Worm</b>, released in 1988. Designed to spread on UNIX systems, it used multiple propagation techniques:</p><ul><li>attempting to log on as a legitimate user,</li><li>exploiting a bug in the UNIX finger protocol, and</li><li>exploiting a trapdoor in the debug option of the remote mail process.</li></ul><p>The key difference between a worm and a virus is that a worm is a standalone program that does not need to attach itself to a host program to execute.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Virus</th><th>Worm</th><th>Trojan</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">يحتاج إلى برنامج مضيف (Host Program)</template>
+          <template class="content-en">Requires Host Program</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا (مستقل)</template>
+          <template class="content-en">No (Standalone)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">نعم (يختبئ داخله)</template>
+          <template class="content-en">Yes (Hides inside)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">النسخ الذاتي (Self-Replicating)</template>
+          <template class="content-en">Self-Replicating</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">طريقة الانتشار الأساسية</template>
+          <template class="content-en">Primary Propagation Method</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">إصابة الملفات التنفيذية</template>
+          <template class="content-en">Infecting executables</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">استغلال ثغرات الشبكة</template>
+          <template class="content-en">Network vulnerability exploit</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">الهندسة الاجتماعية</template>
+          <template class="content-en">Social Engineering</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Random</th><th>Hit List</th><th>Topological</th><th>Local Subnet</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">آلية اختيار الهدف</template>
+          <template class="content-en">Target Selection Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عناوين IP عشوائية</template>
+          <template class="content-en">Random IP addresses</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">قائمة مجمعة مسبقاً</template>
+          <template class="content-en">Pre-compiled list</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">معلومات من جهاز الضحية</template>
+          <template class="content-en">Info from victim machine</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">بنية الشبكة المحلية</template>
+          <template class="content-en">Local network structure</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الضجيج الشبكي (Network Noise)</template>
+          <template class="content-en">Network Noise</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع جداً</template>
+          <template class="content-en">Very High</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (سريع جداً)</template>
+          <template class="content-en">Low (Very fast)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسط</template>
+          <template class="content-en">Medium</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (داخلي)</template>
+          <template class="content-en">Low (Internal)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر استراتيجية 'الشبكة الفرعية المحلية' (Local subnet) خطيرة بشكل خاص على المؤسسات؟</template>
+      <template class="content-en">Why is the 'Local subnet' scanning strategy particularly dangerous for organizations?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تسمح للدودة بتجاوز جدار الحماية الخارجي بمجرد إصابة جهاز واحد بالداخل، ثم تنتشر بحرية بين الأجهزة الداخلية الموثوقة.</p></template>
+      <template class="content-en"><p>Because it allows the worm to bypass the external firewall once a single internal machine is infected, spreading freely among trusted internal hosts.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="mobile-code-drive-by-spam" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الكود المتنقل، التنزيلات التلقائية، والبريد المزعج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Mobile Code, Drive-by-downloads, and Spam</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تستغل هذه الآليات متصفحات الويب وسلوك المستخدمين لنشر البرمجيات الخبيثة دون الحاجة لانتشار نشط مثل الديدان.</p></template>
+    <template class="content-en"><p>These mechanisms exploit web browsers and user behavior to deploy malware without active propagation like worms.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تشمل آليات الانتشار الأخرى:</p><ol><li><b>الكود المتنقل (Mobile Code):</b> برامج تُرسل من نظام بعيد إلى نظام محلي وتُنفذ دون تعليمات صريحة من المستخدم. تشمل طرق استخدامه: البرمجة عبر المواقع (Cross-site scripting)، مواقع الويب التفاعلية، مرفقات البريد، والتنزيلات من مواقع غير موثوقة.</li><li><b>التنزيلات التلقائية (Drive-by-downloads):</b> تستغل ثغرات المتصفح. عندما يزور المستخدم صفحة ويب يتحكم بها المهاجم، يتم تنزيل وتثبيت البرامج الخبيثة دون علم المستخدم. لا تنتشر بنشاط بل تنتظر زيارة المستخدمين.</li><li><b>البريد المزعج (Spam):</b> بريد إلكتروني جماعي غير مرغوب فيه. يُرسل غالباً بواسطة شبكات البوت (Botnets) ويُعد حاملاً رئيسياً للبرمجيات الخبيثة وهجمات التصيد. يتطلب عادةً تفاعلاً من المستخدم (فتح المرفق أو الرابط) لكي يحدث الاختراق.</li></ol></template>
+    <template class="content-en"><p>Other propagation mechanisms include:</p><ol><li><b>Mobile Code:</b> Programs shipped unchanged to a heterogeneous collection of platforms and executed without explicit user instruction. Common vectors include Cross-site scripting, interactive Web sites, e-mail attachments, and untrusted downloads.</li><li><b><span class="smart-term" data-term-en="Drive-by-download" data-ar="التنزيل التلقائي / العابر" data-en-def="An attack where malware is downloaded and installed on a user&#x27;s system simply by visiting a compromised webpage, exploiting browser vulnerabilities.">Drive-by-download<span class="smart-term-tooltip"></span></span>s:</b> Exploits browser vulnerabilities. When a user views an attacker-controlled Web page, code exploits a browser bug to download and install malware without consent. It waits for unsuspecting users rather than actively propagating.</li><li><b>Spam:</b> Unsolicited bulk e-mail. Mostly sent by botnets, it is a significant carrier of malware and phishing attacks. It usually requires the user's active choice to view an attachment or permit installation for the compromise to occur.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يمثل التنزيل التلقائي (Drive-by-download) تحولاً في تكتيكات المهاجمين من 'الدفع' (Push) النشط للبرمجيات الخبيثة عبر الشبكة (كما تفعل الديدان) إلى تكتيك 'الجذب' (Pull) السلبي، حيث يتم تلغيم المواقع الشرعية أو الخبيثة بانتظار الضحايا. هذا يقلل من الضجيج الشبكي ويجعل الاكتشاف المبكر أصعب.</p></template>
+    <template class="content-en"><p>Drive-by-downloads represent a shift in attacker tactics from active 'push' propagation across the network (like worms) to passive 'pull' tactics, where legitimate or malicious sites are booby-trapped waiting for victims. This reduces network noise and makes early detection harder.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الفرق الرئيسي بين انتشار الدودة وانتشار التنزيل التلقائي (Drive-by-download)؟</template>
+      <template class="content-en">What is the main difference between worm propagation and a drive-by-download?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الدودة تبحث بنشاط عن الأجهزة وتهاجمها عبر الشبكة، بينما التنزيل التلقائي ينتظر بشكل سلبي حتى يزور المستخدم صفحة الويب المصابة.</p></template>
+      <template class="content-en"><p>A worm actively seeks out and attacks machines over the network, whereas a drive-by-download passively waits for a user to visit a compromised web page.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="trojans" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> أحصنة طروادة (Trojans)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Trojans</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>برنامج يبدو مفيداً أو شرعياً ولكنه يحتوي على كود خفي ينفذ وظائف ضارة عند تشغيله.</p></template>
+    <template class="content-en"><p>A useful, or apparently useful, program containing hidden code that performs unwanted or harmful functions when invoked.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم أحصنة طروادة لإنجاز وظائف بشكل غير مباشر لا يمكن للمهاجم إنجازها بشكل مباشر. تتناسب مع أحد النماذج الثلاثة التالية:</p><ol><li>الاستمرار في أداء وظيفة البرنامج الأصلي مع تنفيذ نشاط خبيث منفصل في نفس الوقت.</li><li>الاستمرار في أداء وظيفة البرنامج الأصلي ولكن مع تعديل الوظيفة لتنفيذ نشاط خبيث أو لإخفاء نشاط خبيث آخر.</li><li>أداء وظيفة خبيثة تحل محل وظيفة البرنامج الأصلي بالكامل.</li></ol></template>
+    <template class="content-en"><p>Trojans can be used to accomplish functions indirectly that the attacker could not accomplish directly. They fit into one of three models:</p><ol><li>Continuing to perform the function of the original program and additionally performing a separate malicious activity.</li><li>Continuing to perform the function of the original program but modifying the function to perform malicious activity or to disguise other malicious activity.</li><li>Performing a malicious function that completely replaces the function of the original program.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على عكس الفيروسات والديدان، لا تقوم أحصنة طروادة بنسخ نفسها أو الانتشار تلقائياً. إنها تعتمد بشكل كامل على <b>الهندسة الاجتماعية (Social Engineering)</b> لخداع المستخدمين لتنزيلها وتشغيلها، معتقدين أنها برامج شرعية (مثل الألعاب أو أدوات النظام).</p></template>
+    <template class="content-en"><p>Unlike viruses and worms, Trojans do not self-replicate or propagate automatically. They rely entirely on <b>Social Engineering</b> to trick users into downloading and executing them, believing they are legitimate software (like games or system utilities).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يُصنف حصان طروادة كفيروس؟</template>
+      <template class="content-en">Why is a Trojan not classified as a virus?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حصان طروادة لا ينسخ نفسه ولا يربط نفسه بملفات أخرى للانتشار، بل يعتمد على خداع المستخدم لتشغيله.</p></template>
+      <template class="content-en"><p>Because a Trojan does not self-replicate or attach itself to other files to spread; it relies on tricking the user into executing it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="payloads-system-corruption-bots" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الحمولات: فساد النظام وعملاء الهجوم (البوتات)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Payloads: System Corruption and Attack Agents (Bots)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بمجرد تنشيط البرمجيات الخبيثة، قد تقوم بتدمير البيانات (فساد النظام) أو تحويل الجهاز إلى 'زومبي' لتنفيذ هجمات منسقة (شبكات البوت).</p></template>
+    <template class="content-en"><p>Once active, malware may destroy data (system corruption) or turn the machine into a 'zombie' to launch coordinated attacks (botnets).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>1. فساد النظام (System Corruption):</b></p><ol><li>تدمير البيانات عند استيفاء شروط معينة.</li><li>عرض رسائل غير مرغوب فيها.</li><li>تشفير بيانات المستخدم وطلب فدية (Ransomware).</li><li>إلحاق ضرر بالعالم الحقيقي (مثل استهداف برامج التحكم الصناعي).</li><li>محاولة إعادة كتابة كود BIOS.</li><li><b>القنبلة المنطقية (Logic bomb):</b> كود ينفجر عند استيفاء شروط معينة.</li></ol><p><b>2. عميل الهجوم (Attack Agent - Bot/Zombie):</b></p><ol><li>يستولي سراً على جهاز متصل بالإنترنت لاستخدامه في شن هجمات يصعب تتبعها.</li><li><b>شبكة البوت (Botnet):</b> مجموعة من البوتات قادرة على العمل بشكل منسق.</li><li><b>استخدامات البوتات:</b> هجمات حجب الخدمة الموزعة (DDoS)، إرسال البريد المزعج (Spamming)، استنشاق حركة المرور (Sniffing)، تسجيل لوحة المفاتيح (Keylogging)، نشر برمجيات خبيثة جديدة، والتلاعب بالاستطلاعات عبر الإنترنت.</li></ol></template>
+    <template class="content-en"><p><b>1. System Corruption:</b></p><ol><li>Data destruction when trigger conditions are met.</li><li>Displaying unwanted messages.</li><li>Encrypting user data and demanding payment (<span class="smart-term" data-term-en="Ransomware" data-ar="برمجيات الفدية" data-en-def="Malware that encrypts user data and demands payment for the decryption key.">Ransomware<span class="smart-term-tooltip"></span></span>).</li><li>Inflicting real-world damage (e.g., targeting industrial control systems).</li><li>Attempting to rewrite BIOS code.</li><li><b>Logic bomb:</b> Code set to 'explode' when certain conditions are met.</li></ol><p><b>2. Attack Agent (Bot, zombie, drone):</b></p><ol><li>Secretly takes over an Internet-attached computer to launch attacks difficult to trace to the creator.</li><li><b><span class="smart-term" data-term-en="Botnet" data-ar="شبكة الروبوتات / البوت نت" data-en-def="A network of compromised computers (bots/zombies) controlled remotely by an attacker to perform coordinated malicious tasks.">Botnet<span class="smart-term-tooltip"></span></span>:</b> A collection of bots capable of acting in a coordinated manner.</li><li><b>Uses of bots:</b> DDoS attacks, Spamming, Sniffing traffic, Keylogging, Spreading new malware, and Manipulating online polls/games.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ما يميز البوت (Bot) عن الدودة (Worm) هو <b>مرفق التحكم عن بُعد (Remote control facility)</b>. الدودة تنتشر وتنشط نفسها، بينما البوت يتم التحكم فيه من منشأة مركزية.</p><p>تاريخياً، كانت شبكات البوت تستخدم خوادم IRC للتحكم. حديثاً، تستخدم قنوات اتصال خفية عبر بروتوكولات مثل HTTP، أو آليات تحكم موزعة باستخدام بروتوكولات الند للند (P2P) لتجنب وجود نقطة فشل واحدة (Single point of failure).</p></template>
+    <template class="content-en"><p>What distinguishes a bot from a worm is the <b>Remote control facility</b>. A worm propagates and activates itself, whereas a bot is controlled from a central facility.</p><p>Historically, botnets used IRC servers for control. More recently, they use covert communication channels via HTTP, or distributed control mechanisms using peer-to-peer (P2P) protocols to avoid a single point of failure.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا انتقل مشغلو شبكات البوت (Botnets) من استخدام خوادم IRC إلى بروتوكولات الند للند (P2P) للتحكم؟</template>
+      <template class="content-en">Why have botnet operators shifted from using IRC servers to Peer-to-Peer (P2P) protocols for control?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن خوادم IRC تمثل نقطة فشل واحدة؛ إذا تم إغلاق الخادم، تسقط الشبكة بأكملها. بينما P2P يوفر تحكماً موزعاً يصعب إسقاطه.</p></template>
+      <template class="content-en"><p>Because IRC servers represent a single point of failure; if the server is taken down, the entire botnet collapses. P2P provides distributed control that is much harder to dismantle.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="payloads-stealthing-backdoors" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الحمولات: التخفي والأبواب الخلفية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Payloads: Stealthing and Backdoors</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الباب الخلفي هو نقطة دخول سرية تتيح للمهاجم تجاوز إجراءات الأمان العادية للوصول إلى النظام.</p></template>
+    <template class="content-en"><p>A backdoor is a secret entry point that allows an attacker to bypass normal security procedures to access a system.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الباب الخلفي (Backdoor / Trapdoor):</b></p><ol><li>هو نقطة دخول سرية إلى برنامج تسمح لشخص على علم بها بالوصول دون المرور بإجراءات الوصول الأمني المعتادة.</li><li>عبارة عن كود يتعرف على تسلسل خاص من المدخلات، أو يتم تشغيله عند تنفيذه من معرف مستخدم (User ID) معين، أو من خلال تسلسل غير محتمل من الأحداث.</li><li>يُنفذ عادةً كخدمة شبكة تستمع على منفذ غير قياسي (Nonstandard port) يمكن للمهاجم الاتصال به وإصدار أوامر لتشغيلها على النظام المخترق.</li></ol></template>
+    <template class="content-en"><p><b>Backdoor (also known as a trapdoor):</b></p><ol><li>Is a secret entry point into a program that allows someone aware of it to gain access without going through usual security access procedures.</li><li>Code that recognizes a special sequence of input or is triggered by being run from a certain user ID or an unlikely sequence of events.</li><li>Usually implemented as a network service listening on some nonstandard port that the attacker can connect to and issue commands through.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتبر الأبواب الخلفية خطيرة للغاية لأنها تمنح المهاجمين وصولاً مستمراً (Persistence) حتى بعد ترقيع الثغرة الأصلية التي تم من خلالها اختراق النظام. غالباً ما يتم دمج الأبواب الخلفية مع الجذور الخفية (Rootkits) لإخفاء وجود المنفذ المفتوح عن أدوات مراقبة النظام.</p></template>
+    <template class="content-en"><p>Backdoors are highly dangerous because they grant attackers persistent access even after the original vulnerability used to compromise the system has been patched. Backdoors are often combined with Rootkits to hide the presence of the open listening port from system monitoring tools.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لمسؤول النظام اكتشاف باب خلفي يستمع على منفذ غير قياسي؟</template>
+      <template class="content-en">How can a system administrator detect a backdoor listening on a nonstandard port?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال مراقبة حركة مرور الشبكة (Network monitoring)، فحص المنافذ المفتوحة باستخدام أدوات مثل netstat، واستخدام أنظمة كشف التسلل (IDS).</p></template>
+      <template class="content-en"><p>By monitoring network traffic, scanning for open ports using tools like netstat, and utilizing Intrusion Detection Systems (IDS).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="countermeasures-and-ddos" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> التدابير المضادة وهجمات حجب الخدمة الموزعة (DDoS)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Countermeasures and DDoS Attacks</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتضمن التدابير المضادة الوقاية (التحديثات والضوابط) والتخفيف (الاكتشاف والإزالة)، بينما تستخدم هجمات DDoS شبكات البوت لإغراق الأنظمة بالزيارات.</p></template>
+    <template class="content-en"><p>Countermeasures involve prevention (patches, controls) and mitigation (detection, removal), while DDoS attacks use botnets to flood systems with traffic.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>عناصر الوقاية (Prevention):</b></p><ol><li>تحديث الأنظمة وتطبيق التصحيحات (Patches) لتقليل الثغرات.</li><li>تعيين ضوابط وصول (Access controls) مناسبة لتقليل الملفات التي يمكن للمستخدم الوصول إليها.</li><li>التوعية والتدريب للمستخدمين لمواجهة الهندسة الاجتماعية.</li></ol><p><b>خيارات التخفيف (Mitigation) إذا فشلت الوقاية:</b> الاكتشاف (Detection)، التحديد (Identification)، والإزالة (Removal).</p><p><b>مناهج الاكتشاف:</b></p><ol><li><b>برامج حظر السلوك المستندة إلى المضيف (Host-based behavior-blocking):</b> تراقب سلوك البرامج في الوقت الفعلي وتحظر الإجراءات الخبيثة.</li><li><b>مسح المحيط (Perimeter scanning):</b> استخدام شاشات الدخول (Ingress) والخروج (Egress) على جدران الحماية وأنظمة كشف التسلل (IDS).</li></ol><p><b>هجمات حجب الخدمة الموزعة (DDoS):</b> تجعل الأنظمة غير قابلة للوصول عن طريق إغراقها بحركة مرور غير مجدية. الخطوة الأولى هي بناء شبكة الهجوم (Botnet) باستخدام استراتيجيات المسح (عشوائي، قائمة أهداف، طوبولوجي، شبكة فرعية محلية).</p></template>
+    <template class="content-en"><p><b>Elements of prevention:</b></p><ol><li>Ensure systems are current with all patches applied.</li><li>Set appropriate access controls to reduce the number of files a user can access/infect.</li><li>User awareness and training to counter social engineering.</li></ol><p><b>Mitigation options if prevention fails:</b> Detection, Identification, and Removal.</p><p><b>Detection Approaches:</b></p><ol><li><b>Host-based behavior-blocking software:</b> Monitors program behavior in real time and blocks malicious actions.</li><li><b>Perimeter scanning:</b> Uses Ingress and Egress monitors on firewalls and IDS.</li></ol><p><b>DDoS Attacks:</b> Make systems inaccessible by flooding them with useless traffic. The first step is constructing the attack network (infecting machines with zombie software) using scanning strategies (Random, Hit list, Topological, Local subnet).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>متطلبات التدابير المضادة الفعالة تشمل:</p><ul><li><strong>العمومية (Generality)</strong>،</li><li><strong>التوقيت المناسب (Timeliness)</strong>،</li><li><strong>المرونة (Resiliency)</strong>،</li><li><strong>الحد الأدنى من تكاليف حجب الخدمة</strong>،</li><li><strong>الشفافية</strong>،</li><li><strong>والتغطية العالمية والمحلية</strong>.</li></ul><p>عيب برامج حظر السلوك المستندة إلى المضيف هو أن الكود الخبيث يجب أن يعمل فعلياً على الجهاز المستهدف قبل تحديد سلوكه، مما يعني أنه قد يسبب ضرراً قبل أن يتم حظره.</p></template>
+    <template class="content-en"><p>Requirements for effective countermeasures include:</p><ul><li><strong>Generality</strong>,</li><li><strong>Timeliness</strong>,</li><li><strong>Resiliency</strong>,</li><li><strong>Minimal denial-of-service costs</strong>,</li><li><strong>Transparency</strong>, and</li><li><strong>Global/local coverage</strong>.</li></ul><p>A limitation of host-based behavior-blocking is that the malicious code must run on the target machine before its behaviors can be identified, meaning it can cause harm before it is detected and blocked.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر 'المرونة' (Resiliency) مطلباً مهماً للتدابير المضادة للبرمجيات الخبيثة؟</template>
+      <template class="content-en">Why is 'Resiliency' an important requirement for malware countermeasures?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن البرمجيات الخبيثة المتقدمة تحاول غالباً تعطيل أو تجاوز برامج مكافحة الفيروسات؛ لذا يجب أن تكون التدابير المضادة قادرة على مقاومة هذه المحاولات والاستمرار في العمل.</p></template>
+      <template class="content-en"><p>Because advanced malware often attempts to disable or bypass antivirus software; countermeasures must be able to resist these attempts and continue functioning.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة حول البرمجيات الخبيثة. تخيلوا أن نظام التشغيل هو قلعة؛ البرمجيات الخبيثة هي جيوش الأعداء التي تحاول اختراقها. في هذا الدرس، قمنا بتفكيك استراتيجيات العدو إلى قسمين رئيسيين: كيف يصلون إلى القلعة (الانتشار)، وماذا يفعلون بمجرد دخولهم (الحمولة). رأينا كيف تختبئ الفيروسات داخل ملفات شرعية، وكيف تزحف الديدان عبر ثغرات الشبكة، وكيف تخدعنا أحصنة طروادة لفتح الأبواب بأنفسنا. ركزوا جيداً للامتحان على التفريق بين أنواع الفيروسات المخفية (المشفرة، متعددة الأشكال، والمتحولة) لأنها موضع أسئلة متكرر. تذكروا أيضاً أن شبكات البوت (Botnets) هي السلاح المفضل لهجمات حجب الخدمة (DDoS). فهمكم لهذه الآليات هو خط الدفاع الأول. بالتوفيق في دراستكم!</template>
+    <template class="content-en">Welcome friends to this crucial module on Malicious Software. Imagine your OS is a fortress; malware are the enemy armies trying to breach it. In this lesson, we broke down the enemy's strategies into two main parts: how they get to the fortress (Propagation), and what they do once inside (Payload). We saw how viruses hide inside legitimate files, how worms crawl through network vulnerabilities, and how Trojans trick us into opening the gates ourselves. For the exam, focus heavily on distinguishing between the types of concealed viruses (Encrypted, Polymorphic, Metamorphic) as this is a frequent question topic. Also, remember that Botnets are the weapon of choice for DDoS attacks. Your understanding of these mechanisms is the first line of defense. Good luck with your studies!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هما الفئتان الرئيسيتان لتصنيف البرمجيات الخبيثة؟</template>
+          <template class="content-en">What are the two broad categories for classifying malware?</template>
+          <span class="content-target">ما هما الفئتان الرئيسيتان لتصنيف البرمجيات الخبيثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُصنف بناءً على آليات الانتشار (كيف تصل إلى الهدف) والحمولات (ماذا تفعل بعد الوصول).</template>
+          <template class="content-en">They are classified based on Propagation mechanisms (how it reaches the target) and Payloads (what it does once it reaches the target).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المراحل الأربع لدورة حياة الفيروس؟</template>
+          <template class="content-en">What are the four phases of a typical virus lifetime?</template>
+          <span class="content-target">ما هي المراحل الأربع لدورة حياة الفيروس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">مرحلة الخمول (Dormant)، مرحلة الانتشار (Propagation)، مرحلة التحفيز (Triggering)، ومرحلة التنفيذ (Execution).</template>
+          <template class="content-en">Dormant phase, Propagation phase, Triggering phase, and Execution phase.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف الفيروس متعدد الأشكال (Polymorphic) عن الفيروس المتحول (Metamorphic)؟</template>
+          <template class="content-en">How does a polymorphic virus differ from a metamorphic virus?</template>
+          <span class="content-target">كيف يختلف الفيروس متعدد الأشكال (Polymorphic) عن الفيروس المتحول (Metamorphic)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">متعدد الأشكال يغير توقيعه أو تشفيره مع كل إصابة لكن الكود الأساسي يبقى كما هو. المتحول يعيد كتابة الكود الخاص به بالكامل في كل مرة، مما قد يغير سلوكه.</template>
+          <template class="content-en">A polymorphic virus mutates its signature or encryption with every infection but the core code remains the same. A metamorphic virus completely rewrites its own code each time, potentially changing its behavior.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر فيروسات الماكرو خطيرة ومستقلة عن المنصة؟</template>
+          <template class="content-en">Why are macro viruses dangerous and platform-independent?</template>
+          <span class="content-target">لماذا تعتبر فيروسات الماكرو خطيرة ومستقلة عن المنصة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنها تصيب المستندات (مثل Word) التي تدعم الأكواد النصية، بدلاً من الملفات التنفيذية للنظام، مما يسمح لها بالعمل على أي نظام تشغيل يفتح هذه المستندات.</template>
+          <template class="content-en">Because they infect documents (like Word) that support scripting, rather than system executables, allowing them to run on any OS that opens those documents.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اذكر ثلاث استراتيجيات تستخدمها الديدان لاكتشاف الأهداف (Scanning).</template>
+          <template class="content-en">Name three scanning strategies used by worms for target discovery.</template>
+          <span class="content-target">اذكر ثلاث استراتيجيات تستخدمها الديدان لاكتشاف الأهداف (Scanning).</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المسح العشوائي (Random)، قائمة الأهداف (Hit list)، والمسح الطوبولوجي (Topological).</template>
+          <template class="content-en">Random scanning, Hit list scanning, and Topological scanning.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التنزيل التلقائي (Drive-by-download)؟</template>
+          <template class="content-en">What is a drive-by-download?</template>
+          <span class="content-target">ما هو التنزيل التلقائي (Drive-by-download)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو هجوم يستغل ثغرات المتصفح لتنزيل وتثبيت برمجيات خبيثة بمجرد زيارة المستخدم لصفحة ويب مصابة، دون الحاجة لأي تفاعل أو نقر من المستخدم.</template>
+          <template class="content-en">An attack that exploits browser vulnerabilities to download and install malware simply when a user views a compromised webpage, requiring no user interaction.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي النماذج الثلاثة لعمل أحصنة طروادة (Trojans)؟</template>
+          <template class="content-en">What are the three models of operation for Trojans?</template>
+          <span class="content-target">ما هي النماذج الثلاثة لعمل أحصنة طروادة (Trojans)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">1. أداء الوظيفة الأصلية + نشاط خبيث. 2. تعديل الوظيفة الأصلية لإخفاء نشاط خبيث. 3. استبدال الوظيفة الأصلية بالكامل بوظيفة خبيثة.</template>
+          <template class="content-en">1. Perform original function + malicious activity. 2. Modify original function to disguise malicious activity. 3. Completely replace original function with malicious activity.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الرئيسي بين الدودة (Worm) والبوت (Bot)؟</template>
+          <template class="content-en">What is the main difference between a worm and a bot?</template>
+          <span class="content-target">ما هو الفرق الرئيسي بين الدودة (Worm) والبوت (Bot)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الدودة تنتشر وتنشط نفسها بشكل مستقل، بينما البوت يتم التحكم فيه عن بُعد من قبل المهاجم عبر منشأة تحكم مركزية (مثل خوادم C&C).</template>
+          <template class="content-en">A worm propagates and activates itself independently, whereas a bot is controlled remotely by an attacker from a central facility (like C&C servers).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الباب الخلفي (Backdoor) ولماذا هو خطير؟</template>
+          <template class="content-en">What is a backdoor and why is it dangerous?</template>
+          <span class="content-target">ما هو الباب الخلفي (Backdoor) ولماذا هو خطير؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو نقطة دخول سرية تتيح للمهاجم تجاوز إجراءات الأمان. خطورته تكمن في أنه يوفر وصولاً مستمراً حتى لو تم ترقيع الثغرة الأصلية التي تم اختراق النظام منها.</template>
+          <template class="content-en">It is a secret entry point that allows an attacker to bypass security procedures. It is dangerous because it provides persistent access even if the original vulnerability is patched.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو العيب الرئيسي لبرامج حظر السلوك المستندة إلى المضيف؟</template>
+          <template class="content-en">What is the main drawback of host-based behavior-blocking software?</template>
+          <span class="content-target">ما هو العيب الرئيسي لبرامج حظر السلوك المستندة إلى المضيف؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يجب أن يعمل الكود الخبيث فعلياً على الجهاز المستهدف لكي يتم تحليل سلوكه، مما يعني أنه قد يتسبب في بعض الضرر قبل أن يتم اكتشافه وحظره.</template>
+          <template class="content-en">The malicious code must actually run on the target machine for its behavior to be analyzed, meaning it might cause some harm before it is detected and blocked.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "البرمجيات الخبيثة (Malware)",
+      "en": "Malware"
+    },
+    "back": {
+      "definition": {
+        "ar": "أي نوع من البرامج يهدف إلى إلحاق الضرر بالمستخدم أو اختراقه.",
+        "en": "Any type of software that is intended to harm or hack the user."
+      },
+      "example": {
+        "ar": "الفيروسات، الديدان، أحصنة طروادة.",
+        "en": "Viruses, worms, trojans."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "برمجيات الجريمة (Crimeware)",
+      "en": "Crimeware"
+    },
+    "back": {
+      "definition": {
+        "ar": "أدوات إنشاء الفيروسات والهجمات التي تسمح حتى للمبتدئين بنشر البرمجيات الخبيثة.",
+        "en": "Virus-creation toolkits and general attack kits that allow even novices to deploy malware."
+      },
+      "example": {
+        "ar": "مجموعات أدوات استغلال الثغرات الجاهزة.",
+        "en": "Ready-made exploit kits."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "آلية العدوى (Infection mechanism)",
+      "en": "Infection mechanism"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوسيلة التي ينتشر بها الفيروس لتمكينه من التكاثر (ناقل العدوى).",
+        "en": "The means by which a virus spreads or propagates, enabling it to replicate (infection vector)."
+      },
+      "example": {
+        "ar": "إرفاق كود الفيروس بملف تنفيذي .exe.",
+        "en": "Attaching virus code to an .exe file."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "القنبلة المنطقية (Logic Bomb)",
+      "en": "Logic Bomb"
+    },
+    "back": {
+      "definition": {
+        "ar": "الحدث أو الشرط الذي يحدد متى يتم تنشيط الحمولة (المحفز).",
+        "en": "The event or condition that determines when the payload is activated or delivered (Trigger)."
+      },
+      "example": {
+        "ar": "مسح البيانات إذا كان تاريخ النظام هو يوم الجمعة 13.",
+        "en": "Deleting data if the system date is Friday the 13th."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "مرحلة الخمول (Dormant phase)",
+      "en": "Dormant phase"
+    },
+    "back": {
+      "definition": {
+        "ar": "المرحلة التي يكون فيها الفيروس موجوداً على النظام ولكنه غير نشط.",
+        "en": "The phase where the virus is idle on the system."
+      },
+      "example": {
+        "ar": "فيروس ينتظر تاريخاً معيناً ليعمل.",
+        "en": "A virus waiting for a specific date to trigger."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "الفيروس المشفر (Encrypted virus)",
+      "en": "Encrypted virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يستخدم مفتاح تشفير عشوائي لتشفير نفسه، مما يمنع وجود نمط ثابت لاكتشافه.",
+        "en": "A virus that uses a random encryption key to encrypt itself, preventing a constant bit pattern for detection."
+      },
+      "example": {
+        "ar": "تغيير مفتاح التشفير مع كل عملية نسخ.",
+        "en": "Changing the encryption key with every replication."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "الفيروس الخفي (Stealth virus)",
+      "en": "Stealth virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس مصمم صراحة لإخفاء نفسه بالكامل من برامج مكافحة الفيروسات.",
+        "en": "A form of virus explicitly designed to hide itself entirely from detection by antivirus software."
+      },
+      "example": {
+        "ar": "اعتراض طلبات قراءة الملفات لإظهار الملف الأصلي غير المصاب.",
+        "en": "Intercepting file read requests to show the original uninfected file."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الفيروس متعدد الأشكال (Polymorphic virus)",
+      "en": "Polymorphic virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يتحور مع كل إصابة لتغيير توقيعه، مما يجعل اكتشافه بالتوقيع مستحيلاً.",
+        "en": "A virus that mutates with every infection, making detection by the 'signature' impossible."
+      },
+      "example": {
+        "ar": "تغيير روتين فك التشفير في كل مرة.",
+        "en": "Changing the decryption routine every time."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الفيروس المتحول (Metamorphic virus)",
+      "en": "Metamorphic virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يعيد كتابة نفسه بالكامل في كل تكرار، وقد يغير سلوكه ومظهره.",
+        "en": "A virus that rewrites itself completely at each iteration, potentially changing behavior and appearance."
+      },
+      "example": {
+        "ar": "استبدال التعليمات البرمجية بتعليمات أخرى تؤدي نفس الغرض.",
+        "en": "Replacing code instructions with equivalent ones."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "فيروس الماكرو (Macro virus)",
+      "en": "Macro virus"
+    },
+    "back": {
+      "definition": {
+        "ar": "فيروس يصيب الأكواد النصية (Scripts) داخل المستندات بدلاً من البرامج التنفيذية.",
+        "en": "A virus that infects scripting code used to support active content in user document types."
+      },
+      "example": {
+        "ar": "فيروس مدمج في ملف Microsoft Word.",
+        "en": "A virus embedded in a Microsoft Word file."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "الدودة (Worm)",
+      "en": "Worm"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج يبحث بنشاط عن أجهزة أخرى لإصابتها عبر الشبكة وينسخ نفسه.",
+        "en": "A program that actively seeks out more machines to infect over a network and replicates itself."
+      },
+      "example": {
+        "ar": "دودة موريس (Morris Worm).",
+        "en": "The Morris Worm."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "المسح بقائمة الأهداف (Hit list scanning)",
+      "en": "Hit list scanning"
+    },
+    "back": {
+      "definition": {
+        "ar": "استراتيجية مسح للدودة حيث يجمع المهاجم مسبقاً قائمة بالأجهزة الضعيفة لتسريع العدوى.",
+        "en": "A worm scanning strategy where the attacker pre-compiles a long list of potential vulnerable machines."
+      },
+      "example": {
+        "ar": "توزيع قائمة بـ 1000 عنوان IP ضعيف على الأجهزة المصابة.",
+        "en": "Distributing a list of 1000 vulnerable IPs to infected hosts."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "المسح الطوبولوجي (Topological scanning)",
+      "en": "Topological scanning"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام المعلومات الموجودة على جهاز الضحية (مثل قوائم الاتصال) للعثور على أهداف جديدة.",
+        "en": "Using information contained on an infected victim machine to find more hosts to scan."
+      },
+      "example": {
+        "ar": "إرسال الدودة إلى جميع جهات الاتصال في البريد الإلكتروني للضحية.",
+        "en": "Sending the worm to all contacts in the victim's email."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الكود المتنقل (Mobile Code)",
+      "en": "Mobile Code"
+    },
+    "back": {
+      "definition": {
+        "ar": "برامج تُرسل من نظام بعيد وتُنفذ محلياً دون تعليمات صريحة من المستخدم.",
+        "en": "Programs transmitted from a remote system and executed on the local system without explicit user instruction."
+      },
+      "example": {
+        "ar": "البرمجة عبر المواقع (Cross-site scripting).",
+        "en": "Cross-site scripting (XSS)."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "التنزيل التلقائي (Drive-by-download)",
+      "en": "Drive-by-download"
+    },
+    "back": {
+      "definition": {
+        "ar": "استغلال ثغرات المتصفح لتنزيل وتثبيت برامج خبيثة بمجرد زيارة صفحة ويب.",
+        "en": "Exploiting browser vulnerabilities to download and install malware just by viewing a Web page."
+      },
+      "example": {
+        "ar": "زيارة موقع مخترق وإصابة الجهاز دون النقر على أي شيء.",
+        "en": "Visiting a compromised site and getting infected without clicking anything."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "حصان طروادة (Trojan)",
+      "en": "Trojan"
+    },
+    "back": {
+      "definition": {
+        "ar": "برنامج يبدو مفيداً ولكنه يحتوي على كود خفي ينفذ وظائف ضارة.",
+        "en": "A useful, or apparently useful, program containing hidden code that performs unwanted or harmful functions."
+      },
+      "example": {
+        "ar": "لعبة مجانية تقوم بتثبيت برنامج تجسس في الخلفية.",
+        "en": "A free game that installs spyware in the background."
+      }
+    }
+  },
+  {
+    "id": 17,
+    "front": {
+      "ar": "برمجيات الفدية (Ransomware)",
+      "en": "Ransomware"
+    },
+    "back": {
+      "definition": {
+        "ar": "حمولة خبيثة تقوم بتشفير بيانات المستخدم وتطلب الدفع مقابل مفتاح فك التشفير.",
+        "en": "A payload that encrypts user data and demands payment to access the decryption key."
+      },
+      "example": {
+        "ar": "WannaCry.",
+        "en": "WannaCry."
+      }
+    }
+  },
+  {
+    "id": 18,
+    "front": {
+      "ar": "البوت / الزومبي (Bot / Zombie)",
+      "en": "Bot / Zombie"
+    },
+    "back": {
+      "definition": {
+        "ar": "جهاز مخترق يتم التحكم فيه سراً لشن هجمات أو أداء مهام متكررة.",
+        "en": "A secretly taken-over computer used to launch or manage attacks difficult to trace to the creator."
+      },
+      "example": {
+        "ar": "جهاز مستخدم في هجوم DDoS.",
+        "en": "A machine used in a DDoS attack."
+      }
+    }
+  },
+  {
+    "id": 19,
+    "front": {
+      "ar": "الباب الخلفي (Backdoor / Trapdoor)",
+      "en": "Backdoor / Trapdoor"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقطة دخول سرية تتيح للمهاجم تجاوز إجراءات الأمان العادية.",
+        "en": "A secret entry point into a program that allows access without going through usual security procedures."
+      },
+      "example": {
+        "ar": "خدمة شبكة تستمع على منفذ غير قياسي لتلقي الأوامر.",
+        "en": "A network service listening on a nonstandard port to receive commands."
+      }
+    }
+  },
+  {
+    "id": 20,
+    "front": {
+      "ar": "برامج حظر السلوك (Behavior-blocking software)",
+      "en": "Behavior-blocking software"
+    },
+    "back": {
+      "definition": {
+        "ar": "برامج تراقب سلوك التطبيقات في الوقت الفعلي وتحظر الإجراءات الخبيثة المحتملة.",
+        "en": "Software that monitors program behavior in real time and blocks potentially malicious actions."
+      },
+      "example": {
+        "ar": "منع برنامج غير معروف من تعديل ملفات النظام الأساسية.",
+        "en": "Preventing an unknown program from modifying core system files."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من مراحل الفيروس التالية يتم فيها تنشيط الفيروس لأداء وظيفته المقصودة؟",
+      "en": "In which of the following virus phases is the virus activated to perform the function for which it was intended?"
+    },
+    "options": {
+      "ar": [
+        "مرحلة الخمول (Dormant)",
+        "مرحلة الانتشار (Propagation)",
+        "مرحلة التحفيز (Triggering)",
+        "مرحلة التنفيذ (Execution)"
+      ],
+      "en": [
+        "Dormant phase",
+        "Propagation phase",
+        "Triggering phase",
+        "Execution phase"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مرحلة التحفيز (Triggering) هي المرحلة التي يتم فيها تنشيط الفيروس بناءً على حدث أو شرط معين (مثل القنبلة المنطقية).",
+      "en": "The Triggering phase is when the virus is activated based on an event or condition (like a logic bomb)."
+    },
+    "hint": {
+      "ar": "فكر في الكلمة التي تعني 'إطلاق' أو 'تنشيط'.",
+      "en": "Think of the word that means 'to set off' or 'activate'."
+    },
+    "difficulty": "easy",
+    "conceptId": "viruses-structure-phases"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي نوع من الفيروسات يعيد كتابة نفسه بالكامل في كل تكرار لتجنب الاكتشاف؟",
+      "en": "Which type of virus rewrites itself completely at each iteration to avoid detection?"
+    },
+    "options": {
+      "ar": [
+        "الفيروس المشفر (Encrypted)",
+        "الفيروس الخفي (Stealth)",
+        "الفيروس متعدد الأشكال (Polymorphic)",
+        "الفيروس المتحول (Metamorphic)"
+      ],
+      "en": [
+        "Encrypted virus",
+        "Stealth virus",
+        "Polymorphic virus",
+        "Metamorphic virus"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "الفيروس المتحول (Metamorphic) يعيد كتابة الكود الخاص به بالكامل، بينما متعدد الأشكال يغير فقط التشفير أو التوقيع.",
+      "en": "A Metamorphic virus rewrites its code completely, whereas a polymorphic virus only changes its encryption or signature."
+    },
+    "hint": {
+      "ar": "هذا النوع يغير هيكله وسلوكه بالكامل، وليس فقط شكله الخارجي.",
+      "en": "This type changes its entire structure and behavior, not just its outward appearance."
+    },
+    "difficulty": "medium",
+    "conceptId": "virus-concealment-strategies"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هي استراتيجية مسح الدودة التي تستخدم المعلومات الموجودة على جهاز الضحية للعثور على أهداف جديدة؟",
+      "en": "Which worm scanning strategy uses information contained on an infected victim machine to find more hosts?"
+    },
+    "options": {
+      "ar": [
+        "عشوائي (Random)",
+        "قائمة الأهداف (Hit list)",
+        "طوبولوجي (Topological)",
+        "الشبكة الفرعية المحلية (Local subnet)"
+      ],
+      "en": [
+        "Random",
+        "Hit list",
+        "Topological",
+        "Local subnet"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المسح الطوبولوجي يعتمد على استخراج قوائم الاتصال أو سجلات الشبكة من الجهاز المصاب للوصول إلى أجهزة أخرى.",
+      "en": "Topological scanning relies on extracting contact lists or network logs from the infected machine to reach other devices."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بـ 'طوبولوجيا' أو خريطة علاقات الضحية.",
+      "en": "It relates to the 'topology' or relationship map of the victim."
+    },
+    "difficulty": "medium",
+    "conceptId": "worms-and-target-discovery"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي مما يلي يُعد السمة المميزة الرئيسية التي تفرق البوت (Bot) عن الدودة (Worm)؟",
+      "en": "Which of the following is the main distinguishing feature of a Bot compared to a Worm?"
+    },
+    "options": {
+      "ar": [
+        "البوت ينسخ نفسه تلقائياً",
+        "البوت يتم التحكم فيه من منشأة مركزية (عن بُعد)",
+        "البوت لا يمكنه تنفيذ هجمات DDoS",
+        "البوت يصيب الملفات التنفيذية فقط"
+      ],
+      "en": [
+        "A bot self-replicates automatically",
+        "A bot is controlled from a central facility (remotely)",
+        "A bot cannot perform DDoS attacks",
+        "A bot only infects executable files"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الدودة تنتشر وتنشط نفسها بشكل مستقل، بينما البوت ينتظر الأوامر من خادم تحكم (C&C).",
+      "en": "A worm propagates and activates itself independently, whereas a bot waits for commands from a Command and Control (C&C) server."
+    },
+    "hint": {
+      "ar": "فكر في كيفية توجيه شبكات البوت لشن هجمات منسقة.",
+      "en": "Think about how botnets are directed to launch coordinated attacks."
+    },
+    "difficulty": "medium",
+    "conceptId": "payloads-system-corruption-bots"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف تنتشر التنزيلات التلقائية (Drive-by-downloads) عادةً؟",
+      "en": "How do Drive-by-downloads typically propagate?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق إرسال رسائل بريد إلكتروني جماعية",
+        "عن طريق نسخ نفسها عبر محركات أقراص USB",
+        "عن طريق انتظار المستخدمين لزيارة صفحة ويب خبيثة تستغل ثغرات المتصفح",
+        "عن طريق تخمين كلمات مرور الشبكة"
+      ],
+      "en": [
+        "By sending mass emails",
+        "By copying themselves across USB drives",
+        "By waiting for users to visit a malicious webpage that exploits browser vulnerabilities",
+        "By guessing network passwords"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التنزيلات التلقائية لا تنتشر بنشاط، بل تنتظر بشكل سلبي زيارة المستخدم لصفحة ويب مصابة لاستغلال ثغرة في المتصفح.",
+      "en": "Drive-by-downloads do not actively propagate; they passively wait for a user to visit a compromised webpage to exploit a browser bug."
+    },
+    "hint": {
+      "ar": "الاسم يوحي بأن الإصابة تحدث بمجرد 'المرور' أو الزيارة.",
+      "en": "The name implies infection happens just by 'driving by' or visiting."
+    },
+    "difficulty": "easy",
+    "conceptId": "mobile-code-drive-by-spam"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي من البرمجيات الخبيثة التالية يعتمد بشكل كامل على الهندسة الاجتماعية لخداع المستخدم لتشغيله؟",
+      "en": "Which of the following malware relies entirely on social engineering to trick the user into executing it?"
+    },
+    "options": {
+      "ar": [
+        "الدودة (Worm)",
+        "حصان طروادة (Trojan)",
+        "فيروس الماكرو (Macro virus)",
+        "الباب الخلفي (Backdoor)"
+      ],
+      "en": [
+        "Worm",
+        "Trojan",
+        "Macro virus",
+        "Backdoor"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "أحصنة طروادة لا تنسخ نفسها، بل تتنكر كبرامج مفيدة لخداع المستخدمين لتثبيتها.",
+      "en": "Trojans do not self-replicate; they disguise themselves as useful programs to trick users into installing them."
+    },
+    "hint": {
+      "ar": "تذكر القصة اليونانية القديمة للهدية الخادعة.",
+      "en": "Remember the ancient Greek story of the deceptive gift."
+    },
+    "difficulty": "easy",
+    "conceptId": "trojans"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو العيب الرئيسي لبرامج حظر السلوك المستندة إلى المضيف (Host-based behavior-blocking)؟",
+      "en": "What is the main limitation of host-based behavior-blocking software?"
+    },
+    "options": {
+      "ar": [
+        "لا يمكنها اكتشاف الفيروسات المشفرة",
+        "تستهلك الكثير من عرض النطاق الترددي للشبكة",
+        "يجب أن يعمل الكود الخبيث فعلياً على الجهاز قبل اكتشافه، مما قد يسبب ضرراً",
+        "لا يمكن تحديثها عبر الإنترنت"
+      ],
+      "en": [
+        "It cannot detect encrypted viruses",
+        "It consumes too much network bandwidth",
+        "The malicious code must actually run on the machine before detection, potentially causing harm",
+        "It cannot be updated over the Internet"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "نظراً لأنها تراقب السلوك، يجب أن يبدأ البرنامج في العمل لتحديد ما إذا كان خبيثاً، مما يترك نافذة صغيرة لحدوث ضرر.",
+      "en": "Because it monitors behavior, the program must start running to determine if it's malicious, leaving a small window for harm to occur."
+    },
+    "hint": {
+      "ar": "كيف يمكنك معرفة سلوك شخص ما دون أن تتركه يتصرف أولاً؟",
+      "en": "How can you know someone's behavior without letting them act first?"
+    },
+    "difficulty": "medium",
+    "conceptId": "countermeasures-and-ddos"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي مما يلي يُعد مثالاً على 'القنبلة المنطقية' (Logic Bomb)؟",
+      "en": "Which of the following is an example of a 'Logic Bomb'?"
+    },
+    "options": {
+      "ar": [
+        "برنامج يرسل رسائل بريد مزعج باستمرار",
+        "كود خبيث يمسح قاعدة البيانات إذا تم فصل الموظف من الشركة",
+        "دودة تمسح عناوين IP عشوائية",
+        "برنامج يفتح منفذاً سرياً للمهاجم"
+      ],
+      "en": [
+        "A program that continuously sends spam",
+        "Malicious code that deletes the database if an employee is fired",
+        "A worm scanning random IP addresses",
+        "A program opening a secret port for an attacker"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القنبلة المنطقية هي كود يتم تنشيطه (ينفجر) فقط عند استيفاء شروط معينة، مثل تغيير حالة التوظيف أو تاريخ محدد.",
+      "en": "A logic bomb is code that triggers (explodes) only when certain conditions are met, such as a change in employment status or a specific date."
+    },
+    "hint": {
+      "ar": "ابحث عن الخيار الذي يعتمد على 'شرط' أو 'حدث' معين للتنفيذ.",
+      "en": "Look for the option that relies on a specific 'condition' or 'event' to execute."
+    },
+    "difficulty": "medium",
+    "conceptId": "viruses-structure-phases"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو الغرض الأساسي من 'الباب الخلفي' (Backdoor)؟",
+      "en": "What is the primary purpose of a 'Backdoor'?"
+    },
+    "options": {
+      "ar": [
+        "تشفير ملفات المستخدم لطلب فدية",
+        "نسخ الفيروس إلى أجهزة أخرى",
+        "توفير نقطة دخول سرية لتجاوز إجراءات الأمان العادية",
+        "إغراق الشبكة بحركة مرور غير مجدية"
+      ],
+      "en": [
+        "Encrypting user files for ransom",
+        "Replicating the virus to other machines",
+        "Providing a secret entry point to bypass normal security procedures",
+        "Flooding the network with useless traffic"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الباب الخلفي (أو الباب المسحور) يسمح للمهاجم بالوصول المستمر إلى النظام دون الحاجة للمرور بآليات المصادقة الطبيعية.",
+      "en": "A backdoor (or trapdoor) allows an attacker persistent access to a system without going through normal authentication mechanisms."
+    },
+    "hint": {
+      "ar": "فكر في سبب ترك اللص لباب خلفي مفتوحاً في مبنى.",
+      "en": "Think about why a thief would leave a back door open in a building."
+    },
+    "difficulty": "easy",
+    "conceptId": "payloads-stealthing-backdoors"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "لماذا تعتبر فيروسات الماكرو (Macro viruses) تهديداً كبيراً؟",
+      "en": "Why are macro viruses considered a significant threat?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تصيب قطاع التشغيل (Boot sector) مباشرة",
+        "لأنها مستقلة عن المنصة (Platform independent) وتنتشر عبر مشاركة المستندات العادية",
+        "لأنها لا يمكن اكتشافها بواسطة أي برنامج مكافحة فيروسات",
+        "لأنها لا تتطلب أي تفاعل من المستخدم"
+      ],
+      "en": [
+        "Because they directly infect the boot sector",
+        "Because they are platform independent and spread through normal document sharing",
+        "Because they cannot be detected by any antivirus software",
+        "Because they require zero user interaction"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "فيروسات الماكرو تصيب المستندات (مثل Word/Excel) بدلاً من البرامج التنفيذية، مما يجعلها تعمل على أي نظام تشغيل يدعم تلك المستندات وتنتشر بسهولة عبر البريد.",
+      "en": "Macro viruses infect documents (like Word/Excel) rather than executables, making them work on any OS that supports those documents and spreading easily via email."
+    },
+    "hint": {
+      "ar": "هل ملفات Word تعمل فقط على نظام Windows؟",
+      "en": "Do Word files only work on Windows?"
+    },
+    "difficulty": "medium",
+    "conceptId": "viruses-structure-phases"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفصل بين 'الانتشار' و 'الحمولة': لفهم البرمجيات الخبيثة، يجب أن تفصل دائماً بين كيفية وصولها إلى الجهاز (الانتشار: فيروس، دودة، حصان طروادة) وما تفعله بعد وصولها (الحمولة: فدية، تجسس، باب خلفي).</template>
+    <template class="content-en">Separation of 'Propagation' and 'Payload': To understand malware, always separate how it gets to the machine (Propagation: virus, worm, trojan) from what it does once there (Payload: ransomware, spyware, backdoor).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الفيروس والدودة: تذكر دائماً أن الفيروس يحتاج إلى ملف مضيف (Host file) ليربط نفسه به، بينما الدودة هي برنامج مستقل (Standalone) ينتشر عبر الشبكة بنفسه.</template>
+    <template class="content-en">Confusing Viruses and Worms: Always remember that a virus needs a host file to attach itself to, whereas a worm is a standalone program that propagates across the network on its own.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الفرق الدقيق بين Polymorphic و Metamorphic: الفيروس متعدد الأشكال (Polymorphic) يغير 'غلافه' أو تشفيره فقط، بينما الفيروس المتحول (Metamorphic) يغير 'أحشاءه' ويعيد كتابة الكود البرمجي بالكامل.</template>
+    <template class="content-en">The subtle difference between Polymorphic and Metamorphic: A polymorphic virus only changes its 'wrapper' or encryption, while a metamorphic virus changes its 'guts' and completely rewrites its underlying code.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التنزيلات التلقائية (Drive-by-downloads) تتطلب نقر المستخدم: هذا فخ! التنزيل التلقائي يستغل ثغرات المتصفح بمجرد تحميل الصفحة، ولا يتطلب من المستخدم النقر على أي رابط أو زر تحميل.</template>
+    <template class="content-en">Believing Drive-by-downloads require a user click: This is a trap! A drive-by-download exploits browser vulnerabilities just by loading the page, requiring NO click or download button press from the user.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M09.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M11.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> IT Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

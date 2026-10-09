@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS482" data-module="11" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>المدركات متعددة الطبقات - الجزء الأول · DS482 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS482" data-page-title-en="DS482">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M10.html" data-gh-next="M12.html" data-gh-card="../../hub/course.html?code=DS482"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#limitations-linear-models-mlp" class="toc-link" data-bilingual>
+        <template class="content-ar">قيود النماذج الخطية والمدركات متعددة الطبقات (MLP)</template>
+        <template class="content-en">Limitations of Linear Models and Multilayer Perceptrons (MLP)</template>
+        <span class="content-target">قيود النماذج الخطية والمدركات متعددة الطبقات (MLP)</span>
+      </a>
+      <a href="#universal-approximators" class="toc-link" data-bilingual>
+        <template class="content-ar">المقربات الشاملة (Universal Approximators)</template>
+        <template class="content-en">Universal Approximators</template>
+        <span class="content-target">المقربات الشاملة (Universal Approximators)</span>
+      </a>
+      <a href="#activation-functions" class="toc-link" data-bilingual>
+        <template class="content-ar">دوال التنشيط (Activation Functions)</template>
+        <template class="content-en">Activation Functions</template>
+        <span class="content-target">دوال التنشيط (Activation Functions)</span>
+      </a>
+      <a href="#training-vs-generalization-error" class="toc-link" data-bilingual>
+        <template class="content-ar">خطأ التدريب وخطأ التعميم</template>
+        <template class="content-en">Training Error and Generalization Error</template>
+        <span class="content-target">خطأ التدريب وخطأ التعميم</span>
+      </a>
+      <a href="#underfitting-overfitting-complexity" class="toc-link" data-bilingual>
+        <template class="content-ar">فرط التخصيص، نقص التخصيص، وتعقيد النموذج</template>
+        <template class="content-en">Overfitting, Underfitting, and Model Complexity</template>
+        <span class="content-target">فرط التخصيص، نقص التخصيص، وتعقيد النموذج</span>
+      </a>
+      <a href="#model-selection-validation" class="toc-link" data-bilingual>
+        <template class="content-ar">اختيار النموذج ومجموعة التحقق</template>
+        <template class="content-en">Model Selection and Validation Dataset</template>
+        <span class="content-target">اختيار النموذج ومجموعة التحقق</span>
+      </a>
+      <a href="#weight-decay-l2" class="toc-link" data-bilingual>
+        <template class="content-ar">تضاؤل الأوزان (تنظيم L2)</template>
+        <template class="content-en">Weight Decay (L2 Regularization)</template>
+        <span class="content-target">تضاؤل الأوزان (تنظيم L2)</span>
+      </a>
+      <a href="#dropout-regularization" class="toc-link" data-bilingual>
+        <template class="content-ar">الإسقاط (Dropout)</template>
+        <template class="content-en">Dropout Regularization</template>
+        <span class="content-target">الإسقاط (Dropout)</span>
+      </a>
+      <a href="#forward-backward-propagation" class="toc-link" data-bilingual>
+        <template class="content-ar">الانتشار الأمامي والخلفي والرسوم البيانية الحسابية</template>
+        <template class="content-en">Forward/Backward Propagation and Computational Graphs</template>
+        <span class="content-target">الانتشار الأمامي والخلفي والرسوم البيانية الحسابية</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 11</template>
+      <template class="content-en">Module 11</template>
+      <span class="content-target">الوحدة 11</span>
+    </span> · DS482
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">المدركات متعددة الطبقات - الجزء الأول</h1>
+      <p class="hero-description">مقدمة إلى الشبكات العصبية العميقة، دوال التنشيط، مفاهيم التعميم، فرط التخصيص، وتقنيات التنظيم مثل تضاؤل الأوزان والإسقاط، بالإضافة إلى الانتشار الأمامي والخلفي.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Multilayer Perceptrons-I</h1>
+      <p class="hero-description">Introduction to deep neural networks, activation functions, generalization concepts, overfitting, regularization techniques like weight decay and dropout, and forward/backward propagation.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">التعلم العميق</span>
+      <span class="tag">الشبكات العصبية</span>
+      <span class="tag">دوال التنشيط</span>
+      <span class="tag">التنظيم</span>
+      <span class="tag">الانتشار الخلفي</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Deep Learning</span>
+      <span class="tag">Neural Networks</span>
+      <span class="tag">Activation Functions</span>
+      <span class="tag">Regularization</span>
+      <span class="tag">Backpropagation</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف الاستقرار العددي والتهيئة في الشبكات العصبية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح مفهوم التعميم في التعلم العميق والفرق بين خطأ التدريب وخطأ التعميم.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق تقنيات التنظيم مثل تضاؤل الأوزان والإسقاط للحد من فرط التخصيص.</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم آليات الانتشار الأمامي والخلفي باستخدام الرسوم البيانية الحسابية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe Numerical Stability and Initialization.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain Generalization in Deep Learning and the difference between training and generalization error.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply regularization techniques like weight decay and dropout to mitigate overfitting.</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand the mechanics of forward and backward propagation using computational graphs.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="limitations-linear-models-mlp" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> قيود النماذج الخطية والمدركات متعددة الطبقات (MLP)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Limitations of Linear Models and Multilayer Perceptrons (MLP)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>النماذج الخطية تفترض علاقات رتيبة بسيطة، بينما المدركات متعددة الطبقات (MLPs) تتغلب على ذلك بإضافة طبقات مخفية لاكتشاف تفاعلات معقدة.</p></template>
+    <template class="content-en"><p>Linear models assume simple monotonic relationships, while MLPs overcome this by adding hidden layers to discover complex interactions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعاني النماذج الخطية من افتراض <b><span class="smart-term" data-term-en="Monotonicity" data-ar="الرتابة" data-en-def="The assumption that an increase in a feature always causes a consistent directional change in the output.">الرتابة<span class="smart-term-tooltip"></span></span> (Monotonicity)</b>، مما يعني أن أي زيادة في الميزة يجب أن تؤدي دائمًا إلى زيادة (أو نقصان) في المخرجات. هذا يحد من قدرتها على نمذجة التفاعلات المعقدة.</p><p>للتغلب على ذلك، نستخدم <b>المدركات متعددة الطبقات (Multilayer Perceptrons - MLP)</b>. تتكون هذه الشبكات من طبقات متعددة من الخلايا العصبية، حيث تتصل كل طبقة بالكامل بالطبقة التي تليها. الطبقات بين المدخلات والمخرجات تسمى <b>الطبقات المخفية (Hidden Layers)</b>.</p><p>تعمل الطبقات المخفية كتمثيل للبيانات، بينما تعمل الطبقة النهائية كمتنبئ خطي بناءً على هذا التمثيل.</p></template>
+    <template class="content-en"><p>Linear models suffer from the assumption of <b><span class="smart-term" data-term-en="Monotonicity" data-ar="الرتابة" data-en-def="The assumption that an increase in a feature always causes a consistent directional change in the output.">monotonicity<span class="smart-term-tooltip"></span></span></b>, meaning any increase in a feature must always cause an increase (or decrease) in the output. This limits their ability to model complex interactions.</p><p>To overcome this, we use <b>Multilayer Perceptrons (MLP)</b>. These networks consist of multiple layers of neurons, each fully connected to the layer below and above. The layers between input and output are called <b>Hidden Layers</b>.</p><p>The hidden layers act as a representation of the data, while the final layer acts as a linear predictor based on that representation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تاريخياً، تم دراسة مشكلة اللاخطية لعقود باستخدام طرق مثل أشجار القرار وطرق النواة (Kernel methods). ومع ذلك، توفر الشبكات العصبية حلاً طبيعياً من خلال تسلسل التحويلات البسيطة.</p><p>في شبكة MLP، يؤثر كل إدخال على كل خلية عصبية في الطبقة المخفية، وكل خلية مخفية تؤثر على كل خلية في طبقة المخرجات. هذا الاتصال الكامل (Fully Connected) يسمح بالتقاط التفاعلات المعقدة، ولكنه يزيد بشكل كبير من عدد المعلمات، مما يمهد الطريق لمشكلة فرط التخصيص (Overfitting).</p></template>
+    <template class="content-en"><p>Historically, the problem of nonlinearity was studied for decades using methods like decision trees and kernel methods. However, neural networks provide a natural solution through a sequence of relatively simple transformations.</p><p>In an MLP, every input influences every neuron in the hidden layer, and each hidden neuron influences every output neuron. This fully connected architecture allows capturing complex interactions but significantly increases the number of parameters, paving the way for overfitting.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: A neural network diagram showing an Input layer (4 nodes: x1, x2, x3, x4), a Hidden layer (5 nodes: h1, h2, h3, h4, h5), and an Output layer (3 nodes: o1, o2, o3). All nodes in one layer are fully connected to all nodes in the next layer with directed edges (arrows). Nodes are circular, colored light blue. Background dark #0d1117. Labels in white. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="32" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" opacity="0.6"/>
+        </marker>
+        <style>
+            .label-title { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 18px; font-weight: bold; fill: var(--text-primary); }
+            .label-sub { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 14px; fill: var(--text-secondary); }
+            .node-text-light { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: var(--text-primary); }
+            .node-text-dark { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 16px; font-weight: 600; fill: var(--on-brand-lo); }
+            .footer-text { font-family: system-ui, 'Cairo', 'Inter', sans-serif; font-size: 15px; fill: var(--text-secondary); }
+        </style>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Hidden Layer Grouping Highlight -->
+    <rect x="340" y="50" width="120" height="400" rx="20" fill="var(--brand-500)" opacity="0.05" stroke="var(--brand-500)" stroke-dasharray="6,4" stroke-width="1.5"/>
+
+    <!-- Edges: Input to Hidden -->
+    <g stroke="var(--brand-500)" stroke-width="1.5" opacity="0.25" marker-end="url(#arrow)">
+        <!-- From x1 (130) -->
+        <line x1="150" y1="130" x2="400" y2="90" />
+        <line x1="150" y1="130" x2="400" y2="170" />
+        <line x1="150" y1="130" x2="400" y2="250" />
+        <line x1="150" y1="130" x2="400" y2="330" />
+        <line x1="150" y1="130" x2="400" y2="410" />
+        <!-- From x2 (210) -->
+        <line x1="150" y1="210" x2="400" y2="90" />
+        <line x1="150" y1="210" x2="400" y2="170" />
+        <line x1="150" y1="210" x2="400" y2="250" />
+        <line x1="150" y1="210" x2="400" y2="330" />
+        <line x1="150" y1="210" x2="400" y2="410" />
+        <!-- From x3 (290) -->
+        <line x1="150" y1="290" x2="400" y2="90" />
+        <line x1="150" y1="290" x2="400" y2="170" />
+        <line x1="150" y1="290" x2="400" y2="250" />
+        <line x1="150" y1="290" x2="400" y2="330" />
+        <line x1="150" y1="290" x2="400" y2="410" />
+        <!-- From x4 (370) -->
+        <line x1="150" y1="370" x2="400" y2="90" />
+        <line x1="150" y1="370" x2="400" y2="170" />
+        <line x1="150" y1="370" x2="400" y2="250" />
+        <line x1="150" y1="370" x2="400" y2="330" />
+        <line x1="150" y1="370" x2="400" y2="410" />
+    </g>
+
+    <!-- Edges: Hidden to Output -->
+    <g stroke="var(--brand-500)" stroke-width="1.5" opacity="0.25" marker-end="url(#arrow)">
+        <!-- From h1 (90) -->
+        <line x1="400" y1="90" x2="650" y2="170" />
+        <line x1="400" y1="90" x2="650" y2="250" />
+        <line x1="400" y1="90" x2="650" y2="330" />
+        <!-- From h2 (170) -->
+        <line x1="400" y1="170" x2="650" y2="170" />
+        <line x1="400" y1="170" x2="650" y2="250" />
+        <line x1="400" y1="170" x2="650" y2="330" />
+        <!-- From h3 (250) -->
+        <line x1="400" y1="250" x2="650" y2="170" />
+        <line x1="400" y1="250" x2="650" y2="250" />
+        <line x1="400" y1="250" x2="650" y2="330" />
+        <!-- From h4 (330) -->
+        <line x1="400" y1="330" x2="650" y2="170" />
+        <line x1="400" y1="330" x2="650" y2="250" />
+        <line x1="400" y1="330" x2="650" y2="330" />
+        <!-- From h5 (410) -->
+        <line x1="400" y1="410" x2="650" y2="170" />
+        <line x1="400" y1="410" x2="650" y2="250" />
+        <line x1="400" y1="410" x2="650" y2="330" />
+    </g>
+
+    <!-- Nodes: Input Layer -->
+    <g>
+        <circle cx="150" cy="130" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="150" y="135" text-anchor="middle" class="node-text-light">x₁</text>
+        
+        <circle cx="150" cy="210" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="150" y="215" text-anchor="middle" class="node-text-light">x₂</text>
+        
+        <circle cx="150" cy="290" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="150" y="295" text-anchor="middle" class="node-text-light">x₃</text>
+        
+        <circle cx="150" cy="370" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="150" y="375" text-anchor="middle" class="node-text-light">x₄</text>
+    </g>
+
+    <!-- Nodes: Hidden Layer -->
+    <g>
+        <circle cx="400" cy="90" r="24" fill="var(--brand-500)"/>
+        <text x="400" y="95" text-anchor="middle" class="node-text-dark">h₁</text>
+        
+        <circle cx="400" cy="170" r="24" fill="var(--brand-500)"/>
+        <text x="400" y="175" text-anchor="middle" class="node-text-dark">h₂</text>
+        
+        <circle cx="400" cy="250" r="24" fill="var(--brand-500)"/>
+        <text x="400" y="255" text-anchor="middle" class="node-text-dark">h₃</text>
+        
+        <circle cx="400" cy="330" r="24" fill="var(--brand-500)"/>
+        <text x="400" y="335" text-anchor="middle" class="node-text-dark">h₄</text>
+        
+        <circle cx="400" cy="410" r="24" fill="var(--brand-500)"/>
+        <text x="400" y="415" text-anchor="middle" class="node-text-dark">h₅</text>
+    </g>
+
+    <!-- Nodes: Output Layer -->
+    <g>
+        <circle cx="650" cy="170" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="650" y="175" text-anchor="middle" class="node-text-light">o₁</text>
+        
+        <circle cx="650" cy="250" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="650" y="255" text-anchor="middle" class="node-text-light">o₂</text>
+        
+        <circle cx="650" cy="330" r="24" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="650" y="335" text-anchor="middle" class="node-text-light">o₃</text>
+    </g>
+
+    <!-- Labels -->
+    <g>
+        <!-- Input Layer Label -->
+        <text x="150" y="40" text-anchor="middle" class="gsvg-en label-title">Input Layer</text>
+        <text x="150" y="40" text-anchor="middle" class="gsvg-ar label-title">طبقة الإدخال</text>
+        
+        <!-- Hidden Layer Label -->
+        <text x="400" y="40" text-anchor="middle" class="gsvg-en label-title">Hidden Layer</text>
+        <text x="400" y="40" text-anchor="middle" class="gsvg-ar label-title">الطبقة المخفية</text>
+        <text x="400" y="60" text-anchor="middle" class="gsvg-en label-sub">(Representation)</text>
+        <text x="400" y="60" text-anchor="middle" class="gsvg-ar label-sub">(تمثيل البيانات)</text>
+        
+        <!-- Output Layer Label -->
+        <text x="650" y="40" text-anchor="middle" class="gsvg-en label-title">Output Layer</text>
+        <text x="650" y="40" text-anchor="middle" class="gsvg-ar label-title">طبقة الإخراج</text>
+        <text x="650" y="60" text-anchor="middle" class="gsvg-en label-sub">(Linear Predictor)</text>
+        <text x="650" y="60" text-anchor="middle" class="gsvg-ar label-sub">(متنبئ خطي)</text>
+    </g>
+
+    <!-- Footer Note -->
+    <g>
+        <text x="400" y="490" text-anchor="middle" class="gsvg-en footer-text">Multilayer Perceptrons (MLP) overcome linear limitations via hidden representations.</text>
+        <text x="400" y="490" text-anchor="middle" class="gsvg-ar footer-text">تتغلب الشبكات العصبية متعددة الطبقات (MLP) على القيود الخطية من خلال التمثيلات المخفية.</text>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Linear Models</th><th>Deep Neural Networks</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التحيز (Bias)</template>
+          <template class="content-en">Bias</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع (تمثل فئة صغيرة من الدوال)</template>
+          <template class="content-en">High (represent a small class of functions)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (مقربات شاملة)</template>
+          <template class="content-en">Low (universal approximators)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التباين (Variance)</template>
+          <template class="content-en">Variance</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض (نتائج متشابهة عبر عينات مختلفة)</template>
+          <template class="content-en">Low (similar results across different random samples)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع (عرضة لفرط التخصيص)</template>
+          <template class="content-en">High (prone to overfitting)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التقاط التفاعلات بين الميزات</template>
+          <template class="content-en">Capturing Feature Interactions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">ضعيف (تنظر لكل ميزة بشكل فردي)</template>
+          <template class="content-en">Poor (look at each feature individually)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">ممتاز (تتعلم التفاعلات عبر الطبقات المخفية)</template>
+          <template class="content-en">Excellent (learn interactions via hidden layers)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكن لنموذج خطي بسيط حل مشكلة XOR، وكيف يحلها إضافة طبقة مخفية؟</template>
+      <template class="content-en">Why can't a simple linear model solve the XOR problem, and how does adding a hidden layer solve it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مشكلة XOR غير قابلة للفصل خطياً (لا يمكن رسم خط مستقيم يفصل بين الفئات). الطبقة المخفية تقوم بتحويل مساحة المدخلات إلى مساحة جديدة ذات أبعاد أعلى حيث تصبح البيانات قابلة للفصل خطياً بواسطة طبقة المخرجات.</p></template>
+      <template class="content-en"><p>The XOR problem is not linearly separable (no single straight line can separate the classes). A hidden layer transforms the input space into a new, higher-dimensional representation where the data becomes linearly separable by the output layer.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="universal-approximators" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> المقربات الشاملة (Universal Approximators)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Universal Approximators</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن لشبكة عصبية ذات طبقة مخفية واحدة (بعدد كافٍ من العقد) تقريب أي دالة رياضية، لكن الشبكات الأعمق تفعل ذلك بكفاءة أكبر.</p></template>
+    <template class="content-en"><p>A neural network with a single hidden layer (and enough nodes) can approximate any function, but deeper networks do it much more compactly.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرف المدركات متعددة الطبقات (MLPs) بأنها <b>مقربات شاملة (Universal Approximators)</b>. هذا يعني أنه حتى مع وجود شبكة ذات طبقة مخفية واحدة فقط، إذا تم تزويدها بعدد كافٍ من العقد (ربما عدد هائل) ومجموعة الأوزان الصحيحة، يمكنها نمذجة أي دالة.</p><p>ومع ذلك، مجرد قدرة الشبكة على تعلم أي دالة لا يعني أنها الحل الأفضل دائماً. في الواقع، يمكننا تقريب العديد من الدوال بشكل أكثر إحكاماً وكفاءة باستخدام شبكات <b>أعمق (Deeper)</b> بدلاً من شبكات <b>أعرض (Wider)</b>.</p></template>
+    <template class="content-en"><p>MLPs are widely known as <b>universal approximators</b>. This means that even with a single-hidden-layer network, given enough nodes (possibly absurdly many) and the right set of weights, we can model any function.</p><p>However, just because a single-hidden-layer network can learn any function does not mean you should always use one. We can approximate many functions much more compactly and efficiently by using <b>deeper</b> (rather than wider) networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يمكن تشبيه الشبكة العصبية بلغة برمجة مثل C. لغة C قادرة على التعبير عن أي برنامج قابل للحساب (Turing complete)، ولكن التحدي الحقيقي يكمن في كتابة البرنامج الذي يلبي المواصفات. وبالمثل، الشبكة قادرة على تمثيل الدالة، لكن <i>تعلم</i> تلك الدالة (إيجاد الأوزان الصحيحة عبر التحسين) هو الجزء الصعب.</p></template>
+    <template class="content-en"><p>You might think of a neural network as being a bit like the C programming language. The language is capable of expressing any computable program. But actually coming up with a program that meets your specifications is the hard part. Similarly, the network can represent the function, but actually <i>learning</i> that function (finding the weights via optimization) is the hard part.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت طبقة مخفية واحدة تكفي لتقريب أي دالة، فلماذا نستخدم التعلم العميق (طبقات متعددة)؟</template>
+      <template class="content-en">If a single hidden layer is enough to approximate any function, why do we use Deep Learning (multiple layers)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الشبكات العميقة يمكنها تمثيل الدوال المعقدة بعدد أقل بكثير من المعلمات (بكفاءة أكبر) مقارنة بالشبكات الضحلة والعريضة جداً. كما أنها تتعلم تمثيلات هرمية للميزات.</p></template>
+      <template class="content-en"><p>Deep networks can represent complex functions with exponentially fewer parameters (more compactly) than very wide, shallow networks. They also learn hierarchical feature representations.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="activation-functions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> دوال التنشيط (Activation Functions)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Activation Functions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دوال التنشيط هي بوابات رياضية تضيف اللاخطية للشبكة، مما يسمح لها بتعلم أنماط معقدة بدلاً من مجرد تحويلات خطية بسيطة.</p></template>
+    <template class="content-en"><p>Activation functions are mathematical gates that add nonlinearity to the network, allowing it to learn complex patterns instead of just simple linear transformations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تقرر دوال التنشيط ما إذا كان يجب تنشيط الخلية العصبية أم لا عن طريق حساب المجموع المرجح وإضافة التحيز. الأهم من ذلك، أنها تضيف <b>اللاخطية (Nonlinearity)</b> إلى الشبكة.</p><p>أهم دوال التنشيط:</p><ol><li><b>ReLU (<span class="smart-term" data-term-en="ReLU" data-ar="وحدة الخطية المصححة" data-en-def="An activation function defined as the positive part of its argument: f(x) = max(0, x).">وحدة الخطية المصححة<span class="smart-term-tooltip"></span></span>):</b> الدالة الأكثر شيوعاً. تُرجع القيمة نفسها إذا كانت موجبة، وتُرجع صفراً إذا كانت سالبة. <code>ReLU(x) = max(x, 0)</code>.</li><li><b>Sigmoid (<span class="smart-term" data-term-en="Sigmoid" data-ar="الدالة السينية" data-en-def="A mathematical function having a characteristic &#x27;S&#x27;-shaped curve, mapping values to the (0, 1) range.">الدالة السينية<span class="smart-term-tooltip"></span></span>):</b> تضغط المدخلات إلى نطاق بين (0, 1). كانت شائعة قديماً وتستخدم الآن غالباً في طبقة المخرجات للتصنيف الثنائي.</li><li><b>Tanh (الظل الزائدي):</b> تضغط المدخلات إلى نطاق بين (-1, 1). تتميز بتناظر نقطي حول نقطة الأصل.</li></ol></template>
+    <template class="content-en"><p>Activation functions decide whether a neuron should be activated or not by calculating the weighted sum and adding bias. Crucially, they add <b>nonlinearity</b> to the network.</p><p>Common activation functions:</p><ol><li><b><span class="smart-term" data-term-en="ReLU" data-ar="وحدة الخطية المصححة" data-en-def="An activation function defined as the positive part of its argument: f(x) = max(0, x).">ReLU<span class="smart-term-tooltip"></span></span> (Rectified Linear Unit):</b> The most popular choice. Returns the value if positive, and zero if negative. <code>ReLU(x) = max(x, 0)</code>.</li><li><b><span class="smart-term" data-term-en="Sigmoid" data-ar="الدالة السينية" data-en-def="A mathematical function having a characteristic &#x27;S&#x27;-shaped curve, mapping values to the (0, 1) range.">Sigmoid<span class="smart-term-tooltip"></span></span>:</b> Squashes inputs to the interval (0, 1). Historically popular, now mostly used in the output layer for binary classification.</li><li><b>Tanh (Hyperbolic Tangent):</b> Squashes inputs to the interval (-1, 1). Exhibits point symmetry about the origin.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>دالة ReLU غير قابلة للاشتقاق رياضياً عند النقطة 0 بالضبط. في الممارسة العملية، نتجاوز ذلك بتعيين المشتقة إلى 0 (أو قيمة افتراضية) عند هذه النقطة، وهو ما ينجح لأن المدخلات نادراً ما تكون صفراً تماماً.</p><p>تم استبدال Sigmoid بـ ReLU في الطبقات المخفية لأن ReLU أسهل في التدريب وتخفف من مشكلة تلاشي التدرج (Vanishing Gradient) التي تعاني منها دوال Sigmoid و Tanh عندما تكون المدخلات كبيرة جداً أو صغيرة جداً.</p></template>
+    <template class="content-en"><p>The ReLU function is not strictly differentiable when the input is exactly 0. In practice, we default to the left-hand-side derivative and say the derivative is 0. We get away with this because the input may never actually be exactly zero (nondifferentiable on a set of measure zero).</p><p>Sigmoid has mostly been replaced by ReLU in hidden layers because ReLU is simpler, faster to compute, and helps mitigate the vanishing gradient problem that plagues Sigmoid and Tanh when inputs are very large or very small.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>المعادلات الرياضية لدوال التنشيط ReLU و Sigmoid و Tanh.</strong></template>
+      <template class="content-en"><strong>Mathematical equations for ReLU, Sigmoid, and Tanh activation functions.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{ReLU}(x) = \max(x, 0) \\ \text{sigmoid}(x) = \frac{1}{1 + \exp(-x)} \\ \tanh(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Three side-by-side line charts showing activation functions. Chart 1: ReLU, flat at y=0 for x<0, linear y=x for x>0. Chart 2: Sigmoid, S-curve crossing y=0.5 at x=0, asymptotes at y=0 and y=1. Chart 3: Tanh, S-curve crossing y=0 at x=0, asymptotes at y=-1 and y=1. Dark background, bright distinct colors for the lines. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Main Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Common Activation Functions</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">دوال التنشيط الشائعة</text>
+
+    <!-- ================= CHART 1: ReLU ================= -->
+    <g>
+        <!-- Card Background -->
+        <rect x="35" y="70" width="220" height="310" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Titles -->
+        <text x="145" y="105" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">ReLU</text>
+        <text x="145" y="105" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">ريلو (ReLU)</text>
+        <text x="145" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="monospace">f(x) = max(0, x)</text>
+
+        <!-- Axes -->
+        <line x1="55" y1="270" x2="235" y2="270" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="145" y1="290" x2="145" y2="160" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="230" y="285" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">x</text>
+        <text x="155" y="165" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">f(x)</text>
+        <text x="135" y="285" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
+
+        <!-- Function Line (Glow + Main) -->
+        <path d="M 55 270 L 145 270 L 215 165" stroke="var(--brand-500)" stroke-width="8" opacity="0.15" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M 55 270 L 145 270 L 215 165" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+
+        <!-- Bullet Points -->
+        <text x="145" y="330" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Range: [0, ∞)</text>
+        <text x="145" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المدى: [0, ∞)</text>
+        <text x="145" y="350" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Non-linear, fast</text>
+        <text x="145" y="350" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">غير خطية، سريعة</text>
+    </g>
+
+    <!-- ================= CHART 2: Sigmoid ================= -->
+    <g>
+        <!-- Card Background -->
+        <rect x="290" y="70" width="220" height="310" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Titles -->
+        <text x="400" y="105" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Sigmoid</text>
+        <text x="400" y="105" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">سيجمويد (Sigmoid)</text>
+        <text x="400" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="monospace">σ(x) = 1 / (1 + e⁻ˣ)</text>
+
+        <!-- Grid Lines -->
+        <line x1="310" y1="170" x2="490" y2="170" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+        <line x1="310" y1="270" x2="490" y2="270" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+
+        <!-- Axes -->
+        <line x1="310" y1="270" x2="490" y2="270" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="400" y1="290" x2="400" y2="160" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="485" y="285" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">x</text>
+        <text x="410" y="165" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">σ(x)</text>
+        <text x="390" y="175" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
+        <text x="390" y="285" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
+
+        <!-- Function Line (Glow + Main) -->
+        <path d="M 310 268 C 360 268, 380 230, 400 220 S 440 172, 490 172" stroke="var(--brand-500)" stroke-width="8" opacity="0.15" fill="none" stroke-linecap="round" />
+        <path d="M 310 268 C 360 268, 380 230, 400 220 S 440 172, 490 172" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Bullet Points -->
+        <text x="400" y="330" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Range: (0, 1)</text>
+        <text x="400" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المدى: (0, 1)</text>
+        <text x="400" y="350" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Binary classification</text>
+        <text x="400" y="350" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تصنيف ثنائي</text>
+    </g>
+
+    <!-- ================= CHART 3: Tanh ================= -->
+    <g>
+        <!-- Card Background -->
+        <rect x="545" y="70" width="220" height="310" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+        
+        <!-- Titles -->
+        <text x="655" y="105" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Tanh</text>
+        <text x="655" y="105" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الظل الزائدي (Tanh)</text>
+        <text x="655" y="130" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="monospace">tanh(x) = (eˣ - e⁻ˣ) / (eˣ + e⁻ˣ)</text>
+
+        <!-- Grid Lines -->
+        <line x1="565" y1="170" x2="745" y2="170" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+        <line x1="565" y1="270" x2="745" y2="270" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+
+        <!-- Axes -->
+        <line x1="565" y1="220" x2="745" y2="220" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="655" y1="290" x2="655" y2="160" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        
+        <!-- Axis Labels -->
+        <text x="740" y="235" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">x</text>
+        <text x="665" y="165" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-style="italic">tanh(x)</text>
+        <text x="645" y="175" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
+        <text x="645" y="235" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">0</text>
+        <text x="640" y="285" fill="var(--text-muted)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">-1</text>
+
+        <!-- Function Line (Glow + Main) -->
+        <path d="M 565 268 C 610 268, 645 250, 655 220 S 700 172, 745 172" stroke="var(--brand-500)" stroke-width="8" opacity="0.15" fill="none" stroke-linecap="round" />
+        <path d="M 565 268 C 610 268, 645 250, 655 220 S 700 172, 745 172" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Bullet Points -->
+        <text x="655" y="330" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Range: (-1, 1)</text>
+        <text x="655" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المدى: (-1, 1)</text>
+        <text x="655" y="350" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Zero-centered</text>
+        <text x="655" y="350" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">متمركزة حول الصفر</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هي ميزة دالة Tanh مقارنة بدالة Sigmoid؟</template>
+      <template class="content-en">What is the advantage of the Tanh function compared to the Sigmoid function?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>دالة Tanh متمركزة حول الصفر (نطاقها من -1 إلى 1)، مما يجعل متوسط تنشيطات الطبقة المخفية أقرب إلى الصفر، وهذا يساعد في تسريع عملية التقارب (Convergence) أثناء التدريب مقارنة بـ Sigmoid التي نطاقها موجب فقط.</p></template>
+      <template class="content-en"><p>Tanh is zero-centered (range -1 to 1), which helps keep the mean of the hidden layer activations closer to zero. This generally leads to faster convergence during training compared to the strictly positive Sigmoid.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="training-vs-generalization-error" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> خطأ التدريب وخطأ التعميم</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Training Error and Generalization Error</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خطأ التدريب هو مدى جودة أداء النموذج على البيانات التي حفظها، بينما خطأ التعميم هو مدى جودة أدائه على بيانات جديدة لم يرها من قبل.</p></template>
+    <template class="content-en"><p>Training error is how well the model performs on data it has memorized, while generalization error is how well it performs on new, unseen data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يجب التمييز بين نوعين من الأخطاء:</p><ol><li><b>خطأ التدريب (Training Error):</b> هو الخطأ الذي يتم حسابه على مجموعة بيانات التدريب.</li><li><b><span class="smart-term" data-term-en="Generalization Error" data-ar="خطأ التعميم" data-en-def="A measure of how accurately an algorithm is able to predict outcome values for previously unseen data.">خطأ التعميم<span class="smart-term-tooltip"></span></span> (Generalization Error):</b> هو التوقع لخطأ النموذج إذا تم تطبيقه على تيار لا نهائي من البيانات الإضافية المسحوبة من نفس التوزيع الأساسي.</li></ol><p>بما أننا لا نستطيع حساب خطأ التعميم بدقة (لأن تيار البيانات اللانهائي هو كائن خيالي)، فإننا <b>نقدره</b> عن طريق تطبيق النموذج على <b>مجموعة اختبار (Test Set)</b> مستقلة تتكون من عينات تم حجبها أثناء التدريب.</p></template>
+    <template class="content-en"><p>We must differentiate between two types of errors:</p><ol><li><b>Training Error:</b> The error of our model as calculated on the training dataset.</li><li><b><span class="smart-term" data-term-en="Generalization Error" data-ar="خطأ التعميم" data-en-def="A measure of how accurately an algorithm is able to predict outcome values for previously unseen data.">Generalization Error<span class="smart-term-tooltip"></span></span>:</b> The expectation of our model's error were we to apply it to an infinite stream of additional data examples drawn from the same underlying data distribution.</li></ol><p>Because we can never calculate the generalization error exactly, we must <b>estimate</b> it by applying our model to an independent <b>test set</b> constituted of a random selection of data examples withheld from our training set.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتمد نظرية التعلم الإحصائي على افتراض <b>i.i.d. (<span class="smart-term" data-term-en="i.i.d. (Independent and Identically Distributed)" data-ar="مستقلة وموزعة بشكل متطابق" data-en-def="An assumption that each random variable has the same probability distribution as the others and all are mutually independent.">مستقلة وموزعة بشكل متطابق<span class="smart-term-tooltip"></span></span>)</b>. هذا يعني أن بيانات التدريب والاختبار مسحوبة بشكل مستقل من نفس التوزيع، وأن عملية سحب العينات ليس لها ذاكرة.</p><p>الانتهاكات الطفيفة لافتراض i.i.d. شائعة في العالم الحقيقي وغالباً ما تنجح النماذج رغم ذلك. لكن الانتهاكات الكبيرة (مثل تدريب نظام التعرف على الوجوه على طلاب جامعيين واختباره على كبار السن) ستؤدي حتماً إلى فشل النموذج في التعميم.</p></template>
+    <template class="content-en"><p>Statistical learning theory relies on the <b>i.i.d. assumption (independently and identically distributed)</b>. This assumes both training and test data are drawn independently from identical distributions, meaning the sampling process has no memory.</p><p>Minor violations of the i.i.d. assumption are common in real-world applications and models often still work well. However, major violations (e.g., training a face recognition system exclusively on college students and deploying it on the elderly) will cause the model to fail to generalize.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يعني تقليل خطأ التدريب إلى الصفر بالضرورة أن النموذج ممتاز؟</template>
+      <template class="content-en">Why doesn't reducing the training error to zero necessarily mean the model is excellent?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن النموذج قد يكون قام بحفظ بيانات التدريب (فرط التخصيص) بدلاً من تعلم الأنماط العامة، مما سيؤدي إلى خطأ تعميم مرتفع جداً عند اختباره على بيانات جديدة.</p></template>
+      <template class="content-en"><p>Because the model might have simply memorized the training data (overfitting) instead of learning the underlying general patterns, leading to a very high generalization error on new data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="underfitting-overfitting-complexity" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> فرط التخصيص، نقص التخصيص، وتعقيد النموذج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Overfitting, Underfitting, and Model Complexity</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نقص التخصيص (Underfitting) يحدث عندما يكون النموذج أبسط من أن يفهم البيانات، بينما فرط التخصيص (Overfitting) يحدث عندما يحفظ النموذج البيانات المعقدة لدرجة أنه يفشل مع البيانات الجديدة.</p></template>
+    <template class="content-en"><p>Underfitting happens when a model is too simple to capture the data's pattern, while overfitting happens when it memorizes the data so well it fails on new data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند مقارنة أخطاء التدريب والتحقق، نواجه حالتين شائعتين:</p><ol><li><b><span class="smart-term" data-term-en="Underfitting" data-ar="نقص التخصيص" data-en-def="Occurs when a statistical model or machine learning algorithm cannot adequately capture the underlying structure of the data.">نقص التخصيص<span class="smart-term-tooltip"></span></span> (Underfitting):</b> خطأ التدريب وخطأ التحقق كلاهما مرتفع، والفجوة بينهما صغيرة. النموذج بسيط جداً (غير معبر بما فيه الكفاية) لالتقاط النمط.</li><li><b><span class="smart-term" data-term-en="Overfitting" data-ar="فرط التخصيص" data-en-def="The production of an analysis that corresponds too closely or exactly to a particular set of data, and may therefore fail to fit additional data or predict future observations reliably.">فرط التخصيص<span class="smart-term-tooltip"></span></span> (Overfitting):</b> خطأ التدريب أقل بكثير من خطأ التحقق. النموذج معقد جداً وحفظ الضوضاء في بيانات التدريب.</li></ol><p>يتأثر هذا بـ <b>تعقيد النموذج (Model Complexity)</b>. على سبيل المثال، في الانحدار متعدد الحدود، كلما زادت درجة كثيرة الحدود (Degree)، زاد تعقيد النموذج وزادت قدرته على ملاءمة بيانات التدريب بشكل مثالي، مما يزيد من خطر فرط التخصيص.</p></template>
+    <template class="content-en"><p>When comparing training and validation errors, we watch for two common situations:</p><ol><li><b><span class="smart-term" data-term-en="Underfitting" data-ar="نقص التخصيص" data-en-def="Occurs when a statistical model or machine learning algorithm cannot adequately capture the underlying structure of the data.">Underfitting<span class="smart-term-tooltip"></span></span>:</b> Both training and validation errors are substantial, with a small gap between them. The model is too simple (insufficiently expressive) to capture the pattern.</li><li><b><span class="smart-term" data-term-en="Overfitting" data-ar="فرط التخصيص" data-en-def="The production of an analysis that corresponds too closely or exactly to a particular set of data, and may therefore fail to fit additional data or predict future observations reliably.">Overfitting<span class="smart-term-tooltip"></span></span>:</b> Training error is significantly lower than validation error. The model is too complex and has memorized the training data's noise.</li></ol><p>This is heavily influenced by <b>Model Complexity</b>. For example, in polynomial regression, a higher-degree polynomial is more complex. It can fit the training data perfectly but is highly susceptible to overfitting.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هناك عوامل رئيسية تؤثر على قابلية التعميم: عدد المعلمات القابلة للضبط (درجات الحرية)، نطاق القيم التي يمكن أن تتخذها الأوزان، وحجم مجموعة التدريب.</p><p><b>حجم مجموعة البيانات:</b> مع النماذج المعقدة، إذا كان لدينا بيانات قليلة، فإن فرط التخصيص شبه مؤكد. كلما زادت البيانات، انخفض خطأ التعميم. التعلم العميق يتفوق عادة فقط عندما تتوفر آلاف أو ملايين الأمثلة التدريبية.</p></template>
+    <template class="content-en"><p>Factors influencing generalizability include:</p><ul><li><strong>the number of tunable parameters</strong> (degrees of freedom),</li><li><strong>the values taken by the parameters</strong>, and</li><li><strong>the number of training examples</strong>.</li></ul><p><b>Dataset Size:</b> With complex models and few examples, overfitting is highly likely. As we increase training data, generalization error typically decreases.</p><p>Deep learning usually only outperforms linear models when massive datasets are available.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الانحدار متعدد الحدود من الدرجة d.</strong></template>
+      <template class="content-en"><strong>Polynomial regression equation of degree d.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\hat{y} = \sum_{i=0}^{d} x^i w_i$$</div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: A line graph illustrating Underfitting vs Overfitting. X-axis is 'Model Complexity'. Y-axis is 'Loss'. Two curves: 'Training loss' continuously goes down as complexity increases. 'Generalization loss' goes down initially (Optimum point) then starts going up as complexity increases further. The left side is labeled 'Underfitting', the right side is labeled 'Overfitting'. Dark background, distinct curve colors. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for axes -->
+        <marker id="axis-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--text-primary)" />
+        </marker>
+        
+        <!-- Arrowheads for Generalization Gap -->
+        <marker id="gap-arrow-start" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 10 0 L 0 5 L 10 10 Z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="gap-arrow-end" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 Z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Generalization Gap Shaded Area -->
+    <path d="M 400 330 C 500 330, 600 150, 700 50 L 700 395 C 600 395, 500 390, 400 380 Z" fill="var(--brand-500)" opacity="0.1" />
+
+    <!-- Region Divider (Optimum Line) -->
+    <line x1="400" y1="120" x2="400" y2="420" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="6 6" />
+
+    <!-- Axes -->
+    <line x1="100" y1="420" x2="740" y2="420" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#axis-arrow)" />
+    <line x1="100" y1="420" x2="100" y2="40" stroke="var(--text-primary)" stroke-width="2" marker-end="url(#axis-arrow)" />
+
+    <!-- Curves -->
+    <!-- Training Loss Curve -->
+    <path d="M 120 130 C 200 320, 300 370, 400 380 C 500 390, 600 395, 700 395" fill="none" stroke="var(--text-secondary)" stroke-width="4" />
+    
+    <!-- Validation (Generalization) Loss Curve -->
+    <path d="M 120 110 C 200 300, 300 330, 400 330 C 500 330, 600 150, 700 50" fill="none" stroke="var(--brand-500)" stroke-width="4" />
+
+    <!-- Optimum Point -->
+    <circle cx="400" cy="330" r="7" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3" />
+
+    <!-- Generalization Gap Arrow -->
+    <line x1="580" y1="190" x2="580" y2="380" stroke="var(--brand-500)" stroke-width="2" marker-start="url(#gap-arrow-start)" marker-end="url(#gap-arrow-end)" />
+
+    <!-- ================= LABELS ================= -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+        
+        <!-- Axes Labels -->
+        <text x="420" y="470" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Model Complexity</text>
+        <text x="420" y="470" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">تعقيد النموذج</text>
+        
+        <text x="-230" y="60" transform="rotate(-90)" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="18" font-weight="bold">Loss</text>
+        <text x="-230" y="60" transform="rotate(-90)" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="18" font-weight="bold">الخسارة</text>
+
+        <!-- Region Titles: Underfitting -->
+        <text x="250" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">Underfitting</text>
+        <text x="250" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">نقص التوافق</text>
+        
+        <text x="250" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15">High Bias</text>
+        <text x="250" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15">انحياز عالٍ</text>
+
+        <!-- Region Titles: Overfitting -->
+        <text x="550" y="70" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="22" font-weight="bold">Overfitting</text>
+        <text x="550" y="70" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="22" font-weight="bold">فرط التوافق</text>
+        
+        <text x="550" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15">High Variance</text>
+        <text x="550" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15">تباين عالٍ</text>
+
+        <!-- Optimum Label -->
+        <text x="400" y="300" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Optimum</text>
+        <text x="400" y="300" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">النقطة المثلى</text>
+
+        <!-- Curve Labels -->
+        <text x="280" y="310" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="16" font-weight="bold">Validation Loss</text>
+        <text x="280" y="310" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="16" font-weight="bold">خسارة التحقق</text>
+
+        <text x="280" y="405" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="16" font-weight="bold">Training Loss</text>
+        <text x="280" y="405" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="16" font-weight="bold">خسارة التدريب</text>
+
+        <!-- Generalization Gap Label -->
+        <text x="660" y="290" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="15" font-weight="bold">Generalization Gap</text>
+        <text x="660" y="290" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="15" font-weight="bold">فجوة التعميم</text>
+        
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Underfitting</th><th>Overfitting</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">خطأ التدريب</template>
+          <template class="content-en">Training Error</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع</template>
+          <template class="content-en">High</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض جداً</template>
+          <template class="content-en">good</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">خطأ التحقق / التعميم</template>
+          <template class="content-en">Validation / Generalization Error</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع</template>
+          <template class="content-en">High</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">مرتفع (فجوة كبيرة مع خطأ التدريب)</template>
+          <template class="content-en">High (large gap with training error)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تعقيد النموذج</template>
+          <template class="content-en">Model Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">بسيط جداً</template>
+          <template class="content-en">Too simple</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">معقد جداً</template>
+          <template class="content-en">Too complex</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل فرط التخصيص يعتبر دائماً أمراً سيئاً في التعلم العميق؟</template>
+      <template class="content-en">Is overfitting always a bad thing in deep learning?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ليس دائماً. في التعلم العميق، غالباً ما تؤدي النماذج التنبؤية الأفضل أداءً أفضل بكثير على بيانات التدريب مقارنة ببيانات الاختبار. ما يهمنا في النهاية هو تقليل خطأ التحقق (Validation Error) قدر الإمكان، حتى لو كانت الفجوة بينه وبين خطأ التدريب كبيرة.</p></template>
+      <template class="content-en"><p>Not always. In deep learning, the best predictive models often perform far better on training data than on holdout data. Ultimately, we care more about minimizing the validation error itself rather than just minimizing the gap between training and validation errors.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="model-selection-validation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> اختيار النموذج ومجموعة التحقق</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Model Selection and Validation Dataset</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لا تستخدم أبداً بيانات الاختبار لاختيار أفضل نموذج؛ استخدم مجموعة التحقق (Validation Set) لضبط المعلمات الفائقة، أو استخدم التحقق المتقاطع (K-Fold) إذا كانت البيانات قليلة.</p></template>
+    <template class="content-en"><p>Never use test data to select the best model; use a Validation Set to tune hyperparameters, or use K-Fold Cross-Validation if data is scarce.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>اختيار النموذج (Model Selection):</b> هو عملية تقييم عدة نماذج مرشحة (مثل مقارنة شبكات بعدد مختلف من الطبقات المخفية أو دوال تنشيط مختلفة) لاختيار الأفضل.</p><p>للقيام بذلك، يجب ألا نلمس <b>مجموعة الاختبار (Test Set)</b> أبداً حتى ننتهي من اختيار جميع المعلمات الفائقة. إذا استخدمنا بيانات الاختبار في الاختيار، فإننا نخاطر بفرط التخصيص على بيانات الاختبار نفسها.</p><p>لذلك، نقوم بتقسيم البيانات إلى ثلاثة أقسام: تدريب، تحقق (Validation)، واختبار. نستخدم <b><span class="smart-term" data-term-en="Validation Dataset" data-ar="مجموعة التحقق" data-en-def="A sample of data held back from training your model that is used to give an estimate of model skill while tuning model&#x27;s hyperparameters.">مجموعة التحقق<span class="smart-term-tooltip"></span></span></b> لتقييم النماذج أثناء التدريب.</p></template>
+    <template class="content-en"><p><b>Model Selection:</b> The process of evaluating several candidate models (e.g., comparing MLPs with different numbers of hidden layers or activation functions) to choose the best one.</p><p>To do this, we must never touch the <b>Test Set</b> until after we have chosen all hyperparameters.</p><p>If we use test data in model selection, we risk overfitting the test data itself.</p><p>Therefore, we typically split data three ways:</p><ul><li><strong>training</strong>,</li><li><strong>validation</strong>, and</li><li><strong>test</strong> datasets.</li></ul><p>We use the <b>Validation Set</b> to evaluate models during the selection process.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في التطبيقات العملية، نادراً ما يتم التخلص من بيانات الاختبار بعد استخدام واحد بسبب تكلفتها. هذا يخلق حدوداً غامضة بين بيانات التحقق والاختبار.</p><p><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A resampling procedure used to evaluate machine learning models on a limited data sample by dividing data into K subsets.">التحقق المتقاطع K-Fold<span class="smart-term-tooltip"></span></span>:</b> عندما تكون بيانات التدريب نادرة ولا يمكننا تحمل اقتطاع مجموعة تحقق منفصلة، نقسم البيانات إلى K مجموعات فرعية. نتدرب K مرة، في كل مرة نستخدم K-1 للتدريب والمجموعة المتبقية للتحقق. يتم تقدير الخطأ النهائي بأخذ متوسط النتائج من التجارب K.</p></template>
+    <template class="content-en"><p>In practical applications, real-world test data is seldom discarded after just one use because acquiring new test sets is expensive. This creates a murky boundary between validation and test data.</p><p><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A resampling procedure used to evaluate machine learning models on a limited data sample by dividing data into K subsets.">K-Fold Cross-Validation<span class="smart-term-tooltip"></span></span>:</b> When training data is scarce, we split the original training data into K non-overlapping subsets. We train and validate K times, each time training on K-1 subsets and validating on the remaining one. The final error is estimated by averaging the results over the K experiments.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الخطر الأكبر لاستخدام مجموعة الاختبار (Test Set) لضبط المعلمات الفائقة (Hyperparameters)؟</template>
+      <template class="content-en">What is the biggest risk of using the Test Set to tune hyperparameters?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تسرب البيانات (Data Leakage). سيقوم النموذج بـ 'حفظ' خصائص مجموعة الاختبار بشكل غير مباشر، مما يجعل تقييم الأداء النهائي مضللاً ومتفائلاً بشكل مفرط، ولن يعكس الأداء الحقيقي على بيانات العالم الحقيقي.</p></template>
+      <template class="content-en"><p>Data Leakage. The model will indirectly 'memorize' the characteristics of the test set, making the final performance evaluation misleadingly optimistic and not reflective of true real-world performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="weight-decay-l2" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تضاؤل الأوزان (تنظيم L2)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Weight Decay (L2 Regularization)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تضاؤل الأوزان يمنع النموذج من الاعتماد المفرط على أي ميزة واحدة عن طريق إضافة عقوبة إلى دالة الخسارة تجبر الأوزان على البقاء صغيرة.</p></template>
+    <template class="content-en"><p>Weight decay prevents the model from relying too heavily on any single feature by adding a penalty to the loss function that forces weights to stay small.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Weight Decay" data-ar="تضاؤل الأوزان" data-en-def="A regularization technique that adds a penalty to the loss function proportional to the L2 norm of the weights, encouraging smaller weights.">تضاؤل الأوزان<span class="smart-term-tooltip"></span></span> (Weight Decay)</b>، المعروف أيضاً بـ <b>تنظيم L2 (L2 Regularization)</b>، هو تقنية شائعة لمكافحة فرط التخصيص. الفكرة الأساسية هي أن الدوال الأبسط هي تلك التي تكون أوزانها قريبة من الصفر.</p><p>لضمان بقاء الأوزان صغيرة، نضيف <b>مصطلح عقوبة (Penalty Term)</b> إلى دالة الخسارة الأصلية. بدلاً من تقليل خسارة التنبؤ فقط، نقوم الآن بتقليل (خسارة التنبؤ + معيار متجه الوزن).</p><p>إذا نمت الأوزان بشكل كبير جداً، سيركز خوارزمية التعلم على تقليل الأوزان بدلاً من تقليل خطأ التدريب، مما يحد من تعقيد النموذج.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Weight Decay" data-ar="تضاؤل الأوزان" data-en-def="A regularization technique that adds a penalty to the loss function proportional to the L2 norm of the weights, encouraging smaller weights.">Weight Decay<span class="smart-term-tooltip"></span></span></b>, commonly called <b>L2 Regularization</b>, is a widely used technique to combat overfitting. The intuition is that simpler functions are those whose weights are closer to zero.</p><p>To ensure small weights, we add a <b>penalty term</b> (the norm of the weight vector) to the original loss function. Instead of just minimizing prediction loss, we now minimize (prediction loss + penalty term).</p><p>If the weight vector grows too large, the learning algorithm will focus on minimizing the weight norm rather than minimizing the training error, effectively limiting model complexity.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في أطر التعلم العميق الحديثة، يتم دمج تضاؤل الأوزان مباشرة في خوارزمية التحسين (Optimizer) بدلاً من إضافته يدوياً إلى دالة الخسارة. هذا يوفر فائدة حسابية، حيث يعتمد تحديث تضاؤل الأوزان فقط على القيمة الحالية لكل معلمة، والتي يجب على المُحسِّن لمسها مرة واحدة على أي حال، مما يمنع أي عبء حسابي إضافي.</p></template>
+    <template class="content-en"><p>In modern deep learning frameworks, weight decay is integrated directly into the optimization algorithm rather than manually added to the loss function. This serves a computational benefit: since the weight decay update depends only on the current value of each parameter, the optimizer must touch each parameter once anyway, avoiding additional computational overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>دالة الخسارة المعدلة مع تنظيم L2 (حيث لامدا هي المعلمة الفائقة للتنظيم).</strong></template>
+      <template class="content-en"><strong>Modified loss function with L2 regularization (where lambda is the regularization hyperparameter).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$L_{new}(\mathbf{w}) = L_{old}(\mathbf{w}) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يقلل تضاؤل الأوزان من تعقيد النموذج؟</template>
+      <template class="content-en">How does weight decay reduce model complexity?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال إجبار الأوزان على أن تكون صغيرة، فإنه يقلل من تأثير أي ميزة فردية على المخرجات، مما يجعل النموذج أكثر سلاسة وأقل عرضة للتقلبات الحادة التي تميز فرط التخصيص للضوضاء.</p></template>
+      <template class="content-en"><p>By forcing weights to be small, it reduces the impact of any single feature on the output, making the model smoother and less prone to sharp fluctuations that characterize overfitting to noise.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dropout-regularization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> الإسقاط (Dropout)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Dropout Regularization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإسقاط هو تقنية تقوم بإيقاف تشغيل خلايا عصبية عشوائية أثناء التدريب، مما يجبر الشبكة على عدم الاعتماد بشكل مفرط على أي خلية معينة وتعلم ميزات أكثر قوة.</p></template>
+    <template class="content-en"><p>Dropout randomly turns off neurons during training, forcing the network not to rely too heavily on any specific neuron and to learn more robust features.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Dropout" data-ar="الإسقاط" data-en-def="A regularization technique where randomly selected neurons are ignored during training to prevent co-adaptation.">الإسقاط<span class="smart-term-tooltip"></span></span> (Dropout)</b> هو أداة قوية أخرى لتجنب فرط التخصيص.</p><p>يعتمد على فكرة حقن الضوضاء في كل طبقة داخلية أثناء التدريب لفرض السلاسة والمرونة ضد الاضطرابات.</p><p>أثناء التدريب، في كل تكرار، يقوم الإسقاط القياسي بتصفير (إسقاط) جزء من العقد في كل طبقة مخفية باحتمال <code>p</code> قبل حساب الطبقة التالية.</p><p>هذا يكسر ما يسمى <b><span class="smart-term" data-term-en="Co-adaptation" data-ar="التكيف المشترك" data-en-def="A state in neural networks where neurons rely heavily on specific outputs of other neurons, leading to overfitting.">التكيف المشترك<span class="smart-term-tooltip"></span></span> (Co-adaptation)</b>، حيث تعتمد طبقة ما على نمط محدد جداً من التنشيطات في الطبقة السابقة.</p><p>يتم حقن هذه الضوضاء بطريقة <b>غير متحيزة (Unbiased)</b>، بحيث تظل القيمة المتوقعة لكل طبقة مساوية لقيمتها بدون ضوضاء.</p></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Dropout" data-ar="الإسقاط" data-en-def="A regularization technique where randomly selected neurons are ignored during training to prevent co-adaptation.">Dropout<span class="smart-term-tooltip"></span></span></b> is another powerful tool to avoid overfitting. It is based on injecting noise into each internal layer during training to enforce smoothness and resilience to perturbations.</p><p>Throughout training, on each iteration, standard dropout consists of zeroing out (dropping) some fraction of the nodes in each hidden layer with probability <code>p</code> before calculating the subsequent layer. This breaks up <b><span class="smart-term" data-term-en="Co-adaptation" data-ar="التكيف المشترك" data-en-def="A state in neural networks where neurons rely heavily on specific outputs of other neurons, leading to overfitting.">co-adaptation<span class="smart-term-tooltip"></span></span></b>, where a layer relies on a highly specific pattern of activations in the previous layer.</p><p>This noise is injected in an <b>unbiased manner</b>, so the expected value of each layer equals the value it would have taken absent noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><b>في مرحلة الاختبار (Test Time):</b> عادةً ما نقوم بتعطيل الإسقاط. لا نسقط أي عقد ولا نحتاج إلى تسوية (Normalize) المخرجات. </p><p><b>استثناء:</b> يستخدم بعض الباحثين الإسقاط في وقت الاختبار كطريقة إرشادية لتقدير <b>عدم اليقين (Uncertainty)</b> في تنبؤات الشبكة. إذا اتفقت التنبؤات عبر العديد من أقنعة الإسقاط المختلفة، يمكننا القول أن الشبكة أكثر ثقة في قرارها.</p></template>
+    <template class="content-en"><p><b>At Test Time:</b> Typically, we disable dropout. Given a trained model and a new example, we do not drop out any nodes and thus do not need to normalize.</p><p><b>Exception:</b> Some researchers use dropout at test time as a heuristic for estimating the <b>uncertainty</b> of neural network predictions: if the predictions agree across many different dropout masks, then we might say that the network is more confident.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة الإسقاط غير المتحيز، حيث يتم قياس التنشيطات المتبقية للحفاظ على القيمة المتوقعة.</strong></template>
+      <template class="content-en"><strong>Unbiased dropout equation, where remaining activations are scaled to maintain the expected value.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$h'_{i} = \begin{cases} 0 &amp; \text{with probability } p \\ \frac{h_i}{1-p} &amp; \text{with probability } 1-p \end{cases}$$</div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Two side-by-side neural networks. Left: 'Before dropout', a fully connected MLP with 4 inputs, 5 hidden nodes, 3 outputs. Right: 'After dropout', the same network but hidden nodes h2 and h5 are grayed out (dropped), and all their incoming and outgoing edges are removed. Dark background, clear labels. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <!-- Arrow marker for network edges -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-400)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- ========================================== -->
+  <!-- LEFT PANEL: BEFORE DROPOUT                 -->
+  <!-- ========================================== -->
+  <rect x="20" y="20" width="360" height="360" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  
+  <!-- Left Titles -->
+  <text x="200" y="55" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="600" fill="var(--text-primary)">Before Dropout</text>
+  <text x="200" y="55" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="600" fill="var(--text-primary)">قبل الإسقاط (Before Dropout)</text>
+  
+  <text x="200" y="75" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--brand-ink)">Fully connected standard network</text>
+  <text x="200" y="75" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--brand-ink)">شبكة قياسية متصلة بالكامل</text>
+
+  <!-- Left Edges -->
+  <g stroke="var(--brand-400)" stroke-width="1.5" opacity="0.4" marker-end="url(#arrow)">
+    <!-- Input to Hidden -->
+    <!-- From x1 (130) -->
+    <line x1="70" y1="130" x2="200" y2="100"/>
+    <line x1="70" y1="130" x2="200" y2="160"/>
+    <line x1="70" y1="130" x2="200" y2="220"/>
+    <line x1="70" y1="130" x2="200" y2="280"/>
+    <line x1="70" y1="130" x2="200" y2="340"/>
+    <!-- From x2 (190) -->
+    <line x1="70" y1="190" x2="200" y2="100"/>
+    <line x1="70" y1="190" x2="200" y2="160"/>
+    <line x1="70" y1="190" x2="200" y2="220"/>
+    <line x1="70" y1="190" x2="200" y2="280"/>
+    <line x1="70" y1="190" x2="200" y2="340"/>
+    <!-- From x3 (250) -->
+    <line x1="70" y1="250" x2="200" y2="100"/>
+    <line x1="70" y1="250" x2="200" y2="160"/>
+    <line x1="70" y1="250" x2="200" y2="220"/>
+    <line x1="70" y1="250" x2="200" y2="280"/>
+    <line x1="70" y1="250" x2="200" y2="340"/>
+    <!-- From x4 (310) -->
+    <line x1="70" y1="310" x2="200" y2="100"/>
+    <line x1="70" y1="310" x2="200" y2="160"/>
+    <line x1="70" y1="310" x2="200" y2="220"/>
+    <line x1="70" y1="310" x2="200" y2="280"/>
+    <line x1="70" y1="310" x2="200" y2="340"/>
+
+    <!-- Hidden to Output -->
+    <!-- From h1 (100) -->
+    <line x1="200" y1="100" x2="330" y2="160"/>
+    <line x1="200" y1="100" x2="330" y2="220"/>
+    <line x1="200" y1="100" x2="330" y2="280"/>
+    <!-- From h2 (160) -->
+    <line x1="200" y1="160" x2="330" y2="160"/>
+    <line x1="200" y1="160" x2="330" y2="220"/>
+    <line x1="200" y1="160" x2="330" y2="280"/>
+    <!-- From h3 (220) -->
+    <line x1="200" y1="220" x2="330" y2="160"/>
+    <line x1="200" y1="220" x2="330" y2="220"/>
+    <line x1="200" y1="220" x2="330" y2="280"/>
+    <!-- From h4 (280) -->
+    <line x1="200" y1="280" x2="330" y2="160"/>
+    <line x1="200" y1="280" x2="330" y2="220"/>
+    <line x1="200" y1="280" x2="330" y2="280"/>
+    <!-- From h5 (340) -->
+    <line x1="200" y1="340" x2="330" y2="160"/>
+    <line x1="200" y1="340" x2="330" y2="220"/>
+    <line x1="200" y1="340" x2="330" y2="280"/>
+  </g>
+
+  <!-- Left Nodes -->
+  <g stroke-width="2">
+    <!-- Input Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--brand-500)">
+      <circle cx="70" cy="130" r="16"/>
+      <circle cx="70" cy="190" r="16"/>
+      <circle cx="70" cy="250" r="16"/>
+      <circle cx="70" cy="310" r="16"/>
+    </g>
+    <!-- Hidden Nodes -->
+    <g fill="var(--brand-500)" stroke="var(--brand-500)">
+      <circle cx="200" cy="100" r="16"/>
+      <circle cx="200" cy="160" r="16"/>
+      <circle cx="200" cy="220" r="16"/>
+      <circle cx="200" cy="280" r="16"/>
+      <circle cx="200" cy="340" r="16"/>
+    </g>
+    <!-- Output Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--brand-500)">
+      <circle cx="330" cy="160" r="16"/>
+      <circle cx="330" cy="220" r="16"/>
+      <circle cx="330" cy="280" r="16"/>
+    </g>
+  </g>
+
+  <!-- Left Node Labels -->
+  <g font-size="14" text-anchor="middle" dy="0.35em">
+    <!-- Input Labels -->
+    <g fill="var(--text-primary)">
+      <text x="70" y="130">x<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="70" y="190">x<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="70" y="250">x<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+      <text x="70" y="310">x<tspan baseline-shift="sub" font-size="0.7em">4</tspan></text>
+    </g>
+    <!-- Hidden Labels -->
+    <g fill="var(--on-brand-lo)">
+      <text x="200" y="100">h<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="200" y="160">h<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="200" y="220">h<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+      <text x="200" y="280">h<tspan baseline-shift="sub" font-size="0.7em">4</tspan></text>
+      <text x="200" y="340">h<tspan baseline-shift="sub" font-size="0.7em">5</tspan></text>
+    </g>
+    <!-- Output Labels -->
+    <g fill="var(--text-primary)">
+      <text x="330" y="160">y<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="330" y="220">y<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="330" y="280">y<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+    </g>
+  </g>
+
+  <!-- Left Layer Labels -->
+  <g font-size="13" fill="var(--text-secondary)" text-anchor="middle">
+    <text x="70" y="365" class="gsvg-en">Input</text>
+    <text x="70" y="365" class="gsvg-ar">الإدخال</text>
+    
+    <text x="200" y="365" class="gsvg-en">Hidden</text>
+    <text x="200" y="365" class="gsvg-ar">المخفية</text>
+    
+    <text x="330" y="365" class="gsvg-en">Output</text>
+    <text x="330" y="365" class="gsvg-ar">الإخراج</text>
+  </g>
+
+
+  <!-- ========================================== -->
+  <!-- RIGHT PANEL: AFTER DROPOUT                 -->
+  <!-- ========================================== -->
+  <rect x="420" y="20" width="360" height="360" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)"/>
+  
+  <!-- Right Titles -->
+  <text x="600" y="55" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="600" fill="var(--text-primary)">After Dropout</text>
+  <text x="600" y="55" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="600" fill="var(--text-primary)">بعد الإسقاط (After Dropout)</text>
+  
+  <text x="600" y="75" text-anchor="middle" class="gsvg-en" font-size="13" fill="var(--brand-ink)">Nodes h₂ and h₅ dropped</text>
+  <text x="600" y="75" text-anchor="middle" class="gsvg-ar" font-size="13" fill="var(--brand-ink)">تم إسقاط العقدتين h₂ و h₅</text>
+
+  <!-- Right Edges (Only active connections) -->
+  <g stroke="var(--brand-400)" stroke-width="1.5" opacity="0.4" marker-end="url(#arrow)">
+    <!-- Input to Hidden (Active: 100, 220, 280) -->
+    <!-- From x1 (130) -->
+    <line x1="470" y1="130" x2="600" y2="100"/>
+    <line x1="470" y1="130" x2="600" y2="220"/>
+    <line x1="470" y1="130" x2="600" y2="280"/>
+    <!-- From x2 (190) -->
+    <line x1="470" y1="190" x2="600" y2="100"/>
+    <line x1="470" y1="190" x2="600" y2="220"/>
+    <line x1="470" y1="190" x2="600" y2="280"/>
+    <!-- From x3 (250) -->
+    <line x1="470" y1="250" x2="600" y2="100"/>
+    <line x1="470" y1="250" x2="600" y2="220"/>
+    <line x1="470" y1="250" x2="600" y2="280"/>
+    <!-- From x4 (310) -->
+    <line x1="470" y1="310" x2="600" y2="100"/>
+    <line x1="470" y1="310" x2="600" y2="220"/>
+    <line x1="470" y1="310" x2="600" y2="280"/>
+
+    <!-- Hidden to Output (Active: 100, 220, 280) -->
+    <!-- From h1 (100) -->
+    <line x1="600" y1="100" x2="730" y2="160"/>
+    <line x1="600" y1="100" x2="730" y2="220"/>
+    <line x1="600" y1="100" x2="730" y2="280"/>
+    <!-- From h3 (220) -->
+    <line x1="600" y1="220" x2="730" y2="160"/>
+    <line x1="600" y1="220" x2="730" y2="220"/>
+    <line x1="600" y1="220" x2="730" y2="280"/>
+    <!-- From h4 (280) -->
+    <line x1="600" y1="280" x2="730" y2="160"/>
+    <line x1="600" y1="280" x2="730" y2="220"/>
+    <line x1="600" y1="280" x2="730" y2="280"/>
+  </g>
+
+  <!-- Right Nodes -->
+  <g stroke-width="2">
+    <!-- Input Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--brand-500)">
+      <circle cx="470" cy="130" r="16"/>
+      <circle cx="470" cy="190" r="16"/>
+      <circle cx="470" cy="250" r="16"/>
+      <circle cx="470" cy="310" r="16"/>
+    </g>
+    
+    <!-- Hidden Nodes (Active) -->
+    <g fill="var(--brand-500)" stroke="var(--brand-500)">
+      <circle cx="600" cy="100" r="16"/>
+      <circle cx="600" cy="220" r="16"/>
+      <circle cx="600" cy="280" r="16"/>
+    </g>
+    
+    <!-- Hidden Nodes (Dropped) -->
+    <g fill="var(--bg-surface)" stroke="var(--border-color)" stroke-dasharray="4,4" opacity="0.6">
+      <circle cx="600" cy="160" r="16"/>
+      <circle cx="600" cy="340" r="16"/>
+    </g>
+
+    <!-- Output Nodes -->
+    <g fill="var(--bg-surface)" stroke="var(--brand-500)">
+      <circle cx="730" cy="160" r="16"/>
+      <circle cx="730" cy="220" r="16"/>
+      <circle cx="730" cy="280" r="16"/>
+    </g>
+  </g>
+
+  <!-- Right Node Labels -->
+  <g font-size="14" text-anchor="middle" dy="0.35em">
+    <!-- Input Labels -->
+    <g fill="var(--text-primary)">
+      <text x="470" y="130">x<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="470" y="190">x<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="470" y="250">x<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+      <text x="470" y="310">x<tspan baseline-shift="sub" font-size="0.7em">4</tspan></text>
+    </g>
+    
+    <!-- Hidden Labels (Active) -->
+    <g fill="var(--on-brand-lo)">
+      <text x="600" y="100">h<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="600" y="220">h<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+      <text x="600" y="280">h<tspan baseline-shift="sub" font-size="0.7em">4</tspan></text>
+    </g>
+    
+    <!-- Hidden Labels (Dropped) -->
+    <g fill="var(--text-muted)">
+      <text x="600" y="160">h<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="600" y="340">h<tspan baseline-shift="sub" font-size="0.7em">5</tspan></text>
+    </g>
+
+    <!-- Output Labels -->
+    <g fill="var(--text-primary)">
+      <text x="730" y="160">y<tspan baseline-shift="sub" font-size="0.7em">1</tspan></text>
+      <text x="730" y="220">y<tspan baseline-shift="sub" font-size="0.7em">2</tspan></text>
+      <text x="730" y="280">y<tspan baseline-shift="sub" font-size="0.7em">3</tspan></text>
+    </g>
+  </g>
+
+  <!-- Right Layer Labels -->
+  <g font-size="13" fill="var(--text-secondary)" text-anchor="middle">
+    <text x="470" y="365" class="gsvg-en">Input</text>
+    <text x="470" y="365" class="gsvg-ar">الإدخال</text>
+    
+    <text x="600" y="365" class="gsvg-en">Hidden</text>
+    <text x="600" y="365" class="gsvg-ar">المخفية</text>
+    
+    <text x="730" y="365" class="gsvg-en">Output</text>
+    <text x="730" y="365" class="gsvg-ar">الإخراج</text>
+  </g>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نقوم بتوسيع (Scaling) التنشيطات المتبقية بمعامل 1/(1-p) أثناء التدريب باستخدام الإسقاط؟</template>
+      <template class="content-en">Why do we scale the remaining activations by 1/(1-p) during training with dropout?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>للحفاظ على القيمة المتوقعة (Expected Value) للتنشيطات. بما أننا أسقطنا نسبة p من العقد، فإن المجموع الكلي للتنشيطات سينخفض. التوسيع يضمن أن الطبقة التالية تتلقى نفس 'كمية' الإشارة الإجمالية كما لو لم يتم إسقاط أي عقد.</p></template>
+      <template class="content-en"><p>To maintain the expected value of the activations. Since we drop a fraction p of the nodes, the total sum of activations would decrease. Scaling ensures the next layer receives the same overall 'amount' of signal as if no nodes were dropped.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="forward-backward-propagation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الانتشار الأمامي والخلفي والرسوم البيانية الحسابية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Forward/Backward Propagation and Computational Graphs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الانتشار الأمامي يحسب التنبؤات ويخزن المتغيرات الوسيطة، بينما الانتشار الخلفي يعود للخلف لحساب التدرجات (Gradients) لتحديث الأوزان.</p></template>
+    <template class="content-en"><p>Forward propagation computes predictions and stores intermediate variables, while backward propagation goes in reverse to calculate gradients for weight updates.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تدريب الشبكات العصبية يتطلب عمليتين متداخلتين:</p><ol><li><b><span class="smart-term" data-term-en="Forward Propagation" data-ar="الانتشار الأمامي" data-en-def="The process of moving input data through the network to generate an output.">الانتشار الأمامي<span class="smart-term-tooltip"></span></span> (Forward Propagation):</b> يشير إلى حساب وتخزين المتغيرات الوسيطة (بما في ذلك المخرجات) بالترتيب من طبقة المدخلات إلى طبقة المخرجات.</li><li><b><span class="smart-term" data-term-en="Backpropagation" data-ar="الانتشار الخلفي" data-en-def="An algorithm used to calculate derivatives of the loss function with respect to the parameters, moving backwards through the network.">الانتشار الخلفي<span class="smart-term-tooltip"></span></span> (Backward Propagation):</b> يشير إلى طريقة حساب تدرج (Gradient) معلمات الشبكة. تعبر هذه الطريقة الشبكة بترتيب عكسي، من المخرجات إلى المدخلات، وفقاً لـ <b>قاعدة السلسلة (Chain Rule)</b> من التفاضل.</li></ol><p>تساعدنا <b>الرسوم البيانية الحسابية (Computational Graphs)</b> في تصور تبعيات المشغلين والمتغيرات داخل هذه الحسابات.</p></template>
+    <template class="content-en"><p>Training neural networks requires two interdependent processes:</p><ol><li><b><span class="smart-term" data-term-en="Forward Propagation" data-ar="الانتشار الأمامي" data-en-def="The process of moving input data through the network to generate an output.">Forward Propagation<span class="smart-term-tooltip"></span></span>:</b> Refers to the calculation and storage of intermediate variables (including outputs) in order from the input layer to the output layer.</li><li><b>Backward Propagation:</b> Refers to the method of calculating the gradient of neural network parameters. It traverses the network in reverse order, from output to input, according to the <b>chain rule</b> from calculus.</li></ol><p><b><span class="smart-term" data-term-en="Computational Graph" data-ar="الرسم البياني الحسابي" data-en-def="A directed graph where nodes correspond to operations or variables, used to represent mathematical expressions and compute gradients.">Computational Graph<span class="smart-term-tooltip"></span></span>s</b> help us visualize the dependencies of operators and variables within these calculations.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يعتمد الانتشار الأمامي والخلفي على بعضهما البعض. يعيد الانتشار الخلفي استخدام القيم الوسيطة المخزنة من الانتشار الأمامي لتجنب الحسابات المكررة. </p><p>هذا هو السبب الرئيسي الذي يجعل <b>التدريب يتطلب ذاكرة أكبر بكثير من التنبؤ (الاستدلال)</b>. يجب علينا الاحتفاظ بجميع المتغيرات الوسيطة في الذاكرة حتى يكتمل الانتشار الخلفي. حجم هذه المتغيرات يتناسب طردياً مع عدد طبقات الشبكة وحجم الدفعة (Batch Size)، مما قد يؤدي إلى أخطاء نفاد الذاكرة (Out of Memory) عند تدريب شبكات عميقة جداً.</p></template>
+    <template class="content-en"><p>Forward and backward propagation depend on each other. <span class="smart-term" data-term-en="Backpropagation" data-ar="الانتشار الخلفي" data-en-def="An algorithm used to calculate derivatives of the loss function with respect to the parameters, moving backwards through the network.">Backpropagation<span class="smart-term-tooltip"></span></span> reuses the stored intermediate values from forward propagation to avoid duplicate calculations.</p><p>This is the primary reason why <b>training requires significantly more memory than plain prediction (inference)</b>. We need to retain intermediate values until backpropagation is complete. The size of these values is proportional to the number of network layers and the batch size, which easily leads to Out of Memory errors when training deep networks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[5]: Detailed SVG generation prompt: A computational graph showing forward propagation. Nodes represent variables (x, W1, z, h, W2, o, y, L, J) and operations (matrix multiplication, activation function phi, loss calculation, L2 penalty). Directed arrows show the flow of computation from inputs (x, W1) towards the final objective J. Dark background, clear mathematical symbols. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg viewBox="0 0 1060 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Gradient for Operation Nodes -->
+        <linearGradient id="opGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-800)" />
+            <stop offset="100%" stop-color="var(--brand-600)" />
+        </linearGradient>
+        
+        <!-- Arrowhead Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Grouping Boxes (Dashed) -->
+    <rect x="120" y="190" width="530" height="100" rx="12" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,6" fill="none" />
+    <rect x="680" y="130" width="170" height="270" rx="12" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,6" fill="none" />
+
+    <!-- Section Labels (Bilingual) -->
+    <text x="385" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Forward Propagation</text>
+    <text x="385" y="175" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">الانتشار الأمامي</text>
+
+    <text x="765" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Loss &amp; Regularization</text>
+    <text x="765" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">دالة التكلفة والتنظيم</text>
+
+    <text x="70" y="110" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Inputs</text>
+    <text x="70" y="110" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">المدخلات</text>
+
+    <text x="610" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Target</text>
+    <text x="610" y="60" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">القيمة الحقيقية</text>
+
+    <text x="990" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Objective</text>
+    <text x="990" y="210" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">الهدف</text>
+
+    <!-- Edges (Arrows) -->
+    <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+        <!-- x to *1 -->
+        <line x1="89.5" y1="177.3" x2="133.7" y2="216.6" />
+        <!-- W1 to *1 -->
+        <line x1="89.5" y1="302.7" x2="133.7" y2="263.3" />
+        <!-- *1 to z -->
+        <line x1="186" y1="240" x2="215" y2="240" />
+        <!-- z to phi -->
+        <line x1="276" y1="240" x2="305" y2="240" />
+        <!-- phi to h -->
+        <line x1="366" y1="240" x2="395" y2="240" />
+        <!-- h to *2 -->
+        <line x1="456" y1="240" x2="485" y2="240" />
+        <!-- W2 to *2 -->
+        <line x1="445.6" y1="339.2" x2="499" y2="268" />
+        <!-- *2 to o -->
+        <line x1="546" y1="240" x2="575" y2="240" />
+        <!-- y to loss -->
+        <line x1="632" y1="114" x2="690" y2="151" />
+        <!-- o to loss -->
+        <line x1="632" y1="226" x2="690" y2="189" />
+        <!-- loss to L -->
+        <line x1="746" y1="170" x2="775" y2="170" />
+        <!-- W2 to reg -->
+        <line x1="456" y1="360" x2="685" y2="360" />
+        <!-- reg to s -->
+        <line x1="746" y1="360" x2="775" y2="360" />
+        <!-- L to + -->
+        <line x1="828" y1="189" x2="875" y2="239" />
+        <!-- s to + -->
+        <line x1="828" y1="341" x2="875" y2="291" />
+        <!-- + to J -->
+        <line x1="926" y1="265" x2="955" y2="265" />
+        <!-- W1 to reg (Routed around other nodes) -->
+        <path d="M 70,346 L 70,440 Q 70,450 80,450 L 710,450 Q 720,450 720,440 L 720,395" />
+    </g>
+
+    <!-- Variable Nodes (Circles) -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2">
+        <circle cx="70" cy="160" r="24" />
+        <circle cx="70" cy="320" r="24" />
+        <circle cx="250" cy="240" r="24" />
+        <circle cx="430" cy="240" r="24" />
+        <circle cx="430" cy="360" r="24" />
+        <circle cx="610" cy="240" r="24" />
+        <circle cx="610" cy="100" r="24" />
+        <circle cx="810" cy="170" r="24" />
+        <circle cx="810" cy="360" r="24" />
+        <circle cx="990" cy="265" r="24" />
+    </g>
+
+    <!-- Variable Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" text-anchor="middle" dominant-baseline="central">
+        <text x="70" y="160">x</text>
+        <text x="70" y="320">W<tspan dy="-6" font-size="13">(1)</tspan></text>
+        <text x="250" y="240">z</text>
+        <text x="430" y="240">h</text>
+        <text x="430" y="360">W<tspan dy="-6" font-size="13">(2)</tspan></text>
+        <text x="610" y="240">o</text>
+        <text x="610" y="100">y</text>
+        <text x="810" y="170">L</text>
+        <text x="810" y="360">s</text>
+        <text x="990" y="265">J</text>
+    </g>
+
+    <!-- Operation Nodes (Rectangles) -->
+    <g fill="url(#opGrad)">
+        <rect x="136" y="216" width="48" height="48" rx="12" />
+        <rect x="316" y="216" width="48" height="48" rx="12" />
+        <rect x="496" y="216" width="48" height="48" rx="12" />
+        <rect x="696" y="146" width="48" height="48" rx="12" />
+        <rect x="696" y="336" width="48" height="48" rx="12" />
+        <rect x="876" y="241" width="48" height="48" rx="12" />
+    </g>
+
+    <!-- Operation Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-weight="bold" fill="var(--on-brand-hi)" text-anchor="middle" dominant-baseline="central">
+        <text x="160" y="240" font-size="24">×</text>
+        <text x="340" y="240" font-size="20">φ</text>
+        <text x="520" y="240" font-size="24">×</text>
+        <text x="720" y="170" font-size="14">Loss</text>
+        <text x="720" y="360" font-size="14">L2</text>
+        <text x="900" y="265" font-size="24">+</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نحتاج إلى تخزين المتغيرات الوسيطة عند استخدام النموذج للتنبؤ فقط (Inference)؟</template>
+      <template class="content-en">Why don't we need to store intermediate variables when using the model only for prediction (Inference)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأننا في مرحلة التنبؤ لا نقوم بتحديث الأوزان، وبالتالي لا نحتاج إلى إجراء الانتشار الخلفي الذي يعتمد على هذه المتغيرات الوسيطة لحساب التدرجات. بمجرد حساب طبقة، يمكن التخلص من مدخلاتها من الذاكرة.</p></template>
+      <template class="content-en"><p>Because during inference we do not update weights, so we don't perform backpropagation which requires those intermediate variables to compute gradients. Once a layer is computed, its inputs can be discarded from memory.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في جوهر التعلم العميق! في هذه الوحدة، ننتقل من النماذج الخطية البسيطة إلى المدركات متعددة الطبقات (MLPs). تذكروا دائماً: النماذج الخطية مقيدة بـ 'الرتابة'، لكن بإضافة 'الطبقات المخفية' و'دوال التنشيط' (مثل ReLU)، نمنح الشبكة القدرة على تعلم أي دالة معقدة (نظرية التقريب الشامل). ولكن، مع هذه القوة العظيمة تأتي مشكلة 'فرط التخصيص' (Overfitting). للامتحان، ركزوا جيداً على كيفية التمييز بين خطأ التدريب وخطأ التعميم. افهموا متى يحدث نقص التخصيص ومتى يحدث فرط التخصيص بناءً على تعقيد النموذج وحجم البيانات. الأهم من ذلك، كيف نكافح فرط التخصيص؟ لدينا سلاحان رئيسيان: 'تضاؤل الأوزان' (L2 Regularization) الذي يعاقب الأوزان الكبيرة، و'الإسقاط' (Dropout) الذي يكسر التكيف المشترك بين الخلايا. أخيراً، لا تنسوا آليات التدريب: الانتشار الأمامي يخزن المتغيرات، والانتشار الخلفي يستخدمها لحساب التدرجات. هذا يفسر لماذا يستهلك التدريب ذاكرة أكبر بكثير من التنبؤ. ركزوا على هذه الروابط المنطقية وستكونون مستعدين تماماً!</template>
+    <template class="content-en">Welcome to the core of Deep Learning! In this module, we transition from simple linear models to Multilayer Perceptrons (MLPs). Always remember: linear models are restricted by 'monotonicity', but by adding 'hidden layers' and 'activation functions' (like ReLU), we give the network the power to learn any complex function (Universal Approximation Theorem). However, with great power comes the problem of 'Overfitting'. For the exam, focus heavily on distinguishing between training error and generalization error. Understand when underfitting and overfitting occur based on model complexity and dataset size. Most importantly, how do we combat overfitting? We have two main weapons: 'Weight Decay' (L2 Regularization) which penalizes large weights, and 'Dropout' which breaks co-adaptation among neurons. Finally, don't forget the training mechanics: Forward propagation stores variables, and Backpropagation uses them to compute gradients. This explains why training consumes much more memory than inference. Focus on these logical connections and you'll be perfectly prepared!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل دالة ReLU على Sigmoid في الطبقات المخفية؟</template>
+          <template class="content-en">Why do we prefer ReLU over Sigmoid in hidden layers?</template>
+          <span class="content-target">لماذا نفضل دالة ReLU على Sigmoid في الطبقات المخفية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن ReLU أبسط حسابياً ولا تعاني من مشكلة 'تلاشي التدرج' (Vanishing Gradient) للقيم الموجبة الكبيرة، مما يجعل تدريب الشبكات العميقة أسرع وأكثر استقراراً.</template>
+          <template class="content-en">Because ReLU is computationally simpler and does not suffer from the 'vanishing gradient' problem for large positive values, making training deep networks faster and more stable.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الغرض من مجموعة التحقق (Validation Set)؟</template>
+          <template class="content-en">What is the purpose of the Validation Set?</template>
+          <span class="content-target">ما هو الغرض من مجموعة التحقق (Validation Set)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم لتقييم النماذج أثناء التدريب وضبط المعلمات الفائقة (Hyperparameters) دون المساس بمجموعة الاختبار، مما يمنع فرط التخصيص على بيانات الاختبار.</template>
+          <template class="content-en">It is used to evaluate models during training and tune hyperparameters without touching the test set, preventing overfitting to the test data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يكسر الإسقاط (Dropout) التكيف المشترك (Co-adaptation)؟</template>
+          <template class="content-en">How does Dropout break co-adaptation?</template>
+          <span class="content-target">كيف يكسر الإسقاط (Dropout) التكيف المشترك (Co-adaptation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال إيقاف تشغيل خلايا عصبية عشوائياً، لا يمكن لأي خلية الاعتماد بشكل كامل على خلية معينة في الطبقة السابقة، مما يجبر الشبكة على توزيع الأوزان وتعلم ميزات أكثر استقلالية وقوة.</template>
+          <template class="content-en">By randomly turning off neurons, no neuron can rely entirely on a specific neuron in the previous layer, forcing the network to distribute weights and learn more independent, robust features.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا قمنا بزيادة تعقيد النموذج (مثل زيادة درجة كثيرة الحدود) مع بقاء حجم البيانات ثابتاً؟</template>
+          <template class="content-en">What happens if we increase model complexity (like increasing polynomial degree) while keeping data size constant?</template>
+          <span class="content-target">ماذا يحدث إذا قمنا بزيادة تعقيد النموذج (مثل زيادة درجة كثيرة الحدود) مع بقاء حجم البيانات ثابتاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">سينخفض خطأ التدريب (ربما إلى الصفر)، لكن خطأ التعميم سيرتفع بشكل حاد بعد نقطة معينة، مما يؤدي إلى فرط التخصيص (Overfitting).</template>
+          <template class="content-en">Training error will decrease (possibly to zero), but generalization error will sharply increase after a certain point, leading to overfitting.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يستهلك التدريب ذاكرة أكبر من التنبؤ (Inference)؟</template>
+          <template class="content-en">Why does training consume more memory than inference?</template>
+          <span class="content-target">لماذا يستهلك التدريب ذاكرة أكبر من التنبؤ (Inference)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التدريب يتطلب الاحتفاظ بجميع المتغيرات الوسيطة المحسوبة خلال الانتشار الأمامي في الذاكرة لاستخدامها لاحقاً في الانتشار الخلفي لحساب التدرجات.</template>
+          <template class="content-en">Because training requires keeping all intermediate variables computed during forward propagation in memory to use them later in backpropagation for calculating gradients.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو افتراض i.i.d. ولماذا هو مهم؟</template>
+          <template class="content-en">What is the i.i.d. assumption and why is it important?</template>
+          <span class="content-target">ما هو افتراض i.i.d. ولماذا هو مهم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يعني أن البيانات مستقلة وموزعة بشكل متطابق. هو مهم لأنه الأساس النظري الذي يضمن أن الأداء الجيد على بيانات التدريب سينعكس كأداء جيد على بيانات الاختبار (التعميم).</template>
+          <template class="content-en">It means data is Independently and Identically Distributed. It's important because it's the theoretical foundation ensuring that good performance on training data will translate to good performance on test data (generalization).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تطبيق تضاؤل الأوزان (Weight Decay) عملياً في أطر التعلم العميق؟</template>
+          <template class="content-en">How is Weight Decay practically implemented in deep learning frameworks?</template>
+          <span class="content-target">كيف يتم تطبيق تضاؤل الأوزان (Weight Decay) عملياً في أطر التعلم العميق؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">بدلاً من إضافته يدوياً لدالة الخسارة، يتم دمجه مباشرة في خوارزمية المُحسِّن (Optimizer)، مما يوفر كفاءة حسابية حيث يتم تحديث الأوزان في خطوة واحدة.</template>
+          <template class="content-en">Instead of manually adding it to the loss function, it is integrated directly into the Optimizer algorithm, providing computational efficiency as weights are updated in a single step.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نلجأ لاستخدام التحقق المتقاطع K-Fold؟</template>
+          <template class="content-en">When do we resort to using K-Fold Cross-Validation?</template>
+          <span class="content-target">متى نلجأ لاستخدام التحقق المتقاطع K-Fold؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نلجأ إليه عندما تكون مجموعة البيانات المتوفرة لدينا صغيرة جداً بحيث لا يمكننا تحمل اقتطاع جزء منها كمجموعة تحقق ثابتة دون التأثير سلباً على عملية التدريب.</template>
+          <template class="content-en">We resort to it when our available dataset is too small to afford holding out a fixed validation set without negatively impacting the training process.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي ميزة دالة Tanh على دالة Sigmoid؟</template>
+          <template class="content-en">What is the advantage of the Tanh function over the Sigmoid function?</template>
+          <span class="content-target">ما هي ميزة دالة Tanh على دالة Sigmoid؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">دالة Tanh متمركزة حول الصفر (نطاقها من -1 إلى 1)، مما يجعل متوسط التنشيطات أقرب للصفر، وهذا يساعد خوارزمية التحسين على التقارب (Converge) بشكل أسرع.</template>
+          <template class="content-en">Tanh is zero-centered (range -1 to 1), making the mean of activations closer to zero, which helps the optimization algorithm converge faster.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تعني 'الرتابة' (Monotonicity) في سياق النماذج الخطية؟</template>
+          <template class="content-en">What does 'Monotonicity' mean in the context of linear models?</template>
+          <span class="content-target">ماذا تعني 'الرتابة' (Monotonicity) في سياق النماذج الخطية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تعني الافتراض بأن أي زيادة في قيمة ميزة معينة ستؤدي دائماً إلى تأثير في اتجاه واحد (إما زيادة أو نقصان دائم) على المخرجات، بغض النظر عن سياق الميزات الأخرى.</template>
+          <template class="content-en">It means the assumption that any increase in a feature's value will always lead to a unidirectional effect (either always increasing or always decreasing) on the output, regardless of the context of other features.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي المشكلة الرئيسية في النماذج الخطية التي تحلها المدركات متعددة الطبقات (MLP)؟",
+      "en": "What is the main problem with linear models that MLPs solve?"
+    },
+    "back": {
+      "definition": {
+        "ar": "النماذج الخطية تفترض الرتابة (Monotonicity) ولا يمكنها التقاط التفاعلات المعقدة بين الميزات.",
+        "en": "Linear models assume monotonicity and cannot capture complex interactions among features."
+      },
+      "example": {
+        "ar": "مشكلة XOR لا يمكن حلها بنموذج خطي.",
+        "en": "The XOR problem cannot be solved by a linear model."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هو دور الطبقات المخفية (Hidden Layers) في الشبكة العصبية؟",
+      "en": "What is the role of Hidden Layers in a neural network?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعمل كتمثيل للبيانات، حيث تلتقط التفاعلات المعقدة بين المدخلات قبل تمريرها لطبقة المخرجات.",
+        "en": "They act as a representation of the data, capturing complex interactions among inputs before passing them to the output layer."
+      },
+      "example": {
+        "ar": "تحويل بكسلات الصورة إلى ميزات مثل الحواف والأشكال.",
+        "en": "Transforming image pixels into features like edges and shapes."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ماذا تعني نظرية التقريب الشامل (Universal Approximators)؟",
+      "en": "What does the Universal Approximators theorem mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "شبكة عصبية ذات طبقة مخفية واحدة وعدد كافٍ من العقد يمكنها نمذجة أي دالة رياضية.",
+        "en": "A neural network with a single hidden layer and enough nodes can model any mathematical function."
+      },
+      "example": {
+        "ar": "رغم ذلك، الشبكات الأعمق تقرب الدوال بكفاءة أكبر من الشبكات العريضة.",
+        "en": "However, deeper networks approximate functions more efficiently than wide networks."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هي دالة التنشيط ReLU؟",
+      "en": "What is the ReLU activation function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "وحدة الخطية المصححة. تُرجع القيمة نفسها إذا كانت موجبة، وتُرجع صفراً إذا كانت سالبة.",
+        "en": "Rectified Linear Unit. It returns the value if positive, and zero if negative. ReLU(x) = max(x, 0)."
+      },
+      "example": {
+        "ar": "ReLU(-5) = 0, ReLU(3) = 3",
+        "en": "ReLU(-5) = 0, ReLU(3) = 3"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي دالة التنشيط Sigmoid؟",
+      "en": "What is the Sigmoid activation function?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تضغط المدخلات إلى نطاق بين (0, 1). تستخدم غالباً لتفسير المخرجات كاحتمالات.",
+        "en": "A function that squashes inputs to the interval (0, 1). Often used to interpret outputs as probabilities."
+      },
+      "example": {
+        "ar": "تستخدم في طبقة المخرجات لمشاكل التصنيف الثنائي.",
+        "en": "Used in the output layer for binary classification problems."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "كيف تختلف دالة Tanh عن Sigmoid؟",
+      "en": "How does the Tanh function differ from Sigmoid?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة Tanh تضغط المدخلات إلى النطاق (-1, 1) وتتميز بتناظر نقطي حول نقطة الأصل (متمركزة حول الصفر).",
+        "en": "Tanh squashes inputs to the interval (-1, 1) and exhibits point symmetry about the origin (zero-centered)."
+      },
+      "example": {
+        "ar": "تساعد في تسريع التقارب أثناء التدريب مقارنة بـ Sigmoid.",
+        "en": "Helps speed up convergence during training compared to Sigmoid."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما الفرق بين خطأ التدريب وخطأ التعميم؟",
+      "en": "What is the difference between Training Error and Generalization Error?"
+    },
+    "back": {
+      "definition": {
+        "ar": "خطأ التدريب يُحسب على بيانات التدريب، بينما خطأ التعميم هو الأداء المتوقع على بيانات جديدة غير مرئية.",
+        "en": "Training error is calculated on the training data, while generalization error is the expected performance on new, unseen data."
+      },
+      "example": {
+        "ar": "نقدر خطأ التعميم باستخدام مجموعة الاختبار (Test Set).",
+        "en": "We estimate generalization error using a Test Set."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو افتراض i.i.d. في التعلم الآلي؟",
+      "en": "What is the i.i.d. assumption in machine learning?"
+    },
+    "back": {
+      "definition": {
+        "ar": "افتراض أن بيانات التدريب والاختبار مسحوبة بشكل مستقل من توزيعات متطابقة (Independent and Identically Distributed).",
+        "en": "The assumption that training and test data are drawn independently from identical distributions."
+      },
+      "example": {
+        "ar": "إذا تدرب النموذج على صور قطط نهارية واختبر على صور ليلية، فهذا انتهاك لـ i.i.d.",
+        "en": "Training on daytime cat photos and testing on nighttime ones violates i.i.d."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "متى يحدث نقص التخصيص (Underfitting)؟",
+      "en": "When does Underfitting occur?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما يكون النموذج بسيطاً جداً بحيث لا يمكنه تقليل خطأ التدريب، وتكون الفجوة بين خطأ التدريب والتحقق صغيرة.",
+        "en": "When the model is too simple to reduce the training error, and the gap between training and validation error is small."
+      },
+      "example": {
+        "ar": "استخدام خط مستقيم لنمذجة بيانات منحنية بشدة.",
+        "en": "Using a straight line to model highly curved data."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "متى يحدث فرط التخصيص (Overfitting)؟",
+      "en": "When does Overfitting occur?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عندما يكون خطأ التدريب أقل بكثير من خطأ التحقق، مما يعني أن النموذج حفظ بيانات التدريب بدلاً من تعلم الأنماط العامة.",
+        "en": "When training error is significantly lower than validation error, meaning the model memorized training data instead of learning general patterns."
+      },
+      "example": {
+        "ar": "استخدام كثيرة حدود من الدرجة 100 لنمذجة 10 نقاط بيانات.",
+        "en": "Using a 100-degree polynomial to model 10 data points."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "لماذا نستخدم مجموعة التحقق (Validation Set) بدلاً من مجموعة الاختبار لاختيار النموذج؟",
+      "en": "Why do we use a Validation Set instead of the Test Set for model selection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لمنع فرط التخصيص على بيانات الاختبار. يجب أن تظل بيانات الاختبار غير مرئية تماماً حتى التقييم النهائي.",
+        "en": "To prevent overfitting to the test data. Test data must remain completely unseen until the final evaluation."
+      },
+      "example": {
+        "ar": "نستخدم مجموعة التحقق لضبط عدد الطبقات المخفية.",
+        "en": "We use the validation set to tune the number of hidden layers."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو التحقق المتقاطع K-Fold ومتى نستخدمه؟",
+      "en": "What is K-Fold Cross-Validation and when do we use it?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم البيانات إلى K مجموعات، والتدريب K مرة باستخدام مجموعة مختلفة للتحقق كل مرة. يُستخدم عندما تكون بيانات التدريب نادرة.",
+        "en": "Splitting data into K subsets, training K times using a different subset for validation each time. Used when training data is scarce."
+      },
+      "example": {
+        "ar": "في 5-Fold، نتدرب على 80% من البيانات ونختبر على 20%، ونكرر ذلك 5 مرات.",
+        "en": "In 5-Fold, we train on 80% and validate on 20%, repeating 5 times."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "كيف يعمل تضاؤل الأوزان (Weight Decay / L2 Regularization)؟",
+      "en": "How does Weight Decay (L2 Regularization) work?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يضيف عقوبة إلى دالة الخسارة تتناسب مع معيار متجه الأوزان، مما يجبر الأوزان على البقاء صغيرة ويقلل تعقيد النموذج.",
+        "en": "It adds a penalty to the loss function proportional to the norm of the weight vector, forcing weights to stay small and reducing model complexity."
+      },
+      "example": {
+        "ar": "يمنع النموذج من الاعتماد بشكل مفرط على ميزة واحدة.",
+        "en": "Prevents the model from relying too heavily on a single feature."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو الغرض من تقنية الإسقاط (Dropout)؟",
+      "en": "What is the purpose of the Dropout technique?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تصفير بعض الخلايا العصبية عشوائياً أثناء التدريب لكسر التكيف المشترك (Co-adaptation) ومنع فرط التخصيص.",
+        "en": "Randomly zeroing out some neurons during training to break co-adaptation and prevent overfitting."
+      },
+      "example": {
+        "ar": "يجبر الشبكة على تعلم ميزات قوية لا تعتمد على خلية عصبية واحدة.",
+        "en": "Forces the network to learn robust features that don't rely on a single neuron."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما الفرق بين الانتشار الأمامي والانتشار الخلفي؟",
+      "en": "What is the difference between Forward and Backward Propagation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الانتشار الأمامي يحسب التنبؤات والمتغيرات الوسيطة. الانتشار الخلفي يستخدم قاعدة السلسلة لحساب التدرجات لتحديث الأوزان.",
+        "en": "Forward propagation computes predictions and intermediate variables. Backward propagation uses the chain rule to compute gradients for weight updates."
+      },
+      "example": {
+        "ar": "الانتشار الخلفي يعتمد على القيم المخزنة من الانتشار الأمامي.",
+        "en": "Backpropagation relies on the values stored from forward propagation."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية تُرجع القيمة صفر إذا كان الإدخال سالباً؟",
+      "en": "Which of the following activation functions returns zero if the input is negative?"
+    },
+    "options": {
+      "ar": [
+        "Sigmoid",
+        "Tanh",
+        "ReLU",
+        "Softmax"
+      ],
+      "en": [
+        "Sigmoid",
+        "Tanh",
+        "ReLU",
+        "Softmax"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة ReLU (وحدة الخطية المصححة) تُعرف بأنها max(x, 0)، لذا فهي تُرجع صفراً لأي قيمة سالبة.",
+      "en": "The ReLU (Rectified Linear Unit) function is defined as max(x, 0), so it returns zero for any negative value."
+    },
+    "hint": {
+      "ar": "تذكر الدالة التي تتجاهل القيم السالبة تماماً.",
+      "en": "Remember the function that completely discards negative values."
+    },
+    "difficulty": "easy",
+    "conceptId": "activation-functions"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي المشكلة الأساسية التي تحلها المدركات متعددة الطبقات (MLP) مقارنة بالنماذج الخطية؟",
+      "en": "What is the primary problem that MLPs solve compared to linear models?"
+    },
+    "options": {
+      "ar": [
+        "النماذج الخطية تتطلب بيانات أكثر.",
+        "النماذج الخطية تفترض الرتابة ولا يمكنها التقاط التفاعلات المعقدة.",
+        "النماذج الخطية تعاني دائماً من فرط التخصيص.",
+        "النماذج الخطية أبطأ في التدريب."
+      ],
+      "en": [
+        "Linear models require more data.",
+        "Linear models assume monotonicity and cannot capture complex interactions.",
+        "Linear models always suffer from overfitting.",
+        "Linear models are slower to train."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "النماذج الخطية تفترض أن الزيادة في الميزة تؤدي دائماً إلى تغيير في اتجاه واحد (الرتابة)، بينما MLPs يمكنها تعلم علاقات غير خطية وتفاعلات معقدة عبر الطبقات المخفية.",
+      "en": "Linear models assume that an increase in a feature always leads to a unidirectional change (monotonicity), while MLPs can learn non-linear relationships and complex interactions via hidden layers."
+    },
+    "hint": {
+      "ar": "فكر في مشكلة XOR ولماذا لا يمكن لخط مستقيم حلها.",
+      "en": "Think about the XOR problem and why a straight line cannot solve it."
+    },
+    "difficulty": "medium",
+    "conceptId": "limitations-linear-models-mlp"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "إذا كان خطأ التدريب لنموذجك منخفضاً جداً، ولكن خطأ التحقق مرتفع جداً، فما هي المشكلة المرجحة؟",
+      "en": "If your model's training error is very low, but the validation error is very high, what is the likely problem?"
+    },
+    "options": {
+      "ar": [
+        "نقص التخصيص (Underfitting)",
+        "فرط التخصيص (Overfitting)",
+        "معدل التعلم منخفض جداً",
+        "النموذج بسيط جداً"
+      ],
+      "en": [
+        "Underfitting",
+        "Overfitting",
+        "Learning rate is too low",
+        "Model is too simple"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذه هي العلامة الكلاسيكية لفرط التخصيص، حيث حفظ النموذج بيانات التدريب (بما في ذلك الضوضاء) ولكنه فشل في التعميم على بيانات جديدة.",
+      "en": "This is the classic sign of overfitting, where the model has memorized the training data (including noise) but fails to generalize to new data."
+    },
+    "hint": {
+      "ar": "النموذج يؤدي بشكل ممتاز في 'الامتحان التجريبي' ولكنه يرسب في 'الامتحان الحقيقي'.",
+      "en": "The model performs excellently on the 'practice exam' but fails the 'real exam'."
+    },
+    "difficulty": "easy",
+    "conceptId": "underfitting-overfitting-complexity"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "لماذا نستخدم التحقق المتقاطع K-Fold؟",
+      "en": "Why do we use K-Fold Cross-Validation?"
+    },
+    "options": {
+      "ar": [
+        "لتسريع عملية التدريب.",
+        "لتقليل حجم النموذج.",
+        "لتقييم النموذج عندما تكون بيانات التدريب نادرة.",
+        "لزيادة عدد الطبقات المخفية."
+      ],
+      "en": [
+        "To speed up the training process.",
+        "To reduce the size of the model.",
+        "To evaluate the model when training data is scarce.",
+        "To increase the number of hidden layers."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يُستخدم K-Fold عندما لا يكون لدينا بيانات كافية لاقتطاع مجموعة تحقق منفصلة، حيث يسمح لنا باستخدام جميع البيانات للتدريب والتحقق بشكل متناوب.",
+      "en": "K-Fold is used when we don't have enough data to afford a separate validation set, allowing us to use all data for both training and validation iteratively."
+    },
+    "hint": {
+      "ar": "ماذا تفعل إذا كان لديك 100 عينة فقط وتريد تدريب وتقييم النموذج؟",
+      "en": "What do you do if you only have 100 samples and want to train and evaluate the model?"
+    },
+    "difficulty": "medium",
+    "conceptId": "model-selection-validation"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "كيف يقلل تضاؤل الأوزان (Weight Decay) من فرط التخصيص؟",
+      "en": "How does Weight Decay reduce overfitting?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق إسقاط خلايا عصبية عشوائية.",
+        "عن طريق إضافة عقوبة إلى دالة الخسارة تجبر الأوزان على البقاء صغيرة.",
+        "عن طريق زيادة عدد بيانات التدريب.",
+        "عن طريق إيقاف التدريب مبكراً."
+      ],
+      "en": [
+        "By dropping random neurons.",
+        "By adding a penalty to the loss function that forces weights to stay small.",
+        "By increasing the amount of training data.",
+        "By stopping the training early."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تضاؤل الأوزان (تنظيم L2) يضيف معيار متجه الأوزان إلى دالة الخسارة، مما يعاقب الأوزان الكبيرة ويجعل النموذج أبسط وأكثر سلاسة.",
+      "en": "Weight decay (L2 regularization) adds the norm of the weight vector to the loss function, penalizing large weights and making the model simpler and smoother."
+    },
+    "hint": {
+      "ar": "فكر في كلمة 'تضاؤل' (Decay) وماذا تفعل بقيم الأوزان.",
+      "en": "Think about the word 'decay' and what it does to the weight values."
+    },
+    "difficulty": "medium",
+    "conceptId": "weight-decay-l2"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هو الإجراء القياسي لتقنية الإسقاط (Dropout) أثناء مرحلة الاختبار (Test Time)؟",
+      "en": "What is the standard procedure for Dropout during Test Time?"
+    },
+    "options": {
+      "ar": [
+        "إسقاط نفس النسبة من الخلايا كما في التدريب.",
+        "إسقاط نسبة أكبر من الخلايا.",
+        "تعطيل الإسقاط واستخدام جميع الخلايا العصبية.",
+        "تغيير دالة التنشيط."
+      ],
+      "en": [
+        "Drop the same percentage of neurons as in training.",
+        "Drop a larger percentage of neurons.",
+        "Disable dropout and use all neurons.",
+        "Change the activation function."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "عادةً ما يتم تعطيل الإسقاط أثناء الاختبار للحصول على التنبؤ النهائي باستخدام القوة الكاملة للشبكة (باستثناء حالات تقدير عدم اليقين).",
+      "en": "Dropout is typically disabled during testing to get the final prediction using the full capacity of the network (except when estimating uncertainty)."
+    },
+    "hint": {
+      "ar": "هل تريد أن يكون نموذجك 'مشتتاً' أثناء الامتحان النهائي؟",
+      "en": "Do you want your model to be 'distracted' during the final exam?"
+    },
+    "difficulty": "medium",
+    "conceptId": "dropout-regularization"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "لماذا يتطلب تدريب الشبكات العصبية ذاكرة أكبر بكثير من مرحلة التنبؤ (Inference)؟",
+      "en": "Why does training neural networks require significantly more memory than inference?"
+    },
+    "options": {
+      "ar": [
+        "لأن دوال التنشيط تستهلك ذاكرة كبيرة.",
+        "لأننا نحتاج إلى تخزين المتغيرات الوسيطة من الانتشار الأمامي لاستخدامها في الانتشار الخلفي.",
+        "لأن بيانات الاختبار يتم تحميلها مع بيانات التدريب.",
+        "لأن المُحسِّن (Optimizer) ينسخ الشبكة عدة مرات."
+      ],
+      "en": [
+        "Because activation functions consume a lot of memory.",
+        "Because we need to store intermediate variables from forward propagation to use in backpropagation.",
+        "Because test data is loaded along with training data.",
+        "Because the optimizer copies the network multiple times."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الانتشار الخلفي يحتاج إلى القيم الوسيطة (مثل التنشيطات قبل تطبيق الدالة) لحساب التدرجات باستخدام قاعدة السلسلة، مما يتطلب الاحتفاظ بها في الذاكرة.",
+      "en": "Backpropagation needs the intermediate values (like pre-activations) to compute gradients using the chain rule, requiring them to be kept in memory."
+    },
+    "hint": {
+      "ar": "فكر في ما يحتاجه الانتشار الخلفي لحساب المشتقات.",
+      "en": "Think about what backpropagation needs to calculate derivatives."
+    },
+    "difficulty": "hard",
+    "conceptId": "forward-backward-propagation"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ما هو التكيف المشترك (Co-adaptation) في الشبكات العصبية؟",
+      "en": "What is Co-adaptation in neural networks?"
+    },
+    "options": {
+      "ar": [
+        "عندما تتعلم الشبكة التكيف مع بيانات جديدة بسرعة.",
+        "عندما تعتمد طبقة بشكل مفرط على نمط محدد من التنشيطات في الطبقة السابقة.",
+        "عندما تتكيف الأوزان مع معدل التعلم.",
+        "عندما تتكيف دالة الخسارة مع حجم الدفعة."
+      ],
+      "en": [
+        "When the network learns to adapt to new data quickly.",
+        "When a layer relies heavily on a specific pattern of activations in the previous layer.",
+        "When weights adapt to the learning rate.",
+        "When the loss function adapts to the batch size."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التكيف المشترك هو حالة من فرط التخصيص حيث تعتمد الخلايا العصبية على بعضها البعض بشكل مفرط. تقنية الإسقاط (Dropout) تكسر هذا التكيف.",
+      "en": "Co-adaptation is a state of overfitting where neurons rely too heavily on each other. Dropout breaks this adaptation."
+    },
+    "hint": {
+      "ar": "تخيل فريق عمل يعتمد فيه الجميع على شخص واحد فقط لإنجاز المهمة.",
+      "en": "Imagine a team where everyone relies on just one person to get the job done."
+    },
+    "difficulty": "medium",
+    "conceptId": "dropout-regularization"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "وفقاً لنظرية التعلم الإحصائي، ماذا يعني افتراض i.i.d.؟",
+      "en": "According to statistical learning theory, what does the i.i.d. assumption mean?"
+    },
+    "options": {
+      "ar": [
+        "البيانات موزعة بشكل متزايد ومستقل.",
+        "بيانات التدريب والاختبار مسحوبة بشكل مستقل من توزيعات متطابقة.",
+        "البيانات الداخلية متطابقة وموزعة.",
+        "البيانات المستقلة تتجاهل التوزيعات."
+      ],
+      "en": [
+        "Data is increasingly and independently distributed.",
+        "Training and test data are drawn independently from identical distributions.",
+        "Internal data is identical and distributed.",
+        "Independent data ignores distributions."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "i.i.d. تعني Independent and Identically Distributed، وهو افتراض أساسي لضمان قدرة النموذج على التعميم.",
+      "en": "i.i.d. stands for Independent and Identically Distributed, a fundamental assumption to ensure the model can generalize."
+    },
+    "hint": {
+      "ar": "الحرفان 'i' و 'i' يرمزان إلى الاستقلالية والتطابق.",
+      "en": "The letters 'i' and 'i' stand for Independent and Identical."
+    },
+    "difficulty": "easy",
+    "conceptId": "training-vs-generalization-error"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "أي من دوال التنشيط التالية تتميز بتناظر نقطي حول نقطة الأصل (متمركزة حول الصفر)؟",
+      "en": "Which of the following activation functions exhibits point symmetry about the origin (zero-centered)?"
+    },
+    "options": {
+      "ar": [
+        "ReLU",
+        "Sigmoid",
+        "Tanh",
+        "Step Function"
+      ],
+      "en": [
+        "ReLU",
+        "Sigmoid",
+        "Tanh",
+        "Step Function"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة Tanh تضغط القيم بين -1 و 1 وتمر بنقطة الأصل، مما يجعلها متناظرة ومتمركزة حول الصفر، وهو ما يساعد في تسريع التدريب.",
+      "en": "The Tanh function squashes values between -1 and 1 and passes through the origin, making it symmetric and zero-centered, which helps speed up training."
+    },
+    "hint": {
+      "ar": "نطاق هذه الدالة يشمل قيماً سالبة وموجبة بشكل متساوٍ (-1 إلى 1).",
+      "en": "The range of this function includes negative and positive values equally (-1 to 1)."
+    },
+    "difficulty": "medium",
+    "conceptId": "activation-functions"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام مجموعة الاختبار (Test Set) لاختيار أفضل نموذج أو ضبط المعلمات الفائقة. هذا يؤدي إلى تسرب البيانات ويجعل تقييمك النهائي غير صالح. استخدم دائماً مجموعة التحقق (Validation Set) لهذا الغرض.</template>
+    <template class="content-en">Using the Test Set to select the best model or tune hyperparameters. This leads to data leakage and invalidates your final evaluation. Always use a Validation Set for this purpose.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مفاضلة التحيز والتباين (Bias-Variance Tradeoff): النماذج الخطية لها تحيز عالٍ (بسيطة جداً) وتباين منخفض. الشبكات العصبية العميقة لها تحيز منخفض (يمكنها تعلم أي شيء) ولكن تباين عالٍ (عرضة لفرط التخصيص).</template>
+    <template class="content-en">Bias-Variance Tradeoff: Linear models have high bias (too simple) and low variance. Deep neural networks have low bias (can learn anything) but high variance (prone to overfitting).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">على الرغم من أننا نعطل الإسقاط (Dropout) عادةً أثناء الاختبار، إلا أن بعض الباحثين يبقونه مفعلاً كطريقة لتقدير 'عدم اليقين' (Uncertainty) في تنبؤات النموذج. إذا اختلفت التنبؤات كثيراً مع أقنعة إسقاط مختلفة، فالنموذج غير واثق.</template>
+    <template class="content-en">Although we typically disable Dropout during testing, some researchers keep it active as a heuristic to estimate 'uncertainty' in model predictions. If predictions vary wildly with different dropout masks, the model is uncertain.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن دالة ReLU قابلة للاشتقاق في كل مكان. رياضياً، هي غير قابلة للاشتقاق عند الصفر بالضبط. عملياً، نتجاهل ذلك بتعيين المشتقة إلى صفر عند هذه النقطة.</template>
+    <template class="content-en">Believing ReLU is differentiable everywhere. Mathematically, it is non-differentiable at exactly zero. In practice, we ignore this by defaulting the derivative to zero at that point.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الانتشار الخلفي (Backpropagation) ليس سحراً؛ إنه مجرد تطبيق منهجي لـ 'قاعدة السلسلة' (Chain Rule) من التفاضل والتكامل، يتم حسابه بشكل عكسي عبر الرسم البياني الحسابي للشبكة.</template>
+    <template class="content-en">Backpropagation is not magic; it is simply a systematic application of the 'Chain Rule' from calculus, computed in reverse across the network's computational graph.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M10.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M12.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

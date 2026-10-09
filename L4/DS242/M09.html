@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS242" data-module="9" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التعامل مع الملفات الخارجية · DS242 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS242" data-page-title-en="DS242">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M08.html" data-gh-next="M10.html" data-gh-card="../../hub/course.html?code=DS242"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#text-vs-binary-files" class="toc-link" data-bilingual>
+        <template class="content-ar">الملفات النصية مقابل الملفات الثنائية</template>
+        <template class="content-en">Text vs. Binary Files</template>
+        <span class="content-target">الملفات النصية مقابل الملفات الثنائية</span>
+      </a>
+      <a href="#opening-closing-files" class="toc-link" data-bilingual>
+        <template class="content-ar">فتح وإغلاق الملفات (أوضاع الملفات)</template>
+        <template class="content-en">Opening and Closing Files (File Modes)</template>
+        <span class="content-target">فتح وإغلاق الملفات (أوضاع الملفات)</span>
+      </a>
+      <a href="#reading-file-contents" class="toc-link" data-bilingual>
+        <template class="content-ar">قراءة محتويات الملف والتكرار</template>
+        <template class="content-en">Reading a File’s Contents and Looping</template>
+        <span class="content-target">قراءة محتويات الملف والتكرار</span>
+      </a>
+      <a href="#file-pointers" class="toc-link" data-bilingual>
+        <template class="content-ar">مؤشرات الملفات: tell و seek</template>
+        <template class="content-en">File Pointers: tell() and seek()</template>
+        <span class="content-target">مؤشرات الملفات: tell و seek</span>
+      </a>
+      <a href="#reading-copying-binary" class="toc-link" data-bilingual>
+        <template class="content-ar">قراءة ونسخ الملفات الثنائية</template>
+        <template class="content-en">Reading and Copying a Binary File</template>
+        <span class="content-target">قراءة ونسخ الملفات الثنائية</span>
+      </a>
+      <a href="#conquering-csv-files" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع ملفات CSV</template>
+        <template class="content-en">Conquering CSV Files</template>
+        <span class="content-target">التعامل مع ملفات CSV</span>
+      </a>
+      <a href="#csv-data-conversion" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل بيانات CSV إلى أنواع بايثون</template>
+        <template class="content-en">Converting CSV Data to Python Types</template>
+        <span class="content-target">تحويل بيانات CSV إلى أنواع بايثون</span>
+      </a>
+      <a href="#csv-to-objects-dicts" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل CSV إلى كائنات وقواميس</template>
+        <template class="content-en">Converting from CSV to Objects and Dictionaries</template>
+        <span class="content-target">تحويل CSV إلى كائنات وقواميس</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 9</template>
+      <template class="content-en">Module 9</template>
+      <span class="content-target">الوحدة 9</span>
+    </span> · DS242
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التعامل مع الملفات الخارجية</h1>
+      <p class="hero-description">تغطي هذه الوحدة كيفية قراءة وكتابة الملفات النصية والثنائية في بايثون، وإدارة سياق الملفات، والتعامل مع ملفات CSV، وتحويل البيانات إلى كائنات وقواميس.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Working With External Files</h1>
+      <p class="hero-description">This module covers how to read and write text and binary files in Python, manage file contexts, handle CSV files, and convert data into objects and dictionaries.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">بايثون</span>
+      <span class="tag">إدارة الملفات</span>
+      <span class="tag">ملفات CSV</span>
+      <span class="tag">الملفات الثنائية</span>
+      <span class="tag">ترميز UTF-8</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Python</span>
+      <span class="tag">File I/O</span>
+      <span class="tag">CSV Files</span>
+      <span class="tag">Binary Files</span>
+      <span class="tag">UTF-8 Encoding</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم الفرق بين الملفات النصية والملفات الثنائية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية فتح وإغلاق الملفات وقراءة محتوياتها.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية التكرار عبر ملف ونسخ ملف ثنائي.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحويل البيانات من ملفات CSV إلى كائنات وقواميس في بايثون.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand the difference between Text and Binary Files.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain Opening, Closing Files and Reading a File’s Contents.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain Looping through a File and Copying a Binary File.</span></li>
+      <li><span class="obj-icon">✦</span><span>Converting from CSV to Objects and Dictionaries.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="text-vs-binary-files" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> الملفات النصية مقابل الملفات الثنائية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Text vs. Binary Files</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الملفات النصية قابلة للقراءة بواسطة البشر، بينما الملفات الثنائية مصممة لتقرأها الآلات وتتطلب برامج خاصة.</p></template>
+    <template class="content-en"><p>Text files are human-readable, while binary files are machine-readable and require specific programs to interpret.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوجد نوعان أساسيان من الملفات في أنظمة الكمبيوتر:</p><ul><li><b>الملفات النصية (Text files):</b> تحتوي على أحرف نصية عادية (Plain text). عند فتحها في محرر نصوص، تعرض محتوى قابل للقراءة (مثل .txt, .csv, .py, .html).</li><li><b>الملفات الثنائية (Binary files):</b> تخزن المعلومات في شكل بايتات (Bytes) غير قابلة للقراءة البشرية المباشرة. إذا حاولت فتحها في محرر نصوص، فسترى رموزاً غير مفهومة (مثل .exe, .jpg, .mp4, .zip).</li></ul></template>
+    <template class="content-en"><p>There are basically two types of files in computer systems:</p><ul><li><b><span class="smart-term" data-term-en="Text File" data-ar="ملف نصي" data-en-def="A file containing plain text characters, readable by humans.">Text file<span class="smart-term-tooltip"></span></span>:</b> Contains plain text characters. When opened in a text editor, it displays human-readable content (e.g., .txt, .csv, .py, .html).</li><li><b><span class="smart-term" data-term-en="Binary File" data-ar="ملف ثنائي" data-en-def="A file storing information in bytes, not human-readable.">Binary file<span class="smart-term-tooltip"></span></span>:</b> Stores information in bytes that aren’t human-readable. Opening them in a text editor shows gobbledygook (e.g., .exe, .jpg, .mp4, .zip).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب الرئيسي لوجود الملفات الثنائية هو الكفاءة والقدرة على تخزين بيانات معقدة (مثل بكسلات الصور أو إطارات الفيديو) بتنسيق مضغوط وسريع المعالجة للآلة.</p><p>محاولة حفظ <span class="smart-term" data-term-en="Binary File" data-ar="ملف ثنائي" data-en-def="A file storing information in bytes, not human-readable.">ملف ثنائي<span class="smart-term-tooltip"></span></span> بعد فتحه بالخطأ في محرر نصوص قد يؤدي إلى تلف الملف تماماً لأن المحرر سيحاول إعادة ترميز البايتات كأحرف نصية.</p></template>
+    <template class="content-en"><p>The primary reason for binary files is efficiency and the ability to store complex data (like image pixels or video frames) in a compact, machine-optimized format.</p><p>Attempting to save a binary file after accidentally opening it in a text editor can corrupt the file completely, as the editor may try to re-encode the raw bytes as text characters.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم الملفات النصية لتخزين الصور بدلاً من الملفات الثنائية؟</template>
+      <template class="content-en">Why don't we use text files to store images instead of binary files?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تخزين قيم الألوان لكل بكسل كنص سيستهلك مساحة تخزين هائلة وسيكون بطيئاً جداً في القراءة والمعالجة مقارنة بالبايتات الثنائية المحسنة.</p></template>
+      <template class="content-en"><p>Because storing color values for every pixel as text would consume a massive amount of storage space and would be extremely slow to read and process compared to optimized binary bytes.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="opening-closing-files" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> فتح وإغلاق الملفات (أوضاع الملفات)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Opening and Closing Files (File Modes)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم الدالة <code>open()</code> لفتح الملفات، ويُفضل استخدامها مع الكلمة المفتاحية <code>with</code> لضمان إغلاق الملف تلقائياً.</p></template>
+    <template class="content-en"><p>The <code>open()</code> function is used to open files, preferably with the <code>with</code> context manager to ensure automatic closing.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لفتح ملف في بايثون، نستخدم الصيغة: <code>open(filename.ext[,mode])</code>. الأوضاع (Modes) المتاحة هي:</p><ul><li><b>r (Read):</b> للقراءة فقط (الوضع الافتراضي). يثير خطأ إذا لم يكن الملف موجوداً.</li><li><b>w (Write):</b> للكتابة. ينشئ الملف إذا لم يكن موجوداً، ويمسح محتواه (Overwrite) إذا كان موجوداً.</li><li><b>a (Append):</b> للإضافة. يضيف النص في نهاية الملف دون مسح المحتوى القديم.</li><li><b>x (Create):</b> للإنشاء فقط. يثير خطأ إذا كان الملف موجوداً بالفعل.</li><li><b>t (Text):</b> وضع النص (الافتراضي).</li><li><b>b (Binary):</b> وضع الثنائي (يجب تحديده للملفات الثنائية).</li></ul><p>يمكن فتح الملف بطريقتين: الطريقة الأساسية التي تتطلب استدعاء <code>f.close()</code> يدوياً، أو باستخدام <span class="smart-term" data-term-en="Context Manager" data-ar="مدير السياق" data-en-def="A construct in Python (using &#x27;with&#x27;) that automatically manages resource allocation and deallocation, like closing files.">مدير السياق<span class="smart-term-tooltip"></span></span> <code>with open(...) as f:</code> الذي يغلق الملف تلقائياً.</p></template>
+    <template class="content-en"><p>To open a file in Python, use: <code>open(filename.ext[,mode])</code>. Available modes include:</p><ul><li><b>r (Read):</b> Read-only (default). Raises FileNotFoundError if it doesn't exist.</li><li><b>w (Write):</b> Write mode. Creates the file if it doesn't exist, overwrites if it does.</li><li><b>a (Append):</b> Append mode. Adds content to the end without changing existing content.</li><li><b>x (Create):</b> Creates a new file. Raises FileExistsError if it already exists.</li><li><b>t (Text):</b> Text mode (default).</li><li><b>b (Binary):</b> Binary mode (must be specified for binary files).</li></ul><p>Files can be opened basically (requiring manual <code>f.close()</code>) or using a <span class="smart-term" data-term-en="Context Manager" data-ar="مدير السياق" data-en-def="A construct in Python (using &#x27;with&#x27;) that automatically manages resource allocation and deallocation, like closing files.">context manager<span class="smart-term-tooltip"></span></span> <code>with open(...) as f:</code> which closes the file automatically.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام <code>with</code> (مدير السياق) هو الممارسة الأفضل (Best Practice) لأنه يضمن تحرير موارد النظام (إغلاق الملف) حتى لو حدث استثناء (Exception) أثناء معالجة الملف.</p><p>عند التعامل مع ملفات نصية تحتوي على رموز غير إنجليزية، يجب دائماً تحديد الترميز <code>encoding='utf-8'</code> لتجنب أخطاء فك الترميز (UnicodeDecodeError).</p></template>
+    <template class="content-en"><p>Using the <code>with</code> statement (context manager) is a best practice because it guarantees that system resources are released (file is closed) even if an exception occurs during file processing.</p><p>When dealing with text files containing non-ASCII characters, you should always specify <code>encoding='utf-8'</code> to prevent UnicodeDecodeError.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>with open('quotes.txt', 'r', encoding='utf-8') as f:
+    filecontents = f.read()
+    print(filecontents)
+# File is automatically closed here</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>w (Write)</th><th>a (Append)</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تأثيره على الملف الموجود</template>
+          <template class="content-en">Effect on existing file</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يمسح المحتوى القديم بالكامل (Overwrite)</template>
+          <template class="content-en">Completely overwrites old content</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يحافظ على المحتوى القديم ويضيف في النهاية</template>
+          <template class="content-en">Preserves old content, adds to the end</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمت الوضع 'w' على ملف يحتوي بالفعل على بيانات مهمة؟</template>
+      <template class="content-en">What happens if you use the 'w' mode on a file that already contains important data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم مسح جميع البيانات الموجودة مسبقاً في الملف واستبدالها بالبيانات الجديدة (Overwrite).</p></template>
+      <template class="content-en"><p>All previously existing data in the file will be completely erased and overwritten by the new data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="reading-file-contents" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> قراءة محتويات الملف والتكرار</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Reading a File’s Contents and Looping</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقرأ <code>read()</code> الملف كاملاً كنص واحد، وتقرأ <code>readlines()</code> الملف كقائمة من الأسطر، بينما تقرأ <code>readline()</code> سطراً واحداً في كل مرة لتوفير الذاكرة.</p></template>
+    <template class="content-en"><p><code>read()</code> reads the whole file as a single string, <code>readlines()</code> reads it into a list of lines, and <code>readline()</code> reads one line at a time to save memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر بايثون عدة طرق لقراءة الملفات:</p><ul><li><b>read([size]):</b> يقرأ الملف بأكمله ككتلة واحدة (أو عدد محدد من الأحرف/البايتات إذا تم تحديد size).</li><li><b>readlines():</b> يقرأ جميع الأسطر ويخزن كل سطر كعنصر داخل قائمة (List).</li><li><b>readline():</b> يقرأ سطراً واحداً فقط حتى يصل إلى حرف السطر الجديد (<code>\n</code>).</li></ul><p>للملفات الكبيرة، استخدام <code>read()</code> أو <code>readlines()</code> يمثل خطراً لأنه يحمل الملف كاملاً إلى الذاكرة العشوائية (RAM)، مما قد يؤدي إلى انهيار البرنامج. الحل الأفضل هو التكرار باستخدام <code>readline()</code> أو التكرار المباشر على كائن الملف.</p></template>
+    <template class="content-en"><p>Python provides several methods to read files:</p><ul><li><b>read([size]):</b> Reads the entire file as one big chunk (or a specific number of characters/bytes if size is specified).</li><li><b>readlines():</b> Reads all lines of a text file and stores each line as an item in a list.</li><li><b>readline():</b> Reads one line from a text file, ending wherever there’s a newline character (<code>\n</code>).</li></ul><p>For large files, using <code>read()</code> or <code>readlines()</code> is risky because it loads the entire file into <span class="smart-term" data-term-en="RAM" data-ar="ذاكرة الوصول العشوائي" data-en-def="Random Access Memory; where the computer stores data currently being processed. Loading huge files entirely into RAM can cause crashes.">RAM<span class="smart-term-tooltip"></span></span>, which can crash the app. The better approach is looping with <code>readline()</code> or iterating directly over the file object.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند استخدام <code>readline()</code> داخل حلقة <code>while</code>، يجب التأكد من استدعاء <code>readline()</code> مرة أخرى في نهاية الحلقة لتحديث المتغير، وإلا ستدخل في حلقة لا نهائية (Infinite Loop).</p><p>في بايثون الحديثة، الطريقة الأكثر كفاءة وأناقة للتكرار على ملف هي <code>for line in f:</code> والتي تتعامل مع الذاكرة بكفاءة خلف الكواليس دون الحاجة لاستدعاء <code>readline()</code> يدوياً.</p></template>
+    <template class="content-en"><p>When using <code>readline()</code> inside a <code>while</code> loop, you must ensure you call <code>readline()</code> again at the end of the loop to advance to the next line; otherwise, you will create an infinite loop.</p><p>In modern Python, the most pythonic and memory-efficient way to loop through a file is simply <code>for line in f:</code>, which handles buffering automatically behind the scenes.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>with open('quotes.txt') as f:
+    one_line = f.readline()
+    while one_line:
+        print(one_line, end='')
+        one_line = f.readline() # Crucial to advance the loop</code></pre>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>read()</th><th>readlines()</th><th>readline()</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">نوع الإرجاع (Return Type)</template>
+          <template class="content-en">Return Type</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">سلسلة نصية واحدة كبيرة</template>
+          <template class="content-en">Single large string</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">قائمة من السلاسل النصية (الأسطر)</template>
+          <template class="content-en">List of strings (lines)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-neutral" data-bilingual>
+          <template class="content-ar">سلسلة نصية واحدة (سطر واحد)</template>
+          <template class="content-en">Single string (one line)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">استهلاك الذاكرة للملفات الكبيرة</template>
+          <template class="content-en">Memory Consumption for Large Files</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي جداً (خطر الانهيار)</template>
+          <template class="content-en">Very High (Crash risk)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي جداً (خطر الانهيار)</template>
+          <template class="content-en">Very High (Crash risk)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض جداً (آمن)</template>
+          <template class="content-en">Very Low (Safe)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم <code>end=''</code> داخل دالة <code>print</code> عند طباعة الأسطر المقروءة من ملف؟</template>
+      <template class="content-en">Why do we use <code>end=''</code> inside the <code>print</code> function when printing lines read from a file?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن السطر المقروء من الملف يحتوي بالفعل على حرف سطر جديد (\n) في نهايته، ودالة print تضيف سطراً جديداً افتراضياً، مما سيؤدي إلى ظهور أسطر فارغة إضافية إذا لم نلغِ السطر الجديد الخاص بـ print.</p></template>
+      <template class="content-en"><p>Because the line read from the file already contains a newline character (\n) at the end, and the print function adds its own newline by default. Using end='' prevents double-spacing.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="file-pointers" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> مؤشرات الملفات: tell و seek</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> File Pointers: tell() and seek()</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تخبرك الدالة <code>tell()</code> بموقع المؤشر الحالي داخل الملف، بينما تسمح لك الدالة <code>seek()</code> بنقل المؤشر إلى موقع محدد.</p></template>
+    <template class="content-en"><p>The <code>tell()</code> method tells you the current pointer location in a file, while <code>seek()</code> allows you to move the pointer to a specific position.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند قراءة ملف، يحتفظ بايثون بـ "مؤشر" (Pointer) لتتبع المكان الذي وصل إليه في الملف (يُقرأ من أعلى لأسفل، ومن اليسار لليمين).</p><ul><li><b>tell():</b> تُرجع هذه الدالة رقم يمثل موضع الحرف (أو البايت) الحالي للمؤشر. عند فتح الملف للتو، يكون الموضع 0.</li><li><b>seek(position[, whence]):</b> تُستخدم لتغيير موضع <span class="smart-term" data-term-en="Pointer" data-ar="المؤشر" data-en-def="An internal marker maintained by Python that tracks the current reading or writing position within a file.">المؤشر<span class="smart-term-tooltip"></span></span>. على سبيل المثال، <code>f.seek(0)</code> يعيد المؤشر إلى بداية الملف، مما يسمح لك بقراءته مرة أخرى دون الحاجة لإغلاقه وفتحه.</li></ul></template>
+    <template class="content-en"><p>When reading a file, Python maintains a <span class="smart-term" data-term-en="Pointer" data-ar="المؤشر" data-en-def="An internal marker maintained by Python that tracks the current reading or writing position within a file.">pointer<span class="smart-term-tooltip"></span></span> to keep track of where it is in the file (read top to bottom, left to right).</p><ul><li><b>tell():</b> Returns the current character (or byte) position of the pointer. If just opened, it is 0.</li><li><b>seek(position[, whence]):</b> Used to reposition the pointer. For example, <code>f.seek(0)</code> moves the pointer back to the top of the file, allowing you to read it again without reopening.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فهم المؤشرات ضروري جداً عند التعامل مع الملفات الثنائية أو عند الحاجة لتعديل أجزاء معينة من ملف كبير دون إعادة كتابته بالكامل.</p><p>في وضع الإضافة (Append 'a')، يتم وضع المؤشر تلقائياً في نهاية الملف، بينما في وضع القراءة ('r') أو الكتابة ('w')، يبدأ المؤشر من الصفر.</p></template>
+    <template class="content-en"><p>Understanding pointers is crucial when working with binary files or when you need to modify specific parts of a large file without rewriting the whole thing.</p><p>In Append mode ('a'), the pointer is automatically placed at the end of the file, whereas in Read ('r') or Write ('w') modes, it starts at 0.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قرأت ملفاً كاملاً باستخدام <code>read()</code>، ثم حاولت قراءته مرة أخرى باستخدام <code>read()</code> دون إغلاقه، ماذا ستكون النتيجة؟</template>
+      <template class="content-en">If you read an entire file using <code>read()</code>, and then try to read it again using <code>read()</code> without closing it, what will be the result?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستحصل على سلسلة نصية فارغة، لأن المؤشر قد وصل بالفعل إلى نهاية الملف. يجب استخدام <code>seek(0)</code> لإعادته للبداية.</p></template>
+      <template class="content-en"><p>You will get an empty string because the pointer is already at the end of the file. You must use <code>seek(0)</code> to reset it to the beginning.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="reading-copying-binary" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> قراءة ونسخ الملفات الثنائية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Reading and Copying a Binary File</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُقرأ الملفات الثنائية وتُنسخ على شكل "كُتل" (Chunks) باستخدام <code>read(size)</code> لتجنب استهلاك الذاكرة بالكامل.</p></template>
+    <template class="content-en"><p>Binary files are read and copied in "chunks" using <code>read(size)</code> to avoid running out of memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الملفات الثنائية (مثل الصور والفيديو) لا تحتوي على أسطر نصية، لذا لا يمكن استخدام <code>readline()</code> أو <code>readlines()</code> معها. كما أنها قد تكون ضخمة جداً.</p><p>لنسخ ملف ثنائي بأمان:</p><ol><li>افتح الملف الأصلي في وضع القراءة الثنائية <code>'rb'</code>.</li><li>افتح (أو أنشئ) الملف الوجهة في وضع الكتابة الثنائية <code>'wb'</code>.</li><li>اقرأ الملف الأصلي في كتل (مثلاً 4096 بايت في المرة الواحدة) باستخدام <code>read(4096)</code>.</li><li>اكتب هذه ال<span class="smart-term" data-term-en="Chunk" data-ar="كتلة" data-en-def="A specific, manageable size of data (e.g., 4096 bytes) read into memory at one time to prevent memory overflow.">كتلة<span class="smart-term-tooltip"></span></span> في الملف الوجهة باستخدام حلقة <code>while</code> تستمر طالما أن الكتلة المقروءة ليست فارغة.</li></ol></template>
+    <template class="content-en"><p>Binary files (like images/videos) do not have lines of text, so <code>readline()</code> and <code>readlines()</code> cannot be used. They can also be huge.</p><p>To safely copy a binary file:</p><ol><li>Open the original file in read-binary mode <code>'rb'</code>.</li><li>Open (or create) the destination file in write-binary mode <code>'wb'</code>.</li><li>Read the original file in <span class="smart-term" data-term-en="Chunk" data-ar="كتلة" data-en-def="A specific, manageable size of data (e.g., 4096 bytes) read into memory at one time to prevent memory overflow.">chunk<span class="smart-term-tooltip"></span></span>s (e.g., 4096 bytes at a time) using <code>read(4096)</code>.</li><li>Write this chunk to the destination file using a <code>while</code> loop that continues as long as the chunk is not empty.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تحديد حجم الكتلة (Chunk size) يعتمد على توازن بين استهلاك الذاكرة وسرعة الإدخال/الإخراج (I/O). حجم 4KB أو 8KB يعتبر معياراً جيداً لمعظم أنظمة التشغيل.</p><p>هذه الطريقة تضمن أن البرنامج لن يستهلك أكثر من 4 كيلوبايت من الذاكرة في أي لحظة، بغض النظر عما إذا كان حجم الملف الأصلي 1 ميجابايت أو 10 جيجابايت.</p></template>
+    <template class="content-en"><p>Choosing the chunk size is a balance between memory consumption and I/O speed. 4KB or 8KB is a standard sweet spot for most operating systems.</p><p>This chunking method ensures the program never uses more than 4KB of RAM at any given time, regardless of whether the file is 1MB or 10GB.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>with open('image.jpg', 'rb') as original_file:
+    with open('image_copy.jpg', 'wb') as copy_to:
+        chunk = original_file.read(4096)
+        while len(chunk) &gt; 0:
+            copy_to.write(chunk)
+            chunk = original_file.read(4096)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا استخدمت الوضع 'r' بدلاً من 'rb' عند قراءة ملف صورة؟</template>
+      <template class="content-en">What will happen if you use 'r' mode instead of 'rb' when reading an image file?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحاول بايثون فك ترميز البايتات الثنائية كنص (غالباً باستخدام UTF-8)، مما سيؤدي فوراً إلى خطأ UnicodeDecodeError لأن البايتات لا تمثل أحرفاً نصية صالحة.</p></template>
+      <template class="content-en"><p>Python will attempt to decode the binary bytes as text (usually UTF-8), which will immediately raise a UnicodeDecodeError because the bytes do not represent valid text characters.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="conquering-csv-files" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التعامل مع ملفات CSV</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Conquering CSV Files</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ملفات CSV تخزن البيانات الجدولية مفصولة بفواصل، وتُستخدم مكتبة <code>csv</code> المدمجة في بايثون لتسهيل قراءتها ومعالجتها.</p></template>
+    <template class="content-en"><p>CSV files store tabular data separated by commas, and Python's built-in <code>csv</code> module makes reading and processing them easy.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>ملفات CSV (القيم المفصولة بفواصل) هي تنسيق واسع الانتشار لنقل البيانات الجدولية (الصفوف والأعمدة).</p><ul><li><b>الترويسة (Header):</b> الصف الأول غالباً ما يحتوي على أسماء الأعمدة.</li><li><b>علامات الاقتباس:</b> إذا كانت القيمة نفسها تحتوي على فاصلة (مثل <code>"Angst, Annie"</code>)، يتم وضعها بين علامتي تنصيص مزدوجتين لكي لا يعتبرها البرنامج عمودين منفصلين.</li></ul><p>لفتح ملف CSV، نستخدم <code>import csv</code> ثم <code>csv.reader(f)</code>. من الممارسات الجيدة إضافة <code>newline=''</code> في دالة <code>open()</code> لمنع قراءة أسطر فارغة إضافية.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="CSV" data-ar="قيم مفصولة بفواصل" data-en-def="Comma-Separated Values; a plain text format for storing tabular data.">CSV<span class="smart-term-tooltip"></span></span> (comma-separated values) is a widely used format for storing and transporting <span class="smart-term" data-term-en="Tabular Data" data-ar="بيانات جدولية" data-en-def="Data that can generally be displayed in a table format consisting of rows and columns.">tabular data<span class="smart-term-tooltip"></span></span> (rows and columns).</p><ul><li><b>Header:</b> The first row often contains column headings.</li><li><b>Quotation Marks:</b> If a value contains a comma (e.g., <code>"Angst, Annie"</code>), it is enclosed in double quotes so it isn't treated as a new column.</li></ul><p>To open a CSV, use <code>import csv</code> and <code>csv.reader(f)</code>. It is good practice to add <code>newline=''</code> to the <code>open()</code> statement to prevent reading extra blank lines.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مكتبة <code>csv</code> تتعامل تلقائياً مع تعقيدات علامات الاقتباس والفواصل الداخلية، وهو أمر سيكون صعباً جداً إذا حاولنا تقسيم السلاسل النصية يدوياً باستخدام <code>string.split(',')</code>.</p><p>عند قراءة البيانات من CSV، يتم استيراد كل شيء كسلاسل نصية (Strings). يجب عليك تحويل البيانات يدوياً إلى الأنواع المناسبة (int, float, bool, datetime) قبل استخدامها في العمليات الحسابية أو المنطقية.</p></template>
+    <template class="content-en"><p>The <code>csv</code> module automatically handles the complexities of quotes and internal commas, which would be very difficult if we tried to parse the strings manually using <code>string.split(',')</code>.</p><p>When reading from a CSV, everything is imported as strings. You must manually convert the data to appropriate Python types (int, float, bool, datetime) before using them in calculations or logic.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import csv
+with open('sample.csv', encoding='utf-8', newline='') as f:
+    reader = enumerate(csv.reader(f))
+    for i, row in reader:
+        if i &gt; 0: # Skip header row
+            print(row)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تتعامل مع قيمة في ملف CSV تحتوي على علامة اقتباس مفردة (فاصلة عليا) مثل 'O'Henry, Harry'؟</template>
+      <template class="content-en">How do you handle a value in a CSV file that contains a single quote (apostrophe) like 'O'Henry, Harry'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب إحاطة السلسلة النصية بأكملها بعلامات اقتباس مزدوجة في ملف الـ CSV الخام، لكي لا تتداخل الفاصلة العليا مع محددات النص.</p></template>
+      <template class="content-en"><p>The entire string must be enclosed in double quotation marks in the raw CSV file, so the apostrophe doesn't interfere with string delimiters.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="csv-data-conversion" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تحويل بيانات CSV إلى أنواع بايثون</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Converting CSV Data to Python Types</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظراً لأن ملفات CSV تخزن النصوص فقط، يجب استخدام دوال مثل <code>int()</code> و <code>float()</code> و <code>bool()</code> و <code>strptime()</code> لتحويل البيانات إلى أنواعها الصحيحة.</p></template>
+    <template class="content-en"><p>Since CSVs only store text, you must use functions like <code>int()</code>, <code>float()</code>, <code>bool()</code>, and <code>strptime()</code> to convert data to their proper types.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أثناء التكرار عبر صفوف CSV، يجب تنظيف وتحويل البيانات:</p><ul><li><b>الأعداد الصحيحة:</b> <code>int(row[1] or 0)</code> (استخدام <code>or 0</code> يمنع الأخطاء إذا كانت الخلية فارغة).</li><li><b>التواريخ:</b> استخدام وحدة <code>datetime</code>: <code>dt.datetime.strptime(row[2], "%m/%d/%Y").date()</code>.</li><li><b>القيم المنطقية (Boolean):</b> <code>bool(row[3])</code> (الخلايا الفارغة تعتبر False).</li><li><b>الأعداد العشرية (Floats):</b> يجب إزالة الرموز مثل <code>$</code> والفواصل قبل التحويل: <code>float(row[4].replace('$', '').replace(',', ''))</code>.</li></ul></template>
+    <template class="content-en"><p>While looping through CSV rows, data must be cleaned and converted:</p><ul><li><b>Integers:</b> <code>int(row[1] or 0)</code> (using <code>or 0</code> prevents errors on empty strings).</li><li><b>Dates:</b> Use the <code>datetime</code> module: <code>dt.datetime.strptime(row[2], "%m/%d/%Y").date()</code>.</li><li><b>Booleans:</b> <code>bool(row[3])</code> (empty cells evaluate to False).</li><li><b>Floats:</b> Must remove symbols like <code>$</code> and commas before conversion: <code>float(row[4].replace('$', '').replace(',', ''))</code>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام كتل <code>try...except</code> ضروري جداً عند تحويل البيانات من ملفات خارجية، لأن البيانات قد تكون تالفة أو غير متوافقة مع التنسيق المتوقع (مثل إدخال نص في حقل تاريخ)، مما سيؤدي إلى توقف البرنامج (Crash) إذا لم تتم معالجته.</p></template>
+    <template class="content-en"><p>Using <code>try...except</code> blocks is highly recommended when converting data from external files, as the data might be corrupted or improperly formatted (e.g., text in a date field), which would crash the program if unhandled.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفشل الدالة <code>float("$1,234.50")</code> في بايثون؟</template>
+      <template class="content-en">Why does the function <code>float("$1,234.50")</code> fail in Python?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن دالة float تتوقع أرقاماً ونقاط عشرية فقط. وجود علامة الدولار ($) والفاصلة (,) يجعل السلسلة غير قابلة للتحويل المباشر، ويجب إزالتها باستخدام <code>replace()</code> أولاً.</p></template>
+      <template class="content-en"><p>Because the float function expects only digits and a decimal point. The dollar sign ($) and comma (,) make the string invalid for direct conversion and must be removed using <code>replace()</code> first.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="csv-to-objects-dicts" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> تحويل CSV إلى كائنات وقواميس</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Converting from CSV to Objects and Dictionaries</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لتنظيم البيانات المستخرجة، يمكننا إنشاء فئة (Class) وتخزين كل صف كـ "كائن" (Object) داخل قائمة، أو تخزين كل صف كـ "قاموس" (Dictionary).</p></template>
+    <template class="content-en"><p>To organize extracted data, we can define a Class and store each row as an Object in a list, or store each row as a Dictionary.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بدلاً من التعامل مع متغيرات متناثرة، من الأفضل هيكلة البيانات:</p><ul><li><b>استخدام الكائنات (Objects):</b> نقوم بتعريف فئة <code>class Person:</code> تحتوي على دالة البناء <code>__init__</code> لتعيين الخصائص (الاسم، العمر، الرصيد...). أثناء قراءة الـ CSV، ننشئ كائناً جديداً لكل صف ونضيفه إلى قائمة <code>people = []</code>.</li><li><b>استخدام القواميس (Dictionaries):</b> بدلاً من الفئات، يمكننا إنشاء قاموس لكل صف حيث تكون المفاتيح هي أسماء الأعمدة والقيم هي البيانات المحولة، ثم نضيف هذا <span class="smart-term" data-term-en="Dictionary" data-ar="القاموس" data-en-def="A built-in Python data structure that stores data in key-value pairs.">القاموس<span class="smart-term-tooltip"></span></span> إلى قائمة أو قاموس رئيسي.</li></ul></template>
+    <template class="content-en"><p>Instead of dealing with loose variables, it's better to structure the data:</p><ul><li><b>Using Objects:</b> Define a <code>class Person:</code> with an <code>__init__</code> method to set attributes (name, age, balance...). While reading the CSV, instantiate a new object for each row and append it to a list <code>people = []</code>.</li><li><b>Using Dictionaries:</b> Alternatively, create a <span class="smart-term" data-term-en="Dictionary" data-ar="القاموس" data-en-def="A built-in Python data structure that stores data in key-value pairs.">dictionary<span class="smart-term-tooltip"></span></span> for each row where keys are column names and values are the converted data, then add this dictionary to a master list or dictionary.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام الكائنات (OOP) يوفر ميزة التحقق من صحة البيانات وإضافة دوال (Methods) خاصة بالكائن لاحقاً (مثل دالة لتحديث الرصيد). بينما القواميس أسرع في الإعداد وتتوافق بشكل ممتاز مع مكتبات تحليل البيانات مثل Pandas.</p></template>
+    <template class="content-en"><p>Using Objects (OOP) provides the advantage of data validation and adding object-specific methods later (like a method to update balance). Dictionaries, however, are faster to set up and map perfectly to data analysis libraries like Pandas.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Person:
+    def __init__(self, id, first_name, last_name):
+        self.id = id
+        self.first_name = first_name
+        self.last_name = last_name
+
+people = []
+# Inside CSV loop:
+# p = Person(id, fname, lname)
+# people.append(p)</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">متى تفضل استخدام القواميس على الكائنات لتخزين بيانات CSV؟</template>
+      <template class="content-en">When would you prefer using dictionaries over objects to store CSV data?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أفضل القواميس إذا كانت البيانات بسيطة، ولا تحتاج إلى سلوكيات (دوال) معقدة مرتبطة بها، أو إذا كنت أخطط لتمرير هذه البيانات مباشرة إلى إطار عمل مثل JSON أو Pandas.</p></template>
+      <template class="content-en"><p>I would prefer dictionaries if the data is simple, doesn't require complex associated behaviors (methods), or if I plan to pass the data directly to a framework like JSON or Pandas.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أن برامجكم هي مصانع، والملفات الخارجية هي المواد الخام التي تدخل المصنع والمنتجات التي تخرج منه. بدون القدرة على قراءة وكتابة الملفات، ستفقد برامجكم ذاكرتها بمجرد إغلاقها! ركزوا جيداً على الفرق بين الملفات النصية (التي نقرأها نحن) والملفات الثنائية (التي تقرأها الآلة). في الامتحان، غالباً ما أختبر فهمكم لأوضاع فتح الملفات: تذكروا أن 'w' يمسح و 'a' يضيف. ولا تنسوا أبداً استخدام 'with' لفتح الملفات، فهي الممارسة الاحترافية التي تحميكم من تسرب الموارد. أخيراً، ملفات CSV هي لغة البيانات في عالم الأعمال؛ تدربوا جيداً على كيفية تنظيف البيانات المستخرجة منها (مثل إزالة علامة الدولار) وتحويلها إلى كائنات أو قواميس. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this crucial module. Imagine your programs are factories, and external files are the raw materials entering and the products leaving. Without file I/O, your programs lose their memory the moment they close! Focus heavily on the difference between text files (for us) and binary files (for machines). In the exam, I often test your understanding of file modes: remember 'w' wipes and 'a' appends. Never forget to use 'with' to open files; it's the professional practice that prevents resource leaks. Finally, CSV files are the language of data in the business world; practice how to clean extracted data (like removing dollar signs) and convert them into objects or dictionaries. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق الأساسي بين الملف النصي والملف الثنائي؟</template>
+          <template class="content-en">What is the fundamental difference between a text file and a binary file?</template>
+          <span class="content-target">ما الفرق الأساسي بين الملف النصي والملف الثنائي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الملف النصي يحتوي على أحرف قابلة للقراءة البشرية (مثل الكود المصدري أو ملفات txt)، بينما الملف الثنائي يحتوي على بايتات مخصصة للآلة (مثل الصور والبرامج التنفيذية) وتظهر كرموز غير مفهومة إذا فتحت في محرر نصوص.</template>
+          <template class="content-en">A text file contains human-readable characters (like source code or txt files), while a binary file contains machine-specific bytes (like images and executables) and appears as gobbledygook in a text editor.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل استخدام <code>with open(...) as f:</code> بدلاً من <code>f = open(...)</code>؟</template>
+          <template class="content-en">Why do we prefer using <code>with open(...) as f:</code> instead of <code>f = open(...)</code>?</template>
+          <span class="content-target">لماذا نفضل استخدام <code>with open(...) as f:</code> بدلاً من <code>f = open(...)</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن استخدام <code>with</code> (مدير السياق) يضمن إغلاق الملف تلقائياً وتحرير موارد النظام بمجرد انتهاء الكتلة البرمجية، حتى لو حدث خطأ (Exception) أثناء التنفيذ.</template>
+          <template class="content-en">Because using <code>with</code> (context manager) ensures the file is automatically closed and system resources are released once the block finishes, even if an exception occurs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يجب أن أستخدم <code>readline()</code> بدلاً من <code>readlines()</code>؟</template>
+          <template class="content-en">When should I use <code>readline()</code> instead of <code>readlines()</code>?</template>
+          <span class="content-target">متى يجب أن أستخدم <code>readline()</code> بدلاً من <code>readlines()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">استخدم <code>readline()</code> عندما تتعامل مع ملفات ضخمة جداً لا تتسع في الذاكرة العشوائية (RAM). <code>readlines()</code> تحمل الملف كاملاً للذاكرة، بينما <code>readline()</code> تقرأ سطراً واحداً في كل مرة.</template>
+          <template class="content-en">Use <code>readline()</code> when dealing with massive files that won't fit in RAM. <code>readlines()</code> loads the entire file into memory, while <code>readline()</code> reads only one line at a time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي وظيفة الدالة <code>tell()</code>؟</template>
+          <template class="content-en">What is the function of the <code>tell()</code> method?</template>
+          <span class="content-target">ما هي وظيفة الدالة <code>tell()</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُرجع الدالة <code>tell()</code> الموضع الحالي (رقم البايت أو الحرف) لمؤشر القراءة/الكتابة داخل الملف.</template>
+          <template class="content-en">The <code>tell()</code> method returns the current position (byte or character index) of the read/write pointer within the file.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكنني إعادة قراءة ملف من البداية دون إغلاقه وفتحه مرة أخرى؟</template>
+          <template class="content-en">How can I re-read a file from the beginning without closing and reopening it?</template>
+          <span class="content-target">كيف يمكنني إعادة قراءة ملف من البداية دون إغلاقه وفتحه مرة أخرى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">باستخدام الدالة <code>seek(0)</code>، والتي تقوم بنقل مؤشر الملف عائداً إلى الموضع صفر (بداية الملف).</template>
+          <template class="content-en">By using the <code>seek(0)</code> method, which moves the file pointer back to position zero (the start of the file).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نتجنب استهلاك الذاكرة عند نسخ ملف ثنائي ضخم (مثل فيديو)؟</template>
+          <template class="content-en">How do we avoid memory consumption when copying a huge binary file (like a video)?</template>
+          <span class="content-target">كيف نتجنب استهلاك الذاكرة عند نسخ ملف ثنائي ضخم (مثل فيديو)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">عن طريق قراءة وكتابة الملف على شكل "كتل" (Chunks) صغيرة (مثلاً 4096 بايت) باستخدام حلقة <code>while</code>، بدلاً من قراءة الملف بأكمله دفعة واحدة.</template>
+          <template class="content-en">By reading and writing the file in small "chunks" (e.g., 4096 bytes) using a <code>while</code> loop, instead of reading the entire file at once.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم <code>encoding='utf-8'</code> عند فتح بعض الملفات النصية؟</template>
+          <template class="content-en">Why do we use <code>encoding='utf-8'</code> when opening some text files?</template>
+          <span class="content-target">لماذا نستخدم <code>encoding='utf-8'</code> عند فتح بعض الملفات النصية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لضمان قراءة الأحرف الخاصة واللغات غير الإنجليزية (مثل العربية) بشكل صحيح، ولتجنب أخطاء فك الترميز (UnicodeDecodeError).</template>
+          <template class="content-en">To ensure special characters and non-English languages (like Arabic) are read correctly, and to avoid UnicodeDecodeError.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في ملف CSV، كيف يفرق المحلل بين الفاصلة التي تفصل الأعمدة والفاصلة التي هي جزء من النص؟</template>
+          <template class="content-en">In a CSV file, how does the parser differentiate between a column-separating comma and a comma that is part of the text?</template>
+          <span class="content-target">في ملف CSV، كيف يفرق المحلل بين الفاصلة التي تفصل الأعمدة والفاصلة التي هي جزء من النص؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">النص الذي يحتوي على فاصلة داخلية يجب أن يُحاط بعلامات اقتباس مزدوجة (مثل "Smith, John"). مكتبة <code>csv</code> في بايثون تتعامل مع هذا تلقائياً.</template>
+          <template class="content-en">Text containing an internal comma must be enclosed in double quotes (e.g., "Smith, John"). Python's <code>csv</code> module handles this automatically.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى تحويل البيانات المستخرجة من ملف CSV؟</template>
+          <template class="content-en">Why do we need to convert data extracted from a CSV file?</template>
+          <span class="content-target">لماذا نحتاج إلى تحويل البيانات المستخرجة من ملف CSV؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن جميع البيانات في ملف CSV تُقرأ كسلاسل نصية (Strings). إذا أردنا إجراء عمليات حسابية، يجب تحويلها إلى أرقام (int أو float) باستخدام دوال التحويل.</template>
+          <template class="content-en">Because all data in a CSV file is read as strings. If we want to perform calculations, we must convert them to numbers (int or float) using conversion functions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الفائدة من تحويل صفوف CSV إلى كائنات (Objects) بدلاً من تركها كقوائم؟</template>
+          <template class="content-en">What is the benefit of converting CSV rows into Objects rather than leaving them as lists?</template>
+          <span class="content-target">ما هي الفائدة من تحويل صفوف CSV إلى كائنات (Objects) بدلاً من تركها كقوائم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تحويلها إلى كائنات (باستخدام الفئات Classes) يجعل الكود أكثر تنظيماً وقابلية للقراءة، ويسمح بالوصول للبيانات عبر أسماء الخصائص (مثل <code>person.age</code>) بدلاً من الفهارس الرقمية المبهمة (مثل <code>row[2]</code>).</template>
+          <template class="content-en">Converting them to objects (using Classes) makes the code more organized and readable, allowing data access via attribute names (like <code>person.age</code>) instead of obscure numeric indices (like <code>row[2]</code>).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الملف النصي (Text File)",
+      "en": "Text File"
+    },
+    "back": {
+      "definition": {
+        "ar": "ملف يحتوي على أحرف نصية عادية قابلة للقراءة البشرية.",
+        "en": "A file containing plain text characters, readable by humans."
+      },
+      "example": {
+        "ar": "ملفات .txt, .csv, .py",
+        "en": ".txt, .csv, .py files"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "الملف الثنائي (Binary File)",
+      "en": "Binary File"
+    },
+    "back": {
+      "definition": {
+        "ar": "ملف يخزن المعلومات في بايتات غير قابلة للقراءة البشرية المباشرة.",
+        "en": "A file storing information in bytes that aren’t human-readable."
+      },
+      "example": {
+        "ar": "ملفات .exe, .jpg, .mp4",
+        "en": ".exe, .jpg, .mp4 files"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "الوضع 'r'",
+      "en": "'r' Mode"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع القراءة فقط. وهو الوضع الافتراضي عند فتح ملف.",
+        "en": "Read-only mode. It is the default mode when opening a file."
+      },
+      "example": {
+        "ar": "open('file.txt', 'r')",
+        "en": "open('file.txt', 'r')"
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "الوضع 'w'",
+      "en": "'w' Mode"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع الكتابة. يمسح محتوى الملف إذا كان موجوداً، أو ينشئه إذا لم يكن موجوداً.",
+        "en": "Write mode. Overwrites the file if it exists, or creates it if it doesn't."
+      },
+      "example": {
+        "ar": "open('file.txt', 'w')",
+        "en": "open('file.txt', 'w')"
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "الوضع 'a'",
+      "en": "'a' Mode"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع الإضافة. يضيف البيانات إلى نهاية الملف دون مسح المحتوى القديم.",
+        "en": "Append mode. Adds data to the end of the file without overwriting existing content."
+      },
+      "example": {
+        "ar": "open('file.txt', 'a')",
+        "en": "open('file.txt', 'a')"
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "الوضع 'x'",
+      "en": "'x' Mode"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع الإنشاء. ينشئ ملفاً جديداً، ويثير خطأ إذا كان الملف موجوداً بالفعل.",
+        "en": "Create mode. Creates a new file, raises an error if the file already exists."
+      },
+      "example": {
+        "ar": "open('file.txt', 'x')",
+        "en": "open('file.txt', 'x')"
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "الوضع 'b'",
+      "en": "'b' Mode"
+    },
+    "back": {
+      "definition": {
+        "ar": "الوضع الثنائي. يُستخدم لقراءة أو كتابة الملفات الثنائية.",
+        "en": "Binary mode. Used to read or write binary files."
+      },
+      "example": {
+        "ar": "open('image.jpg', 'rb')",
+        "en": "open('image.jpg', 'rb')"
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الكلمة المفتاحية with",
+      "en": "with statement"
+    },
+    "back": {
+      "definition": {
+        "ar": "مدير سياق يضمن إغلاق الملف تلقائياً بعد الانتهاء من استخدامه.",
+        "en": "A context manager that ensures the file is automatically closed after use."
+      },
+      "example": {
+        "ar": "with open('file.txt') as f:",
+        "en": "with open('file.txt') as f:"
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ترميز UTF-8",
+      "en": "UTF-8 Encoding"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنسيق قياسي لتمثيل الأحرف والأرقام من لغات متعددة لتجنب أخطاء الترميز.",
+        "en": "A standard format to represent characters and numbers from multiple languages to avoid encoding errors."
+      },
+      "example": {
+        "ar": "open('file.txt', encoding='utf-8')",
+        "en": "open('file.txt', encoding='utf-8')"
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "الدالة read()",
+      "en": "read() method"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقرأ محتوى الملف بأكمله ككتلة واحدة (سلسلة نصية واحدة).",
+        "en": "Reads the entire file content as one big chunk (a single string)."
+      },
+      "example": {
+        "ar": "content = f.read()",
+        "en": "content = f.read()"
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "الدالة readlines()",
+      "en": "readlines() method"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقرأ جميع أسطر الملف وتخزنها كعناصر داخل قائمة (List).",
+        "en": "Reads all lines of a file and stores them as items in a list."
+      },
+      "example": {
+        "ar": "lines_list = f.readlines()",
+        "en": "lines_list = f.readlines()"
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "الدالة readline()",
+      "en": "readline() method"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقرأ سطراً واحداً فقط من الملف في كل مرة، مما يوفر الذاكرة.",
+        "en": "Reads only one line from the file at a time, saving memory."
+      },
+      "example": {
+        "ar": "one_line = f.readline()",
+        "en": "one_line = f.readline()"
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "الدالة tell()",
+      "en": "tell() method"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُرجع الموضع الحالي لمؤشر القراءة/الكتابة داخل الملف.",
+        "en": "Returns the current position of the read/write pointer within the file."
+      },
+      "example": {
+        "ar": "position = f.tell()",
+        "en": "position = f.tell()"
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الدالة seek()",
+      "en": "seek() method"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُستخدم لتغيير موضع المؤشر داخل الملف إلى مكان محدد.",
+        "en": "Used to reposition the pointer within the file to a specific location."
+      },
+      "example": {
+        "ar": "f.seek(0) # العودة للبداية",
+        "en": "f.seek(0) # Move to start"
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "مكتبة csv",
+      "en": "csv module"
+    },
+    "back": {
+      "definition": {
+        "ar": "مكتبة مدمجة في بايثون تسهل قراءة وكتابة ملفات القيم المفصولة بفواصل.",
+        "en": "A built-in Python module that makes reading and writing comma-separated values files easy."
+      },
+      "example": {
+        "ar": "import csv\nreader = csv.reader(f)",
+        "en": "import csv\nreader = csv.reader(f)"
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "ما هو الوضع الافتراضي عند استخدام الدالة <code>open()</code> بدون تحديد وضع؟",
+      "en": "What is the default mode when using the <code>open()</code> function without specifying a mode?"
+    },
+    "options": {
+      "ar": [
+        "w (الكتابة)",
+        "a (الإضافة)",
+        "r (القراءة)",
+        "x (الإنشاء)"
+      ],
+      "en": [
+        "w (Write)",
+        "a (Append)",
+        "r (Read)",
+        "x (Create)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إذا لم تحدد وضعاً، يفترض بايثون أنك تريد قراءة الملف فقط (الوضع 'r').",
+      "en": "If you don't specify a mode, Python assumes you only want to read the file ('r' mode)."
+    },
+    "hint": {
+      "ar": "إنه الوضع الأكثر أماناً لأنه لا يغير محتويات الملف.",
+      "en": "It's the safest mode because it doesn't alter the file's contents."
+    },
+    "difficulty": "easy",
+    "conceptId": "opening-closing-files"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "أي من الدوال التالية تقرأ الملف بأكمله وتخزن كل سطر كعنصر في قائمة (List)؟",
+      "en": "Which of the following methods reads the entire file and stores each line as an item in a list?"
+    },
+    "options": {
+      "ar": [
+        "read()",
+        "readline()",
+        "readlines()",
+        "read_all()"
+      ],
+      "en": [
+        "read()",
+        "readline()",
+        "readlines()",
+        "read_all()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الدالة <code>readlines()</code> تقرأ الملف كاملاً وتقسمه إلى أسطر داخل قائمة.",
+      "en": "The <code>readlines()</code> method reads the entire file and splits it into lines within a list."
+    },
+    "hint": {
+      "ar": "ابحث عن الكلمة التي تدل على الجمع (lines).",
+      "en": "Look for the plural word (lines)."
+    },
+    "difficulty": "easy",
+    "conceptId": "reading-file-contents"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "لماذا يُعتبر استخدام <code>readlines()</code> خطيراً مع الملفات الضخمة؟",
+      "en": "Why is using <code>readlines()</code> considered risky with huge files?"
+    },
+    "options": {
+      "ar": [
+        "لأنه يمسح محتويات الملف.",
+        "لأنه يحمل الملف بأكمله إلى الذاكرة (RAM) مما قد يسبب انهيار البرنامج.",
+        "لأنه يقرأ السطر الأول فقط.",
+        "لأنه لا يدعم ترميز UTF-8."
+      ],
+      "en": [
+        "Because it deletes the file contents.",
+        "Because it loads the entire file into RAM, which can crash the program.",
+        "Because it only reads the first line.",
+        "Because it doesn't support UTF-8 encoding."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تحميل ملف بحجم جيجابايت في قائمة سيستهلك كل الذاكرة المتاحة ويؤدي إلى توقف البرنامج.",
+      "en": "Loading a gigabyte-sized file into a list will consume all available memory and crash the program."
+    },
+    "hint": {
+      "ar": "فكر في سعة الذاكرة العشوائية لجهاز الكمبيوتر.",
+      "en": "Think about the computer's RAM capacity."
+    },
+    "difficulty": "medium",
+    "conceptId": "reading-file-contents"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي الدالة المستخدمة لمعرفة الموضع الحالي للمؤشر داخل الملف؟",
+      "en": "Which method is used to find the current position of the pointer inside a file?"
+    },
+    "options": {
+      "ar": [
+        "seek()",
+        "find()",
+        "tell()",
+        "position()"
+      ],
+      "en": [
+        "seek()",
+        "find()",
+        "tell()",
+        "position()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الدالة <code>tell()</code> تخبرك بموقع المؤشر الحالي بالبايتات أو الأحرف.",
+      "en": "The <code>tell()</code> method tells you the current pointer location in bytes or characters."
+    },
+    "hint": {
+      "ar": "الكلمة تعني \"أخبرني\".",
+      "en": "The word means 'inform me'."
+    },
+    "difficulty": "medium",
+    "conceptId": "file-pointers"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "عند نسخ ملف ثنائي (مثل صورة)، ما هو الوضع الصحيح لفتح الملف الأصلي؟",
+      "en": "When copying a binary file (like an image), what is the correct mode to open the original file?"
+    },
+    "options": {
+      "ar": [
+        "'r'",
+        "'w'",
+        "'rb'",
+        "'wb'"
+      ],
+      "en": [
+        "'r'",
+        "'w'",
+        "'rb'",
+        "'wb'"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يجب استخدام 'rb' (Read Binary) لقراءة الملفات الثنائية.",
+      "en": "You must use 'rb' (Read Binary) to read binary files."
+    },
+    "hint": {
+      "ar": "تحتاج إلى القراءة (r) في الوضع الثنائي (b).",
+      "en": "You need to read (r) in binary (b) mode."
+    },
+    "difficulty": "easy",
+    "conceptId": "reading-copying-binary"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما هي الفائدة الرئيسية لاستخدام الكلمة المفتاحية <code>with</code> عند فتح الملفات؟",
+      "en": "What is the main benefit of using the <code>with</code> keyword when opening files?"
+    },
+    "options": {
+      "ar": [
+        "تسرع عملية القراءة.",
+        "تغلق الملف تلقائياً حتى في حالة حدوث خطأ.",
+        "تقوم بفك تشفير الملفات الثنائية.",
+        "تمنع المستخدمين الآخرين من فتح الملف."
+      ],
+      "en": [
+        "It speeds up the reading process.",
+        "It automatically closes the file even if an error occurs.",
+        "It decrypts binary files.",
+        "It prevents other users from opening the file."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مدير السياق <code>with</code> يضمن تحرير الموارد وإغلاق الملف بمجرد انتهاء الكتلة البرمجية التابعة له.",
+      "en": "The <code>with</code> context manager ensures resources are released and the file is closed once its block finishes."
+    },
+    "hint": {
+      "ar": "يغنيك عن كتابة <code>f.close()</code>.",
+      "en": "It saves you from writing <code>f.close()</code>."
+    },
+    "difficulty": "medium",
+    "conceptId": "opening-closing-files"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في ملفات CSV، كيف يتم التعامل مع البيانات التي تحتوي على فاصلة (,) بداخلها؟",
+      "en": "In CSV files, how is data containing an internal comma (,) handled?"
+    },
+    "options": {
+      "ar": [
+        "يتم استبدال الفاصلة بنقطة.",
+        "يتم تجاهل الفاصلة.",
+        "يتم إحاطة القيمة بعلامات اقتباس مزدوجة (\"\").",
+        "لا يمكن استخدام الفواصل داخل بيانات CSV."
+      ],
+      "en": [
+        "The comma is replaced by a dot.",
+        "The comma is ignored.",
+        "The value is enclosed in double quotation marks (\"\").",
+        "Commas cannot be used inside CSV data."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "علامات الاقتباس المزدوجة تخبر المحلل (Parser) أن الفاصلة هي جزء من النص وليست فاصلاً بين الأعمدة.",
+      "en": "Double quotes tell the parser that the comma is part of the text, not a column separator."
+    },
+    "hint": {
+      "ar": "كيف تخبر البرنامج أن هذه الكلمتين هما شيء واحد؟",
+      "en": "How do you tell the program these two words are one thing?"
+    },
+    "difficulty": "medium",
+    "conceptId": "conquering-csv-files"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "إذا أردت تحويل السلسلة النصية ' $1,234.56 ' إلى رقم عشري (Float)، ما هي الخطوة الأولى؟",
+      "en": "If you want to convert the string ' $1,234.56 ' to a float, what is the first step?"
+    },
+    "options": {
+      "ar": [
+        "استخدام float() مباشرة.",
+        "إزالة علامة الدولار والفاصلة باستخدام replace().",
+        "استخدام int() ثم القسمة على 100.",
+        "استخدام مكتبة csv.float()."
+      ],
+      "en": [
+        "Use float() directly.",
+        "Remove the dollar sign and comma using replace().",
+        "Use int() then divide by 100.",
+        "Use the csv.float() module."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة <code>float()</code> لا تفهم الرموز مثل $ أو الفواصل، لذا يجب إزالتها أولاً لتصبح السلسلة '1234.56'.",
+      "en": "The <code>float()</code> function doesn't understand symbols like $ or commas, so they must be removed first to make the string '1234.56'."
+    },
+    "hint": {
+      "ar": "يجب تنظيف النص من الرموز غير الرقمية.",
+      "en": "You must clean the text of non-numeric symbols."
+    },
+    "difficulty": "hard",
+    "conceptId": "csv-data-conversion"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو الغرض من إضافة <code>newline=''</code> عند فتح ملف CSV؟",
+      "en": "What is the purpose of adding <code>newline=''</code> when opening a CSV file?"
+    },
+    "options": {
+      "ar": [
+        "لمنع قراءة أسطر فارغة إضافية في بعض أنظمة التشغيل.",
+        "لتحويل الملف إلى سطر واحد.",
+        "لحذف الأسطر الفارغة من الملف الأصلي.",
+        "لتسريع عملية القراءة."
+      ],
+      "en": [
+        "To prevent reading extra blank lines on some operating systems.",
+        "To convert the file into a single line.",
+        "To delete blank lines from the original file.",
+        "To speed up the reading process."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "في بعض الأنظمة (مثل ويندوز)، قد تؤدي قراءة CSV بدون <code>newline=''</code> إلى ظهور أسطر فارغة بين كل صف بيانات.",
+      "en": "On some systems (like Windows), reading a CSV without <code>newline=''</code> can result in blank lines appearing between each data row."
+    },
+    "hint": {
+      "ar": "يتعلق الأمر بكيفية ترجمة أنظمة التشغيل المختلفة لنهايات الأسطر.",
+      "en": "It relates to how different OS translate line endings."
+    },
+    "difficulty": "hard",
+    "conceptId": "conquering-csv-files"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "كيف يمكنك تخطي صف الترويسة (Header) عند قراءة ملف CSV باستخدام حلقة for؟",
+      "en": "How can you skip the header row when reading a CSV file using a for loop?"
+    },
+    "options": {
+      "ar": [
+        "استخدام <code>if i > 0:</code> إذا كنت تستخدم <code>enumerate()</code>.",
+        "حذف الصف الأول من الملف قبل فتحه.",
+        "استخدام <code>reader.skip()</code>.",
+        "مكتبة csv تتخطى الترويسة تلقائياً."
+      ],
+      "en": [
+        "Use <code>if i > 0:</code> if you are using <code>enumerate()</code>.",
+        "Delete the first row from the file before opening it.",
+        "Use <code>reader.skip()</code>.",
+        "The csv module skips the header automatically."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "باستخدام <code>enumerate()</code>، يحصل الصف الأول (الترويسة) على الفهرس 0. الشرط <code>if i > 0:</code> يضمن معالجة صفوف البيانات فقط.",
+      "en": "Using <code>enumerate()</code>, the first row (header) gets index 0. The condition <code>if i > 0:</code> ensures only data rows are processed."
+    },
+    "hint": {
+      "ar": "الترويسة هي دائماً الصف رقم 0.",
+      "en": "The header is always row number 0."
+    },
+    "difficulty": "medium",
+    "conceptId": "conquering-csv-files"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام الوضع 'w' لفتح ملف موجود بغرض إضافة سطر جديد. هذا فخ! الوضع 'w' سيمسح كل محتويات الملف القديمة. استخدم الوضع 'a' للإضافة.</template>
+    <template class="content-en">Using 'w' mode to open an existing file to add a new line. This is a trap! 'w' mode will erase all old contents. Use 'a' mode to append.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استخدام <code>readlines()</code> مع ملفات السجلات (Log files) الضخمة. هذا سيؤدي إلى استهلاك كامل للذاكرة (RAM) وانهيار البرنامج. استخدم حلقة <code>for line in file:</code> بدلاً من ذلك.</template>
+    <template class="content-en">Using <code>readlines()</code> with huge log files. This will consume all RAM and crash the program. Use a <code>for line in file:</code> loop instead.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند قراءة ملفات CSV، كل البيانات تُستخرج كنصوص (Strings) حتى لو كانت أرقاماً. لا تنسَ تحويلها باستخدام <code>int()</code> أو <code>float()</code> قبل إجراء العمليات الحسابية.</template>
+    <template class="content-en">When reading CSV files, all data is extracted as strings, even numbers. Don't forget to convert them using <code>int()</code> or <code>float()</code> before performing calculations.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مدير السياق <code>with</code> هو أفضل صديق لك عند التعامل مع الملفات. فهو يضمن إغلاق الملف وتحرير الموارد بشكل آمن حتى لو توقف البرنامج بسبب خطأ برمجي.</template>
+    <template class="content-en">The <code>with</code> context manager is your best friend when handling files. It ensures the file is closed and resources are safely released even if the program crashes due to an error.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">محاولة قراءة ملف ثنائي (مثل صورة) باستخدام الوضع 'r' العادي. سيؤدي هذا إلى خطأ <code>UnicodeDecodeError</code>. يجب دائماً استخدام 'rb' للملفات الثنائية.</template>
+    <template class="content-en">Trying to read a binary file (like an image) using the normal 'r' mode. This will result in a <code>UnicodeDecodeError</code>. Always use 'rb' for binary files.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M08.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M10.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 4 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>
