@@ -979,6 +979,32 @@ release(aSemaphore)
 end Teller;</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Ada</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>task body Buf_Task is
+ Bufsize : constant Integer := 100;
+ Buf : array (1..Bufsize) of Integer;
+ Filled : Integer range 0..Bufsize := 0;
+ Next_In, Next_Out : Integer range 1..Bufsize := 1;
+begin
+ loop
+  select
+   when Filled &lt; Bufsize =&gt;
+    accept Deposit(Item : in Integer) do
+     Buf(Next_In) := Item;
+    end Deposit;
+    Next_In := (Next_In mod Bufsize) + 1;
+    Filled := Filled + 1;
+  or
+   -- other accept clauses
+  end select;
+ end loop;
+end Buf_Task;</code></pre>
+  </div>
+
   <!-- DIAGRAM[1]: Detailed SVG generation prompt: A timeline diagram showing 'Rendezvous Time Lines'. Two scenarios: (a) TASK_EXAMPLE waits for SENDER. TASK_EXAMPLE reaches 'Wait at accept', SENDER reaches 'Sends message', they join for 'Rendezvous', then both 'Continue execution'. (b) SENDER waits for TASK_EXAMPLE. SENDER reaches 'Sends message and is suspended', TASK_EXAMPLE is 'Busy', then reaches 'Accept', they join for 'Rendezvous', then both continue. Style: educational, dark background #0d1117, accent color #3fb950, viewBox 0 0 800 500, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
@@ -1191,8 +1217,8 @@ myTh.start();</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تعتمد خيوط C# بشكل فضفاض على جافا ولكن مع اختلافات كبيرة. يمكن لأي دالة أن تعمل في خيط خاص بها. يتم إنشاء الخيط عبر كائن <code>Thread</code> ويبدأ تنفيذه بواسطة دالة <code>Start</code>.</p><p>توفر C# ثلاث طرق رئيسية للمزامنة:</p><ol><li><strong>فئة <code><span class="smart-term" data-term-en="Interlocked" data-ar="المتشابك (فئة C#)" data-en-def="A C# class used when the only operations that need to be synchronized are incrementing or decrementing an integer.">Interlocked<span class="smart-term-tooltip"></span></span></code>&lt;/strong&gt; — (للعمليات البسيطة مثل زيادة/نقصان الأعداد الصحيحة).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;جملة <code>lock</code>&lt;/strong&gt; — (لتحديد قسم حرج من الكود، مشابهة لـ synchronized في جافا).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;فئة <code>Monitor</code></strong> — (توفر مزامنة أكثر تعقيدًا).</li></ol></template>
-    <template class="content-en"><p>C# threads are loosely based on Java but have significant differences. Any method can run in its own thread. A thread is created via a <code>Thread</code> object and started with the <code>Start</code> method.</p><p>C# provides three main ways to synchronize threads:</p><ol><li><strong>The <code><span class="smart-term" data-term-en="Interlocked" data-ar="المتشابك (فئة C#)" data-en-def="A C# class used when the only operations that need to be synchronized are incrementing or decrementing an integer.">Interlocked<span class="smart-term-tooltip"></span></span></code> class&lt;/strong&gt; — (for simple integer increment/decrement).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;The <code>lock</code> statement&lt;/strong&gt; — (to mark a critical section of code, similar to Java's synchronized).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;The <code>Monitor</code> class</strong> — (provides more sophisticated synchronization).</li></ol></template>
+    <template class="content-ar"><p>تعتمد خيوط C# بشكل فضفاض على جافا ولكن مع اختلافات كبيرة. يمكن لأي دالة أن تعمل في خيط خاص بها. يتم إنشاء الخيط عبر كائن <code>Thread</code> ويبدأ تنفيذه بواسطة دالة <code>Start</code>.</p><p>توفر C# ثلاث طرق رئيسية للمزامنة:</p><ol><li><strong>فئة <code><span class="smart-term" data-term-en="Interlocked" data-ar="المتشابك (فئة C#)" data-en-def="A C# class used when the only operations that need to be synchronized are incrementing or decrementing an integer.">Interlocked<span class="smart-term-tooltip"></span></span></code>&lt;/strong&gt; — (للعمليات البسيطة مثل زيادة/نقصان الأعداد الصحيحة).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;جملة <code>lock</code>&lt;/strong&gt; — (لتحديد قسم حرج من الكود، مشابهة لـ synchronized في جافا).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;فئة <code>Monitor</code></strong> — (توفر مزامنة أكثر تعقيدًا).</li></ol><p>للتحكم في تنفيذ الخيوط في C#، توفر فئة <code>Thread</code> عدة دوال أساسية:</p><ol><li><b><code>Start</code></b> — لطلب بدء التنفيذ المتزامن للخيط (إنشاء الخيط لا يبدأ تنفيذه تلقائياً).</li><li><b><code>Join</code></b> — لجعل خيط ينتظر حتى ينتهي خيط آخر من التنفيذ.</li><li><b><code>Sleep</code></b> — لتعليق (Suspend) الخيط لفترة زمنية محددة.</li><li><b><code>Abort</code></b> — لإنهاء الخيط بشكل نظيف.</li></ol></template>
+    <template class="content-en"><p>C# threads are loosely based on Java but have significant differences. Any method can run in its own thread. A thread is created via a <code>Thread</code> object and started with the <code>Start</code> method.</p><p>C# provides three main ways to synchronize threads:</p><ol><li><strong>The <code><span class="smart-term" data-term-en="Interlocked" data-ar="المتشابك (فئة C#)" data-en-def="A C# class used when the only operations that need to be synchronized are incrementing or decrementing an integer.">Interlocked<span class="smart-term-tooltip"></span></span></code> class&lt;/strong&gt; — (for simple integer increment/decrement).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;The <code>lock</code> statement&lt;/strong&gt; — (to mark a critical section of code, similar to Java's synchronized).&lt;/li&gt;&lt;li&gt;&lt;strong&gt;The <code>Monitor</code> class</strong> — (provides more sophisticated synchronization).</li></ol><p>To control thread execution in C#, the <code>Thread</code> class provides several basic operations:</p><ol><li><b><code>Start</code></b> — to request the concurrent execution of the thread (creating a thread does not start it).</li><li><b><code>Join</code></b> — to make a thread wait for another thread to finish.</li><li><b><code>Sleep</code></b> — to suspend the thread for a specified time.</li><li><b><code>Abort</code></b> — to terminate the thread cleanly.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1279,8 +1305,8 @@ FORALL (index = 1:1000)
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الأسبوع الحادي عشر. اليوم ندخل عالم 'التزامن' (Concurrency)، وهو من أهم وأعقد المواضيع في علوم الحاسب. تخيل أنك طاهٍ في مطبخ؛ إذا كنت وحدك وتقوم بتقطيع البصل ثم تحريك الحساء بسرعة، فهذا 'تزامن منطقي'. أما إذا كان معك طهاة آخرون يعملون في نفس الوقت، فهذا 'تزامن مادي'. التحدي الأكبر عندما يحتاج طاهيان لنفس السكين (تزامن التنافس) أو عندما ينتظر طاهٍ زميله ليقشر البطاطس قبل أن يقليها (تزامن التعاون). لحل هذه المشاكل، اخترعنا أدوات: 'السيمافورات' وهي مثل إشارات المرور، لكنها عرضة للخطأ البشري. ثم جاءت 'المراقبون' (Monitors) لتوفر غرفاً مغلقة تضمن دخول شخص واحد فقط تلقائياً. وتعرفنا أيضاً على 'تمرير الرسائل' (Rendezvous) كطريقة تواصل راقية. في الامتحان، ركزوا جيداً على التمييز بين التعاون والتنافس، وافهموا كيف تطبق لغات مثل Java و C# هذه المفاهيم (مثل الكلمة المفتاحية synchronized و lock). ولا تنسوا أن التزامن يمكن أن يحدث حتى على مستوى الجملة البرمجية كما في لغة HPF.<p>لقد استكملنا الآن الصورة الشاملة للتزامن. من فهم المعماريات الأساسية (SIMD و MIMD) ومستويات التزامن الأربعة، إلى إدراك القضايا التصميمية الجوهرية التي تواجه مصممي اللغات. كما رأينا كيف تطورت لغة Ada بتقديم الكائنات المحمية لتحسين كفاءة الذاكرة المشتركة، وكيف تدير جافا أولويات الخيوط. هذه التفاصيل الدقيقة هي ما يميز المبرمج المحترف القادر على اختيار الأداة المناسبة لكل بيئة متزامنة.</p></template>
-    <template class="content-en">Welcome to Module 12. Today we enter the world of Concurrency, one of the most critical and complex topics in computer science. Imagine a kitchen: one chef rapidly switching between chopping onions and stirring soup is 'logical concurrency'. Multiple chefs working simultaneously is 'physical concurrency'. The real challenge arises when two chefs need the same knife (Competition Synchronization) or one waits for another to peel potatoes before frying them (Cooperation Synchronization). To solve this, we use tools: 'Semaphores' act like traffic lights but are prone to human error. 'Monitors' provide encapsulated VIP rooms ensuring only one enters automatically. We also explored 'Message Passing' (Rendezvous) as an elegant communication model. For the exam, focus heavily on distinguishing Cooperation vs. Competition, and understand how Java (<code>synchronized</code>) and C# (<code>lock</code>) implement these. Finally, remember that concurrency can even happen at the statement level, as seen with HPF's <code>FORALL</code>.<p>We have now completed the comprehensive picture of concurrency. From understanding the underlying architectures (SIMD and MIMD) and the four levels of concurrency, to grasping the core design issues language creators face. We also saw how Ada evolved with protected objects for efficient shared memory, and how Java manages thread priorities. These nuances distinguish a professional programmer capable of choosing the right tool for any concurrent environment.</p></template>
+    <template class="content-ar">أهلاً بكم في الأسبوع الحادي عشر. اليوم ندخل عالم 'التزامن' (Concurrency)، وهو من أهم وأعقد المواضيع في علوم الحاسب. تخيل أنك طاهٍ في مطبخ؛ إذا كنت وحدك وتقوم بتقطيع البصل ثم تحريك الحساء بسرعة، فهذا 'تزامن منطقي'. أما إذا كان معك طهاة آخرون يعملون في نفس الوقت، فهذا 'تزامن مادي'. التحدي الأكبر عندما يحتاج طاهيان لنفس السكين (تزامن التنافس) أو عندما ينتظر طاهٍ زميله ليقشر البطاطس قبل أن يقليها (تزامن التعاون). لحل هذه المشاكل، اخترعنا أدوات: 'السيمافورات' وهي مثل إشارات المرور، لكنها عرضة للخطأ البشري. ثم جاءت 'المراقبون' (Monitors) لتوفر غرفاً مغلقة تضمن دخول شخص واحد فقط تلقائياً. وتعرفنا أيضاً على 'تمرير الرسائل' (Rendezvous) كطريقة تواصل راقية. في الامتحان، ركزوا جيداً على التمييز بين التعاون والتنافس، وافهموا كيف تطبق لغات مثل Java و C# هذه المفاهيم (مثل الكلمة المفتاحية synchronized و lock). ولا تنسوا أن التزامن يمكن أن يحدث حتى على مستوى الجملة البرمجية كما في لغة HPF.<p>لقد استكملنا الآن الصورة الشاملة للتزامن. من فهم المعماريات الأساسية (SIMD و MIMD) ومستويات التزامن الأربعة، إلى إدراك القضايا التصميمية الجوهرية التي تواجه مصممي اللغات. كما رأينا كيف تطورت لغة Ada بتقديم الكائنات المحمية لتحسين كفاءة الذاكرة المشتركة، وكيف تدير جافا أولويات الخيوط. هذه التفاصيل الدقيقة هي ما يميز المبرمج المحترف القادر على اختيار الأداة المناسبة لكل بيئة متزامنة.</p><p>بينما نتعمق في التزامن، تذكر أن تصميم اللغة يؤثر بشكل كبير على الأمان. في حين توفر جافا و C# أقفالاً يدوية، يُظهر تطور لغة Ada من جمل <code>select</code> المعقدة إلى الكائنات المحمية (Protected Objects) في Ada 95 سعياً مستمراً لجعل المزامنة أكثر أماناً وكفاءة، مما يقلل من عبء المبرمج في تجنب الجمود وحالات السباق.</p></template>
+    <template class="content-en">Welcome to Module 12. Today we enter the world of Concurrency, one of the most critical and complex topics in computer science. Imagine a kitchen: one chef rapidly switching between chopping onions and stirring soup is 'logical concurrency'. Multiple chefs working simultaneously is 'physical concurrency'. The real challenge arises when two chefs need the same knife (Competition Synchronization) or one waits for another to peel potatoes before frying them (Cooperation Synchronization). To solve this, we use tools: 'Semaphores' act like traffic lights but are prone to human error. 'Monitors' provide encapsulated VIP rooms ensuring only one enters automatically. We also explored 'Message Passing' (Rendezvous) as an elegant communication model. For the exam, focus heavily on distinguishing Cooperation vs. Competition, and understand how Java (<code>synchronized</code>) and C# (<code>lock</code>) implement these. Finally, remember that concurrency can even happen at the statement level, as seen with HPF's <code>FORALL</code>.<p>We have now completed the comprehensive picture of concurrency. From understanding the underlying architectures (SIMD and MIMD) and the four levels of concurrency, to grasping the core design issues language creators face. We also saw how Ada evolved with protected objects for efficient shared memory, and how Java manages thread priorities. These nuances distinguish a professional programmer capable of choosing the right tool for any concurrent environment.</p><p>As we master concurrency, remember that language design heavily influences safety. While Java and C# provide manual locks, Ada's evolution from complex <code>select</code> statements to Ada 95's Protected Objects shows a continuous drive to make synchronization both safer and more efficient, reducing the programmer's burden in avoiding deadlocks and race conditions.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1489,6 +1515,41 @@ FORALL (index = 1:1000)
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>في التزامن على مستوى الوحدة (مثل خيوط جافا)، يجب على المبرمج إنشاء الخيوط يدوياً وإدارة المزامنة والأقفال بنفسه. أما في التزامن على مستوى الجملة (مثل HPF)، يقوم المبرمج فقط بوصف كيفية توزيع البيانات (Declarative)، ويترك للمترجم (Compiler) مهمة تحويل الكود ليعمل بالتوازي وإدارة المزامنة تلقائياً.</p></template>
           <template class="content-en"><p>In Unit-level concurrency (like Java threads), the programmer must manually create threads and manage synchronization and locks themselves. In Statement-level concurrency (like HPF), the programmer only declaratively describes how data should be distributed, leaving the compiler to parallelize the code and manage synchronization automatically.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تُعتبر المهمة المنفصلة (Disjoint Task) أبسط أشكال التزامن؟</template>
+          <template class="content-en">Why is a disjoint task considered the simplest form of concurrency?</template>
+          <span class="content-target">لماذا تُعتبر المهمة المنفصلة (Disjoint Task) أبسط أشكال التزامن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن المهمة المنفصلة لا تتواصل مع المهام الأخرى ولا تشاركها البيانات. هذا يعني أنها لا تتطلب أي آليات مزامنة (لا تزامن تعاون ولا تزامن تنافس)، مما يلغي تماماً مخاطر حدوث حالات السباق (Race conditions) أو الجمود (Deadlocks).</p></template>
+          <template class="content-en"><p>Because a disjoint task does not communicate with other tasks or share data. This means it requires no synchronization mechanisms (neither cooperation nor competition), completely eliminating the risks of race conditions or deadlocks.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعزز عبارة <code>else</code> في جملة <code>select</code> بلغة Ada من استقرار البرنامج المتزامن؟</template>
+          <template class="content-en">How does the <code>else</code> clause in an Ada <code>select</code> statement enhance the stability of a concurrent program?</template>
+          <span class="content-target">كيف تعزز عبارة <code>else</code> في جملة <code>select</code> بلغة Ada من استقرار البرنامج المتزامن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في حالة إغلاق جميع الحراس (Guards) في جملة <code>select</code>، فإن البرنامج سيواجه خطأ في وقت التشغيل (Runtime error) ويتوقف. عبارة <code>else</code> توفر مساراً آمناً للهروب، مما يسمح للمهمة بتنفيذ كود بديل (مثل تكرار الحلقة أو القيام بعمل آخر) بدلاً من التحطم، مما يحافظ على استقرار النظام وحيويته.</p></template>
+          <template class="content-en"><p>If all guards in a <code>select</code> statement are closed, the program will encounter a runtime error and crash. The <code>else</code> clause provides a safe escape path, allowing the task to execute alternative code (like repeating the loop or doing other work) instead of crashing, thereby maintaining system stability and liveness.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1786,8 +1847,8 @@ FORALL (index = 1:1000)
         "en": "A modifier that disallows any other synchronized method from running on the object while it is in execution."
       },
       "example": {
-        "ar": "<code>public synchronized void deposit(int i)</code>",
-        "en": "<code>public synchronized void deposit(int i)</code>"
+        "ar": "<code>public synchronized void deposit(int i)<\/code>",
+        "en": "<code>public synchronized void deposit(int i)<\/code>"
       }
     }
   },
@@ -1803,10 +1864,44 @@ FORALL (index = 1:1000)
         "en": "A statement specifying a list of assignments that may be evaluated and executed concurrently."
       },
       "example": {
-        "ar": "<code>FORALL (index = 1:1000) list_1(index) = list_2(index)</code>",
-        "en": "<code>FORALL (index = 1:1000) list_1(index) = list_2(index)</code>"
+        "ar": "<code>FORALL (index = 1:1000) list_1(index) = list_2(index)<\/code>",
+        "en": "<code>FORALL (index = 1:1000) list_1(index) = list_2(index)<\/code>"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "المهمة المنفصلة (Disjoint Task)",
+      "en": "Disjoint Task"
+    },
+    "back": {
+      "definition": {
+        "ar": "مهمة لا تتواصل مع أو تؤثر على تنفيذ أي مهمة أخرى في البرنامج بأي شكل من الأشكال.",
+        "en": "A task that does not communicate with or affect the execution of any other task in the program in any way."
+      },
+      "example": {
+        "ar": "مهمة تقوم بحسابات رياضية معزولة وطباعة النتيجة دون استخدام متغيرات مشتركة.",
+        "en": "A task performing isolated mathematical calculations and printing the result without using shared variables."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "خطأ وقت التشغيل في جملة select (Ada)",
+      "en": "Runtime error in select statement (Ada)"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدث إذا كانت جميع الحراس (guards) في جملة select مغلقة ولم يتم توفير عبارة else.",
+        "en": "Occurs if all guards in a select statement are closed and no else clause is provided."
+      },
+      "example": {
+        "ar": "استخدام <code>else<\/code> لتكرار الحلقة بدلاً من تحطم البرنامج.",
+        "en": "Using an <code>else<\/code> clause to repeat the loop instead of crashing the program."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1816,7 +1911,7 @@ FORALL (index = 1:1000)
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1832,7 +1927,7 @@ FORALL (index = 1:1000)
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2157,6 +2252,70 @@ FORALL (index = 1:1000)
     },
     "difficulty": "medium",
     "conceptId": "statement-level-concurrency"
+  },
+  {
+    "conceptId": "task-execution-states",
+    "question": {
+      "ar": "أي من العبارات التالية يصف بشكل صحيح الفرق بين المهام (Tasks) والبرامج الفرعية العادية (Subprograms)؟",
+      "en": "Which of the following correctly describes a difference between tasks and ordinary subprograms?"
+    },
+    "options": {
+      "ar": [
+        "المهام يجب أن تُستدعى صراحةً دائمًا.",
+        "عند استدعاء مهمة، يُعلق المستدعي دائمًا حتى تنتهي المهمة.",
+        "قد لا يعود التحكم إلى المستدعي بعد اكتمال تنفيذ المهمة.",
+        "المهام لا يمكن أن تعمل معًا."
+      ],
+      "en": [
+        "Tasks must always be explicitly called.",
+        "When a task is called, the caller is always suspended until the task finishes.",
+        "Control may not return to the caller after a task's execution is completed.",
+        "Tasks cannot work together."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "على عكس البرامج الفرعية العادية التي تعود دائمًا إلى نقطة الاستدعاء، المهام قد تنتهي دون إرجاع التحكم للمستدعي، كما أنها قد تبدأ ضمنيًا ولا تعلق المستدعي بالضرورة.",
+      "en": "Unlike ordinary subprograms that always return to the point of call, tasks may terminate without returning control to the caller. They can also be implicitly started and do not necessarily suspend the caller."
+    },
+    "hint": {
+      "ar": "تذكر أن المهام تعمل بشكل متزامن ومستقل إلى حد كبير عن المستدعي.",
+      "en": "Remember that tasks run concurrently and largely independently of the caller."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "message-passing",
+    "question": {
+      "ar": "في لغة Ada، ماذا يحدث إذا تم تقييم جميع الحراس (guards) في جملة select على أنها خاطئة (مغلقة) ولم تكن هناك عبارة else؟",
+      "en": "In Ada, what happens if all guards in a select statement evaluate to false (closed) and there is no else clause?"
+    },
+    "options": {
+      "ar": [
+        "تنتظر المهمة إلى أجل غير مسمى حتى يفتح أحد الحراس.",
+        "يحدث خطأ في وقت التشغيل (Runtime error).",
+        "يتم اختيار أول جملة accept وتجاهل الحارس.",
+        "يتم إنهاء المهمة بشكل طبيعي."
+      ],
+      "en": [
+        "The task waits indefinitely until a guard opens.",
+        "A runtime error occurs.",
+        "The first accept clause is chosen, ignoring the guard.",
+        "The task terminates normally."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كانت جميع الجمل مغلقة، فإن جملة select لا تعرف ماذا تفعل، مما يؤدي إلى خطأ في وقت التشغيل. عبارة else تُستخدم لتوفير مسار بديل وتجنب هذا الخطأ.",
+      "en": "If all clauses are closed, the select statement doesn't know how to proceed, resulting in a runtime error. An else clause is used to provide an alternative path and avoid this error."
+    },
+    "hint": {
+      "ar": "النظام لا يمكنه الانتظار لأن الحراس تعتمد على حالة المتغيرات الحالية التي لن تتغير إذا كانت المهمة معلقة.",
+      "en": "The system cannot wait because guards depend on current variable states which won't change if the task is suspended."
+    },
+    "difficulty": "hard",
+    "id": 12
   }
 ]
 </script>

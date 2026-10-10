@@ -766,8 +766,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تُعرف مهمة اختيار كلمة لتوليدها بناءً على احتمالات النموذج باسم <b>فك التشفير (Decoding)</b>. الطريقة الأكثر شيوعاً هي <b>أخذ العينات (Sampling)</b>.</p><p>طرق أخذ العينات الرئيسية:</p><ol><li><b>أخذ العينات العشوائي (Random Sampling):</b> اختيار الكلمات عشوائياً وفقاً لاحتماليتها. قد يؤدي إلى اختيار كلمات ذات احتمالية منخفضة في ذيل التوزيع، مما يولد جملاً غريبة.</li><li><b>أخذ عينات Top-k:</b> اختيار عدد k من الكلمات الأكثر احتمالاً، وإعادة تسوية احتمالاتها، ثم أخذ عينة عشوائية منها.</li><li><b>أخذ عينات Top-p (Nucleus Sampling):</b> بدلاً من عدد ثابت k، نحتفظ بأصغر مجموعة من الكلمات التي يبلغ مجموع احتمالاتها p (مثلاً 90%). هذا يتكيف مع شكل التوزيع.</li><li><b>أخذ عينات درجة الحرارة (Temperature Sampling):</b> إعادة تشكيل التوزيع بدلاً من قطعه. نقوم بقسمة قيمة logit على معامل درجة الحرارة $\tau$ قبل تمريرها عبر دالة softmax.</li></ol></template>
-    <template class="content-en"><p>The task of choosing a word to generate based on the model's probabilities is called <b>decoding</b>. The most common method is <b>sampling</b>.</p><p>Main sampling methods:</p><ol><li><b>Random Sampling:</b> Choosing words randomly according to their probability. Can pick low-probability words in the tail, generating weird sentences.</li><li><b><span class="smart-term" data-term-en="Top-k Sampling" data-ar="أخذ عينات أعلى k" data-en-def="Sampling from only the top k most probable next words.">Top-k Sampling<span class="smart-term-tooltip"></span></span>:</b> Choose the top k most probable words, renormalize their scores, and sample randomly from them.</li><li><b>Top-p (Nucleus) Sampling:</b> Instead of a fixed k, keep the smallest set of words whose cumulative probability mass is $\ge p$. This adapts to the distribution's shape.</li><li><b>Temperature Sampling:</b> Reshape the distribution instead of truncating it. Divide the logit by a temperature parameter $\tau$ before passing it through softmax.</li></ol></template>
+    <template class="content-ar"><p>تُعرف مهمة اختيار كلمة لتوليدها بناءً على احتمالات النموذج باسم <b>فك التشفير (Decoding)</b>. الطريقة الأكثر شيوعاً هي <b>أخذ العينات (Sampling)</b>.</p><p>طرق أخذ العينات الرئيسية:</p><ol><li><b>أخذ العينات العشوائي (Random Sampling):</b> اختيار الكلمات عشوائياً وفقاً لاحتماليتها. قد يؤدي إلى اختيار كلمات ذات احتمالية منخفضة في ذيل التوزيع، مما يولد جملاً غريبة.</li><li><b>أخذ عينات Top-k:</b> اختيار عدد k من الكلمات الأكثر احتمالاً، وإعادة تسوية احتمالاتها، ثم أخذ عينة عشوائية منها.</li><li><b>أخذ عينات Top-p (Nucleus Sampling):</b> بدلاً من عدد ثابت k، نحتفظ بأصغر مجموعة من الكلمات التي يبلغ مجموع احتمالاتها p (مثلاً 90%). هذا يتكيف مع شكل التوزيع.</li><li><b>أخذ عينات درجة الحرارة (Temperature Sampling):</b> إعادة تشكيل التوزيع بدلاً من قطعه. نقوم بقسمة قيمة logit على معامل درجة الحرارة $\tau$ قبل تمريرها عبر دالة softmax.</li></ol><p>لفهم كيفية عمل هذه الطرق برمجياً، إليك خوارزمية أخذ عينات Top-k بخطواتها الخمس المحددة:</p><ol><li>اختيار عدد الكلمات <code>k</code>.</li><li>لكل كلمة في القاموس <code>V</code>، يتم حساب احتمالية الكلمة بناءً على السياق \(p(w_t \mid w_{&lt;t})\).</li><li>فرز الكلمات حسب الاحتمالية، والاحتفاظ بأعلى <code>k</code> كلمات فقط.</li><li>إعادة تسوية (Renormalize) درجات الكلمات <code>k</code> المتبقية لتصبح توزيعاً احتمالياً صحيحاً (مجموعها يساوي 1).</li><li>أخذ عينة عشوائية لكلمة من بين هذه الكلمات <code>k</code> المتبقية وفقاً لاحتماليتها الجديدة.</li></ol><p>أما في أخذ عينات Top-p (Nucleus)، يتم تعريف القاموس المصغر \(V^{(p)}\) رياضياً بأنه أصغر مجموعة من الكلمات التي تحقق شرط الكتلة الاحتمالية التراكمية: \(\sum_{w \in V^{(p)}} P(w|w_{&lt;t}) \ge p\).</p></template>
+    <template class="content-en"><p>The task of choosing a word to generate based on the model's probabilities is called <b>decoding</b>. The most common method is <b>sampling</b>.</p><p>Main sampling methods:</p><ol><li><b>Random Sampling:</b> Choosing words randomly according to their probability. Can pick low-probability words in the tail, generating weird sentences.</li><li><b><span class="smart-term" data-term-en="Top-k Sampling" data-ar="أخذ عينات أعلى k" data-en-def="Sampling from only the top k most probable next words.">Top-k Sampling<span class="smart-term-tooltip"></span></span>:</b> Choose the top k most probable words, renormalize their scores, and sample randomly from them.</li><li><b>Top-p (Nucleus) Sampling:</b> Instead of a fixed k, keep the smallest set of words whose cumulative probability mass is $\ge p$. This adapts to the distribution's shape.</li><li><b>Temperature Sampling:</b> Reshape the distribution instead of truncating it. Divide the logit by a temperature parameter $\tau$ before passing it through softmax.</li></ol><p>To understand how these methods work programmatically, here is the Top-k sampling algorithm in its five specific steps:</p><ol><li>Choose the number of words <code>k</code>.</li><li>For each word in the vocabulary <code>V</code>, compute the likelihood of this word given the context \(p(w_t \mid w_{&lt;t})\).</li><li>Sort the words by likelihood, keeping only the top <code>k</code> most probable words.</li><li>Renormalize the scores of the <code>k</code> words to be a legitimate probability distribution (summing to 1).</li><li>Randomly sample a word from within these remaining <code>k</code> most-probable words according to its new probability.</li></ol><p>In Top-p (Nucleus) sampling, the reduced vocabulary \(V^{(p)}\) is mathematically defined as the smallest set of words that satisfies the cumulative probability mass condition: \(\sum_{w \in V^{(p)}} P(w|w_{&lt;t}) \ge p\).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1877,8 +1877,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الحاسمة. اليوم ننتقل من النماذج اللغوية البسيطة إلى العمالقة: النماذج اللغوية الضخمة (LLMs). ركزوا معي جيداً على الفرق بين المعماريات الثلاث: متى نستخدم Decoder (لتوليد النصوص مثل GPT)، ومتى نستخدم Encoder (للفهم العميق مثل BERT). في الامتحان، سأسألكم بالتأكيد عن طرق أخذ العينات؛ افهموا جيداً كيف توازن درجة الحرارة (Temperature) و Top-p بين دقة النص وإبداعه. لا تنسوا 'فرض المعلم' (Teacher Forcing) وكيف ينقذ النموذج من الغرق في أخطائه أثناء التدريب. وأخيراً، مقياس 'الحيرة' (Perplexity) هو صديقكم لتقييم النماذج: تذكروا دائماً، الأقل هو الأفضل! راجعوا جيداً كيف يحل BERT مشكلة تعدد المعاني باستخدام التضمينات السياقية. بالتوفيق!</template>
-    <template class="content-en">Welcome everyone to this crucial module. Today we transition from simple language models to the giants: Large Language Models (LLMs). Pay close attention to the differences between the three architectures: when to use a Decoder (for text generation like GPT), and when to use an Encoder (for deep understanding like BERT). On the exam, I will definitely ask about sampling methods; understand exactly how Temperature and Top-p balance text accuracy with creativity. Don't forget 'Teacher Forcing' and how it saves the model from drowning in its own errors during training. Finally, the 'Perplexity' metric is your friend for evaluating models: always remember, lower is better! Review closely how BERT solves polysemy using contextual embeddings. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الحاسمة. اليوم ننتقل من النماذج اللغوية البسيطة إلى العمالقة: النماذج اللغوية الضخمة (LLMs). ركزوا معي جيداً على الفرق بين المعماريات الثلاث: متى نستخدم Decoder (لتوليد النصوص مثل GPT)، ومتى نستخدم Encoder (للفهم العميق مثل BERT). في الامتحان، سأسألكم بالتأكيد عن طرق أخذ العينات؛ افهموا جيداً كيف توازن درجة الحرارة (Temperature) و Top-p بين دقة النص وإبداعه. لا تنسوا 'فرض المعلم' (Teacher Forcing) وكيف ينقذ النموذج من الغرق في أخطائه أثناء التدريب. وأخيراً، مقياس 'الحيرة' (Perplexity) هو صديقكم لتقييم النماذج: تذكروا دائماً، الأقل هو الأفضل! راجعوا جيداً كيف يحل BERT مشكلة تعدد المعاني باستخدام التضمينات السياقية. بالتوفيق!<p>إن فهم الآليات الرياضية الدقيقة لخوارزميات التوليد، مثل خطوة إعادة التسوية (Renormalization) في Top-k أو التجميع التراكمي في Top-p، أمر بالغ الأهمية. هذه ليست مجرد مفاهيم نظرية؛ بل هي الدوال البرمجية الحرفية التي تحدد ما إذا كان النموذج اللغوي سيولد نصاً متماسكاً أم سلسلة من الكلمات العشوائية غير المترابطة.</p></template>
+    <template class="content-en">Welcome everyone to this crucial module. Today we transition from simple language models to the giants: Large Language Models (LLMs). Pay close attention to the differences between the three architectures: when to use a Decoder (for text generation like GPT), and when to use an Encoder (for deep understanding like BERT). On the exam, I will definitely ask about sampling methods; understand exactly how Temperature and Top-p balance text accuracy with creativity. Don't forget 'Teacher Forcing' and how it saves the model from drowning in its own errors during training. Finally, the 'Perplexity' metric is your friend for evaluating models: always remember, lower is better! Review closely how BERT solves polysemy using contextual embeddings. Good luck!<p>Understanding the exact mathematical mechanics of generation algorithms, such as the step-by-step renormalization in Top-k or the cumulative summation in Top-p, is crucial. These aren't just theoretical concepts; they are the literal programmatic functions that dictate whether your language model generates a coherent text or a string of disjointed, random words.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -2052,6 +2052,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">التدريب المسبق يتم على كميات هائلة من النصوص العامة لتعليم النموذج اللغة. الضبط الدقيق هو تدريب إضافي على مجموعة بيانات صغيرة ومتخصصة لتكييف النموذج لأداء مهمة محددة.</template>
           <template class="content-en">Pretraining is done on massive amounts of general text to teach the model language. Finetuning is additional training on a small, specialized dataset to adapt the model to perform a specific task.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر خطوة 'إعادة التسوية' (Renormalization) ضرورية رياضياً وبرمجياً في خوارزمية Top-k؟</template>
+          <template class="content-en">Why is the 'renormalization' step mathematically and programmatically necessary in the Top-k algorithm?</template>
+          <span class="content-target">لماذا تعتبر خطوة 'إعادة التسوية' (Renormalization) ضرورية رياضياً وبرمجياً في خوارزمية Top-k؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>عندما نقوم باقتطاع ذيل التوزيع الطويل ونحتفظ فقط بأفضل k كلمات، فإن مجموع احتمالات هذه الكلمات المتبقية يصبح أقل من 1. دوال أخذ العينات العشوائية في البرمجة تتطلب توزيعاً احتمالياً صحيحاً (مجموعه 1). إعادة التسوية تقوم بتكبير هذه الاحتمالات المتبقية بشكل متناسب لتلبية هذا الشرط الرياضي.</p></template>
+          <template class="content-en"><p>When we truncate the long tail of the distribution and keep only the top k words, the sum of the probabilities of these remaining words is less than 1. Random sampling functions in programming require a valid probability distribution (summing to 1). Renormalization proportionally scales up these remaining probabilities to satisfy this mathematical requirement.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -2370,6 +2388,40 @@
         "en": "10% are left unchanged and 10% are replaced with random words."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي الخطوات الخمس لخوارزمية أخذ عينات Top-k؟",
+      "en": "What are the 5 steps of the Top-k sampling algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1. اختيار k، 2. حساب الاحتمالات، 3. الفرز والاحتفاظ بأعلى k، 4. إعادة التسوية (Renormalize)، 5. أخذ العينة عشوائياً.",
+        "en": "1. Choose k, 2. Compute likelihoods, 3. Sort and keep top k, 4. Renormalize scores, 5. Sample randomly."
+      },
+      "example": {
+        "ar": "إعادة التسوية ضرورية لضمان أن مجموع احتمالات الكلمات المتبقية يساوي 1.",
+        "en": "Renormalization is necessary to ensure the remaining words' probabilities sum to 1."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "ما هو الشرط الرياضي الذي يحدد مجموعة الكلمات $V^{(p)}$ في أخذ عينات Top-p؟",
+      "en": "What is the mathematical condition that defines the word set $V^{(p)}$ in Top-p sampling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن يكون مجموع احتمالات الكلمات في المجموعة أكبر من أو يساوي p: $\\sum P(w|w_{&lt;t}) \\ge p$.",
+        "en": "The sum of probabilities of words in the set must be greater than or equal to p: $\\sum P(w|w_{&lt;t}) \\ge p$."
+      },
+      "example": {
+        "ar": "إذا كانت p=0.9، نستمر في إضافة الكلمات للمجموعة حتى يصل مجموع احتمالاتها إلى 90%.",
+        "en": "If p=0.9, we keep adding words to the set until their cumulative probability reaches 90%."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -2379,7 +2431,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -2395,7 +2447,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2720,6 +2772,38 @@
     },
     "difficulty": "easy",
     "conceptId": "finetuning"
+  },
+  {
+    "conceptId": "sampling-methods",
+    "question": {
+      "ar": "في خوارزمية أخذ عينات Top-k، ما هي الخطوة التي يجب تنفيذها مباشرة بعد فرز الكلمات والاحتفاظ بأعلى k كلمة محتملة؟",
+      "en": "In the Top-k sampling algorithm, what step must be executed immediately after sorting the words and keeping the top k most probable ones?"
+    },
+    "options": {
+      "ar": [
+        "أخذ عينة عشوائية للكلمة التالية مباشرة.",
+        "إعادة تسوية (Renormalize) درجات الكلمات لتصبح توزيعاً احتمالياً صحيحاً.",
+        "قسمة قيم logit على معامل درجة الحرارة.",
+        "تطبيق دالة Softmax مرة أخرى على القاموس بأكمله."
+      ],
+      "en": [
+        "Directly sample the next word randomly.",
+        "Renormalize the scores of the words to be a legitimate probability distribution.",
+        "Divide the logit values by the temperature parameter.",
+        "Apply the Softmax function again to the entire vocabulary."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "بعد اقتطاع التوزيع واستبعاد الكلمات ذات الاحتمالية المنخفضة، لا يعود مجموع احتمالات الكلمات المتبقية يساوي 1. لذلك، يجب إعادة تسويتها (Renormalize) قبل أخذ العينة العشوائية.",
+      "en": "After truncating the distribution and discarding low-probability words, the probabilities of the remaining words no longer sum to 1. Therefore, they must be renormalized before random sampling."
+    },
+    "hint": {
+      "ar": "تذكر أن أي توزيع احتمالي يجب أن يكون مجموعه دائماً 1.",
+      "en": "Remember that any probability distribution must always sum to exactly 1."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -2763,6 +2847,14 @@
     <div data-bilingual>
     <template class="content-ar">التضمينات السياقية (Contextual Embeddings) حلت أكبر مشكلة في معالجة اللغات الطبيعية القديمة: تعدد المعاني. الآن، الكلمة الواحدة تمتلك متجهات لا حصر لها تتكيف مع الجملة التي توجد فيها.</template>
     <template class="content-en">Contextual Embeddings solved the biggest problem in old NLP: polysemy. Now, a single word has infinite vectors that adapt to the sentence it is in.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان خطوة 'إعادة التسوية' (Renormalization) في خوارزمية Top-k. إذا قمت باقتطاع التوزيع واحتفظت بأفضل k كلمات فقط دون إعادة تسوية احتمالاتها، فلن يكون مجموع الاحتمالات 1، مما يؤدي إلى فشل دالة أخذ العينات العشوائية برمجياً.</template>
+    <template class="content-en">Forgetting the 'Renormalization' step in the Top-k algorithm. If you truncate the distribution and keep only the top k words without renormalizing their probabilities, they will not sum to 1, causing the random sampling function to fail programmatically.</template>
     <div class="content-target"></div>
     </div>
   </div>

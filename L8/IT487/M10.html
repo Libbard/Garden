@@ -217,6 +217,75 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { Component } from 'react';
+
+export default class MyComponent extends Component {
+  state = {
+    first: false,
+    second: true
+  };
+
+  render() {
+    const { first, second } = this.state;
+    return (
+      &lt;main&gt;
+        &lt;section&gt;
+          &lt;button disabled={first}&gt;First&lt;/button&gt;
+        &lt;/section&gt;
+        &lt;section&gt;
+          &lt;button disabled={second}&gt;Second&lt;/button&gt;
+        &lt;/section&gt;
+      &lt;/main&gt;
+    );
+  }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Component with initial state
+import React, { Component } from 'react';
+
+export default class MyComponent extends Component {
+  state = {
+    heading: 'React Awesomesauce (Busy)',
+    content: 'Loading...'
+  };
+
+  render() {
+    const { heading, content } = this.state;
+    return (
+      &lt;main&gt;
+        &lt;h1&gt;{heading}&lt;/h1&gt;
+        &lt;p&gt;{content}&lt;/p&gt;
+      &lt;/main&gt;
+    );
+  }
+}
+
+// Rendering and updating the state using setState()
+import React from 'react';
+import { render } from 'react-dom';
+import MyComponent from './MyComponent';
+
+const myComponent = render(&lt;MyComponent /&gt;, document.getElementById('root'));
+
+setTimeout(() =&gt; {
+  myComponent.setState({
+    heading: 'React Awesomesauce',
+    content: 'Done!'
+  });
+}, 3000);</code></pre>
+  </div>
+
   <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a flowchart showing the React Component State lifecycle. Top box: 'Initial State'. Arrow pointing down to 'State'. Arrow pointing down from 'State' to 'render()'. A side box labeled 'setState()' with an arrow pointing left into the 'State' box. Style: educational, dark background #0d1117, accent color #61dafb, viewBox 0 0 800 400, English labels. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
@@ -330,6 +399,26 @@
     <template class="content-ar"><p>إذا تغيرت قيمة خاصية (بسبب تحديث في المكون الأب)، فإن React يتولى إعادة تصيير المكون الأولي، ثم إعادة تصيير JSX الذي تم استخدامه لتصييره في المقام الأول بكفاءة.</p><p>الفرق الحقيقي بين المكون ذو الحالة والمكون الذي يعتمد على الخصائص هو أن المكون الأب هو الذي يقرر متى يتم تصيير JSX بناءً على الخصائص الجديدة. المكون الابن لا يمكنه إعادة تصيير نفسه بناءً على الخصائص.</p></template>
     <template class="content-en"><p>If a property value has changed (due to a parent component updating), React internals take care of making sure the initial component is re-rendered efficiently.</p><p>The real difference compared to a stateful component is that with properties, it's often a parent component that decides when to render the JSX. The component itself cannot re-render itself based on <span class="smart-term" data-term-en="Props" data-ar="الخصائص" data-en-def="Read-only data passed into a React component from its parent.">props<span class="smart-term-tooltip"></span></span>.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { Component } from 'react';
+
+export default class MyButton extends Component {
+  static defaultProps = {
+    disabled: false,
+    text: 'My Button'
+  };
+
+  render() {
+    const { disabled, text } = this.props;
+    return &lt;button disabled={disabled}&gt;{text}&lt;/button&gt;;
+  }
+}</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: Flowchart showing Props rendering cycle. Top box: 'render()'. Arrow down to 'JSX'. Arrow down to 'Props'. Arrow down to 'Component'. Arrow looping back up from 'Component' to 'render()'. Style: educational, dark background #0d1117, accent color #61dafb, viewBox 0 0 800 400, English labels. -->
@@ -511,6 +600,25 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from 'react';
+
+const MyButton = ({ disabled, text }) =&gt; (
+  &lt;button disabled={disabled}&gt;{text}&lt;/button&gt;
+);
+
+MyButton.defaultProps = {
+  text: 'My Button',
+  disabled: false
+};
+
+export default MyButton;</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">كيف يصل المكون الوظيفي إلى الخصائص (Props) مقارنة بالمكون القائم على الفئة؟</template>
@@ -552,6 +660,47 @@
     <template class="content-ar"><p>ما الفائدة من هذا النمط؟ يمكن تحقيق مستوى عالٍ من <b><span class="smart-term" data-term-en="Substitutability" data-ar="القابلية للاستبدال" data-en-def="The ability to swap out child components or containers independently due to separation of concerns.">القابلية للاستبدال<span class="smart-term-tooltip"></span></span> (Substitutability)</b> وإعادة الاستخدام. على سبيل المثال، يمكن للحاوية استبدال المكون الابن الخاص بها بمكون عرض آخر، أو يمكن استخدام نفس المكون الابن في حاوية مختلفة تمامًا.</p><p>في هذا النمط، كلما تم تعيين حالة الحاوية (بعد جلب البيانات مثلاً)، يتم استدعاء <code>render()</code>، وهنا يأتي دور المكون الابن الذي يتلقى الحالة الجديدة كخصائص ويقوم بتحديث العرض.</p></template>
     <template class="content-en"><p>What is the benefit of this pattern? Some level of <b><span class="smart-term" data-term-en="Substitutability" data-ar="القابلية للاستبدال" data-en-def="The ability to swap out child components or containers independently due to separation of concerns.">substitutability<span class="smart-term-tooltip"></span></span></b> and reusability can be achieved. For example, a container could substitute its child component with a different UI, or a child component could be used in a completely different container.</p><p>In this pattern, any time the state of the container is set (e.g., after data is fetched), <code>render()</code> is called. This is where the child component comes in, receiving the container's state as properties and updating the view.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// MyContainer.js (Container Component)
+import React, { Component } from 'react';
+import MyList from './MyList';
+
+function fetchData() {
+  return new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve(['First', 'Second', 'Third']);
+    }, 2000);
+  });
+}
+
+export default class MyContainer extends Component {
+  state = { items: [] };
+
+  componentDidMount() {
+    fetchData().then(items =&gt; this.setState({ items }));
+  }
+
+  render() {
+    return &lt;MyList {...this.state} /&gt;;
+  }
+}
+
+// MyList.js (Stateless Child Component)
+import React from 'react';
+
+export default ({ items }) =&gt; (
+  &lt;ul&gt;
+    {items.map(i =&gt; (
+      &lt;li key={i}&gt;{i}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+);</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -597,6 +746,82 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// PermissionContext.js
+import React, { Component, createContext } from 'react';
+
+const { Provider, Consumer } = createContext('permissions');
+
+export class PermissionProvider extends Component {
+  state = {
+    first: true,
+    second: false,
+    third: true
+  };
+
+  render() {
+    return (
+      &lt;Provider value={this.state}&gt;{this.props.children}&lt;/Provider&gt;
+    );
+  }
+}
+
+const PermissionConsumer = ({ name, children }) =&gt; (
+  &lt;Consumer&gt;{value =&gt; value[name] &amp;&amp; children}&lt;/Consumer&gt;
+);
+
+export { PermissionConsumer };</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// index.js
+import React from 'react';
+import { render } from 'react-dom';
+import { PermissionProvider } from './PermissionContext';
+import App from './App';
+
+render(
+  &lt;PermissionProvider&gt;
+    &lt;App /&gt;
+  &lt;/PermissionProvider&gt;,
+  document.getElementById('root')
+);
+
+// App.js
+import React, { Fragment } from 'react';
+import First from './First';
+import Second from './Second';
+import Third from './Third';
+
+export default () =&gt; (
+  &lt;Fragment&gt;
+    &lt;First /&gt;
+    &lt;Second /&gt;
+    &lt;Third /&gt;
+  &lt;/Fragment&gt;
+);
+
+// First.js (Consumer Component)
+import React from 'react';
+import { PermissionConsumer } from './PermissionContext';
+
+export default () =&gt; (
+  &lt;PermissionConsumer name="first"&gt;
+    &lt;div&gt;
+      &lt;button&gt;First&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/PermissionConsumer&gt;
+);</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">متى يجب عليك تجنب استخدام السياق (Context) والاعتماد على تمرير الخصائص (Props) بدلاً من ذلك؟</template>
@@ -617,8 +842,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل. في هذه الوحدة، نغوص في قلب React: كيف تتدفق البيانات. تخيلوا أن المكون هو إنسان؛ 'الحالة' (State) هي أفكاره الداخلية ومزاجه الذي يتغير بمرور الوقت، بينما 'الخصائص' (Props) هي التعليمات التي يتلقاها من مديره (المكون الأب) ولا يمكنه تغييرها. للامتحان، ركزوا بشدة على الفرق بينهما، وتذكروا دائمًا أن <code>setState</code> تدمج البيانات ولا تستبدلها بالكامل. لقد ناقشنا أيضًا نمط 'الحاويات' (Containers)، وهو سر كتابة كود نظيف وقابل لإعادة الاستخدام؛ افصلوا دائماً بين جلب البيانات وعرضها. وأخيراً، عندما يصبح تمرير الخصائص مزعجاً عبر طبقات كثيرة، يأتي 'السياق' (Context API) كبطل خارق ليبث البيانات للجميع عبر Provider و Consumer. افهموا هذه المفاهيم جيداً، فهي أساس كل تطبيق React ناجح.</template>
-    <template class="content-en">Welcome, future engineers. In this module, we dive into the heart of React: data flow. Imagine a component as a person; 'State' is their internal thoughts and mood that change over time, while 'Props' are instructions from their boss (parent component) that they cannot alter. For the exam, focus heavily on the difference between the two, and always remember that <code>setState</code> merges data, it doesn't replace it entirely. We also discussed the 'Container' pattern, the secret to clean, reusable code; always separate data fetching from rendering. Finally, when passing props becomes tedious across many layers, the 'Context API' steps in as a superhero to broadcast data to everyone via Provider and Consumer. Master these concepts, as they are the foundation of every successful React application.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل. في هذه الوحدة، نغوص في قلب React: كيف تتدفق البيانات. تخيلوا أن المكون هو إنسان؛ 'الحالة' (State) هي أفكاره الداخلية ومزاجه الذي يتغير بمرور الوقت، بينما 'الخصائص' (Props) هي التعليمات التي يتلقاها من مديره (المكون الأب) ولا يمكنه تغييرها. للامتحان، ركزوا بشدة على الفرق بينهما، وتذكروا دائمًا أن <code>setState</code> تدمج البيانات ولا تستبدلها بالكامل. لقد ناقشنا أيضًا نمط 'الحاويات' (Containers)، وهو سر كتابة كود نظيف وقابل لإعادة الاستخدام؛ افصلوا دائماً بين جلب البيانات وعرضها. وأخيراً، عندما يصبح تمرير الخصائص مزعجاً عبر طبقات كثيرة، يأتي 'السياق' (Context API) كبطل خارق ليبث البيانات للجميع عبر Provider و Consumer. افهموا هذه المفاهيم جيداً، فهي أساس كل تطبيق React ناجح.<p>لقد استعرضنا المفاهيم النظرية للحالة والخصائص والسياق. الآن، من خلال الأمثلة البرمجية المضافة، يمكنك رؤية كيف تتفاعل هذه المفاهيم عمليًا لبناء تطبيقات React ديناميكية وقابلة للتطوير. ركز على كيفية تدفق البيانات وتحديث واجهة المستخدم استجابةً لتغيرات الحالة.</p></template>
+    <template class="content-en">Welcome, future engineers. In this module, we dive into the heart of React: data flow. Imagine a component as a person; 'State' is their internal thoughts and mood that change over time, while 'Props' are instructions from their boss (parent component) that they cannot alter. For the exam, focus heavily on the difference between the two, and always remember that <code>setState</code> merges data, it doesn't replace it entirely. We also discussed the 'Container' pattern, the secret to clean, reusable code; always separate data fetching from rendering. Finally, when passing props becomes tedious across many layers, the 'Context API' steps in as a superhero to broadcast data to everyone via Provider and Consumer. Master these concepts, as they are the foundation of every successful React application.<p>We have reviewed the theoretical concepts of state, props, and context. Now, through the added code examples, you can see how these concepts interact practically to build dynamic and scalable React applications. Focus on how data flows and the UI updates in response to state changes.</p></template>
     <div class="content-target"></div>
   </div>
 </section>

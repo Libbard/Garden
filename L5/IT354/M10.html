@@ -35,6 +35,9 @@
   <link rel="stylesheet" href="../../shared/skin.css">
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
 
 
   <!-- data-garden-icons -->
@@ -122,6 +125,11 @@
         <template class="content-ar">بنية قاعدة بيانات العميل والخادم</template>
         <template class="content-en">Client-Server Database Architecture</template>
         <span class="content-target">بنية قاعدة بيانات العميل والخادم</span>
+      </a>
+      <a href="#query-processing-examples" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: معالجة الاستعلامات الموزعة</template>
+        <template class="content-en">Worked Examples: Distributed Query Processing</template>
+        <span class="content-target">أمثلة عملية: معالجة الاستعلامات الموزعة</span>
       </a>
 
       <div class="toc-divider"></div>
@@ -461,8 +469,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يمكن تجزئة العلاقة بطريقتين رئيسيتين، بالإضافة إلى طريقة هجينة:</p><ol><li><b><span class="smart-term" data-term-en="Horizontal Fragmentation" data-ar="التجزئة الأفقية" data-en-def="A subset of tuples of a relation that satisfy specific selection conditions.">التجزئة الأفقية<span class="smart-term-tooltip"></span></span> (Horizontal Fragmentation):</b> مجموعة فرعية من الصفوف (Tuples) التي تلبي شروط اختيار معينة (Selection). لإعادة بناء الجدول، نستخدم عملية الاتحاد (UNION).</li><li><b><span class="smart-term" data-term-en="Vertical Fragmentation" data-ar="التجزئة العمودية" data-en-def="A subset of columns of a relation, which must include the primary key.">التجزئة العمودية<span class="smart-term-tooltip"></span></span> (Vertical Fragmentation):</b> مجموعة فرعية من الأعمدة (Attributes). لا يوجد شرط اختيار، ولكن <b>يجب</b> أن يتضمن كل جزء المفتاح الأساسي (Primary Key) لربط الأجزاء لاحقاً. لإعادة البناء، نستخدم (OUTER JOIN / OUTER UNION).</li><li><b>التجزئة المختلطة (Mixed/Hybrid Fragmentation):</b> مزيج من التجزئة الأفقية والعمودية باستخدام عمليات (SELECT-PROJECT).</li></ol></template>
-    <template class="content-en"><p>A relation can be fragmented in two main ways, plus a hybrid approach:</p><ol><li><b><span class="smart-term" data-term-en="Horizontal Fragmentation" data-ar="التجزئة الأفقية" data-en-def="A subset of tuples of a relation that satisfy specific selection conditions.">Horizontal Fragmentation<span class="smart-term-tooltip"></span></span>:</b> A horizontal subset of a relation containing tuples that satisfy selection conditions. To reconstruct, a UNION operation is applied.</li><li><b><span class="smart-term" data-term-en="Vertical Fragmentation" data-ar="التجزئة العمودية" data-en-def="A subset of columns of a relation, which must include the primary key.">Vertical Fragmentation<span class="smart-term-tooltip"></span></span>:</b> A subset created by selected columns. There is no selection condition, but each fragment <b>must</b> include the primary key attribute. To reconstruct, an OUTER UNION (or JOIN) is applied.</li><li><b>Mixed (Hybrid) Fragmentation:</b> A combination of Vertical and Horizontal fragmentation achieved by SELECT-PROJECT operations.</li></ol></template>
+    <template class="content-ar"><p>يمكن تجزئة العلاقة بطريقتين رئيسيتين، بالإضافة إلى طريقة هجينة:</p><ol><li><b><span class="smart-term" data-term-en="Horizontal Fragmentation" data-ar="التجزئة الأفقية" data-en-def="A subset of tuples of a relation that satisfy specific selection conditions.">التجزئة الأفقية<span class="smart-term-tooltip"></span></span> (Horizontal Fragmentation):</b> مجموعة فرعية من الصفوف (Tuples) التي تلبي شروط اختيار معينة (Selection). لإعادة بناء الجدول، نستخدم عملية الاتحاد (UNION).</li><li><b><span class="smart-term" data-term-en="Vertical Fragmentation" data-ar="التجزئة العمودية" data-en-def="A subset of columns of a relation, which must include the primary key.">التجزئة العمودية<span class="smart-term-tooltip"></span></span> (Vertical Fragmentation):</b> مجموعة فرعية من الأعمدة (Attributes). لا يوجد شرط اختيار، ولكن <b>يجب</b> أن يتضمن كل جزء المفتاح الأساسي (Primary Key) لربط الأجزاء لاحقاً. لإعادة البناء، نستخدم (OUTER JOIN / OUTER UNION).</li><li><b>التجزئة المختلطة (Mixed/Hybrid Fragmentation):</b> مزيج من التجزئة الأفقية والعمودية باستخدام عمليات (SELECT-PROJECT).</li></ol><p>يمكن تمثيل عمليات التجزئة رياضياً باستخدام الجبر العلائقي (Relational Algebra):</p><ul><li><b>التجزئة الأفقية:</b> تُمثل بعملية الاختيار $s_{C_i}(R)$. تكون التجزئة "كاملة" (Complete) إذا كان كل صف في $R$ يلبي الشرط $(C_1 \lor C_2 \lor ... \lor C_n)$. وتكون "منفصلة" (Disjoint) إذا كان لا يوجد صف يلبي $(C_i \land C_j)$.</li><li><b>التجزئة العمودية:</b> تُمثل بعملية الإسقاط $\Pi_{L_i}(R)$. تكون التجزئة "كاملة" إذا اتحدت جميع القوائم لتشمل كل الأعمدة $L_1 \cup L_2 \cup ... \cup L_n = ATTRS(R)$، وتقاطعت حصرياً في المفتاح الأساسي $L_i \cap L_j = PK(R)$.</li><li><b>التجزئة المختلطة:</b> تُمثل بدمج العمليتين $\Pi_{L_i}(s_{C_i}(R))$.</li></ul></template>
+    <template class="content-en"><p>A relation can be fragmented in two main ways, plus a hybrid approach:</p><ol><li><b><span class="smart-term" data-term-en="Horizontal Fragmentation" data-ar="التجزئة الأفقية" data-en-def="A subset of tuples of a relation that satisfy specific selection conditions.">Horizontal Fragmentation<span class="smart-term-tooltip"></span></span>:</b> A horizontal subset of a relation containing tuples that satisfy selection conditions. To reconstruct, a UNION operation is applied.</li><li><b><span class="smart-term" data-term-en="Vertical Fragmentation" data-ar="التجزئة العمودية" data-en-def="A subset of columns of a relation, which must include the primary key.">Vertical Fragmentation<span class="smart-term-tooltip"></span></span>:</b> A subset created by selected columns. There is no selection condition, but each fragment <b>must</b> include the primary key attribute. To reconstruct, an OUTER UNION (or JOIN) is applied.</li><li><b>Mixed (Hybrid) Fragmentation:</b> A combination of Vertical and Horizontal fragmentation achieved by SELECT-PROJECT operations.</li></ol><p>Fragmentation operations can be represented mathematically using Relational Algebra:</p><ul><li><b>Horizontal Fragmentation:</b> Represented by the selection operation $s_{C_i}(R)$. It is "complete" if every tuple in $R$ satisfies the condition $(C_1 \lor C_2 \lor ... \lor C_n)$. It is "disjoint" if no tuple satisfies $(C_i \land C_j)$.</li><li><b>Vertical Fragmentation:</b> Represented by the projection operation $\Pi_{L_i}(R)$. It is "complete" if all projection lists union to include all attributes $L_1 \cup L_2 \cup ... \cup L_n = ATTRS(R)$, and intersect exclusively at the primary key $L_i \cap L_j = PK(R)$.</li><li><b>Mixed Fragmentation:</b> Represented by combining both operations $\Pi_{L_i}(s_{C_i}(R))$.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -993,14 +1001,57 @@
   </details>
 </section>
 
+<section id="query-processing-examples" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> أمثلة عملية: معالجة الاستعلامات الموزعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Worked Examples: Distributed Query Processing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتطلب معالجة الاستعلامات الموزعة حساب تكلفة نقل البيانات لكل استراتيجية محتملة لاختيار المسار الأقل استهلاكاً لعرض النطاق الترددي للشبكة.</p></template>
+    <template class="content-en"><p>Distributed query processing requires calculating the data transfer cost for each possible strategy to select the path that consumes the least network bandwidth.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بناءً على المعطيات التالية: جدول الموظفين (Employee) في الموقع 1 (10,000 صف، حجم الصف 100 بايت، الإجمالي 1,000,000 بايت). جدول الأقسام (Department) في الموقع 2 (100 صف، حجم الصف 35 بايت، الإجمالي 3,500 بايت). الاستعلام يُقدم في الموقع 3، وحجم كل صف في النتيجة هو 40 بايت (إجمالي 10,000 صف = 400,000 بايت).</p><ol><li><b>الاستراتيجية 1:</b> نقل كلا الجدولين إلى الموقع 3. التكلفة = 1,000,000 + 3,500 = 1,003,500 بايت.</li><li><b>الاستراتيجية 2:</b> نقل جدول الموظفين إلى الموقع 2، إجراء الربط، وإرسال النتيجة للموقع 3. التكلفة = 1,000,000 + 400,000 = 1,400,000 بايت.</li><li><b>الاستراتيجية 3:</b> نقل جدول الأقسام إلى الموقع 1، إجراء الربط، وإرسال النتيجة للموقع 3. التكلفة = 3,500 + 400,000 = 403,500 بايت. (هذه هي الاستراتيجية المفضلة).</li></ol><p><b>مثال على تقنية Semijoin (الاستعلام Q'):</b> استرجاع اسم القسم واسم مديره (النتيجة 100 صف، حجم الصف 40 بايت، الإجمالي 4000 بايت). النتيجة مطلوبة في الموقع 2.</p><ol><li>عمل إسقاط لأعمدة الربط من جدول الأقسام في الموقع 2 ونقلها للموقع 1. التكلفة = 9 بايت * 100 صف = 900 بايت.</li><li>إجراء الربط في الموقع 1، ونقل الأعمدة المطلوبة من الملف الناتج إلى الموقع 2. التكلفة = 39 بايت * 100 صف = 3,900 بايت.</li><li>إجراء الربط النهائي في الموقع 2. إجمالي النقل = 900 + 3,900 = 4,800 بايت (مقارنة بـ 7,500 بايت إذا استخدمنا الاستراتيجية التقليدية بنقل النتيجة).</li></ol></template>
+    <template class="content-en"><p>Based on the following data: Employee table at Site 1 (10,000 rows, row size 100 bytes, total 1,000,000 bytes). Department table at Site 2 (100 rows, row size 35 bytes, total 3,500 bytes). Query submitted at Site 3, and each result tuple is 40 bytes (total 10,000 rows = 400,000 bytes).</p><ol><li><b>Strategy 1:</b> Transfer both tables to Site 3. Cost = 1,000,000 + 3,500 = 1,003,500 bytes.</li><li><b>Strategy 2:</b> Transfer Employee to Site 2, execute join, send result to Site 3. Cost = 1,000,000 + 400,000 = 1,400,000 bytes.</li><li><b>Strategy 3:</b> Transfer Department to Site 1, execute join, send result to Site 3. Cost = 3,500 + 400,000 = 403,500 bytes. (This is the preferred strategy).</li></ol><p><b>Semijoin Technique Example (Query Q'):</b> Retrieve department name and manager name (Result 100 tuples, tuple size 40 bytes, total 4000 bytes). Result needed at Site 2.</p><ol><li>Project join attributes of Department at Site 2 and transfer to Site 1. Cost = 9 bytes * 100 rows = 900 bytes.</li><li>Join at Site 1, and transfer required attributes from the resulting file to Site 2. Cost = 39 bytes * 100 rows = 3,900 bytes.</li><li>Execute final join at Site 2. Total transfer = 900 + 3,900 = 4,800 bytes (compared to 7,500 bytes if using the traditional strategy of sending the result).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُظهر هذه الحسابات بوضوح أن القاعدة العامة "انقل الجدول الأصغر إلى موقع الجدول الأكبر" (الاستراتيجية 3) تقلل بشكل كبير من <span class="smart-term" data-term-en="Transfer Cost" data-ar="تكلفة النقل" data-en-def="The total amount of data (in bytes) transmitted over the network during query execution.">تكلفة النقل<span class="smart-term-tooltip"></span></span> مقارنة بنقل الجدول الأكبر.</p><p>في مثال Semijoin، نلاحظ أن التكلفة الإجمالية انخفضت إلى 4,800 بايت بدلاً من 7,500 بايت. يحدث هذا التوفير لأننا نتجنب إرسال بيانات غير ضرورية عبر الشبكة، حيث نرسل فقط المفاتيح (900 بايت) ثم نسترجع فقط البيانات التي تطابقت فعلياً (3,900 بايت).</p><p>ومع ذلك، تتطلب تقنية Semijoin خطوات معالجة إضافية (إسقاط، ربط أولي، ربط نهائي) مما يزيد من استهلاك وحدة المعالجة المركزية (CPU) محلياً، وهو مقايضة مقبولة نظراً لارتفاع تكلفة نقل الشبكة.</p></template>
+    <template class="content-en"><p>These calculations clearly show that the general rule of thumb "transfer the smaller table to the larger table's site" (Strategy 3) significantly reduces <span class="smart-term" data-term-en="Transfer Cost" data-ar="تكلفة النقل" data-en-def="The total amount of data (in bytes) transmitted over the network during query execution.">transfer cost<span class="smart-term-tooltip"></span></span> compared to moving the larger table.</p><p>In the Semijoin example, the total cost dropped to 4,800 bytes instead of 7,500 bytes. This saving occurs because we avoid sending unnecessary data across the network; we only send the keys (900 bytes) and then retrieve only the data that actually matched (3,900 bytes).</p><p>However, the Semijoin technique requires additional processing steps (projection, initial join, final join), which increases local CPU consumption. This is generally an acceptable trade-off given the high cost of network transfer.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا اختلف حجم النتيجة بشكل جذري بين الاستعلام Q (400,000 بايت) والاستعلام Q' (4,000 بايت) في الأمثلة؟</template>
+      <template class="content-en">Why did the result size differ drastically between query Q (400,000 bytes) and query Q' (4,000 bytes) in the examples?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الاستعلام Q يسترجع بيانات لكل موظف (10,000 صف)، بينما الاستعلام Q' يسترجع بيانات لكل قسم (100 صف). عدد الصفوف المطابقة يحدد حجم النتيجة بشكل مباشر.</p></template>
+      <template class="content-en"><p>Because Query Q retrieves data for each employee (10,000 tuples), while Q' retrieves data for each department (100 tuples). The number of matching tuples directly dictates the result size.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة العاشرة. لقد انتقلنا الآن من قواعد البيانات المركزية التي تعيش في خادم واحد، إلى عالم قواعد البيانات الموزعة. تخيل أنك تدير بنكاً عالمياً؛ لا يمكنك وضع كل البيانات في خادم واحد في الرياض. يجب أن توزع البيانات (Fragmentation) وتنسخها (Replication) لضمان السرعة وعدم توقف العمل إذا انقطع الاتصال. في هذا الاختبار، ركزوا بشدة على أنواع التجزئة (متى نستخدم UNION ومتى نستخدم JOIN لإعادة البناء)، وكيفية تقليل نقل البيانات عبر الشبكة باستخدام تقنية Semijoin العبقرية. لا تنسوا أيضاً مقارنة طرق التحكم في التزامن: الموقع الأساسي سهل ولكنه نقطة ضعف، بينما التصويت ديمقراطي ولكنه يتطلب وقت انتظار (Time-out). فهم هذه التوازنات هو مفتاح النجاح في هذا الفصل.</template>
-    <template class="content-en">Welcome to Module 10. We have moved from centralized databases living on a single server to the world of Distributed Databases. Imagine running a global bank; you can't put all data on one server. You must fragment and replicate data to ensure speed and availability if a link fails. For the exam, focus heavily on fragmentation types (when to use UNION vs JOIN for reconstruction), and how to minimize network transfer using the brilliant Semijoin technique. Also, compare concurrency control methods: Primary Site is simple but a single point of failure, while Voting is democratic but requires time-outs. Understanding these trade-offs is your key to success.</template>
+    <template class="content-ar">أهلاً بكم في الوحدة العاشرة. لقد انتقلنا الآن من قواعد البيانات المركزية التي تعيش في خادم واحد، إلى عالم قواعد البيانات الموزعة. تخيل أنك تدير بنكاً عالمياً؛ لا يمكنك وضع كل البيانات في خادم واحد في الرياض. يجب أن توزع البيانات (Fragmentation) وتنسخها (Replication) لضمان السرعة وعدم توقف العمل إذا انقطع الاتصال. في هذا الاختبار، ركزوا بشدة على أنواع التجزئة (متى نستخدم UNION ومتى نستخدم JOIN لإعادة البناء)، وكيفية تقليل نقل البيانات عبر الشبكة باستخدام تقنية Semijoin العبقرية. لا تنسوا أيضاً مقارنة طرق التحكم في التزامن: الموقع الأساسي سهل ولكنه نقطة ضعف، بينما التصويت ديمقراطي ولكنه يتطلب وقت انتظار (Time-out). فهم هذه التوازنات هو مفتاح النجاح في هذا الفصل.<p>لقد أضفنا أمثلة حسابية دقيقة لمعالجة الاستعلامات لتوضيح كيف يتخذ مُحسّن الاستعلامات (Query Optimizer) قراراته. في الامتحان، توقع أن تُعطى أحجام جداول ويُطلب منك حساب التكلفة بالبايت لكل استراتيجية لتحديد المسار الأمثل، تماماً كما فعلنا في الأمثلة.</p></template>
+    <template class="content-en">Welcome to Module 10. We have moved from centralized databases living on a single server to the world of Distributed Databases. Imagine running a global bank; you can't put all data on one server. You must fragment and replicate data to ensure speed and availability if a link fails. For the exam, focus heavily on fragmentation types (when to use UNION vs JOIN for reconstruction), and how to minimize network transfer using the brilliant Semijoin technique. Also, compare concurrency control methods: Primary Site is simple but a single point of failure, while Voting is democratic but requires time-outs. Understanding these trade-offs is your key to success.<p>We have added precise mathematical examples for query processing to illustrate how the Query Optimizer makes decisions. On the exam, expect to be given table sizes and asked to calculate the byte cost for each strategy to determine the optimal path, exactly as we did in the examples.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1174,6 +1225,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">العميل يحلل الاستعلام، يفككه إلى أجزاء، يرسلها للخوادم المناسبة، ثم يجمع النتائج النهائية، مما يخفف العبء عن الخوادم.</template>
           <template class="content-en">The client parses the query, decomposes it, sends it to the appropriate servers, and then combines the final results, offloading work from the servers.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">بما أن تقنية Semijoin تقلل من حجم البيانات المنقولة عبر الشبكة، فلماذا لا نستخدمها دائماً كاستراتيجية افتراضية؟</template>
+          <template class="content-en">Since the Semijoin technique reduces data transferred over the network, why don't we always use it as the default strategy?</template>
+          <span class="content-target">بما أن تقنية Semijoin تقلل من حجم البيانات المنقولة عبر الشبكة، فلماذا لا نستخدمها دائماً كاستراتيجية افتراضية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن تقنية Semijoin تتطلب خطوات معالجة إضافية (إسقاط، ربط أولي، ثم ربط نهائي). إذا كانت نسبة التطابق (Selectivity) عالية جداً (أي أن معظم الصفوف تتطابق)، فإن حجم البيانات المنقولة في الخطوة الثانية سيكون كبيراً تقريباً كحجم الجدول الأصلي، مما يجعل التكلفة الإجمالية (نقل + معالجة CPU) أعلى من الاستراتيجية التقليدية.</p></template>
+          <template class="content-en"><p>Because Semijoin requires additional processing steps (projection, initial join, then final join). If the join selectivity is very high (meaning most tuples match), the data transferred in the second step will be almost as large as the original table, making the total cost (transfer + CPU processing) higher than a traditional strategy.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1526,6 +1595,40 @@
         "en": "Deducting from Bank A and adding to Bank B; both must succeed or both must fail."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تمثيل التجزئة الأفقية والعمودية باستخدام الجبر العلائقي؟",
+      "en": "How are horizontal and vertical fragmentations represented using Relational Algebra?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الأفقية تُمثل بالاختيار $s_{C_i}(R)$، والعمودية تُمثل بالإسقاط $\\Pi_{L_i}(R)$.",
+        "en": "Horizontal is represented by selection $s_{C_i}(R)$, and vertical is represented by projection $\\Pi_{L_i}(R)$."
+      },
+      "example": {
+        "ar": "التجزئة المختلطة تدمج الاثنين: $\\Pi_{L_i}(s_{C_i}(R))$.",
+        "en": "Mixed fragmentation combines both: $\\Pi_{L_i}(s_{C_i}(R))$."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "كيف تحسب تكلفة نقل البيانات لاستراتيجية معينة في استعلام موزع؟",
+      "en": "How do you calculate the data transfer cost for a specific strategy in a distributed query?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بجمع حجم الجداول المنقولة إلى موقع المعالجة + حجم النتيجة المنقولة إلى موقع العميل.",
+        "en": "By summing the size of the tables transferred to the processing site + the size of the result transferred to the client site."
+      },
+      "example": {
+        "ar": "نقل جدول (3500 بايت) + نقل النتيجة (400,000 بايت) = 403,500 بايت.",
+        "en": "Transferring a table (3500 bytes) + transferring the result (400,000 bytes) = 403,500 bytes."
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -1535,7 +1638,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 10</span>
+            <span id="quiz-counter">1 / 11</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1551,7 +1654,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <div class="score-display" id="quiz-score-display">0 / 11</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1876,6 +1979,38 @@
     },
     "difficulty": "easy",
     "conceptId": "replication-and-allocation"
+  },
+  {
+    "conceptId": "query-processing-examples",
+    "question": {
+      "ar": "إذا كان حجم جدول الموظفين 1,000,000 بايت (في الموقع 1)، وجدول الأقسام 3,500 بايت (في الموقع 2)، وحجم النتيجة 400,000 بايت. ما هي تكلفة نقل جدول الموظفين إلى الموقع 2 وإرسال النتيجة للموقع 3؟",
+      "en": "If Employee table is 1,000,000 bytes (Site 1), Department is 3,500 bytes (Site 2), and Result is 400,000 bytes. What is the cost of transferring Employee to Site 2 and sending the result to Site 3?"
+    },
+    "options": {
+      "ar": [
+        "1,003,500 بايت",
+        "403,500 بايت",
+        "1,400,000 بايت",
+        "1,000,000 بايت"
+      ],
+      "en": [
+        "1,003,500 bytes",
+        "403,500 bytes",
+        "1,400,000 bytes",
+        "1,000,000 bytes"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التكلفة هي مجموع حجم جدول الموظفين المنقول (1,000,000) وحجم النتيجة المنقولة (400,000)، مما يساوي 1,400,000 بايت.",
+      "en": "The cost is the sum of the transferred Employee table (1,000,000) and the transferred result (400,000), which equals 1,400,000 bytes."
+    },
+    "hint": {
+      "ar": "اجمع حجم الجدول الذي تم نقله مع حجم النتيجة النهائية.",
+      "en": "Add the size of the moved table to the size of the final result."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1911,6 +2046,14 @@
     <div data-bilingual>
     <template class="content-ar">الاعتقاد بأن النظام المتجانس (Homogeneous) يتطلب نفس نظام التشغيل (OS). هذا خطأ. التجانس يشير فقط إلى برنامج قاعدة البيانات (مثل Oracle)، بينما يمكن أن تختلف أنظمة التشغيل (Linux، Windows).</template>
     <template class="content-en">Believing that a Homogeneous system requires the same Operating System. This is false. Homogeneity refers ONLY to the DBMS software (e.g., Oracle), while the OS can differ (Linux, Windows).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في التجزئة العمودية الكاملة، يجب أن يكون تقاطع أي جزأين هو المفتاح الأساسي فقط ($L_i \cap L_j = PK(R)$). إذا تقاطعا في أعمدة أخرى، فهذا يعني وجود تكرار غير ضروري للبيانات.</template>
+    <template class="content-en">In complete vertical fragmentation, the intersection of any two fragments must be exactly the primary key ($L_i \cap L_j = PK(R)$). If they intersect on other columns, it means there is unnecessary data redundancy.</template>
     <div class="content-target"></div>
     </div>
   </div>

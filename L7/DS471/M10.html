@@ -308,6 +308,30 @@ model.compile(
 history = model.fit(X_train, y_train, epochs=30, validation_data=(X_valid, y_valid))</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>fashion_mnist = keras.datasets.fashion_mnist
+(X_train_full, y_train_full), (X_test, y_test) = fashion_mnist.load_data()
+
+# Split validation set and scale pixel intensities to 0-1
+X_valid, X_train = X_train_full[:5000] / 255.0, X_train_full[5000:] / 255.0
+y_valid, y_train = y_train_full[:5000], y_train_full[5000:]
+
+# Define class names for Fashion MNIST
+class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat", "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>model.summary()</code></pre>
+  </div>
+
   <!-- DIAGRAM[1]: Detailed SVG generation prompt: A neural network architecture diagram. Left side: Input layer labeled 'Flatten (28x28 -> 784)'. Middle: Two hidden layers labeled 'Dense (300, relu)' and 'Dense (100, relu)'. Right side: Output layer labeled 'Dense (10, softmax)'. Arrows connecting all nodes from left to right indicating a fully connected feedforward network. Style: educational, dark background #0d1117, accent color #4CAF50, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
@@ -576,6 +600,38 @@ model.compile(loss="mean_squared_error", optimizer="sgd")
 history = model.fit(X_train_scaled, y_train, epochs=20, validation_data=(X_valid_scaled, y_valid))</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+housing = fetch_california_housing()
+X_train_full, X_test, y_train_full, y_test = train_test_split(housing.data, housing.target)
+X_train, X_valid, y_train, y_valid = train_test_split(X_train_full, y_train_full)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_valid_scaled = scaler.transform(X_valid)
+X_test_scaled = scaler.transform(X_test)</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Evaluating the Model
+mse_test = model.evaluate(X_test_scaled, y_test)
+
+# Making Predictions
+X_new = X_test_scaled[:3] # Example for new instances
+y_pred = model.predict(X_new)</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">إذا أردنا التنبؤ بأسعار منازل لا يمكن أن تكون سالبة أبداً، هل يمكننا استخدام دالة تنشيط معينة في طبقة الإخراج؟</template>
@@ -630,6 +686,29 @@ hidden2 = keras.layers.Dense(30, activation="relu")(hidden1)
 concat = keras.layers.Concatenate()([input, hidden2])
 output = keras.layers.Dense(1)(concat)
 model = keras.models.Model(inputs=[input], outputs=[output])</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Multiple Inputs Example
+input_A = keras.layers.Input(shape=[5])
+input_B = keras.layers.Input(shape=[6])
+
+hidden1 = keras.layers.Dense(30, activation="relu")(input_B)
+hidden2 = keras.layers.Dense(30, activation="relu")(hidden1)
+concat = keras.layers.concatenate([input_A, hidden2])
+
+# Multiple Outputs Example
+output = keras.layers.Dense(1)(concat)
+aux_output = keras.layers.Dense(1)(hidden2)
+
+model = keras.models.Model(inputs=[input_A, input_B], outputs=[output, aux_output])
+
+# Loss Function Compilation with weights
+model.compile(loss=["mse", "mse"], loss_weights=[0.9, 0.1], optimizer="sgd")</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: A diagram showing a Wide & Deep neural network architecture. An 'Input' node splits into two paths. Path 1 goes directly to a 'Concatenate' node (Wide path). Path 2 goes through 'Hidden 1' then 'Hidden 2' before reaching the 'Concatenate' node (Deep path). The 'Concatenate' node then connects to the 'Output' node. Style: educational, dark background #0d1117, accent color #2196F3, viewBox 0 0 800 400, Arabic + English labels. -->
@@ -848,8 +927,8 @@ loaded_model = keras.models.load_model("my_keras_model.h5")</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>أهم <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">الاستدعاءات<span class="smart-term-tooltip"></span></span> المدمجة في Keras:</p><ol><li><b>ModelCheckpoint:</b> يحفظ النموذج على فترات منتظمة. باستخدام <code>save_best_only=True</code>، سيتم حفظ النموذج فقط إذا تحسن أداؤه على مجموعة التحقق (Validation set).</li><li><b>EarlyStopping:</b> يوقف التدريب تلقائياً إذا لم يتحسن أداء النموذج على مجموعة التحقق لعدد معين من الحقب (Epochs)، والذي يُحدد بواسطة المعلمة <code>patience</code>.</li></ol><p>يمكن دمج الاستدعاءات معاً وتمريرها كقائمة إلى دالة <code>model.fit()</code>.</p></template>
-    <template class="content-en"><p>Key built-in <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">callbacks<span class="smart-term-tooltip"></span></span> in Keras:</p><ol><li><b>ModelCheckpoint:</b> Saves the model at regular intervals. With <code>save_best_only=True</code>, it only saves the model if its performance on the validation set improves.</li><li><b>EarlyStopping:</b> Automatically stops training if the model's performance on the validation set doesn't improve for a certain number of epochs, defined by the <code>patience</code> parameter.</li></ol><p>Callbacks can be combined and passed as a list to the <code>model.fit()</code> function.</p></template>
+    <template class="content-ar"><p>أهم <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">الاستدعاءات<span class="smart-term-tooltip"></span></span> المدمجة في Keras:</p><ol><li><b>ModelCheckpoint:</b> يحفظ النموذج على فترات منتظمة. باستخدام <code>save_best_only=True</code>، سيتم حفظ النموذج فقط إذا تحسن أداؤه على مجموعة التحقق (Validation set).</li><li><b>EarlyStopping:</b> يوقف التدريب تلقائياً إذا لم يتحسن أداء النموذج على مجموعة التحقق لعدد معين من الحقب (Epochs)، والذي يُحدد بواسطة المعلمة <code>patience</code>.</li></ol><p>يمكن دمج الاستدعاءات معاً وتمريرها كقائمة إلى دالة <code>model.fit()</code>.</p><p>بالإضافة إلى الاستدعاءات المدمجة، يمكنك إنشاء <b>استدعاءات مخصصة (Custom Callbacks)</b> لتنفيذ مهام محددة مثل تصحيح الأخطاء، أو مراقبة التقدم، أو تعديل معدلات التعلم. يتم ذلك عن طريق وراثة الفئة <code>keras.callbacks.Callback</code> وتجاوز دوال مخصصة مثل <code>on_epoch_end()</code>، <code>on_batch_end()</code>، أو <code>on_train_begin()</code>.</p></template>
+    <template class="content-en"><p>Key built-in <span class="smart-term" data-term-en="Callbacks" data-ar="الاستدعاءات" data-en-def="Functions that can be applied at given stages of the training procedure to monitor or modify the process.">callbacks<span class="smart-term-tooltip"></span></span> in Keras:</p><ol><li><b>ModelCheckpoint:</b> Saves the model at regular intervals. With <code>save_best_only=True</code>, it only saves the model if its performance on the validation set improves.</li><li><b>EarlyStopping:</b> Automatically stops training if the model's performance on the validation set doesn't improve for a certain number of epochs, defined by the <code>patience</code> parameter.</li></ol><p>Callbacks can be combined and passed as a list to the <code>model.fit()</code> function.</p><p>In addition to built-in callbacks, you can create <b><span class="smart-term" data-term-en="Custom Callback" data-ar="استدعاء مخصص" data-en-def="A user-defined class inheriting from keras.callbacks.Callback to execute custom logic during training.">Custom Callback<span class="smart-term-tooltip"></span></span>s</b> to perform specific tasks like debugging, monitoring progress, or adjusting learning rates. This is done by subclassing <code>keras.callbacks.Callback</code> and overriding specific methods such as <code>on_epoch_end()</code>, <code>on_batch_end()</code>, or <code>on_train_begin()</code>.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -869,6 +948,19 @@ early_stopping_cb = keras.callbacks.EarlyStopping(patience=10, restore_best_weig
 history = model.fit(X_train, y_train, epochs=100, 
                     validation_data=(X_valid, y_valid),
                     callbacks=[checkpoint_cb, early_stopping_cb])</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class PrintValTrainRatioCallback(keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs):
+        print("\nval/train: {:.2f}".format(logs["val_loss"] / logs["loss"]))
+
+# Usage:
+# history = model.fit(..., callbacks=[PrintValTrainRatioCallback()])</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -955,8 +1047,8 @@ history = model.fit(X_train, y_train, epochs=30,
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. لقد انتقلنا الآن من الخوارزميات التقليدية إلى عالم 'التعلم العميق' باستخدام Keras. في الامتحان، ركزوا جيداً على متى نستخدم Sequential API (للمهام البسيطة الخطية) ومتى نلجأ إلى Functional API (للمهام المعقدة ذات المدخلات/المخرجات المتعددة). تذكروا دائماً دوال التكلفة: متى نستخدم Sparse Categorical Crossentropy؟ (عندما تكون التسميات أرقاماً). وماذا عن الانحدار؟ (نستخدم MSE ولا نضع دالة تنشيط في النهاية). لا تنسوا أيضاً أهمية الاستدعاءات (Callbacks)؛ فالتوقف المبكر (Early Stopping) هو سلاحكم السري لمنع الإفراط في التخصيص. وأخيراً، تذكروا أن TensorBoard هو عينكم التي ترون بها ما يحدث داخل 'الصندوق الأسود' للشبكة العصبية. راجعوا الأكواد جيداً، ففهم كيفية تجميع (Compile) وتدريب (Fit) النموذج أمر لا غنى عنه.</template>
-    <template class="content-en">Welcome, my friends, to this crucial module. We have now transitioned from traditional algorithms into the realm of 'Deep Learning' using Keras. For the exam, focus heavily on when to use the Sequential API (for simple, linear tasks) versus the Functional API (for complex tasks with multiple inputs/outputs). Always remember your loss functions: when do we use Sparse Categorical Crossentropy? (When labels are integers). What about regression? (We use MSE and no activation function at the end). Do not forget the importance of Callbacks; Early Stopping is your secret weapon against overfitting. Finally, remember that TensorBoard is your eye into the 'black box' of the neural network. Review the code snippets carefully; understanding how to compile and fit a model is indispensable.</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. لقد انتقلنا الآن من الخوارزميات التقليدية إلى عالم 'التعلم العميق' باستخدام Keras. في الامتحان، ركزوا جيداً على متى نستخدم Sequential API (للمهام البسيطة الخطية) ومتى نلجأ إلى Functional API (للمهام المعقدة ذات المدخلات/المخرجات المتعددة). تذكروا دائماً دوال التكلفة: متى نستخدم Sparse Categorical Crossentropy؟ (عندما تكون التسميات أرقاماً). وماذا عن الانحدار؟ (نستخدم MSE ولا نضع دالة تنشيط في النهاية). لا تنسوا أيضاً أهمية الاستدعاءات (Callbacks)؛ فالتوقف المبكر (Early Stopping) هو سلاحكم السري لمنع الإفراط في التخصيص. وأخيراً، تذكروا أن TensorBoard هو عينكم التي ترون بها ما يحدث داخل 'الصندوق الأسود' للشبكة العصبية. راجعوا الأكواد جيداً، ففهم كيفية تجميع (Compile) وتدريب (Fit) النموذج أمر لا غنى عنه.<p>لقد أكملنا الآن دورة حياة النموذج بأكملها: من معالجة البيانات وتقسيمها، إلى بناء بنيات معقدة، وتقييم الأداء، وحتى كتابة استدعاءات مخصصة. إتقان هذه الأدوات العملية في Keras سيمنحك تحكماً كاملاً في تجارب التعلم العميق الخاصة بك.</p></template>
+    <template class="content-en">Welcome, my friends, to this crucial module. We have now transitioned from traditional algorithms into the realm of 'Deep Learning' using Keras. For the exam, focus heavily on when to use the Sequential API (for simple, linear tasks) versus the Functional API (for complex tasks with multiple inputs/outputs). Always remember your loss functions: when do we use Sparse Categorical Crossentropy? (When labels are integers). What about regression? (We use MSE and no activation function at the end). Do not forget the importance of Callbacks; Early Stopping is your secret weapon against overfitting. Finally, remember that TensorBoard is your eye into the 'black box' of the neural network. Review the code snippets carefully; understanding how to compile and fit a model is indispensable.<p>We have now completed the entire model lifecycle: from data preprocessing and splitting, to building complex architectures, evaluating performance, and even writing custom callbacks. Mastering these practical Keras tools will give you full control over your deep learning experiments.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1130,6 +1222,41 @@ history = model.fit(X_train, y_train, epochs=30,
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن دوال التنشيط تقيد المخرجات بنطاق معين (مثل 0 إلى 1). في الانحدار، نريد أن يكون النموذج قادراً على التنبؤ بأي قيمة عددية مستمرة دون قيود.</template>
           <template class="content-en">Because activation functions constrain the output to a specific range (like 0 to 1). In regression, we want the model to be able to predict any continuous numerical value without constraints.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نتعامل مع دالة التكلفة (Loss Function) عندما يحتوي النموذج على مخرجات متعددة (Multiple Outputs)؟</template>
+          <template class="content-en">How do we handle the loss function when a model has multiple outputs?</template>
+          <span class="content-target">كيف نتعامل مع دالة التكلفة (Loss Function) عندما يحتوي النموذج على مخرجات متعددة (Multiple Outputs)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يجب تمرير قائمة بدوال التكلفة إلى دالة <code>compile</code> (دالة لكل مخرج). ستقوم Keras بحساب التكلفة الإجمالية عن طريق جمعها. لضمان عدم سيطرة المخرج المساعد على التدريب، نستخدم المعلمة <code>loss_weights</code> لإعطاء وزن أكبر لتكلفة المخرج الرئيسي.</p></template>
+          <template class="content-en"><p>We must pass a list of loss functions to the <code>compile</code> method (one for each output). Keras will compute the total loss by summing them. To ensure the auxiliary output doesn't dominate training, we use the <code>loss_weights</code> parameter to assign a higher weight to the main output's loss.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخطوات الأساسية لتقييم نموذج Keras واستخدامه للتنبؤ بعد انتهاء التدريب؟</template>
+          <template class="content-en">What are the essential steps to evaluate a Keras model and use it for prediction after training is complete?</template>
+          <span class="content-target">ما هي الخطوات الأساسية لتقييم نموذج Keras واستخدامه للتنبؤ بعد انتهاء التدريب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>أولاً، نستخدم <code>model.evaluate(X_test, y_test)</code> لحساب الخسارة والمقاييس على بيانات اختبار غير مرئية للتأكد من قدرة النموذج على التعميم. ثانياً، نستخدم <code>model.predict(X_new)</code> لتمرير بيانات جديدة تماماً والحصول على التنبؤات الفعلية (سواء كانت احتمالات للفئات أو قيماً مستمرة).</p></template>
+          <template class="content-en"><p>First, we use <code>model.evaluate(X_test, y_test)</code> to compute the loss and metrics on unseen test data to ensure the model generalizes well. Second, we use <code>model.predict(X_new)</code> to pass entirely new data and get the actual predictions (whether class probabilities or continuous values).</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1397,6 +1524,74 @@ history = model.fit(X_train, y_train, epochs=30,
         "en": "Classifying an image as a 'Shirt' or 'Sneaker'."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "model.summary()",
+      "en": "model.summary()"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة تُستخدم لعرض بنية النموذج، بما في ذلك الطبقات، أشكال المخرجات، وعدد المعلمات.",
+        "en": "A method used to display the model's architecture, including layers, output shapes, and the number of parameters."
+      },
+      "example": {
+        "ar": "استخدامها للتحقق من عدد الأوزان القابلة للتدريب في الشبكة.",
+        "en": "Using it to check the number of trainable weights in the network."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "model.evaluate()",
+      "en": "model.evaluate()"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تُستخدم لتقييم أداء النموذج المدرب على مجموعة بيانات الاختبار (Test set).",
+        "en": "A function used to evaluate the trained model's performance on the test dataset."
+      },
+      "example": {
+        "ar": "mse_test = model.evaluate(X_test_scaled, y_test)",
+        "en": "mse_test = model.evaluate(X_test_scaled, y_test)"
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "model.predict()",
+      "en": "model.predict()"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة تُستخدم لتوليد تنبؤات لبيانات جديدة غير مرئية مسبقاً.",
+        "en": "A function used to generate predictions for new, unseen data instances."
+      },
+      "example": {
+        "ar": "y_pred = model.predict(X_new)",
+        "en": "y_pred = model.predict(X_new)"
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "الاستدعاءات المخصصة (Custom Callbacks)",
+      "en": "Custom Callbacks"
+    },
+    "back": {
+      "definition": {
+        "ar": "فئات يحددها المستخدم ترث من <code>keras.callbacks.Callback</code> لتنفيذ منطق مخصص أثناء التدريب.",
+        "en": "User-defined classes inheriting from <code>keras.callbacks.Callback</code> to execute custom logic during training."
+      },
+      "example": {
+        "ar": "تجاوز <code>on_epoch_end()</code> لطباعة نسبة الخسارة.",
+        "en": "Overriding <code>on_epoch_end()</code> to print the loss ratio."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1406,7 +1601,7 @@ history = model.fit(X_train, y_train, epochs=30,
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1422,7 +1617,7 @@ history = model.fit(X_train, y_train, epochs=30,
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1747,6 +1942,70 @@ history = model.fit(X_train, y_train, epochs=30,
     },
     "difficulty": "hard",
     "conceptId": "tensorboard-visualization"
+  },
+  {
+    "conceptId": "functional-api",
+    "question": {
+      "ar": "عند بناء نموذج بمخرجات متعددة (Multiple Outputs)، ما هو الغرض من استخدام المعلمة <code>loss_weights</code> في دالة <code>compile</code>؟",
+      "en": "When building a model with multiple outputs, what is the purpose of using the <code>loss_weights</code> parameter in the <code>compile</code> function?"
+    },
+    "options": {
+      "ar": [
+        "تحديد الأوزان الأولية للشبكة العصبية.",
+        "إعطاء أهمية أكبر لمخرج معين (مثل المخرج الرئيسي) مقارنة بالمخرجات الأخرى (مثل المخرج المساعد) عند حساب التكلفة الإجمالية.",
+        "تحديد معدل التعلم لكل طبقة.",
+        "تجاهل الخسارة الناتجة عن المخرج المساعد تماماً."
+      ],
+      "en": [
+        "To set the initial weights of the neural network.",
+        "To give more importance to a specific output (like the main output) compared to others (like an auxiliary output) when calculating the total loss.",
+        "To define the learning rate for each layer.",
+        "To completely ignore the loss generated by the auxiliary output."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تسمح لك <code>loss_weights</code> بتوجيه النموذج للتركيز أكثر على تحسين المخرج الرئيسي من خلال إعطائه وزناً أعلى (مثلاً 0.9) مقارنة بالمخرج المساعد (مثلاً 0.1).",
+      "en": "<code>loss_weights</code> allows you to direct the model to focus more on optimizing the main output by giving it a higher weight (e.g., 0.9) compared to the auxiliary output (e.g., 0.1)."
+    },
+    "hint": {
+      "ar": "كيف يوازن النموذج بين هدفين مختلفين؟",
+      "en": "How does the model balance two different objectives?"
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "callbacks-early-stopping",
+    "question": {
+      "ar": "أي من الدوال التالية يجب تجاوزها (Override) في استدعاء مخصص (Custom Callback) إذا أردت تنفيذ كود معين بعد انتهاء كل حقبة (Epoch)؟",
+      "en": "Which of the following methods should be overridden in a Custom Callback if you want to execute specific code after every epoch finishes?"
+    },
+    "options": {
+      "ar": [
+        "on_train_begin()",
+        "on_batch_end()",
+        "on_epoch_end()",
+        "on_train_end()"
+      ],
+      "en": [
+        "on_train_begin()",
+        "on_batch_end()",
+        "on_epoch_end()",
+        "on_train_end()"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتم استدعاء الدالة <code>on_epoch_end()</code> تلقائياً بواسطة Keras في نهاية كل حقبة تدريب، مما يجعلها المكان المناسب لطباعة السجلات أو حساب المقاييس المخصصة.",
+      "en": "The <code>on_epoch_end()</code> method is automatically called by Keras at the end of each training epoch, making it the right place to print logs or calculate custom metrics."
+    },
+    "hint": {
+      "ar": "الاسم يشير إلى 'نهاية الحقبة'.",
+      "en": "The name implies 'end of epoch'."
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>

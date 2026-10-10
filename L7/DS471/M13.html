@@ -118,6 +118,16 @@
         <template class="content-en">TensorFlow Datasets (TFDS)</template>
         <span class="content-target">مجموعات بيانات TensorFlow (TFDS)</span>
       </a>
+      <a href="#using-datasets-with-keras" class="toc-link" data-bilingual>
+        <template class="content-ar">استخدام مجموعات البيانات مع Keras</template>
+        <template class="content-en">Using Datasets with Keras</template>
+        <span class="content-target">استخدام مجموعات البيانات مع Keras</span>
+      </a>
+      <a href="#preprocessing-csv-data" class="toc-link" data-bilingual>
+        <template class="content-ar">معالجة بيانات CSV مسبقًا</template>
+        <template class="content-en">Preprocessing CSV Data</template>
+        <span class="content-target">معالجة بيانات CSV مسبقًا</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -991,14 +1001,133 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   </details>
 </section>
 
+<section id="using-datasets-with-keras" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> استخدام مجموعات البيانات مع Keras</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Using Datasets with Keras</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بمجرد بناء خط أنابيب البيانات باستخدام Data API، يمكنك تمريره مباشرة إلى نماذج Keras للتدريب والتقييم.</p><p>يشبه ذلك توصيل خرطوم المياه (البيانات) مباشرة بالمحرك (النموذج) ليعمل بسلاسة وبشكل مستمر.</p></template>
+    <template class="content-en"><p>Once a data pipeline is built using the Data API, you can pass it directly to Keras models for training and evaluation.</p><p>It is like connecting a water hose (data) directly to an engine (model) so it runs smoothly and continuously.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يقبل Keras كائنات <code>tf.data.Dataset</code> مباشرة في دواله الرئيسية:</p><ul><li><b>التدريب (Training):</b> نستخدم <code>model.fit()</code>. إذا كانت مجموعة البيانات متكررة لا نهائيًا (باستخدام <code>repeat()</code>)، يجب تحديد المعلمة <code>steps_per_epoch</code> لإخبار النموذج متى تنتهي الحقبة.</li><li><b>التقييم والتنبؤ (Evaluate & Predict):</b> نستخدم <code>model.evaluate()</code> و <code>model.predict()</code>. وبالمثل، نستخدم المعلمة <code>steps</code> لتحديد عدد الدفعات التي يجب معالجتها.</li></ul></template>
+    <template class="content-en"><p>Keras accepts <code>tf.data.Dataset</code> objects directly in its main methods:</p><ul><li><b>Training:</b> We use <code>model.fit()</code>. If the dataset is infinitely repeated (using <code>repeat()</code>), the <code>steps_per_epoch</code> parameter must be specified to tell the model when an epoch ends.</li><li><b>Evaluate & Predict:</b> We use <code>model.evaluate()</code> and <code>model.predict()</code>. Similarly, we use the <code>steps</code> parameter to specify how many batches to process.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>بالإضافة إلى دوال Keras المدمجة، يمكنك استخدام مجموعات البيانات في <b>حلقات التدريب المخصصة (Custom Training Loops)</b>.</p><p>نظرًا لأن <code>Dataset</code> هو كائن قابل للتكرار (Iterable) في بايثون، يمكنك ببساطة استخدام حلقة <code>for</code> للمرور عبر الدفعات (Batches) وتطبيق خوارزمية الانحدار المتدرج (Gradient Descent) يدويًا باستخدام <code>tf.GradientTape</code>.</p></template>
+    <template class="content-en"><p>In addition to built-in Keras methods, you can use datasets in <b><span class="smart-term" data-term-en="Custom Training Loop" data-ar="حلقة التدريب المخصصة" data-en-def="A manually written loop in TensorFlow to control the exact forward and backward passes of a model.">Custom Training Loop<span class="smart-term-tooltip"></span></span>s</b>.</p><p>Since a <code>Dataset</code> is a Python iterable, you can simply use a <code>for</code> loop to iterate over the batches and apply the Gradient Descent algorithm manually using <code>tf.GradientTape</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Training Model
+model.fit(train_set, steps_per_epoch=len(X_train) // batch_size, epochs=10)
+
+# Evaluate &amp; Predict
+model.evaluate(test_set, steps=len(X_test) // batch_size)
+model.predict(new_set, steps=len(X_new) // batch_size)
+
+# Custom Training Loop
+for X_batch, y_batch in train_set:
+    # Perform gradient descent step here
+    pass</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا مررت مجموعة بيانات لا نهائية (Infinite Dataset) إلى <code>model.evaluate()</code> دون تحديد المعلمة <code>steps</code>؟</template>
+      <template class="content-en">What happens if you pass an infinite dataset to <code>model.evaluate()</code> without specifying the <code>steps</code> parameter?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستستمر عملية التقييم إلى الأبد ولن تتوقف أبدًا، لأن النموذج سيستمر في سحب دفعات جديدة من مجموعة البيانات اللانهائية.</p></template>
+      <template class="content-en"><p>The evaluation process will run forever and never stop, because the model will keep pulling new batches from the infinite dataset.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="preprocessing-csv-data" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> معالجة بيانات CSV مسبقًا</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Preprocessing CSV Data</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كيفية قراءة وتحويل الأسطر النصية الخام من ملفات CSV إلى موترات (Tensors) رقمية يمكن للنموذج فهمها.</p><p>مثل ترجمة كتاب من لغة أجنبية إلى لغتك الأم قبل أن تتمكن من دراسته.</p></template>
+    <template class="content-en"><p>How to read and convert raw text lines from CSV files into numerical Tensors that the model can understand.</p><p>Like translating a book from a foreign language into your native tongue before you can study it.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحليل بيانات CSV، يوفر TensorFlow دوال متخصصة يتم دمجها عادةً داخل دالة <code>map()</code>:</p><ol><li><code>tf.io.decode_csv()</code>: تقوم بتحليل كل سطر CSV وتحويله إلى قائمة من الموترات (Tensors) المنفصلة بناءً على القيم الافتراضية المحددة.</li><li><code>tf.stack()</code>: تقوم بتكديس هذه الحقول المحللة في موترات أحادية البعد (1D tensors).</li></ol><p>أثناء هذه العملية، يتم عادةً فصل الميزات (Features) عن التسمية (Label) وتطبيق عمليات التسوية (Scaling).</p></template>
+    <template class="content-en"><p>To parse CSV data, TensorFlow provides specialized functions typically integrated within a <code>map()</code> function:</p><ol><li><code>tf.io.decode_csv()</code>: Parses each CSV line and converts it into a list of separate Tensors based on specified default values.</li><li><code>tf.stack()</code>: Stacks these parsed fields into 1D tensors.</li></ol><p>During this process, features are usually separated from the label, and scaling operations are applied.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في دالة المعالجة المسبقة، يتم تسوية الميزات المدخلة (Scaling) عن طريق طرح المتوسط (Mean) والقسمة على الانحراف المعياري (Standard Deviation). يجب حساب هذه الإحصائيات مسبقًا على بيانات التدريب.</p><p>تُرجع الدالة في النهاية صفًا (Tuple) يحتوي على الميزات والتسمية <code>(features, label)</code>، وهو التنسيق الدقيق الذي يتوقعه Keras للتدريب الخاضع للإشراف.</p></template>
+    <template class="content-en"><p>In the preprocessing function, input features are scaled by subtracting the mean and dividing by the standard deviation. These statistics must be computed beforehand on the training data.</p><p>The function ultimately returns a tuple containing the features and the label <code>(features, label)</code>, which is the exact format Keras expects for supervised training.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>def preprocess(line):
+    # Parses each CSV line into tensors
+    fields = tf.io.decode_csv(line, record_defaults=defs)
+    # Stacks parsed fields into 1D tensors
+    x = tf.stack(fields[:-1])
+    y = tf.stack(fields[-1:])
+    # Scaling: Input features are normalized
+    return (x - X_mean) / X_std, y</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم <code>fields[:-1]</code> للميزات و <code>fields[-1:]</code> للتسمية في كود المعالجة المسبقة؟</template>
+      <template class="content-en">Why do we use <code>fields[:-1]</code> for features and <code>fields[-1:]</code> for the label in the preprocessing code?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأننا نفترض أن العمود الأخير في ملف CSV يحتوي على التسمية (الهدف)، بينما تحتوي جميع الأعمدة السابقة على الميزات المدخلة.</p></template>
+      <template class="content-en"><p>Because we assume the last column in the CSV file contains the label (target), while all preceding columns contain the input features.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي البيانات المستقبلين. في هذه الوحدة، ننتقل من النماذج التجريبية الصغيرة إلى العالم الحقيقي للتعلم العميق. في الواقع، البيانات ضخمة جدًا ولن تتسع أبدًا في ذاكرة الوصول العشوائي (RAM) لجهازك. هنا يأتي دور Data API في TensorFlow. تخيل أنك تدير مصنعًا؛ لا يمكنك إحضار كل المواد الخام إلى صالة الإنتاج دفعة واحدة. بدلاً من ذلك، تقوم ببناء خط تجميع (Pipeline) يسحب البيانات، يخلطها (Shuffle)، يعالجها (Map)، ويجمعها في دفعات (Batch)، ثم يجهزها مسبقًا (Prefetch) للآلة (GPU) حتى لا تتوقف عن العمل أبدًا. ولتخزين هذه البيانات بكفاءة، نستخدم حاويات قياسية تسمى TFRecords، وننظم البيانات بداخلها باستخدام Protocol Buffers. تذكروا دائمًا: النموذج الجيد يختنق بدون خط أنابيب بيانات سريع. ركزوا على فهم كيفية تسلسل هذه التحويلات وكيفية تحليل TFRecords للامتحان!</template>
-    <template class="content-en">Welcome, future data engineers. In this module, we transition from toy models to the real world of deep learning. In reality, data is massive and will never fit in your RAM. This is where TensorFlow's Data API shines. Imagine running a factory; you can't bring all raw materials to the floor at once. Instead, you build an assembly line (Pipeline) that pulls data, shuffles it, maps it, batches it, and prefetches it for the machine (GPU) so it never sits idle. To store this data efficiently, we use standardized containers called TFRecords, structuring the data inside with Protocol Buffers. Always remember: a great model starves without a fast data pipeline. Focus on understanding how to chain these transformations and how to parse TFRecords for the exam!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي البيانات المستقبلين. في هذه الوحدة، ننتقل من النماذج التجريبية الصغيرة إلى العالم الحقيقي للتعلم العميق. في الواقع، البيانات ضخمة جدًا ولن تتسع أبدًا في ذاكرة الوصول العشوائي (RAM) لجهازك. هنا يأتي دور Data API في TensorFlow. تخيل أنك تدير مصنعًا؛ لا يمكنك إحضار كل المواد الخام إلى صالة الإنتاج دفعة واحدة. بدلاً من ذلك، تقوم ببناء خط تجميع (Pipeline) يسحب البيانات، يخلطها (Shuffle)، يعالجها (Map)، ويجمعها في دفعات (Batch)، ثم يجهزها مسبقًا (Prefetch) للآلة (GPU) حتى لا تتوقف عن العمل أبدًا. ولتخزين هذه البيانات بكفاءة، نستخدم حاويات قياسية تسمى TFRecords، وننظم البيانات بداخلها باستخدام Protocol Buffers. تذكروا دائمًا: النموذج الجيد يختنق بدون خط أنابيب بيانات سريع. ركزوا على فهم كيفية تسلسل هذه التحويلات وكيفية تحليل TFRecords للامتحان!<p>الآن بعد أن أتقنتم بناء خطوط أنابيب البيانات، تذكروا أن الهدف النهائي هو تغذية هذه البيانات بكفاءة إلى نماذج Keras. إن الفهم العميق لكيفية دمج <code>tf.data.Dataset</code> مع <code>model.fit</code> وحلقات التدريب المخصصة هو ما يميز مهندس التعلم الآلي المحترف القادر على تدريب نماذج ضخمة دون اختناقات في الأداء.</p></template>
+    <template class="content-en">Welcome, future data engineers. In this module, we transition from toy models to the real world of deep learning. In reality, data is massive and will never fit in your RAM. This is where TensorFlow's Data API shines. Imagine running a factory; you can't bring all raw materials to the floor at once. Instead, you build an assembly line (Pipeline) that pulls data, shuffles it, maps it, batches it, and prefetches it for the machine (GPU) so it never sits idle. To store this data efficiently, we use standardized containers called TFRecords, structuring the data inside with Protocol Buffers. Always remember: a great model starves without a fast data pipeline. Focus on understanding how to chain these transformations and how to parse TFRecords for the exam!<p>Now that you have mastered building data pipelines, remember that the ultimate goal is to feed this data efficiently into Keras models. A deep understanding of how to integrate <code>tf.data.Dataset</code> with <code>model.fit</code> and custom training loops is what distinguishes a professional ML engineer capable of training massive models without performance bottlenecks.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1176,6 +1305,41 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يطلب منا Keras تحديد <code>steps_per_epoch</code> عند التدريب باستخدام <code>tf.data.Dataset</code>؟</template>
+          <template class="content-en">Why does Keras require us to specify <code>steps_per_epoch</code> when training with a <code>tf.data.Dataset</code>?</template>
+          <span class="content-target">لماذا يطلب منا Keras تحديد <code>steps_per_epoch</code> عند التدريب باستخدام <code>tf.data.Dataset</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن خطوط أنابيب البيانات غالبًا ما تستخدم دالة <code>repeat()</code> لجعل تدفق البيانات لا نهائيًا، مما يمنع توقف التدريب بسبب نقص البيانات. بدون <code>steps_per_epoch</code>، لن يعرف Keras متى تنتهي الحقبة (Epoch) الحالية لكي يقوم بحساب مقاييس التقييم أو حفظ النموذج.</p></template>
+          <template class="content-en"><p>Because data pipelines often use the <code>repeat()</code> function to make the data stream infinite, preventing training from halting due to data starvation. Without <code>steps_per_epoch</code>, Keras wouldn't know when the current epoch ends to calculate metrics or save the model.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في المعالجة المسبقة لملفات CSV، لماذا نقوم بتسوية البيانات (Scaling) داخل خط أنابيب TensorFlow بدلاً من القيام بذلك مسبقًا باستخدام Pandas؟</template>
+          <template class="content-en">In CSV preprocessing, why do we scale the data inside the TensorFlow pipeline instead of doing it beforehand using Pandas?</template>
+          <span class="content-target">في المعالجة المسبقة لملفات CSV، لماذا نقوم بتسوية البيانات (Scaling) داخل خط أنابيب TensorFlow بدلاً من القيام بذلك مسبقًا باستخدام Pandas؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>القيام بذلك داخل خط الأنابيب يسمح بمعالجة البيانات أثناء الطيران (On-the-fly) باستخدام وحدات المعالجة المركزية المتعددة (Multithreading)، مما يوفر الذاكرة. كما أنه يضمن تطبيق نفس تحويلات التسوية بالضبط على بيانات الاختبار والبيانات الجديدة في الإنتاج دون الحاجة إلى كود خارجي.</p></template>
+          <template class="content-en"><p>Doing it inside the pipeline allows for on-the-fly processing using multithreading, which saves memory. It also ensures that the exact same scaling transformations are applied to test data and new data in production without needing external code.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1205,8 +1369,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 2,
     "front": {
-      "ar": "ماذا تفعل الدالة <code>from_tensor_slices()</code>؟",
-      "en": "What does the <code>from_tensor_slices()</code> function do?"
+      "ar": "ماذا تفعل الدالة <code>from_tensor_slices()<\/code>؟",
+      "en": "What does the <code>from_tensor_slices()<\/code> function do?"
     },
     "back": {
       "definition": {
@@ -1222,8 +1386,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 3,
     "front": {
-      "ar": "ما هي وظيفة <code>dataset.repeat(n)</code>؟",
-      "en": "What is the function of <code>dataset.repeat(n)</code>?"
+      "ar": "ما هي وظيفة <code>dataset.repeat(n)<\/code>؟",
+      "en": "What is the function of <code>dataset.repeat(n)<\/code>?"
     },
     "back": {
       "definition": {
@@ -1239,8 +1403,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 4,
     "front": {
-      "ar": "ماذا تفعل الدالة <code>dataset.batch(n)</code>؟",
-      "en": "What does the <code>dataset.batch(n)</code> function do?"
+      "ar": "ماذا تفعل الدالة <code>dataset.batch(n)<\/code>؟",
+      "en": "What does the <code>dataset.batch(n)<\/code> function do?"
     },
     "back": {
       "definition": {
@@ -1261,8 +1425,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
     },
     "back": {
       "definition": {
-        "ar": "باستخدام طريقة <code>map()</code>.",
-        "en": "By using the <code>map()</code> method."
+        "ar": "باستخدام طريقة <code>map()<\/code>.",
+        "en": "By using the <code>map()<\/code> method."
       },
       "example": {
         "ar": "dataset.map(lambda x: x * 2)",
@@ -1273,8 +1437,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 6,
     "front": {
-      "ar": "لماذا نستخدم <code>dataset.shuffle()</code>؟",
-      "en": "Why do we use <code>dataset.shuffle()</code>?"
+      "ar": "لماذا نستخدم <code>dataset.shuffle()<\/code>؟",
+      "en": "Why do we use <code>dataset.shuffle()<\/code>?"
     },
     "back": {
       "definition": {
@@ -1290,8 +1454,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 7,
     "front": {
-      "ar": "متى نستخدم <code>dataset.interleave()</code>؟",
-      "en": "When do we use <code>dataset.interleave()</code>?"
+      "ar": "متى نستخدم <code>dataset.interleave()<\/code>؟",
+      "en": "When do we use <code>dataset.interleave()<\/code>?"
     },
     "back": {
       "definition": {
@@ -1307,8 +1471,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 8,
     "front": {
-      "ar": "ما هي فائدة <code>dataset.prefetch(1)</code>؟",
-      "en": "What is the benefit of <code>dataset.prefetch(1)</code>?"
+      "ar": "ما هي فائدة <code>dataset.prefetch(1)<\/code>؟",
+      "en": "What is the benefit of <code>dataset.prefetch(1)<\/code>?"
     },
     "back": {
       "definition": {
@@ -1358,8 +1522,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 11,
     "front": {
-      "ar": "ما هو <code>tf.train.Example</code>؟",
-      "en": "What is <code>tf.train.Example</code>?"
+      "ar": "ما هو <code>tf.train.Example<\/code>؟",
+      "en": "What is <code>tf.train.Example<\/code>?"
     },
     "back": {
       "definition": {
@@ -1380,8 +1544,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
     },
     "back": {
       "definition": {
-        "ar": "باستخدام الدالة <code>tf.io.parse_single_example()</code> مع قاموس وصف الميزات.",
-        "en": "Using the <code>tf.io.parse_single_example()</code> function along with a feature description dictionary."
+        "ar": "باستخدام الدالة <code>tf.io.parse_single_example()<\/code> مع قاموس وصف الميزات.",
+        "en": "Using the <code>tf.io.parse_single_example()<\/code> function along with a feature description dictionary."
       },
       "example": {
         "ar": "تحويل السلسلة الثنائية إلى موترات (Tensors) قابلة للاستخدام.",
@@ -1392,8 +1556,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 13,
     "front": {
-      "ar": "متى تستخدم <code>SequenceExample</code> بدلاً من <code>Example</code>؟",
-      "en": "When do you use <code>SequenceExample</code> instead of <code>Example</code>?"
+      "ar": "متى تستخدم <code>SequenceExample<\/code> بدلاً من <code>Example<\/code>؟",
+      "en": "When do you use <code>SequenceExample<\/code> instead of <code>Example<\/code>?"
     },
     "back": {
       "definition": {
@@ -1426,8 +1590,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 15,
     "front": {
-      "ar": "ماذا تفعل المعلمة <code>as_supervised=True</code> في TFDS؟",
-      "en": "What does the <code>as_supervised=True</code> parameter do in TFDS?"
+      "ar": "ماذا تفعل المعلمة <code>as_supervised=True<\/code> في TFDS؟",
+      "en": "What does the <code>as_supervised=True<\/code> parameter do in TFDS?"
     },
     "back": {
       "definition": {
@@ -1439,6 +1603,40 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
         "en": "Required to use model.fit() directly."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تمرر مجموعة بيانات (Dataset) إلى <code>model.fit<\/code> في Keras؟",
+      "en": "How do you pass a Dataset to <code>model.fit<\/code> in Keras?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بتمرير كائن Dataset مباشرة كوسيطة أولى، وتحديد <code>steps_per_epoch<\/code> إذا كانت البيانات متكررة.",
+        "en": "By passing the Dataset object directly as the first argument, and specifying <code>steps_per_epoch<\/code> if the data is repeated."
+      },
+      "example": {
+        "ar": "model.fit(train_set, steps_per_epoch=100)",
+        "en": "model.fit(train_set, steps_per_epoch=100)"
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي الدالة المستخدمة لتحليل أسطر CSV في TensorFlow؟",
+      "en": "What function is used to parse CSV lines in TensorFlow?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الدالة <code>tf.io.decode_csv()<\/code>.",
+        "en": "The <code>tf.io.decode_csv()<\/code> function."
+      },
+      "example": {
+        "ar": "تحول سطرًا نصيًا مثل '1.0, 2.0, 3' إلى موترات منفصلة.",
+        "en": "Converts a text line like '1.0, 2.0, 3' into separate tensors."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1448,7 +1646,7 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1464,7 +1662,7 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1537,8 +1735,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 3,
     "question": {
-      "ar": "ما هو الغرض الرئيسي من استخدام <code>dataset.prefetch(1)</code>؟",
-      "en": "What is the primary purpose of using <code>dataset.prefetch(1)</code>?"
+      "ar": "ما هو الغرض الرئيسي من استخدام <code>dataset.prefetch(1)<\/code>؟",
+      "en": "What is the primary purpose of using <code>dataset.prefetch(1)<\/code>?"
     },
     "options": {
       "ar": [
@@ -1569,8 +1767,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 4,
     "question": {
-      "ar": "عند استخدام <code>dataset.shuffle(buffer_size)</code>، ماذا يحدث إذا كان <code>buffer_size</code> يساوي 1؟",
-      "en": "When using <code>dataset.shuffle(buffer_size)</code>, what happens if <code>buffer_size</code> is 1?"
+      "ar": "عند استخدام <code>dataset.shuffle(buffer_size)<\/code>، ماذا يحدث إذا كان <code>buffer_size<\/code> يساوي 1؟",
+      "en": "When using <code>dataset.shuffle(buffer_size)<\/code>, what happens if <code>buffer_size<\/code> is 1?"
     },
     "options": {
       "ar": [
@@ -1697,8 +1895,8 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
   {
     "id": 8,
     "question": {
-      "ar": "في مكتبة TFDS، ماذا تفعل المعلمة <code>as_supervised=True</code> عند تحميل مجموعة بيانات؟",
-      "en": "In the TFDS library, what does the <code>as_supervised=True</code> parameter do when loading a dataset?"
+      "ar": "في مكتبة TFDS، ماذا تفعل المعلمة <code>as_supervised=True<\/code> عند تحميل مجموعة بيانات؟",
+      "en": "In the TFDS library, what does the <code>as_supervised=True<\/code> parameter do when loading a dataset?"
     },
     "options": {
       "ar": [
@@ -1789,6 +1987,70 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
     },
     "difficulty": "easy",
     "conceptId": "tfrecord-format"
+  },
+  {
+    "conceptId": "using-datasets-with-keras",
+    "question": {
+      "ar": "عند استخدام حلقة تدريب مخصصة (Custom Training Loop) مع <code>tf.data.Dataset<\/code>، كيف تصل إلى الدفعات؟",
+      "en": "When using a Custom Training Loop with a <code>tf.data.Dataset<\/code>, how do you access the batches?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام دالة dataset.get_next()",
+        "عن طريق التكرار المباشر باستخدام حلقة for (مثال: for batch in dataset)",
+        "باستخدام دالة model.predict()",
+        "لا يمكن استخدام Datasets في الحلقات المخصصة"
+      ],
+      "en": [
+        "Using the dataset.get_next() function",
+        "By iterating directly using a for loop (e.g., for batch in dataset)",
+        "Using the model.predict() function",
+        "Datasets cannot be used in custom loops"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "كائنات Dataset في TensorFlow قابلة للتكرار (Iterable)، لذا يمكنك استخدام حلقة for القياسية في بايثون للمرور عبر الدفعات.",
+      "en": "Dataset objects in TensorFlow are iterable, so you can use a standard Python for loop to iterate through the batches."
+    },
+    "hint": {
+      "ar": "تعامل معها كما تتعامل مع أي قائمة (List) في بايثون.",
+      "en": "Treat it just like you would treat any List in Python."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "preprocessing-csv-data",
+    "question": {
+      "ar": "في دالة المعالجة المسبقة لبيانات CSV، ما هو الغرض من استخدام <code>tf.stack()<\/code> بعد <code>tf.io.decode_csv()<\/code>؟",
+      "en": "In a CSV preprocessing function, what is the purpose of using <code>tf.stack()<\/code> after <code>tf.io.decode_csv()<\/code>?"
+    },
+    "options": {
+      "ar": [
+        "لتحويل السلاسل النصية إلى أرقام",
+        "لدمج الحقول المنفصلة في موتر (Tensor) واحد أحادي البعد",
+        "لحساب المتوسط والانحراف المعياري",
+        "لخلط البيانات عشوائيًا"
+      ],
+      "en": [
+        "To convert strings to numbers",
+        "To combine the separate fields into a single 1D tensor",
+        "To calculate the mean and standard deviation",
+        "To shuffle the data randomly"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقوم decode_csv بإرجاع قائمة من الموترات المنفصلة (موتر لكل عمود). تقوم stack بتجميعها معًا في موتر واحد يمثل الميزات.",
+      "en": "decode_csv returns a list of separate tensors (one for each column). stack packs them together into a single tensor representing the features."
+    },
+    "hint": {
+      "ar": "تخيل تجميع عدة أوراق متفرقة في رزمة واحدة.",
+      "en": "Imagine gathering several loose papers into a single stack."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1832,6 +2094,22 @@ model.fit(mnist_train, steps_per_epoch=60000 // 32, epochs=5)</code></pre>
     <div data-bilingual>
     <template class="content-ar">ترتيب التحويلات مهم. <code>dataset.repeat().batch(32)</code> يختلف عن <code>dataset.batch(32).repeat()</code>. الأول يضمن أن جميع الدفعات بحجم 32، بينما الثاني قد ينتج دفعة أصغر في نهاية كل تكرار.</template>
     <template class="content-en">Order of transformations matters. <code>dataset.repeat().batch(32)</code> is different from <code>dataset.batch(32).repeat()</code>. The first ensures all batches are size 32, while the second might produce a smaller batch at the end of each repeat.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تحديد <code>steps_per_epoch</code> عند استخدام <code>model.fit()</code> مع مجموعة بيانات تستخدم <code>repeat()</code> بدون وسيطات. سيؤدي ذلك إلى استمرار الحقبة الأولى إلى الأبد.</template>
+    <template class="content-en">Forgetting to specify <code>steps_per_epoch</code> when using <code>model.fit()</code> with a dataset that uses <code>repeat()</code> without arguments. This will cause the first epoch to run forever.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">للتعامل مع أنواع البيانات المعقدة مثل الميزات الفئوية (Categorical features)، يوفر TensorFlow واجهة برمجة تطبيقات الميزات (Features API) التي تعمل بسلاسة مع <code>tf.keras</code>.</template>
+    <template class="content-en">To handle complex data types like categorical features, TensorFlow provides the Features API, which works seamlessly with <code>tf.keras</code>.</template>
     <div class="content-target"></div>
     </div>
   </div>

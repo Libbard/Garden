@@ -103,6 +103,11 @@
         <template class="content-en">Pooling Layers</template>
         <span class="content-target">طبقات التجميع (Pooling)</span>
       </a>
+      <a href="#output-shape-calculation" class="toc-link" data-bilingual>
+        <template class="content-ar">حساب أبعاد الإخراج</template>
+        <template class="content-en">Calculating Output Dimensions</template>
+        <span class="content-target">حساب أبعاد الإخراج</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -261,8 +266,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في عملية <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">الارتباط المتبادل<span class="smart-term-tooltip"></span></span> ثنائية الأبعاد، نبدأ بوضع نافذة التلافيف في الزاوية العلوية اليسرى من مصفوفة الإدخال ونقوم بتمريرها من اليسار لليمين ومن الأعلى للأسفل.</p><p>عند كل موضع، يتم ضرب عناصر الإدخال داخل النافذة مع عناصر النواة (Kernel) عنصراً بعنصر، ثم تُجمع النواتج لتعطي قيمة عددية واحدة في مصفوفة الإخراج (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">خريطة الميزات<span class="smart-term-tooltip"></span></span>).</p><p>ملاحظة: التلافيف الرياضي الدقيق يتطلب قلب النواة أفقياً وعمودياً قبل العملية. ولكن بما أن الأوزان (النواة) يتم تعلمها من البيانات، فإن استخدام الارتباط المتبادل يعطي نفس النتائج عملياً.</p></template>
-    <template class="content-en"><p>In the 2D <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">cross-correlation<span class="smart-term-tooltip"></span></span> operation, we begin with the convolution window at the top-left corner of the input tensor and slide it across from left to right and top to bottom.</p><p>At each position, the input subtensor and the kernel tensor are multiplied element-wise, and the resulting tensor is summed up yielding a single scalar value in the output (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">feature map<span class="smart-term-tooltip"></span></span>).</p><p>Note: Strict mathematical convolution requires flipping the kernel horizontally and vertically. However, since kernels are learned from data, using cross-correlation yields equivalent results in practice.</p></template>
+    <template class="content-ar"><p>في عملية <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">الارتباط المتبادل<span class="smart-term-tooltip"></span></span> ثنائية الأبعاد، نبدأ بوضع نافذة التلافيف في الزاوية العلوية اليسرى من مصفوفة الإدخال ونقوم بتمريرها من اليسار لليمين ومن الأعلى للأسفل.</p><p>عند كل موضع، يتم ضرب عناصر الإدخال داخل النافذة مع عناصر النواة (Kernel) عنصراً بعنصر، ثم تُجمع النواتج لتعطي قيمة عددية واحدة في مصفوفة الإخراج (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">خريطة الميزات<span class="smart-term-tooltip"></span></span>).</p><p>ملاحظة: التلافيف الرياضي الدقيق يتطلب قلب النواة أفقياً وعمودياً قبل العملية. ولكن بما أن الأوزان (النواة) يتم تعلمها من البيانات، فإن استخدام الارتباط المتبادل يعطي نفس النتائج عملياً.</p><p>مثال عملي لحساب الارتباط المتبادل ثنائي الأبعاد: بفرض مصفوفة إدخال بحجم 3x3 ونواة بحجم 2x2.</p><ol><li>نضع النواة في الزاوية العلوية اليسرى. نضرب العناصر المتقابلة ونجمعها: $(0\times0 + 1\times1 + 3\times2 + 4\times3 = 19)$.</li><li>نحرك النواة خطوة واحدة لليمين: $(1\times0 + 2\times1 + 4\times2 + 5\times3 = 25)$.</li><li>نحرك النواة خطوة للأسفل ونعود لليسار: $(3\times0 + 4\times1 + 6\times2 + 7\times3 = 37)$.</li><li>نحرك النواة خطوة لليمين: $(4\times0 + 5\times1 + 7\times2 + 8\times3 = 43)$.</li></ol><p>النتيجة هي مصفوفة إخراج بحجم 2x2 تحتوي على القيم: [[19, 25], [37, 43]].</p></template>
+    <template class="content-en"><p>In the 2D <span class="smart-term" data-term-en="Cross-Correlation" data-ar="الارتباط المتبادل" data-en-def="An operation where a kernel slides over an input, multiplying and summing overlapping elements.">cross-correlation<span class="smart-term-tooltip"></span></span> operation, we begin with the convolution window at the top-left corner of the input tensor and slide it across from left to right and top to bottom.</p><p>At each position, the input subtensor and the kernel tensor are multiplied element-wise, and the resulting tensor is summed up yielding a single scalar value in the output (<span class="smart-term" data-term-en="Feature Map" data-ar="خريطة الميزات" data-en-def="The output of a convolutional layer, representing learned spatial features.">feature map<span class="smart-term-tooltip"></span></span>).</p><p>Note: Strict mathematical convolution requires flipping the kernel horizontally and vertically. However, since kernels are learned from data, using cross-correlation yields equivalent results in practice.</p><p>Worked example of a 2D cross-correlation: Given a 3x3 input tensor and a 2x2 kernel.</p><ol><li>Place the kernel at the top-left. Multiply corresponding elements and sum: $(0\times0 + 1\times1 + 3\times2 + 4\times3 = 19)$.</li><li>Slide the kernel one step right: $(1\times0 + 2\times1 + 4\times2 + 5\times3 = 25)$.</li><li>Slide the kernel one step down and back to the left: $(3\times0 + 4\times1 + 6\times2 + 7\times3 = 37)$.</li><li>Slide the kernel one step right: $(4\times0 + 5\times1 + 7\times2 + 8\times3 = 43)$.</li></ol><p>The result is a 2x2 output tensor with values: [[19, 25], [37, 43]].</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -672,8 +677,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><b>قنوات الإدخال:</b> الصور الحقيقية ليست ثنائية الأبعاد، بل تحتوي على قنوات (مثل RGB). لذلك، يجب أن تحتوي النواة (Kernel) على نفس عدد قنوات الإدخال. يتم حساب الارتباط المتبادل لكل قناة على حدة، ثم تُجمع النتائج معاً لإنتاج قيمة واحدة.</p><p><b>قنوات الإخراج:</b> عادة ما نزيد عدد القنوات كلما تعمقنا في الشبكة. للحصول على قنوات إخراج متعددة، نقوم بإنشاء نواة منفصلة (ثلاثية الأبعاد) لكل قناة إخراج، ثم ندمج (Concatenate) النتائج.</p></template>
-    <template class="content-en"><p><b>Input Channels:</b> Real images have channels (e.g., RGB). Thus, the kernel must have the same number of input channels. Cross-correlation is performed per channel, and the results are summed up.</p><p><b>Output Channels:</b> We typically increase the <span class="smart-term" data-term-en="Channel Dimension" data-ar="بُعد القناة" data-en-def="The third axis of an image tensor, representing different aspects like color (RGB) or learned features.">channel dimension<span class="smart-term-tooltip"></span></span> deeper in the network. To get multiple output channels, we create a separate 3D kernel for every output channel and concatenate the results.</p></template>
+    <template class="content-ar"><p><b>قنوات الإدخال:</b> الصور الحقيقية ليست ثنائية الأبعاد، بل تحتوي على قنوات (مثل RGB). لذلك، يجب أن تحتوي النواة (Kernel) على نفس عدد قنوات الإدخال. يتم حساب الارتباط المتبادل لكل قناة على حدة، ثم تُجمع النتائج معاً لإنتاج قيمة واحدة.</p><p><b>قنوات الإخراج:</b> عادة ما نزيد عدد القنوات كلما تعمقنا في الشبكة. للحصول على قنوات إخراج متعددة، نقوم بإنشاء نواة منفصلة (ثلاثية الأبعاد) لكل قناة إخراج، ثم ندمج (Concatenate) النتائج.</p><p>مثال عملي لحساب الارتباط المتبادل بقناتي إدخال (2 Channels): بفرض إدخال بحجم 2x3x3 ونواة بحجم 2x2x2.</p><ol><li>نحسب الارتباط المتبادل للقناة الأولى (النافذة العلوية اليسرى): $(1\times1 + 2\times2 + 4\times3 + 5\times4 = 37)$.</li><li>نحسب الارتباط المتبادل للقناة الثانية في نفس الموقع: $(0\times0 + 1\times1 + 3\times2 + 4\times3 = 19)$.</li><li>نجمع نتيجتي القناتين معاً للحصول على عنصر الإخراج الأول: $37 + 19 = 56$.</li></ol><p>تُكرر هذه العملية لكل موقع لتكوين خريطة الميزات النهائية (قناة إخراج واحدة).</p></template>
+    <template class="content-en"><p><b>Input Channels:</b> Real images have channels (e.g., RGB). Thus, the kernel must have the same number of input channels. Cross-correlation is performed per channel, and the results are summed up.</p><p><b>Output Channels:</b> We typically increase the <span class="smart-term" data-term-en="Channel Dimension" data-ar="بُعد القناة" data-en-def="The third axis of an image tensor, representing different aspects like color (RGB) or learned features.">channel dimension<span class="smart-term-tooltip"></span></span> deeper in the network. To get multiple output channels, we create a separate 3D kernel for every output channel and concatenate the results.</p><p>Worked example of cross-correlation with 2 input channels: Given a 2x3x3 input and a 2x2x2 kernel.</p><ol><li>Compute cross-correlation for the first channel (top-left window): $(1\times1 + 2\times2 + 4\times3 + 5\times4 = 37)$.</li><li>Compute cross-correlation for the second channel at the same location: $(0\times0 + 1\times1 + 3\times2 + 4\times3 = 19)$.</li><li>Sum the results from both channels to get the first output element: $37 + 19 = 56$.</li></ol><p>This process is repeated for every location to form the final feature map (single output channel).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -940,14 +945,66 @@
   </details>
 </section>
 
+<section id="output-shape-calculation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> حساب أبعاد الإخراج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Calculating Output Dimensions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن حساب حجم مصفوفة الإخراج بدقة باستخدام أبعاد الإدخال وحجم النواة، مما يساعد في تصميم معمارية الشبكة وتجنب أخطاء الأبعاد.</p></template>
+    <template class="content-en"><p>The size of the output tensor can be precisely calculated using the input dimensions and kernel size, aiding in network architecture design and avoiding dimension errors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند تطبيق التلافيف بدون حشو (Padding) أو خطوة (Stride)، يتقلص حجم الإخراج. بفرض أن أبعاد الإدخال هي $n_h \times n_w$ وأبعاد النواة هي $k_h \times k_w$، فإن أبعاد الإخراج تُحسب بالمعادلة التالية:</p><ol><li>الارتفاع: $n_h - k_h + 1$</li><li>العرض: $n_w - k_w + 1$</li></ol></template>
+    <template class="content-en"><p>When applying convolution without padding or stride, the output size shrinks. Assuming input dimensions of $n_h \times n_w$ and kernel dimensions of $k_h \times k_w$, the output dimensions are calculated as:</p><ol><li>Height: $n_h - k_h + 1$</li><li>Width: $n_w - k_w + 1$</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يحدث هذا الانكماش لأن النواة تحتاج إلى مساحة كافية لتنزلق بالكامل داخل حدود الصورة. على سبيل المثال، صورة بحجم 3x3 ونواة 2x2 ستنتج إخراجاً بحجم 2x2.</p><p>لمنع هذا الانكماش، نستخدم الحشو (Padding). إذا أضفنا حشواً مقداره $p_h$ للارتفاع، تصبح المعادلة $(n_h + p_h - k_h + 1)$.</p></template>
+    <template class="content-en"><p>This shrinkage occurs because the kernel needs enough space to slide wholly within the image boundaries. For example, a 3x3 image and a 2x2 kernel yield a 2x2 output.</p><p>To prevent this shrinkage, we use padding. If we add padding of $p_h$ to the height, the formula becomes $(n_h + p_h - k_h + 1)$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>أبعاد الإخراج بدون حشو أو خطوة.</strong></template>
+      <template class="content-en"><strong>Output dimensions without padding or stride.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$(n_h - k_h + 1) \times (n_w - k_w + 1)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو حجم الإخراج لصورة 28x28 عند استخدام نواة 5x5 بدون حشو؟</template>
+      <template class="content-en">What is the output size of a 28x28 image when using a 5x5 kernel with no padding?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الحجم سيكون 24x24، لأن (28 - 5 + 1) = 24.</p></template>
+      <template class="content-en"><p>The size will be 24x24, because (28 - 5 + 1) = 24.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. لقد رأينا كيف أن الشبكات المتصلة بالكامل (MLPs) تنهار أمام الصور بسبب الانفجار في عدد المعلمات. الحل؟ الشبكات العصبية التلافيفية (CNNs). تذكروا دائماً المبدأين السحريين: 'الثبات تجاه الانتقال' و'المحلية'. بدلاً من ربط كل شيء بكل شيء، نستخدم 'نواة' (Kernel) صغيرة تنزلق فوق الصورة وتقوم بعملية 'الارتباط المتبادل'. لكي لا تتقلص الصورة وتختفي حوافها، نستخدم 'الحشو' (Padding). وإذا أردنا تسريع العمل وتقليل الحجم، نزيد 'الخطوة' (Stride). لا تنسوا أن الصور ملونة (قنوات متعددة)، لذا نوياتنا ثلاثية الأبعاد. وإذا أردنا التحكم في عدد القنوات بذكاء، نستخدم التلافيف 1x1. أخيراً، لنجعل شبكتنا أقل حساسية للاهتزازات البسيطة، نمرر البيانات عبر طبقات 'التجميع' (Pooling) التي لا تحتوي على أي أوزان. ركزوا على هذه المفاهيم، فهي أساس كل تطبيقات الرؤية الحاسوبية الحديثة!</template>
-    <template class="content-en">Welcome, friends, to this pivotal module. We've seen how MLPs fail with images due to parameter explosion. The solution? CNNs. Always remember the two magic principles: 'Translation Invariance' and 'Locality'. Instead of connecting everything, we slide a small 'kernel' over the image using 'cross-correlation'. To stop the image from shrinking, we use 'Padding'. To downsample and speed things up, we increase the 'Stride'. Remember, images have depth (RGB channels), so our kernels are 3D. To smartly control channel depth, we use 1x1 convolutions. Finally, to make our network robust to slight shifts, we use parameter-free 'Pooling' layers. Master these building blocks; they are the foundation of all modern computer vision!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. لقد رأينا كيف أن الشبكات المتصلة بالكامل (MLPs) تنهار أمام الصور بسبب الانفجار في عدد المعلمات. الحل؟ الشبكات العصبية التلافيفية (CNNs). تذكروا دائماً المبدأين السحريين: 'الثبات تجاه الانتقال' و'المحلية'. بدلاً من ربط كل شيء بكل شيء، نستخدم 'نواة' (Kernel) صغيرة تنزلق فوق الصورة وتقوم بعملية 'الارتباط المتبادل'. لكي لا تتقلص الصورة وتختفي حوافها، نستخدم 'الحشو' (Padding). وإذا أردنا تسريع العمل وتقليل الحجم، نزيد 'الخطوة' (Stride). لا تنسوا أن الصور ملونة (قنوات متعددة)، لذا نوياتنا ثلاثية الأبعاد. وإذا أردنا التحكم في عدد القنوات بذكاء، نستخدم التلافيف 1x1. أخيراً، لنجعل شبكتنا أقل حساسية للاهتزازات البسيطة، نمرر البيانات عبر طبقات 'التجميع' (Pooling) التي لا تحتوي على أي أوزان. ركزوا على هذه المفاهيم، فهي أساس كل تطبيقات الرؤية الحاسوبية الحديثة!<p>إن فهم العمليات الرياضية الدقيقة، مثل حساب أبعاد الإخراج وجمع حواصل الضرب عبر القنوات المتعددة، أمر بالغ الأهمية لتصحيح أخطاء معمارية الشبكات. تضمن هذه الحسابات الأساسية توافق أشكال المصفوفات (Tensors) تماماً أثناء تدفق البيانات عبر الطبقات التلافيفية العميقة.</p></template>
+    <template class="content-en">Welcome, friends, to this pivotal module. We've seen how MLPs fail with images due to parameter explosion. The solution? CNNs. Always remember the two magic principles: 'Translation Invariance' and 'Locality'. Instead of connecting everything, we slide a small 'kernel' over the image using 'cross-correlation'. To stop the image from shrinking, we use 'Padding'. To downsample and speed things up, we increase the 'Stride'. Remember, images have depth (RGB channels), so our kernels are 3D. To smartly control channel depth, we use 1x1 convolutions. Finally, to make our network robust to slight shifts, we use parameter-free 'Pooling' layers. Master these building blocks; they are the foundation of all modern computer vision!<p>Understanding the exact mathematical operations—like calculating output dimensions and summing element-wise products across multiple channels—is crucial for debugging network architectures. These foundational calculations ensure that tensor shapes align perfectly as data flows through deep convolutional layers.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1121,6 +1178,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لتقليل الدقة المكانية وتوفير ثبات تجاه التغيرات الطفيفة في الموقع (مثل اهتزاز الكاميرا)، وكل ذلك بدون إضافة أي معلمات للتعلم.</template>
           <template class="content-en">To reduce spatial resolution and provide invariance to slight location shifts (like camera shake), all without adding any learnable parameters.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نحدد أبعاد الإخراج لطبقة تلافيفية، ولماذا يتقلص الحجم إذا لم نستخدم الحشو؟</template>
+          <template class="content-en">How do we determine the output dimensions of a convolutional layer, and why does the size shrink if we don't use padding?</template>
+          <span class="content-target">كيف نحدد أبعاد الإخراج لطبقة تلافيفية، ولماذا يتقلص الحجم إذا لم نستخدم الحشو؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نحدد الأبعاد باستخدام المعادلة (n - k + 1). يتقلص الحجم لأن النواة يجب أن تتسع بالكامل داخل الصورة؛ فلا يمكن لمركز النواة أن يقف على بيكسل الحافة دون أن تخرج أطراف النواة خارج الصورة، مما يقلل من عدد المواقع الصالحة للحساب.</p></template>
+          <template class="content-en"><p>We determine dimensions using the formula (n - k + 1). The size shrinks because the kernel must fit entirely within the image; the center of the kernel cannot stand on an edge pixel without the kernel's edges falling outside the image, reducing the number of valid computation locations.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التلافيف متعدد القنوات، كيف تساهم كل قناة إدخال في النتيجة النهائية؟</template>
+          <template class="content-en">In multi-channel convolution, how does each input channel contribute to the final result?</template>
+          <span class="content-target">في التلافيف متعدد القنوات، كيف تساهم كل قناة إدخال في النتيجة النهائية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يتم ضرب كل قناة إدخال عنصراً بعنصر مع الشريحة المقابلة لها في النواة ثلاثية الأبعاد. بعد ذلك، تُجمع كل هذه النواتج الفردية من جميع القنوات معاً لإنتاج قيمة عددية واحدة تمثل ميزة مدمجة من جميع القنوات في ذلك الموقع المكاني.</p></template>
+          <template class="content-en"><p>Each input channel is multiplied element-wise with its corresponding slice in the 3D kernel. Then, all these individual products from all channels are summed together to produce a single scalar value, representing a fused feature from all channels at that spatial location.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1388,6 +1480,40 @@
         "en": "If the camera vibrates and a feature shifts by one pixel, max pooling might yield the same output."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تحسب أبعاد الإخراج لطبقة تلافيفية بدون حشو أو خطوة؟",
+      "en": "How do you calculate the output dimensions of a convolutional layer without padding or stride?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الارتفاع: (n_h - k_h + 1)، العرض: (n_w - k_w + 1).",
+        "en": "Height: (n_h - k_h + 1), Width: (n_w - k_w + 1)."
+      },
+      "example": {
+        "ar": "صورة 10x10 ونواة 3x3 تنتج إخراجاً بحجم 8x8.",
+        "en": "A 10x10 image and a 3x3 kernel produce an 8x8 output."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "في التلافيف متعدد القنوات، كيف يتم دمج نتائج القنوات المختلفة؟",
+      "en": "In multi-channel convolution, how are the results of different channels combined?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم حساب الارتباط المتبادل لكل قناة إدخال على حدة، ثم تُجمع (Summed) جميع النتائج معاً لإنتاج قيمة واحدة في قناة الإخراج.",
+        "en": "Cross-correlation is computed for each input channel separately, and then all results are summed together to produce a single value in the output channel."
+      },
+      "example": {
+        "ar": "إذا كانت نتيجة القناة الحمراء 10 والخضراء 5 والزرقاء 2، فإن القيمة النهائية هي 17.",
+        "en": "If the red channel result is 10, green is 5, and blue is 2, the final value is 17."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1397,7 +1523,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1413,7 +1539,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1738,6 +1864,70 @@
     },
     "difficulty": "medium",
     "conceptId": "pooling-layers"
+  },
+  {
+    "conceptId": "output-shape-calculation",
+    "question": {
+      "ar": "إذا كان لديك صورة إدخال بأبعاد 32x32 وطبقت عليها طبقة تلافيفية بنواة حجمها 5x5 بدون أي حشو (Padding) وبخطوة (Stride) تساوي 1، فما هي أبعاد خريطة الميزات الناتجة؟",
+      "en": "If you have an input image of dimensions 32x32 and apply a convolutional layer with a 5x5 kernel, no padding, and a stride of 1, what are the dimensions of the resulting feature map?"
+    },
+    "options": {
+      "ar": [
+        "32x32",
+        "28x28",
+        "27x27",
+        "16x16"
+      ],
+      "en": [
+        "32x32",
+        "28x28",
+        "27x27",
+        "16x16"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "باستخدام المعادلة (n - k + 1)، نحصل على (32 - 5 + 1) = 28. إذن الأبعاد هي 28x28.",
+      "en": "Using the formula (n - k + 1), we get (32 - 5 + 1) = 28. So the dimensions are 28x28."
+    },
+    "hint": {
+      "ar": "تذكر المعادلة: حجم الإدخال ناقص حجم النواة زائد واحد.",
+      "en": "Remember the formula: input size minus kernel size plus one."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "multiple-channels",
+    "question": {
+      "ar": "عند تطبيق نواة تلافيفية واحدة على صورة RGB (3 قنوات إدخال)، كم عدد قنوات الإخراج التي سيتم إنتاجها؟",
+      "en": "When applying a single convolutional kernel to an RGB image (3 input channels), how many output channels will be produced?"
+    },
+    "options": {
+      "ar": [
+        "3 قنوات إخراج",
+        "قناة إخراج واحدة",
+        "9 قنوات إخراج",
+        "يعتمد ذلك على حجم النواة"
+      ],
+      "en": [
+        "3 output channels",
+        "1 output channel",
+        "9 output channels",
+        "It depends on the kernel size"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "النواة الواحدة (التي تكون ثلاثية الأبعاد بعمق 3) تحسب الارتباط المتبادل لكل قناة ثم تجمع النتائج معاً لإنتاج قناة إخراج واحدة فقط.",
+      "en": "A single kernel (which is 3D with a depth of 3) computes cross-correlation per channel and sums the results together to produce exactly one output channel."
+    },
+    "hint": {
+      "ar": "هل يتم الاحتفاظ بنتائج القنوات منفصلة أم يتم جمعها؟",
+      "en": "Are the channel results kept separate or summed up?"
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1773,6 +1963,14 @@
     <div data-bilingual>
     <template class="content-ar">الخلط بين التلافيف الرياضي الدقيق والارتباط المتبادل. في التعلم العميق، ما نسميه 'تلافيف' هو في الواقع 'ارتباط متبادل' لأننا لا نقوم بقلب النواة (Kernel)، حيث أن الأوزان تُتعلم تلقائياً.</template>
     <template class="content-en">Confusing strict mathematical convolution with cross-correlation. In deep learning, what we call 'convolution' is actually 'cross-correlation' because we don't flip the kernel, as weights are learned automatically.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التلافيف متعدد القنوات ينتج قنوات إخراج متعددة تلقائياً. هذا خطأ؛ نواة واحدة ثلاثية الأبعاد (تغطي كل قنوات الإدخال) تنتج قناة إخراج واحدة فقط بعد جمع النتائج. للحصول على قنوات إخراج متعددة، نحتاج إلى نويات ثلاثية الأبعاد متعددة.</template>
+    <template class="content-en">Believing that multi-channel convolution automatically produces multiple output channels. This is false; a single 3D kernel (covering all input channels) produces only ONE output channel after summing the results. To get multiple output channels, we need multiple 3D kernels.</template>
     <div class="content-target"></div>
     </div>
   </div>

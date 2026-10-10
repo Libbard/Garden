@@ -833,8 +833,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في مسابقة Kaggle لتوقع أسعار المنازل، نتعامل مع بيانات متنوعة (أرقام، فئات، قيم مفقودة). الخطوات الأساسية:</p><ol><li><b>المعالجة المسبقة للبيانات (Preprocessing):</b> استبدال القيم المفقودة بالمتوسط. ثم توحيد البيانات الرقمية (Standardization) لتكون بمتوسط صفر وتباين واحد: $x \leftarrow \frac{x - \mu}{\sigma}$. هذا يسهل التحسين ويمنع تحيز النموذج لميزة ذات قيم كبيرة.</li><li><b>التدريب الأساسي:</b> نبدأ بنموذج خطي بسيط كاختبار سلامة (Sanity Check) لمعرفة ما إذا كانت البيانات تحتوي على معلومات مفيدة.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">التحقق المتقاطع K-Fold<span class="smart-term-tooltip"></span></span>:</b> لتقييم النموذج وضبط المعلمات الفائقة. نقسم البيانات إلى K أجزاء، نتدرب على K-1 ونختبر على الجزء المتبقي، ونكرر.</li></ol></template>
-    <template class="content-en"><p>In the Kaggle house price prediction competition, we handle diverse data (numbers, categories, missing values). Key steps:</p><ol><li><b>Data Preprocessing:</b> Replace missing values with the mean. Standardize numerical data to zero mean and unit variance: $x \leftarrow \frac{x - \mu}{\sigma}$. This aids optimization and prevents bias towards features with large scales.</li><li><b>Baseline Training:</b> Start with a simple linear model as a sanity check to ensure data contains meaningful information.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">K-Fold Cross-Validation<span class="smart-term-tooltip"></span></span>:</b> Used for model selection and hyperparameter tuning. Split data into K folds, train on K-1, validate on the remaining fold, and repeat.</li></ol></template>
+    <template class="content-ar"><p>في مسابقة Kaggle لتوقع أسعار المنازل، نتعامل مع بيانات متنوعة (أرقام، فئات، قيم مفقودة). الخطوات الأساسية:</p><ol><li><b>المعالجة المسبقة للبيانات (Preprocessing):</b> استبدال القيم المفقودة بالمتوسط. ثم توحيد البيانات الرقمية (Standardization) لتكون بمتوسط صفر وتباين واحد: $x \leftarrow \frac{x - \mu}{\sigma}$. هذا يسهل التحسين ويمنع تحيز النموذج لميزة ذات قيم كبيرة.</li><li><b>التدريب الأساسي:</b> نبدأ بنموذج خطي بسيط كاختبار سلامة (Sanity Check) لمعرفة ما إذا كانت البيانات تحتوي على معلومات مفيدة.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">التحقق المتقاطع K-Fold<span class="smart-term-tooltip"></span></span>:</b> لتقييم النموذج وضبط المعلمات الفائقة. نقسم البيانات إلى K أجزاء، نتدرب على K-1 ونختبر على الجزء المتبقي، ونكرر.</li></ol><p>لإكمال مسار المعالجة المسبقة للبيانات والتدريب، يجب دمج خطوات حاسمة إضافية:</p><ol><li><b>معالجة الميزات الفئوية:</b> يجب تحويل الميزات الفئوية المنفصلة (مثل نوع السقف أو حالة القبو) إلى ميزات مؤشر باستخدام <span class="smart-term" data-term-en="One-hot Encoding" data-ar="الترميز الساخن الأحادي" data-en-def="A process of converting categorical data variables into binary vectors so they can be provided to machine learning algorithms.">الترميز الساخن الأحادي<span class="smart-term-tooltip"></span></span> (One-hot encoding). هذا يعاملها كمتجهات ثنائية، مما يسمح للنموذج بمعالجتها رقمياً.</li><li><b>اللوغاريتمات للأخطاء النسبية:</b> في مشاكل مثل توقع أسعار المنازل، نهتم غالباً ب<span class="smart-term" data-term-en="Relative Error" data-ar="الخطأ النسبي" data-en-def="The ratio of the absolute error of a measurement to the measurement being taken, often optimized using logarithms in regression tasks.">الخطأ النسبي<span class="smart-term-tooltip"></span></span> أكثر من الخطأ المطلق (خطأ 10 آلاف دولار في منزل رخيص يختلف عن نفس الخطأ في قصر). أخذ لوغاريتم الأسعار قبل التدريب يساعد النموذج على تحسين الفروق النسبية.</li><li><b>تدريب النموذج النهائي:</b> بعد استخدام التحقق المتقاطع K-fold لاختيار أفضل المعلمات الفائقة (Hyperparameters)، لا تستخدم مجرد طية واحدة للتدريب النهائي. بدلاً من ذلك، قم بتدريب نموذجك النهائي على مجموعة بيانات التدريب <i>بأكملها</i> لتعظيم تعلمه قبل تطبيقه على مجموعة الاختبار لإرساله إلى Kaggle.</li></ol></template>
+    <template class="content-en"><p>In the Kaggle house price prediction competition, we handle diverse data (numbers, categories, missing values). Key steps:</p><ol><li><b>Data Preprocessing:</b> Replace missing values with the mean. Standardize numerical data to zero mean and unit variance: $x \leftarrow \frac{x - \mu}{\sigma}$. This aids optimization and prevents bias towards features with large scales.</li><li><b>Baseline Training:</b> Start with a simple linear model as a sanity check to ensure data contains meaningful information.</li><li><b><span class="smart-term" data-term-en="K-Fold Cross-Validation" data-ar="التحقق المتقاطع K-Fold" data-en-def="A technique to evaluate models by dividing data into K subsets, training on K-1, and testing on the remaining subset.">K-Fold Cross-Validation<span class="smart-term-tooltip"></span></span>:</b> Used for model selection and hyperparameter tuning. Split data into K folds, train on K-1, validate on the remaining fold, and repeat.</li></ol><p>To complete the data preprocessing and training pipeline, additional crucial steps must be integrated:</p><ol><li><b>Handling Categorical Features:</b> Discrete categorical features (like roof type or basement condition) should be transformed into indicator features using <span class="smart-term" data-term-en="One-hot Encoding" data-ar="الترميز الساخن الأحادي" data-en-def="A process of converting categorical data variables into binary vectors so they can be provided to machine learning algorithms.">one-hot encoding<span class="smart-term-tooltip"></span></span>. This treats them as binary vectors, allowing the model to process them numerically.</li><li><b>Logarithms for <span class="smart-term" data-term-en="Relative Error" data-ar="الخطأ النسبي" data-en-def="The ratio of the absolute error of a measurement to the measurement being taken, often optimized using logarithms in regression tasks.">Relative Error<span class="smart-term-tooltip"></span></span>s:</b> In problems like house price prediction, we often care more about relative error than absolute error (a 10k-dollar error on a cheap house matters more than on a mansion). Taking the logarithm of the prices before training helps the model optimize for relative differences.</li><li><b>Final Model Training:</b> After using K-fold cross-validation to select the best hyperparameters, do not just use a single fold for your final model. Instead, train your final model on the <i>entire</i> training dataset to maximize its learning before applying it to the test set for your Kaggle submission.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -872,8 +872,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. لقد تعلمنا كيف نبني الشبكات العصبية، لكن اليوم نتعلم كيف نجعلها 'تعمل فعلياً' في العالم الحقيقي. ليلة الامتحان، تذكروا هذه الركائز: أولاً، الاستقرار العددي. الشبكات العميقة هشة؛ دالة Sigmoid تقتل التدرجات (Vanishing)، والأوزان الكبيرة تفجرها (Exploding). الحل؟ استخدموا ReLU وتهيئة Xavier. ثانياً، التماثل. لا تبدأوا أبداً بأوزان متطابقة، وإلا ستصبح شبكتكم العميقة مجرد خلية عصبية واحدة غبية! العشوائية هنا هي صديقكم. ثالثاً، العالم الحقيقي يتغير. البيانات التي تدربون عليها اليوم قد تختلف غداً (Distribution Shift). ميزوا جيداً بين انزياح التباين (تغير شكل المدخلات) وانزياح التسمية (تغير نسبة المخرجات) وانزياح المفهوم (تغير القواعد تماماً). وأخيراً، تذكروا أن خوارزمياتكم تتخذ قرارات تؤثر على البشر. احذروا من حلقات التغذية الراجعة الجامحة التي تعزز التحيز. في مشروع Kaggle، التوحيد القياسي (Standardization) والتحقق المتقاطع (K-Fold) هما درعكم ضد التخصيص الزائد. ركزوا على هذه المفاهيم، وستكونون جاهزين ليس فقط للامتحان، بل لبناء أنظمة ذكاء اصطناعي مسؤولة وقوية.</template>
-    <template class="content-en">Welcome, future engineers, to this crucial module. We've learned how to build neural networks, but today we learn how to make them *actually work* in the real world. For the exam, remember these pillars: First, numerical stability. Deep networks are fragile; Sigmoid kills gradients (Vanishing), and large weights explode them. The solution? Use ReLU and Xavier initialization. Second, symmetry. Never start with identical weights, or your deep network becomes just one dumb neuron! Randomness is your friend here. Third, the real world changes. The data you train on today might differ tomorrow (Distribution Shift). Distinguish clearly between Covariate Shift (input appearance changes), Label Shift (output proportions change), and Concept Shift (the rules change entirely). Finally, remember your algorithms make decisions affecting humans. Beware of runaway feedback loops that reinforce bias. In your Kaggle project, Standardization and K-Fold cross-validation are your shields against overfitting. Master these, and you are ready not just for the exam, but to build responsible, robust AI systems.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. لقد تعلمنا كيف نبني الشبكات العصبية، لكن اليوم نتعلم كيف نجعلها 'تعمل فعلياً' في العالم الحقيقي. ليلة الامتحان، تذكروا هذه الركائز: أولاً، الاستقرار العددي. الشبكات العميقة هشة؛ دالة Sigmoid تقتل التدرجات (Vanishing)، والأوزان الكبيرة تفجرها (Exploding). الحل؟ استخدموا ReLU وتهيئة Xavier. ثانياً، التماثل. لا تبدأوا أبداً بأوزان متطابقة، وإلا ستصبح شبكتكم العميقة مجرد خلية عصبية واحدة غبية! العشوائية هنا هي صديقكم. ثالثاً، العالم الحقيقي يتغير. البيانات التي تدربون عليها اليوم قد تختلف غداً (Distribution Shift). ميزوا جيداً بين انزياح التباين (تغير شكل المدخلات) وانزياح التسمية (تغير نسبة المخرجات) وانزياح المفهوم (تغير القواعد تماماً). وأخيراً، تذكروا أن خوارزمياتكم تتخذ قرارات تؤثر على البشر. احذروا من حلقات التغذية الراجعة الجامحة التي تعزز التحيز. في مشروع Kaggle، التوحيد القياسي (Standardization) والتحقق المتقاطع (K-Fold) هما درعكم ضد التخصيص الزائد. ركزوا على هذه المفاهيم، وستكونون جاهزين ليس فقط للامتحان، بل لبناء أنظمة ذكاء اصطناعي مسؤولة وقوية.<p>بينما تنتقل من النظريات إلى التطبيق العملي، تذكر أن مجموعات البيانات في العالم الحقيقي فوضوية. إن إتقان تقنيات المعالجة المسبقة مثل الترميز الساخن الأحادي (One-hot encoding)، وفهم دورة حياة التدريب الكاملة—خاصة إعادة التدريب على مجموعة البيانات بأكملها بعد التحقق المتقاطع—هي المهارات التي تميز كبار المنافسين في Kaggle عن غيرهم.</p></template>
+    <template class="content-en">Welcome, future engineers, to this crucial module. We've learned how to build neural networks, but today we learn how to make them *actually work* in the real world. For the exam, remember these pillars: First, numerical stability. Deep networks are fragile; Sigmoid kills gradients (Vanishing), and large weights explode them. The solution? Use ReLU and Xavier initialization. Second, symmetry. Never start with identical weights, or your deep network becomes just one dumb neuron! Randomness is your friend here. Third, the real world changes. The data you train on today might differ tomorrow (Distribution Shift). Distinguish clearly between Covariate Shift (input appearance changes), Label Shift (output proportions change), and Concept Shift (the rules change entirely). Finally, remember your algorithms make decisions affecting humans. Beware of runaway feedback loops that reinforce bias. In your Kaggle project, Standardization and K-Fold cross-validation are your shields against overfitting. Master these, and you are ready not just for the exam, but to build responsible, robust AI systems.<p>As you transition from theory to practice, remember that real-world datasets are messy. Mastering preprocessing techniques like one-hot encoding, and understanding the full training lifecycle—especially retraining on your entire dataset after cross-validation—are the skills that separate top Kaggle competitors from the rest.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1047,6 +1047,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">حتى لو بدأت الأوزان متطابقة، فإن Dropout يقوم بإسقاط (تعطيل) خلايا عصبية مختلفة بشكل عشوائي في كل خطوة تدريب. هذا يجعل المدخلات والتدرجات تختلف لكل خلية، مما يؤدي إلى تحديثات أوزان مختلفة وكسر التماثل.</template>
           <template class="content-en">Even if weights start identical, Dropout randomly drops (deactivates) different neurons at each training step. This causes inputs and gradients to differ for each neuron, leading to different weight updates and breaking the symmetry.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مسابقة Kaggle لتوقع أسعار المنازل، لماذا لا نكتفي بتوحيد (Standardize) البيانات الرقمية، بل نحتاج أيضاً إلى الترميز الساخن الأحادي (One-hot encoding)؟</template>
+          <template class="content-en">In the Kaggle house price prediction competition, why isn't it enough to just standardize numerical data; why do we also need One-hot encoding?</template>
+          <span class="content-target">في مسابقة Kaggle لتوقع أسعار المنازل، لماذا لا نكتفي بتوحيد (Standardize) البيانات الرقمية، بل نحتاج أيضاً إلى الترميز الساخن الأحادي (One-hot encoding)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>التوحيد القياسي يتعامل فقط مع البيانات الرقمية المستمرة. ومع ذلك، تحتوي البيانات الحقيقية غالباً على ميزات فئوية (مثل نوع الشارع أو حالة السقف) لا تحمل ترتيباً رياضياً. الترميز الساخن الأحادي يحول هذه الفئات إلى متجهات ثنائية (أصفار وواحد)، مما يسمح للشبكة العصبية بمعالجتها رياضياً دون افتراض وجود علاقة ترتيبية خاطئة بين الفئات.</p></template>
+          <template class="content-en"><p>Standardization only handles continuous numerical data. However, real-world data often contains categorical features (like street type or roof condition) that have no mathematical ordering. One-hot encoding converts these categories into binary vectors (zeros and ones), allowing the neural network to process them mathematically without falsely assuming an ordinal relationship between the categories.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1314,6 +1332,40 @@
         "en": "Splitting data into 5 folds, training on 4, testing on 1, and repeating 5 times."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يجب معالجة الميزات الفئوية (Categorical Features) قبل إدخالها للشبكة العصبية؟",
+      "en": "How should categorical features be preprocessed before feeding them into a neural network?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب تحويلها إلى ميزات مؤشر (متجهات ثنائية) باستخدام الترميز الساخن الأحادي (One-hot encoding).",
+        "en": "They should be transformed into indicator features (binary vectors) using one-hot encoding."
+      },
+      "example": {
+        "ar": "تحويل ميزة 'لون السيارة' (أحمر، أزرق) إلى [1, 0] و [0, 1].",
+        "en": "Converting a 'car color' feature (red, blue) into [1, 0] and [0, 1]."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي الخطوة التي تلي اختيار أفضل المعلمات الفائقة باستخدام التحقق المتقاطع K-Fold؟",
+      "en": "What is the step following the selection of the best hyperparameters using K-Fold Cross-Validation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إعادة تدريب النموذج النهائي باستخدام تلك المعلمات الفائقة على مجموعة بيانات التدريب بأكملها (وليس فقط على جزء منها).",
+        "en": "Retraining the final model using those hyperparameters on the entire training dataset (not just a fraction of it)."
+      },
+      "example": {
+        "ar": "استخدام 100% من البيانات للتدريب النهائي بدلاً من 80% المستخدمة في كل طية أثناء التحقق المتقاطع.",
+        "en": "Using 100% of the data for final training instead of the 80% used in each fold during CV."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1323,7 +1375,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1339,7 +1391,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1664,6 +1716,70 @@
     },
     "difficulty": "hard",
     "conceptId": "breaking-symmetry"
+  },
+  {
+    "conceptId": "kaggle-house-prices",
+    "question": {
+      "ar": "بعد الانتهاء من التحقق المتقاطع K-Fold وتحديد أفضل المعلمات الفائقة، ما هو الإجراء الصحيح لتدريب النموذج النهائي قبل إرسال التنبؤات إلى Kaggle؟",
+      "en": "After completing K-Fold cross-validation and identifying the best hyperparameters, what is the correct procedure for training the final model before submitting predictions to Kaggle?"
+    },
+    "options": {
+      "ar": [
+        "استخدام النموذج من الطية (Fold) التي حققت أقل خطأ.",
+        "أخذ متوسط الأوزان من جميع النماذج المدربة في الطيات المختلفة.",
+        "إعادة تدريب النموذج باستخدام أفضل المعلمات على مجموعة بيانات التدريب بأكملها.",
+        "تطبيق النموذج مباشرة على بيانات الاختبار دون مزيد من التدريب."
+      ],
+      "en": [
+        "Use the model from the fold that achieved the lowest error.",
+        "Average the weights from all models trained across the different folds.",
+        "Retrain the model using the best hyperparameters on the entire training dataset.",
+        "Apply the model directly to the test data without further training."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التحقق المتقاطع يُستخدم فقط لتقييم واختيار المعلمات الفائقة. للحصول على أفضل أداء نهائي، يجب أن يستفيد النموذج من جميع بيانات التدريب المتاحة، لذا نعيد تدريبه على المجموعة كاملة.",
+      "en": "Cross-validation is used solely for evaluating and selecting hyperparameters. To get the best final performance, the model should benefit from all available training data, so we retrain it on the complete set."
+    },
+    "hint": {
+      "ar": "النموذج يحتاج إلى أكبر قدر ممكن من البيانات ليتعلم بشكل أفضل قبل الاختبار النهائي.",
+      "en": "The model needs as much data as possible to learn optimally before the final test."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "kaggle-house-prices",
+    "question": {
+      "ar": "لماذا نستخدم اللوغاريتمات (Logarithms) عند توقع أسعار المنازل بدلاً من التنبؤ بالسعر المطلق مباشرة؟",
+      "en": "Why do we use logarithms when predicting house prices instead of predicting the absolute price directly?"
+    },
+    "options": {
+      "ar": [
+        "لتحويل الميزات الفئوية إلى أرقام.",
+        "لأننا نهتم بالخطأ النسبي أكثر من الخطأ المطلق.",
+        "لكسر تماثل الأوزان في الشبكة العصبية.",
+        "لتقليل عدد الميزات في مجموعة البيانات."
+      ],
+      "en": [
+        "To convert categorical features into numbers.",
+        "Because we care more about relative error than absolute error.",
+        "To break weight symmetry in the neural network.",
+        "To reduce the number of features in the dataset."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في التنبؤ بالأسعار، الخطأ بمقدار 10,000 دولار في منزل رخيص يعتبر فادحاً، بينما نفس الخطأ في قصر يعتبر ضئيلاً. استخدام اللوغاريتمات يجعل النموذج يركز على تحسين الأخطاء النسبية (النسبة المئوية للخطأ).",
+      "en": "In price prediction, a 10,000-dollar error on a cheap house is huge, while the same error on a mansion is negligible. Using logarithms forces the model to focus on optimizing relative errors (percentage error)."
+    },
+    "hint": {
+      "ar": "فكر في الفرق بين خطأ 10% وخطأ 10 آلاف دولار.",
+      "en": "Think about the difference between a 10% error and a 10,000-dollar error."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1707,6 +1823,14 @@
     <div data-bilingual>
     <template class="content-ar">قاعدة تهيئة خافيير (Xavier): لكي يظل التباين مستقراً، يجب ألا يتأثر تباين المخرجات بعدد المدخلات، وألا يتأثر تباين التدرجات بعدد المخرجات. هذا هو السر وراء استقرار الشبكات العميقة قبل ظهور تقنيات مثل Batch Normalization.</template>
     <template class="content-en">Xavier Initialization Rule: For variance to remain stable, the variance of outputs must not be affected by the number of inputs, and the variance of gradients must not be affected by the number of outputs. This is the secret behind stabilizing deep networks before techniques like Batch Normalization.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">من الأخطاء الشائعة استخدام النموذج الذي تم تدريبه على طية واحدة (Fold) أثناء التحقق المتقاطع كنموذج نهائي. التحقق المتقاطع هو لتقييم واختيار المعلمات الفائقة فقط. بمجرد العثور على أفضل المعلمات، يجب عليك إعادة تدريب النموذج من الصفر باستخدام مجموعة بيانات التدريب كاملة.</template>
+    <template class="content-en">A common mistake is using the model trained on a single fold during cross-validation as the final model. Cross-validation is only for evaluating and selecting hyperparameters. Once the best parameters are found, you must retrain the model from scratch using the entire training dataset.</template>
     <div class="content-target"></div>
     </div>
   </div>

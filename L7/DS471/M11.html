@@ -264,8 +264,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الهدف من تهيئة الأوزان المتقدمة هو الحفاظ على تباين المدخلات والمخرجات لضمان استقرار التدرجات أثناء الانتشار الأمامي والخلفي.</p><p><b>تهيئة Glorot (Xavier):</b> تقوم بتوسيع الأوزان بناءً على عدد المدخلات (fan_in) والمخرجات (fan_out) في كل طبقة. تستخدم عادة مع دوال التنشيط Sigmoid و Tanh.</p><p><b>تهيئة He:</b> اقترحها K. He وهي مصممة خصيصاً للشبكات التي تستخدم دالة التنشيط ReLU. تساعد في تجنب انفجار التدرجات وموت الخلايا العصبية عن طريق توسيع التهيئة بشكل أكبر.</p></template>
-    <template class="content-en"><p>The goal of advanced weight initialization is to maintain the variance of inputs and outputs to ensure stable gradients during forward and backward propagation.</p><p><b>Glorot (Xavier) Initialization:</b> Scales the weights based on the number of inputs (fan_in) and outputs (fan_out) in each layer, stabilizing the variance across layers. Typically used with Sigmoid and Tanh.</p><p><b><span class="smart-term" data-term-en="He Initialization" data-ar="تهيئة هي" data-en-def="Weight initialization optimized for ReLU activation, accounting for the zeroed-out negative values.">He Initialization<span class="smart-term-tooltip"></span></span>:</b> Proposed by K. He, designed specifically for ReLU-based networks. It helps avoid exploding gradients and dying neurons by scaling the initialization further.</p></template>
+    <template class="content-ar"><p>الهدف من تهيئة الأوزان المتقدمة هو الحفاظ على تباين المدخلات والمخرجات لضمان استقرار التدرجات أثناء الانتشار الأمامي والخلفي.</p><p><b>تهيئة Glorot (Xavier):</b> تقوم بتوسيع الأوزان بناءً على عدد المدخلات (fan_in) والمخرجات (fan_out) في كل طبقة. تستخدم عادة مع دوال التنشيط Sigmoid و Tanh.</p><p><b>تهيئة He:</b> اقترحها K. He وهي مصممة خصيصاً للشبكات التي تستخدم دالة التنشيط ReLU. تساعد في تجنب انفجار التدرجات وموت الخلايا العصبية عن طريق توسيع التهيئة بشكل أكبر.</p><p>بالإضافة إلى التوزيع الطبيعي، يمكن سحب الأوزان من <b>توزيع منتظم (Uniform Distribution)</b> محصور بين $-r$ و $+r$. لتهيئة Glorot، يتم حساب الحد $r$ كالتالي: $r = \sqrt{\frac{3}{\text{fan}_{avg}}}$. أما لتهيئة He، فيتم حسابه كالتالي: $r = \sqrt{\frac{6}{\text{fan}_{in}}}$.</p></template>
+    <template class="content-en"><p>The goal of advanced weight initialization is to maintain the variance of inputs and outputs to ensure stable gradients during forward and backward propagation.</p><p><b>Glorot (Xavier) Initialization:</b> Scales the weights based on the number of inputs (fan_in) and outputs (fan_out) in each layer, stabilizing the variance across layers. Typically used with Sigmoid and Tanh.</p><p><b><span class="smart-term" data-term-en="He Initialization" data-ar="تهيئة هي" data-en-def="Weight initialization optimized for ReLU activation, accounting for the zeroed-out negative values.">He Initialization<span class="smart-term-tooltip"></span></span>:</b> Proposed by K. He, designed specifically for ReLU-based networks. It helps avoid exploding gradients and dying neurons by scaling the initialization further.</p><p>In addition to the normal distribution, weights can be drawn from a <b><span class="smart-term" data-term-en="Uniform Distribution" data-ar="التوزيع المنتظم" data-en-def="A probability distribution where all values within a specific range (like -r to +r) have an equal chance of being selected, often used as an alternative to normal distribution for initializing weights.">uniform distribution<span class="smart-term-tooltip"></span></span></b> bounded between $-r$ and $+r$. For Glorot initialization, the bound $r$ is calculated as: $r = \sqrt{\frac{3}{\text{fan}_{avg}}}$. For He initialization, it is calculated as: $r = \sqrt{\frac{6}{\text{fan}_{in}}}$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1046,8 +1046,8 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المفصلية. إذا كنتم تتساءلون لماذا كانت الشبكات العصبية العميقة تعتبر 'فاشلة' قبل عام 2010، فالإجابة تكمن في هذه الوحدة: مشكلة تلاشي وانفجار التدرجات. تخيلوا أنكم تحاولون إيصال رسالة عبر طابور طويل من الأشخاص؛ إما أن يختفي الصوت تماماً (تلاشي) أو يتحول إلى صراخ مزعج (انفجار). لحل هذه المعضلة، سلحنا أنفسنا بأدوات قوية: أولاً، قمنا بضبط 'الضغط' الأولي باستخدام تهيئة Glorot و He. ثانياً، استبدلنا الأنابيب المسدودة (Sigmoid) بصمامات ذكية (ReLU ومشتقاتها). ثالثاً، أضفنا نقاط تفتيش لتنظيم التدفق (Batch Normalization). وإذا خرجت الأمور عن السيطرة، نستخدم مكابح الطوارئ (Gradient Clipping). وأخيراً، تعلمنا كيف نكون أذكياء ولا نبدأ من الصفر دائماً باستخدام نقل التعلم (Transfer Learning). ركزوا جيداً على الفرق بين التدريب والاختبار في Batch Normalization، ولماذا نجمد الطبقات في نقل التعلم، فهذه النقاط هي المفضلة في الامتحانات!</template>
-    <template class="content-en">Welcome friends to this crucial module. If you ever wondered why deep neural networks were considered a 'failure' before 2010, the answer lies here: the vanishing and exploding gradients problem. Imagine passing a message down a long line of people; the sound either dies out completely (vanishing) or turns into distorted shouting (exploding). To solve this, we armed ourselves with powerful tools: First, we adjusted the initial 'pressure' using Glorot and He initialization. Second, we replaced clogging pipes (Sigmoid) with smart valves (ReLU and its variants). Third, we added checkpoints to regulate the flow (Batch Normalization). If things still get out of hand, we use emergency brakes (Gradient Clipping). Finally, we learned to work smart, not hard, by not starting from scratch using Transfer Learning. Pay close attention to the difference between training and testing in Batch Normalization, and why we freeze layers in Transfer Learning—these are absolute exam favorites!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المفصلية. إذا كنتم تتساءلون لماذا كانت الشبكات العصبية العميقة تعتبر 'فاشلة' قبل عام 2010، فالإجابة تكمن في هذه الوحدة: مشكلة تلاشي وانفجار التدرجات. تخيلوا أنكم تحاولون إيصال رسالة عبر طابور طويل من الأشخاص؛ إما أن يختفي الصوت تماماً (تلاشي) أو يتحول إلى صراخ مزعج (انفجار). لحل هذه المعضلة، سلحنا أنفسنا بأدوات قوية: أولاً، قمنا بضبط 'الضغط' الأولي باستخدام تهيئة Glorot و He. ثانياً، استبدلنا الأنابيب المسدودة (Sigmoid) بصمامات ذكية (ReLU ومشتقاتها). ثالثاً، أضفنا نقاط تفتيش لتنظيم التدفق (Batch Normalization). وإذا خرجت الأمور عن السيطرة، نستخدم مكابح الطوارئ (Gradient Clipping). وأخيراً، تعلمنا كيف نكون أذكياء ولا نبدأ من الصفر دائماً باستخدام نقل التعلم (Transfer Learning). ركزوا جيداً على الفرق بين التدريب والاختبار في Batch Normalization، ولماذا نجمد الطبقات في نقل التعلم، فهذه النقاط هي المفضلة في الامتحانات!<p>تذكر أن التفاصيل الدقيقة، مثل الاختيار بين التوزيع الطبيعي والمنتظم في تهيئة الأوزان وفهم معادلاتها، قد تبدو بسيطة لكنها تلعب دوراً حاسماً في استقرار الشبكات العميقة جداً. إتقان هذه الأسس الرياضية سيميزك كمهندس تعلم آلة قادر على بناء وتحسين نماذج معقدة من الصفر.</p></template>
+    <template class="content-en">Welcome friends to this crucial module. If you ever wondered why deep neural networks were considered a 'failure' before 2010, the answer lies here: the vanishing and exploding gradients problem. Imagine passing a message down a long line of people; the sound either dies out completely (vanishing) or turns into distorted shouting (exploding). To solve this, we armed ourselves with powerful tools: First, we adjusted the initial 'pressure' using Glorot and He initialization. Second, we replaced clogging pipes (Sigmoid) with smart valves (ReLU and its variants). Third, we added checkpoints to regulate the flow (Batch Normalization). If things still get out of hand, we use emergency brakes (Gradient Clipping). Finally, we learned to work smart, not hard, by not starting from scratch using Transfer Learning. Pay close attention to the difference between training and testing in Batch Normalization, and why we freeze layers in Transfer Learning—these are absolute exam favorites!<p>Remember that fine details, such as choosing between normal and uniform distributions for weight initialization and understanding their formulas, might seem minor but play a crucial role in the stability of very deep networks. Mastering these mathematical foundations will set you apart as a machine learning engineer capable of building and optimizing complex models from scratch.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1221,6 +1221,24 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يجب أن تكون ميزات الإدخال موحدة (Standardized بمتوسط 0 وتباين 1)، ويجب تهيئة أوزان الشبكة باستخدام تهيئة LeCun (LeCun initialization).</template>
           <template class="content-en">Input features must be standardized (mean 0, variance 1), and the network's weights must be initialized using LeCun initialization.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">هل تقتصر تهيئة الأوزان المتقدمة (مثل Glorot و He) على استخدام التوزيع الطبيعي (Normal Distribution) فقط؟</template>
+          <template class="content-en">Is advanced weight initialization (like Glorot and He) limited to using only the Normal Distribution?</template>
+          <span class="content-target">هل تقتصر تهيئة الأوزان المتقدمة (مثل Glorot و He) على استخدام التوزيع الطبيعي (Normal Distribution) فقط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لا، يمكن أيضاً سحب الأوزان الأولية من توزيع منتظم (Uniform Distribution) محصور بين قيمتين $-r$ و $+r$. يتم ضبط قيمة $r$ رياضياً بناءً على عدد المدخلات والمخرجات للطبقة، وذلك لضمان الحفاظ على نفس التباين (Variance) المستهدف الذي يوفره التوزيع الطبيعي.</p></template>
+          <template class="content-en"><p>No, initial weights can also be drawn from a uniform distribution bounded between $-r$ and $+r$. The value of $r$ is mathematically scaled based on the layer's input and output counts to ensure it maintains the exact same target variance provided by the normal distribution.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1505,6 +1523,23 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
         "en": "Training layers using Autoencoders before fine-tuning with labeled data."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم حساب حدود التوزيع المنتظم (Uniform Distribution) لتهيئة Glorot و He؟",
+      "en": "How are the uniform distribution bounds calculated for Glorot and He initialization?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لتهيئة Glorot: $r = \\sqrt{3 / \\text{fan}_{avg}}$. لتهيئة He: $r = \\sqrt{6 / \\text{fan}_{in}}$.",
+        "en": "For Glorot: $r = \\sqrt{3 / \\text{fan}_{avg}}$. For He: $r = \\sqrt{6 / \\text{fan}_{in}}$."
+      },
+      "example": {
+        "ar": "يتم سحب الأوزان عشوائياً بقيم متساوية الاحتمال بين $-r$ و $+r$.",
+        "en": "Weights are drawn randomly with equal probability between $-r$ and $+r$."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1514,7 +1549,7 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1530,7 +1565,7 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1855,6 +1890,38 @@ model_B_on_A.compile(loss="binary_crossentropy", optimizer=optimizer)</code></pr
     },
     "difficulty": "medium",
     "conceptId": "transfer-learning"
+  },
+  {
+    "conceptId": "weight-initialization",
+    "question": {
+      "ar": "عند استخدام التوزيع المنتظم (Uniform Distribution) في تهيئة Glorot (Xavier)، ما هي المعادلة الصحيحة لحساب الحد $r$ الذي تُسحب منه الأوزان بين $-r$ و $+r$؟",
+      "en": "When using a uniform distribution in Glorot (Xavier) initialization, what is the correct formula to calculate the bound $r$ from which weights are drawn between $-r$ and $+r$?"
+    },
+    "options": {
+      "ar": [
+        "$\\sqrt{3 / \\text{fan}_{avg}}$",
+        "$\\sqrt{6 / \\text{fan}_{in}}$",
+        "$\\sqrt{1 / \\text{fan}_{avg}}$",
+        "$\\sqrt{2 / \\text{fan}_{in}}$"
+      ],
+      "en": [
+        "$\\sqrt{3 / \\text{fan}_{avg}}$",
+        "$\\sqrt{6 / \\text{fan}_{in}}$",
+        "$\\sqrt{1 / \\text{fan}_{avg}}$",
+        "$\\sqrt{2 / \\text{fan}_{in}}$"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "في تهيئة Glorot باستخدام التوزيع المنتظم، يتم حساب الحد $r$ باستخدام الجذر التربيعي لـ 3 مقسوماً على متوسط عدد المدخلات والمخرجات (fan_avg).",
+      "en": "In Glorot initialization using a uniform distribution, the bound $r$ is calculated using the square root of 3 divided by the average of inputs and outputs (fan_avg)."
+    },
+    "hint": {
+      "ar": "تذكر أن Glorot يستخدم الرقم 3 للتوزيع المنتظم ويعتمد على المتوسط (avg).",
+      "en": "Remember that Glorot uses the number 3 for uniform distribution and relies on the average (avg)."
+    },
+    "difficulty": "hard",
+    "id": 11
   }
 ]
 </script>

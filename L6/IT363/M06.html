@@ -103,6 +103,11 @@
         <template class="content-en">Compatibility with SNMPv1</template>
         <span class="content-target">التوافقية مع SNMPv1</span>
       </a>
+      <a href="#snmpv2-generic-pdu-errors" class="toc-link" data-bilingual>
+        <template class="content-ar">تنسيق PDU العام وحالات الخطأ في SNMPv2</template>
+        <template class="content-en">SNMPv2 Generic PDU Format &amp; Error Statuses</template>
+        <span class="content-target">تنسيق PDU العام وحالات الخطأ في SNMPv2</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -1222,14 +1227,57 @@
   </details>
 </section>
 
+<section id="snmpv2-generic-pdu-errors" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تنسيق PDU العام وحالات الخطأ في SNMPv2</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> SNMPv2 Generic PDU Format &amp; Error Statuses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد SNMPv2 تنسيقاً موحداً لجميع رسائل PDU تقريباً، ويوسع حالات الخطأ (Error Statuses) بشكل كبير لتصل إلى 18 حالة، مما يوفر تشخيصاً أدق للمشاكل.</p></template>
+    <template class="content-en"><p>SNMPv2 adopts a standardized format for almost all PDU messages and significantly expands the Error Statuses to 18, providing much finer problem diagnostics.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون حزمة PDU العامة في SNMPv2 من الحقول التالية:</p><ol><li><b>نوع PDU (PDU Type):</b> يحدد نوع الرسالة (من 0 إلى 7، مع ملاحظة أن النوع 4 مهمل Obsolete).</li><li><b><span class="smart-term" data-term-en="RequestID" data-ar="معرف الطلب" data-en-def="A field in the SNMP PDU that uniquely identifies and matches a request with its corresponding response.">معرف الطلب<span class="smart-term-tooltip"></span></span> (RequestID):</b> يربط بشكل فريد بين رسالة الطلب والاستجابة الخاصة بها.</li><li><b>حالة الخطأ (Error Status) و<span class="smart-term" data-term-en="Error Index" data-ar="مؤشر الخطأ" data-en-def="A field in the SNMP response PDU that identifies the exact position of the variable binding in the VarBindList that caused the error.">مؤشر الخطأ<span class="smart-term-tooltip"></span></span> (Error Index):</b> يُستخدمان لتحديد الأخطاء. في رسائل الطلب من المدير، يتم تعيينهما إلى 0. في الاستجابة، إذا كان هناك خطأ، يتم وضع رمز الخطأ في <code>Error Status</code>، ويشير <code>Error Index</code> إلى المتغير المحدد في <span class="smart-term" data-term-en="VarBindList" data-ar="قائمة المتغيرات" data-en-def="A list containing pairs of object names (OIDs) and their corresponding values within an SNMP PDU.">قائمة المتغيرات<span class="smart-term-tooltip"></span></span> الذي تسبب في الخطأ.</li><li><b>قائمة المتغيرات (VarBindList):</b> قائمة بأسماء وقيم المتغيرات.</li></ol><p>تم توسيع حالات الخطأ من 5 في SNMPv1 إلى 18 في SNMPv2. تشمل الحالات الجديدة أخطاء دقيقة مثل: <code>wrongType</code>، <code>wrongLength</code>، <code>noCreation</code>، <code>inconsistentValue</code>، <code>authorizationError</code>، وغيرها، مما يسهل معالجة الأخطاء المعقدة خاصة في عمليات إنشاء الصفوف (Set).</p></template>
+    <template class="content-en"><p>The generic SNMPv2 PDU consists of the following fields:</p><ol><li><b>PDU Type:</b> Identifies the message type (0 to 7, noting that type 4 is obsolete).</li><li><b><span class="smart-term" data-term-en="RequestID" data-ar="معرف الطلب" data-en-def="A field in the SNMP PDU that uniquely identifies and matches a request with its corresponding response.">RequestID<span class="smart-term-tooltip"></span></span>:</b> Uniquely identifies the request-response pair.</li><li><b>Error Status and <span class="smart-term" data-term-en="Error Index" data-ar="مؤشر الخطأ" data-en-def="A field in the SNMP response PDU that identifies the exact position of the variable binding in the VarBindList that caused the error.">Error Index<span class="smart-term-tooltip"></span></span>:</b> Used to identify errors. In request messages, they are set to 0. In responses, if an error occurs, the code is placed in <code>Error Status</code>, and the <code>Error Index</code> points to the specific variable in the <span class="smart-term" data-term-en="VarBindList" data-ar="قائمة المتغيرات" data-en-def="A list containing pairs of object names (OIDs) and their corresponding values within an SNMP PDU.">VarBindList<span class="smart-term-tooltip"></span></span> that caused it.</li><li><b>VarBindList:</b> The list of variable names and values.</li></ol><p>Error statuses were expanded from 5 in SNMPv1 to 18 in SNMPv2. New statuses include precise errors like: <code>wrongType</code>, <code>wrongLength</code>, <code>noCreation</code>, <code>inconsistentValue</code>, <code>authorizationError</code>, etc., facilitating complex error handling, especially during row creation (Set operations).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التوسع في حالات الخطأ كان ضرورياً لدعم الميزات الجديدة في SNMPv2، وخاصة عمليات إنشاء الجداول المعقدة (RowStatus). في SNMPv1، كان خطأ <code>badValue</code> عاماً جداً ولا يوضح ما إذا كانت المشكلة في نوع البيانات، أو طولها، أو عدم تناسقها.</p><p>حقل <code>Error Index</code> يعتبر منقذاً للمديرين (Managers)؛ فإذا أرسل المدير طلب <code>SetRequest</code> يحتوي على 10 متغيرات، وفشل المتغير السابع بسبب نوع بيانات خاطئ، سيرد الوكيل بحالة خطأ <code>wrongType (7)</code> ومؤشر خطأ <code>7</code>. هذا يمنع المدير من رفض الحزمة بأكملها دون معرفة السبب، ويسمح له بتصحيح المتغير السابع فقط.</p></template>
+    <template class="content-en"><p>The expansion of error statuses was necessary to support SNMPv2's new features, particularly complex table row creations (RowStatus). In SNMPv1, the <code>badValue</code> error was too generic and didn't specify if the issue was data type, length, or inconsistency.</p><p>The <code>Error Index</code> field is a lifesaver for Managers. If a Manager sends a <code>SetRequest</code> with 10 variables, and the 7th fails due to a wrong data type, the agent replies with Error Status <code>wrongType (7)</code> and Error Index <code>7</code>. This prevents the manager from discarding the entire PDU blindly, allowing it to correct just the 7th variable.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم تعيين حقلي حالة الخطأ ومؤشر الخطأ إلى 0 في رسالة الطلب (Request) من المدير؟</template>
+      <template class="content-en">Why are the Error Status and Error Index fields set to 0 in a request message from the manager?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الأخطاء يتم اكتشافها وإنشاؤها بواسطة الوكيل (Agent) أثناء معالجة الطلب. المدير لم يواجه خطأ بعد عند إرسال الطلب، لذا تعمل هذه الحقول كعناصر نائبة (Placeholders) يتم تعبئتها بواسطة الوكيل في رسالة الاستجابة.</p></template>
+      <template class="content-en"><p>Because errors are detected and generated by the Agent during request processing. The manager hasn't encountered an error when sending the request, so these fields act as placeholders to be filled by the agent in the response message.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي الشبكات في هذه الوحدة المحورية. لقد رأينا كيف كان الإصدار الأول من SNMP بطيئاً في جلب الجداول الكبيرة. هنا يأتي SNMPv2 كبطل الأداء! ركزوا جيداً على رسالة GetBulkRequest؛ إنها سؤال امتحاني مؤكد. افهموا كيف يقلل حقلا Non-repeaters و Max-repetitions من الضغط على الشبكة. المفهوم الثاني الأهم هو RowStatus؛ تخيلوه كجهاز تحكم عن بعد لصفوف الجدول (إنشاء، تفعيل، حذف). لا تنسوا الفرق بين Create-and-Go (السريع) و Create-and-Wait (المتأني). أخيراً، في عالم الشبكات الحقيقي، لن تختفي الأجهزة القديمة فجأة، لذا فإن فهم كيفية عمل الخادم الوكيل (Proxy Server) لترجمة رسائل v2 إلى v1 هو مهارة هندسية حاسمة. راجعوا هذه النقاط وستكونون مستعدين تماماً!</template>
-    <template class="content-en">Welcome, network engineers, to this pivotal module. We saw how SNMPv1 struggled with large tables. Enter SNMPv2, the performance hero! Pay close attention to the GetBulkRequest; it's a guaranteed exam topic. Understand how Non-repeaters and Max-repetitions reduce network overhead. The second major concept is RowStatus; think of it as a remote control for table rows (create, activate, delete). Don't forget the difference between the swift Create-and-Go and the deliberate Create-and-Wait. Finally, in the real world, legacy devices don't vanish overnight, so understanding how a Proxy Server translates v2 to v1 is a critical engineering skill. Master these, and you'll ace the exam!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي الشبكات في هذه الوحدة المحورية. لقد رأينا كيف كان الإصدار الأول من SNMP بطيئاً في جلب الجداول الكبيرة. هنا يأتي SNMPv2 كبطل الأداء! ركزوا جيداً على رسالة GetBulkRequest؛ إنها سؤال امتحاني مؤكد. افهموا كيف يقلل حقلا Non-repeaters و Max-repetitions من الضغط على الشبكة. المفهوم الثاني الأهم هو RowStatus؛ تخيلوه كجهاز تحكم عن بعد لصفوف الجدول (إنشاء، تفعيل، حذف). لا تنسوا الفرق بين Create-and-Go (السريع) و Create-and-Wait (المتأني). أخيراً، في عالم الشبكات الحقيقي، لن تختفي الأجهزة القديمة فجأة، لذا فإن فهم كيفية عمل الخادم الوكيل (Proxy Server) لترجمة رسائل v2 إلى v1 هو مهارة هندسية حاسمة. راجعوا هذه النقاط وستكونون مستعدين تماماً!<p>لفهم قوة SNMPv2 حقاً، يجب أن تنظر إلى التوحيد القياسي لتنسيق PDU والدقة العالية في الإبلاغ عن الأخطاء. من خلال توحيد شكل الرسائل وتوسيع حالات الخطأ إلى 18 حالة، لم يعد مدير الشبكة يخمن سبب فشل الطلبات، بل أصبح يمتلك أداة تشخيصية دقيقة (Error Index) توجهه مباشرة إلى المتغير المعيب، مما يقلل بشكل كبير من وقت استكشاف الأخطاء وإصلاحها.</p></template>
+    <template class="content-en">Welcome, network engineers, to this pivotal module. We saw how SNMPv1 struggled with large tables. Enter SNMPv2, the performance hero! Pay close attention to the GetBulkRequest; it's a guaranteed exam topic. Understand how Non-repeaters and Max-repetitions reduce network overhead. The second major concept is RowStatus; think of it as a remote control for table rows (create, activate, delete). Don't forget the difference between the swift Create-and-Go and the deliberate Create-and-Wait. Finally, in the real world, legacy devices don't vanish overnight, so understanding how a Proxy Server translates v2 to v1 is a critical engineering skill. Master these, and you'll ace the exam!<p>To truly grasp the power of SNMPv2, you must look at its standardized PDU format and high-resolution error reporting. By unifying message structures and expanding error statuses to 18, the network manager no longer guesses why requests fail. Instead, it possesses a precise diagnostic tool (Error Index) pointing directly to the faulty variable, drastically reducing troubleshooting time.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1403,6 +1451,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأنه يتطلب من نظام إدارة الشبكة (NMS) تشغيل مترجمين للبروتوكولين والقيام بجميع عمليات التحويل داخلياً، مما يستهلك موارد المعالجة.</template>
           <template class="content-en">Because it requires the Network Management System (NMS) to run interpreters for both protocols and perform all conversions internally, consuming processing resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساهم توسيع حالات الخطأ إلى 18 حالة في SNMPv2 في تحسين إدارة الشبكة مقارنة بـ SNMPv1؟</template>
+          <template class="content-en">How does expanding the error statuses to 18 in SNMPv2 improve network management compared to SNMPv1?</template>
+          <span class="content-target">كيف يساهم توسيع حالات الخطأ إلى 18 حالة في SNMPv2 في تحسين إدارة الشبكة مقارنة بـ SNMPv1؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في SNMPv1، كانت الأخطاء عامة جداً (مثل badValue)، مما يجعل استكشاف الأخطاء وإصلاحها يدوياً أو برمجياً أمراً صعباً. في SNMPv2، توفر الحالات الـ 18 دقة عالية (Granularity). على سبيل المثال، يمكن للمدير الآن معرفة ما إذا كان الفشل بسبب نوع بيانات خاطئ (wrongType)، أو طول غير صحيح (wrongLength)، أو نقص في الصلاحيات (authorizationError). هذا يسمح لأنظمة الإدارة باتخاذ إجراءات تصحيحية تلقائية دقيقة دون تدخل بشري.</p></template>
+          <template class="content-en"><p>In SNMPv1, errors were too generic (like badValue), making manual or programmatic troubleshooting difficult. In SNMPv2, the 18 statuses provide high granularity. For instance, a manager now knows if a failure is due to a wrong data type (wrongType), incorrect length (wrongLength), or lack of permissions (authorizationError). This allows management systems to take precise, automated corrective actions without human intervention.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1670,6 +1736,40 @@
         "en": "Defining a linkUp trap using NOTIFICATION-TYPE."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي وظيفة حقل Error Index في رسالة استجابة SNMPv2؟",
+      "en": "What is the function of the Error Index field in an SNMPv2 response message?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحدد المتغير الدقيق (حسب ترتيبه) في قائمة المتغيرات (VarBindList) الذي تسبب في حدوث الخطأ.",
+        "en": "It identifies the exact variable (by its position) in the VarBindList that caused the error to occur."
+      },
+      "example": {
+        "ar": "إذا كان المتغير الثالث غير صالح، سيكون Error Index = 3.",
+        "en": "If the third variable is invalid, the Error Index will be 3."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كم عدد حالات الخطأ (Error Statuses) المحددة في SNMPv2 مقارنة بـ SNMPv1؟",
+      "en": "How many Error Statuses are defined in SNMPv2 compared to SNMPv1?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تم توسيعها إلى 18 حالة خطأ في SNMPv2، مقارنة بـ 5 حالات فقط في SNMPv1.",
+        "en": "They were expanded to 18 error statuses in SNMPv2, compared to only 5 in SNMPv1."
+      },
+      "example": {
+        "ar": "إضافة أخطاء دقيقة مثل wrongType و noCreation.",
+        "en": "Adding precise errors like wrongType and noCreation."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1679,7 +1779,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1695,7 +1795,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2020,6 +2120,38 @@
     },
     "difficulty": "easy",
     "conceptId": "compatibility-snmpv1"
+  },
+  {
+    "conceptId": "snmpv2-generic-pdu-errors",
+    "question": {
+      "ar": "أي حقل في حزمة SNMPv2 PDU العامة يضمن مطابقة استجابة الوكيل مع طلب المدير الأصلي؟",
+      "en": "Which field in the generic SNMPv2 PDU ensures that the agent's response matches the manager's original request?"
+    },
+    "options": {
+      "ar": [
+        "PDU Type",
+        "Error Index",
+        "RequestID",
+        "VarBindList"
+      ],
+      "en": [
+        "PDU Type",
+        "Error Index",
+        "RequestID",
+        "VarBindList"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "حقل RequestID (معرف الطلب) يتم إنشاؤه بواسطة المدير ويُعاد كما هو بواسطة الوكيل، مما يسمح للمدير بربط الاستجابة بالطلب الصحيح في بيئة شبكة غير متزامنة.",
+      "en": "The RequestID field is generated by the manager and echoed back by the agent, allowing the manager to correlate the response to the correct request in an asynchronous network environment."
+    },
+    "hint": {
+      "ar": "يعمل كـ 'رقم تذكرة' للعملية.",
+      "en": "Acts as a 'ticket number' for the transaction."
+    },
+    "difficulty": "easy",
+    "id": 11
   }
 ]
 </script>
@@ -2063,6 +2195,14 @@
     <div data-bilingual>
     <template class="content-ar">الخلط بين Non-repeaters و Max-repetitions. تذكر: Non-repeaters للكائنات الفردية (Scalar) التي تُجلب مرة واحدة، بينما Max-repetitions للأعمدة التي تُجلب منها صفوف متعددة.</template>
     <template class="content-en">Confusing Non-repeaters and Max-repetitions. Remember: Non-repeaters is for scalar objects fetched once, while Max-repetitions is for columns where multiple rows are fetched.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند النظر إلى أنواع PDU في SNMPv2، قد تتساءل عن النوع رقم 4. احذر، النوع 4 يعتبر مهملًا (Obsolete) ولا يُستخدم في SNMPv2، حيث تقفز الأنواع من 3 (Set-Request) إلى 5 (GetBulkRequest).</template>
+    <template class="content-en">When looking at SNMPv2 PDU types, you might wonder about type 4. Beware, type 4 is marked as 'obsolete' and is not used in SNMPv2; the types jump from 3 (Set-Request) to 5 (GetBulkRequest).</template>
     <div class="content-target"></div>
     </div>
   </div>

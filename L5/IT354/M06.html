@@ -35,6 +35,9 @@
   <link rel="stylesheet" href="../../shared/skin.css">
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
 
 
   <!-- data-garden-icons -->
@@ -761,8 +764,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يحافظ هذا النهج على عدد من الإصدارات (Versions) لعنصر البيانات ويخصص الإصدار الصحيح لعملية القراءة الخاصة بالمعاملة. على عكس الآليات الأخرى، لا يتم رفض عملية القراءة أبداً.</p><p><b>الآثار الجانبية:</b> يتطلب مساحة تخزين أكبر بكثير (في الذاكرة والقرص) للحفاظ على الإصدارات. للتحكم في النمو غير المحدود، يتم تشغيل '<span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage space.">جمع القمامة<span class="smart-term-tooltip"></span></span>' (Garbage Collection) لحذف الإصدارات القديمة.</p><p><b>النسخ المتعددة مع القفل ثنائي الطور (Multiversion 2PL):</b></p><ul><li>يسمح للمعاملة T' بقراءة العنصر X بينما هو مقفول حصرياً (Write locked) بواسطة T.</li><li>يتم ذلك بالاحتفاظ بنسختين: نسخة ملتزم بها (Committed) ونسخة جديدة قيد التعديل.</li><li>عندما تستعد T للالتزام، تحصل على <b><span class="smart-term" data-term-en="Certify Lock" data-ar="قفل المصادقة" data-en-def="A lock obtained just before a transaction commits in Multiversion 2PL to make its written version the new committed version.">قفل المصادقة<span class="smart-term-tooltip"></span></span> (Certify Lock)</b> على النسخة الجديدة، وتصبح هي النسخة المعتمدة.</li></ul></template>
-    <template class="content-en"><p>This approach maintains a number of versions of a data item and allocates the right version to a read operation. Unlike other mechanisms, a read operation is NEVER rejected.</p><p><b>Side effects:</b> Significantly more storage (RAM and disk) is required to maintain multiple versions. To check unlimited growth, a <span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage space.">garbage collection<span class="smart-term-tooltip"></span></span> is run when some criteria are satisfied.</p><p><b>Multiversion Two-Phase Locking Using <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل المصادقة" data-en-def="A lock obtained just before a transaction commits in Multiversion 2PL to make its written version the new committed version.">Certify Lock<span class="smart-term-tooltip"></span></span>s:</b></p><ul><li>Allows a transaction T' to read data item X while it is write-locked by a conflicting transaction T.</li><li>Accomplished by maintaining two versions: one committed and one being written.</li><li>When T is ready to commit, it obtains a <b>Certify Lock</b> on the new version, which then becomes the committed version.</li></ul></template>
+    <template class="content-ar"><p>يحافظ هذا النهج على عدد من الإصدارات (Versions) لعنصر البيانات ويخصص الإصدار الصحيح لعملية القراءة الخاصة بالمعاملة. على عكس الآليات الأخرى، لا يتم رفض عملية القراءة أبداً.</p><p><b>الآثار الجانبية:</b> يتطلب مساحة تخزين أكبر بكثير (في الذاكرة والقرص) للحفاظ على الإصدارات. للتحكم في النمو غير المحدود، يتم تشغيل '<span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage space.">جمع القمامة<span class="smart-term-tooltip"></span></span>' (Garbage Collection) لحذف الإصدارات القديمة.</p><p><b>النسخ المتعددة مع القفل ثنائي الطور (Multiversion 2PL):</b></p><ul><li>يسمح للمعاملة T' بقراءة العنصر X بينما هو مقفول حصرياً (Write locked) بواسطة T.</li><li>يتم ذلك بالاحتفاظ بنسختين: نسخة ملتزم بها (Committed) ونسخة جديدة قيد التعديل.</li><li>عندما تستعد T للالتزام، تحصل على <b><span class="smart-term" data-term-en="Certify Lock" data-ar="قفل المصادقة" data-en-def="A lock obtained just before a transaction commits in Multiversion 2PL to make its written version the new committed version.">قفل المصادقة<span class="smart-term-tooltip"></span></span> (Certify Lock)</b> على النسخة الجديدة، وتصبح هي النسخة المعتمدة.</li></ul><p>لضمان قابلية التسلسل في تقنية النسخ المتعددة بناءً على الطوابع الزمنية، يتم تعريف متغيرين لكل نسخة $X_i$: <span class="smart-term" data-term-en="read_TS" data-ar="طابع القراءة" data-en-def="The largest timestamp of all transactions that have successfully read a specific version of a data item.">طابع القراءة<span class="smart-term-tooltip"></span></span> <code>read_TS(Xi)</code> و<span class="smart-term" data-term-en="write_TS" data-ar="طابع الكتابة" data-en-def="The timestamp of the transaction that wrote the value of a specific version of a data item.">طابع الكتابة<span class="smart-term-tooltip"></span></span> <code>write_TS(Xi)</code>. يتم تطبيق القاعدتين التاليتين:</p><ol><li><b>عملية الكتابة write_item(X):</b> ابحث عن النسخة $i$ التي لها أعلى <code>write_TS(Xi)</code> بحيث يكون $\le$ <code>TS(T)</code>. إذا كان <code>read_TS(Xi) > TS(T)</code>، يتم إجهاض المعاملة T والتراجع عنها. عدا ذلك، يتم إنشاء نسخة جديدة $X_j$ وتعيين <code>read_TS(X_j) = write_TS(X_j) = TS(T)</code>.</li><li><b>عملية القراءة read_item(X):</b> ابحث عن النسخة $i$ التي لها أعلى <code>write_TS(Xi)</code> بحيث يكون $\le$ <code>TS(T)</code>. أرجع قيمة هذه النسخة للمعاملة T، وقم بتحديث <code>read_TS(Xi)</code> ليكون القيمة الأكبر بين <code>TS(T)</code> و <code>read_TS(Xi)</code> الحالي.</li></ol></template>
+    <template class="content-en"><p>This approach maintains a number of versions of a data item and allocates the right version to a read operation. Unlike other mechanisms, a read operation is NEVER rejected.</p><p><b>Side effects:</b> Significantly more storage (RAM and disk) is required to maintain multiple versions. To check unlimited growth, a <span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage space.">garbage collection<span class="smart-term-tooltip"></span></span> is run when some criteria are satisfied.</p><p><b>Multiversion Two-Phase Locking Using <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل المصادقة" data-en-def="A lock obtained just before a transaction commits in Multiversion 2PL to make its written version the new committed version.">Certify Lock<span class="smart-term-tooltip"></span></span>s:</b></p><ul><li>Allows a transaction T' to read data item X while it is write-locked by a conflicting transaction T.</li><li>Accomplished by maintaining two versions: one committed and one being written.</li><li>When T is ready to commit, it obtains a <b>Certify Lock</b> on the new version, which then becomes the committed version.</li></ul><p>To ensure serializability in Timestamp-based Multiversion CC, two variables are defined for each version $X_i$: <code>read_TS(Xi)</code> and <code>write_TS(Xi)</code>. The following two rules are applied:</p><ol><li><b>Write operation write_item(X):</b> Find version $i$ with the highest <code>write_TS(Xi)</code> that is $\le$ <code>TS(T)</code>. If <code>read_TS(Xi) > TS(T)</code>, abort and roll-back T. Otherwise, create a new version $X_j$ and set <code>read_TS(X_j) = write_TS(X_j) = TS(T)</code>.</li><li><b>Read operation read_item(X):</b> Find version $i$ with the highest <code>write_TS(Xi)</code> that is $\le$ <code>TS(T)</code>. Return the value of $X_i$ to T, and set <code>read_TS(Xi)</code> to the larger of <code>TS(T)</code> and the current <code>read_TS(Xi)</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -804,8 +807,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في هذه التقنية، يتم التحقق من قابلية التسلسل (Serializability) <i>فقط</i> في وقت الالتزام (Commit). تتكون من ثلاث مراحل:</p><ol><li><b>مرحلة القراءة (Read phase):</b> تقرأ المعاملة القيم الملتزم بها. يتم تطبيق التحديثات <i>فقط</i> على نسخ محلية (في ذاكرة التخزين المؤقت) وليس على قاعدة البيانات الفعلية.</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase in optimistic CC where the system checks if the transaction&#x27;s local updates conflict with other committed transactions.">مرحلة التحقق<span class="smart-term-tooltip"></span></span> (Validation phase):</b> يتم التحقق من قابلية التسلسل قبل كتابة التحديثات. يتم فحص مجموعات القراءة (read_set) ومجموعات الكتابة (write_set) للتأكد من عدم وجود تداخل مع معاملات أخرى. إذا فشل التحقق، يتم إجهاض المعاملة.</li><li><b>مرحلة الكتابة (Write phase):</b> عند نجاح التحقق، يتم تطبيق تحديثات المعاملة على قاعدة البيانات الفعلية.</li></ol></template>
-    <template class="content-en"><p>In this technique, serializability is checked <i>only</i> at the time of commit. It consists of three phases:</p><ol><li><b>Read phase:</b> A transaction reads committed values. Updates are applied <i>only</i> to local copies (versions) in the database cache, not the actual DB.</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase in optimistic CC where the system checks if the transaction&#x27;s local updates conflict with other committed transactions.">Validation phase<span class="smart-term-tooltip"></span></span>:</b> Serializability is checked before writing updates to the database. It checks if the read_set and write_set of the transaction conflict with others. If validation fails, the transaction is aborted.</li><li><b>Write phase:</b> On successful validation, the transaction's updates are applied to the database; otherwise, it is restarted.</li></ol></template>
+    <template class="content-ar"><p>في هذه التقنية، يتم التحقق من قابلية التسلسل (Serializability) <i>فقط</i> في وقت الالتزام (Commit). تتكون من ثلاث مراحل:</p><ol><li><b>مرحلة القراءة (Read phase):</b> تقرأ المعاملة القيم الملتزم بها. يتم تطبيق التحديثات <i>فقط</i> على نسخ محلية (في ذاكرة التخزين المؤقت) وليس على قاعدة البيانات الفعلية.</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase in optimistic CC where the system checks if the transaction&#x27;s local updates conflict with other committed transactions.">مرحلة التحقق<span class="smart-term-tooltip"></span></span> (Validation phase):</b> يتم التحقق من قابلية التسلسل قبل كتابة التحديثات. يتم فحص مجموعات القراءة (read_set) ومجموعات الكتابة (write_set) للتأكد من عدم وجود تداخل مع معاملات أخرى. إذا فشل التحقق، يتم إجهاض المعاملة.</li><li><b>مرحلة الكتابة (Write phase):</b> عند نجاح التحقق، يتم تطبيق تحديثات المعاملة على قاعدة البيانات الفعلية.</li></ol><p>خلال مرحلة التحقق لمعاملة $T_i$، يتم فحص كل معاملة $T_j$ (إما ملتزم بها أو في مرحلة التحقق الخاصة بها) للتأكد من تحقق <b>أحد</b> الشروط الثلاثة التالية:</p><ol><li>تكمل $T_j$ مرحلة الكتابة الخاصة بها قبل أن تبدأ $T_i$ مرحلة القراءة.</li><li>تبدأ $T_i$ مرحلة الكتابة بعد أن تكمل $T_j$ مرحلة الكتابة، و<span class="smart-term" data-term-en="read_set" data-ar="مجموعة القراءة" data-en-def="The set of data items read by a transaction during its read phase.">مجموعة القراءة<span class="smart-term-tooltip"></span></span> <code>read_set</code> الخاصة بـ $T_i$ ليس لها عناصر مشتركة مع <span class="smart-term" data-term-en="write_set" data-ar="مجموعة الكتابة" data-en-def="The set of data items updated by a transaction, initially kept in a local workspace.">مجموعة الكتابة<span class="smart-term-tooltip"></span></span> <code>write_set</code> الخاصة بـ $T_j$.</li><li>كل من <code>read_set</code> و <code>write_set</code> لـ $T_i$ ليس لهما عناصر مشتركة مع <code>write_set</code> لـ $T_j$، وتكمل $T_j$ مرحلة القراءة الخاصة بها.</li></ol><p>يتم فحص الشرط الأول أولاً لكونه الأبسط. إذا لم يتحقق أي من هذه الشروط، تفشل عملية التحقق ويتم إجهاض $T_i$.</p></template>
+    <template class="content-en"><p>In this technique, serializability is checked <i>only</i> at the time of commit. It consists of three phases:</p><ol><li><b>Read phase:</b> A transaction reads committed values. Updates are applied <i>only</i> to local copies (versions) in the database cache, not the actual DB.</li><li><b><span class="smart-term" data-term-en="Validation Phase" data-ar="مرحلة التحقق" data-en-def="The phase in optimistic CC where the system checks if the transaction&#x27;s local updates conflict with other committed transactions.">Validation phase<span class="smart-term-tooltip"></span></span>:</b> Serializability is checked before writing updates to the database. It checks if the read_set and write_set of the transaction conflict with others. If validation fails, the transaction is aborted.</li><li><b>Write phase:</b> On successful validation, the transaction's updates are applied to the database; otherwise, it is restarted.</li></ol><p>During the validation phase for transaction $T_i$, the system checks that for each transaction $T_j$ (either committed or in its validation phase), <b>one</b> of the following three conditions holds:</p><ol><li>$T_j$ completes its write phase before $T_i$ starts its read phase.</li><li>$T_i$ starts its write phase after $T_j$ completes its write phase, and the <code>read_set</code> of $T_i$ has no items in common with the <code>write_set</code> of $T_j$.</li><li>Both the <code>read_set</code> and <code>write_set</code> of $T_i$ have no items in common with the <code>write_set</code> of $T_j$, and $T_j$ completes its read phase.</li></ol><p>The first condition is checked first as it is the simplest. If none of these conditions hold, validation fails and $T_i$ is aborted.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -847,12 +850,12 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تؤثر دقة عنصر البيانات بشكل كبير على أداء التحكم في التزامن. أمثلة على الدقة (من الدقيق إلى الخشن): حقل (Field) -> سجل (Record/Tuple) -> كتلة قرص (Block) -> ملف كامل (File) -> قاعدة البيانات بأكملها (Database).</p><p>لإدارة هذا التسلسل الهرمي، يتم استخدام <b>أقفال النوايا (Intention Locks)</b> بالإضافة إلى أقفال القراءة/الكتابة العادية:</p><ul><li><b>نية مشتركة (IS - Intention-Shared):</b> يشير إلى أنه سيتم طلب قفل مشترك (S) على بعض العقد الفرعية.</li><li><b>نية حصرية (IX - Intention-Exclusive):</b> يشير إلى أنه سيتم طلب قفل حصري (X) على بعض العقد الفرعية.</li><li><b>نية مشتركة-حصرية (SIX - Shared-Intention-Exclusive):</b> العقدة الحالية مقفولة بشكل مشترك (S)، وسيتم طلب قفل حصري (X) على بعض العقد الفرعية.</li></ul></template>
-    <template class="content-en"><p>Data item <span class="smart-term" data-term-en="Granularity" data-ar="الدقة / الحجم" data-en-def="The size of the data item that is locked (e.g., database, table, row).">granularity<span class="smart-term-tooltip"></span></span> significantly affects concurrency control performance. Examples (fine to coarse): Field -> Record (Tuple) -> Disk Block -> Entire File -> Entire Database.</p><p>To manage this hierarchy, <b><span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">Intention lock<span class="smart-term-tooltip"></span></span> modes</b> are defined in addition to read/write locks:</p><ul><li><b>Intention-shared (IS):</b> Indicates that a shared lock(s) will be requested on some descendent node(s).</li><li><b>Intention-exclusive (IX):</b> Indicates that an exclusive lock(s) will be requested on some descendent node(s).</li><li><b>Shared-intention-exclusive (SIX):</b> The current node is locked in shared mode, but an exclusive lock(s) will be requested on some descendent node(s).</li></ul></template>
+    <template class="content-ar"><p>تؤثر دقة عنصر البيانات بشكل كبير على أداء التحكم في التزامن. أمثلة على الدقة (من الدقيق إلى الخشن): حقل (Field) -> سجل (Record/Tuple) -> كتلة قرص (Block) -> ملف كامل (File) -> قاعدة البيانات بأكملها (Database).</p><p>لإدارة هذا التسلسل الهرمي، يتم استخدام <b>أقفال النوايا (Intention Locks)</b> بالإضافة إلى أقفال القراءة/الكتابة العادية:</p><ul><li><b>نية مشتركة (IS - Intention-Shared):</b> يشير إلى أنه سيتم طلب قفل مشترك (S) على بعض العقد الفرعية.</li><li><b>نية حصرية (IX - Intention-Exclusive):</b> يشير إلى أنه سيتم طلب قفل حصري (X) على بعض العقد الفرعية.</li><li><b>نية مشتركة-حصرية (SIX - Shared-Intention-Exclusive):</b> العقدة الحالية مقفولة بشكل مشترك (S)، وسيتم طلب قفل حصري (X) على بعض العقد الفرعية.</li></ul><p>لضمان الجدولة القابلة للتسلسل، يجب اتباع القواعد الست التالية للقفل متعدد الدقة:</p><ol><li>الالتزام بمصفوفة التوافق للأقفال.</li><li>يجب قفل جذر الشجرة أولاً بأي وضع.</li><li>يمكن قفل عقدة بوضع S أو IS فقط إذا كان الأصل مقفولاً بوضع IS أو IX.</li><li>يمكن قفل عقدة بوضع X أو IX أو SIX فقط إذا كان الأصل مقفولاً بوضع IX أو SIX.</li><li>لا يمكن للمعاملة قفل عقدة إلا إذا لم تقم بتحرير أي عقدة أخرى (لفرض سياسة 2PL).</li><li>لا يمكن للمعاملة تحرير عقدة إلا إذا لم تكن أي من العقد الفرعية التابعة لها مقفولة حالياً بواسطة نفس المعاملة (التحرير يتم من أسفل إلى أعلى).</li></ol></template>
+    <template class="content-en"><p>Data item <span class="smart-term" data-term-en="Granularity" data-ar="الدقة / الحجم" data-en-def="The size of the data item that is locked (e.g., database, table, row).">granularity<span class="smart-term-tooltip"></span></span> significantly affects concurrency control performance. Examples (fine to coarse): Field -> Record (Tuple) -> Disk Block -> Entire File -> Entire Database.</p><p>To manage this hierarchy, <b><span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">Intention lock<span class="smart-term-tooltip"></span></span> modes</b> are defined in addition to read/write locks:</p><ul><li><b>Intention-shared (IS):</b> Indicates that a shared lock(s) will be requested on some descendent node(s).</li><li><b>Intention-exclusive (IX):</b> Indicates that an exclusive lock(s) will be requested on some descendent node(s).</li><li><b>Shared-intention-exclusive (SIX):</b> The current node is locked in shared mode, but an exclusive lock(s) will be requested on some descendent node(s).</li></ul><p>To produce a serializable schedule, the following six rules for multiple granularity locking must be followed:</p><ol><li>The lock compatibility matrix must be adhered to.</li><li>The root of the tree must be locked first, in any mode.</li><li>A node can be locked in S or IS mode only if its parent is already locked in IS or IX mode.</li><li>A node can be locked in X, IX, or SIX mode only if its parent is already locked in IX or SIX mode.</li><li>A transaction can lock a node only if it has not unlocked any node (enforcing the 2PL policy).</li><li>A transaction can unlock a node only if none of its children are currently locked by that transaction (bottom-up unlocking).</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
-    <template class="content-ar"><p>قواعد القفل متعدد الدقة صارمة لضمان قابلية التسلسل:</p><ul><li>يجب قفل جذر الشجرة أولاً.</li><li>لا يمكن قفل عقدة بـ S أو IX إلا إذا كان الأصل مقفولاً بـ IS أو IX.</li><li>ولا يمكن قفل عقدة بـ X أو SIX إلا إذا كان الأصل مقفولاً بـ IX أو SIX.</li></ul><p>هذا التصميم يمنع معاملة من قفل جدول كامل (X) بينما توجد معاملة أخرى تقفل صفاً واحداً داخل هذا الجدول. <span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">قفل النية<span class="smart-term-tooltip"></span></span> (IX) على الجدول يخبر المعاملة الأولى فوراً أن هناك نشاطاً بالأسفل، دون الحاجة لفحص كل صف.</p></template>
+    <template class="content-ar"><p>قواعد القفل متعدد الدقة صارمة لضمان قابلية التسلسل:</p><ul><li>يجب قفل جذر الشجرة أولاً.</li><li>لا يمكن قفل عقدة بـ S أو IS إلا إذا كان الأصل مقفولاً بـ IS أو IX.</li><li>ولا يمكن قفل عقدة بـ X أو SIX إلا إذا كان الأصل مقفولاً بـ IX أو SIX.</li></ul><p>هذا التصميم يمنع معاملة من قفل جدول كامل (X) بينما توجد معاملة أخرى تقفل صفاً واحداً داخل هذا الجدول. <span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">قفل النية<span class="smart-term-tooltip"></span></span> (IX) على الجدول يخبر المعاملة الأولى فوراً أن هناك نشاطاً بالأسفل، دون الحاجة لفحص كل صف.</p></template>
     <template class="content-en"><p>The rules for multiple granularity locking are strict to ensure serializability:</p><ul><li>The root must be locked first.</li><li>A node can be locked in S or IX only if the parent is locked in IS or IX.</li><li>A node can be locked in X or SIX only if the parent is locked in IX or SIX.</li></ul><p>This design prevents a transaction from locking an entire table (X) while another transaction holds a lock on a single row inside it. The intention lock (IX) on the table immediately tells the first transaction that there is activity below, without needing to scan every row.</p></template>
     <div class="content-target"></div>
   </div>
@@ -1009,6 +1012,172 @@
 </svg>
 </div>
 
+  <table class="comparison-table">
+    <thead><tr><th></th><th>IS</th><th>IX</th><th>S</th><th>SIX</th><th>X</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع IS</template>
+          <template class="content-en">Compatible with IS</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع IX</template>
+          <template class="content-en">Compatible with IX</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع S</template>
+          <template class="content-en">Compatible with S</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع SIX</template>
+          <template class="content-en">Compatible with SIX</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نعم</template>
+          <template class="content-en">Yes</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التوافق مع X</template>
+          <template class="content-en">Compatible with X</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا</template>
+          <template class="content-en">No</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">إذا أردت قراءة جدول كامل، وتحديث صف واحد فقط فيه، ما هي الأقفال التي ستطلبها على مستوى الجدول ومستوى الصف؟</template>
@@ -1029,8 +1198,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبنائي في واحدة من أهم وحدات قواعد البيانات: التحكم في التزامن. تخيلوا قاعدة البيانات كتقاطع طرق مزدحم؛ بدون إشارات مرور (التحكم في التزامن)، ستتصادم السيارات (المعاملات) وتتدمر البيانات. لقد درسنا كيف نستخدم 'الأقفال' (Locks) كإشارات مرور، وتحديداً بروتوكول 2PL الذي يضمن عدم حدوث أخطاء، لكنه قد يسبب زحاماً خانقاً (الجمود - Deadlock). لذلك تعلمنا كيف نكتشف هذا الجمود أو نتجنبه. ثم انتقلنا لطرق أذكى لا تستخدم الأقفال أصلاً، مثل 'الترتيب الزمني' (Timestamps) الذي ينظم المرور حسب أقدمية السيارات، و'التحكم المتفائل' الذي يفترض أن الشوارع فارغة ولا يتحقق من الحوادث إلا في نهاية الرحلة. ركزوا جيداً في الامتحان على الفرق بين 2PL الأساسي والصارم، وكيفية عمل قاعدة توماس للكتابة، ومتى نستخدم أقفال النوايا (Intention Locks). بالتوفيق!</template>
-    <template class="content-en">Welcome to one of the most critical database modules: Concurrency Control. Imagine the database as a busy intersection; without traffic lights (concurrency control), cars (transactions) will crash, destroying data. We studied using 'Locks' as traffic lights, specifically the 2PL protocol, which guarantees no logical errors but can cause gridlock (Deadlock). Thus, we learned to detect or avoid deadlocks. We then explored lock-free methods like 'Timestamp Ordering', which directs traffic by age, and 'Optimistic CC', which assumes empty streets and only checks for crashes at the end of the trip. For the exam, focus heavily on the difference between Basic and Strict 2PL, how Thomas's Write Rule works, and when to use Intention Locks. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أبنائي في واحدة من أهم وحدات قواعد البيانات: التحكم في التزامن. تخيلوا قاعدة البيانات كتقاطع طرق مزدحم؛ بدون إشارات مرور (التحكم في التزامن)، ستتصادم السيارات (المعاملات) وتتدمر البيانات. لقد درسنا كيف نستخدم 'الأقفال' (Locks) كإشارات مرور، وتحديداً بروتوكول 2PL الذي يضمن عدم حدوث أخطاء، لكنه قد يسبب زحاماً خانقاً (الجمود - Deadlock). لذلك تعلمنا كيف نكتشف هذا الجمود أو نتجنبه. ثم انتقلنا لطرق أذكى لا تستخدم الأقفال أصلاً، مثل 'الترتيب الزمني' (Timestamps) الذي ينظم المرور حسب أقدمية السيارات، و'التحكم المتفائل' الذي يفترض أن الشوارع فارغة ولا يتحقق من الحوادث إلا في نهاية الرحلة. ركزوا جيداً في الامتحان على الفرق بين 2PL الأساسي والصارم، وكيفية عمل قاعدة توماس للكتابة، ومتى نستخدم أقفال النوايا (Intention Locks). بالتوفيق!<p>الآن وبعد أن استوعبت المفاهيم العامة للتحكم في التزامن، فإن إتقان القواعد الخوارزمية الدقيقة هو مفتاح نجاحك في الاختبار. انتبه جيداً للشروط الثلاثة المحددة للتحقق في التحكم المتفائل، ومقارنات الطوابع الزمنية في تقنية النسخ المتعددة، وقواعد القفل الصارمة من أعلى لأسفل والتحرير من أسفل لأعلى في القفل متعدد الدقة. هذه التفاصيل هي أهداف رئيسية للأسئلة الدقيقة!</p></template>
+    <template class="content-en">Welcome to one of the most critical database modules: Concurrency Control. Imagine the database as a busy intersection; without traffic lights (concurrency control), cars (transactions) will crash, destroying data. We studied using 'Locks' as traffic lights, specifically the 2PL protocol, which guarantees no logical errors but can cause gridlock (Deadlock). Thus, we learned to detect or avoid deadlocks. We then explored lock-free methods like 'Timestamp Ordering', which directs traffic by age, and 'Optimistic CC', which assumes empty streets and only checks for crashes at the end of the trip. For the exam, focus heavily on the difference between Basic and Strict 2PL, how Thomas's Write Rule works, and when to use Intention Locks. Good luck!<p>Now that you grasp the high-level concepts of concurrency control, mastering the exact algorithmic rules is your key to exam success. Pay close attention to the three specific validation conditions in Optimistic CC, the timestamp comparisons in Multiversion CC, and the strict top-down locking/bottom-up unlocking rules in Multiple Granularity Locking. These details are prime targets for tricky exam questions!</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1204,6 +1373,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لتجنب فحص كل صف في الجدول. إذا أرادت معاملة قفل الجدول بأكمله، فإن وجود قفل نية (IX) على الجدول يخبرها فوراً أن هناك صفاً مقفولاً بالأسفل، مما يوفر وقت البحث.</template>
           <template class="content-en">To avoid scanning every row. If a transaction wants to lock an entire table, an intention lock (IX) on the table immediately tells it that a row below is locked, saving search time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التحكم المتفائل (Optimistic CC)، لماذا نتحقق من تقاطع مجموعات القراءة والكتابة (read_set و write_set)؟</template>
+          <template class="content-en">In Optimistic CC, why do we check the intersection of read_sets and write_sets?</template>
+          <span class="content-target">في التحكم المتفائل (Optimistic CC)، لماذا نتحقق من تقاطع مجموعات القراءة والكتابة (read_set و write_set)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>للتأكد من أن المعاملة الحالية لم تقرأ بيانات قديمة تم تعديلها للتو بواسطة معاملة أخرى التزمت حديثاً، ولضمان أن المعاملتين لا تحاولان الكتابة فوق نفس البيانات في نفس الوقت، مما يحافظ على العزل التام.</p></template>
+          <template class="content-en"><p>To ensure the current transaction didn't read stale data just modified by a recently committed transaction, and to guarantee both aren't trying to overwrite the same data simultaneously, thus preserving strict isolation.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تفرض قواعد القفل متعدد الدقة (MGL) تطبيق الأقفال من أعلى لأسفل وتحريرها من أسفل لأعلى؟</template>
+          <template class="content-en">Why do Multiple Granularity Locking (MGL) rules enforce top-down locking and bottom-up unlocking?</template>
+          <span class="content-target">لماذا تفرض قواعد القفل متعدد الدقة (MGL) تطبيق الأقفال من أعلى لأسفل وتحريرها من أسفل لأعلى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تطبيق الأقفال من أعلى لأسفل يضمن أن المعاملة تعلن عن نواياها على المستويات العليا قبل التعمق، مما يمنع المعاملات الأخرى من قفل الهيكل بأكمله. التحرير من أسفل لأعلى يضمن عدم ترك أي 'أقفال يتيمة' بالأسفل بدون حماية قفل النية بالأعلى.</p></template>
+          <template class="content-en"><p>Top-down locking ensures a transaction declares its intentions at higher levels before diving deep, preventing others from locking the whole structure. Bottom-up unlocking ensures no 'orphan locks' are left below without the protective intention lock above.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1505,6 +1709,40 @@
         "en": "[EXAMPLE_NEEDED]"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "مجموعة القراءة (read_set) ومجموعة الكتابة (write_set)",
+      "en": "read_set and write_set"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعات تستخدم في مرحلة التحقق للتحكم المتفائل؛ تمثل البيانات التي قرأتها المعاملة والبيانات التي قامت بتحديثها محلياً.",
+        "en": "Sets used in the validation phase of Optimistic CC; representing the data items a transaction read and the items it updated locally."
+      },
+      "example": {
+        "ar": "إذا تقاطعت write_set لمعاملة سابقة مع read_set لمعاملة حالية، فقد تفشل عملية التحقق.",
+        "en": "If the write_set of an older transaction intersects with the read_set of a current one, validation might fail."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "قاعدة التحرير في القفل متعدد الدقة (Unlocking Rule in MGL)",
+      "en": "Unlocking Rule in MGL"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا يمكن للمعاملة تحرير قفل عقدة إلا إذا لم تكن أي من العقد الفرعية التابعة لها مقفولة حالياً بواسطة نفس المعاملة (تحرير من أسفل لأعلى).",
+        "en": "A transaction can unlock a node only if none of its children are currently locked by that transaction (bottom-up unlocking)."
+      },
+      "example": {
+        "ar": "يجب تحرير قفل الصف (X) قبل تحرير قفل الجدول (IX).",
+        "en": "You must unlock the row (X) before you can unlock the table (IX)."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1514,7 +1752,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 10</span>
+            <span id="quiz-counter">1 / 13</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1530,7 +1768,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <div class="score-display" id="quiz-score-display">0 / 13</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1855,6 +2093,102 @@
     },
     "difficulty": "hard",
     "conceptId": "two-phase-locking"
+  },
+  {
+    "conceptId": "multiversion-concurrency-control",
+    "question": {
+      "ar": "في تقنية النسخ المتعددة بناءً على الطوابع الزمنية (MVTO)، متى يتم إجهاض معاملة T تحاول تنفيذ عملية كتابة write_item(X)؟",
+      "en": "In Multi-version Timestamp Ordering (MVTO), when is a transaction T attempting a write_item(X) aborted?"
+    },
+    "options": {
+      "ar": [
+        "إذا كان write_TS(Xi) > TS(T)",
+        "إذا كان read_TS(Xi) > TS(T)",
+        "إذا كان read_TS(Xi) < TS(T)",
+        "لا يتم إجهاض عمليات الكتابة أبداً في هذه التقنية"
+      ],
+      "en": [
+        "If write_TS(Xi) > TS(T)",
+        "If read_TS(Xi) > TS(T)",
+        "If read_TS(Xi) < TS(T)",
+        "Write operations are never aborted in this technique"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إذا كان طابع القراءة للنسخة (read_TS) أكبر من طابع المعاملة (TS(T))، فهذا يعني أن معاملة أحدث قد قرأت هذه النسخة بالفعل، وكتابة قيمة جديدة الآن ستؤدي إلى عدم تناسق.",
+      "en": "If the read timestamp of the version (read_TS) is greater than the transaction's timestamp (TS(T)), it means a younger transaction has already read this version, and writing a new value now would cause inconsistency."
+    },
+    "hint": {
+      "ar": "فكر فيما يحدث إذا قرأ شخص ما بياناتك قبل أن تقوم بتحديثها.",
+      "en": "Think about what happens if someone already read your data before you updated it."
+    },
+    "difficulty": "hard",
+    "id": 11
+  },
+  {
+    "conceptId": "optimistic-concurrency-control",
+    "question": {
+      "ar": "في مرحلة التحقق للتحكم المتفائل، أي من الشروط التالية يضمن نجاح التحقق لمعاملة Ti مقابل معاملة Tj؟",
+      "en": "In the validation phase of Optimistic CC, which of the following conditions guarantees successful validation for transaction Ti against Tj?"
+    },
+    "options": {
+      "ar": [
+        "Tj تكمل مرحلة القراءة الخاصة بها قبل أن تبدأ Ti مرحلة الكتابة",
+        "Tj تكمل مرحلة الكتابة الخاصة بها قبل أن تبدأ Ti مرحلة القراءة",
+        "مجموعة القراءة لـ Ti تتطابق تماماً مع مجموعة الكتابة لـ Tj",
+        "Ti و Tj تبدآن مرحلة القراءة في نفس الوقت"
+      ],
+      "en": [
+        "Tj completes its read phase before Ti starts its write phase",
+        "Tj completes its write phase before Ti starts its read phase",
+        "The read_set of Ti perfectly matches the write_set of Tj",
+        "Ti and Tj start their read phases simultaneously"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الشرط الأول والأبسط للتحقق هو أن المعاملة السابقة (Tj) قد أكملت مرحلة الكتابة بالكامل قبل أن تبدأ المعاملة الحالية (Ti) في القراءة، مما يضمن عدم وجود تداخل زمني.",
+      "en": "The first and simplest validation condition is that the older transaction (Tj) fully completed its write phase before the current transaction (Ti) started reading, ensuring no temporal overlap."
+    },
+    "hint": {
+      "ar": "ابحث عن الشرط الذي يضمن عدم وجود أي تداخل زمني بين المعاملتين.",
+      "en": "Look for the condition that ensures absolutely no temporal overlap between the two transactions."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "multiple-granularity-locking",
+    "question": {
+      "ar": "وفقاً لقواعد القفل متعدد الدقة، ما هو الشرط اللازم لتحرير قفل عقدة معينة؟",
+      "en": "According to Multiple Granularity Locking rules, what is the prerequisite for unlocking a specific node?"
+    },
+    "options": {
+      "ar": [
+        "يجب أن تكون العقدة الأصلية (Parent) قد تم تحريرها أولاً",
+        "يجب ألا تكون أي من العقد الفرعية (Children) مقفولة حالياً بواسطة المعاملة",
+        "يجب أن تكون المعاملة في مرحلة النمو (Growing Phase)",
+        "يجب أن يكون القفل من نوع نية مشتركة (IS) فقط"
+      ],
+      "en": [
+        "The parent node must have been unlocked first",
+        "None of its child nodes can be currently locked by the transaction",
+        "The transaction must be in the Growing Phase",
+        "The lock must be an Intention-Shared (IS) lock only"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القاعدة السادسة تنص على أن التحرير يتم من أسفل إلى أعلى؛ لا يمكنك تحرير عقدة (مثل جدول) إذا كنت لا تزال تقفل جزءاً منها (مثل صف).",
+      "en": "Rule 6 states that unlocking is bottom-up; you cannot unlock a node (like a table) if you still hold a lock on a part of it (like a row)."
+    },
+    "hint": {
+      "ar": "التحرير يتم دائماً من أسفل إلى أعلى (Bottom-up).",
+      "en": "Unlocking is always done bottom-up."
+    },
+    "difficulty": "medium",
+    "id": 13
   }
 ]
 </script>
@@ -1898,6 +2232,22 @@
     <div data-bilingual>
     <template class="content-ar">في القفل متعدد الدقة، يتم تطبيق أقفال النوايا (IS, IX) من أعلى إلى أسفل (Top-Down)، بينما يتم تطبيق الأقفال الفعلية (S, X) في المستوى المطلوب. هذا يمنع التعارضات الهرمية بكفاءة.</template>
     <template class="content-en">In Multiple Granularity Locking, intention locks (IS, IX) are applied Top-Down, while actual locks (S, X) are applied at the target level. This efficiently prevents hierarchical conflicts.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأنه يمكنك تحرير قفل عقدة أصل (مثل الجدول) بمجرد الانتهاء منها. في القفل متعدد الدقة (MGL)، يجب أن يتم التحرير من أسفل إلى أعلى (Bottom-up): لا يمكنك تحرير عقدة إلا إذا لم تكن أي من العقد الفرعية التابعة لها مقفولة حالياً بواسطة معاملتك.</template>
+    <template class="content-en">Thinking you can unlock a parent node (like a table) as soon as you are done with it. In Multiple Granularity Locking (MGL), unlocking must be bottom-up: you can only unlock a node if none of its children are currently locked by your transaction.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في تقنية النسخ المتعددة (MVTO)، إذا حاولت معاملة كتابة بيانات، وكان طابع القراءة للنسخة الحالية أكبر من طابع المعاملة (أي أن معاملة أحدث قد قرأتها بالفعل)، فيجب إجهاض المعاملة الحالية لمنع التناقض.</template>
+    <template class="content-en">In Multi-version Timestamp Ordering (MVTO), if a transaction tries to write, and the read_TS of the current version is greater than the transaction's TS (meaning a younger transaction already read it), the current transaction must be aborted to prevent inconsistency.</template>
     <div class="content-target"></div>
     </div>
   </div>

@@ -103,6 +103,16 @@
         <template class="content-en">Dumping Python Data to JSON</template>
         <span class="content-target">تصدير بيانات بايثون إلى JSON</span>
       </a>
+      <a href="#looping-keyed-json" class="toc-link" data-bilingual>
+        <template class="content-ar">التكرار عبر بيانات JSON المفهرسة</template>
+        <template class="content-en">Looping Through Keyed JSON</template>
+        <span class="content-target">التكرار عبر بيانات JSON المفهرسة</span>
+      </a>
+      <a href="#converting-excel-to-json-tool" class="toc-link" data-bilingual>
+        <template class="content-ar">خطوات تحويل الإكسل إلى JSON</template>
+        <template class="content-en">Steps for Converting Excel to JSON</template>
+        <span class="content-target">خطوات تحويل الإكسل إلى JSON</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -670,14 +680,115 @@
   </details>
 </section>
 
+<section id="looping-keyed-json" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التكرار عبر بيانات JSON المفهرسة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Looping Through Keyed JSON</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بعد تحميل ملف JSON مفهرس (Keyed)، يصبح قاموساً واحداً. يمكنك المرور عبر عناصره ومفاتيحه معاً باستخدام النمط <code>for k, v in dict.items():</code>.</p></template>
+    <template class="content-en"><p>After loading a keyed JSON file, it becomes a single dictionary. You can loop through it using the <code>for k, v in dict.items():</code> pattern.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند فتح وتحميل ملف JSON مفهرس (مثل بيانات Firebase)، تكون النتيجة قاموساً واحداً (Dictionary) بدلاً من قائمة من القواميس. للوصول إلى المفاتيح والقيم في نفس الوقت، نستخدم دالة <code>.items()</code> القياسية في حلقة تكرار.</p><p>النمط الأساسي هو: <code>for k, v in hits.items():</code> حيث يمثل <code>hits</code> القاموس المحمل.</p></template>
+    <template class="content-en"><p>When you open and load a keyed JSON file (like Firebase data), the result is a single dictionary rather than a list of dictionaries. To access both the keys and values simultaneously, you use the standard dictionary <code>.items()</code> method in a loop.</p><p>The basic pattern is: <code>for k, v in hits.items():</code> where <code>hits</code> is the loaded dictionary.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في هذا النمط، يحتفظ المتغير <code>k</code> بالمفتاح الفريد (مثل المعرف الخاص بسجل Firebase)، بينما يحتفظ المتغير <code>v</code> بالقاموس الفرعي (Sub-dictionary) الذي يحتوي على البيانات الفعلية لذلك السجل.</p><p>هذا النمط ضروري جداً قبل أن تتمكن من استخراج أو تعديل حقول معينة، حيث يمكنك داخل الحلقة استخدام <code>v['count']</code> أو <code>v['lastvisit']</code> للوصول إلى البيانات وتعديلها بأمان.</p></template>
+    <template class="content-en"><p>In this pattern, the <code>k</code> variable holds the unique key (e.g., the Firebase record ID), and the <code>v</code> variable holds the sub-dictionary containing the actual data for that record.</p><p>This pattern is essential before you can extract or modify specific fields. Inside the loop, you can use <code>v['count']</code> or <code>v['lastvisit']</code> to access and safely manipulate the data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import json
+
+# Assuming 'hits' is a dictionary loaded from a keyed JSON file
+# Loop through the dictionary using items()
+for k, v in hits.items():
+    # k is the unique key, v is the sub-dictionary of data
+    print(f"Key: {k}")
+    print(f"Data: {v}")</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا استخدمت <code>for item in hits:</code> بدلاً من <code>for k, v in hits.items():</code>؟</template>
+      <template class="content-en">What happens if you use <code>for item in hits:</code> instead of <code>for k, v in hits.items():</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستقوم الحلقة بالمرور عبر المفاتيح (Keys) فقط، ولن تتمكن من الوصول المباشر إلى القيم (البيانات) دون كتابة <code>hits[item]</code> في كل مرة.</p></template>
+      <template class="content-en"><p>The loop will only iterate over the keys. You won't have direct access to the values (the data) without writing <code>hits[item]</code> each time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="converting-excel-to-json-tool" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> خطوات تحويل الإكسل إلى JSON</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Steps for Converting Excel to JSON</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن تحويل بيانات الإكسل إلى JSON باستخدام أدوات خارجية مع ضرورة ضبط الترميز على UTF-8 وتخطي صف العناوين.</p></template>
+    <template class="content-en"><p>Excel data can be converted to JSON using external tools by setting the encoding to UTF-8 and skipping the header row.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تصدير البيانات من الإكسل هو إحدى طرق إنشاء ملف JSON. عند استخدام أداة تحويل (مثل محولات CSV إلى JSON عبر الإنترنت)، اتبع الخطوات التالية:</p><ol><li>افتح الأداة، واضبط الترميز (Encoding) على <strong>UTF-8</strong>، ثم اختر ملف الإكسل.</li><li>تأكد من تحديد خيار "الصف الأول يحتوي على أسماء الأعمدة" (First Row Is Column Names)، واضبط "تخطي عدد من الأسطر" (Skip # of Lines) على 1 لتخطي صف العناوين.</li><li>انقر على زر التحويل (مثلاً CSV to JSON).</li><li>اكتب اسماً للملف الناتج ثم قم بتنزيله.</li></ol></template>
+    <template class="content-en"><p>Exporting data from Excel is one way to create a JSON file. When using a conversion tool (like a CSV to JSON converter), follow these steps:</p><ol><li>Open the tool, set the Encoding to <strong><span class="smart-term" data-term-en="UTF-8" data-ar="ترميز UTF-8" data-en-def="A character encoding capable of encoding all characters on the web, crucial for preserving non-ASCII text during file conversions.">UTF-8<span class="smart-term-tooltip"></span></span></strong>, and choose your Excel file.</li><li>Ensure the "First Row Is Column Names" option is selected and set "Skip # of Lines" to 1 to skip the column headings row.</li><li>Click the conversion button (e.g., CSV to JSON).</li><li>Type a filename and download the resulting file.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ضبط الترميز على UTF-8 خطوة حاسمة لضمان عدم تشوه الأحرف غير الإنجليزية (مثل الحروف العربية أو الرموز الخاصة) أثناء عملية التحويل.</p><p>تخطي صف العناوين يمنع الأداة من تحويل أسماء الأعمدة إلى سجل بيانات (Record) عادي داخل ملف JSON، مما يحافظ على نظافة البيانات وهيكلتها الصحيحة كأزواج من المفاتيح والقيم.</p></template>
+    <template class="content-en"><p>Setting the encoding to UTF-8 is a crucial step to ensure that non-English characters or special symbols are not corrupted during the conversion process.</p><p>Skipping the header row prevents the tool from treating the column names as a standard data record in the resulting JSON file, maintaining clean and correctly structured key-value pairs.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نطلب من أداة التحويل تخطي السطر الأول (Skip 1 Line)؟</template>
+      <template class="content-en">Why do we instruct the conversion tool to skip the first line (Skip 1 Line)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن السطر الأول في جداول الإكسل عادة ما يحتوي على أسماء الأعمدة (Headers) وليس البيانات الفعلية، ولا نريد أن يتم تحويل هذه الأسماء إلى كائن JSON كباقي السجلات.</p></template>
+      <template class="content-en"><p>Because the first row in Excel tables usually contains column headers, not actual data, and we don't want these headers to be converted into a JSON object like the rest of the records.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه المراجعة السريعة. تخيلوا أن JSON هو لغة التواصل العالمية بين أجهزة الكمبيوتر؛ فهو بسيط، خفيف، ومفهوم للجميع. في الامتحان، ركزوا جيداً على الفرق الجوهري بين الدوال التي تنتهي بحرف 's' (مثل loads و dumps) وتلك التي لا تنتهي به. حرف الـ 's' يعني دائماً String (سلسلة نصية). تذكروا أيضاً كيف نتعامل مع التواريخ المزعجة؛ تواريخ الإكسل تحتاج إلى مكتبة xlrd، بينما تواريخ فايربيس تحتاج إلى datetime.utcfromtimestamp. وأخيراً، لا تنسوا الممارسة الآمنة عند حذف البيانات باستخدام pop مع None لتجنب الأخطاء القاتلة. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome friends to this quick review. Imagine JSON as the universal language between computers; it's simple, lightweight, and universally understood. For the exam, focus heavily on the fundamental difference between methods ending with an 's' (like loads and dumps) and those that don't. The 's' always stands for String. Also, remember how we handle pesky dates; Excel dates require the xlrd module, while Firebase dates need datetime.utcfromtimestamp. Finally, don't forget the safe practice of removing data using pop with None to avoid fatal errors. Good luck with your studies!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه المراجعة السريعة. تخيلوا أن JSON هو لغة التواصل العالمية بين أجهزة الكمبيوتر؛ فهو بسيط، خفيف، ومفهوم للجميع. في الامتحان، ركزوا جيداً على الفرق الجوهري بين الدوال التي تنتهي بحرف 's' (مثل loads و dumps) وتلك التي لا تنتهي به. حرف الـ 's' يعني دائماً String (سلسلة نصية). تذكروا أيضاً كيف نتعامل مع التواريخ المزعجة؛ تواريخ الإكسل تحتاج إلى مكتبة xlrd، بينما تواريخ فايربيس تحتاج إلى datetime.utcfromtimestamp. وأخيراً، لا تنسوا الممارسة الآمنة عند حذف البيانات باستخدام pop مع None لتجنب الأخطاء القاتلة. بالتوفيق في دراستكم!<p>أثناء إتقانك لتحميل بيانات JSON، انتبه جيداً لهيكلة بياناتك. البيانات المفهرسة (Keyed JSON) من مصادر مثل Firebase تتطلب استخدام نمط <code>for k, v in dict.items():</code> لتفكيكها بفعالية. افحص دائماً هيكل بياناتك المحملة قبل محاولة تعديلها، وتذكر أن الضبط الصحيح للترميز أثناء التحويل يوفر عليك ساعات من تصحيح الأخطاء.</p></template>
+    <template class="content-en">Welcome friends to this quick review. Imagine JSON as the universal language between computers; it's simple, lightweight, and universally understood. For the exam, focus heavily on the fundamental difference between methods ending with an 's' (like loads and dumps) and those that don't. The 's' always stands for String. Also, remember how we handle pesky dates; Excel dates require the xlrd module, while Firebase dates need datetime.utcfromtimestamp. Finally, don't forget the safe practice of removing data using pop with None to avoid fatal errors. Good luck with your studies!<p>As you master loading JSON, pay special attention to the structure of your data. Keyed JSON from sources like Firebase requires the <code>for k, v in dict.items():</code> pattern to unpack effectively. Always inspect your loaded data's structure before attempting to manipulate it, and remember that proper encoding during conversion saves hours of debugging.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -851,6 +962,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">كلاهما يتحول إلى مصفوفة (Array) في JSON. وعند إعادتها إلى بايثون، ستعود دائماً كـ List.</template>
           <template class="content-en">Both are converted to an Array in JSON. When loaded back into Python, they will always return as a List.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يتم التركيز بشدة على نمط <code>for k, v in dict.items():</code> عند التعامل مع JSON المفهرس مثل بيانات Firebase؟</template>
+          <template class="content-en">Why is the <code>for k, v in dict.items():</code> pattern so heavily emphasized when dealing with keyed JSON like Firebase exports?</template>
+          <span class="content-target">لماذا يتم التركيز بشدة على نمط <code>for k, v in dict.items():</code> عند التعامل مع JSON المفهرس مثل بيانات Firebase؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنه على عكس JSON العادي الذي يُحمل كقائمة بسيطة، يُحمل JSON المفهرس كقاموس متداخل (Nested dictionary). دالة <code>.items()</code> هي الطريقة الأكثر كفاءة واحترافية في بايثون لاستخراج المعرف الفريد للسجل (<code>k</code>) وبياناته المرتبطة (<code>v</code>) في نفس الوقت وداخل دورة واحدة من الحلقة.</p></template>
+          <template class="content-en"><p>Because unlike unkeyed JSON which loads as a simple list, keyed JSON loads as a nested dictionary. The <code>.items()</code> method is the most Pythonic and efficient way to unpack the unique record ID (<code>k</code>) and its associated data payload (<code>v</code>) simultaneously in a single loop iteration.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1169,6 +1298,40 @@
         "en": "json.dumps(data, indent=2)"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تمر عبر المفاتيح والقيم معاً في قاموس JSON مفهرس؟",
+      "en": "How do you loop through both keys and values of a loaded keyed JSON dictionary?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام دالة .items() في حلقة التكرار.",
+        "en": "Using the .items() method in a for loop."
+      },
+      "example": {
+        "ar": "for k, v in dict.items():",
+        "en": "for k, v in dict.items():"
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "ما هو الترميز الذي يجب ضبطه عند تحويل ملف إكسل إلى JSON؟",
+      "en": "What encoding should be set when converting an Excel file to JSON using external tools?"
+    },
+    "back": {
+      "definition": {
+        "ar": "ترميز UTF-8.",
+        "en": "UTF-8 encoding."
+      },
+      "example": {
+        "ar": "للحفاظ على الأحرف غير الإنجليزية من التشوه.",
+        "en": "To preserve non-ASCII characters from corruption."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1178,7 +1341,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1194,7 +1357,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1491,8 +1654,8 @@
   {
     "id": 10,
     "question": {
-      "ar": "إذا كان لديك نص JSON مخزن في متغير <code>my_string</code>، كيف تقوم بتحميله إلى بايثون؟",
-      "en": "If you have JSON text stored in a variable <code>my_string</code>, how do you load it into Python?"
+      "ar": "إذا كان لديك نص JSON مخزن في متغير <code>my_string<\/code>، كيف تقوم بتحميله إلى بايثون؟",
+      "en": "If you have JSON text stored in a variable <code>my_string<\/code>, how do you load it into Python?"
     },
     "options": {
       "ar": [
@@ -1519,6 +1682,70 @@
     },
     "difficulty": "easy",
     "conceptId": "loading-json-data"
+  },
+  {
+    "conceptId": "looping-keyed-json",
+    "question": {
+      "ar": "عند المرور عبر قاموس JSON مفهرس باسم <code>hits<\/code>، أي نمط برمجي يصل بشكل صحيح إلى كل من المعرف الفريد والبيانات المرتبطة به؟",
+      "en": "When looping through a loaded keyed JSON dictionary named <code>hits<\/code>, which code pattern correctly accesses both the unique identifier and its corresponding data?"
+    },
+    "options": {
+      "ar": [
+        "for item in hits:",
+        "for k, v in hits.items():",
+        "for k, v in hits:",
+        "for v in hits.values():"
+      ],
+      "en": [
+        "for item in hits:",
+        "for k, v in hits.items():",
+        "for k, v in hits:",
+        "for v in hits.values():"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة <code>.items()<\/code> تقوم بإرجاع أزواج (المفتاح، القيمة) معاً، مما يسمح بتعيينها للمتغيرين k و v في نفس الوقت.",
+      "en": "The <code>.items()<\/code> method returns key-value pairs together, allowing them to be unpacked into variables k and v simultaneously."
+    },
+    "hint": {
+      "ar": "ابحث عن الدالة التي ترجع العناصر (items).",
+      "en": "Look for the method that returns items."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "converting-excel-to-json-tool",
+    "question": {
+      "ar": "عند استخدام أداة لتحويل الإكسل إلى JSON، لماذا يجب ضبط خيار \"تخطي عدد من الأسطر\" (Skip # of Lines) على 1؟",
+      "en": "When using a tool to convert Excel to JSON, why must you set \"Skip # of Lines\" to 1?"
+    },
+    "options": {
+      "ar": [
+        "لتخطي الصفوف الفارغة في نهاية الملف.",
+        "لتخطي صف العناوين (أسماء الأعمدة).",
+        "لتخطي سجل البيانات الأول.",
+        "لتقليل حجم الملف الناتج."
+      ],
+      "en": [
+        "To skip empty rows at the end of the file.",
+        "To skip the column headings row.",
+        "To skip the first data record.",
+        "To reduce the resulting file size."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تخطي السطر الأول يمنع تحويل أسماء الأعمدة إلى بيانات فعلية داخل ملف JSON.",
+      "en": "Skipping the first line prevents the column headers from being converted into actual data records within the JSON file."
+    },
+    "hint": {
+      "ar": "ماذا يوجد عادة في السطر الأول من جداول الإكسل؟",
+      "en": "What is usually in the first row of an Excel table?"
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>
@@ -1554,6 +1781,14 @@
     <div data-bilingual>
     <template class="content-ar">استخدام <code>del dict['key']</code> لحذف مفتاح قد لا يكون موجوداً سيؤدي إلى انهيار البرنامج (KeyError). استخدم دائماً <code>dict.pop('key', None)</code> كبديل آمن.</template>
     <template class="content-en">Using <code>del dict['key']</code> to remove a key that might not exist will crash the program (KeyError). Always use <code>dict.pop('key', None)</code> as a safe alternative.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند المرور عبر قاموس JSON مفهرس، نسيان استخدام <code>.items()</code> وكتابة <code>for k in dict:</code> سيجعلك تمر عبر المفاتيح فقط، مما يعقد عملية الوصول إلى البيانات الداخلية ويؤدي إلى أخطاء برمجية.</template>
+    <template class="content-en">When looping through a keyed JSON dictionary, forgetting to use <code>.items()</code> and writing <code>for k in dict:</code> will only iterate over the keys, complicating access to the inner data and leading to bugs.</template>
     <div class="content-target"></div>
     </div>
   </div>

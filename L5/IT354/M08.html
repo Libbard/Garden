@@ -130,6 +130,11 @@
         <template class="content-en">Recovery in Multidatabase Systems (2PC)</template>
         <span class="content-target">الاسترداد في أنظمة قواعد البيانات المتعددة (2PC)</span>
       </a>
+      <a href="#cascading-rollback" class="toc-link" data-bilingual>
+        <template class="content-ar">التراجع المتتالي (Cascading Rollback)</template>
+        <template class="content-en">Cascading Rollback</template>
+        <span class="content-target">التراجع المتتالي (Cascading Rollback)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -645,8 +650,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><b>التحديث المؤجل (No Undo/Redo):</b></p><ul><li>تسجل المعاملات تحديثاتها في السجل.</li><li>عند الالتزام (تحت بروتوكول WAL)، تُحفظ هذه التحديثات على القرص.</li><li>بعد الفشل، يُستخدم السجل لإجراء Redo للمعاملات الملتزمة. لا حاجة لـ Undo لأنه لم يتم تفريغ أي AFIM للقرص قبل الالتزام.</li><li>في بيئة متعددة المستخدمين، نستخدم جدولين: <b>جدول نشط (Active table)</b> و <b>جدول الالتزام (Commit table)</b>. يتم عمل Redo لمعاملات جدول الالتزام، وتجاهل المعاملات النشطة.</li></ul><p><b>التحديث الفوري (Undo/No-redo أو Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> يتم تفريغ AFIM للقرص قبل الالتزام. يتم عمل Undo لجميع المعاملات أثناء الاسترداد. لا يتم عمل Redo لأي معاملة.</li><li><b>Undo/Redo:</b> في بيئة متعددة المستخدمين، يتم عمل Undo للمعاملات في الجدول النشط، وعمل Redo للمعاملات في جدول الالتزام.</li></ul></template>
-    <template class="content-en"><p><b>Deferred Update (No Undo/Redo):</b></p><ul><li>Transactions record updates in the log.</li><li>At commit point (under WAL), updates are saved on disk.</li><li>After failure, the log is used to Redo affected transactions. No Undo is required because no AFIM is flushed before commit.</li><li>In concurrent environments, two tables are used: <b>Active table</b> and <b>Commit table</b>. Commit table transactions are redone; active ones are ignored.</li></ul><p><b>Immediate Update (Undo/No-redo or Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> AFIMs are flushed before commit. The recovery manager undoes all transactions during recovery. No transaction is redone.</li><li><b>Undo/Redo:</b> In concurrent execution, undo a transaction if it is in the active table, and redo a transaction if it is in the commit table.</li></ul></template>
+    <template class="content-ar"><p><b>التحديث المؤجل (No Undo/Redo):</b></p><ul><li>تسجل المعاملات تحديثاتها في السجل.</li><li>عند الالتزام (تحت بروتوكول WAL)، تُحفظ هذه التحديثات على القرص.</li><li>بعد الفشل، يُستخدم السجل لإجراء Redo للمعاملات الملتزمة. لا حاجة لـ Undo لأنه لم يتم تفريغ أي AFIM للقرص قبل الالتزام.</li><li>في بيئة متعددة المستخدمين، نستخدم جدولين: <b>جدول نشط (Active table)</b> و <b>جدول الالتزام (Commit table)</b>. يتم عمل Redo لمعاملات جدول الالتزام، وتجاهل المعاملات النشطة.</li></ul><p><b>التحديث الفوري (Undo/No-redo أو Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> يتم تفريغ AFIM للقرص قبل الالتزام. يتم عمل Undo لجميع المعاملات أثناء الاسترداد. لا يتم عمل Redo لأي معاملة.</li><li><b>Undo/Redo:</b> في بيئة متعددة المستخدمين، يتم عمل Undo للمعاملات في الجدول النشط، وعمل Redo للمعاملات في جدول الالتزام.</li></ul><p><b>مثال عملي على التحديث المؤجل (Deferred Update):</b></p><p>لنفترض أن لدينا المعاملات T1, T2, T3, T4. حدثت نقطة فحص (Checkpoint)، ثم التزمت T4، ثم حدث انهيار للنظام (System crash) بينما كانت T2 و T3 لا تزالان قيد التنفيذ.</p><ol><li><b>T1:</b> التزمت قبل نقطة الفحص. لا تحتاج إلى أي إجراء لأن بياناتها كُتبت على القرص أثناء نقطة الفحص.</li><li><b>T4:</b> بدأت بعد نقطة الفحص والتزمت قبل الانهيار. توجد في جدول الالتزام (Commit table). سيتم إجراء <b>Redo</b> لعملياتها.</li><li><b>T2 و T3:</b> كانتا قيد التنفيذ لحظة الانهيار. توجدان في الجدول النشط (Active table). سيتم <b>تجاهلهما</b> تماماً (لا حاجة لـ Undo لأن التحديث مؤجل ولم تصل بياناتهما للقرص).</li></ol><p>النتيجة: يتم إعادة تطبيق T4 فقط، وتُلغى T2 و T3 دون الحاجة لعمليات تراجع معقدة.</p></template>
+    <template class="content-en"><p><b>Deferred Update (No Undo/Redo):</b></p><ul><li>Transactions record updates in the log.</li><li>At commit point (under WAL), updates are saved on disk.</li><li>After failure, the log is used to Redo affected transactions. No Undo is required because no AFIM is flushed before commit.</li><li>In concurrent environments, two tables are used: <b>Active table</b> and <b>Commit table</b>. Commit table transactions are redone; active ones are ignored.</li></ul><p><b>Immediate Update (Undo/No-redo or Undo/Redo):</b></p><ul><li><b>Undo/No-redo:</b> AFIMs are flushed before commit. The recovery manager undoes all transactions during recovery. No transaction is redone.</li><li><b>Undo/Redo:</b> In concurrent execution, undo a transaction if it is in the active table, and redo a transaction if it is in the commit table.</li></ul><p><b>Worked Example for Deferred Update:</b></p><p>Suppose we have transactions T1, T2, T3, T4. A checkpoint occurs, then T4 commits, and then a system crash happens while T2 and T3 are still executing.</p><ol><li><b>T1:</b> Committed before the checkpoint. Needs no action as its data was flushed to disk during the checkpoint.</li><li><b>T4:</b> Started after the checkpoint and committed before the crash. It is in the Commit table. Its operations will be <b>redone</b>.</li><li><b>T2 and T3:</b> Were executing at the time of the crash. They are in the Active table. They will be <b>ignored</b> entirely (no Undo needed because it's a deferred update and their data never reached the disk).</li></ol><p>Result: Only T4 is reapplied, and T2 and T3 are discarded without needing complex undo operations.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -903,8 +908,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تعتمد خوارزمية ARIES على ثلاثة مبادئ:</p><ol><li><b>WAL:</b> الكتابة المسبقة للسجل.</li><li><b>تكرار التاريخ أثناء الإعادة (Repeating history during redo):</b> تعيد ARIES تتبع جميع إجراءات النظام قبل الانهيار لإعادة بناء حالة قاعدة البيانات لحظة الانهيار بالضبط.</li><li><b>تسجيل التغييرات أثناء التراجع (Logging changes during undo):</b> يمنع ARIES من تكرار عمليات التراجع المكتملة إذا حدث فشل أثناء الاسترداد نفسه (باستخدام سجلات تعويضية).</li></ol><p>تتكون ARIES من 3 مراحل:</p><ol><li><b>مرحلة التحليل (Analysis):</b> تبدأ من نقطة الفحص، تحدد الصفحات المعدلة (Dirty pages) والمعاملات النشطة لحظة الانهيار، وتحدد نقطة بدء الـ Redo.</li><li><b>مرحلة الإعادة (Redo):</b> تطبق عمليات الإعادة الضرورية للمضي قدماً حتى نهاية السجل.</li><li><b>مرحلة التراجع (Undo):</b> يُقرأ السجل للخلف ويتم التراجع عن المعاملات النشطة (غير الملتزمة) بترتيب عكسي.</li></ol></template>
-    <template class="content-en"><p>The ARIES algorithm is based on three principles:</p><ol><li><b>WAL:</b> Write-Ahead Logging.</li><li><b>Repeating history during redo:</b> ARIES retraces all actions prior to the crash to reconstruct the exact database state when the crash occurred.</li><li><b>Logging changes during undo:</b> Prevents ARIES from repeating completed undo operations if a failure occurs during recovery (using <span class="smart-term" data-term-en="Compensating Log Record" data-ar="سجل السجل التعويضي" data-en-def="A log record written during the Undo phase to record that an undo operation was performed.">compensating log record<span class="smart-term-tooltip"></span></span>s).</li></ol><p>ARIES consists of 3 steps:</p><ol><li><b>Analysis phase:</b> Starts at the checkpoint, identifies dirty pages and active transactions at crash time, and determines where Redo should start.</li><li><b>Redo phase:</b> Applies necessary redo operations moving forward to the end of the log.</li><li><b>Undo phase:</b> Scans the log backward and undoes operations of active transactions in reverse order.</li></ol></template>
+    <template class="content-ar"><p>تعتمد خوارزمية ARIES على ثلاثة مبادئ:</p><ol><li><b>WAL:</b> الكتابة المسبقة للسجل.</li><li><b>تكرار التاريخ أثناء الإعادة (Repeating history during redo):</b> تعيد ARIES تتبع جميع إجراءات النظام قبل الانهيار لإعادة بناء حالة قاعدة البيانات لحظة الانهيار بالضبط.</li><li><b>تسجيل التغييرات أثناء التراجع (Logging changes during undo):</b> يمنع ARIES من تكرار عمليات التراجع المكتملة إذا حدث فشل أثناء الاسترداد نفسه (باستخدام سجلات تعويضية).</li></ol><p>تتكون ARIES من 3 مراحل:</p><ol><li><b>مرحلة التحليل (Analysis):</b> تبدأ من نقطة الفحص، تحدد الصفحات المعدلة (Dirty pages) والمعاملات النشطة لحظة الانهيار، وتحدد نقطة بدء الـ Redo.</li><li><b>مرحلة الإعادة (Redo):</b> تطبق عمليات الإعادة الضرورية للمضي قدماً حتى نهاية السجل.</li><li><b>مرحلة التراجع (Undo):</b> يُقرأ السجل للخلف ويتم التراجع عن المعاملات النشطة (غير الملتزمة) بترتيب عكسي.</li></ol><p><b>مثال عملي لمرحلة التحليل في ARIES:</b></p><p>بافتراض سجل يحتوي على: 1(T1 تحديث C)، 2(T2 تحديث B)، 3(T1 التزام)، 4(بداية نقطة فحص)، 5(نهاية نقطة فحص)، 6(T3 تحديث A)، 7(T2 تحديث C)، 8(T2 التزام). عند نقطة الفحص، جدول المعاملات يحوي T1(ملتزمة) و T2(نشطة)، وجدول الصفحات المعدلة يحوي C(LSN 1) و B(LSN 2).</p><ol><li><b>LSN 6:</b> T3 تحدث A. تُضاف T3 لجدول المعاملات (نشطة، LSN 6). تُضاف A لجدول الصفحات المعدلة (LSN 6).</li><li><b>LSN 7:</b> T2 تحدث C. يُحدث LSN لـ T2 في جدول المعاملات إلى 7. الصفحة C موجودة مسبقاً في جدول الصفحات المعدلة، لذا <b>لا يتغير</b> LSN الخاص بها (يبقى 1، وهو أقدم تحديث).</li><li><b>LSN 8:</b> T2 تلتزم. تُحدث حالة T2 إلى ملتزمة.</li></ol><p>النتيجة: جدول المعاملات يحوي T1, T2 (ملتزمتان) و T3 (نشطة). جدول الصفحات المعدلة يحوي C(1), B(2), A(6). ستبدأ مرحلة الإعادة (Redo) من LSN 1 (أصغر قيمة).</p></template>
+    <template class="content-en"><p>The ARIES algorithm is based on three principles:</p><ol><li><b>WAL:</b> Write-Ahead Logging.</li><li><b>Repeating history during redo:</b> ARIES retraces all actions prior to the crash to reconstruct the exact database state when the crash occurred.</li><li><b>Logging changes during undo:</b> Prevents ARIES from repeating completed undo operations if a failure occurs during recovery (using <span class="smart-term" data-term-en="Compensating Log Record" data-ar="سجل السجل التعويضي" data-en-def="A log record written during the Undo phase to record that an undo operation was performed.">compensating log record<span class="smart-term-tooltip"></span></span>s).</li></ol><p>ARIES consists of 3 steps:</p><ol><li><b>Analysis phase:</b> Starts at the checkpoint, identifies dirty pages and active transactions at crash time, and determines where Redo should start.</li><li><b>Redo phase:</b> Applies necessary redo operations moving forward to the end of the log.</li><li><b>Undo phase:</b> Scans the log backward and undoes operations of active transactions in reverse order.</li></ol><p><b>Worked Example for ARIES Analysis Phase:</b></p><p>Assume a log: 1(T1 updates C), 2(T2 updates B), 3(T1 commits), 4(begin checkpoint), 5(end checkpoint), 6(T3 updates A), 7(T2 updates C), 8(T2 commits). At the checkpoint, the Transaction Table has T1(commit) and T2(in progress), and the Dirty Page Table has C(LSN 1) and B(LSN 2).</p><ol><li><b>LSN 6:</b> T3 updates A. Add T3 to Transaction Table (in progress, LSN 6). Add A to Dirty Page Table (LSN 6).</li><li><b>LSN 7:</b> T2 updates C. Update T2's LSN in Transaction Table to 7. Page C is already in the Dirty Page Table, so its LSN <b>does not change</b> (remains 1, the earliest update).</li><li><b>LSN 8:</b> T2 commits. Update T2's status to commit.</li></ol><p>Result: Transaction Table has T1, T2 (commit) and T3 (in progress). Dirty Page Table has C(1), B(2), A(6). The Redo phase will start from LSN 1 (the minimum LSN).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -920,8 +925,8 @@
       <span class="content-target"></span>
     </summary>
     <div data-bilingual>
-      <template class="content-ar"><p>يتم ذلك لمنع تكرار التراجع إذا تعطل النظام *أثناء* عملية الاسترداد. السجلات التعويضية تضمن أن عملية التراجع تمضي قدماً ولا تعلق في حلقة مفرغة من التراجعات المتكررة.</p></template>
-      <template class="content-en"><p>It is done to prevent repeating the undo if the system crashes *during* the recovery process. Compensating log records ensure the undo process makes forward progress and doesn't get stuck in an infinite loop of repeated undos.</p></template>
+      <template class="content-ar"><p>يتم ذلك لمنع تكرار التراجع إذا تعطل النظام <em>أثناء</em> عملية الاسترداد. السجلات التعويضية تضمن أن عملية التراجع تمضي قدماً ولا تعلق في حلقة مفرغة من التراجعات المتكررة.</p></template>
+      <template class="content-en"><p>It is done to prevent repeating the undo if the system crashes <em>during</em> the recovery process. Compensating log records ensure the undo process makes forward progress and doesn't get stuck in an infinite loop of repeated undos.</p></template>
       <div class="content-target"></div>
     </div>
   </details>
@@ -970,14 +975,57 @@
   </details>
 </section>
 
+<section id="cascading-rollback" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> التراجع المتتالي (Cascading Rollback)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Cascading Rollback</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ظاهرة تحدث عندما يؤدي فشل معاملة واحدة إلى إجبار معاملات أخرى تعتمد عليها على التراجع والفشل أيضاً.</p></template>
+    <template class="content-en"><p>A phenomenon where the failure of one transaction forces other dependent transactions to also roll back and fail.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يحدث <span class="smart-term" data-term-en="Cascading Rollback" data-ar="التراجع المتتالي" data-en-def="A failure of one transaction causing the rollback of other dependent transactions.">التراجع المتتالي<span class="smart-term-tooltip"></span></span> عندما تقرأ معاملة بيانات تمت كتابتها بواسطة معاملة أخرى لم تلتزم بعد، ثم تفشل المعاملة الأولى.</p><p><b>مثال عملي:</b></p><ol><li>المعاملة T3 تكتب قيمة جديدة للعنصر B.</li><li>المعاملة T2 تقرأ قيمة B (التي كتبتها T3 للتو).</li><li>المعاملة T2 تكتب قيمة جديدة للعنصر D.</li><li>المعاملة T3 تواجه خطأ ويجب التراجع عنها (Undo).</li></ol><p><b>النتيجة:</b> نظراً للتراجع عن T3، تصبح قيمة B التي كتبتها غير صالحة. وبما أن T2 قرأت هذه القيمة غير الصالحة لأداء عملياتها، يجب التراجع عن T2 أيضاً، حتى لو لم يكن بها أخطاء. هذا التفاعل المتسلسل يسمى التراجع المتتالي.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Cascading Rollback" data-ar="التراجع المتتالي" data-en-def="A failure of one transaction causing the rollback of other dependent transactions.">Cascading rollback<span class="smart-term-tooltip"></span></span> occurs when a transaction reads data that was written by another uncommitted transaction, and then the first transaction fails.</p><p><b>Worked Example:</b></p><ol><li>Transaction T3 writes a new value to item B.</li><li>Transaction T2 reads the value of item B (which was just written by T3).</li><li>Transaction T2 writes a new value to item D.</li><li>Transaction T3 encounters an error and must be rolled back (undone).</li></ol><p><b>Result:</b> Because T3 is rolled back, the value of B it wrote is invalid. Since T2 read this invalid value to perform its own operations, T2 must also be rolled back, even if T2 itself had no errors. This chain reaction is called cascading rollback.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التراجعات المتتالية غير مرغوب فيها بشدة لأنها تهدر موارد النظام وتلغي عملاً كان من الممكن أن يكون صحيحاً. إنها نتيجة مباشرة للسماح بـ "القراءات غير المعتمدة" (Dirty Reads).</p><p>لمنع التراجعات المتتالية، تطبق أنظمة قواعد البيانات بروتوكولات تحكم في التزامن صارمة (مثل القفل ثنائي المرحلة الصارم - Strict 2PL)، والتي تضمن أن المعاملة لا يمكنها قراءة البيانات إلا من المعاملات التي التزمت بالفعل.</p></template>
+    <template class="content-en"><p>Cascading rollbacks are highly undesirable because they waste system resources and undo work that might have otherwise been valid. They are a direct consequence of allowing "<span class="smart-term" data-term-en="Dirty Read" data-ar="قراءة غير معتمدة" data-en-def="Reading data that has been modified by an uncommitted transaction.">dirty read<span class="smart-term-tooltip"></span></span>s" (reading uncommitted data).</p><p>To prevent cascading rollbacks, database systems implement strict concurrency control protocols (like Strict Two-Phase Locking), which ensure that a transaction can only read data written by transactions that have already committed.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يمكن لبروتوكول التحديث المؤجل (Deferred Update) أن يمنع التراجع المتتالي؟</template>
+      <template class="content-en">How can the Deferred Update protocol prevent cascading rollbacks?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في التحديث المؤجل، لا يتم كتابة أي بيانات معدلة إلى قاعدة البيانات (أو جعلها مرئية للآخرين) حتى تلتزم المعاملة. وبالتالي، لا يمكن لأي معاملة أخرى قراءة بيانات غير معتمدة، مما يمنع حدوث التراجع المتتالي من الأساس.</p></template>
+      <template class="content-en"><p>In deferred update, no modified data is written to the database (or made visible to others) until the transaction commits. Therefore, no other transaction can read uncommitted data, preventing cascading rollbacks entirely.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في واحدة من أهم وحدات قواعد البيانات: الاسترداد. تخيلوا أنكم تديرون بنكاً وانقطع التيار الكهربائي في منتصف تحويل مليون دولار. الكابوس، أليس كذلك؟ هنا يأتي دور ما تعلمناه اليوم. السر كله يكمن في 'سجل المعاملات' (Log). تذكروا القاعدة الذهبية WAL: اكتب في السجل قبل أن تلمس البيانات الفعلية. في الامتحان، ركزوا جيداً على الفرق بين التحديث المؤجل (الذي يحب الـ Redo ويكره الـ Undo) والتحديث الفوري. ولا تنسوا خوارزمية ARIES؛ إنها المعيار الصناعي. تذكروا مراحلها الثلاث بالترتيب: تحليل (لنعرف أين نحن)، إعادة (لنكرر التاريخ ونصل لنقطة الانهيار)، ثم تراجع (لننظف الفوضى التي تركتها المعاملات غير المكتملة). ركزوا على سياسات Steal و Force وكيف تؤثر على الأداء. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome everyone to one of the most critical database modules: Recovery. Imagine running a bank and the power goes out mid-transfer of a million dollars. Nightmare, right? That's where today's concepts save the day. The secret lies in the 'Transaction Log'. Remember the golden rule, WAL: write to the log before touching the actual data. For the exam, focus heavily on the difference between Deferred Update (loves Redo, hates Undo) and Immediate Update. And don't forget ARIES; it's the industry standard. Remember its three phases in order: Analysis (to know where we are), Redo (to repeat history to the crash point), and Undo (to clean up the mess of uncommitted transactions). Pay attention to Steal/Force policies and their performance impacts. Good luck studying!</template>
+    <template class="content-ar">أهلاً بكم يا شباب في واحدة من أهم وحدات قواعد البيانات: الاسترداد. تخيلوا أنكم تديرون بنكاً وانقطع التيار الكهربائي في منتصف تحويل مليون دولار. الكابوس، أليس كذلك؟ هنا يأتي دور ما تعلمناه اليوم. السر كله يكمن في 'سجل المعاملات' (Log). تذكروا القاعدة الذهبية WAL: اكتب في السجل قبل أن تلمس البيانات الفعلية. في الامتحان، ركزوا جيداً على الفرق بين التحديث المؤجل (الذي يحب الـ Redo ويكره الـ Undo) والتحديث الفوري. ولا تنسوا خوارزمية ARIES؛ إنها المعيار الصناعي. تذكروا مراحلها الثلاث بالترتيب: تحليل (لنعرف أين نحن)، إعادة (لنكرر التاريخ ونصل لنقطة الانهيار)، ثم تراجع (لننظف الفوضى التي تركتها المعاملات غير المكتملة). ركزوا على سياسات Steal و Force وكيف تؤثر على الأداء. بالتوفيق في دراستكم!<p>الآن بعد أن غطينا القواعد النظرية للاسترداد، انتبه جيداً للأمثلة العملية، خاصة تتبع مرحلة التحليل في ARIES وسيناريو التراجع المتتالي. غالباً ما تختبر الاختبارات قدرتك على تطبيق هذه الخوارزميات خطوة بخطوة على تسلسل سجل معين. فهم <em>لماذا</em> يتم تحديث جدول أو <em>لماذا</em> تتراجع معاملة لا يقل أهمية عن حفظ التعريفات.</p></template>
+    <template class="content-en">Welcome everyone to one of the most critical database modules: Recovery. Imagine running a bank and the power goes out mid-transfer of a million dollars. Nightmare, right? That's where today's concepts save the day. The secret lies in the 'Transaction Log'. Remember the golden rule, WAL: write to the log before touching the actual data. For the exam, focus heavily on the difference between Deferred Update (loves Redo, hates Undo) and Immediate Update. And don't forget ARIES; it's the industry standard. Remember its three phases in order: Analysis (to know where we are), Redo (to repeat history to the crash point), and Undo (to clean up the mess of uncommitted transactions). Pay attention to Steal/Force policies and their performance impacts. Good luck studying!<p>Now that we've covered the theoretical rules of recovery, pay close attention to the worked examples, especially the ARIES analysis trace and the cascading rollback scenario. Exams frequently test your ability to apply these algorithms step-by-step to a given log sequence. Understanding <em>why</em> a table updates or <em>why</em> a transaction rolls back is just as important as knowing the definitions.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1151,6 +1199,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يتم إجهاض المعاملة الموزعة بأكملها إذا فشلت أي عقدة واحدة مشاركة، أو إذا ردت أي عقدة بأنها غير قادرة على الالتزام خلال مرحلة التحضير (Prepare phase).</template>
           <template class="content-en">The entire distributed transaction is aborted if even a single participating node fails, or if any node replies that it cannot commit during the prepare phase.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مثال ARIES العملي، لماذا نحتاج إلى مسح السجل للأمام من نقطة الفحص أثناء مرحلة التحليل؟</template>
+          <template class="content-en">In the ARIES worked example, why do we need to scan forward from the checkpoint during the Analysis phase?</template>
+          <span class="content-target">في مثال ARIES العملي، لماذا نحتاج إلى مسح السجل للأمام من نقطة الفحص أثناء مرحلة التحليل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نقطة الفحص تعطينا فقط 'لقطة' للماضي. من خلال المسح للأمام من نقطة الفحص حتى نهاية السجل، نقوم بتحديث هذه اللقطة لتعكس الحالة الدقيقة لجدول المعاملات وجدول الصفحات المعدلة في اللحظة التي انهار فيها النظام بالضبط، مما يمهد الطريق لمرحلتي الإعادة والتراجع.</p></template>
+          <template class="content-en"><p>The checkpoint only gives us a snapshot of the past. By scanning forward from the checkpoint to the end of the log, we update that snapshot to reflect the exact state of the Transaction and Dirty Page tables at the exact moment the system crashed, setting the stage for Redo and Undo.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُعتبر التراجع المتتالي مشكلة أداء كبيرة في قواعد البيانات؟</template>
+          <template class="content-en">Why is cascading rollback considered a major performance issue in databases?</template>
+          <span class="content-target">لماذا يُعتبر التراجع المتتالي مشكلة أداء كبيرة في قواعد البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنه يجبر النظام على التراجع عن عمل كان صحيحاً تماماً في حد ذاته، لمجرد أنه اعتمد على بيانات خاطئة من معاملة أخرى. هذا يهدر دورات المعالج، وعرض النطاق الترددي للإدخال/الإخراج، ويؤخر اكتمال معاملات متعددة بسبب فشل واحد.</p></template>
+          <template class="content-en"><p>Because it forces the system to undo work that was perfectly valid on its own, simply because it relied on bad data from another transaction. This wastes CPU cycles, I/O bandwidth, and delays the completion of multiple transactions due to a single failure.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1503,6 +1586,40 @@
         "en": "[EXAMPLE_NEEDED]"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو الهدف الرئيسي لمرحلة التحليل في ARIES؟",
+      "en": "What is the main goal of the Analysis phase in ARIES?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحديد المعاملات النشطة والصفحات المعدلة لحظة الانهيار، وإيجاد نقطة بداية الإعادة (Redo).",
+        "en": "Identify active transactions and dirty pages at crash time, and find the starting point for Redo."
+      },
+      "example": {
+        "ar": "البحث عن أصغر LSN في جدول الصفحات المعدلة لبدء الإعادة منه.",
+        "en": "Finding the minimum LSN in the Dirty Page Table to start Redo from."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "ما هو التراجع المتتالي (Cascading Rollback)؟",
+      "en": "What is a Cascading Rollback?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سلسلة من التراجعات تحدث عندما تقرأ معاملة بيانات غير معتمدة لمعاملة أخرى تفشل لاحقاً.",
+        "en": "A chain of rollbacks occurring when a transaction reads uncommitted data of another transaction that later fails."
+      },
+      "example": {
+        "ar": "T2 تقرأ تعديل T3. تفشل T3، فيجب التراجع عن T2 أيضاً.",
+        "en": "T2 reads T3's update. T3 fails, so T2 must also be rolled back."
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -1512,7 +1629,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 10</span>
+            <span id="quiz-counter">1 / 12</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1528,7 +1645,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <div class="score-display" id="quiz-score-display">0 / 12</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1853,6 +1970,70 @@
     },
     "difficulty": "hard",
     "conceptId": "aries-recovery-algorithm"
+  },
+  {
+    "conceptId": "aries-recovery-algorithm",
+    "question": {
+      "ar": "في مرحلة التحليل لخوارزمية ARIES، إذا وُجدت صفحة بالفعل في جدول الصفحات المعدلة وتم العثور على تحديث جديد لها في السجل، ماذا يحدث لـ LSN الخاص بها في الجدول؟",
+      "en": "In the ARIES analysis phase, if a page is already in the Dirty Page Table and a new update for it is found in the log, what happens to its LSN in the table?"
+    },
+    "options": {
+      "ar": [
+        "يتم تحديثه إلى LSN الجديد.",
+        "يبقى دون تغيير (يحتفظ بأقدم LSN).",
+        "يتم تعيينه إلى الصفر.",
+        "تتم إزالة الصفحة من الجدول."
+      ],
+      "en": [
+        "It is updated to the new LSN.",
+        "It remains unchanged (keeps the earliest LSN).",
+        "It is set to zero.",
+        "The page is removed from the table."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يحتفظ جدول الصفحات المعدلة دائماً بأقدم LSN جعل الصفحة معدلة، لأن هذا يحدد النقطة التي يجب أن تبدأ منها عملية الإعادة (Redo) لتلك الصفحة.",
+      "en": "The Dirty Page Table always keeps the earliest LSN that made the page dirty, because this determines the point from which the Redo operation must start for that page."
+    },
+    "hint": {
+      "ar": "فكر في النقطة التي يجب أن تبدأ منها لإصلاح كل شيء.",
+      "en": "Think about the point you need to start from to fix everything."
+    },
+    "difficulty": "hard",
+    "id": 11
+  },
+  {
+    "conceptId": "cascading-rollback",
+    "question": {
+      "ar": "ما هو السبب الرئيسي لحدوث التراجع المتتالي؟",
+      "en": "What is the primary cause of a cascading rollback?"
+    },
+    "options": {
+      "ar": [
+        "فشل الوسائط (Media failure).",
+        "قراءة بيانات غير معتمدة (Dirty Read).",
+        "بروتوكول الكتابة المسبقة للسجل (WAL).",
+        "نقاط الفحص الضبابية (Fuzzy checkpointing)."
+      ],
+      "en": [
+        "Media failure.",
+        "Reading uncommitted data (Dirty Read).",
+        "Write-Ahead Logging (WAL).",
+        "Fuzzy checkpointing."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تحدث التراجعات المتتالية عندما تعتمد المعاملات على بيانات غير معتمدة (Dirty Reads) يتم التراجع عنها لاحقاً.",
+      "en": "Cascading rollbacks happen when transactions depend on uncommitted data (Dirty Reads) that is later undone."
+    },
+    "hint": {
+      "ar": "الاعتماد على عمل لم يكتمل بعد هو أمر محفوف بالمخاطر.",
+      "en": "Relying on unfinished work is risky."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1896,6 +2077,14 @@
     <div data-bilingual>
     <template class="content-ar">في بروتوكول 2PC (الالتزام ثنائي المرحلة)، المنسق هو نقطة الضعف. إذا فشل المنسق، تتوقف جميع العقد المشاركة في حالة انتظار (Blocking)، مما يجعله بروتوكولاً غير مثالي للأنظمة عالية التوافر.</template>
     <template class="content-en">In the 2PC (Two-Phase Commit) protocol, the coordinator is the weak point. If the coordinator fails, all participating nodes block and wait, making it less than ideal for highly available systems.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في مرحلة التحليل لخوارزمية ARIES، احذر من تحديث LSN لصفحة موجودة بالفعل في جدول الصفحات المعدلة. الجدول يحتفظ دائماً بأقدم (أصغر) LSN، وليس الأحدث!</template>
+    <template class="content-en">In the ARIES Analysis phase, beware of updating the LSN of a page already in the Dirty Page Table. The table always keeps the EARLIEST (smallest) LSN, not the latest!</template>
     <div class="content-target"></div>
     </div>
   </div>

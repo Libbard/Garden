@@ -110,6 +110,11 @@
         <template class="content-en">Data Warehouse Functionality (OLAP)</template>
         <span class="content-target">وظائف مستودع البيانات (OLAP)</span>
       </a>
+      <a href="#building-data-warehouse" class="toc-link" data-bilingual>
+        <template class="content-ar">بناء وإدارة مستودعات البيانات</template>
+        <template class="content-en">Building and Managing Data Warehouses</template>
+        <span class="content-target">بناء وإدارة مستودعات البيانات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -270,8 +275,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تأخذ قاعدة الارتباط الشكل X => Y. لكي تكون القاعدة مثيرة للاهتمام، يجب أن تحقق حدين أدنيين:</p><ul><li><b><span class="smart-term" data-term-en="Support" data-ar="الدعم" data-en-def="The percentage of transactions that contain all items in the itemset.">الدعم<span class="smart-term-tooltip"></span></span> (Support):</b> النسبة المئوية للمعاملات التي تحتوي على جميع العناصر في القاعدة (LHS U RHS).</li><li><b><span class="smart-term" data-term-en="Confidence" data-ar="الثقة" data-en-def="The conditional probability that the RHS is true given that the LHS is true.">الثقة<span class="smart-term-tooltip"></span></span> (Confidence):</b> الاحتمال الشرطي بأن Y صحيح عندما يكون X صحيحاً. تُحسب كالتالي: Support(LHS U RHS) / Support(LHS).</li></ul><p>توليد القواعد يتم بخطوتين: إيجاد مجموعات العناصر المتكررة (Frequent itemsets)، ثم توليد القواعد منها.</p></template>
-    <template class="content-en"><p>An association rule is of the form X => Y. For a rule to be of interest, it must satisfy a minimum:</p><ul><li><b><span class="smart-term" data-term-en="Support" data-ar="الدعم" data-en-def="The percentage of transactions that contain all items in the itemset.">Support<span class="smart-term-tooltip"></span></span>:</b> The percentage of transactions that contain all items in the itemset (LHS U RHS).</li><li><b><span class="smart-term" data-term-en="Confidence" data-ar="الثقة" data-en-def="The conditional probability that the RHS is true given that the LHS is true.">Confidence<span class="smart-term-tooltip"></span></span>:</b> The conditional probability that Y is true when X is known to be true. Computed as: Support(LHS U RHS) / Support(LHS).</li></ul><p>Generating rules is a two-step process: Generate all frequent itemsets, then generate rules for each itemset.</p></template>
+    <template class="content-ar"><p>تأخذ قاعدة الارتباط الشكل X => Y. لكي تكون القاعدة مثيرة للاهتمام، يجب أن تحقق حدين أدنيين:</p><ul><li><b><span class="smart-term" data-term-en="Support" data-ar="الدعم" data-en-def="The percentage of transactions that contain all items in the itemset.">الدعم<span class="smart-term-tooltip"></span></span> (Support):</b> النسبة المئوية للمعاملات التي تحتوي على جميع العناصر في القاعدة (LHS U RHS).</li><li><b><span class="smart-term" data-term-en="Confidence" data-ar="الثقة" data-en-def="The conditional probability that the RHS is true given that the LHS is true.">الثقة<span class="smart-term-tooltip"></span></span> (Confidence):</b> الاحتمال الشرطي بأن Y صحيح عندما يكون X صحيحاً. تُحسب كالتالي: Support(LHS U RHS) / Support(LHS).</li></ul><p>توليد القواعد يتم بخطوتين: إيجاد مجموعات العناصر المتكررة (Frequent itemsets)، ثم توليد القواعد منها.</p><p>الخوارزمية العامة لتوليد قواعد الارتباط من مجموعات العناصر المتكررة (Frequent itemsets) تتم كالتالي:</p><ol><li>لكل مجموعة عناصر متكررة $X$، ولكل مجموعة فرعية $Y$ تنتمي إلى $X$، نحدد $Z = X - Y$.</li><li>نقوم بحساب نسبة الدعم: إذا كان $\frac{Support(X)}{Support(Z)} > \text{minimum confidence}$، فإن القاعدة $Z \Rightarrow Y$ تعتبر قاعدة صحيحة (Valid rule).</li></ol></template>
+    <template class="content-en"><p>An association rule is of the form X => Y. For a rule to be of interest, it must satisfy a minimum:</p><ul><li><b><span class="smart-term" data-term-en="Support" data-ar="الدعم" data-en-def="The percentage of transactions that contain all items in the itemset.">Support<span class="smart-term-tooltip"></span></span>:</b> The percentage of transactions that contain all items in the itemset (LHS U RHS).</li><li><b><span class="smart-term" data-term-en="Confidence" data-ar="الثقة" data-en-def="The conditional probability that the RHS is true given that the LHS is true.">Confidence<span class="smart-term-tooltip"></span></span>:</b> The conditional probability that Y is true when X is known to be true. Computed as: Support(LHS U RHS) / Support(LHS).</li></ul><p>Generating rules is a two-step process: Generate all frequent itemsets, then generate rules for each itemset.</p><p>The general algorithm for generating association rules from frequent itemsets proceeds as follows:</p><ol><li>For a frequent itemset $X$ and a subset $Y$ of $X$, let $Z = X - Y$.</li><li>Calculate the support ratio: If $\frac{Support(X)}{Support(Z)} > \text{minimum confidence}$, then the rule $Z \Rightarrow Y$ is a valid rule.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -766,14 +771,57 @@
   </details>
 </section>
 
+<section id="building-data-warehouse" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> بناء وإدارة مستودعات البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Building and Managing Data Warehouses</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بناء مستودع البيانات هو مشروع ضخم يستغرق وقتاً طويلاً، ويتطلب استخراج البيانات من مصادر متعددة، تنظيفها، وتصميم سياسات تحديث فعالة.</p></template>
+    <template class="content-en"><p>Building a data warehouse is a massive, time-consuming project requiring data extraction from multiple sources, cleansing, and designing effective refresh policies.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتضمن تصميم وبناء مستودع البيانات الخطوات والتحديات التالية:</p><ol><li><b><span class="smart-term" data-term-en="Data Acquisition" data-ar="الاستحواذ على البيانات" data-en-def="The process of extracting, formatting, and cleaning data from multiple heterogeneous sources.">الاستحواذ على البيانات<span class="smart-term-tooltip"></span></span> (Acquisition):</b> استخراج البيانات من مصادر غير متجانسة، تنسيقها، وتنظيفها. التنظيف يصعب أتمتته. يشمل ذلك عملية <b>Back flushing</b> (ترقية قواعد البيانات المصدرية بالبيانات المنظفة).</li><li><b>التخزين (Storing):</b> ملاءمة البيانات مع النموذج متعدد الأبعاد، إنشاء هياكل البيانات ومسارات الوصول (Access paths)، ودعم البيانات المتغيرة زمنياً.</li><li><b>الإدارة والصيانة:</b> تحديد سياسات التحديث (Refresh policy)، <span class="smart-term" data-term-en="Purging" data-ar="التخلص من البيانات" data-en-def="The process of removing old or obsolete data from the warehouse to manage storage.">التخلص من البيانات<span class="smart-term-tooltip"></span></span> القديمة (Purging)، وتصميم المكونات الوصفية (Metadata).</li></ol><p>من أبرز الصعوبات: الوقت الطويل للبناء (قد يستغرق سنوات)، ضمان جودة البيانات، والحاجة لمهارات إدارية أوسع بكثير من قواعد البيانات التقليدية.</p></template>
+    <template class="content-en"><p>Designing and building a data warehouse involves the following steps and challenges:</p><ol><li><b><span class="smart-term" data-term-en="Data Acquisition" data-ar="الاستحواذ على البيانات" data-en-def="The process of extracting, formatting, and cleaning data from multiple heterogeneous sources.">Data Acquisition<span class="smart-term-tooltip"></span></span>:</b> Extracting data from heterogeneous sources, formatting, and cleaning it (cleaning is difficult to automate). This includes <b><span class="smart-term" data-term-en="Back Flushing" data-ar="التنظيف العكسي / الترقية العكسية" data-en-def="Upgrading the original source databases with the cleaned data from the data warehouse.">Back flushing<span class="smart-term-tooltip"></span></span></b> (upgrading source databases with cleaned data).</li><li><b>Storing:</b> Fitting data into the multi-dimensional model, creating data structures and access paths, and supporting time-variant data.</li><li><b>Management and Maintenance:</b> Determining refresh policies, <span class="smart-term" data-term-en="Purging" data-ar="التخلص من البيانات" data-en-def="The process of removing old or obsolete data from the warehouse to manage storage.">purging<span class="smart-term-tooltip"></span></span> old data, and designing the metadata component.</li></ol><p>Major difficulties include: huge lead time (can take years), ensuring data quality, and requiring far broader administration skills than traditional databases.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يصعب أتمتة تنظيف البيانات؟ لأن الأخطاء غالباً ما تكون سياقية (Contextual) وتتطلب فهماً لقواعد العمل (Business rules) لحلها، مثل تضارب الأسماء أو القيم المفقودة من أنظمة قديمة مختلفة.</p><p>عملية الـ Back flushing تعتبر تحدياً تنظيمياً لأنها تتطلب تعديل الأنظمة التشغيلية (التي قد تكون حساسة) بناءً على التصحيحات التي تمت في بيئة المستودع التحليلية.</p></template>
+    <template class="content-en"><p>Why is data cleaning difficult to automate? Because errors are often contextual and require an understanding of business rules to resolve, such as conflicting names or missing values from different legacy systems.</p><p>The Back flushing process is an organizational challenge because it requires modifying operational systems (which can be sensitive) based on corrections made in the analytical warehouse environment.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تتطلب إدارة مستودع البيانات مهارات أوسع من إدارة قاعدة بيانات تقليدية؟</template>
+      <template class="content-en">Why does administering a data warehouse require broader skills than a traditional database?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تتضمن التعامل مع مصادر بيانات غير متجانسة، عمليات تنظيف معقدة، تصميم نماذج متعددة الأبعاد، وإدارة سياسات تحديث ضخمة، بالإضافة إلى فهم عميق لاحتياجات العمل التحليلية.</p></template>
+      <template class="content-en"><p>Because it involves handling heterogeneous data sources, complex cleaning processes, multi-dimensional modeling, managing large refresh policies, and a deep understanding of analytical business needs.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الدسمة والمهمة جداً. اليوم نربط بين عالمين: كيف نستخرج الذهب (المعرفة) من البيانات، وأين نخزن هذا الذهب وكيف نحلله. بدأنا بـ KDD، وتذكروا دائماً أن تنقيب البيانات هو مجرد خطوة واحدة؛ إذا لم تنظف بياناتك أولاً، فنتائجك بلا قيمة. ركزوا جيداً على خوارزمية Apriori وكيف تستخدم 'مضاد الرتابة' لتقليل الجهد، هذا سؤال كلاسيكي في الامتحانات! ثم انتقلنا إلى مستودعات البيانات. لماذا لا نستخدم قواعد البيانات العادية للتحليل؟ لأن استعلامات OLAP المعقدة ستدمر أداء أنظمة المعاملات (OLTP). لذلك نبني مستودعاً بهيكل 'متعدد الأبعاد'. افهموا الفرق الجوهري بين المخطط النجمي (سريع لكن يستهلك مساحة) ومخطط ندفة الثلج (يوفر مساحة لكنه أبطأ). وأخيراً، تخيلوا عمليات OLAP (Roll-up, Drill-down) كأنكم تنظرون إلى مكعب روبيك وتديرونه لتروا البيانات من زوايا مختلفة. ركزوا على هذه المفاهيم، فهي أساس ذكاء الأعمال الحديث!</template>
-    <template class="content-en">Welcome everyone to this crucial module. Today we connect two worlds: how to extract gold (knowledge) from data, and where to store and analyze it. We started with KDD—always remember that data mining is just one step; if you don't clean your data first, your results are worthless. Pay close attention to the Apriori algorithm and how it uses 'anti-monotonicity' to save effort; this is a classic exam topic! Then we moved to Data Warehouses. Why not use normal DBs for analysis? Because complex OLAP queries would crush the performance of transactional systems (OLTP). So, we build a warehouse with a 'multi-dimensional' structure. Understand the core difference between a Star Schema (fast but consumes space) and a Snowflake Schema (saves space but slower). Finally, visualize OLAP operations (Roll-up, Drill-down) like holding a Rubik's cube and turning it to see data from different angles. Master these concepts; they are the foundation of modern Business Intelligence!</template>
+    <template class="content-ar">أهلاً بكم يا شباب في هذه الوحدة الدسمة والمهمة جداً. اليوم نربط بين عالمين: كيف نستخرج الذهب (المعرفة) من البيانات، وأين نخزن هذا الذهب وكيف نحلله. بدأنا بـ KDD، وتذكروا دائماً أن تنقيب البيانات هو مجرد خطوة واحدة؛ إذا لم تنظف بياناتك أولاً، فنتائجك بلا قيمة. ركزوا جيداً على خوارزمية Apriori وكيف تستخدم 'مضاد الرتابة' لتقليل الجهد، هذا سؤال كلاسيكي في الامتحانات! ثم انتقلنا إلى مستودعات البيانات. لماذا لا نستخدم قواعد البيانات العادية للتحليل؟ لأن استعلامات OLAP المعقدة ستدمر أداء أنظمة المعاملات (OLTP). لذلك نبني مستودعاً بهيكل 'متعدد الأبعاد'. افهموا الفرق الجوهري بين المخطط النجمي (سريع لكن يستهلك مساحة) ومخطط ندفة الثلج (يوفر مساحة لكنه أبطأ). وأخيراً، تخيلوا عمليات OLAP (Roll-up, Drill-down) كأنكم تنظرون إلى مكعب روبيك وتديرونه لتروا البيانات من زوايا مختلفة. ركزوا على هذه المفاهيم، فهي أساس ذكاء الأعمال الحديث!<p>الآن بعد أن فهمنا الأساسيات، يجب أن ندرك أن تنقيب البيانات لا يقتصر على قواعد الارتباط؛ فهناك تقنيات متقدمة كالانحدار والشبكات العصبية. كما أن تطبيق هذه الخوارزميات يتطلب بيئة صلبة، وهنا تبرز أهمية بناء مستودعات بيانات قوية رغم تحديات استخراج وتنظيف البيانات المعقدة.</p></template>
+    <template class="content-en">Welcome everyone to this crucial module. Today we connect two worlds: how to extract gold (knowledge) from data, and where to store and analyze it. We started with KDD—always remember that data mining is just one step; if you don't clean your data first, your results are worthless. Pay close attention to the Apriori algorithm and how it uses 'anti-monotonicity' to save effort; this is a classic exam topic! Then we moved to Data Warehouses. Why not use normal DBs for analysis? Because complex OLAP queries would crush the performance of transactional systems (OLTP). So, we build a warehouse with a 'multi-dimensional' structure. Understand the core difference between a Star Schema (fast but consumes space) and a Snowflake Schema (saves space but slower). Finally, visualize OLAP operations (Roll-up, Drill-down) like holding a Rubik's cube and turning it to see data from different angles. Master these concepts; they are the foundation of modern Business Intelligence!<p>Now that we grasp the basics, we must realize data mining extends beyond association rules to advanced techniques like regression and neural networks. Applying these algorithms requires a solid environment, highlighting the critical need to build robust data warehouses despite the complex challenges of data extraction and cleansing.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -947,6 +995,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">خوارزمية FP-Tree لا تحتاج إلى توليد مجموعات مرشحة (Candidate generation) كما تفعل Apriori، بل تقوم بضغط قاعدة البيانات في شجرة، مما يجعلها أسرع بكثير وأكثر كفاءة في استخدام الذاكرة.</template>
           <template class="content-en">The FP-Tree algorithm does not need to generate candidate itemsets like Apriori does. Instead, it compresses the database into a tree, making it much faster and more memory-efficient.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تتغلب خوارزمية FP-Tree على مشكلة استهلاك الذاكرة الموجودة في خوارزمية Apriori؟</template>
+          <template class="content-en">How does the FP-Tree algorithm overcome the memory consumption problem present in the Apriori algorithm?</template>
+          <span class="content-target">كيف تتغلب خوارزمية FP-Tree على مشكلة استهلاك الذاكرة الموجودة في خوارزمية Apriori؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>خوارزمية Apriori تولد عدداً هائلاً من المجموعات المرشحة (Candidate itemsets) وتختبر دعمها بمسح قاعدة البيانات مراراً. خوارزمية FP-Tree تتجنب هذا تماماً بضغط قاعدة البيانات في هيكل شجري (FP-Tree) يشارك المسارات للعناصر المتكررة، مما يقلل حجم البيانات بشكل كبير ويسمح باستخراج الأنماط دون توليد مرشحين.</p></template>
+          <template class="content-en"><p>Apriori generates a massive number of candidate itemsets and tests their support by scanning the DB repeatedly. FP-Tree avoids this entirely by compressing the DB into a tree structure that shares paths for frequent items, drastically reducing data size and allowing pattern extraction without candidate generation.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في سياق بناء مستودع البيانات، لماذا نعتبر مرحلة 'تنظيف البيانات' (Data Cleansing) من أصعب المراحل التي لا يمكن أتمتتها بالكامل؟</template>
+          <template class="content-en">In the context of building a data warehouse, why is 'Data Cleansing' considered one of the hardest phases that cannot be fully automated?</template>
+          <span class="content-target">في سياق بناء مستودع البيانات، لماذا نعتبر مرحلة 'تنظيف البيانات' (Data Cleansing) من أصعب المراحل التي لا يمكن أتمتتها بالكامل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن البيانات تأتي من مصادر غير متجانسة (Heterogeneous) قد تحتوي على تناقضات منطقية لا يمكن للآلة فهمها وحدها. مثلاً، عميل مسجل باسمين مختلفين في نظامين، أو قيم مفقودة تعني أشياء مختلفة حسب سياق النظام القديم. حل هذه المشاكل يتطلب تدخلاً بشرياً وفهماً لقواعد العمل (Business rules).</p></template>
+          <template class="content-en"><p>Because data comes from heterogeneous sources that may contain logical inconsistencies a machine cannot understand alone. For example, a customer registered with different names in two systems, or missing values meaning different things depending on the legacy system's context. Resolving these requires human intervention and understanding of business rules.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1231,6 +1314,23 @@
         "en": "A table containing sales revenue, product ID, and time ID."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو مصطلح Back Flushing في بناء مستودعات البيانات؟",
+      "en": "What is Back Flushing in data warehouse building?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية ترقية وتحديث قواعد البيانات المصدرية الأصلية باستخدام البيانات التي تم تنظيفها في المستودع.",
+        "en": "The process of upgrading the original source databases with the cleaned data from the warehouse."
+      },
+      "example": {
+        "ar": "تصحيح أخطاء إملائية في أسماء العملاء في المستودع ثم إرسال التصحيح للنظام التشغيلي.",
+        "en": "Correcting customer name typos in the warehouse and sending the correction back to the operational system."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1240,7 +1340,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 10</span>
+            <span id="quiz-counter">1 / 11</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1256,7 +1356,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <div class="score-display" id="quiz-score-display">0 / 11</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1581,6 +1681,38 @@
     },
     "difficulty": "medium",
     "conceptId": "association-rules"
+  },
+  {
+    "conceptId": "association-rules",
+    "question": {
+      "ar": "عند توليد قواعد الارتباط، إذا كانت X مجموعة عناصر متكررة و Y مجموعة فرعية منها، و Z = X - Y. متى تكون القاعدة Z => Y صحيحة؟",
+      "en": "When generating association rules, if X is a frequent itemset, Y is a subset of X, and Z = X - Y. When is the rule Z => Y valid?"
+    },
+    "options": {
+      "ar": [
+        "إذا كان Support(Z) / Support(X) > الحد الأدنى للثقة",
+        "إذا كان Support(X) / Support(Z) > الحد الأدنى للثقة",
+        "إذا كان Support(X) - Support(Z) > الحد الأدنى للدعم",
+        "إذا كان Support(Y) / Support(Z) > الحد الأدنى للثقة"
+      ],
+      "en": [
+        "If Support(Z) / Support(X) > minimum confidence",
+        "If Support(X) / Support(Z) > minimum confidence",
+        "If Support(X) - Support(Z) > minimum support",
+        "If Support(Y) / Support(Z) > minimum confidence"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حسب الخوارزمية، القاعدة Z => Y تكون صحيحة إذا كانت نسبة دعم المجموعة الكلية (X) إلى دعم الشرط (Z) أكبر من الحد الأدنى للثقة.",
+      "en": "According to the algorithm, the rule Z => Y is valid if the ratio of the total itemset support (X) to the condition support (Z) is greater than the minimum confidence."
+    },
+    "hint": {
+      "ar": "تذكر أن الثقة هي دعم (الكل) مقسوماً على دعم (الطرف الأيسر).",
+      "en": "Remember that confidence is support(All) divided by support(LHS)."
+    },
+    "difficulty": "hard",
+    "id": 11
   }
 ]
 </script>
@@ -1624,6 +1756,22 @@
     <div data-bilingual>
     <template class="content-ar">الفرق بين Roll-up و Drill-Down في OLAP: Roll-up يقلل التفاصيل (مثال: تجميع المبيعات من أيام إلى شهور)، بينما Drill-Down يزيد التفاصيل (مثال: تفصيل المبيعات السنوية إلى أرباع).</template>
     <template class="content-en">The difference between Roll-up and Drill-Down in OLAP: Roll-up decreases detail (e.g., aggregating daily sales to monthly), while Drill-Down increases detail (e.g., breaking down annual sales into quarters).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية FP-Tree، يتم مسح قاعدة البيانات مرتين فقط: الأولى لحساب تكرار العناصر الفردية، والثانية لبناء الشجرة. هذا ما يجعلها أسرع بكثير من خوارزمية Apriori التي تمسح القاعدة مرات عديدة.</template>
+    <template class="content-en">In the FP-Tree algorithm, the database is scanned only twice: first to count 1-itemset frequencies, and second to build the tree. This is what makes it much faster than Apriori, which scans the DB multiple times.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين تحليل الأنماط المتسلسلة (Sequential Patterns) وقواعد الارتباط (Association Rules). قواعد الارتباط لا تهتم بالترتيب الزمني (شراء الخبز والحليب معاً)، بينما الأنماط المتسلسلة تعتمد كلياً على الترتيب (شراء هاتف، ثم بعد شهر شراء غطاء له).</template>
+    <template class="content-en">Do not confuse Sequential Patterns with Association Rules. Association rules ignore time order (buying bread and milk together), while sequential patterns strictly depend on time order (buying a phone, then a month later buying a case).</template>
     <div class="content-target"></div>
     </div>
   </div>

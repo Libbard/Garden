@@ -89,6 +89,11 @@
         <template class="content-en">Binding Adapter to RecyclerView and Updating Data</template>
         <span class="content-target">ربط المحول بـ RecyclerView وتحديث البيانات</span>
       </a>
+      <a href="#recyclerview-item-clicks" class="toc-link" data-bilingual>
+        <template class="content-ar">التعامل مع النقرات على عناصر RecyclerView</template>
+        <template class="content-en">Handling Clicks on RecyclerView Items</template>
+        <span class="content-target">التعامل مع النقرات على عناصر RecyclerView</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -644,14 +649,80 @@ mAdapter.notifyDataSetChanged();</code></pre>
   </details>
 </section>
 
+<section id="recyclerview-item-clicks" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> التعامل مع النقرات على عناصر RecyclerView</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Handling Clicks on RecyclerView Items</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتم التعامل مع نقرات المستخدم على عناصر القائمة عن طريق تعيين <code>OnClickListener</code> على كائن <code>itemView</code> داخل الفئة الداخلية <code>ViewHolder</code>.</p></template>
+    <template class="content-en"><p>User clicks on list items are handled by setting an <code>OnClickListener</code> on the <code>itemView</code> object inside the inner <code>ViewHolder</code> class.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لجعل عناصر <code>RecyclerView</code> قابلة للنقر والتفاعل، نتبع الخطوات التالية:</p><ol><li>نمرر مرجعاً للنشاط (مثل <code>MainActivity</code>) إلى مُنشئ المحول (Adapter).</li><li>داخل مُنشئ الفئة الداخلية <code>ListItemHolder</code>، نقوم بتعيين مستمع للنقرات <code>setOnClickListener</code> على الكائن <code>itemView</code> (الذي يمثل التخطيط بأكمله للعنصر الواحد).</li><li>داخل دالة <code>onClick</code>، نستدعي دالة من النشاط الرئيسي (مثل <code>showNote</code>) ونمرر لها موضع العنصر الذي تم النقر عليه باستخدام دالة <code>getAdapterPosition()</code>.</li></ol><p>في تطبيق Note to Self، تقوم دالة <code>showNote</code> في <code>MainActivity</code> بإنشاء مثيل جديد من نافذة الحوار <code>DialogShowNote</code> وتمرير بيانات الملاحظة المحددة إليها لعرضها.</p></template>
+    <template class="content-en"><p>To make <code>RecyclerView</code> items clickable and interactive, we follow these steps:</p><ol><li>Pass a reference of the Activity (like <code>MainActivity</code>) to the Adapter's constructor.</li><li>Inside the constructor of the inner <code>ListItemHolder</code> class, set an <code>setOnClickListener</code> on the <code>itemView</code> object (which represents the entire layout for a single item).</li><li>Inside the <code>onClick</code> method, invoke a method from the main activity (like <code>showNote</code>) and pass the clicked item's position using the <code>getAdapterPosition()</code> method.</li></ol><p>In the Note to Self app, the <code>showNote</code> method in <code>MainActivity</code> creates a new instance of the <code>DialogShowNote</code> dialog window and passes the selected note's data to it for display.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من أفضل الممارسات تعيين <code>OnClickListener</code> داخل مُنشئ (Constructor) فئة <code>ViewHolder</code> بدلاً من دالة <code>onBindViewHolder</code>. دالة <code>onBindViewHolder</code> تُستدعى بشكل متكرر جداً أثناء التمرير، وإنشاء كائنات مستمع (Listener Objects) جديدة في كل مرة سيؤدي إلى استهلاك غير ضروري للذاكرة وإبطاء الأداء (Garbage Collection Churn).</p><p>استخدام دالة <code>getAdapterPosition()</code> أمر بالغ الأهمية. لا تعتمد على متغير <code>position</code> الممرر إلى <code>onBindViewHolder</code> للتعامل مع النقرات، لأن ترتيب العناصر قد يتغير (مثلاً عند حذف عنصر)، بينما <code>getAdapterPosition()</code> يضمن لك دائماً الحصول على الفهرس الحالي والصحيح للعنصر وقت النقر.</p></template>
+    <template class="content-en"><p>It is a best practice to set the <code>OnClickListener</code> inside the <code>ViewHolder</code> constructor rather than in the <code>onBindViewHolder</code> method. <code>onBindViewHolder</code> is called very frequently during scrolling, and creating new Listener Objects every time would lead to unnecessary memory consumption and slow down performance (Garbage Collection Churn).</p><p>Using the <code>getAdapterPosition()</code> method is crucial. Do not rely on the <code>position</code> variable passed to <code>onBindViewHolder</code> for handling clicks, because item order might change (e.g., when an item is deleted), whereas <code>getAdapterPosition()</code> always guarantees you get the current and correct index of the item at the time of the click.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Inside ListItemHolder constructor in NoteAdapter
+itemView.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View view) {
+        // Invoke showNote method from MainActivity using the passed reference
+        mMainActivity.showNote(getAdapterPosition());
+    }
+});
+
+// Inside MainActivity class
+public void showNote(int noteToShow) {
+    DialogShowNote dialog = new DialogShowNote();
+    // Get the specific note from the ArrayList using the position
+    dialog.sendNoteSelected(noteList.get(noteToShow));
+    dialog.show(getSupportFragmentManager(), "");
+}</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نمرر مرجع MainActivity إلى المحول (Adapter) بدلاً من كتابة كود إظهار نافذة الحوار مباشرة داخل المحول؟</template>
+      <template class="content-en">Why do we pass a reference of MainActivity to the Adapter instead of writing the dialog display code directly inside the Adapter?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>للحفاظ على فصل الاهتمامات (Separation of Concerns). المحول يجب أن يهتم فقط بربط البيانات بالعرض، بينما النشاط (Activity) هو المسؤول عن إدارة واجهة المستخدم الشاملة ونوافذ الحوار. هذا يجعل الكود أكثر تنظيماً وقابلية لإعادة الاستخدام.</p></template>
+      <template class="content-en"><p>To maintain Separation of Concerns. The Adapter should only care about binding data to views, while the Activity is responsible for managing the overall UI and dialog windows. This makes the code more organized and reusable.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة السادسة. في هذه الوحدة، ننتقل بتطبيقاتنا إلى مستوى احترافي. نبدأ بتعلم كيفية مقاطعة المستخدم بأدب لطلب معلومات أو تأكيد إجراء باستخدام نوافذ الحوار (Dialogs) عبر فئة DialogFragment. لكن التحدي الأكبر يكمن في عرض البيانات. تخيل تطبيقاً يعرض آلاف التغريدات أو الملاحظات؛ استخدام الطرق التقليدية سيؤدي إلى انهيار التطبيق بسبب نفاد الذاكرة. هنا يأتي دور البطل: RecyclerView. هذا المكون العبقري لا ينشئ آلاف العناصر، بل ينشئ ما يكفي لملء الشاشة فقط، ثم يقوم بـ 'إعادة تدويرها' أثناء التمرير. لفهم هذا، يجب أن تتقن ثلاثية المحول (Adapter): دالة لإنشاء التخطيط (onCreateViewHolder)، دالة لربط البيانات (onBindViewHolder)، ودالة لمعرفة حجم البيانات (getItemCount). ركزوا جيداً على كيفية تفاعل هذه المكونات مع بعضها، فهذا سؤال مؤكد في الامتحان وأساس لأي تطبيق أندرويد حقيقي.</template>
-    <template class="content-en">Welcome to Module 6. In this module, we take our apps to a professional level. We start by learning how to politely interrupt the user to request information or confirm an action using Dialogs via the DialogFragment class. But the biggest challenge lies in displaying data. Imagine an app displaying thousands of tweets or notes; using traditional methods will crash the app due to out-of-memory errors. Enter the hero: RecyclerView. This brilliant component doesn't create thousands of items; it creates just enough to fill the screen, then 'recycles' them as you scroll. To master this, you must master the Adapter's trio: a method to create the layout (onCreateViewHolder), a method to bind data (onBindViewHolder), and a method to know the data size (getItemCount). Focus closely on how these components interact, as this is a guaranteed exam topic and the foundation of any real Android app.</template>
+    <template class="content-ar">أهلاً بكم في الوحدة السادسة. في هذه الوحدة، ننتقل بتطبيقاتنا إلى مستوى احترافي. نبدأ بتعلم كيفية مقاطعة المستخدم بأدب لطلب معلومات أو تأكيد إجراء باستخدام نوافذ الحوار (Dialogs) عبر فئة DialogFragment. لكن التحدي الأكبر يكمن في عرض البيانات. تخيل تطبيقاً يعرض آلاف التغريدات أو الملاحظات؛ استخدام الطرق التقليدية سيؤدي إلى انهيار التطبيق بسبب نفاد الذاكرة. هنا يأتي دور البطل: RecyclerView. هذا المكون العبقري لا ينشئ آلاف العناصر، بل ينشئ ما يكفي لملء الشاشة فقط، ثم يقوم بـ 'إعادة تدويرها' أثناء التمرير. لفهم هذا، يجب أن تتقن ثلاثية المحول (Adapter): دالة لإنشاء التخطيط (onCreateViewHolder)، دالة لربط البيانات (onBindViewHolder)، ودالة لمعرفة حجم البيانات (getItemCount). ركزوا جيداً على كيفية تفاعل هذه المكونات مع بعضها، فهذا سؤال مؤكد في الامتحان وأساس لأي تطبيق أندرويد حقيقي.<p>الآن بعد أن قمنا بعرض البيانات بكفاءة، الخطوة المنطقية التالية هي جعلها تفاعلية. التعامل مع النقرات داخل RecyclerView يتطلب فهماً دقيقاً لدورة حياة ViewHolder. من خلال ربط مستمع النقرات في المكان الصحيح وتمرير الموضع الدقيق إلى النشاط الرئيسي، نضمن استجابة سريعة وتجربة مستخدم سلسة خالية من تسرب الذاكرة.</p></template>
+    <template class="content-en">Welcome to Module 6. In this module, we take our apps to a professional level. We start by learning how to politely interrupt the user to request information or confirm an action using Dialogs via the DialogFragment class. But the biggest challenge lies in displaying data. Imagine an app displaying thousands of tweets or notes; using traditional methods will crash the app due to out-of-memory errors. Enter the hero: RecyclerView. This brilliant component doesn't create thousands of items; it creates just enough to fill the screen, then 'recycles' them as you scroll. To master this, you must master the Adapter's trio: a method to create the layout (onCreateViewHolder), a method to bind data (onBindViewHolder), and a method to know the data size (getItemCount). Focus closely on how these components interact, as this is a guaranteed exam topic and the foundation of any real Android app.<p>Now that we have displayed data efficiently, the next logical step is making it interactive. Handling clicks within a RecyclerView requires a precise understanding of the ViewHolder lifecycle. By attaching the click listener in the correct place and passing the exact position back to the main activity, we ensure a fast response and a smooth, memory-leak-free user experience.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -825,6 +896,24 @@ mAdapter.notifyDataSetChanged();</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأنه يسهل عملية ترجمة التطبيق إلى لغات أخرى (Localization)، ويجعل صيانة النصوص وتغييرها في المستقبل أسهل بكثير من البحث عنها داخل مئات الأسطر البرمجية.</template>
           <template class="content-en">Because it makes translating the app into other languages (Localization) easier, and makes maintaining and changing texts in the future much easier than searching for them inside hundreds of lines of code.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتواصل المحول (Adapter) مع النشاط (Activity) لإخباره بأن المستخدم قام بالنقر على ملاحظة معينة؟</template>
+          <template class="content-en">How does the Adapter communicate with the Activity to tell it that the user clicked on a specific note?</template>
+          <span class="content-target">كيف يتواصل المحول (Adapter) مع النشاط (Activity) لإخباره بأن المستخدم قام بالنقر على ملاحظة معينة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نقوم بتمرير مرجع للنشاط (MainActivity) إلى المحول عبر مُنشئه. عندما ينقر المستخدم على عنصر، يلتقط الـ ViewHolder هذا الحدث ويستخدم المرجع لاستدعاء دالة عامة في النشاط (مثل showNote)، ممرراً لها موضع العنصر (Position) لكي يعرف النشاط أي ملاحظة يجب عرضها.</p></template>
+          <template class="content-en"><p>We pass a reference of the Activity (MainActivity) to the Adapter via its constructor. When a user clicks an item, the ViewHolder captures this event and uses the reference to call a public method in the Activity (like showNote), passing it the item's position so the Activity knows which note to display.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1092,6 +1181,40 @@ mAdapter.notifyDataSetChanged();</code></pre>
         "en": "recyclerView.setLayoutManager(new LinearLayoutManager(this));"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "أين هو المكان الأفضل لتعيين OnClickListener لعناصر RecyclerView؟",
+      "en": "Where is the best place to set an OnClickListener for RecyclerView items?"
+    },
+    "back": {
+      "definition": {
+        "ar": "داخل مُنشئ (Constructor) الفئة الداخلية ViewHolder.",
+        "en": "Inside the constructor of the inner ViewHolder class."
+      },
+      "example": {
+        "ar": "لتجنب إنشاء كائنات مستمع جديدة في كل مرة يتم فيها استدعاء onBindViewHolder.",
+        "en": "To avoid creating new listener objects every time onBindViewHolder is called."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي الدالة التي يجب استخدامها لمعرفة موضع العنصر المنقور داخل ViewHolder؟",
+      "en": "Which method should be used to find the position of the clicked item inside the ViewHolder?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دالة getAdapterPosition().",
+        "en": "The getAdapterPosition() method."
+      },
+      "example": {
+        "ar": "mMainActivity.showNote(getAdapterPosition());",
+        "en": "mMainActivity.showNote(getAdapterPosition());"
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1101,7 +1224,7 @@ mAdapter.notifyDataSetChanged();</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1117,7 +1240,7 @@ mAdapter.notifyDataSetChanged();</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1442,6 +1565,38 @@ mAdapter.notifyDataSetChanged();</code></pre>
     },
     "difficulty": "hard",
     "conceptId": "implementing-recycleradapter"
+  },
+  {
+    "conceptId": "recyclerview-item-clicks",
+    "question": {
+      "ar": "لماذا يُنصح بتعيين OnClickListener داخل مُنشئ ViewHolder بدلاً من onBindViewHolder؟",
+      "en": "Why is it recommended to set the OnClickListener inside the ViewHolder constructor instead of onBindViewHolder?"
+    },
+    "options": {
+      "ar": [
+        "لأن onBindViewHolder لا يمكنها الوصول إلى itemView.",
+        "لأن تعيينه في onBindViewHolder سيؤدي إلى إنشاء كائنات مستمع جديدة بشكل متكرر أثناء التمرير، مما يقلل الأداء.",
+        "لأن مُنشئ ViewHolder هو المكان الوحيد الذي يمكن فيه استدعاء دوال MainActivity.",
+        "لأن OnClickListener لا يعمل إلا إذا تم تعريفه قبل ربط البيانات."
+      ],
+      "en": [
+        "Because onBindViewHolder cannot access itemView.",
+        "Because setting it in onBindViewHolder will repeatedly create new listener objects during scrolling, reducing performance.",
+        "Because the ViewHolder constructor is the only place where MainActivity methods can be called.",
+        "Because OnClickListener only works if defined before data binding."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة onBindViewHolder تُستدعى لكل عنصر يظهر على الشاشة أثناء التمرير. إنشاء OnClickListener جديد في كل مرة يستهلك الذاكرة ويشغل جامع القمامة (Garbage Collector). المُنشئ يُستدعى مرة واحدة فقط لكل ViewHolder.",
+      "en": "The onBindViewHolder method is called for every item that appears on screen during scrolling. Creating a new OnClickListener every time consumes memory and triggers the Garbage Collector. The constructor is called only once per ViewHolder."
+    },
+    "hint": {
+      "ar": "فكر في عدد المرات التي تُستدعى فيها كل دالة أثناء قيام المستخدم بتمرير قائمة طويلة.",
+      "en": "Think about how many times each method is called while the user scrolls a long list."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1477,6 +1632,22 @@ mAdapter.notifyDataSetChanged();</code></pre>
     <div data-bilingual>
     <template class="content-ar">تمرير <code>true</code> كمعامل أخير في دالة <code>inflate</code> داخل <code>onCreateViewHolder</code>. يجب أن يكون دائماً <code>false</code>، لأن RecyclerView هو من يقرر متى يرفق العرض (View) بالشجرة، وليس أنت.</template>
     <template class="content-en">Passing <code>true</code> as the last parameter in the <code>inflate</code> method inside <code>onCreateViewHolder</code>. It must always be <code>false</code>, because the RecyclerView decides when to attach the View to the tree, not you.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">دائماً استخدم <code>getAdapterPosition()</code> داخل مستمع النقرات في ViewHolder لمعرفة العنصر الذي تم النقر عليه. لا تستخدم متغير <code>position</code> الخاص بدالة <code>onBindViewHolder</code> لأنه قد يصبح غير دقيق إذا تغيرت القائمة.</template>
+    <template class="content-en">Always use <code>getAdapterPosition()</code> inside the ViewHolder's click listener to know which item was clicked. Do not use the <code>position</code> variable from <code>onBindViewHolder</code> as it may become stale if the list changes.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تعيين <code>OnClickListener</code> داخل دالة <code>onBindViewHolder</code>. هذا خطأ شائع يؤدي إلى إنشاء كائنات جديدة باستمرار أثناء التمرير، مما يرهق الذاكرة (Garbage Collector). المكان الصحيح هو مُنشئ (Constructor) الـ ViewHolder.</template>
+    <template class="content-en">Setting the <code>OnClickListener</code> inside the <code>onBindViewHolder</code> method. This is a common mistake that leads to constantly creating new objects during scrolling, exhausting memory (Garbage Collector). The correct place is the ViewHolder's constructor.</template>
     <div class="content-target"></div>
     </div>
   </div>

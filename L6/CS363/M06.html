@@ -112,6 +112,16 @@
         <template class="content-en">Assignment Statements</template>
         <span class="content-target">جمل التعيين</span>
       </a>
+      <a href="#conditional-expressions" class="toc-link" data-bilingual>
+        <template class="content-ar">التعبيرات الشرطية</template>
+        <template class="content-en">Conditional Expressions</template>
+        <span class="content-target">التعبيرات الشرطية</span>
+      </a>
+      <a href="#expression-errors" class="toc-link" data-bilingual>
+        <template class="content-ar">الأخطاء في التعبيرات</template>
+        <template class="content-en">Errors in Expressions</template>
+        <span class="content-target">الأخطاء في التعبيرات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -707,6 +717,56 @@ while ((ch = getchar()) != EOF) {
 }</code></pre>
   </div>
 
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Fortran, C, Perl, C++</th><th>Java, C#</th><th>Ada</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التحويلات المسموحة ضمنياً</template>
+          <template class="content-en">Implicit Conversions Allowed</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">أي نوع رقمي إلى أي نوع رقمي (توسيع وتضييق)</template>
+          <template class="content-en">Any numeric type to any numeric type (widening and narrowing)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">التحويلات التوسيعية فقط</template>
+          <template class="content-en">Only widening coercions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يُسمح بأي تحويل ضمني (No coercion)</template>
+          <template class="content-en">No assignment coercion allowed</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">أمان البيانات (Data Safety)</template>
+          <template class="content-en">Data Safety</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفض (خطر فقدان البيانات بصمت)</template>
+          <template class="content-en">Low (risk of silent data loss)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">متوسط إلى عالي (آمن للتحويلات التوسيعية)</template>
+          <template class="content-en">Medium to High (safe for widening)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالي جداً (يتطلب تحويلاً صريحاً دائماً)</template>
+          <template class="content-en">Very High (always requires explicit casting)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">ما هو العيب الرئيسي لاستخدام التعيين كتعبير (Assignment as an Expression)؟</template>
@@ -721,14 +781,115 @@ while ((ch = getchar()) != EOF) {
   </details>
 </section>
 
+<section id="conditional-expressions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> التعبيرات الشرطية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Conditional Expressions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التعبيرات الشرطية (مثل المعامل الثلاثي <code>? :</code>) تسمح بكتابة جملة <code>if-else</code> بشكل مختصر داخل التعبير نفسه.</p></template>
+    <template class="content-en"><p>Conditional expressions (like the ternary operator <code>? :</code>) allow writing an <code>if-else</code> statement concisely within an expression itself.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في اللغات المعتمدة على C (مثل C و C++ و Java)، يُستخدم المعامل الثلاثي <code>? :</code> لإنشاء تعبيرات شرطية. على سبيل المثال، التعبير <code>average = (count == 0) ? 0 : sum / count;</code> يتم تقييمه تماماً كما لو تمت كتابته باستخدام جملة <code>if-else</code> التقليدية.</p><p>هذا يعني أنه يتم التحقق من الشرط أولاً، وبناءً عليه يتم تقييم وتنفيذ أحد الشقين فقط، مما يجعله يعمل كآلية تقييم قصير الدائرة (Short-circuit) أيضاً.</p></template>
+    <template class="content-en"><p>In C-based languages (like C, C++, and Java), the <span class="smart-term" data-term-en="Ternary Operator" data-ar="معامل ثلاثي" data-en-def="An operator that takes three arguments: a condition, a result for true, and a result for false.">ternary operator<span class="smart-term-tooltip"></span></span> <code>? :</code> is used to create conditional expressions. For example, the expression <code>average = (count == 0) ? 0 : sum / count;</code> evaluates exactly as if it were written using a traditional <code>if-else</code> statement.</p><p>This means the condition is checked first, and based on the result, only one of the two subsequent expressions is evaluated and executed, effectively acting as a short-circuit mechanism.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام التعبيرات الشرطية يجعل الكود أكثر إيجازاً، خاصة عند تعيين قيم للمتغيرات بناءً على شرط بسيط.</p><p>ومع ذلك، الإفراط في استخدامها أو تداخلها (Nesting) يمكن أن يضر بشكل كبير بمقروئية الكود، مما يجعل تتبع الأخطاء المنطقية أمراً صعباً.</p></template>
+    <template class="content-en"><p>Using conditional expressions makes the code more concise, especially when assigning values to variables based on a simple condition.</p><p>However, overusing them or nesting them can significantly harm code readability, making it difficult to track down logical errors.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Conditional expression
+average = (count == 0) ? 0 : sum / count;
+
+// Evaluates as if written as follows:
+if (count == 0)
+    average = 0;
+else
+    average = sum / count;</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر المعامل <code>? :</code> معاملًا ثلاثيًا (Ternary)؟</template>
+      <template class="content-en">Why is the <code>? :</code> operator considered a ternary operator?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه المعامل الوحيد الذي يأخذ ثلاثة معاملات (Operands): الشرط، القيمة إذا كان الشرط صحيحاً، والقيمة إذا كان الشرط خاطئاً.</p></template>
+      <template class="content-en"><p>Because it is the only operator that takes three operands: the condition, the value if true, and the value if false.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="expression-errors" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الأخطاء في التعبيرات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Errors in Expressions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تنتج أخطاء التعبيرات إما عن قيود رياضية (كالقسمة على صفر) أو قيود معمارية (كالطفف Overflow)، وغالباً ما تتجاهلها بيئة التشغيل.</p></template>
+    <template class="content-en"><p>Expression errors stem from mathematical limits (like division by zero) or architectural limits (like overflow), and are often ignored by the run-time system.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أثناء تقييم التعبيرات، قد تحدث أخطاء لسببين رئيسيين:</p><ol><li><b>القيود المتأصلة في الحساب (Inherent limitations of arithmetic):</b> مثل محاولة <span class="smart-term" data-term-en="Division by Zero" data-ar="القسمة على صفر" data-en-def="A mathematical error that occurs when the divisor in a division operation is zero.">القسمة على صفر<span class="smart-term-tooltip"></span></span> (Division by zero).</li><li><b>قيود حسابات الحاسوب (Limitations of computer arithmetic):</b> مثل الطفف (Overflow) عندما تتجاوز النتيجة السعة القصوى لنوع البيانات.</li></ol><p>من المثير للاهتمام أن العديد من أنظمة التشغيل (Run-time systems) تتجاهل هذه الأخطاء افتراضياً ولا توقف البرنامج، مما قد يؤدي إلى نتائج غير صحيحة بصمت.</p></template>
+    <template class="content-en"><p>During expression evaluation, errors can occur for two main reasons:</p><ol><li><b>Inherent limitations of arithmetic:</b> Such as attempting <span class="smart-term" data-term-en="Division by Zero" data-ar="القسمة على صفر" data-en-def="A mathematical error that occurs when the divisor in a division operation is zero.">division by zero<span class="smart-term-tooltip"></span></span>.</li><li><b>Limitations of computer arithmetic:</b> Such as <span class="smart-term" data-term-en="Overflow" data-ar="طفف / تجاوز السعة" data-en-def="An error that occurs when a calculation produces a result that is greater than the maximum representable value for a given data type.">overflow<span class="smart-term-tooltip"></span></span>, which happens when a result exceeds the maximum capacity of the data type.</li></ol><p>Interestingly, many run-time systems ignore these errors by default and do not halt the program, which can silently lead to incorrect results.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تجاهل أخطاء وقت التشغيل مثل الطفف (Overflow) في لغات مثل C يعود لأسباب تتعلق بالأداء. التحقق من كل عملية حسابية يضيف عبئاً إضافياً (Overhead) على المعالج.</p><p>لذلك، تقع مسؤولية التحقق من هذه الحالات الاستثنائية على عاتق المبرمج لضمان صحة وموثوقية البرنامج.</p></template>
+    <template class="content-en"><p>Ignoring run-time errors like overflow in languages such as C is primarily for performance reasons. Checking every single arithmetic operation adds significant overhead to the processor.</p><p>Therefore, the responsibility of checking for these exceptional cases falls on the programmer to ensure program correctness and reliability.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تقوم لغة C بإيقاف البرنامج تلقائياً عند حدوث طفف (Overflow) في الأعداد الصحيحة؟</template>
+      <template class="content-en">Why doesn't C automatically halt the program when an integer overflow occurs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن لغة C مصممة لتكون قريبة من عتاد الآلة وسريعة جداً. إضافة تعليمات للتحقق من الطفف بعد كل عملية حسابية سيبطئ التنفيذ بشكل كبير.</p></template>
+      <template class="content-en"><p>Because C is designed to be close to the hardware and extremely fast. Adding instructions to check for overflow after every arithmetic operation would significantly slow down execution.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الأسبوع السادس! هذا الأسبوع نغوص في قلب اللغات الحتمية: التعبيرات وجمل التعيين. قد تبدو التعبيرات الحسابية بسيطة، لكن خلف الكواليس، يتخذ المترجم قرارات حاسمة بناءً على قواعد الأسبقية والترابط. احذروا من 'الآثار الجانبية'؛ عندما تقوم دالة بتغيير متغير خارجي أثناء تقييم تعبير، فإن ترتيب التقييم يصبح مسألة حياة أو موت للكود الخاص بك! سنرى كيف تحل لغة Java هذه المشكلة بفرض ترتيب صارم، وكيف تتألق اللغات الوظيفية بخاصية 'الشفافية المرجعية' حيث لا توجد آثار جانبية أصلاً. سنتحدث أيضاً عن تحويلات الأنواع: التوسيع الآمن والتضييق الخطر، وكيف يمكن للتحويل الضمني (Coercion) أن يخفي أخطاءك. أخيراً، انتبهوا لفخ التقييم المختصر (Short-circuit) والتعبير الغريب <code>a &lt; b &lt; c</code> في لغة C، فهذه مواضيع كلاسيكية في الامتحانات!<p>لقد أضفنا تفاصيل هامة حول التعبيرات الشرطية وكيفية تعامل اللغات المختلفة مع أخطاء التقييم وتعيين النمط المختلط. فهم هذه الفروق الدقيقة بين لغات مثل C++ و Java و Ada أمر بالغ الأهمية، حيث أن ما يعتبر كوداً صحيحاً في لغة قد يكون خطأً فادحاً أو غير مسموح به في لغة أخرى. ركزوا على هذه الاختلافات في الامتحان.</p></template>
-    <template class="content-en">Welcome to Module 6! This week we dive into the heartbeat of imperative languages: Expressions and Assignment Statements. Arithmetic expressions might seem simple, but behind the scenes, the compiler makes critical decisions based on precedence and associativity rules. Beware of 'side effects'; when a function alters external state during evaluation, the order of operand evaluation becomes a matter of life and death for your code! We'll see how Java fixes this with strict ordering, and how functional languages shine with 'Referential Transparency' where side effects don't exist. We also cover type conversions: safe widening vs. risky narrowing, and how implicit coercion can mask bugs. Finally, watch out for the short-circuit evaluation trap and the quirky <code>a &lt; b &lt; c</code> in C—these are classic exam favorites!<p>We have added crucial details about conditional expressions and how different languages handle evaluation errors and mixed-mode assignments. Understanding these nuances between languages like C++, Java, and Ada is critical, as what is valid code in one might be a fatal error or disallowed in another. Focus on these distinctions for the exam.</p></template>
+    <template class="content-ar">أهلاً بكم في الأسبوع السادس! هذا الأسبوع نغوص في قلب اللغات الحتمية: التعبيرات وجمل التعيين. قد تبدو التعبيرات الحسابية بسيطة، لكن خلف الكواليس، يتخذ المترجم قرارات حاسمة بناءً على قواعد الأسبقية والترابط. احذروا من 'الآثار الجانبية'؛ عندما تقوم دالة بتغيير متغير خارجي أثناء تقييم تعبير، فإن ترتيب التقييم يصبح مسألة حياة أو موت للكود الخاص بك! سنرى كيف تحل لغة Java هذه المشكلة بفرض ترتيب صارم، وكيف تتألق اللغات الوظيفية بخاصية 'الشفافية المرجعية' حيث لا توجد آثار جانبية أصلاً. سنتحدث أيضاً عن تحويلات الأنواع: التوسيع الآمن والتضييق الخطر، وكيف يمكن للتحويل الضمني (Coercion) أن يخفي أخطاءك. أخيراً، انتبهوا لفخ التقييم المختصر (Short-circuit) والتعبير الغريب <code>a &lt; b &lt; c</code> في لغة C، فهذه مواضيع كلاسيكية في الامتحانات!<p>لقد أضفنا تفاصيل هامة حول التعبيرات الشرطية وكيفية تعامل اللغات المختلفة مع أخطاء التقييم وتعيين النمط المختلط. فهم هذه الفروق الدقيقة بين لغات مثل C++ و Java و Ada أمر بالغ الأهمية، حيث أن ما يعتبر كوداً صحيحاً في لغة قد يكون خطأً فادحاً أو غير مسموح به في لغة أخرى. ركزوا على هذه الاختلافات في الامتحان.</p><p>بينما نختتم استكشافنا للتعبيرات، تذكر أن المرونة التي توفرها التعبيرات الشرطية، والمخاطر الخفية لأخطاء الحساب أو تعيينات النمط المختلط، تعود جميعها إلى مقايضة أساسية في تصميم اللغات: التوازن بين راحة المبرمج، وسرعة التنفيذ، وأمان الأنواع.</p></template>
+    <template class="content-en">Welcome to Module 6! This week we dive into the heartbeat of imperative languages: Expressions and Assignment Statements. Arithmetic expressions might seem simple, but behind the scenes, the compiler makes critical decisions based on precedence and associativity rules. Beware of 'side effects'; when a function alters external state during evaluation, the order of operand evaluation becomes a matter of life and death for your code! We'll see how Java fixes this with strict ordering, and how functional languages shine with 'Referential Transparency' where side effects don't exist. We also cover type conversions: safe widening vs. risky narrowing, and how implicit coercion can mask bugs. Finally, watch out for the short-circuit evaluation trap and the quirky <code>a &lt; b &lt; c</code> in C—these are classic exam favorites!<p>We have added crucial details about conditional expressions and how different languages handle evaluation errors and mixed-mode assignments. Understanding these nuances between languages like C++, Java, and Ada is critical, as what is valid code in one might be a fatal error or disallowed in another. Focus on these distinctions for the exam.</p><p>As we wrap up our exploration of expressions, remember that the flexibility of conditional expressions, and the hidden dangers of arithmetic errors or mixed-mode assignments, all boil down to a fundamental trade-off in language design: balancing programmer convenience, execution speed, and type safety.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -920,6 +1081,41 @@ while ((ch = getchar()) != EOF) {
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>في C++، يُسمح بجميع التحويلات الضمنية (توسيع وتضييق) أثناء التعيين، مما قد يؤدي إلى فقدان البيانات. أما في Java، فيُسمح فقط بالتحويلات التوسيعية ضمنياً، ويُطلب تحويل صريح (Casting) للتحويلات التضييقية لضمان الأمان.</p></template>
           <template class="content-en"><p>In C++, all implicit conversions (widening and narrowing) are allowed during assignment, which can lead to data loss. In Java, only widening conversions are allowed implicitly, and explicit casting is required for narrowing conversions to ensure safety.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر التعبيرات الشرطية (المعامل الثلاثي) آمنة عند التعامل مع عمليات قد تسبب أخطاء مثل القسمة على صفر؟</template>
+          <template class="content-en">Why are conditional expressions (ternary operator) safe when dealing with operations that might cause errors like division by zero?</template>
+          <span class="content-target">لماذا تعتبر التعبيرات الشرطية (المعامل الثلاثي) آمنة عند التعامل مع عمليات قد تسبب أخطاء مثل القسمة على صفر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تعمل كجملة if-else وتستخدم التقييم قصير الدائرة. إذا كان الشرط يمنع القسمة على صفر (مثل <code>count == 0 ? 0 : sum / count</code>)، فإن شق القسمة لن يتم تقييمه أو تنفيذه أبداً، مما يحمي البرنامج من الانهيار.</p></template>
+          <template class="content-en"><p>Because they act as an if-else statement and utilize short-circuit evaluation. If the condition prevents division by zero (e.g., <code>count == 0 ? 0 : sum / count</code>), the division branch is never evaluated or executed, protecting the program from crashing.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعكس قواعد تعيين النمط المختلط (Mixed-mode assignment) فلسفة تصميم لغات البرمجة المختلفة؟</template>
+          <template class="content-en">How do mixed-mode assignment rules reflect the design philosophy of different programming languages?</template>
+          <span class="content-target">كيف تعكس قواعد تعيين النمط المختلط (Mixed-mode assignment) فلسفة تصميم لغات البرمجة المختلفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لغات مثل C و C++ تعطي الأولوية لمرونة المبرمج وتسمح بجميع التحويلات الضمنية، حتى لو أدت لفقدان البيانات. لغات مثل Java تفضل الأمان وتسمح فقط بالتحويلات التوسيعية ضمنياً. بينما لغة Ada تتبنى صرامة تامة وتمنع أي تحويل ضمني لتجنب الأخطاء الخفية تماماً.</p></template>
+          <template class="content-en"><p>Languages like C and C++ prioritize programmer flexibility and allow all implicit conversions, even if they cause data loss. Languages like Java prefer safety, allowing only implicit widening conversions. Ada adopts strictness, forbidding any implicit coercion to completely avoid subtle bugs.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1187,6 +1383,40 @@ while ((ch = getchar()) != EOF) {
         "en": "($a, $b) = (1, 2) in Perl."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "التعبير الشرطي (المعامل الثلاثي)",
+      "en": "Conditional Expression (Ternary Operator)"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعبير يستخدم المعامل <code>? :</code> ليعمل كجملة <code>if-else</code> مضمنة.",
+        "en": "An expression using the <code>? :</code> operator that acts as an inline <code>if-else</code> statement."
+      },
+      "example": {
+        "ar": "x = (y > 0) ? 1 : -1;",
+        "en": "x = (y > 0) ? 1 : -1;"
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "أسباب أخطاء التعبيرات (Errors in Expressions)",
+      "en": "Causes of Errors in Expressions"
+    },
+    "back": {
+      "definition": {
+        "ar": "قيود رياضية (كالقسمة على صفر) أو قيود في حسابات الحاسوب (كالطفف Overflow).",
+        "en": "Inherent mathematical limitations (like division by zero) or computer arithmetic limitations (like overflow)."
+      },
+      "example": {
+        "ar": "غالباً ما تتجاهلها بيئة التشغيل (Run-time system) لأسباب تتعلق بالأداء.",
+        "en": "Often ignored by the run-time system for performance reasons."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1196,7 +1426,7 @@ while ((ch = getchar()) != EOF) {
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1212,7 +1442,7 @@ while ((ch = getchar()) != EOF) {
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1285,21 +1515,21 @@ while ((ch = getchar()) != EOF) {
   {
     "id": 3,
     "question": {
-      "ar": "كيف يتم تقييم التعبير <code>a < b < c</code> في لغة C؟",
-      "en": "How is the expression <code>a < b < c</code> evaluated in C?"
+      "ar": "كيف يتم تقييم التعبير <code>a < b < c<\/code> في لغة C؟",
+      "en": "How is the expression <code>a < b < c<\/code> evaluated in C?"
     },
     "options": {
       "ar": [
-        "يتم تقييم <code>a < b</code> لإنتاج 0 أو 1، ثم تقارن النتيجة مع <code>c</code>.",
-        "يتم تقييمه كـ <code>(a < b) && (b < c)</code>.",
+        "يتم تقييم <code>a < b<\/code> لإنتاج 0 أو 1، ثم تقارن النتيجة مع <code>c<\/code>.",
+        "يتم تقييمه كـ <code>(a < b) && (b < c)<\/code>.",
         "يُصدر المترجم خطأ بناء (Syntax Error).",
-        "يتم تقييم <code>b < c</code> أولاً، ثم تقارن النتيجة مع <code>a</code>."
+        "يتم تقييم <code>b < c<\/code> أولاً، ثم تقارن النتيجة مع <code>a<\/code>."
       ],
       "en": [
         "The left operator is evaluated producing 0 or 1, then compared with c.",
-        "It is evaluated as <code>(a < b) && (b < c)</code>.",
+        "It is evaluated as <code>(a < b) && (b < c)<\/code>.",
         "The compiler throws a syntax error.",
-        "The right operator <code>b < c</code> is evaluated first, then compared with a."
+        "The right operator <code>b < c<\/code> is evaluated first, then compared with a."
       ]
     },
     "correctIndex": 0,
@@ -1368,12 +1598,12 @@ while ((ch = getchar()) != EOF) {
     },
     "correctIndex": 0,
     "explanation": {
-      "ar": "إذا كان التعبير يحتوي على أثر جانبي (مثل <code>b++</code>) في الجزء الذي تم تخطيه بسبب التقييم المختصر، فلن يتم تنفيذه أبداً.",
-      "en": "If an expression contains a side effect (like <code>b++</code>) in the part that is skipped due to short-circuiting, it will never be executed."
+      "ar": "إذا كان التعبير يحتوي على أثر جانبي (مثل <code>b++<\/code>) في الجزء الذي تم تخطيه بسبب التقييم المختصر، فلن يتم تنفيذه أبداً.",
+      "en": "If an expression contains a side effect (like <code>b++<\/code>) in the part that is skipped due to short-circuiting, it will never be executed."
     },
     "hint": {
-      "ar": "ماذا يحدث لـ <code>b++</code> في التعبير <code>(a > b) || (b++ / 3)</code> إذا كان الشرط الأول صحيحاً؟",
-      "en": "What happens to <code>b++</code> in <code>(a > b) || (b++ / 3)</code> if the first condition is true?"
+      "ar": "ماذا يحدث لـ <code>b++<\/code> في التعبير <code>(a > b) || (b++ / 3)<\/code> إذا كان الشرط الأول صحيحاً؟",
+      "en": "What happens to <code>b++<\/code> in <code>(a > b) || (b++ / 3)<\/code> if the first condition is true?"
     },
     "difficulty": "hard",
     "conceptId": "short-circuit-evaluation"
@@ -1381,8 +1611,8 @@ while ((ch = getchar()) != EOF) {
   {
     "id": 6,
     "question": {
-      "ar": "ما هو الغرض من المعامل <code>===</code> في JavaScript و PHP؟",
-      "en": "What is the purpose of the <code>===</code> operator in JavaScript and PHP?"
+      "ar": "ما هو الغرض من المعامل <code>===<\/code> في JavaScript و PHP؟",
+      "en": "What is the purpose of the <code>===<\/code> operator in JavaScript and PHP?"
     },
     "options": {
       "ar": [
@@ -1400,8 +1630,8 @@ while ((ch = getchar()) != EOF) {
     },
     "correctIndex": 0,
     "explanation": {
-      "ar": "المعامل <code>===</code> يقارن القيمة والنوع معاً دون محاولة تحويل نوع إلى آخر (No Coercion).",
-      "en": "The <code>===</code> operator compares both value and type without attempting to coerce one type into another."
+      "ar": "المعامل <code>===<\/code> يقارن القيمة والنوع معاً دون محاولة تحويل نوع إلى آخر (No Coercion).",
+      "en": "The <code>===<\/code> operator compares both value and type without attempting to coerce one type into another."
     },
     "hint": {
       "ar": "يُسمى معامل المساواة الصارمة.",
@@ -1537,6 +1767,70 @@ while ((ch = getchar()) != EOF) {
     },
     "difficulty": "medium",
     "conceptId": "assignment-statements"
+  },
+  {
+    "conceptId": "conditional-expressions",
+    "question": {
+      "ar": "كيف يتم تقييم التعبير الشرطي <code>average = (count == 0) ? 0 : sum / count;<\/code>؟",
+      "en": "How is the conditional expression <code>average = (count == 0) ? 0 : sum / count;<\/code> evaluated?"
+    },
+    "options": {
+      "ar": [
+        "كما لو تمت كتابته كجملة if-else، حيث يتم تقييم شق واحد فقط بناءً على الشرط.",
+        "يتم تقييم كلا الشقين (0 و sum / count) أولاً، ثم يتم اختيار أحدهما.",
+        "يُصدر المترجم خطأ لأن التعيين لا يمكن أن يحتوي على شروط.",
+        "يتم تقييمه من اليمين إلى اليسار دائماً."
+      ],
+      "en": [
+        "As if written as an if-else statement, where only one branch is evaluated based on the condition.",
+        "Both branches (0 and sum / count) are evaluated first, then one is chosen.",
+        "The compiler throws an error because assignments cannot contain conditions.",
+        "It is always evaluated strictly from right to left."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "المعامل الثلاثي <code>? :<\/code> يعمل كجملة <code>if-else<\/code>، مما يعني أنه يقيم الشرط أولاً، ثم يقيم فقط الشق الذي يتوافق مع نتيجة الشرط، متجنباً تقييم الشق الآخر (مما يمنع خطأ القسمة على صفر هنا).",
+      "en": "The ternary operator <code>? :<\/code> acts as an <code>if-else<\/code> statement, meaning it evaluates the condition first, then only evaluates the branch that matches the condition's result, avoiding the evaluation of the other branch (preventing division by zero here)."
+    },
+    "hint": {
+      "ar": "فكر في كيفية عمل جملة if-else التقليدية.",
+      "en": "Think about how a traditional if-else statement works."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "expression-errors",
+    "question": {
+      "ar": "لماذا تتجاهل العديد من أنظمة التشغيل (Run-time systems) أخطاء التعبيرات مثل الطفف (Overflow)؟",
+      "en": "Why do many run-time systems ignore expression errors like overflow?"
+    },
+    "options": {
+      "ar": [
+        "لأن التحقق من كل عملية حسابية يضيف عبئاً كبيراً ويبطئ التنفيذ.",
+        "لأن الطفف (Overflow) لا يؤثر على النتائج النهائية للبرنامج.",
+        "لأن المترجم (Compiler) يقوم بإصلاح هذه الأخطاء تلقائياً قبل التشغيل.",
+        "لأن لغات البرمجة لا تمتلك آليات للتعامل مع الأخطاء."
+      ],
+      "en": [
+        "Because checking every arithmetic operation adds significant overhead and slows down execution.",
+        "Because overflow does not affect the final results of the program.",
+        "Because the compiler automatically fixes these errors before runtime.",
+        "Because programming languages lack mechanisms to handle errors."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "لأسباب تتعلق بالأداء، تتجنب اللغات القريبة من العتاد (مثل C) إضافة تعليمات فحص بعد كل عملية حسابية، وتترك مسؤولية التحقق للمبرمج.",
+      "en": "For performance reasons, hardware-close languages (like C) avoid adding check instructions after every arithmetic operation, leaving the responsibility of validation to the programmer."
+    },
+    "hint": {
+      "ar": "السرعة مقابل الأمان.",
+      "en": "Speed versus safety."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1573,6 +1867,14 @@ while ((ch = getchar()) != EOF) {
       <template class="content-ar">الخلط بين الإكراه (Coercion) والصب (Casting). الإكراه يحدث ضمنياً بواسطة المترجم وقد يخفي الأخطاء، بينما الصب هو تحويل صريح يكتبه المبرمج ليوضح نيته.</template>
       <template class="content-en">Confusing Coercion with Casting. Coercion happens implicitly by the compiler and can hide errors, while casting is an explicit conversion written by the programmer to state intent.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن التعبير الشرطي <code>? :</code> يقيم كلا الشقين. في الواقع، هو يقيم الشرط أولاً، ثم يقيم وينفذ شقاً واحداً فقط بناءً على النتيجة، مما يجعله آمناً من الآثار الجانبية غير المقصودة في الشق الذي لم يتحقق.</template>
+    <template class="content-en">Believing that the conditional expression <code>? :</code> evaluates both branches. In reality, it evaluates the condition first, then evaluates and executes only one branch based on the result, making it safe from unintended side effects in the unexecuted branch.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -279,14 +279,47 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يتكون القفل ثنائي الطور من مرحلتين حصريتين:</p><ol><li><b>مرحلة القفل (النمو):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على عناصر البيانات المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش):</b> تقوم المعاملة بتحرير عناصر البيانات المقفلة واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: خلال مرحلة القفل، يجب ألا تبدأ مرحلة إلغاء القفل، وخلال مرحلة إلغاء القفل، يجب ألا تبدأ مرحلة القفل.</p><p>يوجد نوعان من الأقفال: قفل مشترك (Shared/Read) وقفل حصري (Exclusive/Write). يمكن تحويل الأقفال عبر الترقية (Upgrade) من قراءة لكتابة، أو التخفيض (Downgrade) من كتابة لقراءة.</p></template>
-    <template class="content-en"><p>Two-Phase Locking consists of two mutually exclusive phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: During the locking phase, the unlocking phase must not start, and during the unlocking phase, the locking phase must not begin.</p><p>There are two lock modes: Shared (Read) and Exclusive (Write). Locks can be converted via Upgrade (read to write) or Downgrade (write to read).</p></template>
+    <template class="content-ar"><p>يتكون القفل ثنائي الطور من مرحلتين حصريتين:</p><ol><li><b>مرحلة القفل (النمو):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على عناصر البيانات المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش):</b> تقوم المعاملة بتحرير عناصر البيانات المقفلة واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: خلال مرحلة القفل، يجب ألا تبدأ مرحلة إلغاء القفل، وخلال مرحلة إلغاء القفل، يجب ألا تبدأ مرحلة القفل.</p><p>يوجد نوعان من الأقفال: قفل مشترك (Shared/Read) وقفل حصري (Exclusive/Write). يمكن تحويل الأقفال عبر الترقية (Upgrade) من قراءة لكتابة، أو التخفيض (Downgrade) من كتابة لقراءة.</p><p><b>مثال عملي على التنفيذ التسلسلي:</b> بفرض القيم الأولية X=20 و Y=30.</p><ol><li><b>تنفيذ T1 ثم T2:</b> تقرأ T1 قيمة Y (30) وتضيفها إلى X لتصبح X=50. ثم تقرأ T2 قيمة X الجديدة (50) وتضيفها إلى Y لتصبح Y=80. النتيجة النهائية: X=50, Y=80.</li><li><b>تنفيذ T2 ثم T1:</b> تقرأ T2 قيمة X (20) وتضيفها إلى Y لتصبح Y=50. ثم تقرأ T1 قيمة Y الجديدة (50) وتضيفها إلى X لتصبح X=70. النتيجة النهائية: X=70, Y=50.</li></ol><p>يضمن بروتوكول 2PL أن أي تنفيذ متزامن سينتج إحدى هاتين النتيجتين الصحيحتين، ولن يسمح بتداخل يؤدي إلى نتائج غير متسقة.</p></template>
+    <template class="content-en"><p>Two-Phase Locking consists of two mutually exclusive phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: During the locking phase, the unlocking phase must not start, and during the unlocking phase, the locking phase must not begin.</p><p>There are two lock modes: Shared (Read) and Exclusive (Write). Locks can be converted via Upgrade (read to write) or Downgrade (write to read).</p><p><b>Worked Example of Serial Execution:</b> Assuming initial values X=20 and Y=30.</p><ol><li><b>T1 followed by T2:</b> T1 reads Y (30) and adds it to X, making X=50. Then T2 reads the new X (50) and adds it to Y, making Y=80. Final result: X=50, Y=80.</li><li><b>T2 followed by T1:</b> T2 reads X (20) and adds it to Y, making Y=50. Then T1 reads the new Y (50) and adds it to X, making X=70. Final result: X=70, Y=50.</li></ol><p>The 2PL protocol guarantees that any concurrent execution will yield one of these two correct serial results, preventing inconsistent interleaving.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
     <template class="content-ar"><p>يضمن بروتوكول 2PL القابلية للجدولة التسلسلية (Serializability)، لكنه لا يمنع حدوث الجمود (Deadlock).</p><p>توجد خوارزميات مختلفة لـ 2PL: الأساسي (Basic)، المحافظ (Conservative) الذي يمنع الجمود بقفل كل شيء مسبقاً، والصارم (Strict) الذي يحرر الأقفال فقط بعد الإنهاء لمنع الإجهاض المتسلسل.</p></template>
     <template class="content-en"><p>The 2PL protocol guarantees serializability, but it does not inherently prevent deadlocks.</p><p>There are variations of 2PL:</p><ul><li><strong>Basic</strong>,</li><li><strong>Conservative</strong> (prevents deadlock by locking all items before execution), and</li><li><strong>Strict</strong> (unlocks only after termination to prevent cascading aborts).</li></ul></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>read_lock(X):
+B: if LOCK(X) = "unlocked" then
+     LOCK(X) &lt;- "read-locked"
+     no_of_reads(X) &lt;- 1
+   else if LOCK(X) = "read-locked" then
+     no_of_reads(X) &lt;- no_of_reads(X) + 1
+   else
+     wait until LOCK(X) = "unlocked" and wake up
+     goto B
+
+write_lock(X):
+B: if LOCK(X) = "unlocked" then
+     LOCK(X) &lt;- "write-locked"
+   else
+     wait until LOCK(X) = "unlocked" and wake up
+     goto B
+
+unlock(X):
+if LOCK(X) = "write-locked" then
+   LOCK(X) &lt;- "unlocked"
+   wake up waiting transactions
+else if LOCK(X) = "read-locked" then
+   no_of_reads(X) &lt;- no_of_reads(X) - 1
+   if no_of_reads(X) = 0 then
+      LOCK(X) &lt;- "unlocked"
+      wake up waiting transactions</code></pre>
   </div>
 
   <!-- DIAGRAM[1]: A line graph showing the number of locks held by a transaction over time. The x-axis is Time, the y-axis is Number of Locks. The graph goes up in steps (Growing Phase), reaches a peak (Lock Point), and then goes down in steps (Shrinking Phase). Label the phases clearly in English and Arabic. Dark background #0d1117, accent color #58a6ff. -->
@@ -724,8 +757,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يحتفظ هذا النهج بعدد من الإصدارات (Versions) لعنصر البيانات (X1, X2, ..., Xn) ويخصص الإصدار الصحيح لعملية القراءة الخاصة بالمعاملة بناءً على الطوابع الزمنية.</p><ul><li><b>الميزة الرئيسية:</b> على عكس الآليات الأخرى، لا يتم رفض عملية القراءة أبداً في هذه الآلية.</li><li><b>الآثار الجانبية:</b> يتطلب مساحة تخزين أكبر بكثير (في الذاكرة والقرص) للحفاظ على الإصدارات المتعددة. يتطلب تشغيل '<span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">جمع القمامة<span class="smart-term-tooltip"></span></span>' (Garbage Collection) لحذف الإصدارات القديمة التي لم تعد مطلوبة.</li></ul><p><b>القفل ثنائي الطور متعدد الإصدارات باستخدام أقفال التصديق (Certify Locks):</b></p><p>يسمح للمعاملة T' بقراءة X بينما يتم قفله حصرياً (للكتابة) بواسطة T. يتم ذلك بالاحتفاظ بإصدارين: إصدار مؤكد (Committed) وإصدار جديد قيد التعديل. عند رغبة T في التأكيد، تطلب قفل تصديق (Certify Lock) على الإصدار الجديد.</p></template>
-    <template class="content-en"><p>This approach maintains a number of versions of a data item (X1, X2, ..., Xn) and allocates the right version to a read operation based on timestamps.</p><ul><li><b>Main Advantage:</b> Unlike other mechanisms, a read operation is never rejected.</li><li><b>Side Effects:</b> Significantly more storage (RAM and disk) is required. A <span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">garbage collection<span class="smart-term-tooltip"></span></span> process must run to check unlimited growth of versions.</li></ul><p><b>Multiversion 2PL Using <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل التصديق" data-en-def="A lock obtained just before a transaction commits to make its new version the official committed version.">Certify Lock<span class="smart-term-tooltip"></span></span>s:</b></p><p>Allows transaction T' to read X while it is write-locked by conflicting transaction T. It maintains two versions: a committed version and a new version. When T is ready to commit, it obtains a Certify Lock on the new version.</p></template>
+    <template class="content-ar"><p>يحتفظ هذا النهج بعدد من الإصدارات (Versions) لعنصر البيانات (X1, X2, ..., Xn) ويخصص الإصدار الصحيح لعملية القراءة الخاصة بالمعاملة بناءً على الطوابع الزمنية.</p><ul><li><b>الميزة الرئيسية:</b> على عكس الآليات الأخرى، لا يتم رفض عملية القراءة أبداً في هذه الآلية.</li><li><b>الآثار الجانبية:</b> يتطلب مساحة تخزين أكبر بكثير (في الذاكرة والقرص) للحفاظ على الإصدارات المتعددة. يتطلب تشغيل '<span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">جمع القمامة<span class="smart-term-tooltip"></span></span>' (Garbage Collection) لحذف الإصدارات القديمة التي لم تعد مطلوبة.</li></ul><p><b>القفل ثنائي الطور متعدد الإصدارات باستخدام أقفال التصديق (Certify Locks):</b></p><p>يسمح للمعاملة T' بقراءة X بينما يتم قفله حصرياً (للكتابة) بواسطة T. يتم ذلك بالاحتفاظ بإصدارين: إصدار مؤكد (Committed) وإصدار جديد قيد التعديل. عند رغبة T في التأكيد، تطلب قفل تصديق (Certify Lock) على الإصدار الجديد.</p><p><b>مصفوفة التوافق لأقفال التصديق (Certify Locks):</b></p><ul><li><b>قفل القراءة (Read):</b> يتوافق مع قفل القراءة وقفل الكتابة (Write)، لكنه يرفض قفل التصديق (Certify).</li><li><b>قفل الكتابة (Write):</b> يتوافق مع قفل القراءة فقط، ويرفض الكتابة والتصديق.</li><li><b>قفل التصديق (Certify):</b> حصري تماماً، لا يتوافق مع أي قفل آخر (لا قراءة ولا كتابة ولا تصديق).</li></ul></template>
+    <template class="content-en"><p>This approach maintains a number of versions of a data item (X1, X2, ..., Xn) and allocates the right version to a read operation based on timestamps.</p><ul><li><b>Main Advantage:</b> Unlike other mechanisms, a read operation is never rejected.</li><li><b>Side Effects:</b> Significantly more storage (RAM and disk) is required. A <span class="smart-term" data-term-en="Garbage Collection" data-ar="جمع القمامة" data-en-def="The process of deleting old, unneeded versions of data items to free up storage.">garbage collection<span class="smart-term-tooltip"></span></span> process must run to check unlimited growth of versions.</li></ul><p><b>Multiversion 2PL Using <span class="smart-term" data-term-en="Certify Lock" data-ar="قفل التصديق" data-en-def="A lock obtained just before a transaction commits to make its new version the official committed version.">Certify Lock<span class="smart-term-tooltip"></span></span>s:</b></p><p>Allows transaction T' to read X while it is write-locked by conflicting transaction T. It maintains two versions: a committed version and a new version. When T is ready to commit, it obtains a Certify Lock on the new version.</p><p><b>Certify Lock Compatibility Matrix:</b></p><ul><li><b>Read Lock:</b> Compatible with Read and Write locks, but incompatible with Certify locks.</li><li><b>Write Lock:</b> Compatible with Read locks only; incompatible with Write and Certify locks.</li><li><b>Certify Lock:</b> Strictly exclusive; incompatible with all other locks (Read, Write, and Certify).</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -810,8 +843,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تحدد وحدة البيانات القابلة للقفل حبيبيتها (Granularity). يمكن أن تكون خشنة (Coarse) مثل قاعدة البيانات بأكملها، أو دقيقة (Fine) مثل سجل أو حقل.</p><p>تؤثر الحبيبية بشكل كبير على الأداء: الحبيبية الخشنة تعني تزامناً منخفضاً (لأن قفل ملف يمنع الآخرين من قراءة أي سجل فيه)، بينما الحبيبية الدقيقة تعني تزامناً عالياً ولكن بعبء كبير على مدير الأقفال.</p><p><b>أقفال النوايا (Intention Locks) لإدارة التسلسل الهرمي:</b></p><ul><li><b>(IS) Intention-shared:</b> يشير إلى أنه سيتم طلب قفل مشترك على بعض العقد الفرعية.</li><li><b>(IX) Intention-exclusive:</b> يشير إلى أنه سيتم طلب قفل حصري على بعض العقد الفرعية.</li><li><b>(SIX) Shared-intention-exclusive:</b> العقدة الحالية مقفلة بشكل مشترك، ولكن سيتم طلب قفل حصري على بعض العقد الفرعية.</li></ul></template>
-    <template class="content-en"><p>A lockable unit of data defines its granularity. It can be coarse (entire database) or fine (a tuple or attribute).</p><p>Granularity significantly affects performance: coarse granularity means low concurrency, while fine granularity means high concurrency but high overhead for the lock manager.</p><p><b><span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">Intention Lock<span class="smart-term-tooltip"></span></span>s for managing hierarchy:</b></p><ul><li><b>(IS) Intention-shared:</b> Indicates a shared lock will be requested on some descendent node(s).</li><li><b>(IX) Intention-exclusive:</b> Indicates an exclusive lock will be requested on some descendent node(s).</li><li><b>(SIX) Shared-intention-exclusive:</b> Current node is locked in shared mode, but an exclusive lock will be requested on descendent node(s).</li></ul></template>
+    <template class="content-ar"><p>تحدد وحدة البيانات القابلة للقفل حبيبيتها (Granularity). يمكن أن تكون خشنة (Coarse) مثل قاعدة البيانات بأكملها، أو دقيقة (Fine) مثل سجل أو حقل.</p><p>تؤثر الحبيبية بشكل كبير على الأداء: الحبيبية الخشنة تعني تزامناً منخفضاً (لأن قفل ملف يمنع الآخرين من قراءة أي سجل فيه)، بينما الحبيبية الدقيقة تعني تزامناً عالياً ولكن بعبء كبير على مدير الأقفال.</p><p><b>أقفال النوايا (Intention Locks) لإدارة التسلسل الهرمي:</b></p><ul><li><b>(IS) Intention-shared:</b> يشير إلى أنه سيتم طلب قفل مشترك على بعض العقد الفرعية.</li><li><b>(IX) Intention-exclusive:</b> يشير إلى أنه سيتم طلب قفل حصري على بعض العقد الفرعية.</li><li><b>(SIX) Shared-intention-exclusive:</b> العقدة الحالية مقفلة بشكل مشترك، ولكن سيتم طلب قفل حصري على بعض العقد الفرعية.</li></ul><p><b><span class="smart-term" data-term-en="Compatibility Matrix" data-ar="مصفوفة التوافق" data-en-def="A table defining which lock modes can be granted simultaneously on the same data item.">مصفوفة التوافق<span class="smart-term-tooltip"></span></span> لأقفال النوايا (Compatibility Matrix):</b></p><ul><li><b>قفل IS:</b> يتوافق مع IS, IX, S, SIX.</li><li><b>قفل IX:</b> يتوافق مع IS, IX فقط.</li><li><b>قفل S:</b> يتوافق مع IS, S فقط.</li><li><b>قفل SIX:</b> يتوافق مع IS فقط.</li><li><b>قفل X:</b> لا يتوافق مع أي قفل آخر.</li></ul></template>
+    <template class="content-en"><p>A lockable unit of data defines its granularity. It can be coarse (entire database) or fine (a tuple or attribute).</p><p>Granularity significantly affects performance: coarse granularity means low concurrency, while fine granularity means high concurrency but high overhead for the lock manager.</p><p><b><span class="smart-term" data-term-en="Intention Lock" data-ar="قفل النية" data-en-def="A lock placed on a higher-level node in a hierarchy to indicate that a lock is being requested on a lower-level node.">Intention Lock<span class="smart-term-tooltip"></span></span>s for managing hierarchy:</b></p><ul><li><b>(IS) Intention-shared:</b> Indicates a shared lock will be requested on some descendent node(s).</li><li><b>(IX) Intention-exclusive:</b> Indicates an exclusive lock will be requested on some descendent node(s).</li><li><b>(SIX) Shared-intention-exclusive:</b> Current node is locked in shared mode, but an exclusive lock will be requested on descendent node(s).</li></ul><p><b>Intention Lock <span class="smart-term" data-term-en="Compatibility Matrix" data-ar="مصفوفة التوافق" data-en-def="A table defining which lock modes can be granted simultaneously on the same data item.">Compatibility Matrix<span class="smart-term-tooltip"></span></span>:</b></p><ul><li><b>IS Lock:</b> Compatible with IS, IX, S, SIX.</li><li><b>IX Lock:</b> Compatible with IS, IX only.</li><li><b>S Lock:</b> Compatible with IS, S only.</li><li><b>SIX Lock:</b> Compatible with IS only.</li><li><b>X Lock:</b> Incompatible with all other locks.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -996,8 +1029,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال قواعد البيانات في الوحدة السابعة. تخيلوا قاعدة البيانات كمدينة مزدحمة، والمعاملات هي السيارات. بدون إشارات مرور، ستحدث حوادث (تعارضات). هنا يأتي دور 'التحكم في التزامن'. أداتنا الأولى هي 'القفل ثنائي الطور' (2PL)، وهو كشرطي يطلب منك أخذ كل التصاريح (مرحلة النمو) قبل أن تبدأ بإرجاعها (مرحلة الانكماش). لكن احذروا! هذا الشرطي قد يتسبب في زحام خانق حيث تنتظر سيارتان بعضهما البعض للأبد، وهذا ما نسميه 'الجمود' (Deadlock). لحل ذلك، لدينا بدائل: 'الطوابع الزمنية' التي تعطي أولوية للأقدم، أو 'التحكم متعدد الإصدارات' الذي يحتفظ بنسخ قديمة من البيانات لكي لا نرفض طلب قراءة أبداً. وفي المدن الهادئة، نستخدم 'التحكم المتفائل'، حيث نفترض عدم وجود حوادث ونتحقق فقط في النهاية. ركزوا جيداً على الفرق بين أنواع 2PL (خاصة الصارم) وكيفية اكتشاف الجمود، فهذه مواضيع مفضلة في الامتحانات!</template>
-    <template class="content-en">Welcome, database champions, to Module 7. Imagine the database as a busy city and transactions as cars. Without traffic lights, collisions (conflicts) happen. Enter 'Concurrency Control'. Our first tool is Two-Phase Locking (2PL), like a cop requiring you to get all permits (growing phase) before returning any (shrinking phase). But beware! This can cause a gridlock where two cars wait for each other forever—a 'Deadlock'. To fix this, we have alternatives: 'Timestamps' that prioritize older transactions, or 'Multiversion' control that keeps old copies so reads are never rejected. In quiet towns, we use 'Optimistic Control', assuming no crashes and only checking at the end. Focus heavily on the differences between 2PL variations (especially Strict) and deadlock detection—these are absolute exam favorites!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال قواعد البيانات في الوحدة السابعة. تخيلوا قاعدة البيانات كمدينة مزدحمة، والمعاملات هي السيارات. بدون إشارات مرور، ستحدث حوادث (تعارضات). هنا يأتي دور 'التحكم في التزامن'. أداتنا الأولى هي 'القفل ثنائي الطور' (2PL)، وهو كشرطي يطلب منك أخذ كل التصاريح (مرحلة النمو) قبل أن تبدأ بإرجاعها (مرحلة الانكماش). لكن احذروا! هذا الشرطي قد يتسبب في زحام خانق حيث تنتظر سيارتان بعضهما البعض للأبد، وهذا ما نسميه 'الجمود' (Deadlock). لحل ذلك، لدينا بدائل: 'الطوابع الزمنية' التي تعطي أولوية للأقدم، أو 'التحكم متعدد الإصدارات' الذي يحتفظ بنسخ قديمة من البيانات لكي لا نرفض طلب قراءة أبداً. وفي المدن الهادئة، نستخدم 'التحكم المتفائل'، حيث نفترض عدم وجود حوادث ونتحقق فقط في النهاية. ركزوا جيداً على الفرق بين أنواع 2PL (خاصة الصارم) وكيفية اكتشاف الجمود، فهذه مواضيع مفضلة في الامتحانات!<p>بينما نختتم دراستنا للتحكم في التزامن، تذكر أن الهدف دائماً هو الموازنة بين سلامة البيانات وأداء النظام. سواء كنت تستخدم الأقفال الصارمة، أو التحقق المتفائل، أو الإصدارات المتعددة، فأنت تدير مقايضة (Trade-off). إن إتقان حبيبية الأقفال ومصفوفات التوافق هو ما يميز مهندس قواعد البيانات الخبير عن المبتدئ.</p></template>
+    <template class="content-en">Welcome, database champions, to Module 7. Imagine the database as a busy city and transactions as cars. Without traffic lights, collisions (conflicts) happen. Enter 'Concurrency Control'. Our first tool is Two-Phase Locking (2PL), like a cop requiring you to get all permits (growing phase) before returning any (shrinking phase). But beware! This can cause a gridlock where two cars wait for each other forever—a 'Deadlock'. To fix this, we have alternatives: 'Timestamps' that prioritize older transactions, or 'Multiversion' control that keeps old copies so reads are never rejected. In quiet towns, we use 'Optimistic Control', assuming no crashes and only checking at the end. Focus heavily on the differences between 2PL variations (especially Strict) and deadlock detection—these are absolute exam favorites!<p>As we conclude concurrency control, remember that the goal is always balancing data integrity with system performance. Whether you use strict locks, optimistic validation, or multiversioning, you are managing a trade-off. Mastering lock granularities and compatibility matrices is what separates an expert database architect from a novice.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1171,6 +1204,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تمنع المعاملات من قفل عنصر كبير (مثل ملف) إذا كان هناك عنصر صغير داخله (مثل سجل) مقفل بالفعل. قفل النية يعمل كعلامة تحذير على الباب الخارجي توفر عناء تفتيش كل الغرف بالداخل.</template>
           <template class="content-en">They prevent transactions from locking a large item (like a file) if a small item inside it (like a record) is already locked. An intention lock acts as a warning sign on the front door, saving the effort of checking every room inside.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تسمح مصفوفة التوافق بوجود قفلي IX على نفس العقدة (مثل جدول) في نفس الوقت؟ ألا يسبب ذلك تعارضاً؟</template>
+          <template class="content-en">Why does the compatibility matrix allow two IX locks on the same node (like a table) at the same time? Doesn't that cause a conflict?</template>
+          <span class="content-target">لماذا تسمح مصفوفة التوافق بوجود قفلي IX على نفس العقدة (مثل جدول) في نفس الوقت؟ ألا يسبب ذلك تعارضاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لا يسبب تعارضاً في هذا المستوى. قفل IX (النية الحصرية) يعني فقط أن المعاملة 'تنوي' قفل عنصر فرعي (مثل سجل معين) حصرياً. يمكن لمعاملتين أن تنويا الكتابة في نفس الجدول، طالما أنهما سيكتبان في سجلات مختلفة. التعارض الحقيقي سيتم التحقق منه عند محاولة قفل السجلات نفسها بوضع X.</p></template>
+          <template class="content-en"><p>It doesn't cause a conflict at this level. An IX (Intention-Exclusive) lock merely means the transaction 'intends' to exclusively lock a child item (like a specific record). Two transactions can intend to write to the same table, as long as they target different records. The actual conflict is checked when they try to place X locks on the specific records.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1523,6 +1574,40 @@
         "en": "Placing an IS lock on a file before reading a record inside it."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في مصفوفة توافق أقفال النوايا، ما هي الأقفال التي تتوافق مع قفل النية الحصرية (IX)؟",
+      "en": "In the Intention Lock compatibility matrix, which locks are compatible with an Intention-Exclusive (IX) lock?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتوافق قفل IX فقط مع قفل النية المشتركة (IS) وقفل النية الحصرية (IX) الآخر.",
+        "en": "An IX lock is only compatible with an Intention-Shared (IS) lock and another Intention-Exclusive (IX) lock."
+      },
+      "example": {
+        "ar": "لا يتوافق مع S أو SIX أو X.",
+        "en": "It is not compatible with S, SIX, or X locks."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "في 2PL متعدد الإصدارات، هل يتوافق قفل القراءة مع قفل الكتابة؟ ولماذا؟",
+      "en": "In Multiversion 2PL, is a Read lock compatible with a Write lock? Why?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نعم، يتوافقان. لأن عملية القراءة تقرأ الإصدار القديم المؤكد، بينما تقوم عملية الكتابة بإنشاء إصدار جديد منفصل.",
+        "en": "Yes, they are compatible. Because the read operation reads the old committed version, while the write operation creates a separate new version."
+      },
+      "example": {
+        "ar": "هذا ما يمنع عمليات القراءة من التأخير بسبب عمليات الكتابة.",
+        "en": "This is what prevents read operations from being delayed by write operations."
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -1532,7 +1617,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 10</span>
+            <span id="quiz-counter">1 / 11</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1548,7 +1633,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 10</div>
+          <div class="score-display" id="quiz-score-display">0 / 11</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1873,6 +1958,38 @@
     },
     "difficulty": "hard",
     "conceptId": "deadlock-and-starvation"
+  },
+  {
+    "conceptId": "lock-granularity",
+    "question": {
+      "ar": "وفقاً لمصفوفة توافق أقفال النوايا، أي من الأقفال التالية يتوافق مع قفل SIX (النية المشتركة الحصرية)؟",
+      "en": "According to the Intention Lock compatibility matrix, which of the following locks is compatible with a SIX (Shared-Intention-Exclusive) lock?"
+    },
+    "options": {
+      "ar": [
+        "قفل IS (نية مشتركة)",
+        "قفل IX (نية حصرية)",
+        "قفل S (مشترك)",
+        "قفل X (حصري)"
+      ],
+      "en": [
+        "IS (Intention-Shared) lock",
+        "IX (Intention-Exclusive) lock",
+        "S (Shared) lock",
+        "X (Exclusive) lock"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "قفل SIX صارم جداً ولا يتوافق إلا مع قفل IS. لا يمكن لمعاملة أخرى أن تنوي الكتابة (IX) أو تقرأ بالكامل (S) بينما توجد معاملة تحمل قفل SIX.",
+      "en": "A SIX lock is quite restrictive and is only compatible with an IS lock. No other transaction can intend to write (IX) or fully read (S) while a SIX lock is held."
+    },
+    "hint": {
+      "ar": "تذكر أن SIX يجمع بين S و IX، لذا فهو يرفض معظم الأقفال الأخرى.",
+      "en": "Remember that SIX combines S and IX, so it rejects most other locks."
+    },
+    "difficulty": "hard",
+    "id": 11
   }
 ]
 </script>
@@ -1916,6 +2033,14 @@
     <div data-bilingual>
     <template class="content-ar">أقفال النوايا (Intention Locks) لا تقفل البيانات فعلياً، بل تعمل كـ 'علامات تحذير' على المستويات العليا من الشجرة لتسريع عملية التحقق من الأقفال في المستويات السفلى.</template>
     <template class="content-en">Intention Locks do not actually lock the data; they act as 'warning signs' at higher levels of the tree to speed up lock checking at lower levels.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قد تعتقد أن قفلين من نوع النية الحصرية (IX) يتعارضان على نفس العقدة. هذا خطأ! يمكن لمعاملتين وضع قفل IX على نفس الجدول، لأنهما قد تنويان قفل صفوف (سجلات) *مختلفة* حصرياً داخل هذا الجدول.</template>
+    <template class="content-en">You might think two Intention-Exclusive (IX) locks conflict on the same node. They don't! Two transactions can hold IX locks on the same table because they might intend to exclusively lock *different* rows inside that table.</template>
     <div class="content-target"></div>
     </div>
   </div>

@@ -123,6 +123,11 @@
         <template class="content-en">OS Interaction &amp; Least Privilege</template>
         <span class="content-target">التفاعل مع نظام التشغيل وأقل الصلاحيات</span>
       </a>
+      <a href="#program-interaction-and-output" class="toc-link" data-bilingual>
+        <template class="content-ar">التفاعل مع البرامج الأخرى ومعالجة المخرجات</template>
+        <template class="content-en">Other Program Interaction &amp; Handling Output</template>
+        <span class="content-target">التفاعل مع البرامج الأخرى ومعالجة المخرجات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -244,6 +249,26 @@
     <template class="content-ar"><p>لماذا لا تزال هذه المشكلة موجودة رغم معرفتنا بها؟ يعود ذلك إلى وجود كميات هائلة من الأكواد القديمة (Legacy Code) المكتوبة بلغات غير آمنة مثل C/C++، بالإضافة إلى ممارسات البرمجة السيئة.</p><p>اللغات الحديثة عالية المستوى (مثل Java أو Python) تمتلك آليات قوية للتحقق من الأنواع والحدود، مما يجعلها محصنة ضد هذا النوع من الهجمات، ولكنها قد تستهلك موارد أكثر (Overhead).</p><p>تاريخياً، تم استخدام هذه الثغرة في هجمات شهيرة جداً مثل دودة موريس (1988)، و Code Red (2001)، و Slammer (2003).</p></template>
     <template class="content-en"><p>Why is this still a concern despite knowing prevention techniques? It is largely due to the massive amount of legacy code written in unsafe languages like C/C++ deployed in OS and software tools, combined with poor programming practices.</p><p>Modern high-level programming languages have a strong notion of type and valid operations, making them generally not vulnerable to buffer overflows, though this incurs some performance overhead.</p><p>Historically, this mechanism was widely used by notorious malware such as the Morris Worm (1988), Code Red (2001), and Slammer (2003).</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>int main(int argc, char *argv[]) {
+    int valid = 0;
+    char str1[8];
+    char str2[8];
+    
+    next_tag(str1);
+    gets(str2); // Vulnerable function: no bounds checking
+    
+    if (strncmp(str1, str2, 8) == 0)
+        valid = 1;
+        
+    printf("buffer1: str1(%s), str2(%s), valid(%d)\n", str1, str2, valid);
+}</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -655,6 +680,22 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>PHP</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Vulnerable PHP code
+$name = $_REQUEST['name'];
+$query = "SELECT * FROM suppliers WHERE name = '" . $name . "';";
+$result = mysql_query($query);
+
+// Safer PHP code using escaping (though parameterized queries are best)
+$name = $_REQUEST['name'];
+$query = "SELECT * FROM suppliers WHERE name = '" . mysql_real_escape_string($name) . "';";
+$result = mysql_query($query);</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">كيف يختلف حقن الكود (Code Injection) عن حقن الأوامر (Command Injection)؟</template>
@@ -888,8 +929,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><b>الاستخدام الصحيح للذاكرة:</b> تخصيص الذاكرة الديناميكية يُستخدم لمعالجة البيانات غير المعروفة (يتم تخصيصها عند الحاجة، وتحريرها عند الانتهاء). الفشل في تحريرها يؤدي إلى '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">تسرب الذاكرة<span class="smart-term-tooltip"></span></span>' (Memory Leak). في اللغات القديمة (C/C++)، يضمن المبرمج التخصيص والتحرير الصحيحين، بينما تتعامل اللغات الحديثة مع ذلك تلقائياً.</p><p><b>حالات السباق في الذاكرة المشتركة (Race Conditions):</b> تحدث عندما تصل خيوط/عمليات متعددة إلى بيانات أو ذاكرة مشتركة. يؤدي ذلك إلى تلف أو فقدان التغييرات بسبب التداخل ما لم تتم مزامنة الوصول. يجب استخدام أساسيات المزامنة المناسبة (Synchronization Primitives)، مع الانتباه لمشكلة 'الجمود' (Deadlock).</p><p><b>الملفات المؤقتة الآمنة:</b> تستخدم العديد من البرامج ملفات مؤقتة في منطقة نظام مشتركة. يجب أن تكون فريدة ولا يصل إليها الآخرون. استخدام معرف العملية (Process ID) لإنشاء الاسم يجعله فريداً ولكنه 'يمكن التنبؤ به'، مما يسمح للمهاجم بتخمينه وإنشاء ملفه الخاص قبل البرنامج. يجب استخدام أسماء عشوائية وأذونات صحيحة.</p></template>
-    <template class="content-en"><p><b>Correct Use of Memory:</b> Dynamic memory allocation is used to manipulate unknown data (allocated upon need, released when done). Incorrect release causes a '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">Memory Leak<span class="smart-term-tooltip"></span></span>'. In older languages (C/C++), the programmer ensures correct allocation and release, whereas modern languages handle this automatically.</p><p><b><span class="smart-term" data-term-en="Race Condition" data-ar="حالة السباق" data-en-def="A flaw that occurs when the timing or ordering of events affects a program&#x27;s correctness, often in multi-threaded or multi-process environments.">Race Condition<span class="smart-term-tooltip"></span></span>s in Shared Memory:</b> Occur when multiple threads/processes access shared data/memory. This leads to corruption or loss of changes due to overlapping accesses unless access is synchronized. Suitable synchronization primitives must be used, though this introduces the risk of access deadlocks.</p><p><b>Safe Temporary Files:</b> Many programs use temporary files in a shared system area. They must be unique and not accessed by others. Creating a name using the Process ID is unique but predictable. An attacker might guess it and attempt to create their own file between the program checking and creating it. Secure temp files need random names and correct permissions.</p></template>
+    <template class="content-ar"><p><b>الاستخدام الصحيح للذاكرة:</b> تخصيص الذاكرة الديناميكية يُستخدم لمعالجة البيانات غير المعروفة (يتم تخصيصها عند الحاجة، وتحريرها عند الانتهاء). الفشل في تحريرها يؤدي إلى '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">تسرب الذاكرة<span class="smart-term-tooltip"></span></span>' (Memory Leak). في اللغات القديمة (C/C++)، يضمن المبرمج التخصيص والتحرير الصحيحين، بينما تتعامل اللغات الحديثة مع ذلك تلقائياً.</p><p><b>حالات السباق في الذاكرة المشتركة (Race Conditions):</b> تحدث عندما تصل خيوط/عمليات متعددة إلى بيانات أو ذاكرة مشتركة. يؤدي ذلك إلى تلف أو فقدان التغييرات بسبب التداخل ما لم تتم مزامنة الوصول. يجب استخدام أساسيات المزامنة المناسبة (Synchronization Primitives)، مع الانتباه لمشكلة 'الجمود' (Deadlock).</p><p><b>الملفات المؤقتة الآمنة:</b> تستخدم العديد من البرامج ملفات مؤقتة في منطقة نظام مشتركة. يجب أن تكون فريدة ولا يصل إليها الآخرون. استخدام معرف العملية (Process ID) لإنشاء الاسم يجعله فريداً ولكنه 'يمكن التنبؤ به'، مما يسمح للمهاجم بتخمينه وإنشاء ملفه الخاص قبل البرنامج. يجب استخدام أسماء عشوائية وأذونات صحيحة.</p><p>لمنع حالات السباق عند الوصول إلى الملفات المشتركة، يجب استخدام آليات مزامنة مناسبة. تشمل البدائل الرئيسية ما يلي:</p><ol><li><b>ملف القفل (Lockfile):</b> إنشاء ملف منفصل للإشارة إلى وجود قفل. يعتمد هذا على عمليات الإنشاء/التحقق الذرية (Atomic) ويعتبر قفلاً استشارياً.</li><li><b>قفل الملف الاستشاري (Advisory file lock):</b> باستخدام استدعاءات النظام مثل <code>flock</code>. يجب أن تتعاون البرامج الأخرى وتتحقق من هذا القفل؛ حيث يمكن للبرامج الخبيثة تجاهله ببساطة.</li><li><b>قفل الملف الإلزامي (Mandatory file lock):</b> باستخدام استدعاءات النظام مثل <code>fcntl</code>. يفرض نظام التشغيل هذا القفل، مما يمنع أي عملية أخرى من الوصول إلى الملف حتى يتم تحريره، ولكنه يتطلب تحريراً دقيقاً لمنع الجمود.</li></ol></template>
+    <template class="content-en"><p><b>Correct Use of Memory:</b> Dynamic memory allocation is used to manipulate unknown data (allocated upon need, released when done). Incorrect release causes a '<span class="smart-term" data-term-en="Memory Leak" data-ar="تسرب الذاكرة" data-en-def="A type of resource leak that occurs when a computer program incorrectly manages memory allocations in a way that memory which is no longer needed is not released.">Memory Leak<span class="smart-term-tooltip"></span></span>'. In older languages (C/C++), the programmer ensures correct allocation and release, whereas modern languages handle this automatically.</p><p><b><span class="smart-term" data-term-en="Race Condition" data-ar="حالة السباق" data-en-def="A flaw that occurs when the timing or ordering of events affects a program&#x27;s correctness, often in multi-threaded or multi-process environments.">Race Condition<span class="smart-term-tooltip"></span></span>s in Shared Memory:</b> Occur when multiple threads/processes access shared data/memory. This leads to corruption or loss of changes due to overlapping accesses unless access is synchronized. Suitable synchronization primitives must be used, though this introduces the risk of access deadlocks.</p><p><b>Safe Temporary Files:</b> Many programs use temporary files in a shared system area. They must be unique and not accessed by others. Creating a name using the Process ID is unique but predictable. An attacker might guess it and attempt to create their own file between the program checking and creating it. Secure temp files need random names and correct permissions.</p><p>To prevent race conditions when accessing shared files, suitable synchronization mechanisms are required. The main alternatives include:</p><ol><li><b>Lockfile:</b> Creating a separate file to indicate a lock. This relies on atomic create/check operations and acts as an <span class="smart-term" data-term-en="Advisory Lock" data-ar="قفل استشاري" data-en-def="A file locking mechanism that requires cooperating processes to explicitly check for the lock before accessing the file.">advisory lock<span class="smart-term-tooltip"></span></span>.</li><li><b>Advisory file lock:</b> Using system calls like <code>flock</code>. Other programs must cooperatively check for this lock; malicious programs can simply ignore it.</li><li><b>Mandatory file lock:</b> Using system calls like <code>fcntl</code>. The OS enforces this lock, preventing any other process from accessing the file until it is released, but it requires careful release to avoid deadlocks.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -897,6 +938,63 @@
     <template class="content-en"><p>Race conditions often manifest as TOCTOU (Time of Check to Time of Use) vulnerabilities. A program checks a condition (e.g., does this file exist?), but before it uses the file, an attacker alters the state (e.g., replaces the file with a symlink to a sensitive system file).</p><p>Memory leaks might not directly lead to arbitrary code execution, but they are frequently exploited in Denial of Service (DoS) attacks to exhaust system resources and crash the application.</p><p>File locking mechanisms vary between OSs. Using an 'Advisory Lock' means other programs must cooperatively check for the lock; malicious programs can simply ignore advisory locks and access the file anyway.</p></template>
     <div class="content-target"></div>
   </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Advisory Lock</th><th>Mandatory Lock</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">آلية التنفيذ</template>
+          <template class="content-en">Enforcement Mechanism</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يعتمد على تعاون البرامج الأخرى للتحقق من القفل.</template>
+          <template class="content-en">Relies on the cooperation of other programs to check for the lock.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">يفرضه نظام التشغيل بقوة على جميع العمليات.</template>
+          <template class="content-en">Strictly enforced by the Operating System on all processes.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">تجاوز القفل</template>
+          <template class="content-en">Lock Bypass</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">يمكن للبرامج الخبيثة تجاهله والوصول إلى الملف.</template>
+          <template class="content-en">Malicious programs can ignore it and access the file.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">لا يمكن تجاوزه؛ سيتم حظر أي عملية تحاول الوصول.</template>
+          <template class="content-en">Cannot be bypassed; any process attempting access will be blocked.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">خطر الجمود (Deadlock)</template>
+          <template class="content-en">Deadlock Risk</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أقل خطورة، حيث يمكن للعمليات الأخرى تجاوز القفل إذا لزم الأمر.</template>
+          <template class="content-en">Lower risk, as other processes can bypass the lock if necessary.</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">خطر أعلى؛ يتطلب تحريراً دقيقاً لتجنب تجميد النظام.</template>
+          <template class="content-en">Higher risk; requires careful release to avoid freezing the system.</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <details class="thinking-question">
     <summary data-bilingual>
@@ -955,14 +1053,73 @@
   </details>
 </section>
 
+<section id="program-interaction-and-output" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> التفاعل مع البرامج الأخرى ومعالجة المخرجات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Other Program Interaction &amp; Handling Output</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتفاعل البرامج غالباً مع برامج أخرى وتنتج مخرجات. يجب تأمين هذه التفاعلات (مثل استخدام IPSec أو TLS) والتأكد من أن المخرجات لا تحتوي على أكواد خبيثة تستهدف أجهزة العرض (مثل اختطاف المحطة الطرفية).</p></template>
+    <template class="content-en"><p>Programs often interact with other programs and generate output. These interactions must be secured (e.g., using IPSec or TLS), and output must be sanitized to prevent attacks targeting display devices (like terminal hijacking).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التفاعل مع البرامج الأخرى:</b> قد تستخدم البرامج خدمات برامج أخرى. يجب التحقق من الافتراضات حول البيانات المتبادلة. لضمان سرية وسلامة البيانات، استخدم الأنابيب (Pipes) أو الملفات المؤقتة داخل نفس النظام، واستخدم بروتوكولات مثل IPSec أو TLS/SSL أو SSH عبر الشبكة.</p><p><b>معالجة مخرجات البرنامج:</b> يجب أن تتوافق المخرجات مع الشكل أو التفسير المتوقع. إذا تم عرض المخرجات على محطة طرفية (Terminal)، يجب أن تستخدم مجموعة الأحرف المتوقعة. يمكن للمهاجمين استغلال المخرجات غير المصفاة لإرسال تسلسلات هروب (Escape Sequences) للتحكم في المحطة الطرفية (X terminal hijack).</p><p><b>التمزيق الآمن للملفات (Secure File Shredder):</b> مثال على المعالجة الآمنة هو حذف الملفات. الحذف العادي يزيل المؤشر فقط ويبقي البيانات على القرص. التمزيق الآمن يكتب أنماطاً متعددة فوق محتويات الملف قبل حذفه لضمان عدم إمكانية استعادته.</p></template>
+    <template class="content-en"><p><b>Other Program Interaction:</b> Programs may use the services of other programs. Assumptions about exchanged data must be verified. For data confidentiality and integrity, use pipes or temp files within the same system, and protocols like IPSec, TLS/SSL, or SSH across networks.</p><p><b>Handling Program Output:</b> Output must conform to the expected form or interpretation. If output is displayed on a terminal, it must use the expected character set. Attackers can exploit unfiltered output to send <span class="smart-term" data-term-en="Escape Sequence" data-ar="تسلسل الهروب" data-en-def="A sequence of characters used to change the state of a terminal or display device, which can be exploited if output is not sanitized.">escape sequence<span class="smart-term-tooltip"></span></span>s that control the terminal (e.g., VT100 escape sequences, X terminal hijack).</p><p><b>Secure File Shredder:</b> A practical example of safe handling is file deletion. Normal deletion only removes the pointer, leaving data on the disk. A secure shredder overwrites the file contents with multiple patterns before deletion to ensure it cannot be recovered.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في خوارزمية التمزيق الآمن للملفات، لا يكفي مجرد الكتابة فوق الملف. تستخدم أنظمة التشغيل والتطبيقات مخازن مؤقتة للكتابة (Write Buffers) لتحسين الأداء.</p><p>إذا قمت بالكتابة فوق الملف ثم حذفه فوراً، قد يتم حذف الملف قبل أن يتم تفريغ المخازن المؤقتة فعلياً إلى القرص الصلب، مما يترك البيانات الأصلية سليمة.</p><p>لذلك، تتطلب الخوارزمية الأفضل تفريغ مخازن التطبيق (Flush) ثم مزامنة مخازن نظام التشغيل مع الجهاز المادي (باستخدام أمر <code>sync</code>) بعد كل نمط كتابة، لضمان تدمير البيانات المغناطيسية فعلياً.</p></template>
+    <template class="content-en"><p>In a secure <span class="smart-term" data-term-en="File Shredding" data-ar="تمزيق الملفات" data-en-def="The process of securely deleting a computer file by overwriting its data multiple times with specific patterns so it cannot be recovered.">file shredding<span class="smart-term-tooltip"></span></span> algorithm, simply overwriting the file is not enough. Operating systems and applications use write buffers to optimize performance.</p><p>If you overwrite a file and immediately delete it, the file might be removed before the buffers are actually flushed to the physical disk, leaving the original data intact.</p><p>Therefore, a better algorithm requires flushing application buffers and then syncing the OS file system write buffers with the physical device (using the <code>sync</code> command) after each pattern write, ensuring the magnetic data is actually destroyed.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>patterns = [10101010, 01010101, 11001100, 00110011, 00000000, 11111111, ...]
+open file for update
+for each pattern
+    seek to start of file
+    overwrite file contents with pattern
+    flush application write buffers
+    sync file system write buffers with device
+close file
+remove file</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر تسلسلات الهروب (Escape Sequences) في المخرجات خطراً أمنياً؟</template>
+      <template class="content-en">Why are Escape Sequences in output considered a security risk?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المحطات الطرفية (Terminals) تفسر هذه التسلسلات كأوامر (مثل تغيير الألوان أو إعادة تعيين الشاشة). يمكن للمهاجم إدراج تسلسلات خبيثة في المخرجات لإعادة برمجة مفاتيح لوحة المفاتيح الخاصة بالمستخدم أو تنفيذ أوامر مخفية (اختطاف المحطة الطرفية).</p></template>
+      <template class="content-en"><p>Because terminals interpret these sequences as commands (like changing colors or resetting the screen). An attacker can inject malicious sequences into the output to reprogram the user's keyboard keys or execute hidden commands (terminal hijacking).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أنكم تبنون قلعة؛ تجاوز سعة المخزن المؤقت هو كمن يسكب الماء بقوة حتى يفيض الخندق ويدمر الجدران الداخلية. لقد رأينا كيف استغلت دودة موريس هذا الخطأ البسيط في لغة C للسيطرة على الأنظمة. تذكروا دائماً: المكدس (Stack) يحتوي على 'عنوان العودة'، وهو الهدف الذهبي للمهاجمين لتوجيه البرنامج نحو كودهم الخبيث (Shellcode). لحسن الحظ، لدينا دروع مثل Stackguard و ASLR، لكن المهاجمين أذكياء، فابتكروا هجمات Return-to-libc لتجاوزها. الجزء الثاني من رحلتنا يركز على 'البرمجة الدفاعية'. القاعدة الذهبية هنا: لا تثق بأي مدخلات! سواء كان حقن SQL، أو XSS، أو التلاعب بمتغير PATH، كلها تنبع من افتراضات خاطئة حول سلامة البيانات. للامتحان، ركزوا جيداً على الفرق بين دفاعات وقت الترجمة ووقت التشغيل، وافهموا لماذا يعتبر التوحيد القياسي (Canonicalization) والقائمة البيضاء (Allowlisting) أفضل أصدقائكم في التحقق من المدخلات. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this critical module. Imagine building a fortress; a buffer overflow is like pouring water so forcefully that it overflows the moat and destroys the inner walls. We saw how the Morris Worm exploited this simple C language flaw to take over systems. Always remember: the Stack contains the 'Return Address', the golden target for attackers to redirect the program to their malicious 'Shellcode'. Fortunately, we have shields like Stackguard and ASLR, but attackers are smart, inventing Return-to-libc to bypass them. The second part of our journey focuses on 'Defensive Programming'. The golden rule: Trust NO input! Whether it's SQL Injection, XSS, or PATH manipulation, they all stem from false assumptions about data safety. For the exam, focus heavily on the difference between compile-time and run-time defenses, and understand why Canonicalization and Allowlisting are your best friends in input validation. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أنكم تبنون قلعة؛ تجاوز سعة المخزن المؤقت هو كمن يسكب الماء بقوة حتى يفيض الخندق ويدمر الجدران الداخلية. لقد رأينا كيف استغلت دودة موريس هذا الخطأ البسيط في لغة C للسيطرة على الأنظمة. تذكروا دائماً: المكدس (Stack) يحتوي على 'عنوان العودة'، وهو الهدف الذهبي للمهاجمين لتوجيه البرنامج نحو كودهم الخبيث (Shellcode). لحسن الحظ، لدينا دروع مثل Stackguard و ASLR، لكن المهاجمين أذكياء، فابتكروا هجمات Return-to-libc لتجاوزها. الجزء الثاني من رحلتنا يركز على 'البرمجة الدفاعية'. القاعدة الذهبية هنا: لا تثق بأي مدخلات! سواء كان حقن SQL، أو XSS، أو التلاعب بمتغير PATH، كلها تنبع من افتراضات خاطئة حول سلامة البيانات. للامتحان، ركزوا جيداً على الفرق بين دفاعات وقت الترجمة ووقت التشغيل، وافهموا لماذا يعتبر التوحيد القياسي (Canonicalization) والقائمة البيضاء (Allowlisting) أفضل أصدقائكم في التحقق من المدخلات. بالتوفيق!<p>أخيراً، تذكر أن أمان البرنامج لا يقتصر على مدخلاته فقط، بل يمتد إلى كيفية تفاعله مع البرامج الأخرى وكيفية تعامله مع المخرجات. من تأمين الاتصالات عبر الشبكة إلى التمزيق الآمن للملفات لمنع استعادة البيانات، يجب أن تتبنى عقلية دفاعية شاملة تغطي دورة حياة البيانات بالكامل.</p></template>
+    <template class="content-en">Welcome, my friends, to this critical module. Imagine building a fortress; a buffer overflow is like pouring water so forcefully that it overflows the moat and destroys the inner walls. We saw how the Morris Worm exploited this simple C language flaw to take over systems. Always remember: the Stack contains the 'Return Address', the golden target for attackers to redirect the program to their malicious 'Shellcode'. Fortunately, we have shields like Stackguard and ASLR, but attackers are smart, inventing Return-to-libc to bypass them. The second part of our journey focuses on 'Defensive Programming'. The golden rule: Trust NO input! Whether it's SQL Injection, XSS, or PATH manipulation, they all stem from false assumptions about data safety. For the exam, focus heavily on the difference between compile-time and run-time defenses, and understand why Canonicalization and Allowlisting are your best friends in input validation. Good luck!<p>Finally, remember that a program's security isn't limited to its inputs; it extends to how it interacts with other programs and handles outputs. From securing network communications to securely shredding files to prevent data recovery, you must adopt a holistic defensive mindset that covers the entire data lifecycle.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1136,6 +1293,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">الدفاع الأساسي هو 'ترميز المخرجات' (Output Encoding)، حيث يتم تحويل الأحرف الخاصة (مثل < و >) إلى كيانات HTML آمنة قبل عرضها، مما يمنع المتصفح من تنفيذها ككود برمجي.</template>
           <template class="content-en">The primary defense is 'Output Encoding', where special characters (like < and >) are converted into safe HTML entities before being displayed, preventing the browser from executing them as script code.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نكتفي باستخدام الأقفال الإلزامية (Mandatory Locks) دائماً بما أنها أكثر أماناً من الأقفال الاستشارية؟</template>
+          <template class="content-en">Why don't we always use Mandatory Locks since they are more secure than Advisory Locks?</template>
+          <span class="content-target">لماذا لا نكتفي باستخدام الأقفال الإلزامية (Mandatory Locks) دائماً بما أنها أكثر أماناً من الأقفال الاستشارية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>على الرغم من أمانها، إلا أن الأقفال الإلزامية تزيد بشكل كبير من خطر حدوث 'الجمود' (Deadlocks) في النظام. إذا تعطل برنامج يحمل قفلاً إلزامياً ولم يحرره، فلن تتمكن أي عملية أخرى من الوصول إلى الملف، مما قد يتطلب إعادة تشغيل النظام. الأقفال الاستشارية توفر مرونة أكبر لتجاوز هذه المشاكل.</p></template>
+          <template class="content-en"><p>Despite their security, mandatory locks significantly increase the risk of 'deadlocks' in the system. If a program holding a mandatory lock crashes and fails to release it, no other process can access the file, potentially requiring a system reboot. Advisory locks offer more flexibility to bypass such issues.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن أن يؤدي الفشل في معالجة مخرجات البرنامج إلى اختراق أمني؟</template>
+          <template class="content-en">How can a failure to handle program output lead to a security breach?</template>
+          <span class="content-target">كيف يمكن أن يؤدي الفشل في معالجة مخرجات البرنامج إلى اختراق أمني؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>إذا قام البرنامج بعرض بيانات غير موثوقة مباشرة على محطة طرفية (Terminal) دون تصفية، يمكن للمهاجم تضمين 'تسلسلات هروب' (Escape Sequences). تقوم المحطة الطرفية بتفسير هذه التسلسلات كأوامر، مما قد يسمح للمهاجم بإعادة برمجة مفاتيح لوحة المفاتيح أو تنفيذ أوامر ضارة بصلاحيات المستخدم الحالي.</p></template>
+          <template class="content-en"><p>If a program displays untrusted data directly to a terminal without sanitization, an attacker can embed 'escape sequences'. The terminal interprets these sequences as commands, which could allow the attacker to reprogram keyboard keys or execute malicious commands with the current user's privileges.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1403,6 +1595,40 @@
         "en": "Changing PATH to point to the attacker's directory containing a malicious script named 'ls'."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو الفرق الرئيسي بين القفل الاستشاري (Advisory Lock) والقفل الإلزامي (Mandatory Lock) للملفات؟",
+      "en": "What is the main difference between an Advisory Lock and a Mandatory Lock for files?"
+    },
+    "back": {
+      "definition": {
+        "ar": "القفل الاستشاري يتطلب من البرامج الأخرى التعاون والتحقق من القفل (يمكن تجاهله)، بينما القفل الإلزامي يفرضه نظام التشغيل بقوة ويمنع أي وصول غير مصرح به.",
+        "en": "An advisory lock requires other programs to cooperatively check for the lock (it can be ignored), whereas a mandatory lock is strictly enforced by the OS, preventing any unauthorized access."
+      },
+      "example": {
+        "ar": "استخدام flock (استشاري) مقابل fcntl (إلزامي) في أنظمة Unix.",
+        "en": "Using flock (advisory) versus fcntl (mandatory) in Unix systems."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "لماذا تتطلب خوارزمية التمزيق الآمن للملفات (Secure File Shredder) استخدام أمر المزامنة (sync)؟",
+      "en": "Why does a Secure File Shredder algorithm require the use of the sync command?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لإجبار نظام التشغيل على تفريغ مخازن الكتابة المؤقتة (Write Buffers) ونقل البيانات فعلياً إلى القرص الصلب المادي قبل حذف الملف.",
+        "en": "To force the operating system to flush its write buffers and physically commit the overwritten data to the hard drive before the file is deleted."
+      },
+      "example": {
+        "ar": "بدون sync، قد يتم حذف الملف من الفهرس بينما لا تزال أنماط التمزيق في الذاكرة العشوائية (RAM)، مما يترك البيانات الأصلية على القرص.",
+        "en": "Without sync, the file might be removed from the index while the shredding patterns are still in RAM, leaving the original data on the disk."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1412,7 +1638,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1428,7 +1654,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1753,6 +1979,70 @@
     },
     "difficulty": "medium",
     "conceptId": "os-interaction-least-privilege"
+  },
+  {
+    "conceptId": "memory-management-race-conditions",
+    "question": {
+      "ar": "أي من آليات قفل الملفات التالية توفر أعلى مستوى من الأمان ضد البرامج الخبيثة التي تحاول الوصول إلى ملف مشترك؟",
+      "en": "Which of the following file locking mechanisms provides the highest level of security against malicious programs attempting to access a shared file?"
+    },
+    "options": {
+      "ar": [
+        "ملف القفل (Lockfile)",
+        "القفل الاستشاري (Advisory Lock)",
+        "القفل الإلزامي (Mandatory Lock)",
+        "استخدام معرف العملية (PID) كاسم للملف"
+      ],
+      "en": [
+        "Lockfile",
+        "Advisory Lock",
+        "Mandatory Lock",
+        "Using the Process ID (PID) as the file name"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "القفل الإلزامي يفرضه نظام التشغيل بقوة، مما يعني أنه لا يمكن لأي برنامج (حتى البرامج الخبيثة التي تتجاهل الأقفال) الوصول إلى الملف حتى يتم تحريره. الأقفال الاستشارية وملفات القفل يمكن تجاهلها.",
+      "en": "A mandatory lock is strictly enforced by the OS, meaning no program (even malicious ones that ignore locks) can access the file until it is released. Advisory locks and lockfiles can be ignored."
+    },
+    "hint": {
+      "ar": "ابحث عن الآلية التي لا تعتمد على 'تعاون' البرامج الأخرى.",
+      "en": "Look for the mechanism that does not rely on the 'cooperation' of other programs."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "program-interaction-and-output",
+    "question": {
+      "ar": "عند تصميم خوارزمية لتمزيق الملفات بشكل آمن (Secure File Shredder)، ما هي الخطوة الحاسمة التي يجب اتخاذها بعد الكتابة فوق محتويات الملف وقبل إغلاقه وحذفه؟",
+      "en": "When designing a Secure File Shredder algorithm, what critical step must be taken after overwriting the file contents and before closing and removing it?"
+    },
+    "options": {
+      "ar": [
+        "تشفير الملف باستخدام خوارزمية AES.",
+        "تغيير أذونات الملف ليصبح للقراءة فقط.",
+        "مزامنة مخازن نظام التشغيل مع الجهاز المادي (sync).",
+        "إعادة تسمية الملف باستخدام معرف العملية (PID)."
+      ],
+      "en": [
+        "Encrypting the file using AES.",
+        "Changing the file permissions to read-only.",
+        "Syncing the file system write buffers with the physical device (sync).",
+        "Renaming the file using the Process ID (PID)."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تستخدم أنظمة التشغيل مخازن مؤقتة (Buffers) لتسريع عمليات الكتابة. إذا لم تقم بمزامنة (sync) هذه المخازن مع القرص المادي، فقد يتم حذف الملف قبل أن تتم الكتابة فوق البيانات فعلياً على القرص المغناطيسي.",
+      "en": "Operating systems use buffers to speed up write operations. If you do not sync these buffers with the physical disk, the file might be deleted before the data is actually overwritten on the magnetic media."
+    },
+    "hint": {
+      "ar": "كيف تتأكد من أن البيانات قد غادرت الذاكرة العشوائية (RAM) ووصلت إلى القرص الصلب؟",
+      "en": "How do you ensure data has left the RAM and reached the hard drive?"
+    },
+    "difficulty": "hard",
+    "id": 12
   }
 ]
 </script>
@@ -1796,6 +2086,14 @@
     <div data-bilingual>
     <template class="content-ar">السبب الجذري لهجمات الحقن (Injection) هو فشل النظام في التمييز بين 'البيانات' و 'التعليمات/الأوامر'.</template>
     <template class="content-en">The root cause of injection attacks is the system's failure to distinguish between 'data' and 'instructions/commands'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن حذف ملف باستخدام أمر نظام التشغيل العادي (مثل rm أو دالة remove) يمحو البيانات نهائياً. هذا فخ! الحذف العادي يزيل المؤشر فقط، وتبقى البيانات على القرص ويمكن استعادتها. يجب استخدام خوارزمية تمزيق آمنة (Secure Shredding) للكتابة فوق البيانات.</template>
+    <template class="content-en">Believing that deleting a file using a standard OS command (like rm or the remove function) erases the data permanently. This is a trap! Normal deletion only removes the pointer, and the data remains on the disk and can be recovered. A secure shredding algorithm must be used to overwrite the data.</template>
     <div class="content-target"></div>
     </div>
   </div>

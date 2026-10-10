@@ -540,8 +540,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>مقارنة طرق فك التشفير:</p><ul><li><b>البحث الجشع (Greedy search):</b> يختار الكلمة ذات الاحتمالية الأعلى في كل خطوة. <i>المشكلة:</i> الخيار الأفضل محلياً قد يؤدي إلى مسار سيء عالمياً.</li><li><b>البحث الشامل (Exhaustive search):</b> يحسب احتمالية كل الجمل الممكنة. <i>المشكلة:</i> بطيء جداً ومستحيل عملياً.</li><li><b>بحث الشعاع (Beam search):</b> يحتفظ بعدد ثابت $k$ (<span class="smart-term" data-term-en="Beam width (k)" data-ar="عرض الشعاع" data-en-def="The fixed-size memory footprint representing the number of hypotheses kept at each step in beam search.">عرض الشعاع<span class="smart-term-tooltip"></span></span>) من الفرضيات في كل خطوة.</li></ul><p><b>خوارزمية بحث الشعاع:</b></p><ol><li>حساب احتمالية كل كلمة في المفردات للخطوة الأولى.</li><li>اختيار أفضل $k$ كلمات (تسمى الفرضيات).</li><li>تمرير كل فرضية لفاصِل التشفير لتوليد الكلمة التالية، مما يوسع الفرضيات.</li><li>تقليم (Prune) الفرضيات للاحتفاظ بأفضل $k$ فرضيات فقط بناءً على مجموع الاحتماليات اللوغاريتمية (Log probability).</li></ol></template>
-    <template class="content-en"><p>Comparison of decoding methods:</p><ul><li><b>Greedy search:</b> Chooses the highest probability word at each step. <i>Problem:</i> A high probability choice at time $t$ might lead to a wrong path at $t+1$.</li><li><b>Exhaustive search:</b> Computes the probability of every possible sentence. <i>Problem:</i> Too slow/intractable.</li><li><b>Beam search:</b> Maintains a fixed number $k$ (beam width) of hypotheses at each step.</li></ul><p><b>Beam Search Algorithm:</b></p><ol><li>Compute softmax over the vocabulary for the first word.</li><li>Select the $k$-best scoring words (initial hypotheses).</li><li>Pass each <span class="smart-term" data-term-en="Hypothesis" data-ar="الفرضية" data-en-def="An output sequence or translation-so-far, together with its probability score.">hypothesis<span class="smart-term-tooltip"></span></span> to the decoder to extend it to every possible next token.</li><li>Prune the expanded hypotheses, keeping only the top $k$ based on their cumulative log probability score.</li></ol></template>
+    <template class="content-ar"><p>مقارنة طرق فك التشفير:</p><ul><li><b>البحث الجشع (Greedy search):</b> يختار الكلمة ذات الاحتمالية الأعلى في كل خطوة. <i>المشكلة:</i> الخيار الأفضل محلياً قد يؤدي إلى مسار سيء عالمياً.</li><li><b>البحث الشامل (Exhaustive search):</b> يحسب احتمالية كل الجمل الممكنة. <i>المشكلة:</i> بطيء جداً ومستحيل عملياً.</li><li><b>بحث الشعاع (Beam search):</b> يحتفظ بعدد ثابت $k$ (<span class="smart-term" data-term-en="Beam width (k)" data-ar="عرض الشعاع" data-en-def="The fixed-size memory footprint representing the number of hypotheses kept at each step in beam search.">عرض الشعاع<span class="smart-term-tooltip"></span></span>) من الفرضيات في كل خطوة.</li></ul><p><b>خوارزمية بحث الشعاع:</b></p><ol><li>حساب احتمالية كل كلمة في المفردات للخطوة الأولى.</li><li>اختيار أفضل $k$ كلمات (تسمى الفرضيات).</li><li>تمرير كل فرضية لفاصِل التشفير لتوليد الكلمة التالية، مما يوسع الفرضيات.</li><li>تقليم (Prune) الفرضيات للاحتفاظ بأفضل $k$ فرضيات فقط بناءً على مجموع الاحتماليات اللوغاريتمية (Log probability).</li></ol><p><b>مثال عملي: بحث الشعاع (k=2)</b></p><p>لنفترض أننا نترجم المدخل "il a m’entarte" (الترجمة المتوقعة: "he hit me with a pie") باستخدام عرض شعاع $k=2$. نتتبع الاحتمالية اللوغاريتمية التراكمية في كل خطوة.</p><ol><li><b>الخطوة 1:</b> من <code>&lt;START&gt;</code>، يتنبأ النموذج بالكلمة الأولى. أفضل فرضيتين هما "he" (الدرجة: -0.7) و "I" (الدرجة: -0.9).</li><li><b>الخطوة 2:</b> نوسع كلتا الفرضيتين. "he" تؤدي إلى "hit" (-1.7) و "struck" (-2.9). "I" تؤدي إلى "was" (-1.6) و "got" (-1.8). نحتفظ بأفضل اثنتين إجمالاً: "was" (-1.6) و "hit" (-1.7).</li><li><b>الخطوة 3:</b> نوسع أفضل اثنتين جديدتين. "hit" تؤدي إلى "a" (-2.8) و "me" (-2.5). "was" تؤدي إلى "hit" (-2.9) و "struck" (-3.8). أفضل اثنتين الآن هما "me" (-2.5) و "a" (-2.8).</li><li><b>الخطوة 4:</b> نوسع مجدداً. "me" تؤدي إلى "with" (-3.3) و "on" (-3.5). "a" تؤدي إلى "tart" (-4.0) و "pie" (-3.4). أفضل اثنتين هما "with" (-3.3) و "pie" (-3.4).</li><li><b>الخطوة 5:</b> "with" تؤدي إلى "a" (-3.7) و "one" (-4.3). "pie" تؤدي إلى "in" (-4.8) و "with" (-4.5). أفضل اثنتين هما "a" (-3.7) و "one" (-4.3).</li><li><b>الخطوة 6:</b> "a" تؤدي إلى "pie" (-4.3) و "tart" (-4.6). "one" تؤدي إلى "pie" (-5.0) و "tart" (-5.3). أفضل اثنتين هما "pie" (-4.3) و "tart" (-4.6).</li></ol><p>الفرضية ذات الدرجة الأعلى في النهاية هي "pie" بدرجة -4.3. نتتبع مسارها العكسي (Backtrack) للحصول على الترجمة النهائية: <code>&lt;START&gt; he hit me with a pie</code>.</p></template>
+    <template class="content-en"><p>Comparison of decoding methods:</p><ul><li><b>Greedy search:</b> Chooses the highest probability word at each step. <i>Problem:</i> A high probability choice at time $t$ might lead to a wrong path at $t+1$.</li><li><b>Exhaustive search:</b> Computes the probability of every possible sentence. <i>Problem:</i> Too slow/intractable.</li><li><b>Beam search:</b> Maintains a fixed number $k$ (beam width) of hypotheses at each step.</li></ul><p><b>Beam Search Algorithm:</b></p><ol><li>Compute softmax over the vocabulary for the first word.</li><li>Select the $k$-best scoring words (initial hypotheses).</li><li>Pass each <span class="smart-term" data-term-en="Hypothesis" data-ar="الفرضية" data-en-def="An output sequence or translation-so-far, together with its probability score.">hypothesis<span class="smart-term-tooltip"></span></span> to the decoder to extend it to every possible next token.</li><li>Prune the expanded hypotheses, keeping only the top $k$ based on their cumulative log probability score.</li></ol><p><b>Worked Example: Beam Search (k=2)</b></p><p>Let's translate the input "il a m’entarte" (Expected: "he hit me with a pie") using a beam width of $k=2$. We track the cumulative log probability at each step.</p><ol><li><b>Step 1:</b> From <code>&lt;START&gt;</code>, the model predicts the first word. The top 2 hypotheses are "he" (score: -0.7) and "I" (score: -0.9).</li><li><b>Step 2:</b> Expand both hypotheses. "he" leads to "hit" (-1.7) and "struck" (-2.9). "I" leads to "was" (-1.6) and "got" (-1.8). We keep the top 2 overall: "was" (-1.6) and "hit" (-1.7).</li><li><b>Step 3:</b> Expand the new top 2. "hit" leads to "a" (-2.8) and "me" (-2.5). "was" leads to "hit" (-2.9) and "struck" (-3.8). The new top 2 are "me" (-2.5) and "a" (-2.8).</li><li><b>Step 4:</b> Expand again. "me" leads to "with" (-3.3) and "on" (-3.5). "a" leads to "tart" (-4.0) and "pie" (-3.4). The top 2 are "with" (-3.3) and "pie" (-3.4).</li><li><b>Step 5:</b> "with" leads to "a" (-3.7) and "one" (-4.3). "pie" leads to "in" (-4.8) and "with" (-4.5). The top 2 are "a" (-3.7) and "one" (-4.3).</li><li><b>Step 6:</b> "a" leads to "pie" (-4.3) and "tart" (-4.6). "one" leads to "pie" (-5.0) and "tart" (-5.3). The top 2 are "pie" (-4.3) and "tart" (-4.6).</li></ol><p>The top-scoring hypothesis is "pie" with a score of -4.3. We <span class="smart-term" data-term-en="Backtrack" data-ar="التتبع العكسي" data-en-def="The process of tracing back from the final chosen node to the start node to retrieve the full generated sequence.">backtrack<span class="smart-term-tooltip"></span></span> through its path to obtain the final translation: <code>&lt;START&gt; he hit me with a pie</code>.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -921,12 +921,12 @@
 
 بعد ذلك، كيف نختار الكلمات؟ لا نستخدم البحث الجشع لأنه متسرع، ولا البحث الشامل لأنه بطيء، بل نستخدم 'بحث الشعاع' (Beam Search) الذي يحتفظ بأفضل k خيارات. تذكروا أن درجاته سالبة (Log probs). 
 
-ماذا لو لم يكن لدينا بيانات كافية؟ نلجأ للترجمة العكسية (Backtranslation) لابتكار بيانات اصطناعية. وأخيراً، كيف نقيم عملنا؟ إما بشرياً (الكفاية والطلاقة) أو آلياً (BLEU للكلمات، chrF للحروف، و BERTSCORE للمعنى العميق). ولا تنسوا القضايا الأخلاقية؛ النماذج قد ترث تحيزاتنا الثقافية (مثل ربط مهن معينة بجنس محدد). بالتوفيق في دراستكم!</template>
+ماذا لو لم يكن لدينا بيانات كافية؟ نلجأ للترجمة العكسية (Backtranslation) لابتكار بيانات اصطناعية. وأخيراً، كيف نقيم عملنا؟ إما بشرياً (الكفاية والطلاقة) أو آلياً (BLEU للكلمات، chrF للحروف، و BERTSCORE للمعنى العميق). ولا تنسوا القضايا الأخلاقية؛ النماذج قد ترث تحيزاتنا الثقافية (مثل ربط مهن معينة بجنس محدد). بالتوفيق في دراستكم!<p>لقد أضفنا مثالاً عملياً مفصلاً لخوارزمية بحث الشعاع (Beam Search). في الاختبار، قد يُطلب منك تتبع شجرة البحث خطوة بخطوة وحساب الدرجات التراكمية لتحديد الفرضيات التي سيتم الاحتفاظ بها أو تقليمها. تأكد من فهمك لكيفية جمع الاحتماليات اللوغاريتمية السلبية.</p></template>
     <template class="content-en">Welcome, friends, to this quick review of Machine Translation. Imagine building a bridge between two cultures; that bridge is the Encoder-Decoder model. The encoder reads and understands the source (creating context), and the decoder writes the translation step-by-step. The magic trick is 'Cross-Attention', allowing the decoder to peek back at the source sentence at every step. For the exam, nail down the difference between self and cross-attention!
 
 Next, how do we pick words? We don't use Greedy (too short-sighted) or Exhaustive (too slow); we use 'Beam Search', keeping the top k paths. Remember, its scores are negative log probabilities.
 
-What if we lack data? We use Backtranslation to hallucinate synthetic data. Finally, evaluation: Human (Adequacy vs. Fluency) or Automatic (BLEU for words, chrF for chars, BERTSCORE for deep meaning). And never forget the ethics; models can inherit our cultural biases (like gender stereotypes). Good luck studying!</template>
+What if we lack data? We use Backtranslation to hallucinate synthetic data. Finally, evaluation: Human (Adequacy vs. Fluency) or Automatic (BLEU for words, chrF for chars, BERTSCORE for deep meaning). And never forget the ethics; models can inherit our cultural biases (like gender stereotypes). Good luck studying!<p>We have added a detailed worked example of the Beam Search algorithm. On the exam, you may be asked to trace a search tree step-by-step and calculate cumulative scores to determine which hypotheses are kept or pruned. Make sure you understand how to add negative log probabilities.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1100,6 +1100,24 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">عن طريق إضافة رموز خاصة (Special tokens) إلى المدخلات، مثل إضافة رمز يحدد لغة المصدر للمشفّر، ورمز يحدد لغة الهدف لفاصِل التشفير.</template>
           <template class="content-en">By adding special tokens to the inputs, such as a token specifying the source language to the encoder, and a token specifying the target language to the decoder.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم تحديث الدرجة التراكمية (Cumulative score) لكل فرضية في خوارزمية بحث الشعاع عند الانتقال من خطوة إلى أخرى؟</template>
+          <template class="content-en">How is the cumulative score of each hypothesis updated in the Beam Search algorithm when moving from one step to the next?</template>
+          <span class="content-target">كيف يتم تحديث الدرجة التراكمية (Cumulative score) لكل فرضية في خوارزمية بحث الشعاع عند الانتقال من خطوة إلى أخرى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يتم تحديث الدرجة عن طريق جمع الاحتمالية اللوغاريتمية (Log probability) للكلمة الجديدة المولدة مع الدرجة التراكمية للفرضية السابقة. نظراً لأن الاحتماليات اللوغاريتمية سالبة، فإن الدرجة التراكمية تصبح أكثر سلبية مع كل خطوة.</p></template>
+          <template class="content-en"><p>The score is updated by adding the log probability of the newly generated word to the cumulative score of the previous hypothesis. Since log probabilities are negative, the cumulative score becomes more negative with each step.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1367,6 +1385,23 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
         "en": "Does not penalize the model for using valid synonyms."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "التتبع العكسي (Backtracking) في بحث الشعاع",
+      "en": "Backtracking in Beam Search"
+    },
+    "back": {
+      "definition": {
+        "ar": "الخطوة النهائية بعد الوصول إلى نهاية التوليد، حيث يتم تتبع المسار من العقدة ذات الدرجة الأعلى للوراء حتى البداية للحصول على الجملة الكاملة.",
+        "en": "The final step after reaching the end of generation, where the path is traced backward from the highest-scoring node to the start to retrieve the full sentence."
+      },
+      "example": {
+        "ar": "تتبع المسار من كلمة 'pie' للوراء للحصول على 'he hit me with a pie'.",
+        "en": "Tracing back from the word 'pie' to get 'he hit me with a pie'."
+      }
+    },
+    "id": 16
   }
 ]
 </script>
@@ -1376,7 +1411,7 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1392,7 +1427,7 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1717,6 +1752,38 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
     },
     "difficulty": "medium",
     "conceptId": "low-resource-mt"
+  },
+  {
+    "conceptId": "decoding-beam-search",
+    "question": {
+      "ar": "في مثال بحث الشعاع (k=2)، إذا كانت الفرضيات الأربع المتاحة في الخطوة 2 هي: 'hit' (-1.7)، 'struck' (-2.9)، 'was' (-1.6)، و 'got' (-1.8). ماذا سيحدث في خطوة التقليم (Pruning)؟",
+      "en": "In the Beam Search example (k=2), if the four available hypotheses at Step 2 are: 'hit' (-1.7), 'struck' (-2.9), 'was' (-1.6), and 'got' (-1.8). What will happen during the pruning step?"
+    },
+    "options": {
+      "ar": [
+        "سيتم الاحتفاظ بـ 'hit' و 'struck' لأنهما يتبعان نفس المسار.",
+        "سيتم الاحتفاظ بـ 'was' و 'hit' لأنهما يمتلكان أعلى درجتين إجمالاً.",
+        "سيتم الاحتفاظ بـ 'was' و 'got' لأنهما يمتلكان أعلى درجتين إجمالاً.",
+        "سيتم الاحتفاظ بـ 'struck' و 'got' لأنهما الأقل سلبية."
+      ],
+      "en": [
+        "We keep 'hit' and 'struck' because they follow the same path.",
+        "We keep 'was' and 'hit' because they have the highest overall scores.",
+        "We keep 'was' and 'got' because they have the highest overall scores.",
+        "We keep 'struck' and 'got' because they are the least negative."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في بحث الشعاع، نقوم بتقليم جميع الفرضيات المتاحة ونحتفظ فقط بأفضل k فرضيات (أعلى درجات، أي الأقرب للصفر). هنا، -1.6 و -1.7 هما الأعلى.",
+      "en": "In beam search, we prune all available hypotheses and keep only the top k (highest scores, i.e., closest to zero). Here, -1.6 and -1.7 are the highest."
+    },
+    "hint": {
+      "ar": "تذكر أن الدرجات سالبة، لذا الرقم الأقرب للصفر هو الأكبر.",
+      "en": "Remember scores are negative, so the number closest to zero is the largest."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1760,6 +1827,14 @@ What if we lack data? We use Backtranslation to hallucinate synthetic data. Fina
     <div data-bilingual>
     <template class="content-ar">الترجمة العكسية (Backtranslation) تستخدم نصوصاً أحادية اللغة في اللغة الهدف، وتترجمها إلى المصدر لإنشاء بيانات تدريب. هذا يضمن أن النموذج يتعلم توليد لغة هدف طبيعية جداً.</template>
     <template class="content-en">Backtranslation uses monolingual texts in the target language and translates them to the source to create training data. This ensures the model learns to generate highly natural target language.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية بحث الشعاع، قد يتم استبعاد الكلمة التي تشكل جزءاً من الترجمة المثلى في خطوة مبكرة إذا كانت الفرضية التي تحتوي عليها لا تقع ضمن أفضل k فرضيات في تلك اللحظة. هذا هو السبب في أن بحث الشعاع لا يضمن الحل الأمثل.</template>
+    <template class="content-en">In Beam Search, a word that is part of the optimal translation might be pruned early if the hypothesis containing it does not rank in the top k at that specific step. This is why beam search does not guarantee the optimal solution.</template>
     <div class="content-target"></div>
     </div>
   </div>

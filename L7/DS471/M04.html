@@ -221,8 +221,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>ينمذج الانحدار الخطي التنبؤات كمجموع مرجح للميزات بالإضافة إلى حد التحيز (Bias term).</p><p>يمكن التعبير عنه بالصيغة الموجهة (Vectorized Form) باستخدام ضرب المصفوفات لزيادة كفاءة الحساب.</p><p><span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">المعادلة العادية<span class="smart-term-tooltip"></span></span> (Normal Equation) توفر طريقة مباشرة لحساب قيم المعلمات المثلى التي تقلل دالة التكلفة (متوسط الخطأ التربيعي MSE). خطوات استخدامها تتضمن</p><ol><li>إضافة عمود من الآحاد لمصفوفة الميزات لحساب التحيز،</li><li>ثم استخدام مكتبة NumPy لحساب المعكوس والضرب النقطي.</li></ol></template>
-    <template class="content-en"><p>Linear Regression models predictions as a weighted sum of features plus a bias term. It uses vectorized form and matrix operations for efficient computation.</p><p>The <span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">Normal Equation<span class="smart-term-tooltip"></span></span> provides a direct method to compute the optimal parameter values that minimize the cost function (Mean Squared Error). Steps to use it include adding a column of ones to the feature matrix to account for the bias term, and using NumPy to calculate the inverse and dot product.</p></template>
+    <template class="content-ar"><p>ينمذج الانحدار الخطي التنبؤات كمجموع مرجح للميزات بالإضافة إلى حد التحيز (Bias term).</p><p>يمكن التعبير عنه بالصيغة الموجهة (Vectorized Form) باستخدام ضرب المصفوفات لزيادة كفاءة الحساب.</p><p><span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">المعادلة العادية<span class="smart-term-tooltip"></span></span> (Normal Equation) توفر طريقة مباشرة لحساب قيم المعلمات المثلى التي تقلل دالة التكلفة (متوسط الخطأ التربيعي MSE). خطوات استخدامها تتضمن</p><ol><li>إضافة عمود من الآحاد لمصفوفة الميزات لحساب التحيز،</li><li>ثم استخدام مكتبة NumPy لحساب المعكوس والضرب النقطي.</li></ol><p>المعادلة الأساسية للانحدار الخطي (Basic Model) تُكتب كالتالي: $\hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \dots + \theta_n x_n$، حيث $\hat{y}$ هي القيمة المتوقعة، و $x_i$ هي قيمة الميزة، و $\theta_j$ هي معلمات النموذج (بما في ذلك حد التحيز $\theta_0$).</p><p>لزيادة كفاءة الحساب، تُستخدم <span class="smart-term" data-term-en="Vectorized Form" data-ar="الصيغة الموجهة" data-en-def="A mathematical representation using vectors and matrices to perform operations on entire datasets simultaneously, avoiding explicit loops.">الصيغة الموجهة<span class="smart-term-tooltip"></span></span> (Vectorized Form): $y = h_\theta(x) = \theta \cdot x$. وباستخدام تدوين المصفوفات، تُكتب كـ $y = \theta^T x$، حيث $\theta^T$ هو منقول متجه المعلمات (Transpose).</p></template>
+    <template class="content-en"><p>Linear Regression models predictions as a weighted sum of features plus a bias term. It uses vectorized form and matrix operations for efficient computation.</p><p>The <span class="smart-term" data-term-en="Normal Equation" data-ar="المعادلة العادية" data-en-def="A closed-form solution that finds the value of theta that minimizes the cost function.">Normal Equation<span class="smart-term-tooltip"></span></span> provides a direct method to compute the optimal parameter values that minimize the cost function (Mean Squared Error). Steps to use it include adding a column of ones to the feature matrix to account for the bias term, and using NumPy to calculate the inverse and dot product.</p><p>The basic equation for the Linear Regression model is written as: $\hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \dots + \theta_n x_n$, where $\hat{y}$ is the predicted value, $x_i$ is the feature value, and $\theta_j$ are the model parameters (including the bias term $\theta_0$).</p><p>For efficient computation, the <span class="smart-term" data-term-en="Vectorized Form" data-ar="الصيغة الموجهة" data-en-def="A mathematical representation using vectors and matrices to perform operations on entire datasets simultaneously, avoiding explicit loops.">Vectorized Form<span class="smart-term-tooltip"></span></span> is used: $y = h_\theta(x) = \theta \cdot x$. Using matrix notation, it is written as $y = \theta^T x$, where $\theta^T$ is the transpose of the parameter vector.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -531,6 +531,36 @@ elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5)
 elastic_net.fit(X, y)</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.base import clone
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+model = clone(early_stopping_model)
+best_val_error = float("inf")
+no_progress = 0
+max_no_progress = 5
+
+for epoch in range(1000):
+    model.fit(X_train, y_train)
+    y_val_predict = model.predict(X_val)
+    val_error = mean_squared_error(y_val, y_val_predict)
+    if val_error &lt; best_val_error:
+        best_val_error = val_error
+        no_progress = 0
+    else:
+        no_progress += 1
+        if no_progress &gt;= max_no_progress:
+            print("Early stopping!")
+            break</code></pre>
+  </div>
+
   <table class="comparison-table">
     <thead><tr><th></th><th>Normal Equation</th><th>SVD</th><th>Gradient Descent</th></tr></thead>
     <tbody>
@@ -749,6 +779,52 @@ print('Recall:', recall_score(y_true, y_pred))
 print('F1 Score:', f1_score(y_true, y_pred))</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+
+y_test = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1]
+y_pred = [0, 1, 0, 0, 0, 0, 0, 1, 1, 1]
+
+cm = confusion_matrix(y_test, y_pred)
+plt.matshow(cm)
+plt.title('Confusion Matrix')
+plt.colorbar()
+plt.ylabel('True Label')
+plt.xlabel('Predicted Label')
+plt.show()</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+
+y_test = [0, 0, 1, 1]
+y_scores = [0.1, 0.4, 0.35, 0.8]
+
+fpr, tpr, _ = roc_curve(y_test, y_scores)
+roc_auc = auc(fpr, tpr)
+
+plt.figure()
+plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc='lower right')
+plt.show()</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا نستخدم درجة F1 بدلاً من المتوسط الحسابي العادي للضبط والاستدعاء؟</template>
@@ -803,6 +879,61 @@ grid_search = GridSearchCV(pipeline, parameters, cv=3)
 grid_search.fit(X_train, y_train)</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+# Create a pipeline with TfidfVectorizer and LogisticRegression
+pipeline = Pipeline([
+    ('vect', TfidfVectorizer()),
+    ('clf', LogisticRegression())
+])
+
+# Define the parameter grid
+parameters = {
+    'vect__max_df': (0.25, 0.5, 0.75),
+    'vect__stop_words': ('english', None),
+    'vect__max_features': (2500, 5000, 10000, None),
+    'vect__ngram_range': ((1, 1), (1, 2)),
+    'vect__use_idf': (True, False),
+    'vect__norm': ('l1', 'l2'),
+    'clf__penalty': ('l1', 'l2'),
+    'clf__C': (0.01, 0.1, 1, 10),
+}
+
+# Setup GridSearchCV
+grid_search = GridSearchCV(pipeline, parameters, n_jobs=-1, verbose=1, scoring='accuracy', cv=3)
+
+# Load data
+df = pd.read_csv('data/sms.csv')
+X, y = df['message'], df['label']
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+# Fit grid search
+grid_search.fit(X_train, y_train)
+
+# Print results
+print('Best score: %0.3f' % grid_search.best_score_)
+print('Best parameters set:')
+best_parameters = grid_search.best_estimator_.get_params()
+for param_name in sorted(parameters.keys()):
+    print('\t%s: %r' % (param_name, best_parameters[param_name]))
+
+# Evaluate on test set
+predictions = grid_search.predict(X_test)
+print('Accuracy:', accuracy_score(y_test, predictions))
+print('Precision:', precision_score(y_test, predictions))
+print('Recall:', recall_score(y_test, predictions))</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">ما هو العيب الرئيسي للبحث الشبكي (Grid Search) وكيف يمكن التخفيف منه؟</template>
@@ -823,8 +954,8 @@ grid_search.fit(X_train, y_train)</code></pre>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. لقد انتقلنا من مجرد رسم خطوط مستقيمة (الانحدار الخطي) إلى اتخاذ قرارات حاسمة (الانحدار اللوجستي). في الامتحان، ركزوا بشدة على فهم 'لماذا' نستخدم تقنية معينة. لماذا نلجأ للانحدار التدريجي (Gradient Descent)؟ لأن المعادلة العادية تنهار مع البيانات الضخمة. لماذا نستخدم التنظيم (L1/L2)؟ لمنع النموذج من حفظ البيانات (Overfitting). تذكروا دائماً أن الانحدار اللوجستي، رغم اسمه، هو خوارزمية تصنيف تستخدم دالة Sigmoid لتحويل الأرقام إلى احتمالات. وأخيراً، لا تنخدعوا بمقياس الدقة (Accuracy) في البيانات غير المتوازنة؛ مصفوفة الارتباك ودرجة F1 هما أصدقاؤكم الحقيقيون هنا. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome to this pivotal module. We've moved from just drawing straight lines (Linear Regression) to making critical decisions (Logistic Regression). For the exam, focus heavily on the 'why'. Why use Gradient Descent? Because the Normal Equation chokes on massive datasets. Why use Regularization (L1/L2)? To stop the model from memorizing data (Overfitting). Always remember that Logistic Regression, despite its name, is a classification algorithm that uses the Sigmoid function to turn numbers into probabilities. Finally, don't be fooled by Accuracy on imbalanced datasets; the Confusion Matrix and F1 Score are your true friends here. Good luck studying!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقاء في هذه الوحدة المحورية. لقد انتقلنا من مجرد رسم خطوط مستقيمة (الانحدار الخطي) إلى اتخاذ قرارات حاسمة (الانحدار اللوجستي). في الامتحان، ركزوا بشدة على فهم 'لماذا' نستخدم تقنية معينة. لماذا نلجأ للانحدار التدريجي (Gradient Descent)؟ لأن المعادلة العادية تنهار مع البيانات الضخمة. لماذا نستخدم التنظيم (L1/L2)؟ لمنع النموذج من حفظ البيانات (Overfitting). تذكروا دائماً أن الانحدار اللوجستي، رغم اسمه، هو خوارزمية تصنيف تستخدم دالة Sigmoid لتحويل الأرقام إلى احتمالات. وأخيراً، لا تنخدعوا بمقياس الدقة (Accuracy) في البيانات غير المتوازنة؛ مصفوفة الارتباك ودرجة F1 هما أصدقاؤكم الحقيقيون هنا. بالتوفيق في دراستكم!<p>لقد قمنا بتعميق فهمنا للأسس الرياضية للانحدار الخطي من خلال استكشاف الصيغ الموجهة، وأضفنا أمثلة برمجية شاملة لخطوط الأنابيب (Pipelines) في البحث الشبكي. كما قدمنا الانحدار متعدد الحدود كجسر حاسم بين النماذج الخطية البسيطة والبيانات المعقدة في العالم الحقيقي، مما يمهد الطريق لفهم أعمق لمرونة النماذج.</p></template>
+    <template class="content-en">Welcome to this pivotal module. We've moved from just drawing straight lines (Linear Regression) to making critical decisions (Logistic Regression). For the exam, focus heavily on the 'why'. Why use Gradient Descent? Because the Normal Equation chokes on massive datasets. Why use Regularization (L1/L2)? To stop the model from memorizing data (Overfitting). Always remember that Logistic Regression, despite its name, is a classification algorithm that uses the Sigmoid function to turn numbers into probabilities. Finally, don't be fooled by Accuracy on imbalanced datasets; the Confusion Matrix and F1 Score are your true friends here. Good luck studying!<p>We have deepened our understanding of the mathematical foundations of linear regression by exploring vectorized forms, and added comprehensive code examples for Pipelines in Grid Search. We also introduced Polynomial Regression as a crucial bridge between simple linear models and complex real-world data, paving the way for a deeper understanding of model flexibility.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -998,6 +1129,24 @@ grid_search.fit(X_train, y_train)</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">المعلمات (مثل الأوزان) يتعلمها النموذج بنفسه من البيانات أثناء التدريب. المعلمات الفائقة (مثل معدل التعلم) يحددها المبرمج قبل بدء التدريب للتحكم في كيفية تعلم النموذج.</template>
           <template class="content-en">Parameters (like weights) are learned by the model itself from the data during training. Hyperparameters (like learning rate) are set by the programmer before training begins to control how the model learns.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كان الانحدار متعدد الحدود ينمذج منحنيات، فلماذا نعتبره نوعاً من الانحدار الخطي؟</template>
+          <template class="content-en">If Polynomial Regression models curves, why is it considered a type of Linear Regression?</template>
+          <span class="content-target">إذا كان الانحدار متعدد الحدود ينمذج منحنيات، فلماذا نعتبره نوعاً من الانحدار الخطي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن كلمة 'خطي' في الإحصاء تشير إلى العلاقة بين المعلمات (الأوزان $\theta$) والنتيجة المتوقعة، وليس العلاقة بين الميزات الأصلية والنتيجة. بما أن المعادلة هي مجموع مرجح للأوزان المضروبة في الميزات (حتى لو كانت الميزات مربعة أو مكعبة)، فإن النموذج يظل خطياً رياضياً ويمكن حله بنفس طرق الانحدار الخطي.</p></template>
+          <template class="content-en"><p>Because 'linear' in statistics refers to the relationship between the parameters (weights $\theta$) and the predicted outcome, not the relationship between the original features and the outcome. Since the equation is a weighted sum of weights multiplied by features (even if those features are squared or cubed), the model remains mathematically linear and can be solved using the same linear regression methods.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
