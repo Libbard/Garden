@@ -38,7 +38,8 @@
   function deps() {
     if (depsP) return depsP;
     depsP = Promise.all([
-      css('notes.css'), css('module-ink.css'),
+      css('notes.css'), css('module-ink.css'), css('surface.css'),
+      js('menu.js', function () { return !!window.GardenMenu; }),
       js('notes-ink-codec.js', function () { return !!window.GardenInkCodec; }),
       js('notes-input.js', function () { return !!window.GardenInkInput; }),
       js('notes-icons.js', function () { return !!window.GardenNotesIcons; }),
@@ -218,6 +219,42 @@
     return regs;
   }
 
+  var MCODE = { flash: 'f', full: 'u', deep: 'd', base: 'b' };
+  function mcode(k) { var m = k.split('|')[1] || ''; return MCODE[m] || (m.charAt(0) || 'z'); }
+  function bridgeKey(lay, a, b) {
+    var c = '', i;
+    for (i = a; i <= b; i++) c += mcode(lay[i].key);
+    return 'x-' + (b - a + 1) + '-' + lay[a].el.id + '|' + c;
+  }
+  function bridgeAt(lay, key) {
+    var m = /^x-(\d+)-(.+)\|([a-z]+)$/.exec(key);
+    if (!m) return -1;
+    var n = +m[1], i;
+    for (i = 0; i < lay.length; i++) {
+      if (lay[i].el.id !== m[2]) continue;
+      if (i + n - 1 >= lay.length || bridgeKey(lay, i, i + n - 1) !== key) return -1;
+      return i;
+    }
+    return -1;
+  }
+  function liveBridges(lay) {
+    var out = [], seen = {}, k;
+    var add = function (key) {
+      if (seen[key] || key.indexOf('x-') !== 0) return;
+      seen[key] = 1;
+      var i = bridgeAt(lay, key);
+      if (i >= 0) out.push({ key: key, top: lay[i].top, i: i });
+    };
+    if (S.store) for (k in S.store.L) if (Object.prototype.hasOwnProperty.call(S.store.L, k)) add(k);
+    for (k in S.mem) if (Object.prototype.hasOwnProperty.call(S.mem, k) && S.mem[k] && S.mem[k].length) add(k);
+    return out;
+  }
+
+  function regionOf(lay, y) {
+    for (var r = 0; r < lay.length; r++) if (y < lay[r].end || r === lay.length - 1) return r;
+    return lay.length - 1;
+  }
+
   function sheetH() {
     var r = S.lay || layout();
     return r.length ? r[r.length - 1].end : 400;
@@ -250,14 +287,21 @@
 
   function split() {
     if (!S.ov || !S.ov.cv || !S.lay) return;
-    var els = S.ov.cv.els || [], by = {}, i, r;
-    for (i = 0; i < S.lay.length; i++) by[S.lay[i].key] = [];
+    var els = S.ov.cv.els || [], by = {}, i, lay = S.lay, G = window.GardenCanvas;
+    for (i = 0; i < lay.length; i++) by[lay[i].key] = [];
+    (S.vis || []).forEach(function (b) { by[b.key] = []; });
     for (i = 0; i < els.length; i++) {
-      var y = anchorY(els[i]);
-      for (r = 0; r < S.lay.length; r++) {
-        var g = S.lay[r];
-        if (y < g.end || r === S.lay.length - 1) { by[g.key].push(shifted(els[i], -g.top)); break; }
+      var a = regionOf(lay, anchorY(els[i])), lo = a, hi = a;
+      var bb = G.bboxOf ? G.bboxOf(els[i]) : null;
+      if (bb) {
+        lo = regionOf(lay, bb.y); hi = regionOf(lay, bb.y + bb.h);
+        while (hi > lo && bb.y + bb.h < lay[hi].top + 8) hi--;
+        while (lo < hi && bb.y > lay[lo].bot - 8) lo++;
+        if (lo === hi) lo = hi = Math.max(lo, Math.min(hi, a));
       }
+      if (lo === hi) { by[lay[lo].key].push(shifted(els[i], -lay[lo].top)); continue; }
+      var bk = bridgeKey(lay, lo, hi);
+      (by[bk] = by[bk] || []).push(shifted(els[i], -lay[lo].top));
     }
     for (var key in by) {
       if (!Object.prototype.hasOwnProperty.call(by, key)) continue;
@@ -336,12 +380,14 @@
   function compose() {
     if (!S.ov) return Promise.resolve();
     S.lay = layout();
-    var lay = S.lay;
-    return Promise.all(lay.map(function (g) { return unpackLayer(g.key); })).then(function (lists) {
+    var lay = S.lay, vis = liveBridges(lay);
+    var parts = lay.map(function (g) { return { key: g.key, top: g.top }; }).concat(vis);
+    return Promise.all(parts.map(function (g) { return unpackLayer(g.key); })).then(function (lists) {
       if (lay !== S.lay || !S.ov) return;
+      S.vis = vis;
       var all = [];
       lists.forEach(function (list, i) {
-        list.forEach(function (e) { var c = shifted(e, lay[i].top); c.id = nid(); all.push(c); });
+        list.forEach(function (e) { var c = shifted(e, parts[i].top); c.id = nid(); all.push(c); });
       });
       S.ov.fit();
       var cv = S.ov.cv;
@@ -452,22 +498,226 @@
     S.ov.toggle(S.drawing);
     if (S.fab) {
       S.fab.setAttribute('aria-pressed', S.drawing ? 'true' : 'false');
-      var t = S.drawing ? L('أخفِ أدواتِ الرسم', 'Hide drawing tools') : L('أظهِرْ أدواتِ الرسم', 'Show drawing tools');
+      var k = keyLabel(), ar = S.drawing ? 'أوقفِ القلم' : 'شغّلِ القلم', en = S.drawing ? 'Pen off' : 'Pen on';
+      var t = L(ar, en) + (k ? ' (' + k + ')' : '');
       S.fab.setAttribute('aria-label', t); S.fab.title = t;
-      S.fab.setAttribute('data-ar-title', S.drawing ? 'أخفِ أدواتِ الرسم' : 'أظهِرْ أدواتِ الرسم');
-      S.fab.setAttribute('data-en-title', S.drawing ? 'Hide drawing tools' : 'Show drawing tools');
+      S.fab.setAttribute('data-ar-title', ar + (k ? ' (' + k + ')' : ''));
+      S.fab.setAttribute('data-en-title', en + (k ? ' (' + k + ')' : ''));
+    }
+  }
+
+  var DEF_KEY = 'key:Alt+KeyP';
+  function penKeys() {
+    var X = window.GardenInkInput, out = [];
+    if (X && X.devProfile) X.devProfile().binds.forEach(function (b) { if (b.a === 'tools' && b.t.indexOf('key:') === 0) out.push(b.t); });
+    return out.length ? out : [DEF_KEY];
+  }
+  function keyLabel() {
+    var X = window.GardenInkInput;
+    return X && X.trigLabel ? X.trigLabel(penKeys()[0]) : 'Alt + P';
+  }
+
+  function key() {
+    if (S.busy) return Promise.resolve();
+    if (!S.on) return enable();
+    setDrawing(!S.drawing);
+    return Promise.resolve();
+  }
+
+  function onPenWake(e) {
+    if (!S.on || S.drawing || e.pointerType !== 'pen') return;
+    var X = window.GardenInkInput, t = X && X.trigOf ? X.trigOf(e) : null;
+    if (!t || X.actFor(t) !== 'tools') return;
+    e.preventDefault(); e.stopPropagation();
+    setDrawing(true);
+  }
+
+  var TAP_SEL = 'a[href], button, summary, label, input, select, textarea, [role="button"], [role="tab"], [tabindex]:not([tabindex="-1"])';
+  function pass(x, y, src) {
+    if (!S.ov || !S.ov.host) return false;
+    var host = S.ov.host, list = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [], el = null, i;
+    for (i = 0; i < list.length; i++) {
+      if (host.contains(list[i]) || (list[i].closest && list[i].closest('.ndl, .nip, .mi-dock'))) continue;
+      el = list[i]; break;
+    }
+    var t = el && el.closest ? el.closest(TAP_SEL) : null;
+    if (!t) return false;
+    if (src === 'touch' && t.tagName === 'A' && !/^#/.test(t.getAttribute('href') || '')) return false;
+    if (/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName) && !/^(checkbox|radio|button|submit)$/.test(t.type || '')) {
+      try { t.focus({ preventScroll: true }); } catch (e) {}
+      return true;
+    }
+    t.click();
+    return true;
+  }
+
+  var BIN = 'garden_mink_bin:' + pageKey();
+  function visibleKeys() {
+    var out = [];
+    (S.lay || []).forEach(function (g) { out.push(g.key); });
+    (S.vis || []).forEach(function (b) { out.push(b.key); });
+    return out;
+  }
+  function wipe(all) {
+    if (!S.on || !S.ov || !S.ov.cv) return Promise.resolve(0);
+    split();
+    clearTimeout(S.saveT);
+    return persist().then(function () {
+      var st = readStore(), keys = all ? Object.keys(st.L) : visibleKeys().filter(function (k) { return !!st.L[k]; });
+      if (!keys.length) return 0;
+      var bin = { at: Date.now(), L: {} }, n = 0;
+      st.pend = st.pend || {}; st.dt = st.dt || {};
+      keys.forEach(function (k) {
+        bin.L[k] = st.L[k];
+        delete st.L[k]; st.pend[k] = 'del'; st.dt[k] = Date.now();
+        S.mem[k] = []; S.sig[k] = sigOf([]);
+        n++;
+      });
+      try { localStorage.setItem(BIN, JSON.stringify(bin)); } catch (e) {}
+      writeStore(st);
+      S.store = st;
+      schedulePush();
+      markBtn();
+      return compose().then(function () { undoBar(n); return n; });
+    });
+  }
+  function readBin() {
+    try { var b = JSON.parse(localStorage.getItem(BIN) || 'null'); return (b && b.L && Object.keys(b.L).length) ? b : null; }
+    catch (e) { return null; }
+  }
+  function restore() {
+    var bin = readBin();
+    if (!bin || !S.on) return Promise.resolve(0);
+    if (S.ov && S.ov.cv) split();
+    clearTimeout(S.saveT);
+    return persist().then(function () {
+      var st = readStore(), t = Date.now(), n = 0;
+      st.pend = st.pend || {}; st.dt = st.dt || {};
+      Object.keys(bin.L).forEach(function (k) {
+        if (st.L[k]) return;
+        st.L[k] = Object.assign({}, bin.L[k], { t: t });
+        st.pend[k] = 'set'; delete st.dt[k];
+        delete S.mem[k]; delete S.sig[k];
+        n++;
+      });
+      try { localStorage.removeItem(BIN); } catch (e) {}
+      writeStore(st);
+      S.store = st;
+      schedulePush();
+      markBtn();
+      return compose().then(function () { return n; });
+    });
+  }
+
+  function undoBar(n) {
+    var old = document.querySelector('.mi-undo');
+    if (old) old.remove();
+    var bar = document.createElement('div');
+    bar.className = 'mi-undo';
+    bar.setAttribute('role', 'status');
+    bar.innerHTML = '<span></span><button type="button" class="gsf-btn gsf-btn--sm"></button>';
+    bar.firstChild.textContent = L('مُسح الرسم', 'Drawings cleared') + ' · ' + n + ' ' + L(n === 1 ? 'طبقة' : 'طبقات', n === 1 ? 'layer' : 'layers');
+    bar.lastChild.textContent = L('تراجع', 'Undo');
+    bar.lastChild.addEventListener('click', function () { bar.remove(); restore(); });
+    document.body.appendChild(bar);
+    setTimeout(function () { if (bar.isConnected) bar.remove(); }, 9000);
+  }
+
+  var POS = 'garden_mi_dock';
+  function readPos() {
+    try { var p = JSON.parse(localStorage.getItem(POS) || 'null'); return (p && isFinite(p.x) && isFinite(p.y)) ? p : null; }
+    catch (e) { return null; }
+  }
+  function placeDock(p) {
+    var d = S.dock;
+    if (!d) return;
+    if (!p) { d.style.left = d.style.top = ''; d.removeAttribute('data-moved'); return; }
+    var z = parseFloat(getComputedStyle(d).zoom) || 1;
+    var w = (d.offsetWidth || 90) * z, h = (d.offsetHeight || 48) * z, vw = window.innerWidth, vh = window.innerHeight, pad = 8;
+    var x = Math.max(pad, Math.min(vw - w - pad, p.x * vw - w / 2));
+    var y = Math.max(pad, Math.min(vh - h - pad, p.y * vh - h / 2));
+    d.style.left = Math.round(x / z) + 'px'; d.style.top = Math.round(y / z) + 'px';
+    d.setAttribute('data-moved', '1');
+  }
+
+  function openMenu() {
+    var M = window.GardenMenu;
+    if (!M || !S.more) return;
+    var st = readStore(), vis = visibleKeys().filter(function (k) { return !!st.L[k]; }).length;
+    var all = Object.keys(st.L).length, bin = readBin();
+    var h = M.head(L('الرسمُ في هذه الصفحة', 'Drawings on this page')) +
+      M.item('wipe-vis', 'fa-eraser', L('امسحِ الظاهرَ الآن', 'Clear what you see now'), { off: !vis }) +
+      M.item('wipe-all', 'fa-trash-can', L('امسحْ كلَّ رسم الصفحة · كلُّ الأنماط', 'Clear every drawing · all modes'), { off: !all, danger: true }) +
+      M.item('restore', 'fa-rotate-left', L('استعِدْ آخرَ ما مُسح', 'Bring back the last clear'), { off: !bin }) +
+      M.sep() +
+      M.head(L('اختصارُ القلم', 'Pen shortcut') + ': ' + keyLabel()) +
+      M.item('keys', 'fa-keyboard', L('غيِّرِ الاختصارَ أو اربطْه بزرٍّ', 'Change the shortcut or bind a button')) +
+      M.item('home', 'fa-arrows-to-dot', L('أعِدِ الزرَّ إلى مكانه', 'Put the button back'), { off: !readPos() });
+    var r = S.more.getBoundingClientRect();
+    var el = M.open(r.left, r.top, h, function (act) {
+      if (act === 'wipe-vis') wipe(false);
+      else if (act === 'wipe-all') wipe(true);
+      else if (act === 'restore') restore();
+      else if (act === 'home') { try { localStorage.removeItem(POS); } catch (e) {} placeDock(null); }
+      else if (act === 'keys') {
+        if (!S.drawing) setDrawing(true);
+        var dl = S.ov && S.ov.dial;
+        if (dl && dl.togglePanel) { try { localStorage.setItem('garden_ink_panel_tab', 'binds'); } catch (e2) {} dl.togglePanel(true); if (dl.panel) { dl.panel.tab = 'binds'; dl.panel.render(); } }
+      }
+    }, { label: L('خياراتُ الرسم', 'Drawing options'), cls: 'mi-menu' });
+    if (el) {
+      var er = el.getBoundingClientRect();
+      var top = r.top - er.height - 8;
+      if (top < 8) top = r.bottom + 8;
+      el.style.insetBlockStart = (parseFloat(el.style.insetBlockStart || '0') + top - er.top) + 'px';
     }
   }
 
   function buildFab() {
-    if (S.fab) { S.fab.hidden = false; return; }
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'mi-fab';
-    b.innerHTML = '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i>';
-    b.addEventListener('click', function () { setDrawing(!(S.ov && S.ov.on)); });
-    document.body.appendChild(b);
-    S.fab = b;
+    if (S.dock) { S.dock.hidden = false; placeDock(readPos()); return; }
+    var d = document.createElement('div');
+    d.className = 'mi-dock';
+    d.innerHTML = '<button type="button" class="mi-more" aria-haspopup="menu"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>' +
+      '<button type="button" class="mi-fab"><i class="fa-solid fa-pen-nib" aria-hidden="true"></i></button>';
+    var b = d.lastChild, m = d.firstChild;
+    var mt = L('خياراتُ الرسم: المسحُ والاختصار', 'Drawing options: clear and shortcut');
+    m.title = mt; m.setAttribute('aria-label', mt);
+    m.setAttribute('data-ar-title', 'خياراتُ الرسم: المسحُ والاختصار'); m.setAttribute('data-en-title', 'Drawing options: clear and shortcut');
+    m.addEventListener('click', openMenu);
+    var drag = null;
+    b.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      drag = { x: e.clientX, y: e.clientY, id: e.pointerId, moved: false, r: d.getBoundingClientRect() };
+      try { b.setPointerCapture(e.pointerId); } catch (e2) {}
+    });
+    b.addEventListener('pointermove', function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
+      drag.moved = true;
+      d.setAttribute('data-drag', '1');
+      placeDock({ x: (drag.r.left + drag.r.width / 2 + dx) / window.innerWidth, y: (drag.r.top + drag.r.height / 2 + dy) / window.innerHeight });
+    });
+    var end = function (e) {
+      if (!drag || e.pointerId !== drag.id) return;
+      var was = drag;
+      drag = null;
+      d.removeAttribute('data-drag');
+      if (!was.moved) return;
+      S.fabDragged = Date.now();
+      var r = d.getBoundingClientRect();
+      var p = { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight };
+      try { localStorage.setItem(POS, JSON.stringify(p)); } catch (e3) {}
+    };
+    b.addEventListener('pointerup', end);
+    b.addEventListener('pointercancel', end);
+    b.addEventListener('click', function () {
+      if (S.fabDragged && Date.now() - S.fabDragged < 400) return;
+      setDrawing(!(S.ov && S.ov.on));
+    });
+    document.body.appendChild(d);
+    S.dock = d; S.fab = b; S.more = m;
+    placeDock(readPos());
   }
 
   function markBtn() {
@@ -503,13 +753,16 @@
         scroller: scroller, stage: S.main, sheet: S.main, bound: true, refW: SHEET,
         lineSel: LINE_SEL, surface: 'module',
         heightOf: sheetH,
+        onPass: pass,
         onChange: function () { split(); }
       });
+      if (S.ov.dial) S.ov.dial.onExit = function () { setDrawing(false); };
       S.ov.show();
       S.on = true;
       buildFab();
       document.addEventListener('click', onDepthClick, true);
       document.addEventListener('click', blockFold, true);
+      window.addEventListener('pointerdown', onPenWake, true);
       window.addEventListener('resize', onResize);
       if (window.ResizeObserver) {
         S.ro = new ResizeObserver(relayout);
@@ -530,6 +783,7 @@
 
   function onResize() {
     if (!S.on) return;
+    placeDock(readPos());
     fitZoom();
     if (S.ov) S.ov.fit();
   }
@@ -540,11 +794,14 @@
     var flush = persist();
     document.removeEventListener('click', onDepthClick, true);
     document.removeEventListener('click', blockFold, true);
+    window.removeEventListener('pointerdown', onPenWake, true);
     window.removeEventListener('resize', onResize);
     if (S.ro) { S.ro.disconnect(); S.ro = null; }
     if (S.ov) { try { S.ov.destroy(); } catch (e) {} S.ov = null; }
-    if (S.fab) S.fab.hidden = true;
-    S.on = false; S.drawing = false; S.lay = null;
+    if (S.dock) S.dock.hidden = true;
+    var ub = document.querySelector('.mi-undo');
+    if (ub) ub.remove();
+    S.on = false; S.drawing = false; S.lay = null; S.vis = [];
     if (S.main) { S.main.style.zoom = ''; closeFolds(); markFree(false); }
     document.documentElement.classList.remove('mi-on', 'nov-drawing');
     forceViewport(false);
@@ -559,6 +816,10 @@
 
   window.GardenModuleInk = {
     toggle: toggle,
+    key: key,
+    keys: penKeys,
+    wipe: wipe,
+    restore: restore,
     enable: enable,
     disable: disable,
     bind: function (btn) { S.btn = btn; markBtn(); },

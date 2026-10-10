@@ -658,6 +658,36 @@
     return true;
   };
 
+  var EAT_SKIP = '.mi-dock, .g-header, .gsf-menu';
+  function eat(e) {
+    var t = e && e.target;
+    if (!e || e.type !== 'pointerdown' || (t && t.closest && t.closest(EAT_SKIP))) return false;
+    var id = e.pointerId, t0 = Date.now();
+    e.preventDefault();
+    e.stopPropagation();
+    var stop = function (ev) {
+      if (ev.pointerId !== id) return;
+      ev.preventDefault(); ev.stopPropagation();
+      if (ev.type !== 'pointermove') off();
+    };
+    var clk = function (ev) {
+      document.removeEventListener('click', clk, true);
+      if (Date.now() - t0 > 900) return;
+      ev.preventDefault(); ev.stopPropagation();
+    };
+    var off = function () {
+      document.removeEventListener('pointermove', stop, true);
+      document.removeEventListener('pointerup', stop, true);
+      document.removeEventListener('pointercancel', stop, true);
+      setTimeout(function () { document.removeEventListener('click', clk, true); }, 900);
+    };
+    document.addEventListener('pointermove', stop, true);
+    document.addEventListener('pointerup', stop, true);
+    document.addEventListener('pointercancel', stop, true);
+    document.addEventListener('click', clk, true);
+    return true;
+  }
+
   function typing(t) {
     return !!(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)));
   }
@@ -714,6 +744,8 @@
     this.palmDef = o.palmDefault || '';
     this.profile = o.profile || new Profile();
     this.onDouble = o.onDouble || null;
+    this.onPass = o.onPass || null;
+    this.passing = {};
     this.live = {};
     this.gest = {};
     this.swallow = {};
@@ -828,6 +860,20 @@
     return 'draw';
   };
 
+  Router.prototype.srcOff = function (e) {
+    if (e.pointerType === 'mouse') return !this.profile.mouseIsTwin() && devProfile().src.mouse === 'off';
+    if (e.pointerType === 'touch') return palmMode(this.palmDef) === 'off' && !(e.width >= PALM_AREA || e.height >= PALM_AREA);
+    return false;
+  };
+
+  Router.prototype.passable = function (g) {
+    if (!this.onPass || !g || g.act === 'hand' || g.multi || g.palm) return false;
+    if (g.src !== 'mouse' && g.src !== 'touch') return false;
+    if ((g.moved || 0) >= TAP_PX || now() - (g.t0 || 0) > 450) return false;
+    if (g.src === 'touch' && (this.drawingCount() > 0 || (this.profile.lastPenAt && now() - this.profile.lastPenAt < 700))) return false;
+    return true;
+  };
+
   Router.prototype.drawingCount = function () {
     var n = 0;
     for (var k in this.live) if (this.live[k]) n++;
@@ -928,13 +974,20 @@
         return;
       }
       var verdict = self.classify(e);
-      if (verdict === 'reject') { e.preventDefault(); return; }
+      if (verdict === 'reject') {
+        e.preventDefault();
+        if (self.onPass && self.srcOff(e)) self.passing[e.pointerId] = { x: e.clientX, y: e.clientY, t0: now(), src: e.pointerType };
+        return;
+      }
 
       /*@3.NOIJ2.22*/
       if ((!mod && (verdict === 'gesture' || self.mode() === 'pan')) || act === 'hand') {
         e.preventDefault();
         self.cancelProvisional();
-        self.gest[e.pointerId] = Object.assign(self.gpt(e), { src: e.pointerType, t0: now(), moved: 0, act: act === 'hand' ? 'hand' : null });
+        var multi = self.gestureCount() > 0;
+        if (multi) for (var gk in self.gest) if (self.gest[gk]) self.gest[gk].multi = 1;
+        self.gest[e.pointerId] = Object.assign(self.gpt(e), { src: e.pointerType, t0: now(), moved: 0, act: act === 'hand' ? 'hand' : null,
+          px: e.clientX, py: e.clientY, multi: multi ? 1 : 0, palm: (e.width >= PALM_AREA || e.height >= PALM_AREA) ? 1 : 0 });
         try { el.setPointerCapture(e.pointerId); } catch (err) {}
         self.emitGesture('start');
         return;
@@ -1012,9 +1065,16 @@
     this._up = function (e) {
       self._cr = null;
       if (self.swallow[e.pointerId]) { delete self.swallow[e.pointerId]; return; }
+      var ps = self.passing[e.pointerId];
+      if (ps) {
+        delete self.passing[e.pointerId];
+        if (e.type === 'pointerup' && Math.abs(e.clientX - ps.x) + Math.abs(e.clientY - ps.y) < TAP_PX && now() - ps.t0 < 600) self.onPass(ps.x, ps.y, ps.src);
+        return;
+      }
       if (self.gest[e.pointerId]) {
         var gg = self.gest[e.pointerId];
         delete self.gest[e.pointerId];
+        if (e.type === 'pointerup' && self.passable(gg)) self.onPass(gg.px, gg.py, gg.src);
         self.noteTap(gg);
         self.emitGesture(self.gestureCount() ? 'move' : 'end');
         if (gg.act === 'hand' && (gg.moved || 0) < TAP_PX && now() - (gg.t0 || 0) < 400 && self.onEndMod) {
@@ -1112,6 +1172,7 @@
     mods: function (adapter) { return new Mods(adapter); },
     splitAct: splitAct,
     keys: keys,
+    eat: eat,
     ring: ring,
     keyOf: keyOf,
     penKeys: penKeys,

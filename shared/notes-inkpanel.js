@@ -19,8 +19,8 @@
     { k: 'text', icon: 'fa-i-cursor', ar: 'نصّ', en: 'Text', cap: 'text' }
   ];
   var SHAPE_TOOLS = { rect: 1, ell: 1, line: 1, arr: 1, shp: 1 };
-  var MOUSE = [['draw', 'ترسم', 'Draws'], ['pan', 'تمرّر', 'Scrolls'], ['off', 'لا تفعل شيئاً', 'Does nothing']];
-  var TOUCH = [['auto', 'تلقائيّ', 'Automatic'], ['draw', 'يرسم', 'Draws'], ['pan', 'يمرّر', 'Scrolls'], ['off', 'لا يفعل شيئاً', 'Does nothing']];
+  var MOUSE = [['draw', 'ترسم', 'Draws'], ['pan', 'تمرّر', 'Scrolls'], ['off', 'تنقر في الصفحة فقط', 'Clicks the page only']];
+  var TOUCH = [['auto', 'تلقائيّ', 'Automatic'], ['draw', 'يرسم', 'Draws'], ['pan', 'يمرّر', 'Scrolls'], ['off', 'ينقر في الصفحة فقط', 'Taps the page only']];
   var HOW = [['auto', 'تلقائيّ', 'Automatic'], ['hold', 'ما دام مضغوطاً', 'While held'], ['toggle', 'يبدّل', 'Toggles']];
   var OS_ICON = { windows: 'fa-laptop', mac: 'fa-laptop', chromebook: 'fa-laptop', android: 'fa-tablet-screen-button',
                   ipad: 'fa-tablet-screen-button', iphone: 'fa-mobile-screen', other: 'fa-laptop' };
@@ -82,6 +82,7 @@
       var t = e.target;
       if (t && t.closest && (t.closest('.nip') || t.closest('.ndl') || t.closest('dialog') || t.closest('.nsw-bd') || t.closest('.nsw'))) return;
       self.toggle(false);
+      if (window.GardenInkInput && GardenInkInput.eat) GardenInkInput.eat(e);
     };
     document.addEventListener('pointerdown', this._outside, true);
     var drag = null;

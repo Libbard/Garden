@@ -2862,6 +2862,7 @@
       var t = e.target;
       if (t && t.closest && (t.closest('.ndl') || t.closest('.nip') || t.closest('.ndl-dock') || t.closest('dialog'))) return;
       self.setOpen(false);
+      if (I2 && I2.eat) I2.eat(e);
     };
     document.addEventListener('pointerdown', this._outside, true);
 

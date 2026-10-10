@@ -592,6 +592,26 @@
       } catch (eMi) {}
       inkBtn.addEventListener('click', function () { _openModuleInk(inkBtn); });
       inline.appendChild(inkBtn);
+      window.addEventListener('keydown', function (e) {
+        if (e.repeat || e.defaultPrevented || !e.code || /^(Control|Shift|Alt|Meta)/.test(e.code)) return;
+        var t = e.target;
+        if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable || (t.closest && t.closest('dialog[open]')))) return;
+        var c = 'key:' + (e.ctrlKey ? 'Ctrl+' : '') + (e.altKey ? 'Alt+' : '') + (e.shiftKey ? 'Shift+' : '') + (e.metaKey ? 'Meta+' : '') + e.code;
+        var want = [];
+        if (window.GardenModuleInk && GardenModuleInk.keys) want = GardenModuleInk.keys();
+        else {
+          try {
+            var pr = JSON.parse(localStorage.getItem('garden_ink_dev_' + (localStorage.getItem('garden_device_id') || '')) || 'null');
+            if (pr && Array.isArray(pr.binds)) pr.binds.forEach(function (x) { if (x.a === 'tools' && String(x.t).indexOf('key:') === 0) want.push(x.t); });
+          } catch (eK) {}
+          if (!want.length) want = ['key:Alt+KeyP'];
+        }
+        if (want.indexOf(c) < 0) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (window.GardenModuleInk && GardenModuleInk.key) { GardenModuleInk.bind(inkBtn); GardenModuleInk.key(); }
+        else _openModuleInk(inkBtn);
+      }, true);
     }
 
     /*@3.GAHJ.49*/

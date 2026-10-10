@@ -385,6 +385,7 @@
     this.onBand = o.onBand || function () {};
     this.onAdd = o.onAdd || function () {};
     this.onTap = o.onTap || function () {};
+    this.onPass = o.onPass || null;
     this.unview = o.unview || null;
     /*@3.NOCJ.116*/
     this.onTextAt = o.onTextAt || null;
@@ -2017,6 +2018,7 @@
       mode: function () { return self.tool === 'hand' ? 'pan' : 'draw'; },
       onEndMod: function (info) { self.endMod(info); },
       onDouble: function () { self.dropDot(); },
+      onPass: function (x, y, src) { if (self.onPass) self.onPass(x, y, src); },
 
       onBegin: function (id, pt, ptype, act) {
         if (act) { self.beginMod(act); self._modDid = false; }

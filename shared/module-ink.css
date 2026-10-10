@@ -14,18 +14,43 @@ html.mi-on .main-content > section {
 }
 html.mi-on .main-content > .fade-up { opacity: 1; transform: none; animation: none; transition: none; }
 html.mi-vp aside.sidebar { display: none; }
-html.mi-vp .ndl, html.mi-vp .nip, html.mi-vp .mi-fab { zoom: var(--mi-ui, 1); }
+html.mi-vp .ndl, html.mi-vp .nip, html.mi-vp .mi-dock, html.mi-vp .mi-undo { zoom: var(--mi-ui, 1); }
+html.mi-on .main-content .depth-tabs { position: relative; z-index: 31; }
 
 html.mi-on .nov-host .nc-wrap,
 html.mi-on .nov-host .nc-wet { touch-action: pinch-zoom; }
 html.nov-drawing .main-content { user-select: none; -webkit-user-select: none; cursor: crosshair; }
 html.nov-drawing .main-content > .mi-free { user-select: auto; -webkit-user-select: auto; cursor: auto; }
 
-.mi-fab {
+.mi-dock {
   position: fixed;
   inset-block-end: calc(1.75rem + var(--sa-b, 0px));
   inset-inline-end: 1.25rem;
   z-index: 330;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  touch-action: none;
+}
+.mi-dock[data-moved="1"] { inset-block-end: auto; inset-inline-end: auto; }
+.mi-dock[hidden] { display: none; }
+.mi-dock[data-drag="1"] .mi-fab { cursor: grabbing; box-shadow: 0 10px 26px rgba(0, 0, 0, .35); }
+.mi-more {
+  inline-size: 30px;
+  block-size: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  display: grid;
+  place-items: center;
+  font-size: .8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .2);
+  cursor: pointer;
+}
+.mi-more:hover { color: var(--text-primary); }
+.mi-more:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+.mi-fab {
   inline-size: 48px;
   block-size: 48px;
   border-radius: 50%;
@@ -38,7 +63,25 @@ html.nov-drawing .main-content > .mi-free { user-select: auto; -webkit-user-sele
   box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
   cursor: pointer;
 }
-.mi-fab[hidden] { display: none; }
+.mi-fab { touch-action: none; }
+.mi-undo {
+  position: fixed;
+  inset-block-end: calc(1.5rem + var(--sa-b, 0px));
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  z-index: 1240;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem .6rem .5rem .9rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: .85rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+}
+[dir="rtl"] .mi-undo { translate: 50% 0; }
 .mi-fab[aria-pressed="true"] {
   color: var(--brand-500);
   border-color: color-mix(in oklab, var(--brand-500) 55%, transparent);
